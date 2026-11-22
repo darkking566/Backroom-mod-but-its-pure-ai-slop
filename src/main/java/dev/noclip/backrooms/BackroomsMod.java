@@ -19,7 +19,9 @@ public final class BackroomsMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		ModBlocks.register();
+		ModSounds.register();
 		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, id("level_0"), Level0ChunkGenerator.CODEC);
 		Noclip.register();
+		Level0Ambience.register();
 	}
 }

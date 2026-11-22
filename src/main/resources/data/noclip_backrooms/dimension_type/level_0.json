@@ -1,9 +1,6 @@
 {
   "ambient_light": 0.0,
   "attributes": {
-    "minecraft:audio/ambient_sounds": {
-      "loop": "minecraft:block.beacon.ambient"
-    },
     "minecraft:gameplay/bed_rule": {
       "can_set_spawn": "never",
       "can_sleep": "never",

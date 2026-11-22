@@ -15,5 +15,8 @@
   "block.noclip_backrooms.exit_light": "Green Exit Light",
   "block.noclip_backrooms.exit_door": "Exit Door",
   "block.noclip_backrooms.exit_door_top": "Exit Door (Top)",
-  "block.noclip_backrooms.exit_sign": "Exit Sign"
+  "block.noclip_backrooms.exit_sign": "Exit Sign",
+  "subtitles.noclip_backrooms.ambient.fluorescent_hum": "Fluorescent light hums",
+  "subtitles.noclip_backrooms.ambient.wall_scratch": "Something scratches behind the wall",
+  "subtitles.noclip_backrooms.ambient.distant_whisper": "Faint whispers echo"
 }
