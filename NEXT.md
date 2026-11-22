@@ -8,7 +8,7 @@ Fabric・Minecraft 26.2・Java 25・模組代號 `noclip_backrooms`
 - **入口**：在主世界卡進牆裡，受到窒息傷害時掉進 Level 0。
 - **核心**：同一個世界種子永遠產生同一座迷宮；所有通道都走得通。
 - **離開**：找到綠色 EXIT 門並按右鍵，帶著物品回到重生點（床、重生錨，沒有就是世界出生點）。天花板燈變綠代表附近有出口。
-- **紅線**：不讓玩家生成在牆裡；不動正式遊戲資料夾與既有存檔；不代為同意 EULA；不自行提交或發布。
+- **紅線**：不讓玩家生成在牆裡；不動正式遊戲資料夾與既有存檔；不代為同意 EULA；只在本機提交自己的改動、不推送或發布。
 
 ## 這一版不做
 
@@ -58,7 +58,10 @@ Fabric・Minecraft 26.2・Java 25・模組代號 `noclip_backrooms`
 
 ## 多工具同時開發
 
-這個資料夾也有 Antigravity 在修改，而且沒有 Git。改之前先讀最新檔案，不要整檔覆寫；不要同時執行 Gradle（會互刪對方的測試目錄）。
+規則只寫在 [AGENTS.md](AGENTS.md)。
+
+- `Minecraft Mod Test`：主資料夾，`main` 分支，Antigravity 開發、使用者試玩。
+- `Minecraft Mod Test - Claude`：Claude 的資料夾，`claude` 分支，有自己的編譯與測試暫存。
 
 ## 已知限制
 
