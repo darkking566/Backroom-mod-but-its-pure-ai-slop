@@ -1,0 +1,154 @@
+package dev.noclip.backrooms;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.ArrayDeque;
+import java.util.EnumSet;
+import java.util.Random;
+import org.junit.jupiter.api.Test;
+
+class MazeTest {
+	private static final int SIZE = Maze.CELL * Maze.SECTOR * 3;
+
+	@Test
+	void everyOpenBlockIsReachable() {
+		Random random = new Random(0);
+		// Includes negative coordinates and positions near the world border.
+		int[] origins = {0, -SIZE, -29_999_984 / SIZE * SIZE, 29_000_000 / SIZE * SIZE};
+
+		for (int run = 0; run < 1000; run++) {
+			long seed = random.nextLong();
+			int origin = origins[run % origins.length];
+			boolean[] unvisited = new boolean[SIZE * SIZE];
+			int open = 0;
+			for (int i = 0; i < unvisited.length; i++) {
+				int x = origin + i % SIZE, z = origin + i / SIZE;
+				unvisited[i] = !Maze.isWall(seed, x, z) && !Maze.isPit(seed, x, z);
+				if (unvisited[i]) open++;
+			}
+
+			ArrayDeque<Integer> queue = new ArrayDeque<>();
+			int start = 1 + SIZE;
+			assertTrue(unvisited[start]);
+			unvisited[start] = false;
+			queue.add(start);
+			int reached = 0;
+			while (!queue.isEmpty()) {
+				int at = queue.poll(), x = at % SIZE, z = at / SIZE;
+				reached++;
+				int[] next = {x > 0 ? at - 1 : -1, x < SIZE - 1 ? at + 1 : -1, z > 0 ? at - SIZE : -1, z < SIZE - 1 ? at + SIZE : -1};
+				for (int n : next) {
+					if (n >= 0 && unvisited[n]) {
+						unvisited[n] = false;
+						queue.add(n);
+					}
+				}
+			}
+			assertEquals(open, reached, "unreachable area, seed " + seed);
+		}
+	}
+
+	@Test
+	void landingSpotsAreNeverWalls() {
+		for (int cx = -300; cx < 300; cx++) {
+			for (int cz = -300; cz < 300; cz++) {
+				assertFalse(Maze.isWall(42, cx * Maze.CELL + Maze.CENTER, cz * Maze.CELL + Maze.CENTER));
+			}
+		}
+	}
+
+	@Test
+	void seedChangesTheFloorPlan() {
+		int different = 0;
+		for (int x = 0; x < SIZE; x++) {
+			for (int z = 0; z < SIZE; z++) {
+				if (Maze.isWall(1, x, z) != Maze.isWall(2, x, z)) different++;
+			}
+		}
+		assertTrue(different > SIZE);
+	}
+
+	@Test
+	void allZoneVariantsGenerateWithExpectedTraits() {
+		int sectorBlocks = Maze.CELL * Maze.SECTOR;
+		EnumSet<Maze.Zone> seen = EnumSet.noneOf(Maze.Zone.class);
+		boolean sawArchOverhang = false;
+		boolean checkedPillarHall = false;
+		boolean checkedDarkened = false;
+		boolean sawPuddle = false;
+		boolean sawPit = false;
+		boolean sawRedWarningWall = false;
+		boolean sawThickCarpet = false;
+
+		assertEquals(Maze.Zone.CLASSIC, Maze.zoneAt(12345L, Maze.CENTER, Maze.CENTER));
+
+		for (int sx = -10; sx <= 10; sx++) {
+			for (int sz = -10; sz <= 10; sz++) {
+				int ox = sx * sectorBlocks;
+				int oz = sz * sectorBlocks;
+				Maze.Zone zone = Maze.zoneAt(12345L, ox + Maze.CENTER, oz + Maze.CENTER);
+				seen.add(zone);
+
+				if (zone == Maze.Zone.DARKENED) {
+					checkedDarkened = true;
+					for (int x = ox; x < ox + sectorBlocks; x++) {
+						for (int z = oz; z < oz + sectorBlocks; z++) {
+							assertFalse(Maze.lampWorks(12345L, x, z), "darkened zone had a lit lamp");
+							if (Maze.isPuddle(12345L, x, z)) {
+								sawPuddle = true;
+								assertFalse(Maze.isWall(12345L, x, z), "puddle overlapped a wall");
+							}
+						}
+					}
+				} else if (zone == Maze.Zone.PILLARS) {
+					checkedPillarHall = true;
+					for (int cx = 0; cx < Maze.SECTOR; cx++) {
+						for (int cz = 0; cz < Maze.SECTOR; cz++) {
+							assertTrue(Maze.isWall(12345L, ox + cx * Maze.CELL, oz + cz * Maze.CELL),
+									"pillar hall missing corner pillar");
+						}
+					}
+				} else if (zone == Maze.Zone.ARCHES) {
+					for (int x = ox; x < ox + sectorBlocks; x++) {
+						for (int z = oz; z < oz + sectorBlocks; z++) {
+							if (!Maze.isWall(12345L, x, z, false) && Maze.isWall(12345L, x, z, true)) {
+								sawArchOverhang = true;
+							}
+							if (Maze.isThickCarpet(12345L, x, z)) sawThickCarpet = true;
+						}
+					}
+				} else if (zone == Maze.Zone.PITS) {
+					for (int x = ox; x < ox + sectorBlocks; x++) {
+						for (int z = oz; z < oz + sectorBlocks; z++) {
+							if (Maze.isPit(12345L, x, z)) {
+								sawPit = true;
+								assertFalse(Maze.isWall(12345L, x, z), "pit overlapped a wall");
+							}
+						}
+					}
+				}
+
+				if (zone != Maze.Zone.RED_ROOM) {
+					for (int x = ox; x < ox + sectorBlocks; x++) {
+						for (int z = oz; z < oz + sectorBlocks; z++) {
+							if (Maze.isWall(12345L, x, z) && Maze.isRedWarningWall(12345L, x, z)) {
+								sawRedWarningWall = true;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		assertEquals(EnumSet.allOf(Maze.Zone.class), seen, "not all zone variants generated");
+		assertTrue(checkedDarkened, "never verified darkened zone");
+		assertTrue(checkedPillarHall, "never verified pillar hall");
+		assertTrue(sawArchOverhang, "arches zone never produced an arch overhang");
+		assertTrue(sawPuddle, "darkened zone never produced a sunken puddle");
+		assertTrue(sawPit, "pits zone never produced a pit");
+		assertTrue(sawRedWarningWall, "never saw peeling red warning wall beside a red room");
+		assertTrue(sawThickCarpet, "never saw thick carpet");
+	}
+}

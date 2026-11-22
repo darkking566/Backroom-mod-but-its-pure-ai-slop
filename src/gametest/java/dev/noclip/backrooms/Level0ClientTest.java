@@ -1,0 +1,185 @@
+package dev.noclip.backrooms;
+
+import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
+import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
+import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
+import net.fabricmc.fabric.api.client.gametest.v1.world.TestWorldSave;
+import net.minecraft.core.BlockPos;
+import net.minecraft.locale.Language;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+
+/** Plays the first version in a real client: fall in, look around, die out, reload. */
+public final class Level0ClientTest implements FabricClientGameTest {
+	@Override
+	public void runTest(ClientGameTestContext context) {
+		TestWorldSave save;
+		try (TestSingleplayerContext game = context.worldBuilder().create()) {
+			save = game.getWorldSave();
+			var server = game.getServer();
+			game.getConnection().waitForChunksRender();
+			// Keeps chat out of the screenshots.
+			server.runCommand("gamerule send_command_feedback false");
+			server.runCommand("gamemode survival @a");
+			server.runCommand("give @a minecraft:apple 3");
+
+			// Creative players do not suffocate, so they must stay in the Overworld.
+			server.runCommand("gamemode creative @a");
+			server.runCommand("execute as @a at @s run fill ~-1 ~ ~-1 ~1 ~2 ~1 minecraft:stone");
+			context.waitTicks(40);
+			server.runOnServer(s -> check(player(s).level().dimension() == Level.OVERWORLD, "creative player fell in"));
+			server.runCommand("execute as @a at @s run fill ~-1 ~ ~-1 ~1 ~2 ~1 minecraft:air");
+
+			int standY = Level0ChunkGenerator.FLOOR_Y + 1;
+
+			// The shortcut command given in NEXT.md
+			server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
+			context.waitTicks(20);
+			server.runOnServer(s -> check(player(s).level().dimension() == BackroomsMod.LEVEL_0 && !player(s).isInWall(), "shortcut command failed"));
+			// Spectators hover, so no fall damage is carried into the checks below.
+			server.runCommand("gamemode spectator @a");
+			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 200 0");
+			context.waitTicks(20);
+
+			suffocate(context, game);
+			server.waitFor(s -> player(s).level().dimension() == BackroomsMod.LEVEL_0, 400);
+			context.waitTicks(40);
+			game.getConnection().waitForChunksRender();
+			server.runOnServer(s -> {
+				ServerPlayer player = player(s);
+				check(Math.abs(player.getY() - standY) < 0.01, "landed at y=" + player.getY());
+				check(!player.isInWall(), "landed inside a wall");
+				check(player.getHealth() == player.getMaxHealth(), "hurt on the way in");
+				check(!player.getInventory().isEmpty(), "inventory lost on the way in");
+				checkGeneratedBlocks(player.level());
+				for (var entity : player.level().getAllEntities()) check(!(entity instanceof Mob), "a mob spawned");
+			});
+
+			checkBlocks(context, game);
+			ExitClientChecks.run(context, game, 3, 3);
+			server.runOnServer(s -> {
+				for (int i = 0; i < ModBlocks.ALL.size(); i++) {
+					player(s).getInventory().setItem(i, new ItemStack(ModBlocks.ALL.get(i)));
+				}
+			});
+
+			for (int yaw = 0; yaw < 360; yaw += 90) {
+				server.runCommand("execute as @a at @s run tp @s ~ ~ ~ " + yaw + " 5");
+				context.waitTicks(15);
+				context.runOnClient(client -> client.gui.toastManager().clear());
+				context.waitTick();
+				context.takeScreenshot("level0_yaw_" + yaw);
+			}
+
+			server.runCommand("execute as @a at @s run tp @s ~ ~ ~ 90 -55");
+			context.waitTicks(15);
+			context.takeScreenshot("level0_ceiling");
+
+			server.runCommand("execute as @a at @s run tp @s ~ ~ ~ 0 5");
+			context.waitTicks(10);
+			context.getInput().holdKeyFor(options -> options.keyUp, 20);
+			server.waitFor(s -> player(s).getZ() > 4, 100);
+
+			server.runCommand("execute as @a at @s run tp @s 701.5 " + standY + " -699.5 45 5");
+			game.getConnection().waitForChunksDownload();
+			context.waitTicks(20);
+			game.getConnection().waitForChunksRender();
+			context.takeScreenshot("level0_far_away");
+			server.runOnServer(s -> check(!player(s).isInWall(), "distant cell centre is blocked"));
+
+			server.runCommand("kill @a");
+			context.waitFor(client -> client.player != null && client.player.isDeadOrDying());
+			context.runOnClient(client -> client.player.respawn());
+			server.waitFor(s -> player(s).isAlive() && player(s).level().dimension() == Level.OVERWORLD, 400);
+			game.getConnection().waitForChunksRender();
+
+			// Second entry, onto a landing spot someone has built on.
+			server.runOnServer(s -> s.getLevel(BackroomsMod.LEVEL_0)
+					.setBlockAndUpdate(new BlockPos(3, standY, 3), Blocks.STONE.defaultBlockState()));
+			suffocate(context, game);
+			server.waitFor(s -> player(s).level().dimension() == BackroomsMod.LEVEL_0, 400);
+			context.waitTicks(20);
+			server.runOnServer(s -> check(player(s).getBlockX() == 10 && !player(s).isInWall(), "blocked landing not skipped: " + player(s).position()));
+
+			// Inside Level 0 suffocation must hurt as normal.
+			context.waitTicks(80);
+			server.runCommand("execute as @a at @s run fill ~ ~ ~ ~ ~1 ~ minecraft:stone");
+			server.runCommand("execute as @a at @s run fill ~-1 ~ ~-1 ~1 ~1 ~1 minecraft:stone");
+			server.waitFor(s -> player(s).getHealth() < player(s).getMaxHealth(), 200);
+			server.runCommand("execute as @a at @s run fill ~-1 ~ ~-1 ~1 ~1 ~1 minecraft:air");
+			context.waitTicks(20);
+		}
+
+		try (TestSingleplayerContext game = save.open()) {
+			game.getConnection().waitForChunksRender();
+			game.getServer().runOnServer(s -> check(player(s).level().dimension() == BackroomsMod.LEVEL_0, "reload left Level 0"));
+			context.takeScreenshot("level0_after_reload");
+		}
+	}
+
+	/** The route given to players: a one-block pit, three deep, with two sand blocks dropped on your head. */
+	private static void suffocate(ClientGameTestContext context, TestSingleplayerContext game) {
+		var server = game.getServer();
+		server.runCommand("gamemode survival @a");
+		server.runCommand("fill 2 199 2 4 202 4 minecraft:stone");
+		server.runCommand("fill 3 200 3 3 202 3 minecraft:air");
+		server.runCommand("execute in minecraft:overworld run tp @a 3.5 200 3.5");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(10);
+		server.runCommand("item replace entity @a hotbar.0 with minecraft:sand 8");
+		// Look up at the top block of the pit's west wall and place, as a player would.
+		context.getInput().lookAt(90, -60);
+		context.waitTicks(5);
+		context.getInput().pressMouse(1);
+		context.waitTicks(15);
+		context.getInput().lookAt(90, -60);
+		context.getInput().pressMouse(1);
+	}
+
+	private static void checkBlocks(ClientGameTestContext context, TestSingleplayerContext game) {
+		game.getServer().runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			for (Block block : ModBlocks.ALL) {
+				if (block.getLootTable().isEmpty()) continue; // the unbreakable exit
+				var drops = Block.getDrops(block.defaultBlockState(), level, new BlockPos(3, 3, 3), null);
+				check(drops.size() == 1 && drops.getFirst().is(block.asItem()), "wrong drop for " + block);
+			}
+		});
+		context.runOnClient(client -> {
+			for (Block block : ModBlocks.ALL) {
+				check(Language.getInstance().has(block.getDescriptionId()), "no name for " + block);
+				check(block.asItem().getDescriptionId().equals(block.getDescriptionId()), "wrong item name key for " + block);
+			}
+		});
+	}
+
+	private static void checkGeneratedBlocks(ServerLevel level) {
+		long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
+		int[] ys = {0, Level0ChunkGenerator.FLOOR_Y, Level0ChunkGenerator.FLOOR_Y + 1,
+				Level0ChunkGenerator.FLOOR_Y + 2, Level0ChunkGenerator.CEILING_Y - 1,
+				Level0ChunkGenerator.CEILING_Y, Level0ChunkGenerator.HEIGHT - 1};
+		for (int x = -32; x < 32; x++) {
+			for (int z = -32; z < 32; z++) {
+				for (int y : ys) {
+					var expected = Level0ChunkGenerator.blockAt(seed, x, y, z);
+					check(level.getBlockState(new BlockPos(x, y, z)).is(expected.getBlock()),
+							"world differs from generator at " + x + ", " + y + ", " + z);
+				}
+			}
+		}
+	}
+
+	private static ServerPlayer player(MinecraftServer server) {
+		return server.getPlayerList().getPlayers().getFirst();
+	}
+
+	private static void check(boolean condition, String message) {
+		if (!condition) throw new AssertionError(message);
+	}
+}

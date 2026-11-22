@@ -1,0 +1,109 @@
+package dev.noclip.backrooms;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.Arrays;
+import java.util.Random;
+import org.junit.jupiter.api.Test;
+
+class ExitsTest {
+	/** The longest walk allowed from any walkable block to the nearest exit. */
+	private static final int MAX_WALK = 450;
+	private static final int BORDER_REGION = 29_900_000 / Exits.REGION;
+	private static final int[] REGIONS = {0, -1, 7, -BORDER_REGION, BORDER_REGION};
+
+	@Test
+	void everyRegionHasADoorInAWallWithRoomOnBothSides() {
+		Random random = new Random(1);
+		for (int run = 0; run < 500; run++) {
+			long seed = random.nextLong();
+			for (int origin : REGIONS) {
+				for (int rx = origin - 1; rx <= origin + 1; rx++) {
+					for (int rz = origin - 1; rz <= origin + 1; rz++) {
+						Exits.Door door = Exits.doorIn(seed, rx, rz);
+						assertNotNull(door, "no exit, seed " + seed);
+						int x = door.x(), z = door.z();
+						assertTrue(Exits.isDoor(seed, x, z));
+						assertEquals(rx, Math.floorDiv(x, Exits.REGION));
+						assertEquals(rz, Math.floorDiv(z, Exits.REGION));
+						for (int dz = -1; dz <= 1; dz++) {
+							assertTrue(Maze.isWall(seed, x, z + dz, false) && Maze.isWall(seed, x, z + dz, true), "door not set in a wall");
+						}
+						for (int side : new int[] {x - 1, x + 1}) {
+							assertFalse(Maze.isWall(seed, side, z, true), "door blocked");
+							assertFalse(Maze.isPit(seed, side, z), "door opens over a pit");
+							assertFalse(Maze.isPuddle(seed, side, z), "door opens into a puddle");
+						}
+					}
+				}
+			}
+		}
+	}
+
+	@Test
+	void anExitIsWalkableFromEverywhere() {
+		Random random = new Random(2);
+		int size = Exits.REGION * 3;
+		int[] queue = new int[size * size], walked = new int[size * size];
+
+		for (int run = 0; run < 250; run++) {
+			long seed = random.nextLong();
+			int region = REGIONS[run % REGIONS.length];
+			int origin = (region - 1) * Exits.REGION;
+			Arrays.fill(walked, Integer.MAX_VALUE);
+			boolean[] walkable = new boolean[size * size];
+			for (int i = 0; i < walkable.length; i++) {
+				int x = origin + i % size, z = origin + i / size;
+				walkable[i] = !Maze.isWall(seed, x, z) && !Maze.isPit(seed, x, z);
+			}
+
+			int tail = 0;
+			for (int rx = region - 1; rx <= region + 1; rx++) {
+				for (int rz = region - 1; rz <= region + 1; rz++) {
+					Exits.Door door = Exits.doorIn(seed, rx, rz);
+					for (int x : new int[] {door.x() - 1, door.x() + 1}) {
+						if (x < origin || x >= origin + size) continue;
+						int at = x - origin + (door.z() - origin) * size;
+						walked[at] = 0;
+						queue[tail++] = at;
+					}
+				}
+			}
+
+			for (int head = 0; head < tail; head++) {
+				int at = queue[head], x = at % size, z = at / size;
+				int[] next = {x > 0 ? at - 1 : -1, x < size - 1 ? at + 1 : -1, z > 0 ? at - size : -1, z < size - 1 ? at + size : -1};
+				for (int n : next) {
+					if (n >= 0 && walkable[n] && walked[n] == Integer.MAX_VALUE) {
+						walked[n] = walked[at] + 1;
+						queue[tail++] = n;
+					}
+				}
+			}
+
+			// Only the middle region: the others may be nearer to a door outside the window.
+			for (int x = Exits.REGION; x < Exits.REGION * 2; x++) {
+				for (int z = Exits.REGION; z < Exits.REGION * 2; z++) {
+					int at = x + z * size;
+					if (walkable[at]) assertTrue(walked[at] <= MAX_WALK, "too far from an exit: " + walked[at] + " blocks, seed " + seed);
+				}
+			}
+		}
+	}
+
+	@Test
+	void lampsNearAnExitPointToIt() {
+		Random random = new Random(3);
+		for (int run = 0; run < 500; run++) {
+			long seed = random.nextLong();
+			Exits.Door door = Exits.doorIn(seed, run % 5 - 2, run % 3 - 1);
+			assertTrue(Exits.lampPointsToExit(seed, door.x() + Maze.CENTER, door.z()));
+			assertTrue(Exits.lampPointsToExit(seed, door.x() - Maze.CELL + Maze.CENTER, door.z()));
+			assertTrue(Exits.lampPointsToExit(seed, door.x() + Exits.HINT_CELLS * Maze.CELL + Maze.CENTER, door.z()));
+			assertTrue(Exits.lampPointsToExit(seed, door.x() - (Exits.HINT_CELLS + 1) * Maze.CELL + Maze.CENTER, door.z()));
+		}
+	}
+}

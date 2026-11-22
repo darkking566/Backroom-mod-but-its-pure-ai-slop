@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "noclip_backrooms:block/carpet"
+      },
+      {
+        "model": "noclip_backrooms:block/carpet",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/carpet",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/carpet",
+        "y": 270
+      }
+    ]
+  }
+}
