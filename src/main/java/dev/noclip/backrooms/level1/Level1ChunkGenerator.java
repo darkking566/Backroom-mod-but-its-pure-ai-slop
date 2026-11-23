@@ -36,7 +36,7 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 	static final int LOW_CEILING_Y = 36;
 	static final int CEILING_Y = 38;
 	// Must match dimension_type/level_1.json
-	static final int HEIGHT = 48;
+	static final int HEIGHT = 96;
 	private static final int HALL_TOP = CEILING_Y - 1, LOW_TOP = LOW_CEILING_Y - 1;
 
 	private Level1ChunkGenerator(BiomeSource biomeSource) {
@@ -80,7 +80,10 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 			if (state != null) return state;
 		}
 		// Bedrock under the floor and over the roof, so nothing gets out underneath or lands on top.
-		if (y == 0 || y > CEILING_Y) return Blocks.BEDROCK.defaultBlockState();
+		if (y == 0 || y >= HEIGHT - 1) return Blocks.BEDROCK.defaultBlockState();
+		BlockState elevated = Level1Elevation.block(seed, tile, ceiling, x, y, z);
+		if (elevated != null) return elevated;
+		if (y > CEILING_Y) return Blocks.CONCRETE.gray().defaultBlockState();
 		if (y < FLOOR_Y) return Blocks.CONCRETE.gray().defaultBlockState();
 		if (y == CEILING_Y) return state(Level1Blocks.GARAGE_CEILING);
 		if (y == FLOOR_Y) return floor(tile);

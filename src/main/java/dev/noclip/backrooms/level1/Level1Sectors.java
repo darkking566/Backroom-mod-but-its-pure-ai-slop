@@ -109,7 +109,8 @@ final class Level1Sectors {
 	private static BlockState piping(long seed, Tile tile, double zone, int roll, int x, int y, int z) {
 		boolean open = tile == Tile.FLOOR || tile == Tile.LINE || tile == Tile.DAMP;
 		if (!open) return null;
-		if (y == Level1ChunkGenerator.CEILING_Y - 1 && roll < (1 - zone) * 60) return Level1Blocks.CEILING_PIPE.defaultBlockState();
+		int topCeil = Level1Elevation.ceilingY(seed, Math.floorDiv(x, Level1Layout.DISTRICT), Math.floorDiv(z, Level1Layout.DISTRICT));
+		if (y == topCeil - 1 && roll < (1 - zone) * 60) return Level1Blocks.CEILING_PIPE.defaultBlockState();
 		if (y == FLOOR + 2 && roll < (1 - zone) * 45) {
 			for (Direction side : Direction.Plane.HORIZONTAL) {
 				if (Level1Layout.tile(seed, x + side.getStepX(), z + side.getStepZ()) == Tile.PILLAR) {
