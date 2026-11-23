@@ -355,6 +355,15 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		});
 		context.waitTicks(10);
 		server.runCommand("gamemode spectator @a");
+		// The sealed doorway, seen from either side along the passage.
+		boolean throughX = doorway.tiles()[0][0] == doorway.tiles()[1][0];
+		for (int side = -3; side <= 3; side += 6) {
+			int cx = lock.getX() + (throughX ? side : 0), cz = lock.getZ() + (throughX ? 0 : side);
+			if (!Level1Layout.tile(seed, cx, cz).walkable()) continue;
+			float yaw = throughX ? (side < 0 ? -90 : 90) : (side < 0 ? 0 : 180);
+			shoot(context, game, cx + 0.5, STAND, cz + 0.5, yaw, 0, "level1_sealed_door");
+			break;
+		}
 
 		// Smoke chokes a camp in the corridors.
 		BlockPos camp = find(seed, room[0] * 64 + 22, room[1] * 64 + 22, Tile.CORRIDOR);

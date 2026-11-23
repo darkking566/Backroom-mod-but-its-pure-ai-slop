@@ -104,7 +104,8 @@ final class Workers {
 			if (Level1Layout.tile(seed, x, z) != Tile.FLOOR) continue;
 			BlockPos at = new BlockPos(x, Level1ChunkGenerator.FLOOR_Y + 1, z);
 			if (!level.isLoaded(at) || !level.getBlockState(at).isAir() || !level.getBlockState(at.above()).isAir()) continue;
-			Mob worker = EntityTypes.VILLAGER.create(level, EntitySpawnReason.EVENT);
+			// A zombie body (it shows armour, which a villager's does not), with no mind: a shadow in dark work clothes.
+			Mob worker = EntityTypes.ZOMBIE.create(level, EntitySpawnReason.EVENT);
 			if (worker == null) return false;
 			worker.snapTo(x + 0.5, at.getY(), z + 0.5, random.nextFloat() * 360, 0);
 			worker.setNoAi(true);
