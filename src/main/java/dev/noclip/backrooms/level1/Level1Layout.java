@@ -1,0 +1,311 @@
+package dev.noclip.backrooms.level1;
+
+import java.util.SplittableRandom;
+
+/**
+ * The Level 1 floor plan as a pure function of seed and block position, so chunks can be generated in any order.
+ *
+ * The level is cut into 64x64 districts. Most are parking or warehouse halls whose pillar grid runs on without a
+ * seam from one district to the next; about a third are blocks of tight white corridors with small rooms.
+ * A district owns the line of blocks along its west and north edges. A line only carries a wall where corridors
+ * meet something, or where a hall happens to be divided, and every such wall has openings, so each district
+ * reaches all four neighbours and the whole level is one connected space.
+ */
+public final class Level1Layout {
+	public static final int DISTRICT = 64;
+	static final int CELL = 4;
+	static final int CELLS = DISTRICT / CELL;
+	/** Pillars stand every BAY_X blocks along X, in rows every BAY_Z blocks along Z. */
+	static final int BAY_X = 9;
+	static final int BAY_Z = 16;
+	private static final int KIND = 1, EDGE = 2, LAMP = 3, LEAK = 4, PUDDLE = 5;
+	static final int PLAN = 7;
+
+	public enum Kind {
+		PARKING,
+		WAREHOUSE,
+		CORRIDORS
+	}
+
+	/** What fills a column between the floor and the ceiling. */
+	public enum Tile {
+		// Halls: a five-block ceiling.
+		FLOOR, LINE, DAMP, PUDDLE, PILLAR, SHELF, HALL_WALL,
+		// Corridors: a three-block ceiling.
+		CORRIDOR, DESK, ROOM_SHELF, WALL, BRICK, PADDED, DOOR,
+		// The wall around a corridor block, and the low doorways through it.
+		PERIMETER, OPENING, OPENING_SIGN,
+		// Exits to other levels (see HallPlan): a service room, a floor hatch, a lone door frame, a stairwell.
+		EXIT_CORE, HATCH, FRAME, STAIRWELL;
+
+		public boolean walkable() {
+			return switch (this) {
+				case FLOOR, LINE, DAMP, PUDDLE, CORRIDOR, OPENING, OPENING_SIGN, HATCH, FRAME -> true;
+				default -> false;
+			};
+		}
+	}
+
+	/** What hangs from the ceiling of a column: at the top of a hall, or just under a corridor ceiling. */
+	public enum Ceiling {
+		NONE, BEAM, LAMP, DEAD_LAMP, PIPE, LEAK, BULB, DEAD_BULB, EXIT_BULB
+	}
+
+	/** The wall along the west or north edge of a district: a bit per open slot. */
+	record Edge(int open, boolean corridor, boolean signs) {
+		boolean isOpen(int slot) {
+			return (open >>> slot & 1) != 0;
+		}
+	}
+
+	/** The bottom block of an exit door, in a wall that runs along Z. */
+	public record Door(int x, int z) {
+	}
+
+	private Level1Layout() {
+	}
+
+	public static Kind kind(long seed, int dx, int dz) {
+		// Everyone who comes in near the origin lands in a parking hall.
+		if (dx == 0 && dz == 0) return Kind.PARKING;
+		int roll = Math.floorMod(hash(seed, dx, dz, KIND), 100);
+		if (roll < 48) return Kind.PARKING;
+		if (roll < 70) return Kind.WAREHOUSE;
+		return Kind.CORRIDORS;
+	}
+
+	public static Kind kindAt(long seed, int x, int z) {
+		return kind(seed, Math.floorDiv(x, DISTRICT), Math.floorDiv(z, DISTRICT));
+	}
+
+	public static Tile tile(long seed, int x, int z) {
+		int dx = Math.floorDiv(x, DISTRICT), dz = Math.floorDiv(z, DISTRICT);
+		int lx = Math.floorMod(x, DISTRICT), lz = Math.floorMod(z, DISTRICT);
+		if (lx == 0 || lz == 0) {
+			Tile line = lineTile(seed, dx, dz, lx, lz);
+			if (line != null) return line;
+		}
+		Kind kind = kind(seed, dx, dz);
+		if (kind == Kind.CORRIDORS) return CorridorPlan.of(seed, dx, dz).tile(lx, lz);
+		return hallTile(seed, kind, x, z);
+	}
+
+	public static Ceiling ceiling(long seed, int x, int z) {
+		int dx = Math.floorDiv(x, DISTRICT), dz = Math.floorDiv(z, DISTRICT);
+		Kind kind = kind(seed, dx, dz);
+		if (kind == Kind.CORRIDORS) {
+			int lx = Math.floorMod(x, DISTRICT), lz = Math.floorMod(z, DISTRICT);
+			if (lx % CELL != CELL / 2 || lz % CELL != CELL / 2) return Ceiling.NONE;
+			return CorridorPlan.of(seed, dx, dz).bulb(lx / CELL, lz / CELL);
+		}
+		int bx = Math.floorMod(x, BAY_X), bz = Math.floorMod(z, BAY_Z);
+		if (bz < 2) return Ceiling.BEAM;
+		if (bz == 8) return leaky(seed, x, z) ? Ceiling.LEAK : Ceiling.PIPE;
+		if (bx == 5 && (bz == 4 || bz == 12)) {
+			int works = kind == Kind.PARKING ? 88 : 80;
+			return Math.floorMod(hash(seed, x, z, LAMP), 100) < works ? Ceiling.LAMP : Ceiling.DEAD_LAMP;
+		}
+		return Ceiling.NONE;
+	}
+
+	private static Tile hallTile(long seed, Kind kind, int x, int z) {
+		HallPlan.Cell cell = exitCell(seed, x, z);
+		if (cell != null) {
+			Tile exit = exitTile(cell);
+			if (exit != null) return exit;
+		}
+		int bx = Math.floorMod(x, BAY_X), bz = Math.floorMod(z, BAY_Z);
+		if (bx < 2 && bz < 2) return Tile.PILLAR;
+		// Racks leave the aisle and the pillar line free, with a gap at every pillar.
+		if (kind == Kind.WAREHOUSE && bx >= 2 && bx <= 7 && (bz == 4 || bz == 5 || bz == 11 || bz == 12)) return Tile.SHELF;
+		int wet = wetness(seed, x, z);
+		if (wet == 2) return Tile.PUDDLE;
+		if (wet == 1) return Tile.DAMP;
+		// Stall lines run along Z through the two rows of parking spaces between pillar lines.
+		boolean stalls = bz >= 2 && bz <= 6 || bz >= 11;
+		if (kind == Kind.PARKING && stalls && (bx == 1 || bx == 4 || bx == 7)) return Tile.LINE;
+		return Tile.FLOOR;
+	}
+
+	/** The exit footprint at (x, z) in a hall, or null. */
+	static HallPlan.Cell exitCell(long seed, int x, int z) {
+		int dx = Math.floorDiv(x, DISTRICT), dz = Math.floorDiv(z, DISTRICT);
+		if (kind(seed, dx, dz) == Kind.CORRIDORS) return null;
+		return HallPlan.of(seed, dx, dz).cell(x, z);
+	}
+
+	/** The exits in a district; none in corridor blocks, whose way out is the metal door home. */
+	public static java.util.List<HallPlan.Placed> exits(long seed, int dx, int dz) {
+		return HallPlan.of(seed, dx, dz).placed();
+	}
+
+	/** The tile of an exit footprint, or null where the hall shows through (around a stairwell). */
+	private static Tile exitTile(HallPlan.Cell cell) {
+		int bx = cell.bx(), bz = cell.bz();
+		boolean shaft = bx >= 4 && bx <= 5;
+		return switch (cell.placed().exit().shape) {
+			case CORE_DOOR, CORE_PAINTING, CORE_OUTLETS -> Tile.EXIT_CORE;
+			case PILLAR -> Tile.PILLAR;
+			case HATCH -> Tile.HATCH;
+			case FRAME -> Tile.FRAME;
+			case STAIRS_DOWN -> shaft && bz >= 3 && bz <= 6 ? Tile.STAIRWELL : null;
+			case STAIRS_UP -> shaft && bz >= 3 && bz <= 9 ? Tile.STAIRWELL : null;
+		};
+	}
+
+	/** 2 under a leak, 1 around it, 0 dry. Leaks only hang over the aisle, so only nearby rows can be wet. */
+	private static int wetness(long seed, int x, int z) {
+		int bz = Math.floorMod(z, BAY_Z);
+		if (bz < 5 || bz > 11) return 0;
+		int pipeZ = z - bz + 8;
+		int wet = 0;
+		for (int px = x - 3; px <= x + 3; px++) {
+			if (!leaksAt(seed, px, pipeZ)) continue;
+			long h = hash(seed, px, pipeZ, PUDDLE);
+			double radius = 0.9 + Math.floorMod(h, 10) / 10.0;
+			double stretch = 1.0 + Math.floorMod(h >>> 8, 7) / 10.0; // puddles spread along the aisle
+			double rough = Math.floorMod(hash(seed, x, z, PUDDLE + 1), 5) / 10.0;
+			double distance = Math.hypot((x - px) / stretch, z - pipeZ) + rough;
+			if (distance <= radius) return 2;
+			if (distance <= radius + 1.0) wet = 1;
+		}
+		return wet;
+	}
+
+	private static boolean leaky(long seed, int x, int z) {
+		return Math.floorMod(hash(seed, x, z, LEAK), 29) == 0;
+	}
+
+	/** A leaking pipe really hangs here: not over corridors and not inside a wall. */
+	private static boolean leaksAt(long seed, int x, int z) {
+		if (!leaky(seed, x, z)) return false;
+		int dx = Math.floorDiv(x, DISTRICT), dz = Math.floorDiv(z, DISTRICT);
+		if (kind(seed, dx, dz) == Kind.CORRIDORS) return false;
+		int lx = Math.floorMod(x, DISTRICT), lz = Math.floorMod(z, DISTRICT);
+		return lx != 0 && lz != 0 || lineTile(seed, dx, dz, lx, lz) == null;
+	}
+
+	/** The tile on a district's own west or north line, or null where that line has no wall. */
+	private static Tile lineTile(long seed, int dx, int dz, int lx, int lz) {
+		if (lx == 0 && lz == 0) return corner(seed, dx, dz);
+		boolean west = lx == 0;
+		Edge edge = edge(seed, dx, dz, west);
+		if (edge == null) return null;
+		int along = west ? lz : lx;
+		int slot = along / CELL, offset = along % CELL;
+		Tile wall = edge.corridor() ? Tile.PERIMETER : Tile.HALL_WALL;
+		if (offset == 0) {
+			// Between two open slots of a hall wall the post goes too, for a wider gap.
+			return !edge.corridor() && edge.isOpen(slot - 1) && edge.isOpen(slot) ? null : wall;
+		}
+		if (!edge.isOpen(slot)) return wall;
+		if (!edge.corridor()) return null;
+		return edge.signs() && offset == CELL / 2 ? Tile.OPENING_SIGN : Tile.OPENING;
+	}
+
+	private static Tile corner(long seed, int dx, int dz) {
+		Edge[] around = {edge(seed, dx, dz, true), edge(seed, dx, dz, false),
+				edge(seed, dx - 1, dz, false), edge(seed, dx, dz - 1, true)};
+		Tile tile = null;
+		for (Edge edge : around) {
+			if (edge == null) continue;
+			if (edge.corridor()) return Tile.PERIMETER;
+			tile = Tile.HALL_WALL;
+		}
+		return tile;
+	}
+
+	/** The wall on the west (or north) line of a district, or null if there is none. */
+	static Edge edge(long seed, int dx, int dz, boolean west) {
+		Kind here = kind(seed, dx, dz);
+		Kind there = west ? kind(seed, dx - 1, dz) : kind(seed, dx, dz - 1);
+		SplittableRandom random = new SplittableRandom(hash(seed, dx, dz, west ? EDGE : EDGE + 100));
+		boolean hereCorridors = here == Kind.CORRIDORS, thereCorridors = there == Kind.CORRIDORS;
+		if (!hereCorridors && !thereCorridors) {
+			// Most halls run straight into the next one.
+			if (random.nextInt(100) >= 25) return null;
+			int open = 0;
+			for (int slot = 0; slot < CELLS; slot++) {
+				if (random.nextInt(100) < 45) open |= 1 << slot;
+			}
+			while (Integer.bitCount(open) < 3) open |= 1 << random.nextInt(CELLS);
+			return new Edge(open, false, false);
+		}
+		int open = 0;
+		while (Integer.bitCount(open) < 2) open |= 1 << random.nextInt(CELLS);
+		// Green lights mark the way from a hall into the corridors.
+		return new Edge(open, true, hereCorridors != thereCorridors);
+	}
+
+	/** The way out of a district, or null for halls: every block of corridors has one door. */
+	public static Door door(long seed, int dx, int dz) {
+		if (kind(seed, dx, dz) != Kind.CORRIDORS) return null;
+		CorridorPlan plan = CorridorPlan.of(seed, dx, dz);
+		return new Door(dx * DISTRICT + plan.doorX(), dz * DISTRICT + plan.doorZ());
+	}
+
+	/**
+	 * Where someone falling in near (x, z) lands: on the aisle of the nearest parking hall,
+	 * since new arrivals from Level 0 come out in the parking structure.
+	 */
+	public static int[] landing(long seed, int x, int z) {
+		int dx0 = Math.floorDiv(x, DISTRICT), dz0 = Math.floorDiv(z, DISTRICT);
+		for (int ring = 0; ring < 8; ring++) {
+			int[] best = null;
+			long bestDistance = Long.MAX_VALUE;
+			for (int dx = dx0 - ring; dx <= dx0 + ring; dx++) {
+				for (int dz = dz0 - ring; dz <= dz0 + ring; dz++) {
+					if (Math.max(Math.abs(dx - dx0), Math.abs(dz - dz0)) != ring) continue;
+					if (kind(seed, dx, dz) != Kind.PARKING) continue;
+					int[] spot = aisleSpot(seed, dx, dz, x, z);
+					long distance = (long) (spot[0] - x) * (spot[0] - x) + (long) (spot[1] - z) * (spot[1] - z);
+					if (distance < bestDistance) {
+						bestDistance = distance;
+						best = spot;
+					}
+				}
+			}
+			if (best != null) return best;
+		}
+		return aisleSpot(seed, 0, 0, x, z);
+	}
+
+	/** The open point on an aisle inside district (dx, dz) nearest to (x, z), stepping past any exit standing there. */
+	static int[] aisleSpot(long seed, int dx, int dz, int x, int z) {
+		int[] spot = aisleSpot(dx, dz, x, z);
+		int minX = dx * DISTRICT + 6, maxX = dx * DISTRICT + DISTRICT - 7;
+		for (int i = 0; i < 12; i++) {
+			int sx = spot[0] + (i + 1) / 2 * (i % 2 == 0 ? 1 : -1) * BAY_X;
+			if (sx >= minX && sx <= maxX && tile(seed, sx, spot[1]).walkable()) return new int[] {sx, spot[1]};
+		}
+		return spot;
+	}
+
+	/** The point on an aisle inside district (dx, dz) nearest to (x, z), never on its edge lines. */
+	static int[] aisleSpot(int dx, int dz, int x, int z) {
+		int minX = dx * DISTRICT + 6, maxX = dx * DISTRICT + DISTRICT - 7;
+		int minZ = dz * DISTRICT + 6, maxZ = dz * DISTRICT + DISTRICT - 7;
+		int sx = Math.clamp(x, minX, maxX), sz = Math.clamp(z, minZ, maxZ);
+		sx += 5 - Math.floorMod(sx, BAY_X);
+		sz += 9 - Math.floorMod(sz, BAY_Z);
+		if (sx < minX) sx += BAY_X;
+		if (sx > maxX) sx -= BAY_X;
+		if (sz < minZ) sz += BAY_Z;
+		if (sz > maxZ) sz -= BAY_Z;
+		return new int[] {sx, sz};
+	}
+
+	static long hash(long seed, int x, int z, int salt) {
+		long h = mix(seed + salt);
+		h = mix(h ^ x);
+		return mix(h ^ z);
+	}
+
+	// SplitMix64 finalizer
+	private static long mix(long v) {
+		v += 0x9E3779B97F4A7C15L;
+		v = (v ^ (v >>> 30)) * 0xBF58476D1CE4E5B9L;
+		v = (v ^ (v >>> 27)) * 0x94D049BB133111EBL;
+		return v ^ (v >>> 31);
+	}
+}

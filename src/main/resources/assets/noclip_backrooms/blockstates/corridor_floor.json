@@ -1,0 +1,63 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/corridor_floor",
+        "weight": 10
+      },
+      {
+        "model": "noclip_backrooms:block/level1/corridor_floor",
+        "y": 90,
+        "weight": 10
+      },
+      {
+        "model": "noclip_backrooms:block/level1/corridor_floor",
+        "y": 180,
+        "weight": 10
+      },
+      {
+        "model": "noclip_backrooms:block/level1/corridor_floor",
+        "y": 270,
+        "weight": 10
+      },
+      {
+        "model": "noclip_backrooms:block/level1/corridor_floor_1",
+        "weight": 10
+      },
+      {
+        "model": "noclip_backrooms:block/level1/corridor_floor_1",
+        "y": 90,
+        "weight": 10
+      },
+      {
+        "model": "noclip_backrooms:block/level1/corridor_floor_1",
+        "y": 180,
+        "weight": 10
+      },
+      {
+        "model": "noclip_backrooms:block/level1/corridor_floor_1",
+        "y": 270,
+        "weight": 10
+      },
+      {
+        "model": "noclip_backrooms:block/level1/corridor_floor_2",
+        "weight": 4
+      },
+      {
+        "model": "noclip_backrooms:block/level1/corridor_floor_2",
+        "y": 90,
+        "weight": 4
+      },
+      {
+        "model": "noclip_backrooms:block/level1/corridor_floor_2",
+        "y": 180,
+        "weight": 4
+      },
+      {
+        "model": "noclip_backrooms:block/level1/corridor_floor_2",
+        "y": 270,
+        "weight": 4
+      }
+    ]
+  }
+}

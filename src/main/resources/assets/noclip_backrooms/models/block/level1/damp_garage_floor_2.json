@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "noclip_backrooms:block/level1/damp_garage_floor_2",
+    "side": "noclip_backrooms:block/level1/garage_floor",
+    "bottom": "noclip_backrooms:block/level1/garage_floor"
+  }
+}

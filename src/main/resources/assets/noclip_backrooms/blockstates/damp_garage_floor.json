@@ -1,0 +1,51 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor"
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor",
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_1"
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_1",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_1",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_1",
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_2"
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_2",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_2",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_2",
+        "y": 270
+      }
+    ]
+  }
+}

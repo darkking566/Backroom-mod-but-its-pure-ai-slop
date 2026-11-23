@@ -29,5 +29,99 @@
         "attenuation_distance": 26
       }
     ]
+  },
+  "level1.lamp_hum": {
+    "subtitle": "subtitles.noclip_backrooms.level1.lamp_hum",
+    "sounds": [
+      {
+        "name": "noclip_backrooms:ambient.fluorescent_hum",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.pipe_clang": {
+    "subtitle": "subtitles.noclip_backrooms.level1.pipe_clang",
+    "sounds": [
+      {
+        "name": "minecraft:block.anvil.land",
+        "type": "event",
+        "volume": 0.5
+      },
+      {
+        "name": "minecraft:block.iron_door.close",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:block.chain.hit",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.pipe_drip": {
+    "subtitle": "subtitles.noclip_backrooms.level1.pipe_drip",
+    "sounds": [
+      {
+        "name": "minecraft:block.pointed_dripstone.drip_water",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.rumble": {
+    "subtitle": "subtitles.noclip_backrooms.level1.rumble",
+    "sounds": [
+      {
+        "name": "minecraft:ambient.cave",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.power_failing": {
+    "subtitle": "subtitles.noclip_backrooms.level1.power_failing",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.ambient",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.power_off": {
+    "subtitle": "subtitles.noclip_backrooms.level1.power_off",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.deactivate",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.power_on": {
+    "subtitle": "subtitles.noclip_backrooms.level1.power_on",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.activate",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.crate_open": {
+    "subtitle": "subtitles.noclip_backrooms.level1.crate_open",
+    "sounds": [
+      {
+        "name": "minecraft:block.barrel.open",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.wall_flicker": {
+    "subtitle": "subtitles.noclip_backrooms.level1.wall_flicker",
+    "sounds": [
+      {
+        "name": "minecraft:block.copper_bulb.turn_off",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:block.copper_bulb.turn_on",
+        "type": "event"
+      }
+    ]
   }
 }

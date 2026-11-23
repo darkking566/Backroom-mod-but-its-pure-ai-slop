@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=true": {
+      "model": "noclip_backrooms:block/level1/bare_bulb"
+    },
+    "lit=false": {
+      "model": "noclip_backrooms:block/level1/bare_bulb_off"
+    }
+  }
+}

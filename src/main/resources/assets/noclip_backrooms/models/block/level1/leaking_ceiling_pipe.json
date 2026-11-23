@@ -1,0 +1,112 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level1/pipe_rusty",
+    "pipe": "noclip_backrooms:block/level1/pipe_rusty",
+    "bracket": "noclip_backrooms:block/level1/pipe_bracket"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        10,
+        6.25
+      ],
+      "to": [
+        16,
+        13.5,
+        9.75
+      ],
+      "faces": {
+        "north": {
+          "texture": "#pipe"
+        },
+        "south": {
+          "texture": "#pipe"
+        },
+        "up": {
+          "texture": "#pipe"
+        },
+        "down": {
+          "texture": "#pipe"
+        },
+        "east": {
+          "texture": "#pipe",
+          "uv": [
+            0,
+            6,
+            3.5,
+            9.5
+          ]
+        },
+        "west": {
+          "texture": "#pipe",
+          "uv": [
+            0,
+            6,
+            3.5,
+            9.5
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        7,
+        9.6,
+        5.8
+      ],
+      "to": [
+        9,
+        13.9,
+        10.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bracket"
+        },
+        "south": {
+          "texture": "#bracket"
+        },
+        "east": {
+          "texture": "#bracket"
+        },
+        "west": {
+          "texture": "#bracket"
+        },
+        "up": {
+          "texture": "#bracket"
+        },
+        "down": {
+          "texture": "#bracket"
+        }
+      }
+    },
+    {
+      "from": [
+        7.6,
+        13.9,
+        7.6
+      ],
+      "to": [
+        8.4,
+        16,
+        8.4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bracket"
+        },
+        "south": {
+          "texture": "#bracket"
+        },
+        "east": {
+          "texture": "#bracket"
+        },
+        "west": {
+          "texture": "#bracket"
+        }
+      }
+    }
+  ]
+}
