@@ -1,7 +1,18 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level1/gallery_wall"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/gallery_wall",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/level1/gallery_wall_1",
+        "weight": 1
+      },
+      {
+        "model": "noclip_backrooms:block/level1/gallery_wall_2",
+        "weight": 1
+      }
+    ]
   }
 }

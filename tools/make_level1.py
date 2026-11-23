@@ -1179,7 +1179,7 @@ def save_cutout(name, m, alpha):
     Image.fromarray(np.dstack([rgb_, a]), "RGBA").save(TEXTURES / f"{name}.png", optimize=True)
 
 
-def gallery_wall():
+def gallery_wall_old():
     """Painted block wall hung with two framed pictures: a room where someone hung paintings on every wall."""
     m = block_wall((214, 209, 196), 960)
     for x0, y0, x1, y1, sky, ground in ((10, 22, 58, 70, (150, 182, 206), (96, 128, 84)),
@@ -1201,6 +1201,260 @@ def floor_painting():
     return m
 
 
+
+# ---- The sectors' own materials (see Level1Sectors): every one drawn at 128 px like the rest of Level 1
+
+GILD_COLORS = [(214, 176, 40), (214, 112, 40), (58, 112, 178), (96, 162, 62), (182, 54, 50), (112, 66, 142)]
+
+
+def masonry(color, seed, course=32, length=64):
+    """Cut stone in courses: each block its own shade, recessed joints."""
+    m = flat(color, 0.3, 10, 40)
+    rng = np.random.default_rng(seed)
+    row = (Y // course).astype(int)
+    col = ((X + (row % 2) * (length // 2)) // length).astype(int) % (SIZE // length)
+    shades = rng.uniform(0.85, 1.12, (SIZE // course, SIZE // length, 1))
+    m.color *= shades[row, col]
+    grain = noise(seed + 1, 128) * 0.5 + noise(seed + 2, 32) * 0.5
+    m.color *= (1 + grain * 0.07)[..., None]
+    m.height += grain * 0.5
+    shifted = (X + (row % 2) * (length // 2)) % length
+    joint = np.maximum(1 - step(0.8, 2.0, np.minimum(Y % course, course - Y % course)),
+                       1 - step(0.8, 2.0, np.minimum(shifted, length - shifted)))
+    paint(m, joint, tuple(int(c * 0.55) for c in color), height=-1.4, smooth=0.1, porosity=60)
+    return m
+
+
+def marble(color, seed, vein=0.7):
+    m = flat(color, 0.55, 20, 5)
+    m.color *= (1 + clouds(seed, 4)[..., None] * 0.05)
+    v = np.abs(noise(seed + 1, 5) + noise(seed + 2, 24) * 0.35)
+    tint(m, (1 - step(0.02, 0.08, v)) * 0.8, (vein, vein, vein * 1.03))
+    return m
+
+
+def gothic_column():
+    m = marble((228, 226, 218), 1300)
+    flute = 0.5 + 0.5 * np.cos(X / SIZE * 2 * np.pi * 8)
+    m.height += flute * 1.6
+    tint(m, (1 - flute) * 0.35, (0.88, 0.88, 0.86))
+    return m
+
+
+def gothic_base():
+    m = marble((196, 192, 182), 1310)
+    for y in (28, 92):
+        paint(m, box(0, y, 128, y + 8), (150, 146, 138), height=1.5)
+    return m
+
+
+def gothic_floor():
+    m = marble((168, 168, 166), 1320)
+    joint = np.maximum(1 - step(0.8, 2.0, np.minimum(X % 64, 64 - X % 64)), 1 - step(0.8, 2.0, np.minimum(Y % 64, 64 - Y % 64)))
+    tint(m, joint, (0.55, 0.55, 0.55))
+    paint(m, joint, height=-1.2)
+    return m
+
+
+def moss_floor(seed, grassy):
+    m = flat((88, 132, 56) if grassy else (62, 98, 46), 0.12, 6, 80)
+    n = noise(seed, 128) * 0.4 + noise(seed + 1, 48) * 0.35 + noise(seed + 2, 16) * 0.25
+    m.color *= (1 + n * 0.22)[..., None]
+    m.height += n * 0.8
+    if grassy:
+        tint(m, step(0.5, 0.8, noise(seed + 3, 128, 12)) * 0.6, (1.25, 1.3, 0.9))
+    else:
+        tint(m, step(0.74, 0.9, noise(seed + 3, 64)), (0.7, 0.62, 0.5))
+    return m
+
+
+def garden_wall():
+    m = block_wall((190, 196, 184), 1400)
+    tint(m, step(0.0, 0.5, clouds(1401, 4) + 0.25 * noise(1402, 64)) * 0.8, (0.62, 0.82, 0.52))
+    return m
+
+
+def garden_pillar():
+    m = concrete((118, 118, 112), 1410)
+    moss = step(0.3, 0.8, Y / SIZE + clouds(1411, 5) * 0.5 - 0.2)
+    tint(m, moss * 0.85, (0.55, 0.78, 0.45))
+    return m
+
+
+def garden_ceiling():
+    m = concrete((108, 110, 106), 1420)
+    tint(m, step(0.05, 0.5, clouds(1421, 4)) * 0.8, (0.6, 0.8, 0.5))
+    return m
+
+
+def planks(base, seed, board=32, gloss=0.25):
+    m = flat(base, gloss, 8, 30)
+    rng = np.random.default_rng(seed)
+    row = (Y // board).astype(int)
+    shades = rng.uniform(0.82, 1.14, (SIZE // board,))
+    offset = rng.integers(0, SIZE, SIZE // board)
+    grain = noise(seed + 1, 3, 96) * 0.6 + noise(seed + 2, 14, 96) * 0.4
+    m.color *= (shades[row][..., None] * (1 + grain[..., None] * 0.12))
+    gap = 1 - step(0.6, 1.8, np.minimum(Y % board, board - Y % board))
+    end = 1 - step(0.6, 1.6, np.abs((X + offset[row]) % SIZE))
+    seam = np.maximum(gap, end)
+    tint(m, seam, (0.45, 0.45, 0.45))
+    paint(m, seam, height=-1.2)
+    return m
+
+
+def lacquer_wall():
+    m = flat((136, 28, 32), 0.78, 60, 0)
+    m.color *= (1 + clouds(1520, 3)[..., None] * 0.06)
+    paint(m, np.clip(1 - box(4, 4, 124, 124, 1), 0, 1), (190, 150, 62), height=2, smooth=0.6, f0=200)
+    paint(m, box(0, 60, 128, 68), (190, 150, 62), height=1.5, smooth=0.6, f0=200)
+    paint(m, np.clip(1 - box(14, 14, 114, 54, 1), 0, 1) * (1 - np.clip(1 - box(18, 18, 110, 50, 1), 0, 1)), (96, 18, 22), height=-1)
+    return m
+
+
+def lacquer_pillar():
+    m = flat((142, 26, 30), 0.82, 60, 0)
+    m.color *= (1 + clouds(1530, 3)[..., None] * 0.05)
+    tint(m, np.exp(-((X - 44) / 10.0) ** 2) * 0.5, (1.35, 1.3, 1.3))
+    for y in (8, 110):
+        paint(m, box(0, y, 128, y + 10), (190, 150, 62), height=2, smooth=0.6, f0=200)
+    return m
+
+
+def legend_base():
+    m = planks((36, 26, 22), 1500, board=64)
+    paint(m, box(0, 60, 128, 68), (120, 100, 52), height=2, smooth=0.6, f0=200)
+    return m
+
+
+def legend_ceiling():
+    m = planks((44, 30, 24), 1510, board=32)
+    for x in (0, 64):
+        paint(m, box(x - 4, 0, x + 4, 128), (30, 20, 16), height=2)
+    for y in (0, 64):
+        paint(m, box(0, y - 4, 128, y + 4), (30, 20, 16), height=2)
+    return m
+
+
+def neon(color):
+    """A dark housing with a tube that burns."""
+    m = flat((28, 28, 32), 0.5, 40, 0)
+    paint(m, box(0, 44, 128, 84), color, glow=1.0, height=-1, smooth=0.9)
+    paint(m, box(0, 56, 128, 72), tuple(min(255, int(c * 1.0) + 40) for c in color), glow=1.0)
+    return m
+
+
+def copper_pillar():
+    m = metal((176, 104, 66), 0.55)
+    tint(m, step(0.45, 0.75, clouds(1540, 4)) * 0.7, (0.5, 1.2, 0.95))
+    for y in (28, 100):
+        paint(m, box(0, y, 128, y + 12), (150, 84, 52), height=2, smooth=0.5, f0=230)
+        for x in range(10, 128, 20):
+            paint(m, 1 - step(1.5, 3, np.hypot(X - x, Y - (y + 6))), (210, 150, 110), height=1.2, f0=230)
+    return m
+
+
+def glitch(color, seed, bright):
+    m = flat(color, 0.3, 20, 0)
+    rng = np.random.default_rng(seed)
+    for top in range(0, SIZE, 16):
+        m.color[top:top + 16] = np.roll(m.color[top:top + 16], int(rng.integers(0, SIZE)), axis=1)
+        if rng.random() < 0.4:
+            m.color[top:top + 16] *= rng.uniform(0.2, 1.4)
+    scan = (Y % 8 < 2).astype(float)
+    tint(m, scan, (0.55, 0.55, 0.55))
+    tear = step(0.72, 0.86, noise(seed, 2, 48)) * 0.9
+    paint(m, tear, (240, 250, 255), glow=bright)
+    if bright:
+        m.glow[:] = np.maximum(m.glow, 0.25)
+    return m
+
+
+def cone():
+    m = flat((236, 110, 28), 0.5, 10, 0)
+    m.color *= (1 + noise(1550, 24)[..., None] * 0.06)
+    paint(m, box(0, 44, 128, 80), (240, 240, 236), f0=60)
+    return m
+
+
+def scaffold_pole():
+    m = metal((178, 182, 186), 0.6)
+    m.color *= (1 + noise(1560, 4, 64)[..., None] * 0.05)
+    for y in (24, 72, 104):
+        paint(m, box(0, y, 128, y + 10), (130, 134, 138), height=2, f0=230)
+    return m
+
+
+def site_machine():
+    m = flat((222, 176, 32), 0.45, 40, 0)
+    m.color *= (1 + noise(1570, 12)[..., None] * 0.05)
+    diagonal = (((X + Y) // 16) % 2).astype(float)
+    paint(m, box(0, 96, 128, 128) * diagonal, (30, 30, 28))
+    paint(m, box(20, 20, 108, 60), (40, 40, 44), height=-2)
+    for x in range(26, 104, 10):
+        paint(m, box(x, 22, x + 4, 58), (90, 90, 96), height=1)
+    paint(m, 1 - step(5, 7, np.hypot(X - 36, Y - 80)), (210, 50, 40), glow=0.6)
+    paint(m, 1 - step(5, 7, np.hypot(X - 60, Y - 80)), (70, 200, 90), glow=0.6)
+    return m
+
+
+def plant_sprite(kind, seed):
+    """A tuft, a fern or a flower drawn at 128 px with alpha around it: (material, alpha)."""
+    rng = np.random.default_rng(seed)
+    s = 4
+    image = Image.new("RGBA", (SIZE * s, SIZE * s), (0, 0, 0, 0))
+    d = ImageDraw.Draw(image)
+
+    def blade(x0, y0, x1, y1, width, color):
+        bend = rng.uniform(-8, 8)
+        d.line([(x0 * s, y0 * s), ((x0 + x1) / 2 * s + bend * s, (y0 + y1) / 2 * s), (x1 * s, y1 * s)], fill=color, width=max(1, int(width * s)))
+    greens = [(52, 120, 52), (70, 148, 60), (92, 170, 70), (40, 100, 48)]
+    if kind == "grass":
+        for _ in range(22):
+            x = rng.uniform(18, 110)
+            blade(x, 128, x + rng.uniform(-22, 22), rng.uniform(24, 90), rng.uniform(2.5, 5), greens[int(rng.integers(0, 4))] + (255,))
+    elif kind == "fern":
+        d.line([(64 * s, 128 * s), (66 * s, 70 * s), (60 * s, 18 * s)], fill=(60, 126, 56, 255), width=3 * s)
+        for i in range(10):
+            y = 112 - i * 9
+            reach = 30 - i * 2.2
+            for side in (-1, 1):
+                blade(63, y, 63 + side * reach, y - 14, 3.2 - i * 0.12, greens[(i + (side > 0)) % 4] + (255,))
+    else:
+        colors = {"blue": (70, 110, 224), "red": (204, 44, 44), "yellow": (244, 214, 54)}
+        petal = colors[kind[len("flower_"):]] if kind.startswith("flower_") else colors["blue"]
+        top = rng.uniform(40, 56)
+        blade(64, 128, 64 + rng.uniform(-8, 8), top + 10, 4, (60, 130, 56, 255))
+        blade(64, 108, 38, 92, 3, (70, 146, 60, 255))
+        blade(64, 100, 92, 84, 3, (70, 146, 60, 255))
+        cx = 64 + rng.uniform(-6, 6)
+        for k in range(7):
+            a = k / 7 * 2 * np.pi
+            px, py = cx + 15 * np.cos(a), top + 15 * np.sin(a)
+            d.ellipse([(px - 10) * s, (py - 10) * s, (px + 10) * s, (py + 10) * s], fill=petal + (255,))
+        d.ellipse([(cx - 8) * s, (top - 8) * s, (cx + 8) * s, (top + 8) * s], fill=(232, 176, 52, 255))
+    arr = np.asarray(image.resize((SIZE, SIZE), Image.Resampling.LANCZOS), float)
+    m = flat((0, 0, 0), 0.2, 6, 0)
+    m.color[:] = arr[..., :3]
+    return m, arr[..., 3] / 255
+
+
+def gallery_wall(layout=0):
+    """Painted block wall hung with framed pictures; three layouts, so a gallery's walls do not repeat."""
+    m = block_wall((214, 209, 196), 960 + layout)
+    skies = [(150, 182, 206), (226, 190, 150), (178, 196, 170), (120, 140, 176)]
+    grounds = [(96, 128, 84), (84, 70, 98), (120, 104, 76), (70, 96, 90)]
+    frames = {0: [(10, 22, 58, 70), (70, 56, 118, 112)],
+              1: [(14, 16, 114, 78)],
+              2: [(8, 14, 40, 60), (48, 30, 80, 76), (88, 14, 120, 60)]}[layout]
+    for i, (x0, y0, x1, y1) in enumerate(frames):
+        paint(m, box(x0 - 5, y0 - 5, x1 + 5, y1 + 5), (150, 112, 60), height=2)
+        paint(m, box(x0, y0, x1, y1), skies[(i + layout) % 4])
+        paint(m, box(x0, (y0 + y1) // 2 + 6, x1, y1), grounds[(i + layout) % 4])
+    return m
+
+
+
 def prop_textures(t):
     t["trader_sign"] = trader_sign()
     t["clinic_sign"] = clinic_sign()
@@ -1210,7 +1464,40 @@ def prop_textures(t):
     t["counter_trade"] = canvas((44, 86, 96), 990)
     t["counter_tom"] = canvas((176, 60, 52), 991)
     t["floor_painting"] = floor_painting()
-    t["gallery_wall"] = gallery_wall()
+    t["gallery_wall"] = gallery_wall(0)
+    t["gallery_wall_1"] = gallery_wall(1)
+    t["gallery_wall_2"] = gallery_wall(2)
+    for i, color in enumerate(GILD_COLORS):
+        t[f"gild_pillar_{i}"] = runs(concrete(color, 1000 + i * 7), 1100 + i)
+    t["gild_wall"] = block_wall((230, 230, 224), 1200)
+    t["gild_floor"] = concrete((158, 158, 152), 1210)
+    t["gothic_column"] = gothic_column()
+    t["gothic_base"] = gothic_base()
+    t["gothic_brick"] = masonry((136, 134, 130), 1330)
+    t["gothic_floor"] = gothic_floor()
+    t["gothic_ceiling"] = masonry((62, 64, 72), 1340, course=32, length=32)
+    t["garden_moss"] = moss_floor(1350, False)
+    t["garden_grass_floor"] = moss_floor(1360, True)
+    t["garden_wall"] = garden_wall()
+    t["garden_pillar"] = garden_pillar()
+    t["garden_ceiling"] = garden_ceiling()
+    t["legend_floor"] = planks((58, 38, 26), 1480)
+    t["legend_floor_line"] = planks((150, 40, 40), 1490)
+    t["legend_wall"] = lacquer_wall()
+    t["legend_pillar"] = lacquer_pillar()
+    t["legend_base"] = legend_base()
+    t["legend_ceiling"] = legend_ceiling()
+    t["neon_cyan"] = neon((120, 240, 255))
+    t["neon_magenta"] = neon((255, 90, 200))
+    t["neon_amber"] = neon((255, 190, 80))
+    t["copper_pillar"] = copper_pillar()
+    t["glitch_black"] = glitch((14, 14, 18), 1600, 0.0)
+    t["glitch_magenta"] = glitch((200, 40, 160), 1610, 0.4)
+    t["glitch_cyan"] = glitch((30, 190, 210), 1620, 0.4)
+    t["construction_cone"] = cone()
+    t["scaffold_pole"] = scaffold_pole()
+    t["site_machine"] = site_machine()
+    t["counter_top"] = planks((52, 38, 30), 1580, board=64)
     t["bed_sheet"] = canvas((224, 226, 228), 985)
     t["booth_wall"] = booth_panel(800)
     t["booth_drawer"] = booth_drawer(False)
@@ -1874,6 +2161,21 @@ def all_models():
     m["sunken_chair"] = sunken_chair_model()
     m["floor_painting"] = floor_painting_model()
     m["signup_booth"] = cube_all("signup_sign")
+    for name in CUBES:
+        m[name] = cube_all(name)
+    for name in PLANT_SPRITES:
+        m[name] = {"parent": "minecraft:block/cross", "textures": {"cross": NS + name}}
+    stack = [((2, 0, 2), (14, 2, 14)), ((4, 2, 4), (12, 6, 12)), ((5, 6, 5), (11, 10, 11)), ((6, 10, 6), (10, 14, 10))]
+    m["construction_cone"] = {"parent": "minecraft:block/block", "textures": {"particle": NS + "construction_cone", "t": NS + "construction_cone"},
+                              "elements": [el(a, b, sides("#t")) for a, b in stack]}
+    m["scaffold_pole"] = {"parent": "minecraft:block/block", "textures": {"particle": NS + "scaffold_pole", "t": NS + "scaffold_pole"},
+                          "elements": [el((7, 0, 7), (9, 16, 9), sides("#t")), el((6, 4, 6), (10, 6, 10), sides("#t")), el((6, 10, 6), (10, 12, 10), sides("#t"))]}
+    m["site_machine"] = {"parent": "minecraft:block/block", "textures": {"particle": NS + "site_machine", "t": NS + "site_machine"},
+                         "elements": [el((2, 0, 2), (14, 14, 14), sides("#t")), el((6, 14, 6), (10, 16, 10), sides("#t"))]}
+    for name in ("trade", "tom"):
+        m[name + "_counter"] = {"parent": "minecraft:block/block",
+                                "textures": {"particle": NS + "counter_" + name, "t": NS + "counter_" + name, "top": NS + "counter_top"},
+                                "elements": [el((0, 0, 1), (16, 12, 15), sides("#t")), el((0, 12, 0), (16, 14, 16), sides("#top"))]}
     m["sealed_door"] = cube_all("door_jamb")
     m["natural_lock"] = {"parent": "minecraft:block/block",
                          "textures": {"particle": NS + "door_jamb", "body": NS + "door_knob", "metal": NS + "door_jamb"},
@@ -1954,6 +2256,12 @@ def all_blockstates():
     turns = {"up": {}, "down": {"x": 180}, "north": {"x": 90}, "south": {"x": 90, "y": 180}, "east": {"x": 90, "y": 90},
              "west": {"x": 90, "y": 270}}
     b["phosphor_mark"] = {"variants": {f"facing={f}": {"model": NS + "phosphor_mark", **turn} for f, turn in turns.items()}}
+    for name in CUBES + ["construction_cone", "scaffold_pole", "site_machine"] + list(PLANT_SPRITES):
+        if name in ("gallery_wall_1", "gallery_wall_2"):
+            continue
+        b[name] = {"variants": {"": spin(name)}} if name in SPUN else single(name)
+    b["gallery_wall"] = {"variants": {"": [{"model": NS + "gallery_wall", "weight": 2}, {"model": NS + "gallery_wall_1", "weight": 1},
+                                           {"model": NS + "gallery_wall_2", "weight": 1}]}}
     b["pipe_gauge"] = {"variants": {f"facing={f}": {"model": NS + "pipe_gauge", **turn} for f, turn in turns.items()}}
     b["clinic_bed"] = {"variants": {"": {"model": NS + "hospital_bed"}}}
     for taken in ("false", "true"):
@@ -2050,6 +2358,16 @@ ITEM_MODELS = {"clinic_bed": "hospital_bed", "garage_floor": "garage_floor", "ga
                "old_brick": "old_brick", "padded_wall": "padded_wall", "darkness_below": "darkness", "darkness_above": "darkness"}
 
 
+PLANT_SPRITES = {"garden_grass": ("grass", 1700), "garden_fern": ("fern", 1710), "garden_flower_blue": ("flower_blue", 1720),
+                 "garden_flower_red": ("flower_red", 1730), "garden_flower_yellow": ("flower_yellow", 1740)}
+CUBES = ["gild_pillar_0", "gild_pillar_1", "gild_pillar_2", "gild_pillar_3", "gild_pillar_4", "gild_pillar_5", "gild_wall", "gild_floor",
+         "gothic_column", "gothic_base", "gothic_brick", "gothic_floor", "gothic_ceiling", "garden_moss", "garden_grass_floor", "garden_wall",
+         "garden_pillar", "garden_ceiling", "legend_floor", "legend_floor_line", "legend_wall", "legend_pillar", "legend_base", "legend_ceiling",
+         "copper_pillar", "neon_cyan", "neon_magenta", "neon_amber", "glitch_black", "glitch_magenta", "glitch_cyan", "gallery_wall_1", "gallery_wall_2"]
+SPUN = ["gild_floor", "gothic_floor", "gothic_ceiling", "garden_moss", "garden_grass_floor", "garden_ceiling", "legend_floor", "legend_floor_line", "legend_ceiling"]
+SECTOR_BLOCKS = CUBES + list(PLANT_SPRITES) + ["construction_cone", "scaffold_pole", "site_machine"]
+
+
 def main():
     TEXTURES.mkdir(parents=True, exist_ok=True)
     mt.OUT = TEXTURES  # make_textures writes Level 0's textures; point its writer at Level 1's folder
@@ -2058,6 +2376,8 @@ def main():
         mt.save(name, material)
     save_animated("flickering_wallpaper", flicker_frames(), FLICKER)
     save_cutout("phosphor_mark", *phosphor_mark())
+    for plant, (kind, seed) in PLANT_SPRITES.items():
+        save_cutout(plant, *plant_sprite(kind, seed))
     save_cutout("settlement_marker", *settlement_marker(False))
     save_cutout("settlement_marker_taken", *settlement_marker(True))
     item_textures()

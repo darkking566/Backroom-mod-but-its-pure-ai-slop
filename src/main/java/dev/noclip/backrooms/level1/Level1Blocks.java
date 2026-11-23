@@ -204,6 +204,57 @@ public final class Level1Blocks {
 			.mapColor(MapColor.COLOR_YELLOW).strength(-1.0F, 3600000.0F).sound(SoundType.WOOD), SignupBoothBlock::new);
 	public static final Block GALLERY_WALL = register("gallery_wall", Properties.of()
 			.mapColor(MapColor.QUARTZ).strength(2.0F).sound(SoundType.STONE));
+	// What the sectors are dressed in (see Level1Sectors)
+	public static final Block GILD_PILLAR_0 = register("gild_pillar_0", Properties.of().mapColor(MapColor.COLOR_YELLOW).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GILD_PILLAR_1 = register("gild_pillar_1", Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GILD_PILLAR_2 = register("gild_pillar_2", Properties.of().mapColor(MapColor.COLOR_BLUE).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GILD_PILLAR_3 = register("gild_pillar_3", Properties.of().mapColor(MapColor.COLOR_LIGHT_GREEN).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GILD_PILLAR_4 = register("gild_pillar_4", Properties.of().mapColor(MapColor.COLOR_RED).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GILD_PILLAR_5 = register("gild_pillar_5", Properties.of().mapColor(MapColor.COLOR_PURPLE).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GILD_WALL = register("gild_wall", Properties.of().mapColor(MapColor.SNOW).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GILD_FLOOR = register("gild_floor", Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GOTHIC_COLUMN = register("gothic_column", Properties.of().mapColor(MapColor.QUARTZ).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GOTHIC_BASE = register("gothic_base", Properties.of().mapColor(MapColor.QUARTZ).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GOTHIC_BRICK = register("gothic_brick", Properties.of().mapColor(MapColor.STONE).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GOTHIC_FLOOR = register("gothic_floor", Properties.of().mapColor(MapColor.STONE).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GOTHIC_CEILING = register("gothic_ceiling", Properties.of().mapColor(MapColor.DEEPSLATE).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GARDEN_MOSS = register("garden_moss", Properties.of().mapColor(MapColor.COLOR_GREEN).strength(2.0F).sound(SoundType.MOSS));
+	public static final Block GARDEN_GRASS_FLOOR = register("garden_grass_floor", Properties.of().mapColor(MapColor.GRASS).strength(2.0F).sound(SoundType.GRASS));
+	public static final Block GARDEN_WALL = register("garden_wall", Properties.of().mapColor(MapColor.COLOR_LIGHT_GREEN).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GARDEN_PILLAR = register("garden_pillar", Properties.of().mapColor(MapColor.COLOR_GREEN).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GARDEN_CEILING = register("garden_ceiling", Properties.of().mapColor(MapColor.COLOR_GREEN).strength(2.0F).sound(SoundType.MOSS));
+	public static final Block LEGEND_FLOOR = register("legend_floor", Properties.of().mapColor(MapColor.COLOR_BROWN).strength(2.0F).sound(SoundType.WOOD));
+	public static final Block LEGEND_FLOOR_LINE = register("legend_floor_line", Properties.of().mapColor(MapColor.CRIMSON_STEM).strength(2.0F).sound(SoundType.WOOD));
+	public static final Block LEGEND_WALL = register("legend_wall", Properties.of().mapColor(MapColor.COLOR_RED).strength(2.0F).sound(SoundType.WOOD));
+	public static final Block LEGEND_PILLAR = register("legend_pillar", Properties.of().mapColor(MapColor.COLOR_RED).strength(2.0F).sound(SoundType.WOOD));
+	public static final Block LEGEND_BASE = register("legend_base", Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F).sound(SoundType.WOOD));
+	public static final Block LEGEND_CEILING = register("legend_ceiling", Properties.of().mapColor(MapColor.COLOR_BROWN).strength(2.0F).sound(SoundType.WOOD));
+	public static final Block COPPER_PILLAR = register("copper_pillar", Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(2.0F).sound(SoundType.METAL));
+	/** Neon in the Legend Sector: not on the lamps' circuit, so a blackout leaves it burning. */
+	public static final Block NEON_CYAN = register("neon_cyan", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12));
+	/** Neon in the Legend Sector: not on the lamps' circuit, so a blackout leaves it burning. */
+	public static final Block NEON_MAGENTA = register("neon_magenta", Properties.of().mapColor(MapColor.COLOR_MAGENTA).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12));
+	/** Neon in the Legend Sector: not on the lamps' circuit, so a blackout leaves it burning. */
+	public static final Block NEON_AMBER = register("neon_amber", Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12));
+	public static final Block GARDEN_GRASS = register("garden_grass", Properties.of().mapColor(MapColor.PLANT).instabreak().noCollision().noOcclusion().replaceable().sound(SoundType.GRASS),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 12, 14)));
+	public static final Block GARDEN_FERN = register("garden_fern", Properties.of().mapColor(MapColor.PLANT).instabreak().noCollision().noOcclusion().replaceable().sound(SoundType.GRASS),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 12, 14)));
+	public static final Block GARDEN_FLOWER_BLUE = register("garden_flower_blue", Properties.of().mapColor(MapColor.PLANT).instabreak().noCollision().noOcclusion().replaceable().sound(SoundType.GRASS),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 12, 14)));
+	public static final Block GARDEN_FLOWER_RED = register("garden_flower_red", Properties.of().mapColor(MapColor.PLANT).instabreak().noCollision().noOcclusion().replaceable().sound(SoundType.GRASS),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 12, 14)));
+	public static final Block GARDEN_FLOWER_YELLOW = register("garden_flower_yellow", Properties.of().mapColor(MapColor.PLANT).instabreak().noCollision().noOcclusion().replaceable().sound(SoundType.GRASS),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 12, 14)));
+	public static final Block CONSTRUCTION_CONE = register("construction_cone", Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(0.5F).sound(SoundType.WOOL).noOcclusion().noCollision(),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 14, 14)));
+	public static final Block SCAFFOLD_POLE = register("scaffold_pole", Properties.of().mapColor(MapColor.METAL).strength(0.5F).sound(SoundType.METAL).noOcclusion().noCollision(),
+			p -> new ShapedBlock(p, Block.box(7, 0, 7, 9, 16, 9)));
+	public static final Block SITE_MACHINE = register("site_machine", Properties.of().mapColor(MapColor.COLOR_YELLOW).strength(0.5F).sound(SoundType.METAL).noOcclusion(),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 14, 14)));
+	public static final Block GLITCH_BLACK = register("glitch_black", Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 0));
+	public static final Block GLITCH_MAGENTA = register("glitch_magenta", Properties.of().mapColor(MapColor.COLOR_MAGENTA).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 6));
+	public static final Block GLITCH_CYAN = register("glitch_cyan", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 6));
 	/** The chair in the rubber room, sunk into the floor. */
 	public static final Block SUNKEN_CHAIR = register("sunken_chair", Properties.of()
 			.mapColor(MapColor.COLOR_GRAY).strength(0.8F).sound(SoundType.WOOL).noOcclusion(),

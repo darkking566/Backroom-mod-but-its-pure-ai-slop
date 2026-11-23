@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "noclip_backrooms:block/level1/garden_flower_blue"
+  }
+}
