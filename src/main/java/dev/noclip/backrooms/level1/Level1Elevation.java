@@ -476,6 +476,25 @@ public final class Level1Elevation {
 		return solidConcrete();
 	}
 
+	/** Returns false where the main y=32 floor has been carved away (sunken basins, landmarks, sublevel stairs). */
+	static boolean hasMainFloor(long seed, int x, int z) {
+		int dx = Math.floorDiv(x, D), dz = Math.floorDiv(z, D);
+		if (Level1Landmarks.landmark(seed, dx, dz) != Level1Landmarks.Landmark.NONE) return false;
+		Profile p = profile(seed, dx, dz);
+		int lx = Math.floorMod(x, D), lz = Math.floorMod(z, D);
+		if (p == Profile.SUNKEN_BASIN && inBasin(lx, lz)) return false;
+		if (p == Profile.SUBLEVEL_TUNNELS && lx >= 12 && lx <= 20 && lz >= 18 && lz <= 27) return false;
+		Level1SectorArchitecture.Variant v = Level1SectorArchitecture.variant(seed, dx, dz);
+		if (v == Level1SectorArchitecture.Variant.TAILCHASE_EXCAVATION_PITS
+				&& ((lx >= 12 && lx <= 26 && lz >= 14 && lz <= 28) || (lx >= 36 && lx <= 50 && lz >= 34 && lz <= 48))) {
+			return false;
+		}
+		if (v == Level1SectorArchitecture.Variant.GARDEN_SUNKEN_POND && Math.hypot(lx - 32, lz - 32) <= 18) {
+			return false;
+		}
+		return true;
+	}
+
 	private static boolean inBasin(int lx, int lz) {
 		return lx >= 12 && lx <= 51 && lz >= 12 && lz <= 51;
 	}

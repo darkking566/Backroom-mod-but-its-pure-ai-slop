@@ -49,7 +49,7 @@ final class Level1Sectors {
 			case TAILCHASE, TALON -> null;
 		};
 		if (dressed != null) return dressed;
-		if (state.isAir() && y > FLOOR && y <= FLOOR + 3) {
+		if (state.isAir() && y > FLOOR && y <= FLOOR + 3 && Level1Elevation.hasMainFloor(seed, x, z)) {
 			// The same roll up a whole column, so poles and heaps stand rather than float.
 			BlockState scene = scenery(sector, tile, Math.floorMod(Level1Layout.hash(seed, x, z, 23), 100), y);
 			if (scene != null) return scene;
