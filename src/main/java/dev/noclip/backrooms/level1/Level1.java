@@ -39,6 +39,7 @@ public final class Level1 {
 		Gardens.register();
 		Residents.register();
 		Warps.register();
+		Thresholds.register();
 		Strays.register();
 		Marauders.register();
 		Smilers.register();

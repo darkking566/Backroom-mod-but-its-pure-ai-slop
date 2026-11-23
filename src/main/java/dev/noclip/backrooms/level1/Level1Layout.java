@@ -49,6 +49,17 @@ public final class Level1Layout {
 		return Sector.TAILCHASE;
 	}
 
+	/**
+	 * The way to Level 2: "head toward where the pipes and gauges get thicker". Some regions have a pipe zone around their
+	 * centre, copper pillars crowding in toward the middle. Returns how far from that centre (0 at it, 1 at the edge), or -1.
+	 */
+	public static double pipeZone(long seed, int x, int z) {
+		int size = DISTRICT * SECTOR_DISTRICTS, rx = Math.floorDiv(x, size), rz = Math.floorDiv(z, size);
+		if ((rx == 0 && rz == 0) || Math.floorMod(hash(seed, rx, rz, SECTOR + 1), 100) >= 15) return -1;
+		double distance = Math.hypot(x - (rx * size + size / 2.0), z - (rz * size + size / 2.0)) / 100.0;
+		return distance < 1 ? distance : -1;
+	}
+
 	/** The settlements players have found in Level 1. */
 	public enum Base {
 		NONE,

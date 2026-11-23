@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level1;
 
+import dev.noclip.backrooms.core.LevelExits;
 import dev.noclip.backrooms.level0.Level0;
 import dev.noclip.backrooms.level1.Level1Layout.Kind;
 import dev.noclip.backrooms.level1.Level1Layout.Tile;
@@ -233,6 +234,28 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		shoot(context, game, fort[0] * 64 + 31.5, STAND, fort[1] * 64 + 11.5, 0, 0, "level1_cornucopia");
 		check(server.computeOnServer(s -> Residents.populate(level1(s), fort[0], fort[1])) > 0, "no one is at Cornucopia");
 		shoot(context, game, fort[0] * 64 + 31.5, STAND, fort[1] * 64 + 11.5, 0, 0, "level1_cornucopia_people");
+
+		// Where the copper pipes crowd in, the way to Level 2 (shut until that level exists).
+		BlockPos pipes = null;
+		for (int rx = -6; rx <= 6 && pipes == null; rx++) {
+			for (int rz = -6; rz <= 6 && pipes == null; rz++) {
+				int cx = rx * 256 + 128, cz = rz * 256 + 128;
+				for (int dx = -8; dx <= 8 && pipes == null; dx++) {
+					for (int dz = -8; dz <= 8 && pipes == null; dz++) {
+						double zone = Level1Layout.pipeZone(seed, cx + dx, cz + dz);
+						if (zone >= 0 && zone <= 0.06 && Level1Layout.tile(seed, cx + dx, cz + dz) == Tile.FLOOR
+								&& Level1Layout.kindAt(seed, cx + dx, cz + dz) != Kind.CORRIDORS) pipes = new BlockPos(cx + dx, STAND, cz + dz);
+					}
+				}
+			}
+		}
+		check(pipes != null, "no pipe zone near the origin");
+		int refusedBefore = LevelExits.refusals();
+		shoot(context, game, pipes.getX() + 0.5, STAND, pipes.getZ() + 0.5, 90, 5, "level1_pipe_zone");
+		server.runCommand("gamemode survival @a");
+		context.waitTicks(30);
+		check(LevelExits.refusals() > refusedBefore, "the threshold to Level 2 did nothing");
+		server.runCommand("gamemode spectator @a");
 
 		// The zone is not Euclidean: carried a bay or two along the hall, heading kept.
 		int[] spot = Level1Layout.landing(seed, 0, 0);

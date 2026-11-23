@@ -24,9 +24,13 @@ final class Level1Sectors {
 	}
 
 	static BlockState dress(Sector sector, Tile tile, BlockState state, long seed, int x, int y, int z) {
-		if (sector == Sector.TALON) return state;
 		Block block = state.getBlock();
 		int roll = Math.floorMod(Level1Layout.hash(seed, x * 31 + y, z, 17), 100);
+		double zone = Level1Layout.pipeZone(seed, x, z);
+		if (zone >= 0 && roll < (1 - zone) * 85 && (block == Level1Blocks.GARAGE_PILLAR || block == Level1Blocks.GARAGE_PILLAR_MARKED || block == Level1Blocks.GARAGE_PILLAR_BASE)) {
+			return Blocks.RAW_COPPER_BLOCK.defaultBlockState();
+		}
+		if (sector == Sector.TALON) return state;
 		BlockState dressed = switch (sector) {
 			case GILD -> gild(block, seed, x, z);
 			case GOTHIC -> gothic(block);
