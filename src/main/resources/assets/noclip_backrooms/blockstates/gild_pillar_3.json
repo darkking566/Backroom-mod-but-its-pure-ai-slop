@@ -1,7 +1,18 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level1/gild_pillar_3"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/gild_pillar_3",
+        "weight": 14
+      },
+      {
+        "model": "noclip_backrooms:block/level1/gild_pillar_3_1",
+        "weight": 9
+      },
+      {
+        "model": "noclip_backrooms:block/level1/gild_pillar_3_2",
+        "weight": 6
+      }
+    ]
   }
 }

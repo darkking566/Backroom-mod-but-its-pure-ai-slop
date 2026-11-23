@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "noclip_backrooms:block/level1/gild_wall_1"
+  }
+}
