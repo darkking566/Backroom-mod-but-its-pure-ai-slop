@@ -175,7 +175,7 @@ public final class Level1Landmarks {
 				return Level1Blocks.OLD_COMPUTER.defaultBlockState()
 						.setValue(OldComputerBlock.FACING, u == 1 ? Direction.EAST : Direction.WEST);
 			}
-			if (y == 42 && (u == 2 || u == 29) && v % 8 == 4) return state(Level1Blocks.CAGED_LAMP);
+			if (y == topCeil - 1 && (u == 2 || u == 29) && v % 8 == 4) return state(Level1Blocks.CAGED_LAMP);
 			return y == topCeil - 1 ? hallFixture(ceiling) : air();
 		}
 
@@ -183,10 +183,9 @@ public final class Level1Landmarks {
 		if (y == lowerY) {
 			return state((u % 6 == 0 || v % 6 == 0) ? Level1Blocks.DAMP_GARAGE_FLOOR : Level1Blocks.GARAGE_FLOOR);
 		}
-		// Giant rows of copper cooling towers & generator banks on lower floor
+		// Giant rows of full-height copper cooling towers & generator banks on lower floor
 		if ((u == 9 || u == 22) && (v == 10 || v == 16 || v == 22)) {
-			if (y > lowerY && y <= 39) return state(Level1Blocks.COPPER_PILLAR);
-			if (y == 40) return state(Level1Blocks.CAGED_LAMP);
+			if (y > lowerY && y < topCeil) return state(Level1Blocks.COPPER_PILLAR);
 		}
 		if ((u == 11 || u == 20) && (v == 10 || v == 16 || v == 22) && y == lowerY + 1) {
 			return state(Level1Blocks.GENERATOR);
@@ -194,8 +193,8 @@ public final class Level1Landmarks {
 		if ((u == 12 || u == 19) && (v == 11 || v == 17) && y == lowerY + 1) {
 			return state(Level1Blocks.FUEL_DRUM);
 		}
-		// Overhead pipe grid at y = 45
-		if (y == 45 && (u % 6 == 0 || v % 6 == 0)) return state(Level1Blocks.CEILING_PIPE);
+		// Overhead X-aligned pipe grid mounted directly under the ceiling
+		if (y == topCeil - 1 && v % 6 == 0) return state(Level1Blocks.CEILING_PIPE);
 		if (y == topCeil - 1) return hallFixture(ceiling);
 		return air();
 	}
@@ -275,7 +274,7 @@ public final class Level1Landmarks {
 		if (onShaftRim && (y == 25 || y == 33 || y == 41 || y == 49)) {
 			return barrier((v == 8 || v == 23) ? Direction.Axis.X : Direction.Axis.Z);
 		}
-		if ((y == 30 || y == 38 || y == 46 || y == 54) && (u == 5 || u == 26) && (v == 5 || v == 26)) {
+		if ((y == 31 || y == 39 || y == 47 || y == 55) && (u == 5 || u == 26) && (v == 5 || v == 26)) {
 			return state(Level1Blocks.CAGED_LAMP);
 		}
 		if (y < 24) return solidConcrete();
@@ -358,7 +357,7 @@ public final class Level1Landmarks {
 			if (y == 38) return state(Level1Blocks.GARAGE_FLOOR);
 			boolean rim = u == 3 || u == 28 || v == 3 || v == 28;
 			if (y == 39 && rim) return barrier((v == 3 || v == 28) ? Direction.Axis.X : Direction.Axis.Z);
-			if (y == 42 && (u == 1 || u == 30) && v % 10 == 5) return state(Level1Blocks.FLOODLIGHT);
+			if (y == 39 && (u == 1 || u == 30) && v % 10 == 5) return state(Level1Blocks.FLOODLIGHT);
 		}
 
 		// Massive 7-block-tall shelf aisles inside (u = 7..24, v = 6..25)

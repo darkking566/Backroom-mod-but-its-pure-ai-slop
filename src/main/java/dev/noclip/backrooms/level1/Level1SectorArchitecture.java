@@ -207,19 +207,19 @@ public final class Level1SectorArchitecture {
 		return null;
 	}
 
-	/** Heavy overhead copper pipe gantries, suspended caged lamps, and industrial oil drums below. */
+	/** Heavy overhead copper pipe gantries (X-aligned so pipes connect cleanly), ceiling-mounted caged lamps, and drums. */
 	private static BlockState talonPipeGantry(long seed, Tile tile, BlockState cur, int x, int y, int z, int lx, int lz, int topCeil) {
 		if (!cur.isAir()) return null;
-		// Thick overhead pipe racks at y = 36 and y = 42 (when tall)
-		if (y == FLOOR + 4 || (topCeil >= 46 && y == FLOOR + 10)) {
-			if (lx % 12 == 0 || lz % 12 == 0) return state(Level1Blocks.CEILING_PIPE);
+		// CEILING_PIPE only connects along the X axis (fixed Z, varying X), and must sit right under the ceiling.
+		if (y == topCeil - 1) {
+			if (lz % 12 == 0) return state(Level1Blocks.CEILING_PIPE);
 			if (lx % 12 == 6 && lz % 12 == 6) return state(Level1Blocks.CAGED_LAMP);
 		}
-		// Vertical copper pipe risers beside aisles
-		if (lx % 12 == 0 && lz % 12 == 0 && y > FLOOR && y < Math.min(topCeil, FLOOR + 12)) {
+		// Full-height vertical copper pipe risers (floor to ceiling, never floating mid-air)
+		if (lx % 12 == 0 && lz % 12 == 0 && y > FLOOR && y < topCeil) {
 			return state(Level1Blocks.COPPER_PILLAR);
 		}
-		// Occasional red fuel drums clustered near the risers
+		// Occasional red fuel drums clustered near the risers on the main floor
 		if (y == FLOOR + 1 && tile == Tile.FLOOR && Math.abs(lx % 12) == 1 && Math.abs(lz % 12) == 1) {
 			if (Math.floorMod(Level1Layout.hash(seed, x, z, 71), 3) == 0) return state(Level1Blocks.FUEL_DRUM);
 		}
@@ -324,8 +324,8 @@ public final class Level1SectorArchitecture {
 			int archY = archBase + Math.min(dist / 2, 4);
 			if (y >= archY && y <= Math.min(topCeil - 1, archY + 2)) return state(Level1Blocks.GOTHIC_BRICK);
 		}
-		// Hanging caged chandelier in the center of each bay
-		if (bx == 5 && bz == 8 && y == Math.min(topCeil - 2, FLOOR + 6)) {
+		// Hanging caged chandelier mounted directly under the ceiling in the center of each bay
+		if (bx == 5 && bz == 8 && y == topCeil - 1) {
 			return state(Level1Blocks.CAGED_LAMP);
 		}
 		return null;
@@ -374,7 +374,7 @@ public final class Level1SectorArchitecture {
 			if (doorway && y <= FLOOR + 3) return null;
 			return state(Level1Blocks.GOTHIC_BRICK);
 		}
-		if (cx == 8 && cz == 8 && y == FLOOR + 4) return state(Level1Blocks.CAGED_LAMP);
+		if (cx == 8 && cz == 8 && y == topCeil - 1) return state(Level1Blocks.CAGED_LAMP);
 		return null;
 	}
 
@@ -540,7 +540,7 @@ public final class Level1SectorArchitecture {
 			if (cx == 8 && cz == 8) return state(Level1Blocks.SITE_MACHINE);
 			if (cx == 7 && cz == 7) return state(Level1Blocks.CONSTRUCTION_CONE);
 		}
-		if (cx == 8 && cz == 8 && y == Math.min(topCeil - 1, FLOOR + 7)) return state(Level1Blocks.CAGED_LAMP);
+		if (cx == 8 && cz == 8 && y == topCeil - 1) return state(Level1Blocks.CAGED_LAMP);
 		return null;
 	}
 

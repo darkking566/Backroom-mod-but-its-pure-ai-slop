@@ -450,7 +450,7 @@ public final class Level1Elevation {
 			if (y == sub1Ceil) return state(Level1Blocks.GARAGE_CEILING);
 			if (y == sub1Ceil - 1) {
 				if (ceiling == Ceiling.LAMP || ceiling == Ceiling.DEAD_LAMP) return hallFixture(ceiling);
-				if (lx % 16 == 8 || lz % 16 == 8) return state(Level1Blocks.CEILING_PIPE);
+				if (lz % 16 == 8) return state(Level1Blocks.CEILING_PIPE);
 			}
 			return air();
 		}
