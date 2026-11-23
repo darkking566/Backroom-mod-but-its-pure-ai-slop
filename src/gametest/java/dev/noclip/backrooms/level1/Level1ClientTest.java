@@ -50,6 +50,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			blackout(context, game);
 			crate(context, game);
 			views(context, game, seed);
+			exits(context, game, seed);
 			checkBlocks(context, game);
 			leaveThroughDoor(context, game, seed);
 		}
@@ -195,6 +196,110 @@ public final class Level1ClientTest implements FabricClientGameTest {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * Every kind of exit to another level, as generated: a picture of each, a shut one refusing,
+	 * the lone door frame passed back and forth, and the stairs up into Level 0.
+	 */
+	private static void exits(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		server.runCommand("gamemode spectator @a");
+		for (Level1Exit exit : Level1Exit.values()) {
+			HallPlan.Placed placed = nearestExit(seed, exit);
+			int[] spot = placed.spot();
+			double x = spot[0] + 0.5, z = spot[1] + 0.5;
+			String name = "level1_exit_" + exit.level.replace('.', '_');
+			switch (exit.shape) {
+				case CORE_DOOR, CORE_PAINTING, CORE_OUTLETS -> {
+					int[] out = HallPlan.FACES[placed.face()];
+					float yaw = facing(out);
+					shoot(context, game, x + out[0] * 3, STAND, z + out[1] * 3, yaw, exit.shape == Level1Exit.Shape.CORE_OUTLETS ? 25 : 5, name);
+				}
+				case PILLAR -> shoot(context, game, x - 3, STAND, z, -90, 5, name);
+				case HATCH -> shoot(context, game, x, STAND, z + 2.5, 180, 50, name);
+				case FRAME -> shoot(context, game, x, STAND, z + 4, 180, 5, name);
+				case STAIRS_DOWN -> shoot(context, game, x + 0.5, STAND, z - 2.5, 0, 40, name);
+				case STAIRS_UP -> shoot(context, game, x + 0.5, STAND, z - 3, 0, -25, name);
+			}
+		}
+
+		// A door to a level that does not exist yet stays shut and says so.
+		HallPlan.Placed shop = nearestExit(seed, Level1Exit.AUTOMATIC_DOOR);
+		int[] door = shop.spot();
+		int[] out = HallPlan.FACES[shop.face()];
+		float yaw = facing(out);
+		int refused = dev.noclip.backrooms.levels.LevelExits.refusals();
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f %.1f 20",
+				door[0] + 0.5 + out[0] * 1.5, STAND, door[1] + 0.5 + out[1] * 1.5, yaw));
+		server.runCommand("gamemode survival @a");
+		context.waitTicks(10);
+		context.getInput().lookAt(yaw, 20);
+		context.waitTicks(3);
+		context.getInput().pressMouse(1);
+		context.waitTicks(10);
+		context.takeScreenshot("level1_exit_closed");
+		server.runOnServer(s -> {
+			check(dev.noclip.backrooms.levels.LevelExits.refusals() > refused, "the door to Level 197 did not refuse");
+			check(player(s).level().dimension() == Level1.LEVEL_1, "a closed door let the player through");
+		});
+
+		// Back and forth through the lone frame: the fourth pass tries to go to 1.1, which is not open either.
+		HallPlan.Placed frame = nearestExit(seed, Level1Exit.DOOR_FRAME);
+		int[] at = frame.spot();
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f 180 0",
+				at[0] + 0.5, STAND, at[1] + 3.0));
+		context.waitTicks(20);
+		int before = dev.noclip.backrooms.levels.LevelExits.refusals();
+		for (int pass = 0; pass < DoorFrameBlock.PASSES; pass++) {
+			boolean forward = pass % 2 == 0;
+			context.getInput().holdKeyFor(options -> forward ? options.keyUp : options.keyDown, 22);
+			context.waitTicks(6);
+		}
+		context.waitTicks(10);
+		server.runOnServer(s -> check(dev.noclip.backrooms.levels.LevelExits.refusals() > before, "going back and forth through the frame did nothing"));
+
+		// The stairs up, rarest of all, climb back into Level 0.
+		HallPlan.Placed stairs = nearestExit(seed, Level1Exit.STAIRS_UP);
+		int[] bottom = stairs.spot();
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f 0 0",
+				bottom[0] + 1.0, STAND, bottom[1] - 0.5));
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(20);
+		context.getInput().holdKeyFor(options -> options.keyUp, 80);
+		server.waitFor(s -> player(s).level().dimension() == Level1.LEVEL_0, 200);
+		context.waitTicks(30);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level1_stairs_into_level0");
+		server.runOnServer(s -> {
+			ServerPlayer player = player(s);
+			check(!player.isInWall(), "came up inside a Level 0 wall");
+			check(player.getHealth() == player.getMaxHealth(), "hurt on the stairs");
+		});
+		// Back to Level 1 for the rest of the test.
+		server.runCommand("gamemode spectator @a");
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f",
+				bottom[0] + 1.0, STAND, bottom[1] - 1.5));
+		context.waitTicks(20);
+	}
+
+	/** The yaw that looks back at an exit from the side it faces. */
+	private static float facing(int[] out) {
+		return (float) Math.toDegrees(Math.atan2(out[0], -out[1]));
+	}
+
+	private static HallPlan.Placed nearestExit(long seed, Level1Exit exit) {
+		for (int ring = 0; ring < 12; ring++) {
+			for (int dx = -ring; dx <= ring; dx++) {
+				for (int dz = -ring; dz <= ring; dz++) {
+					if (Math.max(Math.abs(dx), Math.abs(dz)) != ring) continue;
+					for (HallPlan.Placed placed : Level1Layout.exits(seed, dx, dz)) {
+						if (placed.exit() == exit) return placed;
+					}
+				}
+			}
+		}
+		throw new AssertionError("no " + exit + " near the origin");
 	}
 
 	/** A picture of pos, backing away from it in a straight line through open floor, up to seven blocks. */

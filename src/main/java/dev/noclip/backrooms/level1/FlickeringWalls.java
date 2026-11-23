@@ -31,10 +31,14 @@ import net.minecraft.world.phys.Vec3;
 final class FlickeringWalls {
 	/** Level 0 wall blocks that may start to flicker; listed in data, so this needs nothing from Level 0's code. */
 	private static final TagKey<Block> LEVEL_0_WALLS = TagKey.create(Registries.BLOCK, Level1.id("level_0_walls"));
-	private static final int FIRST_DELAY = 3 * 60 * 20, DELAY_SPREAD = 2 * 60 * 20;
+	// The way into the parking structure is meant to be one of the hardest to find: a long wait, and it opens well away.
+	private static final int FIRST_DELAY = 4 * 60 * 20, DELAY_SPREAD = 3 * 60 * 20;
+	private static final int NEAREST = 16, FARTHEST = 40;
 	private static final int RETRY_DELAY = 10 * 20, REOPEN_DELAY = 60 * 20, MOVED_DELAY = 20 * 20;
 	private static final int GIVE_UP_DISTANCE = 80;
-	private static final int CRACKLE_INTERVAL = 50;
+	private static final int CRACKLE_INTERVAL = 100;
+	/** Loud enough to carry about 32 blocks through the maze. */
+	private static final float CRACKLE_VOLUME = 2.0F;
 
 	private record Wall(BlockPos bottom, BlockState lower, BlockState upper) {
 	}
@@ -85,7 +89,7 @@ final class FlickeringWalls {
 					DUE.put(id, TIME_INSIDE.getOrDefault(id, 0) + REOPEN_DELAY);
 				} else if (now % CRACKLE_INTERVAL == 0) {
 					level0.playSound(null, wall.bottom().above(), Level1Sounds.WALL_FLICKER, SoundSource.AMBIENT,
-							1.0F, 0.8F + level0.getRandom().nextFloat() * 0.4F);
+							CRACKLE_VOLUME, 0.8F + level0.getRandom().nextFloat() * 0.4F);
 				}
 				continue;
 			}
@@ -107,7 +111,7 @@ final class FlickeringWalls {
 
 		for (int attempt = 0; attempt < 80; attempt++) {
 			double angle = random.nextDouble() * Math.PI * 2;
-			double distance = 8 + random.nextDouble() * 16;
+			double distance = NEAREST + random.nextDouble() * (FARTHEST - NEAREST);
 			double ax = Math.cos(angle), az = Math.sin(angle);
 			// Behind or beside the player, never right in front of them.
 			if (ax * look.x + az * look.z > 0.3) continue;

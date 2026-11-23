@@ -94,10 +94,11 @@ Fabric・Minecraft 26.2・Java 25・模組代號 `noclip_backrooms`
 
 畫面升級在 `claude` 分支等使用者試玩，同意後再合併進 `main`。之後候選（尚未決定）：第一隻怪物。
 
-## Level 1：停車場（`claude` 分支，等使用者試玩）
+## Level 1：停車場（等使用者試玩）
 
 - 說明：[docs/level1.md](docs/level1.md)
-- 從 Level 0 進入：在 Level 0 待 3～5 分鐘，附近會有一段牆開始閃爍、冒電火花，直接走進去
+- 從 Level 0 進入：在 Level 0 待 4～7 分鐘，16～40 格外會有一段牆開始閃爍、冒電火花，直接走進去
 - 直接進入：`/execute in noclip_backrooms:level_1 run tp @s 32.5 33 41.5`
 - 離開：白色走廊區裡的鐵製出口門（有 EXIT 標誌，附近燈泡是綠色）
+- 通往其他樓層的 11 種出口（樓層越低越難找），還沒做的樓層會顯示尚未開放：見 docs/level1.md
 - 改貼圖或模型：`python tools/make_level1.py`

@@ -54,17 +54,22 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 	}
 
 	static BlockState blockAt(long seed, int x, int y, int z) {
-		return block(seed, Level1Layout.tile(seed, x, z), Level1Layout.ceiling(seed, x, z), x, y, z);
+		return block(seed, Level1Layout.tile(seed, x, z), Level1Layout.ceiling(seed, x, z), Level1Layout.exitCell(seed, x, z), x, y, z);
 	}
 
-	private static BlockState block(long seed, Tile tile, Ceiling ceiling, int x, int y, int z) {
+	private static BlockState block(long seed, Tile tile, Ceiling ceiling, HallPlan.Cell exit, int x, int y, int z) {
+		if (exit != null) {
+			BlockState state = Level1Exits.block(exit, x, y, z);
+			if (state != null) return state;
+		}
 		// Bedrock under the floor and over the roof, so nothing gets out underneath or lands on top.
 		if (y == 0 || y > CEILING_Y) return Blocks.BEDROCK.defaultBlockState();
 		if (y < FLOOR_Y) return Blocks.CONCRETE.gray().defaultBlockState();
 		if (y == CEILING_Y) return state(Level1Blocks.GARAGE_CEILING);
 		if (y == FLOOR_Y) return floor(tile);
 		return switch (tile) {
-			case FLOOR, LINE, DAMP, PUDDLE -> y == HALL_TOP ? hallFixture(ceiling) : air();
+			case FLOOR, LINE, DAMP, PUDDLE, HATCH, FRAME, STAIRWELL -> y == HALL_TOP ? hallFixture(ceiling) : air();
+			case EXIT_CORE -> state(Level1Blocks.GARAGE_WALL);
 			case SHELF -> y <= FLOOR_Y + 2 ? state(Level1Blocks.METAL_SHELF) : y == HALL_TOP ? hallFixture(ceiling) : air();
 			case PILLAR -> pillar(seed, x, y, z);
 			case HALL_WALL -> state(Level1Blocks.GARAGE_WALL);
@@ -84,7 +89,7 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 
 	private static BlockState floor(Tile tile) {
 		return switch (tile) {
-			case FLOOR, PILLAR, SHELF, HALL_WALL -> state(Level1Blocks.GARAGE_FLOOR);
+			case FLOOR, PILLAR, SHELF, HALL_WALL, EXIT_CORE, HATCH, FRAME, STAIRWELL -> state(Level1Blocks.GARAGE_FLOOR);
 			case LINE -> state(Level1Blocks.GARAGE_FLOOR_LINE);
 			case DAMP -> state(Level1Blocks.DAMP_GARAGE_FLOOR);
 			case PUDDLE -> state(Level1Blocks.PUDDLED_GARAGE_FLOOR);
@@ -170,8 +175,9 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 				int wx = minX + x, wz = minZ + z;
 				Tile tile = Level1Layout.tile(seed, wx, wz);
 				Ceiling ceiling = Level1Layout.ceiling(seed, wx, wz);
+				HallPlan.Cell exit = Level1Layout.exitCell(seed, wx, wz);
 				for (int y = 0; y < HEIGHT; y++) {
-					BlockState state = block(seed, tile, ceiling, wx, y, wz);
+					BlockState state = block(seed, tile, ceiling, exit, wx, y, wz);
 					chunk.setBlockState(pos.set(x, y, z), state);
 					oceanFloor.update(x, y, z, state);
 					surface.update(x, y, z, state);

@@ -30,6 +30,7 @@ public final class Level1Blocks {
 	private static final VoxelShape BULB_SHAPE = Block.box(5.5, 3, 5.5, 10.5, 16, 10.5);
 	private static final VoxelShape DESK_SHAPE = Block.box(0, 0, 0.5, 16, 14, 15.5);
 	private static final VoxelShape COMPUTER_SHAPE = Block.box(2, 0, 2, 14, 11, 14);
+	private static final VoxelShape FRAME_SHAPE = Block.box(0, 0, 6.5, 16, 16, 9.5);
 
 	// The parking structure
 	public static final Block GARAGE_FLOOR = register("garage_floor", concrete(MapColor.STONE));
@@ -74,6 +75,32 @@ public final class Level1Blocks {
 			.mapColor(MapColor.COLOR_YELLOW).strength(-1.0F, 3600000.0F).noLootTable().noCollision()
 			.sound(SoundType.WOOD).lightLevel(state -> 6).emissiveRendering(state -> true), FlickeringWallBlock::new);
 
+	// Ways on to other levels (Level1Exit lists where each leads)
+	public static final Block WHITE_DOOR = door("white_door", Level1Exit.WHITE_DOOR, SoundType.WOOD, 0);
+	public static final Block WHITE_DOOR_TOP = door("white_door_top", Level1Exit.WHITE_DOOR, SoundType.WOOD, 0);
+	public static final Block REINFORCED_DOOR = door("reinforced_door", Level1Exit.REINFORCED_DOOR, SoundType.METAL, 0);
+	public static final Block REINFORCED_DOOR_TOP = door("reinforced_door_top", Level1Exit.REINFORCED_DOOR, SoundType.METAL, 0);
+	public static final Block AUTOMATIC_DOOR = door("automatic_door", Level1Exit.AUTOMATIC_DOOR, SoundType.GLASS, 12);
+	public static final Block AUTOMATIC_DOOR_TOP = door("automatic_door_top", Level1Exit.AUTOMATIC_DOOR, SoundType.GLASS, 12);
+	public static final Block PICKAXE_DOOR = door("pickaxe_door", Level1Exit.PICKAXE_DOOR, SoundType.WOOD, 0);
+	public static final Block PICKAXE_DOOR_TOP = door("pickaxe_door_top", Level1Exit.PICKAXE_DOOR, SoundType.WOOD, 0);
+	public static final Block PALACE_PAINTING = register("palace_painting", exitProperties(MapColor.COLOR_PINK, SoundType.WOOD),
+			p -> new ExitBlock(p, Level1Exit.PAINTING.level));
+	public static final Block OUTLET_WALL = register("outlet_wall", exitProperties(MapColor.STONE, SoundType.STONE),
+			p -> new ExitBlock(p, Level1Exit.OUTLETS.level));
+	public static final Block CRACKED_PILLAR = register("cracked_pillar", exitProperties(MapColor.STONE, SoundType.STONE),
+			p -> new ExitBlock(p, Level1Exit.CRACKED_PILLAR.level));
+	public static final Block CELLAR_HATCH = register("cellar_hatch", exitProperties(MapColor.METAL, SoundType.METAL),
+			p -> new ExitBlock(p, Level1Exit.CELLAR_HATCH.level));
+	public static final Block DOOR_FRAME = register("standalone_door_frame", exitProperties(MapColor.WOOD, SoundType.WOOD).noOcclusion().noCollision(),
+			p -> new DoorFrameBlock(p, FRAME_SHAPE, Level1Exit.DOOR_FRAME.level));
+	public static final Block DOOR_FRAME_TOP = register("standalone_door_frame_top", exitProperties(MapColor.WOOD, SoundType.WOOD).noOcclusion().noCollision(),
+			p -> new ShapedBlock(p, FRAME_SHAPE));
+	public static final Block CONCRETE_STAIRS = register("concrete_stairs", concrete(MapColor.STONE),
+			p -> new ConcreteStairsBlock(GARAGE_FLOOR.defaultBlockState(), p));
+	public static final Block DARKNESS_BELOW = register("darkness_below", darkness(), p -> new DarknessBlock(p, Level1Exit.STAIRS_DOWN.level));
+	public static final Block DARKNESS_ABOVE = register("darkness_above", darkness(), p -> new DarknessBlock(p, Level1Exit.STAIRS_UP.level));
+
 	private Level1Blocks() {
 	}
 
@@ -107,6 +134,20 @@ public final class Level1Blocks {
 	// Like the Level 0 exit: neither destroyed nor carried away.
 	private static Properties exit() {
 		return Properties.of().mapColor(MapColor.METAL).strength(-1.0F, 3600000.0F).noLootTable().sound(SoundType.METAL);
+	}
+
+	// Ways to other levels cannot be broken or carried off either.
+	private static Properties exitProperties(MapColor color, SoundType sound) {
+		return Properties.of().mapColor(color).strength(-1.0F, 3600000.0F).noLootTable().sound(sound);
+	}
+
+	private static Block door(String name, Level1Exit exit, SoundType sound, int light) {
+		return register(name, exitProperties(MapColor.METAL, sound).noOcclusion().lightLevel(state -> light),
+				p -> new AxisExitBlock(p, exit.level));
+	}
+
+	private static Properties darkness() {
+		return Properties.of().mapColor(MapColor.COLOR_BLACK).strength(-1.0F, 3600000.0F).noLootTable().noCollision().sound(SoundType.WOOL);
 	}
 
 	private static Block register(String name, Properties properties) {

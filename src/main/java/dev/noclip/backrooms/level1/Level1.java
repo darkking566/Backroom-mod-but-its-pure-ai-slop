@@ -1,5 +1,7 @@
 package dev.noclip.backrooms.level1;
 
+import dev.noclip.backrooms.levels.Level0Arrival;
+import dev.noclip.backrooms.levels.LevelExits;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -27,6 +29,9 @@ public final class Level1 {
 		Level1Blocks.register();
 		Level1Sounds.register();
 		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, id("level_1"), Level1ChunkGenerator.CODEC);
+		// The levels that exist so far; exits to any other level stay shut until it registers here too.
+		LevelExits.open("0", Level0Arrival::arrive);
+		LevelExits.open("1", Level1Travel::enter);
 		FlickeringWalls.register();
 		Blackouts.register();
 		Crates.register();

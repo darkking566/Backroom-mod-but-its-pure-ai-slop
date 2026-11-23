@@ -15,7 +15,7 @@ from PIL import Image, ImageDraw
 
 sys.dont_write_bytecode = True  # no __pycache__ next to the scripts
 import make_textures as mt  # noqa: E402
-from make_textures import SIZE, X, Y, box, box_x, clouds, flat, inside, metal, noise, paint, step, tint  # noqa: E402
+from make_textures import SIZE, X, Y, box, box_x, clouds, flat, inside, metal, noise, paint, rgb, step, tint  # noqa: E402
 
 ASSETS = mt.ASSETS
 TEXTURES = ASSETS / "textures/block/level1"
@@ -418,6 +418,192 @@ def flicker_frames():
 FLICKER = [(0, 40), (1, 2), (0, 3), (2, 2), (0, 25), (3, 2), (1, 1), (0, 18), (4, 3), (2, 2), (0, 30), (3, 1), (0, 6), (1, 3)]
 
 
+# Exits to other levels
+
+def mask(draw_fn, height=SIZE):
+    """Draws with PIL at 4x and returns a 0..1 mask of SIZE x height."""
+    scale = 4
+    image = Image.new("L", (SIZE * scale, height * scale))
+    draw_fn(ImageDraw.Draw(image), scale)
+    return np.asarray(image.resize((SIZE, height), Image.Resampling.LANCZOS), float) / 255
+
+
+def white_door(top):
+    """Plain, too clean, too white."""
+    m = flat((238, 238, 234), 0.45, 10, 5)
+    m.color *= (1 + noise(700, 6, 96)[..., None] * 0.012)
+    edge = np.clip(1 - box(3, -2, 125, 130 if top else 125, 1.5), 0, 1)
+    tint(m, edge, (0.93, 0.93, 0.91))
+    m.glow += 0.08
+    return m
+
+
+def reinforced_door(top):
+    m = metal((72, 76, 80), 0.45)
+    rust = step(0.2, 0.5, clouds(710 + top, 5)) * inside()
+    paint(m, rust * 0.7, (104, 66, 42), smooth=0.12, f0=10, porosity=30)
+    for y in ((24, 104) if top else (40, 112)):
+        band = box(0, y - 7, 128, y + 7, 1)
+        paint(m, band, (96, 100, 104), height=2.5, smooth=0.55, f0=230)
+        for x in range(10, 128, 20):
+            rivet = 1 - step(1.5, 3, np.hypot(X - x, Y - y))
+            paint(m, rivet, (130, 132, 134), height=1.2, f0=230)
+    if top:
+        slot = box(44, 52, 84, 64)
+        paint(m, slot, (16, 16, 18), height=-2)
+        for x in (52, 64, 76):
+            paint(m, box(x - 1.5, 52, x + 1.5, 64), (110, 112, 114), height=1)
+    return m
+
+
+def pickaxe_door(top):
+    """A worn wooden door with a pickaxe daubed across both halves in white paint."""
+    m = flat((112, 96, 78), 0.2, 8, 50)
+    grain = noise(720, 3, 128) * 0.6 + noise(721, 12, 128) * 0.4
+    m.color *= (1 + grain[..., None] * 0.14)
+    m.height += grain * 0.6
+    tint(m, step(0.3, 0.6, clouds(722 + top, 4)) * 0.5, (0.82, 0.8, 0.76))
+
+    def drawing(draw, s):
+        # Drawn on a 128 x 256 sheet: the top half of the door is rows 0..127.
+        draw.line([(40 * s, 228 * s), (88 * s, 60 * s)], fill=255, width=9 * s)  # handle
+        draw.arc([(18 * s, 30 * s), (122 * s, 120 * s)], 200, 330, fill=255, width=11 * s)  # head
+        draw.line([(76 * s, 56 * s), (98 * s, 70 * s)], fill=255, width=12 * s)
+    sheet = mask(drawing, SIZE * 2)
+    paint_mask = sheet[:SIZE] if top else sheet[SIZE:]
+    paint_mask = paint_mask * (1 - step(0.55, 0.7, noise(725, 64)) * 0.6)
+    paint(m, paint_mask, (226, 224, 214), height=0.4, smooth=0.3)
+    return m
+
+
+def automatic_door(top):
+    """Glass sliding doors with a warm, bright shop behind them."""
+    m = metal((176, 180, 182), 0.7)
+    glass = box(12, 0 if top else -2, 116, 130 if not top else 128)
+    if top:
+        glass = box(12, 26, 116, 130)
+        paint(m, box(0, 0, 128, 24), (60, 64, 66), smooth=0.6)  # header with the motor
+    light = rgb(255, 238, 200) * (0.86 + 0.14 * (Y / SIZE))[..., None]
+    paint(m, glass, light, height=-1.5, smooth=0.96, f0=20, glow=0.85)
+    seam = box(62, -2, 66, 130)
+    paint(m, seam * glass, (150, 154, 156), height=1, glow=0)
+    if not top:
+        sticker = 1 - step(5, 6.5, np.hypot(X - 40, Y - 30))
+        paint(m, sticker, (200, 40, 40), glow=0.3)
+        paint(m, sticker * (1 - step(2.5, 3.5, np.abs(Y - 30))), (250, 250, 250), glow=0.3)
+    return m
+
+
+def palace_painting():
+    """A pink marble palace in a gilt frame, hung where no one would hang a painting."""
+    m = flat((206, 196, 222), 0.3, 10)
+    m.color[:] = (rgb(214, 204, 226) + (rgb(240, 222, 214) - rgb(214, 204, 226)) * (Y / SIZE)[..., None])
+    marble = rgb(232, 176, 190)
+    veins = 1 - step(0.02, 0.06, np.abs(noise(731, 6) + noise(732, 24) * 0.4))
+    body = box(22, 54, 106, 104)
+    paint(m, body, marble)
+    tint(m, veins * body * 0.6, (0.86, 0.78, 0.8))
+    dome = 1 - step(0, 1, np.hypot((X - 64) / 22, (Y - 54) / 18) - 1)
+    paint(m, dome * (Y < 54), marble * 1.04)
+    for x in range(30, 104, 12):
+        paint(m, box(x, 60, x + 4, 104), (246, 214, 220), height=1)
+    arch = box(56, 80, 72, 104) + (1 - step(0, 1, np.hypot(X - 64, Y - 80) - 8)) * (Y < 80)
+    paint(m, np.clip(arch, 0, 1), (90, 60, 70))
+    paint(m, box(16, 100, 112, 108), (220, 200, 196))  # steps
+    m.color *= (1 + noise(733, 96)[..., None] * 0.03)
+    frame = np.clip(1 - box(14, 14, 114, 114, 1), 0, 1)
+    bevel = 0.8 + 0.4 * np.clip((X - Y) / SIZE + 0.5, 0, 1)
+    paint(m, frame, rgb(184, 146, 62) * bevel[..., None], height=3, smooth=0.7, f0=220)
+    paint(m, np.clip(1 - box(4, 4, 124, 124, 1), 0, 1), (120, 92, 40), height=4)
+    return m
+
+
+def outlet_wall(seed):
+    """Concrete with far too many outlets in it."""
+    m = concrete((136, 136, 131), seed)
+    rng = np.random.default_rng(seed)
+    spots = [(x, y) for x in (22, 52, 82, 108) for y in (24, 64, 104)]
+    for x, y in spots:
+        x += rng.uniform(-5, 5)
+        y += rng.uniform(-6, 6)
+        plate = box(x - 9, y - 13, x + 9, y + 13, 1)
+        paint(m, plate, (224, 218, 200), height=1.2, smooth=0.5)
+        for sx in (-3, 3):
+            paint(m, box(x + sx - 1, y - 7, x + sx + 1, y - 1), (30, 28, 26), height=-1)
+        paint(m, 1 - step(1, 2, np.hypot(X - x, Y - y - 6)), (30, 28, 26), height=-1)
+        grime = (1 - step(10, 18, np.hypot(X - x, Y - y))) * 0.25
+        tint(m, grime, (0.9, 0.88, 0.84))
+    return m
+
+
+def cracked_pillar():
+    """A pillar split from floor to ceiling, wide enough to squeeze into; the crack lines up block to block."""
+    m = concrete((146, 146, 140), 460)
+    wobble = 9 * np.sin(Y / SIZE * np.pi) * (noise(740, 1, 6) + 0.3)
+    centre = 64 + wobble
+    width = 3 + 5 * np.sin(Y / SIZE * np.pi) ** 2 + 1.5 * noise(741, 1, 16)
+    gap = 1 - step(width * 0.7, width, np.abs(X - centre))
+    rim = (1 - step(width, width + 5, np.abs(X - centre))) * (1 - gap)
+    tint(m, rim, (0.72, 0.72, 0.7))
+    paint(m, rim * 0.6, height=-1)
+    paint(m, gap, (8, 8, 9), height=-6, smooth=0.05)
+    chips = step(0.7, 0.85, noise(742, 48)) * (1 - step(width + 2, width + 12, np.abs(X - centre)))
+    tint(m, chips, (1.12, 1.12, 1.1))
+    return m
+
+
+def hatch():
+    """A steel hatch set flush into the concrete, easy to walk straight over."""
+    m = concrete((118, 118, 114), 300)
+    plate = box(14, 14, 114, 114, 1)
+    steel = metal((96, 98, 96), 0.4)
+    pattern = ((np.abs((X + Y) % 16 - 8) < 1.5) & (np.abs((X - Y) % 16 - 8) > 5)).astype(float)
+    m.color += (steel.color - m.color) * plate[..., None]
+    paint(m, plate * pattern, height=0.6, smooth=0.5)
+    tint(m, plate * pattern * 0.6, (1.12, 1.12, 1.12))
+    rim = np.clip(box(11, 11, 117, 117) - box(14, 14, 114, 114), 0, 1)
+    paint(m, rim, (40, 40, 40), height=-1.5)
+    paint(m, box(54, 92, 74, 102, 1), (34, 34, 34), height=-1.5)  # handle recess
+    paint(m, box(57, 95, 71, 99, 1), (150, 150, 146), height=0.5, f0=230)
+    rust = step(0.15, 0.45, clouds(750, 5)) * plate * 0.8
+    paint(m, rust, (110, 68, 40), smooth=0.1, f0=10)
+    return m
+
+
+def door_frame_wood():
+    m = flat((222, 218, 206), 0.35, 8, 20)
+    grain = noise(760, 128, 4) * 0.6 + noise(761, 64, 2) * 0.4
+    m.color *= (1 + grain[..., None] * 0.05)
+    chips = step(0.75, 0.86, noise(762, 40))
+    paint(m, chips, (140, 112, 80))
+    return m
+
+
+def darkness():
+    m = flat((6, 6, 7), 0.0, 4, 0)
+    m.color *= (1 + noise(770, 32)[..., None] * 0.25)
+    return m
+
+
+def exit_textures(t):
+    for top in (False, True):
+        suffix = "_top" if top else ""
+        t["white_door" + suffix] = white_door(top)
+        t["reinforced_door" + suffix] = reinforced_door(top)
+        t["pickaxe_door" + suffix] = pickaxe_door(top)
+        t["automatic_door" + suffix] = automatic_door(top)
+    t["door_jamb"] = metal((66, 68, 70), 0.5)
+    t["door_knob"] = metal((196, 198, 196), 0.85)
+    t["door_knob"].f0[:] = 255
+    t["palace_painting"] = palace_painting()
+    t["outlet_wall"] = outlet_wall(780)
+    t["cracked_pillar"] = cracked_pillar()
+    t["cellar_hatch"] = hatch()
+    t["door_frame_wood"] = door_frame_wood()
+    t["darkness"] = darkness()
+    return t
+
+
 def all_textures():
     t = {}
     floor = (118, 118, 114)
@@ -518,7 +704,7 @@ def all_textures():
     screen.color *= (1 + 0.25 * np.exp(-((X - 44) ** 2 + (Y - 40) ** 2) / 900))[..., None]
     paint(screen, np.clip(1 - box(10, 10, 118, 118, 3), 0, 1), (60, 60, 56), smooth=0.4)
     t["computer_screen"] = screen
-    return t
+    return exit_textures(t)
 
 
 # Models
@@ -637,6 +823,64 @@ def computer_model():
     }
 
 
+def exit_door_model(leaf, knob, glow=False):
+    """A door set into a wall that runs along Z: steel jambs at the wall faces, the leaf recessed between them."""
+    jamb = {name: "#jamb" for name in ("north", "south", "east", "west", "up", "down")}
+    leaf_faces = {"east": {"texture": "#leaf"}, "west": {"texture": "#leaf"},
+                  "up": {"texture": "#jamb", "cullface": "up"}, "down": {"texture": "#jamb", "cullface": "down"}}
+    light = {"shade": False, "light_emission": 12} if glow else {}
+    elements = [
+        el((0, 0, 0), (16, 16, 1.5), {**jamb, "north": {"texture": "#jamb", "cullface": "north"}}),
+        el((0, 0, 14.5), (16, 16, 16), {**jamb, "south": {"texture": "#jamb", "cullface": "south"}}),
+        el((1, 0, 1.5), (15, 16, 14.5), leaf_faces, **light),
+    ]
+    if knob:
+        for x0, x1 in ((15, 15.8), (0.2, 1)):
+            elements.append(el((x0, 7, 11.2), (x1, 8.2, 12.6), sides("#knob")))
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": NS + leaf, "leaf": NS + leaf, "jamb": NS + "door_jamb", "knob": NS + "door_knob"},
+            "elements": elements}
+
+
+def door_frame_model(top):
+    posts = [el((0, 0, 6.5), (1.5, 14 if top else 16, 9.5), sides("#wood")),
+             el((14.5, 0, 6.5), (16, 14 if top else 16, 9.5), sides("#wood"))]
+    if top:
+        posts.append(el((0, 14, 6.5), (16, 16, 9.5), sides("#wood")))
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": NS + "door_frame_wood", "wood": NS + "door_frame_wood"}, "elements": posts}
+
+
+def stairs_models():
+    textures = {"bottom": NS + "garage_floor", "top": NS + "garage_floor", "side": NS + "garage_pillar"}
+    return {"concrete_stairs" + suffix: {"parent": f"minecraft:block/{parent}", "textures": textures}
+            for suffix, parent in (("", "stairs"), ("_inner", "inner_stairs"), ("_outer", "outer_stairs"))}
+
+
+def stairs_blockstate():
+    """The same 40 states and turns as Minecraft's own stairs."""
+    variants = {}
+    base = {"east": 0, "south": 90, "west": 180, "north": 270}
+    for facing, turn in base.items():
+        for half in ("bottom", "top"):
+            for shape in ("straight", "inner_left", "inner_right", "outer_left", "outer_right"):
+                model = NS + "concrete_stairs" + ("_inner" if shape.startswith("inner") else "_outer" if shape.startswith("outer") else "")
+                y = turn
+                if shape in ("inner_left", "outer_left") and half == "bottom":
+                    y -= 90
+                if shape in ("inner_right", "outer_right") and half == "top":
+                    y += 90
+                variant = {"model": model}
+                if half == "top":
+                    variant["x"] = 180
+                if y % 360:
+                    variant["y"] = y % 360
+                if "x" in variant or "y" in variant:
+                    variant["uvlock"] = True
+                variants[f"facing={facing},half={half},shape={shape}"] = variant
+    return {"variants": variants}
+
+
 def cube_all(texture):
     return {"parent": "minecraft:block/cube_all", "textures": {"all": NS + texture}}
 
@@ -679,6 +923,16 @@ def all_models():
     m["office_desk"] = desk_model()
     m["old_computer"] = computer_model()
     m["flickering_wallpaper"] = cube_all("flickering_wallpaper")
+    for door in ("white_door", "reinforced_door", "pickaxe_door", "automatic_door"):
+        glow = door == "automatic_door"
+        m[door] = exit_door_model(door, knob=door in ("white_door", "pickaxe_door"), glow=glow)
+        m[door + "_top"] = exit_door_model(door + "_top", knob=False, glow=glow)
+    for name in ("palace_painting", "outlet_wall", "cracked_pillar", "darkness"):
+        m[name] = cube_all(name)
+    m["cellar_hatch"] = bottom_top("cellar_hatch", "garage_floor")
+    m["standalone_door_frame"] = door_frame_model(False)
+    m["standalone_door_frame_top"] = door_frame_model(True)
+    m.update(stairs_models())
     return m
 
 
@@ -724,6 +978,15 @@ def all_blockstates():
     b["padded_wall"] = {"variants": {"": [{"model": NS + "padded_wall", "weight": 5}, {"model": NS + "padded_wall_1"}]}}
     b["old_computer"] = {"variants": {f"facing={f}": ({"model": NS + "old_computer", "y": y} if y else {"model": NS + "old_computer"})
                                       for f, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}}
+    for door in ("white_door", "reinforced_door", "pickaxe_door", "automatic_door"):
+        for name in (door, door + "_top"):
+            b[name] = {"variants": {"axis=z": {"model": NS + name}, "axis=x": {"model": NS + name, "y": 90}}}
+    for name in ("palace_painting", "outlet_wall", "cracked_pillar", "cellar_hatch", "standalone_door_frame",
+                 "standalone_door_frame_top"):
+        b[name] = single(name)
+    b["darkness_below"] = single("darkness")
+    b["darkness_above"] = single("darkness")
+    b["concrete_stairs"] = stairs_blockstate()
     return b
 
 
@@ -761,7 +1024,9 @@ def preview(textures):
              "damp_garage_floor", "garage_wall", "garage_wall_1", "garage_pillar_base", "garage_pillar_marked", "garage_ceiling",
              "light_lens", "pipe", "pipe_rusty", "shelf_frame", "crate_side", "crate_top",
              "painted_wall", "painted_wall_2", "corridor_floor", "emergency_sign", "metal_door", "metal_door_top",
-             "old_brick", "old_brick_1", "padded_wall", "desk_top", "computer_case", "computer_screen"]
+             "old_brick", "old_brick_1", "padded_wall", "desk_top", "computer_case", "computer_screen",
+             "white_door", "reinforced_door", "pickaxe_door", "automatic_door", "palace_painting", "outlet_wall",
+             "white_door_top", "reinforced_door_top", "pickaxe_door_top", "automatic_door_top", "cracked_pillar", "cellar_hatch"]
     columns, gap, side = 6, 8, SIZE * 2
     rows = (len(names) + columns - 1) // columns
     sheet = Image.new("RGB", (columns * (side + gap) + gap, rows * (side + gap) + gap), (30, 30, 30))
@@ -801,7 +1066,7 @@ def check(blockstates):
 ITEM_MODELS = {"garage_floor": "garage_floor", "garage_floor_line": "garage_floor_line", "damp_garage_floor": "damp_garage_floor",
                "puddled_garage_floor": "puddled_garage_floor", "garage_wall": "garage_wall", "garage_ceiling": "garage_ceiling",
                "metal_shelf": "metal_shelf_boxes", "painted_concrete_wall": "painted_wall", "corridor_floor": "corridor_floor",
-               "old_brick": "old_brick", "padded_wall": "padded_wall"}
+               "old_brick": "old_brick", "padded_wall": "padded_wall", "darkness_below": "darkness", "darkness_above": "darkness"}
 
 
 def main():

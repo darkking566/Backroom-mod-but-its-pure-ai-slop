@@ -38,6 +38,10 @@ class MapDump {
 					case PERIMETER -> 0x202838;
 					case OPENING -> 0xb0e0b0;
 					case OPENING_SIGN -> 0x00c060;
+					case EXIT_CORE -> 0xff40ff;
+					case HATCH -> 0xff8000;
+					case FRAME -> 0x00ffff;
+					case STAIRWELL -> 0xff0000;
 				};
 				var ceiling = Level1Layout.ceiling(12345, x, z);
 				if (ceiling == Level1Layout.Ceiling.LAMP || ceiling == Level1Layout.Ceiling.BULB) rgb = 0xffffa0;

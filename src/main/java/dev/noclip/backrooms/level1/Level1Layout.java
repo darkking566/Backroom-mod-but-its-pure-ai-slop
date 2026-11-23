@@ -34,11 +34,13 @@ public final class Level1Layout {
 		// Corridors: a three-block ceiling.
 		CORRIDOR, DESK, ROOM_SHELF, WALL, BRICK, PADDED, DOOR,
 		// The wall around a corridor block, and the low doorways through it.
-		PERIMETER, OPENING, OPENING_SIGN;
+		PERIMETER, OPENING, OPENING_SIGN,
+		// Exits to other levels (see HallPlan): a service room, a floor hatch, a lone door frame, a stairwell.
+		EXIT_CORE, HATCH, FRAME, STAIRWELL;
 
 		public boolean walkable() {
 			return switch (this) {
-				case FLOOR, LINE, DAMP, PUDDLE, CORRIDOR, OPENING, OPENING_SIGN -> true;
+				case FLOOR, LINE, DAMP, PUDDLE, CORRIDOR, OPENING, OPENING_SIGN, HATCH, FRAME -> true;
 				default -> false;
 			};
 		}
@@ -107,6 +109,11 @@ public final class Level1Layout {
 	}
 
 	private static Tile hallTile(long seed, Kind kind, int x, int z) {
+		HallPlan.Cell cell = exitCell(seed, x, z);
+		if (cell != null) {
+			Tile exit = exitTile(cell);
+			if (exit != null) return exit;
+		}
 		int bx = Math.floorMod(x, BAY_X), bz = Math.floorMod(z, BAY_Z);
 		if (bx < 2 && bz < 2) return Tile.PILLAR;
 		// Racks leave the aisle and the pillar line free, with a gap at every pillar.
@@ -118,6 +125,32 @@ public final class Level1Layout {
 		boolean stalls = bz >= 2 && bz <= 6 || bz >= 11;
 		if (kind == Kind.PARKING && stalls && (bx == 1 || bx == 4 || bx == 7)) return Tile.LINE;
 		return Tile.FLOOR;
+	}
+
+	/** The exit footprint at (x, z) in a hall, or null. */
+	static HallPlan.Cell exitCell(long seed, int x, int z) {
+		int dx = Math.floorDiv(x, DISTRICT), dz = Math.floorDiv(z, DISTRICT);
+		if (kind(seed, dx, dz) == Kind.CORRIDORS) return null;
+		return HallPlan.of(seed, dx, dz).cell(x, z);
+	}
+
+	/** The exits in a district; none in corridor blocks, whose way out is the metal door home. */
+	public static java.util.List<HallPlan.Placed> exits(long seed, int dx, int dz) {
+		return HallPlan.of(seed, dx, dz).placed();
+	}
+
+	/** The tile of an exit footprint, or null where the hall shows through (around a stairwell). */
+	private static Tile exitTile(HallPlan.Cell cell) {
+		int bx = cell.bx(), bz = cell.bz();
+		boolean shaft = bx >= 4 && bx <= 5;
+		return switch (cell.placed().exit().shape) {
+			case CORE_DOOR, CORE_PAINTING, CORE_OUTLETS -> Tile.EXIT_CORE;
+			case PILLAR -> Tile.PILLAR;
+			case HATCH -> Tile.HATCH;
+			case FRAME -> Tile.FRAME;
+			case STAIRS_DOWN -> shaft && bz >= 3 && bz <= 6 ? Tile.STAIRWELL : null;
+			case STAIRS_UP -> shaft && bz >= 3 && bz <= 9 ? Tile.STAIRWELL : null;
+		};
 	}
 
 	/** 2 under a leak, 1 around it, 0 dry. Leaks only hang over the aisle, so only nearby rows can be wet. */
@@ -224,7 +257,7 @@ public final class Level1Layout {
 				for (int dz = dz0 - ring; dz <= dz0 + ring; dz++) {
 					if (Math.max(Math.abs(dx - dx0), Math.abs(dz - dz0)) != ring) continue;
 					if (kind(seed, dx, dz) != Kind.PARKING) continue;
-					int[] spot = aisleSpot(dx, dz, x, z);
+					int[] spot = aisleSpot(seed, dx, dz, x, z);
 					long distance = (long) (spot[0] - x) * (spot[0] - x) + (long) (spot[1] - z) * (spot[1] - z);
 					if (distance < bestDistance) {
 						bestDistance = distance;
@@ -234,7 +267,18 @@ public final class Level1Layout {
 			}
 			if (best != null) return best;
 		}
-		return aisleSpot(0, 0, x, z);
+		return aisleSpot(seed, 0, 0, x, z);
+	}
+
+	/** The open point on an aisle inside district (dx, dz) nearest to (x, z), stepping past any exit standing there. */
+	static int[] aisleSpot(long seed, int dx, int dz, int x, int z) {
+		int[] spot = aisleSpot(dx, dz, x, z);
+		int minX = dx * DISTRICT + 6, maxX = dx * DISTRICT + DISTRICT - 7;
+		for (int i = 0; i < 12; i++) {
+			int sx = spot[0] + (i + 1) / 2 * (i % 2 == 0 ? 1 : -1) * BAY_X;
+			if (sx >= minX && sx <= maxX && tile(seed, sx, spot[1]).walkable()) return new int[] {sx, spot[1]};
+		}
+		return spot;
 	}
 
 	/** The point on an aisle inside district (dx, dz) nearest to (x, z), never on its edge lines. */
