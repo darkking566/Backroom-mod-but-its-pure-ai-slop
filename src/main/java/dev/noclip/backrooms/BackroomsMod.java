@@ -27,5 +27,6 @@ public final class BackroomsMod implements ModInitializer {
 		RedRoomLoop.register();
 		EdgeShift.register();
 		ShadowHallucination.register();
+		PitEffects.register();
 	}
 }

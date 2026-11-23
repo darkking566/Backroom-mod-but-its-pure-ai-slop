@@ -241,4 +241,41 @@ class MazeTest {
 		// Side cell whose southern corner peeks forward must count as observed.
 		assertFalse(EdgeShift.isOutOfObservation(0.5, 0.5, 0.0, 1.0, 14, -2));
 	}
+
+	@Test
+	void stairwellsAndMacroPillarHallsGenerateCleanly() {
+		long seed = 12345L;
+		boolean sawStairwell = false;
+		boolean sawMacroPillar = false;
+
+		for (int cx = -64; cx < 64; cx++) {
+			for (int cz = -64; cz < 64; cz++) {
+				if (Maze.isStairwellCell(seed, cx, cz)) {
+					sawStairwell = true;
+					assertEquals(Maze.Zone.CLASSIC, Maze.zoneAt(seed, cx * Maze.CELL, cz * Maze.CELL));
+					assertFalse(Maze.isWall(seed, cx * Maze.CELL + Maze.CENTER, cz * Maze.CELL + Maze.CENTER));
+				}
+			}
+		}
+
+		for (int sx = -10; sx < 10; sx += 2) {
+			for (int sz = -10; sz < 10; sz += 2) {
+				if (sx == 0 && sz == 0) continue;
+				int baseX = sx * Maze.SECTOR * Maze.CELL + Maze.CENTER;
+				int baseZ = sz * Maze.SECTOR * Maze.CELL + Maze.CENTER;
+				if (Maze.zoneAt(seed, baseX, baseZ) == Maze.Zone.PILLARS) {
+					sawMacroPillar = true;
+					// All four sectors of the 2x2 macro-block should share PILLARS.
+					assertEquals(Maze.Zone.PILLARS, Maze.zoneAt(seed, (sx + 1) * Maze.SECTOR * Maze.CELL + Maze.CENTER, baseZ));
+					assertEquals(Maze.Zone.PILLARS, Maze.zoneAt(seed, baseX, (sz + 1) * Maze.SECTOR * Maze.CELL + Maze.CENTER));
+					assertEquals(Maze.Zone.PILLARS, Maze.zoneAt(seed,
+							(sx + 1) * Maze.SECTOR * Maze.CELL + Maze.CENTER,
+							(sz + 1) * Maze.SECTOR * Maze.CELL + Maze.CENTER));
+				}
+			}
+		}
+
+		assertTrue(sawStairwell, "never generated a classic stairwell cell");
+		assertTrue(sawMacroPillar, "never generated a 2x2 macro pillar hall");
+	}
 }

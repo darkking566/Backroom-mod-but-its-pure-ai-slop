@@ -11,9 +11,10 @@ final class Maze {
 	static final int CELL = 7;
 	static final int CENTER = 3;
 	static final int SECTOR = 8;
+	static final int LARGE_ZONE_SPAN = 3;
 
 	private static final int TREE = 1, WEST = 2, NORTH = 3, PILLAR = 4, LAMP = 5, ZONE = 6, FEATURE = 7, WARNING = 8,
-			SHIFT_PILLAR = 9;
+			SHIFT_PILLAR = 9, STAIRWELL = 10;
 
 	@FunctionalInterface
 	interface EpochSource {
@@ -44,13 +45,52 @@ final class Maze {
 		// Keep the origin sector classic so first-time landings always look familiar.
 		if (sx == 0 && sz == 0) return Zone.CLASSIC;
 
+		Zone large = largeZoneAtSector(seed, sx, sz);
+		if (large != null) return large;
+
+		// Pillar halls span 2x2 sectors (112x112 blocks) to capture their vast, dizzying scale.
+		int mx = Math.floorDiv(sx, 2), mz = Math.floorDiv(sz, 2);
+		if (Math.floorMod(hash(seed, mx, mz, ZONE + 1), 100) < 17 && !macroHasLargeZone(seed, mx, mz)) {
+			return Zone.PILLARS;
+		}
+
 		int roll = Math.floorMod(hash(seed, sx, sz, ZONE), 100);
-		if (roll < 42) return Zone.CLASSIC;
-		if (roll < 59) return Zone.PILLARS;
-		if (roll < 72) return Zone.ARCHES;
-		if (roll < 84) return Zone.DARKENED;
-		if (roll < 95) return Zone.PITS;
-		return Zone.RED_ROOM;
+		if (roll < 56) return Zone.CLASSIC;
+		if (roll < 78) return Zone.ARCHES;
+		return Zone.PITS;
+	}
+
+	private static Zone largeZoneAtSector(long seed, int sx, int sz) {
+		// Darkened zones and Red Rooms span 3x3 sectors (168x168 blocks) at lower occurrence frequency.
+		int lx = Math.floorDiv(sx, LARGE_ZONE_SPAN), lz = Math.floorDiv(sz, LARGE_ZONE_SPAN);
+		if (lx == 0 && lz == 0) return null;
+		int roll = Math.floorMod(hash(seed, lx, lz, ZONE + 2), 100);
+		if (roll < 3) return Zone.RED_ROOM;
+		if (roll < 9) return Zone.DARKENED;
+		return null;
+	}
+
+	private static boolean macroHasLargeZone(long seed, int mx, int mz) {
+		int baseSx = mx * 2, baseSz = mz * 2;
+		for (int dx = 0; dx < 2; dx++) {
+			for (int dz = 0; dz < 2; dz++) {
+				if (largeZoneAtSector(seed, baseSx + dx, baseSz + dz) != null) return true;
+			}
+		}
+		return false;
+	}
+
+	static int largeZoneOriginSector(int sectorCoord) {
+		return Math.floorDiv(sectorCoord, LARGE_ZONE_SPAN) * LARGE_ZONE_SPAN;
+	}
+
+	/** Whether a RED_ROOM cell is strictly inside the zone (all four cardinal neighbors are also RED_ROOM). */
+	static boolean isRedRoomInteriorCell(long seed, int cx, int cz) {
+		return zoneForCell(seed, cx, cz) == Zone.RED_ROOM
+				&& zoneForCell(seed, cx - 1, cz) == Zone.RED_ROOM
+				&& zoneForCell(seed, cx + 1, cz) == Zone.RED_ROOM
+				&& zoneForCell(seed, cx, cz - 1) == Zone.RED_ROOM
+				&& zoneForCell(seed, cx, cz + 1) == Zone.RED_ROOM;
 	}
 
 	/** Whether (x, z) is in the 2-cell transition warning band outside a RED_ROOM sector. */
@@ -144,6 +184,14 @@ final class Maze {
 		return Math.floorMod(hash(seed, cx, cz, FEATURE), 3) == 0;
 	}
 
+	/** Whether a classic cell hosts a cramped dead-end concrete stairwell alcove. */
+	static boolean isStairwellCell(long seed, int cx, int cz) {
+		if (cx == 0 && cz == 0) return false;
+		if (zoneForCell(seed, cx, cz) != Zone.CLASSIC) return false;
+		if (Exits.isProtectedCell(seed, cx, cz)) return false;
+		return Math.floorMod(hash(seed, cx, cz, STAIRWELL), 18) == 0;
+	}
+
 	/** Whether the walkable layers (floor+1 and floor+2) are solid wall at (x, z). */
 	static boolean isWall(long seed, int x, int z) {
 		return isWall(seed, x, z, false);
@@ -164,6 +212,10 @@ final class Maze {
 		int epoch = effectiveEpoch(zone, cx, cz, epochs);
 
 		if (ix != 0 && iz != 0) {
+			if (isStairwellCell(seed, cx, cz)) {
+				if (iz == 5 && ix >= 2 && ix <= 5) return true;
+				if (ix == 5 && iz == 4) return true;
+			}
 			return zone == Zone.PILLARS && epoch > 0 && isShiftedPillar(seed, cx, cz, ix, iz, epoch);
 		}
 		if (iz != 0) return westEdge(seed, cx, cz, zone, epoch).blocks(iz, topLayer);
