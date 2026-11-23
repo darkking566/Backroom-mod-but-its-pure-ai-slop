@@ -27,7 +27,21 @@ final class CorridorPlan {
 		/** A bed in the middle with tables round it. */
 		MEDICAL,
 		/** Pictures on every wall. */
-		GALLERY
+		GALLERY,
+		/** Rows of desks and chairs. */
+		CLASSROOM,
+		/** Columns of bookcases with a reading table. */
+		LIBRARY,
+		/** Rows of beds. */
+		DORM,
+		/** Long tables with chairs. */
+		CANTEEN,
+		/** An open office of partitioned desks. */
+		CUBICLES,
+		/** A grid of bare columns. */
+		PILLARED,
+		/** Chairs lined up along the walls. */
+		WAITING
 	}
 
 	private record Key(long seed, int dx, int dz) {
@@ -49,8 +63,10 @@ final class CorridorPlan {
 	private final Room[] roomTypes = new Room[8];
 	private int rooms;
 	private final Ceiling[] bulbs = new Ceiling[N * N];
-	/** 0 nothing, 1 desk, 2 shelf, 3 bed, 4 table, 5 chair, 6 floor painting; by local block position. */
+	/** 0 nothing, 1 desk, 2 shelf, 3 bed, 4 table, 5 chair, 6 floor painting, 7 bookcase, 8 partition, 9 pillar; by local block position. */
 	private final byte[] furniture = new byte[SIZE * SIZE];
+	/** A second stream for the looks of rooms, so choosing furniture never shifts the maze or where rooms stand. */
+	private SplittableRandom variety;
 	private int doorX = -1, doorZ = -1;
 
 	static CorridorPlan of(long seed, int dx, int dz) {
@@ -62,6 +78,7 @@ final class CorridorPlan {
 	private CorridorPlan(long seed, int dx, int dz) {
 		SplittableRandom random = new SplittableRandom(Level1Layout.hash(seed, dx, dz, Level1Layout.PLAN));
 		Arrays.fill(roomOf, -1);
+		variety = new SplittableRandom(Level1Layout.hash(seed, dx, dz, Level1Layout.PLAN + 7919));
 		carveMaze(random);
 		addLoops(random);
 		addRooms(random);
@@ -101,6 +118,12 @@ final class CorridorPlan {
 		}
 	}
 
+	/** The kind of room whose cells cover this local block, or null. */
+	Room roomAt(int lx, int lz) {
+		int cell = lx / CELL + lz / CELL * N;
+		return roomOf[cell] < 0 ? null : roomTypes[roomOf[cell]];
+	}
+
 	int doorX() {
 		return doorX;
 	}
@@ -122,6 +145,9 @@ final class CorridorPlan {
 		if (item == 5) return Tile.CHAIR;
 		if (item == 6) return Tile.FLOOR_PAINTING;
 		if (item == 4) return Tile.TABLE;
+		if (item == 7) return Tile.BOOKSHELF;
+		if (item == 8) return Tile.PARTITION;
+		if (item == 9) return Tile.WALL;
 
 		int ci = lx / CELL, cj = lz / CELL, px = lx % CELL, pz = lz % CELL;
 		if (px != 0 && pz != 0) return Tile.CORRIDOR;
@@ -201,12 +227,18 @@ final class CorridorPlan {
 				w = 2;
 				h = 2;
 				int pick = random.nextInt(100);
-				type = pick < 35 ? Room.OFFICE : pick < 60 ? Room.STORAGE : pick < 70 ? Room.EMPTY : pick < 85 ? Room.MEDICAL : Room.GALLERY;
+				type = pick < 20 ? Room.OFFICE : pick < 34 ? Room.STORAGE : pick < 40 ? Room.EMPTY : pick < 50 ? Room.MEDICAL : pick < 60 ? Room.GALLERY
+						: pick < 68 ? Room.CLASSROOM : pick < 76 ? Room.LIBRARY : pick < 84 ? Room.DORM : pick < 90 ? Room.CANTEEN
+						: pick < 96 ? Room.CUBICLES : pick < 98 ? Room.PILLARED : Room.WAITING;
 			} else {
 				boolean wide = random.nextBoolean();
 				w = wide ? 3 : 2;
 				h = wide ? 2 : 3;
 				type = random.nextBoolean() ? Room.STORAGE : Room.OFFICE;
+				// The big rooms take their looks from the second stream.
+				int look = variety.nextInt(100);
+				if (type == Room.OFFICE) type = look < 40 ? Room.OFFICE : look < 75 ? Room.CUBICLES : Room.CLASSROOM;
+				else type = look < 40 ? Room.STORAGE : look < 75 ? Room.LIBRARY : Room.CANTEEN;
 			}
 			int i0 = random.nextInt(N - w + 1), j0 = random.nextInt(N - h + 1);
 			if (taken(i0, j0, w, h)) continue;
@@ -240,21 +272,93 @@ final class CorridorPlan {
 		int z0 = room.j() * CELL + 2, z1 = (room.j() + room.h()) * CELL - 2;
 		if (room.type() == Room.PADDED) furniture[room.i() * CELL + 2 + (room.j() * CELL + 2) * SIZE] = 5;
 		if (x1 - x0 < 4 || z1 - z0 < 4) return;
-		if (room.type() == Room.OFFICE) {
-			int z = (z0 + z1) / 2;
-			for (int x = x0 + 1; x < x1; x += 2) furniture[x + z * SIZE] = 1;
-		} else if (room.type() == Room.GALLERY) {
-			furniture[x0 + 1 + z0 * SIZE] = 6;
-			furniture[x1 - 2 + (z1 - 1) * SIZE] = 6;
-			furniture[x0 + (z0 + z1) / 2 * SIZE] = 6;
-		} else if (room.type() == Room.MEDICAL) {
-			furniture[(x0 + x1) / 2 + (z0 + z1) / 2 * SIZE] = 3;
-			for (int x : new int[] {x0, x1 - 1}) {
-				for (int z : new int[] {z0, z1 - 1}) furniture[x + z * SIZE] = 4;
+		switch (room.type()) {
+			case OFFICE -> {
+				int z = (z0 + z1) / 2;
+				for (int x = x0 + 1; x < x1; x += 2) furniture[x + z * SIZE] = 1;
 			}
-		} else if (room.type() == Room.STORAGE) {
-			for (int z = z0 + 1; z < z1; z += 2) {
-				for (int x = x0; x < x1; x++) furniture[x + z * SIZE] = 2;
+			case GALLERY -> {
+				furniture[x0 + 1 + z0 * SIZE] = 6;
+				furniture[x1 - 2 + (z1 - 1) * SIZE] = 6;
+				furniture[x0 + (z0 + z1) / 2 * SIZE] = 6;
+			}
+			case MEDICAL -> {
+				furniture[(x0 + x1) / 2 + (z0 + z1) / 2 * SIZE] = 3;
+				for (int x : new int[] {x0, x1 - 1}) {
+					for (int z : new int[] {z0, z1 - 1}) furniture[x + z * SIZE] = 4;
+				}
+			}
+			case STORAGE -> {
+				for (int z = z0 + 1; z < z1; z += 2) {
+					for (int x = x0; x < x1; x++) furniture[x + z * SIZE] = 2;
+				}
+			}
+			case CLASSROOM -> {
+				// Pairs of desks in rows with a chair behind each, an aisle after every pair, and a free lane between rows.
+				for (int z = z0; z + 1 < z1; z += 3) {
+					for (int x = x0; x < x1; x++) {
+						if ((x - x0) % 3 == 2) continue;
+						furniture[x + z * SIZE] = 1;
+						furniture[x + (z + 1) * SIZE] = 5;
+					}
+				}
+			}
+			case CANTEEN -> {
+				// Long tables with a chair here and there down both sides, broken by gaps to cross through.
+				for (int z = z0 + 1; z + 1 < z1; z += 5) {
+					for (int x = x0; x < x1; x++) {
+						if ((x - x0) % 7 == 6) continue;
+						furniture[x + z * SIZE] = 4;
+						if (variety.nextInt(100) < 55) furniture[x + (z - 1) * SIZE] = 5;
+						if (variety.nextInt(100) < 55) furniture[x + (z + 1) * SIZE] = 5;
+					}
+				}
+			}
+			case DORM -> {
+				// Beds with a gap between each, in rows with room to walk between.
+				for (int z = z0; z < z1; z += 3) {
+					for (int x = x0; x < x1; x += 2) furniture[x + z * SIZE] = 3;
+				}
+			}
+			case LIBRARY -> {
+				// Stacks: columns of bookcases five long, a gap in each to slip through, two lanes between columns.
+				for (int x = x0; x < x1; x += 3) {
+					for (int z = z0; z < z1; z++) {
+						if ((z - z0) % 6 == 5) continue;
+						furniture[x + z * SIZE] = 7;
+					}
+				}
+				// A reading table with a chair in a corner of the stacks.
+				furniture[x1 - 1 + (z1 - 1) * SIZE] = 4;
+				furniture[x1 - 2 + (z1 - 1) * SIZE] = 5;
+			}
+			case CUBICLES -> {
+				// Each cubicle is an L of partition panels round a desk and chair, open to the aisles on its other two sides.
+				for (int z = z0; z + 2 < z1; z += 4) {
+					for (int x = x0; x + 2 < x1; x += 4) {
+						for (int k = 0; k < 3; k++) {
+							furniture[x + k + z * SIZE] = 8;
+							furniture[x + (z + k) * SIZE] = 8;
+						}
+						furniture[x + 1 + (z + 1) * SIZE] = 1;
+						furniture[x + 2 + (z + 2) * SIZE] = 5;
+					}
+				}
+			}
+			case PILLARED -> {
+				for (int z = z0 + 1; z < z1; z += 4) {
+					for (int x = x0 + 1; x < x1; x += 4) furniture[x + z * SIZE] = 9;
+				}
+			}
+			case WAITING -> {
+				// Chairs set in rows along two walls, and a low table between.
+				for (int x = x0; x < x1; x += 2) {
+					furniture[x + z0 * SIZE] = 5;
+					furniture[x + (z1 - 1) * SIZE] = 5;
+				}
+				furniture[(x0 + x1) / 2 + (z0 + z1) / 2 * SIZE] = 4;
+			}
+			default -> {
 			}
 		}
 	}

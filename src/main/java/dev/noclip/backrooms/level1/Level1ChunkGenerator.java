@@ -107,6 +107,8 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 			case BED -> y == FLOOR_Y + 1 ? state(Level1Blocks.HOSPITAL_BED) : corridor(ceiling, y);
 			case TABLE -> y == FLOOR_Y + 1 ? state(Level1Blocks.OFFICE_DESK) : corridor(ceiling, y);
 			case GALLERY -> y <= LOW_CEILING_Y ? state(Level1Blocks.GALLERY_WALL) : state(Level1Blocks.GARAGE_WALL);
+			case BOOKSHELF -> y <= FLOOR_Y + 2 ? state(Level1Blocks.BOOK_SHELF) : corridor(ceiling, y);
+			case PARTITION -> y <= FLOOR_Y + 2 ? state(Level1Blocks.CUBICLE_PANEL) : corridor(ceiling, y);
 			case ROOM_SHELF -> y <= FLOOR_Y + 2 ? state(Level1Blocks.METAL_SHELF) : corridor(ceiling, y);
 			case WALL -> y <= LOW_CEILING_Y ? state(Level1Blocks.PAINTED_CONCRETE_WALL) : state(Level1Blocks.GARAGE_WALL);
 			case BRICK -> y <= LOW_CEILING_Y ? state(Level1Blocks.OLD_BRICK) : state(Level1Blocks.GARAGE_WALL);

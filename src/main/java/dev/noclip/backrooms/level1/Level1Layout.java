@@ -100,7 +100,7 @@ public final class Level1Layout {
 		// Halls: a five-block ceiling.
 		FLOOR, LINE, DAMP, PUDDLE, PILLAR, SHELF, HALL_WALL,
 		// Corridors: a three-block ceiling.
-		CORRIDOR, DESK, ROOM_SHELF, BED, TABLE, CHAIR, FLOOR_PAINTING, WALL, BRICK, PADDED, GALLERY, DOOR,
+		CORRIDOR, DESK, ROOM_SHELF, BED, TABLE, CHAIR, FLOOR_PAINTING, WALL, BRICK, PADDED, GALLERY, DOOR, BOOKSHELF, PARTITION,
 		// The wall around a corridor block, and the low doorways through it.
 		PERIMETER, OPENING, OPENING_SIGN,
 		// Exits to other levels (see HallPlan): a service room, a floor hatch, a lone door frame, a stairwell.

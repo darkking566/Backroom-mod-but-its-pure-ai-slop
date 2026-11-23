@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
+    "noclip_backrooms:book_shelf",
     "noclip_backrooms:wallpaper",
     "noclip_backrooms:wallpaper_baseboard",
     "noclip_backrooms:pale_wallpaper",

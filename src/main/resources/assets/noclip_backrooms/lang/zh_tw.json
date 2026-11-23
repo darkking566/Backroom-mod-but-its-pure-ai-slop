@@ -287,5 +287,7 @@
   "block.noclip_backrooms.site_machine": "施工機具",
   "block.noclip_backrooms.glitch_black": "故障的黑",
   "block.noclip_backrooms.glitch_magenta": "故障的洋紅",
-  "block.noclip_backrooms.glitch_cyan": "故障的青"
+  "block.noclip_backrooms.glitch_cyan": "故障的青",
+  "block.noclip_backrooms.book_shelf": "書架",
+  "block.noclip_backrooms.cubicle_panel": "隔間板"
 }

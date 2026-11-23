@@ -84,6 +84,11 @@ public final class Level1Blocks {
 			.mapColor(MapColor.TERRACOTTA_RED).strength(2.0F).sound(SoundType.STONE));
 	public static final Block PADDED_WALL = register("padded_wall", Properties.of()
 			.mapColor(MapColor.WOOL).strength(0.8F).sound(SoundType.WOOL));
+	/** Room furniture: a floor-to-ceiling bookcase, and an office partition. */
+	public static final Block BOOK_SHELF = register("book_shelf", Properties.of()
+			.mapColor(MapColor.WOOD).strength(1.2F).sound(SoundType.WOOD));
+	public static final Block CUBICLE_PANEL = register("cubicle_panel", Properties.of()
+			.mapColor(MapColor.COLOR_GRAY).strength(0.6F).sound(SoundType.WOOL));
 	public static final Block OFFICE_DESK = register("office_desk", Properties.of()
 			.mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD).noOcclusion(), p -> new ShapedBlock(p, DESK_SHAPE));
 	public static final Block OLD_COMPUTER = register("old_computer", Properties.of()

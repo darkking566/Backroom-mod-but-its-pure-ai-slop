@@ -300,6 +300,49 @@ def padded(seed, stained=False):
     return m
 
 
+def book_shelf():
+    """Three shelves of books in a dark wood frame; tiles upward so two blocks make a bookcase."""
+    m = flat((86, 60, 38), 0.35, 10, 30)
+    m.color *= (1 + (noise(1800, 4, 128) * 0.5 + noise(1801, 32, 128) * 0.2) * 0.1)[..., None]
+    rng = np.random.default_rng(1802)
+    palette = [(120, 40, 36), (52, 72, 96), (70, 92, 62), (150, 120, 60), (90, 60, 100), (170, 160, 140), (60, 60, 64), (130, 80, 50)]
+    for top in (0, 42, 84):
+        floor_y = top + 37
+        x = 3
+        while x < 120:
+            w, h = int(rng.integers(5, 12)), int(rng.integers(22, 34))
+            if x + w > 124:
+                break
+            shade = rng.uniform(0.8, 1.1)
+            y0 = floor_y - h
+            m.color[y0:floor_y, x:x + w] = np.array(palette[int(rng.integers(len(palette)))]) * shade
+            m.height[y0:floor_y, x:x + w] = 2
+            m.color[y0:floor_y, x:x + 1] *= 0.65
+            m.color[y0 + 4:y0 + 6, x:x + w] = (206, 188, 124)
+            x += w + int(rng.integers(0, 2))
+        m.color[floor_y:floor_y + 5, :] = (66, 46, 28)
+        m.height[floor_y:floor_y + 5, :] = 1
+    m.color[:, 0:3] = (66, 46, 28)
+    m.color[:, 125:128] = (66, 46, 28)
+    m.color[126:128, :] = (66, 46, 28)
+    return m
+
+
+def cubicle_panel():
+    """A grey-blue fabric partition with dark trim and a few pinned notes."""
+    m = flat((112, 132, 142), 0.15, 6, 60)
+    m.color *= (1 + np.sin(X * 2.0) * np.sin(Y * 2.0) * 0.035 + noise(1810, 8) * 0.04)[..., None]
+    rng = np.random.default_rng(1811)
+    for _ in range(5):
+        x, y = int(rng.integers(12, 100)), int(rng.integers(16, 96))
+        w, h = int(rng.integers(12, 22)), int(rng.integers(14, 26))
+        paint(m, box(x, y, x + w, y + h), (226, 222, 202), height=1)
+        paint(m, box(x + w // 2 - 1, y + 1, x + w // 2 + 1, y + 3), (170, 40, 40), height=2)
+    for edge in (box(0, 0, 127, 7), box(0, 120, 127, 127), box(0, 0, 4, 127), box(123, 0, 127, 127)):
+        paint(m, edge, (50, 52, 56), height=2, smooth=0.5)
+    return m
+
+
 def bulb_glass(color, glow):
     m = flat(color, 0.92, 30)
     m.color *= (1 + 0.12 * np.exp(-((X - 50) ** 2 + (Y - 46) ** 2) / 500))[..., None]
@@ -1776,6 +1819,8 @@ def all_textures():
     t["old_brick_1"] = bricks(610, True)
     t["padded_wall"] = padded(620)
     t["padded_wall_1"] = padded(630, True)
+    t["book_shelf"] = book_shelf()
+    t["cubicle_panel"] = cubicle_panel()
     t["desk_top"] = laminate()
     t["desk_leg"] = metal((86, 86, 88), 0.5)
     t["computer_case"] = plastic((198, 188, 160), 640)
@@ -2088,7 +2133,7 @@ def all_models():
         m[name] = bottom_top(name, "garage_floor")
     for name in ("garage_wall", "garage_wall_1", "garage_wall_2", "garage_wall_3", "garage_pillar", "garage_pillar_base",
                  "garage_pillar_marked", "garage_ceiling", "garage_ceiling_1", "painted_wall", "painted_wall_1", "painted_wall_2",
-                 "painted_wall_3", "old_brick", "old_brick_1", "padded_wall", "padded_wall_1"):
+                 "painted_wall_3", "old_brick", "old_brick_1", "padded_wall", "padded_wall_1", "book_shelf", "cubicle_panel"):
         m[name] = cube_all(name)
     for name in ("corridor_floor", "corridor_floor_1", "corridor_floor_2"):
         m[name] = bottom_top(name, "corridor_floor")
@@ -2235,6 +2280,8 @@ def all_blockstates():
     b["emergency_sign"] = {"variants": {"axis=z": {"model": NS + "emergency_sign"}, "axis=x": {"model": NS + "emergency_sign", "y": 90}}}
     b["old_brick"] = {"variants": {"": [{"model": NS + "old_brick", "weight": 3}, {"model": NS + "old_brick_1"}]}}
     b["padded_wall"] = {"variants": {"": [{"model": NS + "padded_wall", "weight": 5}, {"model": NS + "padded_wall_1"}]}}
+    b["book_shelf"] = single("book_shelf")
+    b["cubicle_panel"] = single("cubicle_panel")
     b["old_computer"] = {"variants": {f"facing={f}": ({"model": NS + "old_computer", "y": y} if y else {"model": NS + "old_computer"})
                                       for f, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}}
     for door in ("white_door", "reinforced_door", "pickaxe_door", "automatic_door", *NEW_DOORS, "white_wood_door"):

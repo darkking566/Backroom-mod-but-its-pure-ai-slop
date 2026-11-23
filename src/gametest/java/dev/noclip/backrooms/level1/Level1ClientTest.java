@@ -79,6 +79,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			if (only("items")) items(context, game, seed);
 			if (only("monsters")) monsters(context, game, seed);
 			if (only("people")) people(context, game, seed);
+			if (only("rooms")) rooms(context, game, seed);
 			if (only("hounds")) hounds(context, game, seed);
 			if (only("checkBlocks")) checkBlocks(context, game);
 			if (only("leaveThroughDoor")) leaveThroughDoor(context, game, seed);
@@ -877,6 +878,34 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			if (now != null) farthest = Math.max(farthest, now.distanceTo(first));
 		}
 		check(farthest > 1.5, "the residents stood still (moved " + farthest + ")");
+	}
+
+	/** One picture of each kind of room in the corridors, from a corner of its free ring. */
+	private static void rooms(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		game.getServer().runCommand("gamemode spectator @a");
+		for (CorridorPlan.Room type : CorridorPlan.Room.values()) {
+			int[] at = null;
+			for (int ring = 0; ring < 20 && at == null; ring++) {
+				for (int dx = -ring; dx <= ring && at == null; dx++) {
+					for (int dz = -ring; dz <= ring && at == null; dz++) {
+						if (Math.max(Math.abs(dx), Math.abs(dz)) != ring || Level1Layout.kindAt(seed, dx * 64 + 32, dz * 64 + 32) != Kind.CORRIDORS) continue;
+						CorridorPlan plan = CorridorPlan.of(seed, dx, dz);
+						for (int ci = 1; ci < Level1Layout.CELLS && at == null; ci++) {
+							for (int cj = 1; cj < Level1Layout.CELLS && at == null; cj++) {
+								int lx = ci * Level1Layout.CELL, lz = cj * Level1Layout.CELL;
+								// The top-left cell of a room, so its free ring starts one block in from the corner.
+								if (plan.roomAt(lx, lz) == type && plan.roomAt(lx - 1, lz) != type && plan.roomAt(lx, lz - 1) != type) at = new int[] {dx * 64 + lx + 1, dz * 64 + lz + 1};
+							}
+						}
+					}
+				}
+			}
+			if (at == null) {
+				System.out.println("no " + type + " room near the origin");
+				continue;
+			}
+			shoot(context, game, at[0] + 0.5, STAND, at[1] + 0.5, -45, 12, "level1_room_" + type.name().toLowerCase());
+		}
 	}
 
 	private static void hounds(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
