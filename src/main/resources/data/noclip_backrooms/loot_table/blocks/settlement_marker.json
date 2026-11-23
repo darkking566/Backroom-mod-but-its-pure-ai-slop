@@ -82,6 +82,11 @@
               }
             }
           ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:clipp_card",
+          "weight": 2
         }
       ]
     }

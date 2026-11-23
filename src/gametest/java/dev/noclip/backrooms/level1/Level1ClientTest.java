@@ -46,6 +46,9 @@ public final class Level1ClientTest implements FabricClientGameTest {
 				Marauders.holdOff(s, 20 * 60 * 10);
 				// Same for hounds, which come out in blackouts.
 				Hounds.holdOff(s, 20 * 60 * 10);
+				// And nobody moves into the settlements, or is carried off along the halls, until their own tests.
+				Residents.holdOff(s, 20 * 60 * 10);
+				Warps.holdOff(s, 20 * 60 * 10);
 			});
 			server.runCommand("gamemode spectator @a");
 			BlockPos arrival = server.computeOnServer(s -> player(s).blockPosition());
@@ -218,6 +221,34 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		server.runOnServer(s -> player(s).setHealth(4.0F));
 		standAndUse(context, game, clinic[0] * 64 + 24.5, clinic[1] * 64 + 25.5, 180, 22);
 		server.runOnServer(s -> check(player(s).getHealth() >= player(s).getMaxHealth() - 0.1F, "the clinic bed did not mend the player"));
+
+		// The people move in, once.
+		server.runCommand("gamemode spectator @a");
+		int came = server.computeOnServer(s -> Residents.populate(level1(s), clinic[0], clinic[1]));
+		check(came == 2, "the medics did not move into Hippocrates-1: " + came);
+		check(server.computeOnServer(s -> Residents.populate(level1(s), clinic[0], clinic[1])) == 0, "the medics moved in twice");
+		shoot(context, game, clinic[0] * 64 + 31.5, STAND, clinic[1] * 64 + 11.5, 0, 0, "level1_hippocrates_people");
+		int[] fort = nearestBase(seed, Level1Layout.Base.CORNUCOPIA);
+		// The district has to be loaded for anyone to move in.
+		shoot(context, game, fort[0] * 64 + 31.5, STAND, fort[1] * 64 + 11.5, 0, 0, "level1_cornucopia");
+		check(server.computeOnServer(s -> Residents.populate(level1(s), fort[0], fort[1])) > 0, "no one is at Cornucopia");
+		shoot(context, game, fort[0] * 64 + 31.5, STAND, fort[1] * 64 + 11.5, 0, 0, "level1_cornucopia_people");
+
+		// The zone is not Euclidean: carried a bay or two along the hall, heading kept.
+		int[] spot = Level1Layout.landing(seed, 0, 0);
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f 0 0", spot[0] + 0.5, STAND, spot[1] + 0.5));
+		server.runCommand("gamemode survival @a");
+		context.waitTicks(20);
+		boolean warped = server.computeOnServer(s -> {
+			for (int jumps = 1; jumps <= 2; jumps++) {
+				for (int sign = 1; sign >= -1; sign -= 2) {
+					if (Warps.warp(level1(s), player(s), new Vec3(1, 0, 0), sign, jumps)) return true;
+				}
+			}
+			return false;
+		});
+		check(warped, "the hall carried no one anywhere");
+		server.runCommand("gamemode spectator @a");
 		server.runCommand("gamemode spectator @a");
 	}
 

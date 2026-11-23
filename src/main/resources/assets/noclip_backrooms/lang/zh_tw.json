@@ -224,5 +224,15 @@
   "block.noclip_backrooms.white_wood_door_top": "純白木門",
   "block.noclip_backrooms.attic_hatch": "通往閣樓的洞",
   "block.noclip_backrooms.outdoor_gap": "露出戶外的缺口",
-  "block.noclip_backrooms.wall_vent": "敞開的通風管"
+  "block.noclip_backrooms.wall_vent": "敞開的通風管",
+  "item.noclip_backrooms.clipp_card": "C.L.I.P.P. 卡",
+  "message.noclip_backrooms.clipp": "C.L.I.P.P. 協議（阿丽亚娜集團，赫爾墨斯團隊）：\nC - 評估環境：確認有沒有威脅，認出周圍的建築結構。\nL - 找尋出口：反向切出，或找門、窗等阈界。\nI - 查資料庫：用蒐集到的資訊確認所在層級，以及哪個出口安全。\nP - 準備裝備：拿必要的物品，需要就換衣服。\nP - 觀察周圍：建立一個臨時的安全區。",
+  "resident.noclip_backrooms.meg_patrol": "M.E.G. 巡邏隊員",
+  "resident.noclip_backrooms.colonist": "殖民者",
+  "resident.noclip_backrooms.trader": "B.N.T.G. 商人",
+  "resident.noclip_backrooms.medic": "希波克拉底醫護",
+  "resident.noclip_backrooms.tom": "Tom",
+  "resident.noclip_backrooms.aiko": "佐藤愛子",
+  "resident.noclip_backrooms.speednoclipper": "速切玩家",
+  "resident.noclip_backrooms.justice": "丰饒角的正義追尋者"
 }

@@ -1085,6 +1085,26 @@ TELEPORT_BERRY = [
 ]
 
 
+CLIPP_CARD = [
+    "................",
+    "..wwwwwwwwwwww..",
+    "..wbbbbbbbbbbw..",
+    "..wbbbbbbbbbbw..",
+    "..wwwwwwwwwwww..",
+    "..wrwwrwwrwwrw..",
+    "..wwwwwwwwwwww..",
+    "..wrrwwrrwwrrw..",
+    "..wwwwwwwwwwww..",
+    "..wrwwrwwrwwrw..",
+    "..wwwwwwwwwwww..",
+    "..wwwwwwwwwwww..",
+    "................",
+    "................",
+    "................",
+    "................",
+]
+
+
 def item_textures():
     ITEMS.mkdir(parents=True, exist_ok=True)
     glass = (190, 214, 222, 255)
@@ -1097,6 +1117,7 @@ def item_textures():
     pixel_art(FRIEND_ORB, {"k": (40, 70, 110, 255), "b": (110, 190, 240, 255), "w": (235, 250, 255, 255), "d": (70, 130, 200, 255)}).save(ITEMS / "friend_orb.png")
     pixel_art(SQUIRT_GUN, {"b": (60, 120, 220, 255), "w": (150, 200, 250, 255), "k": (40, 40, 50, 255)}).save(ITEMS / "squirt_gun.png")
     pixel_art(TELEPORT_BERRY, {"g": (60, 150, 70, 255), "p": (140, 60, 170, 255), "v": (200, 150, 230, 255), "d": (90, 30, 120, 255)}).save(ITEMS / "teleport_berry.png")
+    pixel_art(CLIPP_CARD, {"w": (238, 232, 216, 255), "b": (46, 90, 150, 255), "r": (170, 60, 56, 255)}).save(ITEMS / "clipp_card.png")
     smiler_face().save(ITEMS / "smiler_face.png")
 
 
@@ -1989,7 +2010,7 @@ def main():
     save_cutout("settlement_marker", *settlement_marker(False))
     save_cutout("settlement_marker_taken", *settlement_marker(True))
     item_textures()
-    for item in ("almond_water", "alloy", "phosphor_powder", "bandage", "crowbar", "friend_orb", "squirt_gun", "teleport_berry", "smiler_face"):
+    for item in ("almond_water", "alloy", "phosphor_powder", "bandage", "crowbar", "friend_orb", "squirt_gun", "teleport_berry", "clipp_card", "smiler_face"):
         write_json(ASSETS / f"models/item/level1/{item}.json",
                    {"parent": "minecraft:item/generated", "textures": {"layer0": f"noclip_backrooms:item/level1/{item}"}})
         write_json(ASSETS / f"items/{item}.json", {"model": {"type": "minecraft:model", "model": f"noclip_backrooms:item/level1/{item}"}})

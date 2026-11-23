@@ -224,5 +224,15 @@
   "block.noclip_backrooms.white_wood_door_top": "Pure White Wooden Door",
   "block.noclip_backrooms.attic_hatch": "Hole to the Attic",
   "block.noclip_backrooms.outdoor_gap": "Gap onto the Outdoors",
-  "block.noclip_backrooms.wall_vent": "Open Air Vent"
+  "block.noclip_backrooms.wall_vent": "Open Air Vent",
+  "item.noclip_backrooms.clipp_card": "C.L.I.P.P. Card",
+  "message.noclip_backrooms.clipp": "C.L.I.P.P. protocol (Ariane Circle, Hermes team):\nC - Check your environment for threats and the structure around you.\nL - Locate an exit: a noclip back out, or a door, window or other threshold.\nI - Inspect the database to work out which level this is and which exit is safe.\nP - Prepare your equipment, and change clothes if you need to.\nP - Perimeter your environment: make a temporary safe zone.",
+  "resident.noclip_backrooms.meg_patrol": "M.E.G. Patrol Member",
+  "resident.noclip_backrooms.colonist": "Colonist",
+  "resident.noclip_backrooms.trader": "B.N.T.G. Trader",
+  "resident.noclip_backrooms.medic": "Hippocrates Medic",
+  "resident.noclip_backrooms.tom": "Tom",
+  "resident.noclip_backrooms.aiko": "Aiko Sato",
+  "resident.noclip_backrooms.speednoclipper": "Speednoclipper",
+  "resident.noclip_backrooms.justice": "Cornucopia Justice Seeker"
 }

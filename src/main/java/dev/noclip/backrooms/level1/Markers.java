@@ -81,7 +81,7 @@ final class Markers {
 			}
 		}
 		long seed = Level1ChunkGenerator.planSeed(level.getChunkSource().randomState());
-		for (int attempt = 0; attempt < 60; attempt++) {
+		for (int attempt = 0; attempt < 400; attempt++) {
 			double angle = random.nextDouble() * Math.PI * 2, distance = 10 + random.nextDouble() * 18;
 			int x = (int) Math.floor(player.getX() + Math.cos(angle) * distance);
 			int z = (int) Math.floor(player.getZ() + Math.sin(angle) * distance);

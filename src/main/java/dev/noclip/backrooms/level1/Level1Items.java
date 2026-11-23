@@ -28,6 +28,8 @@ public final class Level1Items {
 					Consumables.defaultDrink()
 							.onConsume(new RemoveStatusEffectsConsumeEffect(HolderSet.direct(MobEffects.NAUSEA, MobEffects.DARKNESS, MobEffects.BLINDNESS)))
 							.onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.REGENERATION, 100, 0)))
+							// Sharper eyes than before, the wiki says.
+							.onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 400, 0)))
 							.build())
 			.usingConvertsTo(Items.GLASS_BOTTLE), Item::new);
 	/** Scrap metal worth something to the settlements; four make an iron ingot. */
@@ -50,6 +52,8 @@ public final class Level1Items {
 	public static final Item TELEPORT_BERRY = register("teleport_berry", new Item.Properties().stacksTo(8)
 			.food(new FoodProperties.Builder().nutrition(1).saturationModifier(0.2F).alwaysEdible().build(),
 					Consumables.defaultFood().build()), TeleportBerryItem::new);
+	/** The Ariane Circle's card for arriving anywhere new. */
+	public static final Item CLIPP_CARD = register("clipp_card", new Item.Properties().stacksTo(1), ClippCardItem::new);
 	/** What a smiler looks like: only ever shown floating in the dark, never handed out. */
 	static final Item SMILER_FACE = register("smiler_face", new Item.Properties().stacksTo(1), Item::new);
 
@@ -66,6 +70,7 @@ public final class Level1Items {
 			output.accept(FRIEND_ORB);
 			output.accept(SQUIRT_GUN);
 			output.accept(TELEPORT_BERRY);
+			output.accept(CLIPP_CARD);
 		});
 	}
 
