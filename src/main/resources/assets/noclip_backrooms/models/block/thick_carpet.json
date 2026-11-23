@@ -1,6 +1,8 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "all": "noclip_backrooms:block/thick_carpet"
+    "top": "noclip_backrooms:block/thick_carpet",
+    "bottom": "noclip_backrooms:block/thick_carpet",
+    "side": "noclip_backrooms:block/thick_carpet_edge"
   }
 }

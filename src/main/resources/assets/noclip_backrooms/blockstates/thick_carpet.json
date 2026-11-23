@@ -1,7 +1,36 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/thick_carpet"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/thick_carpet"
+      },
+      {
+        "model": "noclip_backrooms:block/thick_carpet",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/thick_carpet",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/thick_carpet",
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/thick_carpet_1"
+      },
+      {
+        "model": "noclip_backrooms:block/thick_carpet_1",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/thick_carpet_1",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/thick_carpet_1",
+        "y": 270
+      }
+    ]
   }
 }

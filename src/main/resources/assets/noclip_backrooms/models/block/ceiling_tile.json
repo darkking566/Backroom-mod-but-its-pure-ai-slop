@@ -1,6 +1,6 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "noclip_backrooms:block/ceiling_tile_base",
   "textures": {
-    "all": "noclip_backrooms:block/ceiling_tile"
+    "tile": "noclip_backrooms:block/ceiling_tile"
   }
 }

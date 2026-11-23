@@ -1,12 +1,8 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "noclip_backrooms:block/baseboard_wall",
   "textures": {
-    "north": "noclip_backrooms:block/wallpaper_baseboard",
-    "south": "noclip_backrooms:block/wallpaper_baseboard",
-    "east": "noclip_backrooms:block/wallpaper_baseboard",
-    "west": "noclip_backrooms:block/wallpaper_baseboard",
-    "up": "noclip_backrooms:block/wallpaper",
-    "down": "noclip_backrooms:block/wallpaper",
-    "particle": "noclip_backrooms:block/wallpaper"
+    "side": "noclip_backrooms:block/wallpaper_baseboard",
+    "top": "noclip_backrooms:block/wallpaper",
+    "board": "noclip_backrooms:block/board"
   }
 }

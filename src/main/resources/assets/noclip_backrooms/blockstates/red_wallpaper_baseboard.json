@@ -1,7 +1,13 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/red_wallpaper_baseboard"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/red_wallpaper_baseboard",
+        "weight": 8
+      },
+      {
+        "model": "noclip_backrooms:block/red_wallpaper_baseboard_1"
+      }
+    ]
   }
 }

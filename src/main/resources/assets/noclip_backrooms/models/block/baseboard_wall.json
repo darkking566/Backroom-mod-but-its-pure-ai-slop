@@ -1,0 +1,126 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "#side"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": {
+          "texture": "#top",
+          "cullface": "down"
+        },
+        "up": {
+          "texture": "#top",
+          "cullface": "up"
+        },
+        "north": {
+          "texture": "#side",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#side",
+          "cullface": "south"
+        },
+        "west": {
+          "texture": "#side",
+          "cullface": "west"
+        },
+        "east": {
+          "texture": "#side",
+          "cullface": "east"
+        }
+      }
+    },
+    {
+      "from": [0, 0, -0.75],
+      "to": [16, 2.8, 0],
+      "faces": {
+        "north": {
+          "texture": "#board",
+          "uv": [0, 0, 16, 16]
+        },
+        "up": {
+          "texture": "#board",
+          "uv": [0, 1, 16, 2]
+        },
+        "west": {
+          "texture": "#board",
+          "uv": [0, 0, 16, 16]
+        },
+        "east": {
+          "texture": "#board",
+          "uv": [0, 0, 16, 16]
+        }
+      }
+    },
+    {
+      "from": [0, 0, 16],
+      "to": [16, 2.8, 16.75],
+      "faces": {
+        "south": {
+          "texture": "#board",
+          "uv": [0, 0, 16, 16]
+        },
+        "up": {
+          "texture": "#board",
+          "uv": [0, 1, 16, 2]
+        },
+        "west": {
+          "texture": "#board",
+          "uv": [0, 0, 16, 16]
+        },
+        "east": {
+          "texture": "#board",
+          "uv": [0, 0, 16, 16]
+        }
+      }
+    },
+    {
+      "from": [-0.75, 0, 0],
+      "to": [0, 2.8, 16],
+      "faces": {
+        "west": {
+          "texture": "#board",
+          "uv": [0, 0, 16, 16]
+        },
+        "up": {
+          "texture": "#board",
+          "uv": [0, 1, 16, 2]
+        },
+        "north": {
+          "texture": "#board",
+          "uv": [0, 0, 16, 16]
+        },
+        "south": {
+          "texture": "#board",
+          "uv": [0, 0, 16, 16]
+        }
+      }
+    },
+    {
+      "from": [16, 0, 0],
+      "to": [16.75, 2.8, 16],
+      "faces": {
+        "east": {
+          "texture": "#board",
+          "uv": [0, 0, 16, 16]
+        },
+        "up": {
+          "texture": "#board",
+          "uv": [0, 1, 16, 2]
+        },
+        "north": {
+          "texture": "#board",
+          "uv": [0, 0, 16, 16]
+        },
+        "south": {
+          "texture": "#board",
+          "uv": [0, 0, 16, 16]
+        }
+      }
+    }
+  ]
+}

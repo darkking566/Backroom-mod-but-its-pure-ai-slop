@@ -1,6 +1,8 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "noclip_backrooms:block/baseboard_wall",
   "textures": {
-    "all": "noclip_backrooms:block/pale_wallpaper_baseboard"
+    "side": "noclip_backrooms:block/pale_wallpaper_baseboard",
+    "top": "noclip_backrooms:block/pale_wallpaper",
+    "board": "noclip_backrooms:block/pale_board"
   }
 }

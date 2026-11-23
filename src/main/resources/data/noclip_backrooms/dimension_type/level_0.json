@@ -11,8 +11,9 @@
     },
     "minecraft:gameplay/can_start_raid": false,
     "minecraft:gameplay/respawn_anchor_works": false,
-    "minecraft:visual/ambient_light_color": "#2b2614",
-    "minecraft:visual/fog_color": "#8a7b45",
+    "minecraft:visual/ambient_light_color": "#29261b",
+    "minecraft:visual/block_light_tint": "#fff1c9",
+    "minecraft:visual/fog_color": "#776d48",
     "minecraft:visual/fog_start_distance": 12.0,
     "minecraft:visual/fog_end_distance": 64.0,
     "minecraft:visual/sky_light_factor": 0.0

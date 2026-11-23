@@ -1,7 +1,21 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/wallpaper"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/wallpaper",
+        "weight": 22
+      },
+      {
+        "model": "noclip_backrooms:block/wallpaper_1",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/wallpaper_2",
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/wallpaper_3"
+      }
+    ]
   }
 }
