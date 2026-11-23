@@ -491,7 +491,7 @@ public final class Level1Elevation {
 	}
 
 	/** Keeps exits and hall props surrounded by a safe concrete buffer on the main floor. */
-	private static boolean isNearExitOrProp(long seed, int dx, int dz, int x, int z) {
+	static boolean isNearExitOrProp(long seed, int dx, int dz, int x, int z) {
 		HallPlan plan = HallPlan.of(seed, dx, dz);
 		for (HallPlan.Placed placed : plan.placed()) {
 			int[] spot = placed.spot();
