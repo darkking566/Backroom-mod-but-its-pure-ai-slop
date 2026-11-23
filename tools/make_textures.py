@@ -216,6 +216,73 @@ def soiled(m, seed):
     return m
 
 
+# Each stain kind below keeps clear of the border, so any variant sits next to any other.
+
+def spot(seed, radius, wobble=0.35):
+    """A rough blob in 0..1 somewhere near the middle, plus its signed field."""
+    rng = np.random.default_rng(seed)
+    cx, cy = rng.uniform(44, 84, 2)
+    field = 1 - np.hypot((X - cx) / radius[0], (Y - cy) / radius[1]) + clouds(seed, 6) * wobble
+    return field * inside() - (1 - inside())
+
+
+def ring(m, seed):
+    """A dried spill: faintly darker inside, a sharp brown tide line at the edge."""
+    field = spot(seed, (30, 24))
+    tint(m, step(0, 0.1, field), (0.93, 0.9, 0.84))
+    tint(m, 1 - step(0.015, 0.07, np.abs(field - 0.03)), (0.7, 0.62, 0.5))
+    return m
+
+
+def drips(m, seed):
+    rng = np.random.default_rng(seed)
+    drops = np.zeros((SIZE, SIZE))
+    for _ in range(rng.integers(9, 16)):
+        x, y = rng.uniform(26, 102, 2)
+        r = rng.uniform(1.2, 4.5)
+        drops = np.maximum(drops, 1 - step(r * 0.7, r, np.hypot(X - x, Y - y)))
+    tint(m, drops, (0.66, 0.58, 0.46))
+    paint(m, drops, smooth=0.35)
+    return m
+
+
+def wet(m, seed):
+    """Fresh water from above: darker, cooler and glossy under shaders."""
+    patch = step(-0.05, 0.25, spot(seed, (28, 23), 0.55))
+    tint(m, patch, (0.76, 0.78, 0.8))
+    paint(m, patch, smooth=0.72, f0=12, porosity=20)
+    return m
+
+
+def smear(m, seed):
+    """Something dragged across: a long streak at a random angle."""
+    rng = np.random.default_rng(seed)
+    a = rng.uniform(0, np.pi)
+    along, across = (X - 64) * np.cos(a) + (Y - 64) * np.sin(a), -(X - 64) * np.sin(a) + (Y - 64) * np.cos(a)
+    width = 6 + 3 * noise(seed, 16)
+    streak = (1 - step(width * 0.5, width, np.abs(across + 4 * noise(seed + 1, 4)))) * (1 - step(30, 46, np.abs(along)))
+    streak *= 0.6 + 0.4 * step(-0.2, 0.4, noise(seed + 2, 40, 6))
+    tint(m, streak * inside(), (0.78, 0.73, 0.64))
+    return m
+
+
+def worn(m, seed):
+    """Trodden flat: paler, with the fibres pressed down."""
+    patch = step(-0.1, 0.3, spot(seed, (30, 26), 0.6))
+    tint(m, patch, (1.09, 1.07, 1.02))
+    m.height *= 1 - 0.6 * patch
+    paint(m, patch, smooth=0.14, porosity=35)
+    return m
+
+
+def mould(m, seed):
+    cluster = step(-0.1, 0.35, spot(seed, (34, 30), 0.6))
+    specks = step(0.25, 0.55, noise(seed + 5, 64) * 0.6 + noise(seed + 6, 32) * 0.4) * cluster
+    tint(m, specks, (0.72, 0.78, 0.66))
+    tint(m, cluster * 0.6, (0.92, 0.94, 0.9))
+    return m
+
+
 def carpet_edge(top):
     m = flat((74, 70, 62), 0.1, 10, 25)
     grit = noise(61, 64) * 0.7 + noise(62, 24) * 0.3
@@ -362,6 +429,9 @@ def all_textures():
     t["carpet"] = carpet(300)
     t["carpet_1"] = carpet(310)
     t["carpet_2"] = soiled(carpet(300), 320)
+    t["carpet_3"] = soiled(carpet(310), 330)
+    for i, stain in enumerate((ring, drips, wet, smear, worn, mould), 4):
+        t[f"carpet_{i}"] = stain(carpet(300 + 10 * (i % 2)), 340 + 10 * i)
     t["carpet_edge"] = carpet_edge(t["carpet"])
     t["thick_carpet"] = carpet(400, True)
     t["thick_carpet_1"] = carpet(410, True)

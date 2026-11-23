@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "noclip_backrooms:block/carpet_7",
+    "bottom": "noclip_backrooms:block/carpet_7",
+    "side": "noclip_backrooms:block/carpet_edge"
+  }
+}
