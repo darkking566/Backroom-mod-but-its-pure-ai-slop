@@ -265,7 +265,8 @@ def peel(seed, shape, wobble=0.75, rough=0.07):
 # Floor
 
 def carpet(seed, thick=False):
-    dark, light = ((98, 80, 49), (148, 125, 80)) if thick else ((122, 101, 59), (182, 160, 105))
+    # Near red rooms the two carpets are mixed block by block, so their brightness must stay close.
+    dark, light = (122, 101, 59), (182, 160, 105)
     m = flat(dark, 0.06, 8, 60)
     depth = np.zeros((SIZE, SIZE))
     rng = np.random.default_rng(seed)
@@ -283,10 +284,6 @@ def carpet(seed, thick=False):
                 depth[py, px] = top * arch
                 m.color[py, px] = color * (0.78 + 0.22 * arch)
     m.height += depth
-    if thick:
-        wet = step(0.05, 0.4, clouds(seed + 3, 5)) * inside()
-        tint(m, wet, (0.88, 0.89, 0.89))
-        paint(m, wet, smooth=0.62, f0=8)
     return m
 
 
@@ -524,6 +521,7 @@ def all_textures():
     t["carpet_edge"] = carpet_edge(t["carpet"])
     t["thick_carpet"] = carpet(400, True)
     t["thick_carpet_1"] = carpet(410, True)
+    t["thick_carpet_2"] = wet(carpet(400, True), 420)  # rare, so wet blocks never form a grid
     t["thick_carpet_edge"] = carpet_edge(t["thick_carpet"])
 
     t["ceiling_tile"] = ceiling_tile()
