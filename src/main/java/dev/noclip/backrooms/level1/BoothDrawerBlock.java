@@ -1,6 +1,6 @@
 package dev.noclip.backrooms.level1;
 
-import dev.noclip.backrooms.levels.LevelExits;
+import dev.noclip.backrooms.core.LevelExits;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;

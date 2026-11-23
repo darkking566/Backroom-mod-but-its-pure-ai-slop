@@ -3,7 +3,7 @@
     python tools/make_level1.py
 
 Uses the drawing helpers and the labPBR writer of make_textures.py (Pillow and NumPy).
-Textures go to textures/block/level1/, models to models/block/level1/. Also writes docs/level1_textures.png.
+Textures go to textures/block/level1/, models to models/block/level1/. Also writes docs/levels/level1/textures.png.
 Level 0 files are not touched.
 """
 
@@ -980,7 +980,7 @@ def phosphor_mark():
 
 
 def save_cutout(name, m, alpha):
-    mt.save("level1/" + name, m)
+    mt.save(name, m)
     rgb_ = np.clip(np.rint(m.color), 0, 255).astype("uint8")
     a = (alpha > 0.5).astype("uint8") * 255
     Image.fromarray(np.dstack([rgb_, a]), "RGBA").save(TEXTURES / f"{name}.png", optimize=True)
@@ -1425,9 +1425,9 @@ def all_models():
     m["broken_bare_bulb"] = bulb_model("bulb_glass_off", False)
     m["green_bare_bulb"] = bulb_model("bulb_glass_green", True)
     m["emergency_sign"] = sign_model()
-    m["metal_exit_door"] = {"parent": "noclip_backrooms:block/exit_door", "textures": {
+    m["metal_exit_door"] = {"parent": "noclip_backrooms:block/level0/exit_door", "textures": {
         "particle": NS + "metal_door_frame", "leaf": NS + "metal_door", "frame": NS + "metal_door_frame", "bar": NS + "metal_door_bar"}}
-    m["metal_exit_door_top"] = {"parent": "noclip_backrooms:block/exit_door_top", "textures": {
+    m["metal_exit_door_top"] = {"parent": "noclip_backrooms:block/level0/exit_door_top", "textures": {
         "particle": NS + "metal_door_frame", "leaf": NS + "metal_door_top", "frame": NS + "metal_door_frame", "bar": NS + "metal_door_bar"}}
     m["office_desk"] = desk_model()
     m["old_computer"] = computer_model()
@@ -1541,7 +1541,7 @@ def write_json(path, data):
 def save_animated(name, frames, timing):
     parts = []
     for i, frame in enumerate(frames):
-        mt.save(f"level1/_frame{i}", frame)
+        mt.save(f"_frame{i}", frame)
         images = []
         for suffix in ("", "_n", "_s"):
             with Image.open(TEXTURES / f"_frame{i}{suffix}.png") as image:
@@ -1576,7 +1576,7 @@ def preview(textures):
         for dx in (0, SIZE):
             for dy in (0, SIZE):
                 sheet.paste(tile, (gap + i % columns * (side + gap) + dx, gap + i // columns * (side + gap) + dy))
-    sheet.save(mt.ROOT / "docs/level1_textures.png", optimize=True)
+    sheet.save(mt.ROOT / "docs/levels/level1/textures.png", optimize=True)
 
 
 def check(blockstates):
@@ -1617,9 +1617,10 @@ ITEM_MODELS = {"garage_floor": "garage_floor", "garage_floor_line": "garage_floo
 
 def main():
     TEXTURES.mkdir(parents=True, exist_ok=True)
+    mt.OUT = TEXTURES  # make_textures writes Level 0's textures; point its writer at Level 1's folder
     textures = all_textures()
     for name, material in textures.items():
-        mt.save("level1/" + name, material)
+        mt.save(name, material)
     save_animated("flickering_wallpaper", flicker_frames(), FLICKER)
     save_cutout("phosphor_mark", *phosphor_mark())
     item_textures()

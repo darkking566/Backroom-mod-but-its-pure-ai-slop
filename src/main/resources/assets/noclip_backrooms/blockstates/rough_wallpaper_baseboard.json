@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "noclip_backrooms:block/rough_wallpaper_baseboard"
+      "model": "noclip_backrooms:block/level0/rough_wallpaper_baseboard"
     }
   }
 }

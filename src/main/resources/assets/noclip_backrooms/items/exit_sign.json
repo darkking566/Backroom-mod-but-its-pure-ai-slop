@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "noclip_backrooms:block/exit_sign"
+    "model": "noclip_backrooms:block/level0/exit_sign"
   }
 }

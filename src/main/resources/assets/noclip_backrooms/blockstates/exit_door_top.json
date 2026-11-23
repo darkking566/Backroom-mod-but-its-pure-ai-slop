@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "noclip_backrooms:block/exit_door_top"
+      "model": "noclip_backrooms:block/level0/exit_door_top"
     }
   }
 }

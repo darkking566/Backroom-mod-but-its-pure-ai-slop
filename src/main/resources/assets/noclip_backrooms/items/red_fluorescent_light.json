@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "noclip_backrooms:block/red_fluorescent_light"
+    "model": "noclip_backrooms:block/level0/red_fluorescent_light"
   }
 }

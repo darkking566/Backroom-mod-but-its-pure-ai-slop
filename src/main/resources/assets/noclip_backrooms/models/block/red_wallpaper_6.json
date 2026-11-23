@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "noclip_backrooms:block/red_wallpaper_6"
-  }
-}

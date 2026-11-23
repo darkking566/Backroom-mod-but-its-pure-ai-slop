@@ -1,6 +1,0 @@
-{
-  "parent": "noclip_backrooms:block/ceiling_tile_base",
-  "textures": {
-    "tile": "noclip_backrooms:block/ceiling_tile_1"
-  }
-}

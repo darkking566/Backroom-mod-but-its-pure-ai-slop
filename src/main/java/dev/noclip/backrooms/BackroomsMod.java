@@ -1,36 +1,24 @@
 package dev.noclip.backrooms;
 
+import dev.noclip.backrooms.level0.Level0;
+import dev.noclip.backrooms.level1.Level1;
 import net.fabricmc.api.ModInitializer;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
 
+/**
+ * The mod's entry point. Each level lives in its own package (level0, level1, ...) and registers itself;
+ * things that cross between levels live in core. See README.md for where things go.
+ */
 public final class BackroomsMod implements ModInitializer {
-	static final String MOD_ID = "noclip_backrooms";
-	static final ResourceKey<Level> LEVEL_0 = ResourceKey.create(Registries.DIMENSION, id("level_0"));
+	public static final String MOD_ID = "noclip_backrooms";
 
-	static Identifier id(String path) {
+	public static Identifier id(String path) {
 		return Identifier.fromNamespaceAndPath(MOD_ID, path);
 	}
 
 	@Override
 	public void onInitialize() {
-		ModBlocks.register();
-		ModItems.register();
-		ModSounds.register();
-		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, id("level_0"), Level0ChunkGenerator.CODEC);
-		Noclip.register();
-		Level0Ambience.register();
-		RedRoomEffects.register();
-		RedRoomLoop.register();
-		EdgeShift.register();
-		ShadowHallucination.register();
-		PitEffects.register();
-		FlashlightLight.register();
-		// Level 1 keeps everything in its own package.
-		dev.noclip.backrooms.level1.Level1.register();
+		Level0.register();
+		Level1.register();
 	}
 }

@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level1;
 
+import dev.noclip.backrooms.level0.Level0;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.TickTask;
@@ -43,7 +44,7 @@ final class Level1DoorBlock extends Block {
 		// false: do not spend a respawn anchor charge.
 		TeleportTransition destination = player.findRespawnPositionAndUseSpawnBlock(false, TeleportTransition.PLAY_PORTAL_SOUND);
 		var target = destination.newLevel().dimension();
-		if (target == Level1.LEVEL_0) {
+		if (target == Level0.LEVEL_0) {
 			// A spawn point in Level 0 would make the way out lead straight back in. One in Level 1 is a settlement
 			// someone chose to call home, so the door takes them there.
 			ServerLevel overworld = player.level().getServer().overworld();

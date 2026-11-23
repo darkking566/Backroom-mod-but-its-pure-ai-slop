@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "noclip_backrooms:block/exit_door"
+    "model": "noclip_backrooms:block/level0/exit_door"
   }
 }

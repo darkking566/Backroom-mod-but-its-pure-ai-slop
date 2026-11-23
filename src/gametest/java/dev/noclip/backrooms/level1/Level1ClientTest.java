@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level1;
 
+import dev.noclip.backrooms.level0.Level0;
 import dev.noclip.backrooms.level1.Level1Layout.Kind;
 import dev.noclip.backrooms.level1.Level1Layout.Tile;
 import java.util.Locale;
@@ -100,7 +101,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		game.getConnection().waitForChunksRender();
 		context.runOnClient(client -> client.gui.toastManager().clear());
 		context.takeScreenshot("level1_flickering_wall");
-		check(server.computeOnServer(s -> player(s).level().dimension() == Level1.LEVEL_0), "left Level 0 too early");
+		check(server.computeOnServer(s -> player(s).level().dimension() == Level0.LEVEL_0), "left Level 0 too early");
 
 		context.getInput().holdKeyFor(options -> options.keyUp, 40);
 		for (int waited = 0; waited < 200 && !server.computeOnServer(s -> player(s).level().dimension() == Level1.LEVEL_1); waited += 10) {
@@ -117,7 +118,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			check(player.getHealth() == player.getMaxHealth(), "hurt on the way in");
 			long seed = Level1ChunkGenerator.planSeed(player.level().getChunkSource().randomState());
 			check(Level1Layout.kindAt(seed, player.getBlockX(), player.getBlockZ()) == Kind.PARKING, "did not land in a parking hall");
-			BlockState left = s.getLevel(Level1.LEVEL_0).getBlockState(wall);
+			BlockState left = s.getLevel(Level0.LEVEL_0).getBlockState(wall);
 			check(!left.is(Level1Blocks.FLICKERING_WALLPAPER), "flickering wall stayed open after use");
 			checkGenerated(player.level(), seed, player.blockPosition());
 			for (var entity : player.level().getAllEntities()) check(!(entity instanceof Mob), "a mob spawned");
@@ -247,7 +248,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		int[] door = shop.spot();
 		int[] out = HallPlan.FACES[shop.face()];
 		float yaw = facing(out);
-		int refused = dev.noclip.backrooms.levels.LevelExits.refusals();
+		int refused = dev.noclip.backrooms.core.LevelExits.refusals();
 		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f %.1f 20",
 				door[0] + 0.5 + out[0] * 1.5, STAND, door[1] + 0.5 + out[1] * 1.5, yaw));
 		server.runCommand("gamemode survival @a");
@@ -258,7 +259,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		context.waitTicks(10);
 		context.takeScreenshot("level1_exit_closed");
 		server.runOnServer(s -> {
-			check(dev.noclip.backrooms.levels.LevelExits.refusals() > refused, "the door to Level 197 did not refuse");
+			check(dev.noclip.backrooms.core.LevelExits.refusals() > refused, "the door to Level 197 did not refuse");
 			check(player(s).level().dimension() == Level1.LEVEL_1, "a closed door let the player through");
 		});
 
@@ -268,14 +269,14 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f 180 0",
 				at[0] + 0.5, STAND, at[1] + 3.0));
 		context.waitTicks(20);
-		int before = dev.noclip.backrooms.levels.LevelExits.refusals();
+		int before = dev.noclip.backrooms.core.LevelExits.refusals();
 		for (int pass = 0; pass < DoorFrameBlock.PASSES; pass++) {
 			boolean forward = pass % 2 == 0;
 			context.getInput().holdKeyFor(options -> forward ? options.keyUp : options.keyDown, 22);
 			context.waitTicks(6);
 		}
 		context.waitTicks(10);
-		server.runOnServer(s -> check(dev.noclip.backrooms.levels.LevelExits.refusals() > before, "going back and forth through the frame did nothing"));
+		server.runOnServer(s -> check(dev.noclip.backrooms.core.LevelExits.refusals() > before, "going back and forth through the frame did nothing"));
 
 		// The stairs up, rarest of all, climb back into Level 0.
 		HallPlan.Placed stairs = nearestExit(seed, Level1Exit.STAIRS_UP);
@@ -285,7 +286,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(20);
 		context.getInput().holdKeyFor(options -> options.keyUp, 80);
-		server.waitFor(s -> player(s).level().dimension() == Level1.LEVEL_0, 200);
+		server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 200);
 		context.waitTicks(30);
 		game.getConnection().waitForChunksRender();
 		context.takeScreenshot("level1_stairs_into_level0");

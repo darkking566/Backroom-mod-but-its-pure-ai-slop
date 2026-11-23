@@ -5,7 +5,7 @@
 Needs Pillow and NumPy. Every texture gets two companions that shaders read in the labPBR format:
   *_n.png  bumps: normal (RG), crevice shading (B), depth (A)
   *_s.png  surface: smoothness (R), reflectance (G), porosity (B), glow (A)
-Also writes docs/textures.png, a tiled preview.
+Also writes docs/levels/level0/textures.png, a tiled preview. Level 0 textures go to textures/block/level0/.
 """
 
 import json
@@ -18,7 +18,7 @@ from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parent.parent
 ASSETS = ROOT / "src/main/resources/assets/noclip_backrooms"
-OUT = ASSETS / "textures/block"
+OUT = ASSETS / "textures/block/level0"
 SIZE = 128
 Y, X = np.mgrid[0:SIZE, 0:SIZE].astype(float)
 
@@ -580,17 +580,17 @@ def preview(textures):
         for dx in (0, SIZE):
             for dy in (0, SIZE):
                 sheet.paste(tile, (gap + i % columns * (side + gap) + dx, gap + i // columns * (side + gap) + dy))
-    sheet.save(ROOT / "docs/textures.png", optimize=True)
+    sheet.save(ROOT / "docs/levels/level0/textures.png", optimize=True)
 
 
 def check():
     """Every texture a model uses must exist with both companions, and every model a block uses must exist."""
     prefix = "noclip_backrooms:block/"
-    for path in (ASSETS / "models/block").glob("*.json"):
+    for path in (ASSETS / "models/block/level0").glob("*.json"):
         for value in json.loads(path.read_text(encoding="utf8")).get("textures", {}).values():
             if value.startswith(prefix):
                 for suffix in ("", "_n", "_s"):
-                    assert (OUT / f"{value[len(prefix):]}{suffix}.png").is_file(), (path.name, value, suffix)
+                    assert (ASSETS / "textures/block" / f"{value[len(prefix):]}{suffix}.png").is_file(), (path.name, value, suffix)
     for path in (ASSETS / "blockstates").glob("*.json"):
         for entry in json.loads(path.read_text(encoding="utf8"))["variants"].values():
             for variant in entry if isinstance(entry, list) else [entry]:

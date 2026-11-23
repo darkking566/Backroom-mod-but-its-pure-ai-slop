@@ -1,0 +1,75 @@
+# Noclip: Backrooms
+
+Fabric 模組，Minecraft 26.2、Java 25，模組代號 `noclip_backrooms`。在主世界卡進牆裡就會掉進後室，一層一層往下走。
+
+- 開遊戲試玩：雙擊 `play.bat`
+- 編譯並跑單元測試：`.\gradlew.bat build`
+- 真實遊戲自動測試：`.\gradlew.bat runClientGameTest`
+- 進度與試玩方法：[NEXT.md](NEXT.md)；協作規則：[AGENTS.md](AGENTS.md)；素材授權：[CREDITS.md](CREDITS.md)
+
+## 資料夾怎麼分：一層一個資料夾，跨樓層的放 core
+
+```
+src/main/java/dev/noclip/backrooms/
+├─ BackroomsMod.java        模組入口：依序呼叫每一層的 register()；也放共用的 MOD_ID、id()
+├─ core/                    好幾層都會用到的機制
+│  └─ LevelExits.java       出口登記處：每個出口寫著通往哪一層，這裡決定通不通
+├─ level0/                  Level 0「大廳」（入口檔 Level0.java）
+└─ level1/                  Level 1「停車場」（入口檔 Level1.java）
+
+src/main/resources/assets/noclip_backrooms/
+├─ textures/block/level0/  textures/block/level1/      方塊貼圖（含光影用的 _n、_s）
+├─ models/block/level0/    models/block/level1/        方塊模型
+├─ textures/item/level0/   textures/item/level1/       物品圖示
+├─ models/item/level0/     models/item/level1/         物品模型
+├─ sounds/level0/                                      音效檔
+└─ blockstates/  items/  lang/  sounds.json            ← Minecraft 規定只能放在一起（檔名就是方塊或物品 ID）
+
+src/main/resources/data/noclip_backrooms/
+├─ dimension/  dimension_type/  worldgen/biome/        一層一個檔：level_0.json、level_1.json
+├─ loot_table/blocks/                                  依方塊 ID，只能放一起
+├─ recipe/  tags/block/
+└─ ../minecraft/tags/block/mineable/                   挖掘工具標籤，每層的方塊都加在這
+
+src/test/java/dev/noclip/backrooms/level0/  level1/        單元測試（迷宮、地形一定走得通……）
+src/gametest/java/dev/noclip/backrooms/level0/  level1/    真實遊戲測試；新增的要登記在 src/gametest/resources/fabric.mod.json
+
+tools/make_textures.py      畫 Level 0 的貼圖，也是共用的繪圖工具
+tools/make_level1.py        畫 Level 1 的貼圖，並寫出 Level 1 的模型、blockstates、物品模型
+
+docs/levels/level0/         Level 0 的截圖與貼圖預覽
+docs/levels/level1/         Level 1 的說明（README.md）與貼圖預覽
+```
+
+**每一層自己管自己**：方塊、物品、音效、維度、地形、事件都放在那一層的資料夾，那層的入口檔負責全部註冊。所以擴充 Level 0 只會動到 `level0/` 和 Level 0 的資源資料夾，不會碰到別層。
+
+**只能放在一起的檔案**（`blockstates/`、`items/`、`lang/*.json`、`sounds.json`、`loot_table/blocks/`、挖掘工具標籤）：直接加新條目就好，不同層的條目互不影響。
+
+## 跨樓層的東西放哪
+
+一層可以通往很多層，以後還會一直加。規則是**出口歸出發的那層，落點歸到達的那層**：
+
+| 情況 | 放哪 | 例子 |
+|---|---|---|
+| 某層裡的一個出口（門、樓梯、裂縫……） | 出口所在的那層 | Level 1 往上的樓梯在 `level1/` |
+| 到達某層時站在哪 | 被到達的那層，並在入口檔用 `LevelExits.open("層號", ...)` 登記 | 到達 Level 0 的 `Level0Arrival` 在 `level0/` |
+| 長在別層裡、專門通往這層的入口 | 被進入的那層（誰被進入，誰負責入口） | Level 0 的閃爍牆通往 Level 1，所以 `FlickeringWalls` 在 `level1/` |
+| 好幾層都會用到的機制 | `core/` | `LevelExits` |
+
+出口只要寫上目的地的層號（例如 `"188"`）就好。那層還沒做的話，出口會顯示「尚未開放」；等那層用 `LevelExits.open` 登記，所有通往它的出口就一起接通，不用回頭改。
+
+git 分支不是用來分樓層的：`main` 是整合好的版本，`claude` 是 Claude 的工作區（規則見 AGENTS.md）。
+
+## 新增一層（以 Level 2 為例）
+
+1. 建立 `level2/Level2.java`：`public static final ResourceKey<Level> LEVEL_2`，以及 `public static void register()`。這一層的其他程式都放在 `level2/`。
+2. 在 `data/noclip_backrooms/` 加 `dimension/level_2.json`、`dimension_type/level_2.json`、`worldgen/biome/level_2.json`。
+3. 在 `BackroomsMod.onInitialize()` 加一行 `Level2.register();`。
+4. 在 `Level2.register()` 裡寫 `LevelExits.open("2", 到達的方法)`，Level 1 往下的樓梯就會自動通到這裡。
+5. 貼圖、模型放 `textures/block/level2/`、`models/block/level2/`。
+6. 測試放 `src/test/.../level2/`、`src/gametest/.../level2/`，並把遊戲測試登記到 `src/gametest/resources/fabric.mod.json`。
+
+## ID 規則
+
+- 方塊、物品、維度、音效的 ID 一旦用了就**永遠不改**：存檔記的是 ID，改名等於舊存檔裡的東西消失。搬檔案、改資料夾不會影響存檔。
+- 子樓層用句點：Level 1.1 是 `level_1.1`，不要寫成 `level_1_1`，會跟 Level 11 撞名。

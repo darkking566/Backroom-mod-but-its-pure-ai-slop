@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "noclip_backrooms:block/broken_fluorescent_light"
+      "model": "noclip_backrooms:block/level0/broken_fluorescent_light"
     }
   }
 }
