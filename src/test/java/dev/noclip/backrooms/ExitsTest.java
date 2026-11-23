@@ -57,10 +57,11 @@ class ExitsTest {
 			int region = REGIONS[run % REGIONS.length];
 			int origin = (region - 1) * Exits.REGION;
 			Arrays.fill(walked, Integer.MAX_VALUE);
-			boolean[] walkable = new boolean[size * size];
-			for (int i = 0; i < walkable.length; i++) {
+			byte[] floorY = new byte[size * size];
+			for (int i = 0; i < floorY.length; i++) {
 				int x = origin + i % size, z = origin + i / size;
-				walkable[i] = !Maze.isWall(seed, x, z) && !Maze.isPit(seed, x, z);
+				int fy = Maze.walkableFloorY(seed, x, z, Maze.EpochSource.ZERO);
+				floorY[i] = fy == Integer.MIN_VALUE ? Byte.MIN_VALUE : (byte) fy;
 			}
 
 			int tail = 0;
@@ -78,9 +79,10 @@ class ExitsTest {
 
 			for (int head = 0; head < tail; head++) {
 				int at = queue[head], x = at % size, z = at / size;
+				byte curY = floorY[at];
 				int[] next = {x > 0 ? at - 1 : -1, x < size - 1 ? at + 1 : -1, z > 0 ? at - size : -1, z < size - 1 ? at + size : -1};
 				for (int n : next) {
-					if (n >= 0 && walkable[n] && walked[n] == Integer.MAX_VALUE) {
+					if (n >= 0 && floorY[n] != Byte.MIN_VALUE && Math.abs(floorY[n] - curY) <= 1 && walked[n] == Integer.MAX_VALUE) {
 						walked[n] = walked[at] + 1;
 						queue[tail++] = n;
 					}
@@ -91,7 +93,7 @@ class ExitsTest {
 			for (int x = Exits.REGION; x < Exits.REGION * 2; x++) {
 				for (int z = Exits.REGION; z < Exits.REGION * 2; z++) {
 					int at = x + z * size;
-					if (walkable[at]) assertTrue(walked[at] <= MAX_WALK, "too far from an exit: " + walked[at] + " blocks, seed " + seed);
+					if (floorY[at] != Byte.MIN_VALUE) assertTrue(walked[at] <= MAX_WALK, "too far from an exit: " + walked[at] + " blocks, seed " + seed);
 				}
 			}
 		}

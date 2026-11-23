@@ -64,6 +64,8 @@ final class Exits {
 			// Red Rooms have no easy way out: never place an exit door inside or bordering a RED_ROOM.
 			if (Maze.zoneAt(seed, cx * Maze.CELL, cz * Maze.CELL) == Maze.Zone.RED_ROOM
 					|| Maze.zoneAt(seed, (cx - 1) * Maze.CELL, cz * Maze.CELL) == Maze.Zone.RED_ROOM) continue;
+			// Only place exit doors on standard flat FLOOR_Y = 32 cells (never over chasms, stairs, or megahall voids).
+			if (!Maze.isStandardFloorCell(seed, cx, cz) || !Maze.isStandardFloorCell(seed, cx - 1, cz)) continue;
 			if (hasSolidWestWall(seed, cx * Maze.CELL, cz * Maze.CELL)) {
 				return new Door(cx * Maze.CELL, cz * Maze.CELL + Maze.CENTER);
 			}

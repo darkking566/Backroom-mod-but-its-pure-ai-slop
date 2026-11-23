@@ -18,7 +18,7 @@ import net.minecraft.world.effect.MobEffects;
 final class PitEffects {
 	private static final int ABYSS_CHECK_TICKS = 5;
 	private static final int LURE_CHECK_TICKS = 20;
-	private static final double LETHAL_Y = 20.0;
+	private static final double LETHAL_Y = -20.0;
 
 	private PitEffects() {
 	}
@@ -41,13 +41,14 @@ final class PitEffects {
 		for (ServerPlayer player : level.players()) {
 			if (player.isCreative() || player.isSpectator() || !player.isAlive()) continue;
 
-			if (player.getY() < LETHAL_Y && Maze.isPit(seed, player.getBlockX(), player.getBlockZ())) {
+			if (player.getY() < LETHAL_Y && Maze.isAbyss(seed, player.getBlockX(), player.getBlockZ())) {
 				player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 40, 0, true, false, true));
 				player.hurtServer(level, level.damageSources().fellOutOfWorld(), Float.MAX_VALUE);
 				continue;
 			}
 
-			if (checkLure && Maze.zoneAt(seed, player.getBlockX(), player.getBlockZ()) == Maze.Zone.PITS) {
+			Maze.Zone zone = Maze.zoneAt(seed, player.getBlockX(), player.getBlockZ());
+			if (checkLure && (zone == Maze.Zone.PITS || zone == Maze.Zone.CHASM)) {
 				emitPitLure(level, seed, player, random);
 			}
 		}
@@ -58,13 +59,13 @@ final class PitEffects {
 		for (int attempt = 0; attempt < 8; attempt++) {
 			int tx = px + random.nextInt(13) - 6;
 			int tz = pz + random.nextInt(13) - 6;
-			if (!Maze.isPit(seed, tx, tz)) continue;
+			if (!Maze.isAbyss(seed, tx, tz)) continue;
 
-			double py = Level0ChunkGenerator.FLOOR_Y - 5.0 - random.nextDouble() * 5.0;
+			double py = player.getY() - 10.0 - random.nextDouble() * 10.0;
 			level.sendParticles(player, ParticleTypes.SOUL_FIRE_FLAME, false, false,
 					tx + 0.5, py, tz + 0.5, 2, 0.3, 0.6, 0.3, 0.005);
 			if (random.nextInt(36) == 0) {
-				level.playSound(null, tx + 0.5, Level0ChunkGenerator.FLOOR_Y - 4.0, tz + 0.5,
+				level.playSound(null, tx + 0.5, py + 2.0, tz + 0.5,
 						ModSounds.DISTANT_WHISPER, SoundSource.AMBIENT, 0.20F, 0.72F + random.nextFloat() * 0.12F);
 			}
 			return;

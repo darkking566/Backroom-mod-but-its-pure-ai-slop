@@ -20,10 +20,10 @@
   "has_ender_dragon_fight": false,
   "has_fixed_time": true,
   "has_skylight": false,
-  "height": 48,
+  "height": 128,
   "infiniburn": "#minecraft:infiniburn_overworld",
-  "logical_height": 38,
-  "min_y": 0,
+  "logical_height": 96,
+  "min_y": -32,
   "monster_spawn_block_light_limit": 0,
   "monster_spawn_light_level": 0,
   "skybox": "none"

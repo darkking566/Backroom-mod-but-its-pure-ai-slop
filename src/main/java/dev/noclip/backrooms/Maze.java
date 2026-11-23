@@ -14,7 +14,7 @@ final class Maze {
 	static final int LARGE_ZONE_SPAN = 3;
 
 	private static final int TREE = 1, WEST = 2, NORTH = 3, PILLAR = 4, LAMP = 5, ZONE = 6, FEATURE = 7, WARNING = 8,
-			SHIFT_PILLAR = 9, STAIRWELL = 10, ROOM = 11, CEILING = 12, FLOOR = 13, MERGE = 14;
+			SHIFT_PILLAR = 9, STAIRWELL = 10, ROOM = 11, CEILING = 12, FLOOR = 13, MERGE = 14, ATRIUM = 15;
 
 	@FunctionalInterface
 	interface EpochSource {
@@ -31,7 +31,9 @@ final class Maze {
 		PITS,
 		RED_ROOM,
 		CUBICLES,
-		CORRIDORS
+		CORRIDORS,
+		MEGATHALL,
+		CHASM
 	}
 
 	enum RoomLayout {
@@ -81,10 +83,15 @@ final class Maze {
 		Zone large = largeZoneAtSector(seed, sx, sz);
 		if (large != null) return large;
 
-		// Pillar halls span 2x2 sectors (112x112 blocks) to capture their vast, dizzying scale.
+		// Macro 2x2-sector zones (112x112 blocks): Pillar Halls, Megahalls, and Abyssal Chasms.
 		int mx = Math.floorDiv(sx, 2), mz = Math.floorDiv(sz, 2);
-		if (Math.floorMod(hash(seed, mx, mz, ZONE + 1), 100) < 17 && !macroHasLargeZone(seed, mx, mz)) {
-			return Zone.PILLARS;
+		if (!macroHasLargeZone(seed, mx, mz)) {
+			int macroRoll = Math.floorMod(hash(seed, mx, mz, ZONE + 1), 100);
+			if (macroRoll < 14) return Zone.PILLARS;
+			if (!nearOriginEdgeShiftCheck(mx, mz)) {
+				if (macroRoll < 27) return Zone.MEGATHALL;
+				if (macroRoll < 40) return Zone.CHASM;
+			}
 		}
 
 		int roll = Math.floorMod(hash(seed, sx, sz, ZONE), 100);
@@ -150,10 +157,14 @@ final class Maze {
 		return zoneForCell(seed, sx * SECTOR, sz * SECTOR);
 	}
 
+	private static boolean nearOriginEdgeShiftCheck(int mx, int mz) {
+		return (mx == 0 && mz == 0) || (mx == 0 && mz == -1) || (mx == -1 && mz == -1);
+	}
+
 	/** Relative frequency of Edge Shift in this zone (0 means completely stable). */
 	static int shiftWeight(Zone zone) {
 		return switch (zone) {
-			case ARCHES -> 0;
+			case ARCHES, MEGATHALL, CHASM -> 0;
 			case RED_ROOM -> 1;
 			case PITS -> 2;
 			case CUBICLES -> 3;
@@ -174,12 +185,12 @@ final class Maze {
 			case CUBICLES -> 450;
 			case PITS -> 500;
 			case RED_ROOM -> 700;
-			case ARCHES -> Integer.MAX_VALUE;
+			case ARCHES, MEGATHALL, CHASM -> Integer.MAX_VALUE;
 		};
 	}
 
 	private static int effectiveEpoch(Zone zone, int cx, int cz, EpochSource epochs) {
-		return zone == Zone.ARCHES ? 0 : epochs.epochAt(cx, cz);
+		return (zone == Zone.ARCHES || zone == Zone.MEGATHALL || zone == Zone.CHASM) ? 0 : epochs.epochAt(cx, cz);
 	}
 
 	/** Whether a wall block should show peeling yellow wallpaper exposing dark red underneath. */
@@ -248,6 +259,60 @@ final class Maze {
 		};
 	}
 
+	static boolean isAbyss(long seed, int x, int z) {
+		if (isPit(seed, x, z)) return true;
+		return zoneAt(seed, x, z) == Zone.CHASM && ChasmPlan.isAbyssBlock(seed, x, z);
+	}
+
+	/** Whether a cell has flat standard FLOOR_Y = 32 across its whole floor (safe for Exits). */
+	static boolean isStandardFloorCell(long seed, int cx, int cz) {
+		Zone zone = zoneForCell(seed, cx, cz);
+		if (zone == Zone.CHASM) return ChasmPlan.isFlatRimCell(seed, cx, cz);
+		if (zone == Zone.MEGATHALL) return MegahallPlan.isRimCell(cx, cz);
+		return true;
+	}
+
+	/** Whether (cx, cz) belongs to a merged 3x3 high-ceiling atrium hall in CLASSIC or ARCHES. */
+	static boolean isAtriumCell(long seed, int cx, int cz) {
+		int ax = Math.floorDiv(cx, 3), az = Math.floorDiv(cz, 3);
+		if (ax == 0 && az == 0) return false;
+		if (Math.floorMod(hash(seed, ax, az, ATRIUM), 8) != 0) return false;
+		int baseCx = ax * 3, baseCz = az * 3;
+		Zone zone = zoneForCell(seed, baseCx, baseCz);
+		if (zone != Zone.CLASSIC && zone != Zone.ARCHES) return false;
+		if (Math.floorDiv(baseCx, SECTOR) == 0 && Math.floorDiv(baseCz, SECTOR) == 0) return false;
+		return zoneForCell(seed, baseCx + 2, baseCz) == zone
+				&& zoneForCell(seed, baseCx, baseCz + 2) == zone
+				&& zoneForCell(seed, baseCx + 2, baseCz + 2) == zone;
+	}
+
+	/** Standing floor block Y at (x, z), or Integer.MIN_VALUE if solid wall or abyss pit. */
+	static int walkableFloorY(long seed, int x, int z, EpochSource epochs) {
+		if (isWall(seed, x, z, false, epochs)) return Integer.MIN_VALUE;
+		int cx = Math.floorDiv(x, CELL), cz = Math.floorDiv(z, CELL);
+		Zone zone = zoneForCell(seed, cx, cz);
+		if (zone == Zone.CHASM) return ChasmPlan.walkableFloorY(seed, x, z);
+		if (zone == Zone.MEGATHALL) return MegahallPlan.walkableFloorY(seed, x, z);
+		if (isPit(seed, x, z)) return Integer.MIN_VALUE;
+		int ix = Math.floorMod(x, CELL), iz = Math.floorMod(z, CELL);
+		if (ix >= 2 && ix <= 5 && iz >= 2 && iz <= 5 && isSunkenCell(seed, cx, cz)) {
+			return Level0ChunkGenerator.FLOOR_Y - 1;
+		}
+		return Level0ChunkGenerator.FLOOR_Y;
+	}
+
+	/** Ceiling Y for a cell (supports tall MEGATHALL bays, CHASM caverns/sub-levels, and 3x3 atriums). */
+	static int cellCeilingY(long seed, int cx, int cz) {
+		Zone zone = zoneForCell(seed, cx, cz);
+		if (zone == Zone.CHASM) return ChasmPlan.cellCeilingY(seed, cx, cz);
+		if (zone == Zone.MEGATHALL) return MegahallPlan.cellCeilingY(seed, cx, cz);
+		if (isAtriumCell(seed, cx, cz)) {
+			int ax = Math.floorDiv(cx, 3), az = Math.floorDiv(cz, 3);
+			return Math.floorMod(hash(seed, ax, az, ATRIUM + 1), 2) == 0 ? 44 : 48;
+		}
+		return Level0ChunkGenerator.CEILING_Y;
+	}
+
 	/** Whether a cell hosts a cramped dead-end concrete stairwell alcove. */
 	static boolean isStairwellCell(long seed, int cx, int cz) {
 		return stairwellDir(seed, cx, cz) >= 0;
@@ -267,6 +332,7 @@ final class Maze {
 		if (freq == 0) return -1;
 		long h = hash(seed, cx, cz, STAIRWELL);
 		if (Math.floorMod(h, freq) != 0) return -1;
+		if (zone == Zone.CLASSIC && isAtriumCell(seed, cx, cz)) return -1;
 		if (Exits.isProtectedCell(seed, cx, cz)) return -1;
 		return Math.floorMod(h >>> 8, 4);
 	}
@@ -277,6 +343,7 @@ final class Maze {
 		Zone zone = zoneForCell(seed, cx, cz);
 		if (zone != Zone.CLASSIC && zone != Zone.ARCHES && zone != Zone.CUBICLES) return false;
 		if (Math.floorMod(hash(seed, cx, cz, FLOOR), 22) != 0) return false;
+		if (isAtriumCell(seed, cx, cz)) return false;
 		if (Exits.isProtectedCell(seed, cx, cz)) return false;
 		return !isStairwellCell(seed, cx, cz);
 	}
@@ -287,7 +354,8 @@ final class Maze {
 	}
 
 	static CeilingStyle ceilingStyle(long seed, int cx, int cz) {
-		if ((cx == 0 && cz == 0) || isStairwellCell(seed, cx, cz) || Exits.isProtectedCell(seed, cx, cz)) {
+		if ((cx == 0 && cz == 0) || isStairwellCell(seed, cx, cz) || isAtriumCell(seed, cx, cz)
+				|| Exits.isProtectedCell(seed, cx, cz)) {
 			return CeilingStyle.FLAT;
 		}
 		Zone zone = zoneForCell(seed, cx, cz);
@@ -314,7 +382,7 @@ final class Maze {
 				if (roll < 48) yield CeilingStyle.LOW_SOFFIT;
 				yield CeilingStyle.FLAT;
 			}
-			case PITS, RED_ROOM -> CeilingStyle.FLAT;
+			case PITS, RED_ROOM, MEGATHALL, CHASM -> CeilingStyle.FLAT;
 		};
 	}
 
@@ -362,6 +430,8 @@ final class Maze {
 		int cx = Math.floorDiv(x, CELL), cz = Math.floorDiv(z, CELL);
 		int ix = Math.floorMod(x, CELL), iz = Math.floorMod(z, CELL);
 		Zone zone = zoneForCell(seed, cx, cz);
+		if (zone == Zone.CHASM) return ChasmPlan.isWallAt(seed, x, z, topLayer);
+		if (zone == Zone.MEGATHALL) return MegahallPlan.isWallAt(seed, x, z, topLayer);
 		int epoch = effectiveEpoch(zone, cx, cz, epochs);
 
 		if (ix != 0 && iz != 0) {
@@ -376,6 +446,10 @@ final class Maze {
 					|| isSunkenCell(seed, cx, cz)) {
 				return false;
 			}
+			if (isAtriumCell(seed, cx, cz)) {
+				int ax = Math.floorMod(cx, 3), az = Math.floorMod(cz, 3);
+				return (ax == 0 || ax == 2) && (az == 0 || az == 2) && ix == 4 && iz == 4;
+			}
 			return isInteriorLayoutWall(seed, cx, cz, ix, iz, zone, epoch, topLayer)
 					&& !Exits.isProtectedCell(seed, cx, cz);
 		}
@@ -383,6 +457,9 @@ final class Maze {
 		if (ix != 0) return northEdge(seed, cx, cz, zone, epoch).blocks(ix, topLayer);
 
 		if (zone == Zone.PILLARS || zone == Zone.PITS) return true;
+		if (isAtriumCell(seed, cx, cz) && Math.floorMod(cx, 3) != 0 && Math.floorMod(cz, 3) != 0) {
+			return false;
+		}
 
 		Zone northNeighbor = zoneForCell(seed, cx, cz - 1);
 		Zone westNeighbor = zoneForCell(seed, cx - 1, cz);
@@ -466,6 +543,7 @@ final class Maze {
 				if (roll < 80) yield RoomLayout.FOUR_PILLARS;
 				yield RoomLayout.PARTITION_FULL;
 			}
+			case MEGATHALL, CHASM -> RoomLayout.OPEN;
 		};
 	}
 
@@ -559,6 +637,8 @@ final class Maze {
 		if (ix < 2 || ix > 5 || iz < 2 || iz > 5) return false;
 
 		Zone zone = zoneForCell(seed, cx, cz);
+		if (zone == Zone.MEGATHALL) return MegahallPlan.isLamp(seed, x, z);
+		if (zone == Zone.CHASM) return isLamp(x, z);
 		int epoch = effectiveEpoch(zone, cx, cz, epochs);
 		long h = mixEpoch(hash(seed, cx, cz, LAMP + 1), epoch);
 		int roll = Math.floorMod(h, 100);
@@ -598,12 +678,16 @@ final class Maze {
 	static boolean lampWorks(long seed, int x, int z, EpochSource epochs) {
 		int cx = Math.floorDiv(x, CELL), cz = Math.floorDiv(z, CELL);
 		Zone zone = zoneForCell(seed, cx, cz);
+		if (zone == Zone.MEGATHALL) return MegahallPlan.isLamp(seed, x, z);
+		if (zone == Zone.CHASM) return isLamp(x, z);
 		int epoch = effectiveEpoch(zone, cx, cz, epochs);
 		long h = mixEpoch(hash(seed, cx, cz, LAMP), epoch);
 		return switch (zone) {
 			case DARKENED -> false;
 			case RED_ROOM -> Math.floorMod(h, 100) < 65;
 			case PITS -> Math.floorMod(h, 5) >= 2;
+			case CHASM -> Math.floorMod(h, 5) >= 1;
+			case MEGATHALL -> Math.floorMod(h, 6) != 0;
 			case PILLARS -> Math.floorMod(h, 10) != 0;
 			case ARCHES -> Math.floorMod(h, 7) != 0;
 			case CUBICLES -> Math.floorMod(h, 8) != 0;
@@ -619,6 +703,9 @@ final class Maze {
 	}
 
 	private static Edge westEdge(long seed, int cx, int cz, Zone zone, int epoch) {
+		if (Math.floorMod(cx, 3) != 0 && isAtriumCell(seed, cx, cz)) {
+			return new Edge(1, CELL - 1, zone == Zone.ARCHES ? Edge.DoorStyle.ARCHED : Edge.DoorStyle.FULL);
+		}
 		if (Math.floorMod(cx, 2) == 1 && isOpenQuadEdge(seed, Math.floorDiv(cx, 2), Math.floorDiv(cz, 2),
 				zone, zoneForCell(seed, cx - 1, cz))) {
 			return new Edge(1, CELL - 1, Edge.DoorStyle.FULL);
@@ -629,6 +716,9 @@ final class Maze {
 	}
 
 	private static Edge northEdge(long seed, int cx, int cz, Zone zone, int epoch) {
+		if (Math.floorMod(cz, 3) != 0 && isAtriumCell(seed, cx, cz)) {
+			return new Edge(1, CELL - 1, zone == Zone.ARCHES ? Edge.DoorStyle.ARCHED : Edge.DoorStyle.FULL);
+		}
 		if (Math.floorMod(cz, 2) == 1 && isOpenQuadEdge(seed, Math.floorDiv(cx, 2), Math.floorDiv(cz, 2),
 				zone, zoneForCell(seed, cx, cz - 1))) {
 			return new Edge(1, CELL - 1, Edge.DoorStyle.FULL);
@@ -715,6 +805,7 @@ final class Maze {
 					if (!required && roll >= 48) yield new Edge(1, 0, DoorStyle.FULL);
 					yield doorway(hash, 2, 3, framedOrFull);
 				}
+				case MEGATHALL, CHASM -> new Edge(1, CELL - 1, DoorStyle.FULL);
 			};
 		}
 

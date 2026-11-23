@@ -342,9 +342,9 @@ public final class Level0ClientTest implements FabricClientGameTest {
 
 	private static void checkGeneratedBlocks(ServerLevel level) {
 		long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
-		int[] ys = {0, Level0ChunkGenerator.FLOOR_Y, Level0ChunkGenerator.FLOOR_Y + 1,
+		int[] ys = {Level0ChunkGenerator.MIN_Y, 0, Level0ChunkGenerator.FLOOR_Y, Level0ChunkGenerator.FLOOR_Y + 1,
 				Level0ChunkGenerator.FLOOR_Y + 2, Level0ChunkGenerator.CEILING_Y - 1,
-				Level0ChunkGenerator.CEILING_Y, Level0ChunkGenerator.HEIGHT - 1};
+				Level0ChunkGenerator.CEILING_Y, Level0ChunkGenerator.MAX_Y};
 		for (int x = -32; x < 32; x++) {
 			for (int z = -32; z < 32; z++) {
 				for (int y : ys) {
