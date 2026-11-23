@@ -1,8 +1,14 @@
 package dev.noclip.backrooms.level1;
 
 import dev.noclip.backrooms.core.people.People;
+import dev.noclip.backrooms.core.people.Person;
 import dev.noclip.backrooms.level1.Level1Layout.Base;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -15,6 +21,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * The people of the settlements: Alpha Base's patrol, the colonists, the traders, Hippocrates-1's medics, Tom and his
@@ -24,6 +31,7 @@ import net.minecraft.world.phys.AABB;
 final class Residents {
 	static final String TAG = "noclip_backrooms_resident";
 	private static final int NEAR = 64;
+	private static final Map<UUID, State> STATES = new HashMap<>();
 	private static int heldOffUntil;
 
 	private Residents() {
@@ -36,6 +44,7 @@ final class Residents {
 
 	static void register() {
 		ServerTickEvents.END_SERVER_TICK.register(Residents::tick);
+		ServerTickEvents.END_SERVER_TICK.register(Residents::walk);
 	}
 
 	private static void tick(MinecraftServer server) {
@@ -55,6 +64,68 @@ final class Residents {
 				}
 			}
 		}
+	}
+
+	private static final class State {
+		Vec3 goal;
+		int waitUntil, giveUp;
+	}
+
+	/** Strolls the people about their settlement: a few blocks at a time, a pause between, and a turn to face anyone close. */
+	private static void walk(MinecraftServer server) {
+		ServerLevel level = server.getLevel(Level1.LEVEL_1);
+		if (level == null || level.players().isEmpty()) return;
+		int now = server.getTickCount();
+		Set<UUID> seen = new HashSet<>();
+		for (ServerPlayer player : level.players()) {
+			for (Person person : level.getEntitiesOfClass(Person.class, player.getBoundingBox().inflate(48), p -> p.entityTags().contains(TAG))) {
+				if (seen.add(person.getUUID())) stroll(level, person, now);
+			}
+		}
+		if (now % 200 == 0) STATES.keySet().removeIf(id -> !seen.contains(id));
+	}
+
+	private static void stroll(ServerLevel level, Person person, int now) {
+		State state = STATES.computeIfAbsent(person.getUUID(), id -> new State());
+		ServerPlayer near = null;
+		for (ServerPlayer player : level.players()) {
+			if (!player.isSpectator() && player.distanceTo(person) < 4) near = player;
+		}
+		if (near != null) {
+			Walkers.face(person, near.position());
+			return;
+		}
+		if (now < state.waitUntil) return;
+		RandomSource random = level.getRandom();
+		if (state.goal == null || now > state.giveUp) {
+			state.goal = pickGoal(level, person, random);
+			state.giveUp = now + 400;
+			if (state.goal == null) state.waitUntil = now + 100;
+			return;
+		}
+		if (Walkers.step(person, state.goal, 0.035) < 0.5) {
+			state.goal = null;
+			state.waitUntil = now + 60 + random.nextInt(140);
+		}
+	}
+
+	/** A free spot a few blocks off, kept inside the settlement's open middle. */
+	private static Vec3 pickGoal(ServerLevel level, Person person, RandomSource random) {
+		int x0 = Math.floorDiv(person.getBlockX(), Level1Layout.DISTRICT) * Level1Layout.DISTRICT;
+		int z0 = Math.floorDiv(person.getBlockZ(), Level1Layout.DISTRICT) * Level1Layout.DISTRICT;
+		for (int attempt = 0; attempt < 20; attempt++) {
+			int x = person.getBlockX() + random.nextInt(13) - 6, z = person.getBlockZ() + random.nextInt(13) - 6;
+			if (x < x0 + 20 || x > x0 + 44 || z < z0 + 18 || z > z0 + 44) continue;
+			BlockPos at = new BlockPos(x, Level1ChunkGenerator.FLOOR_Y + 1, z);
+			if (level.isLoaded(at) && free(level, at)) return new Vec3(x + 0.5, at.getY(), z + 0.5);
+		}
+		return null;
+	}
+
+	/** For tests: where the first resident near this point is, or null. */
+	static Vec3 residentNear(ServerLevel level, BlockPos around) {
+		var found = level.getEntitiesOfClass(Person.class, new AABB(around).inflate(24), p -> p.entityTags().contains(TAG));
+		return found.stream().min(java.util.Comparator.comparing(Person::getUUID)).map(Person::position).orElse(null);
 	}
 
 	/** Moves the people into the settlement of district (dx, dz) unless some are already there; returns how many came. */

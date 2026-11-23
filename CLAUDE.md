@@ -73,6 +73,9 @@
   - `Residents`、`Patrols`、`Workers` 改用新實體（敵對的正義使者仍是原版掠奪者）；施工影子不再穿下界合金裝備
   - `Level1ClientTest` 新增 `people`（八種造型一排、近照、背面）
 
+- 居民會走動（`Residents.walk`）：沒有 AI，沿用施工影子的走路程式（`Walkers`），在據點中間一次走幾格、停 1～3 秒，玩家走近 4 格內就停下轉向；客戶端測試 `people` 段檢查 30 秒內有走動
+- 客戶端測試可只跑指定段落：先設環境變數 `NOCLIP_ONLY`（例如 `people,secrets`），不設就跑全部；段落名見 `Level1ClientTest.runTest`
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23

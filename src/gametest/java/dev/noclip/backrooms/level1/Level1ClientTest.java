@@ -26,6 +26,12 @@ import net.minecraft.world.phys.Vec3;
 /** Plays Level 1 in a real client: through a flickering wall, around the halls and corridors, a blackout, a crate, and out. */
 public final class Level1ClientTest implements FabricClientGameTest {
 	private static final int STAND = Level1ChunkGenerator.FLOOR_Y + 1;
+	/** Set NOCLIP_ONLY=people,secrets to run just those sections (the full run takes a quarter of an hour); unset runs everything. */
+	private static final String ONLY = System.getenv("NOCLIP_ONLY");
+
+	private static boolean only(String section) {
+		return ONLY == null || ONLY.isBlank() || java.util.Arrays.asList(ONLY.split(",")).contains(section);
+	}
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
@@ -60,22 +66,22 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			}
 			shoot(context, game, arrival.getX() + 0.5, STAND, arrival.getZ() + 0.5, 90, -50, "level1_ceiling");
 
-			blackout(context, game);
-			crate(context, game);
-			marker(context, game);
-			views(context, game, seed);
-			sectors(context, game, seed);
-			exits(context, game, seed);
-			events(context, game, seed);
-			settlements(context, game, seed);
-			wikiSettlements(context, game, seed);
-			secrets(context, game, seed);
-			items(context, game, seed);
-			monsters(context, game, seed);
-			people(context, game, seed);
-			hounds(context, game, seed);
-			checkBlocks(context, game);
-			leaveThroughDoor(context, game, seed);
+			if (only("blackout")) blackout(context, game);
+			if (only("crate")) crate(context, game);
+			if (only("marker")) marker(context, game);
+			if (only("views")) views(context, game, seed);
+			if (only("sectors")) sectors(context, game, seed);
+			if (only("exits")) exits(context, game, seed);
+			if (only("events")) events(context, game, seed);
+			if (only("settlements")) settlements(context, game, seed);
+			if (only("wikiSettlements")) wikiSettlements(context, game, seed);
+			if (only("secrets")) secrets(context, game, seed);
+			if (only("items")) items(context, game, seed);
+			if (only("monsters")) monsters(context, game, seed);
+			if (only("people")) people(context, game, seed);
+			if (only("hounds")) hounds(context, game, seed);
+			if (only("checkBlocks")) checkBlocks(context, game);
+			if (only("leaveThroughDoor")) leaveThroughDoor(context, game, seed);
 		}
 	}
 
@@ -857,6 +863,20 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		shoot(context, game, spot[0] + 0.5 + 1.65, STAND + 0.9, spot[1] + 2.4, 0, 5, "level1_people_close_right");
 		shoot(context, game, spot[0] + 0.5, STAND + 0.9, spot[1] + 8.5, 180, 5, "level1_people_backs");
 		server.runCommand("kill @e[tag=test_person]");
+		// Residents stroll about rather than stand still.
+		int[] home = nearestBase(seed, Level1Layout.Base.TOMS);
+		shoot(context, game, home[0] * 64 + 31.5, STAND, home[1] * 64 + 11.5, 0, 0, "level1_resident_walk_place");
+		server.runOnServer(s -> Residents.populate(level1(s), home[0], home[1]));
+		BlockPos hub = new BlockPos(home[0] * 64 + 32, STAND, home[1] * 64 + 30);
+		Vec3 first = server.computeOnServer(s -> Residents.residentNear(level1(s), hub));
+		check(first != null, "no resident moved in");
+		double farthest = 0;
+		for (int i = 0; i < 30; i++) {
+			context.waitTicks(20);
+			Vec3 now = server.computeOnServer(s -> Residents.residentNear(level1(s), hub));
+			if (now != null) farthest = Math.max(farthest, now.distanceTo(first));
+		}
+		check(farthest > 1.5, "the residents stood still (moved " + farthest + ")");
 	}
 
 	private static void hounds(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
