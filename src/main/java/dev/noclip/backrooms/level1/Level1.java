@@ -48,6 +48,7 @@ public final class Level1 {
 		Strays.register();
 		Marauders.register();
 		Smilers.register();
+		SkinStealers.register();
 		Hounds.register();
 		Level1Ambience.register();
 	}
