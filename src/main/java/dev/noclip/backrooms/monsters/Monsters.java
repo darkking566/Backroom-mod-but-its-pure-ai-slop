@@ -2,6 +2,7 @@ package dev.noclip.backrooms.monsters;
 
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.monsters.hound.Hound;
+import dev.noclip.backrooms.monsters.smiler.Smiler;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.core.Registry;
@@ -25,6 +26,9 @@ public final class Monsters {
 	public static final EntityType<Hound> HOUND = register("hound",
 			EntityType.Builder.of(Hound::new, MobCategory.MONSTER).sized(0.95F, 1.05F).eyeHeight(0.8F).clientTrackingRange(10));
 	public static final Item HOUND_SPAWN_EGG = registerEgg("hound_spawn_egg", HOUND);
+	public static final EntityType<Smiler> SMILER = register("smiler",
+			EntityType.Builder.of(Smiler::new, MobCategory.MONSTER).sized(0.75F, 2.05F).eyeHeight(1.72F).clientTrackingRange(10));
+	public static final Item SMILER_SPAWN_EGG = registerEgg("smiler_spawn_egg", SMILER);
 
 	public static final SoundEvent HOUND_GROWL = sound("hound.growl");
 	public static final SoundEvent HOUND_ROAR = sound("hound.roar");
@@ -36,7 +40,11 @@ public final class Monsters {
 
 	public static void register() {
 		FabricDefaultAttributeRegistry.register(HOUND, Hound.createAttributes());
-		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.SPAWN_EGGS).register(output -> output.accept(HOUND_SPAWN_EGG));
+		FabricDefaultAttributeRegistry.register(SMILER, Smiler.createAttributes());
+		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.SPAWN_EGGS).register(output -> {
+			output.accept(HOUND_SPAWN_EGG);
+			output.accept(SMILER_SPAWN_EGG);
+		});
 	}
 
 	private static <T extends net.minecraft.world.entity.Entity> EntityType<T> register(String name, EntityType.Builder<T> builder) {

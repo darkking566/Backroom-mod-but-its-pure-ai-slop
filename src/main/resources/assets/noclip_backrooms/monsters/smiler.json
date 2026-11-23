@@ -1,0 +1,6210 @@
+{
+  "entity_id": "noclip_backrooms:smiler",
+  "display_name_zh_tw": "\u7b11\u9b58",
+  "display_name_en_us": "Smiler",
+  "texture_atlas": {
+    "file": "smiler.png",
+    "width": 512,
+    "height": 512,
+    "regions": {
+      "void": {
+        "u": 8,
+        "v": 8,
+        "w": 152,
+        "h": 152
+      },
+      "smoke": {
+        "u": 180,
+        "v": 8,
+        "w": 152,
+        "h": 152
+      },
+      "mouth": {
+        "u": 352,
+        "v": 8,
+        "w": 152,
+        "h": 152
+      },
+      "eye": {
+        "u": 8,
+        "v": 180,
+        "w": 152,
+        "h": 152
+      },
+      "teeth": {
+        "u": 180,
+        "v": 180,
+        "w": 152,
+        "h": 152
+      }
+    }
+  },
+  "parts": [
+    {
+      "name": "Pelvis",
+      "parent": "root",
+      "pivot_mc": [
+        0,
+        11.0,
+        0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -3.2,
+            -2.0,
+            -2.2
+          ],
+          "size_mc": [
+            6.4,
+            4.2,
+            4.4
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -2.4,
+            2.0,
+            -1.6
+          ],
+          "size_mc": [
+            4.8,
+            2.2,
+            3.2
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tendril_L",
+      "parent": "Pelvis",
+      "pivot_mc": [
+        -2.6,
+        2.8,
+        0.4
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            5.0,
+            2.0
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.7,
+            5.0,
+            -0.7
+          ],
+          "size_mc": [
+            1.4,
+            4.5,
+            1.4
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tendril_C",
+      "parent": "Pelvis",
+      "pivot_mc": [
+        0.0,
+        3.4,
+        0.8
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.2,
+            0.0,
+            -1.2
+          ],
+          "size_mc": [
+            2.4,
+            5.5,
+            2.4
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.8,
+            5.5,
+            -0.8
+          ],
+          "size_mc": [
+            1.6,
+            5.0,
+            1.6
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tendril_R",
+      "parent": "Pelvis",
+      "pivot_mc": [
+        2.6,
+        2.8,
+        0.4
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            5.0,
+            2.0
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.7,
+            5.0,
+            -0.7
+          ],
+          "size_mc": [
+            1.4,
+            4.5,
+            1.4
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Torso_Lower",
+      "parent": "Pelvis",
+      "pivot_mc": [
+        0,
+        -2.0,
+        0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -2.8,
+            -5.5,
+            -2.0
+          ],
+          "size_mc": [
+            5.6,
+            5.5,
+            4.0
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.6,
+            -5.0,
+            1.6
+          ],
+          "size_mc": [
+            3.2,
+            4.5,
+            1.2
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Torso_Upper",
+      "parent": "Torso_Lower",
+      "pivot_mc": [
+        0,
+        -5.5,
+        0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -4.4,
+            -7.2,
+            -2.8
+          ],
+          "size_mc": [
+            8.8,
+            7.2,
+            5.6
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -5.2,
+            -6.4,
+            -2.2
+          ],
+          "size_mc": [
+            10.4,
+            3.6,
+            4.4
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -2.2,
+            -6.8,
+            2.4
+          ],
+          "size_mc": [
+            4.4,
+            5.8,
+            1.4
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Neck",
+      "parent": "Torso_Upper",
+      "pivot_mc": [
+        0,
+        -7.2,
+        -0.4
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.8,
+            -3.2,
+            -1.8
+          ],
+          "size_mc": [
+            3.6,
+            3.6,
+            3.6
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Head",
+      "parent": "Neck",
+      "pivot_mc": [
+        0,
+        -3.0,
+        -0.4
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -5.0,
+            -10.5,
+            -4.4
+          ],
+          "size_mc": [
+            10.0,
+            8.2,
+            8.8
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -4.2,
+            -11.6,
+            -3.6
+          ],
+          "size_mc": [
+            8.4,
+            1.4,
+            7.2
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -4.4,
+            -3.6,
+            -4.1
+          ],
+          "size_mc": [
+            8.8,
+            3.4,
+            4.0
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -3.8,
+            -8.2,
+            -4.6
+          ],
+          "size_mc": [
+            2.6,
+            2.6,
+            0.5
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            1.2,
+            -8.2,
+            -4.6
+          ],
+          "size_mc": [
+            2.6,
+            2.6,
+            0.5
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -3.5,
+            -7.8,
+            -4.85
+          ],
+          "size_mc": [
+            2.0,
+            1.8,
+            0.45
+          ],
+          "uv_region": [
+            8,
+            180
+          ]
+        },
+        {
+          "origin_mc": [
+            1.5,
+            -7.8,
+            -4.85
+          ],
+          "size_mc": [
+            2.0,
+            1.8,
+            0.45
+          ],
+          "uv_region": [
+            8,
+            180
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.5,
+            -0.7,
+            -0.35
+          ],
+          "size_mc": [
+            1.0,
+            1.4,
+            0.7
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -4.1,
+            -4.7,
+            -3.95
+          ],
+          "subpart_rot_rad_mc": [
+            0,
+            0.35,
+            -0.25
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.5,
+            -0.75,
+            -0.35
+          ],
+          "size_mc": [
+            1.0,
+            1.5,
+            0.7
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -2.9,
+            -3.65,
+            -4.25
+          ],
+          "subpart_rot_rad_mc": [
+            0,
+            0.18,
+            -0.1
+          ]
+        },
+        {
+          "origin_mc": [
+            -2.0,
+            -3.8,
+            -4.8
+          ],
+          "size_mc": [
+            1.1,
+            1.6,
+            0.7
+          ],
+          "uv_region": [
+            180,
+            180
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.55,
+            -3.6,
+            -4.85
+          ],
+          "size_mc": [
+            1.1,
+            1.7,
+            0.7
+          ],
+          "uv_region": [
+            180,
+            180
+          ]
+        },
+        {
+          "origin_mc": [
+            0.9,
+            -3.8,
+            -4.8
+          ],
+          "size_mc": [
+            1.1,
+            1.6,
+            0.7
+          ],
+          "uv_region": [
+            180,
+            180
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.5,
+            -0.75,
+            -0.35
+          ],
+          "size_mc": [
+            1.0,
+            1.5,
+            0.7
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            2.9,
+            -3.65,
+            -4.25
+          ],
+          "subpart_rot_rad_mc": [
+            0,
+            -0.18,
+            0.1
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.5,
+            -0.7,
+            -0.35
+          ],
+          "size_mc": [
+            1.0,
+            1.4,
+            0.7
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            4.1,
+            -4.7,
+            -3.95
+          ],
+          "subpart_rot_rad_mc": [
+            0,
+            -0.35,
+            0.25
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Jaw",
+      "parent": "Head",
+      "pivot_mc": [
+        0,
+        -2.0,
+        -0.2
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -4.6,
+            0.0,
+            -4.3
+          ],
+          "size_mc": [
+            9.2,
+            2.4,
+            5.2
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -3.8,
+            2.2,
+            -3.6
+          ],
+          "size_mc": [
+            7.6,
+            1.2,
+            4.0
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.45,
+            -0.7,
+            -0.3
+          ],
+          "size_mc": [
+            0.9,
+            1.4,
+            0.6
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -3.95,
+            -0.9,
+            -3.8
+          ],
+          "subpart_rot_rad_mc": [
+            0,
+            0.35,
+            0.2
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.45,
+            -0.7,
+            -0.3
+          ],
+          "size_mc": [
+            0.9,
+            1.4,
+            0.6
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -2.75,
+            -0.3,
+            -4.1
+          ],
+          "subpart_rot_rad_mc": [
+            0,
+            0.18,
+            0.08
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.9,
+            -0.7,
+            -4.6
+          ],
+          "size_mc": [
+            1.0,
+            1.4,
+            0.6
+          ],
+          "uv_region": [
+            180,
+            180
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.5,
+            -0.6,
+            -4.65
+          ],
+          "size_mc": [
+            1.0,
+            1.5,
+            0.6
+          ],
+          "uv_region": [
+            180,
+            180
+          ]
+        },
+        {
+          "origin_mc": [
+            0.9,
+            -0.7,
+            -4.6
+          ],
+          "size_mc": [
+            1.0,
+            1.4,
+            0.6
+          ],
+          "uv_region": [
+            180,
+            180
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.45,
+            -0.7,
+            -0.3
+          ],
+          "size_mc": [
+            0.9,
+            1.4,
+            0.6
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            2.75,
+            -0.3,
+            -4.1
+          ],
+          "subpart_rot_rad_mc": [
+            0,
+            -0.18,
+            -0.08
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.45,
+            -0.7,
+            -0.3
+          ],
+          "size_mc": [
+            0.9,
+            1.4,
+            0.6
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            3.95,
+            -0.9,
+            -3.8
+          ],
+          "subpart_rot_rad_mc": [
+            0,
+            -0.35,
+            -0.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Shoulder_L",
+      "parent": "Torso_Upper",
+      "pivot_mc": [
+        -5.2,
+        -5.6,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.4,
+            -1.4,
+            -1.4
+          ],
+          "size_mc": [
+            2.8,
+            2.8,
+            2.8
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "UpperArm_L",
+      "parent": "Shoulder_L",
+      "pivot_mc": [
+        -0.6,
+        0.6,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.1,
+            0.0,
+            -1.1
+          ],
+          "size_mc": [
+            2.2,
+            8.2,
+            2.2
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Forearm_L",
+      "parent": "UpperArm_L",
+      "pivot_mc": [
+        0.0,
+        8.0,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -0.9,
+            0.0,
+            -0.9
+          ],
+          "size_mc": [
+            1.8,
+            8.6,
+            1.8
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Claw_L",
+      "parent": "Forearm_L",
+      "pivot_mc": [
+        0.0,
+        8.4,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -0.9
+          ],
+          "size_mc": [
+            2.0,
+            2.0,
+            1.8
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.8,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            3.6,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.85,
+            3.6,
+            -0.55
+          ],
+          "subpart_rot_rad_mc": [
+            0.25,
+            0,
+            -0.12
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -2.1,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            4.2,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            3.9,
+            -0.65
+          ],
+          "subpart_rot_rad_mc": [
+            0.28,
+            0,
+            0.0
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.7,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            3.4,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.85,
+            3.5,
+            -0.55
+          ],
+          "subpart_rot_rad_mc": [
+            0.25,
+            0,
+            0.12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Shoulder_R",
+      "parent": "Torso_Upper",
+      "pivot_mc": [
+        5.2,
+        -5.6,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.4,
+            -1.4,
+            -1.4
+          ],
+          "size_mc": [
+            2.8,
+            2.8,
+            2.8
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "UpperArm_R",
+      "parent": "Shoulder_R",
+      "pivot_mc": [
+        0.6,
+        0.6,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.1,
+            0.0,
+            -1.1
+          ],
+          "size_mc": [
+            2.2,
+            8.2,
+            2.2
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Forearm_R",
+      "parent": "UpperArm_R",
+      "pivot_mc": [
+        0.0,
+        8.0,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -0.9,
+            0.0,
+            -0.9
+          ],
+          "size_mc": [
+            1.8,
+            8.6,
+            1.8
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Claw_R",
+      "parent": "Forearm_R",
+      "pivot_mc": [
+        0.0,
+        8.4,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -0.9
+          ],
+          "size_mc": [
+            2.0,
+            2.0,
+            1.8
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.8,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            3.6,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.85,
+            3.6,
+            -0.55
+          ],
+          "subpart_rot_rad_mc": [
+            0.25,
+            0,
+            -0.12
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -2.1,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            4.2,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            3.9,
+            -0.65
+          ],
+          "subpart_rot_rad_mc": [
+            0.28,
+            0,
+            0.0
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.7,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            3.4,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.85,
+            3.5,
+            -0.55
+          ],
+          "subpart_rot_rad_mc": [
+            0.25,
+            0,
+            0.12
+          ]
+        }
+      ]
+    }
+  ],
+  "animations": {
+    "idle_hover": {
+      "loop": true,
+      "keyframes": [
+        {
+          "time_sec": 0.0,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.05,
+                0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                11.0,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.2555,
+                0,
+                0.08
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.44,
+                0,
+                -0.0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.355,
+                0,
+                -0.08
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.08,
+                0,
+                0.0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                -0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.08,
+                0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.06,
+                0.1,
+                0.0
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0.188
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                0.12
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.23,
+                0,
+                -0.08
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.15,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                -0.188
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.08,
+                0,
+                -0.12
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0.08
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.3,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.0783,
+                0.0,
+                0.0318
+              ],
+              "pos_mc": [
+                0.283,
+                11.99,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.3611,
+                0,
+                0.1436
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.3697,
+                0,
+                -0.0636
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.3514,
+                0,
+                -0.0164
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.1083,
+                0,
+                0.0255
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.1283,
+                0,
+                -0.0318
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.08,
+                0.0566,
+                0.0459
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.06,
+                0.0707,
+                0.1273
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.2,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0.1739
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.1093,
+                0,
+                0.12
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.2651,
+                0,
+                -0.08
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.0439,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                -0.1739
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.1093,
+                0,
+                -0.12
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.2651,
+                0,
+                0.08
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.0439,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.6,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.09,
+                0.0,
+                0.045
+              ],
+              "pos_mc": [
+                0.4,
+                12.4,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.3431,
+                0,
+                0.17
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.2,
+                0,
+                -0.09
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.2297,
+                0,
+                0.01
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.12,
+                0,
+                0.036
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.1,
+                0,
+                -0.045
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.08,
+                0.08,
+                0.0849
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.06,
+                0.0,
+                0.18
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0.14
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.08,
+                0,
+                0.12
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                -0.08
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                -0.14
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                -0.12
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.23,
+                0,
+                0.08
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.15,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.9,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.0783,
+                0.0,
+                0.0318
+              ],
+              "pos_mc": [
+                0.283,
+                11.99,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.2119,
+                0,
+                0.1436
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.0303,
+                0,
+                -0.0636
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.0614,
+                0,
+                -0.0164
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.1083,
+                0,
+                0.0255
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.0717,
+                0,
+                -0.0318
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.08,
+                0.0566,
+                0.1109
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.06,
+                -0.0707,
+                0.1273
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.08,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0.1061
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.1093,
+                0,
+                0.12
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.4349,
+                0,
+                -0.08
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.0439,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                -0.1061
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.2507,
+                0,
+                -0.12
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.2651,
+                0,
+                0.08
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.2561,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 1.2,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.05,
+                0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                11.0,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.0445,
+                0,
+                0.08
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                -0.04,
+                0,
+                -0.0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                -0.055,
+                0,
+                -0.08
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.08,
+                0,
+                0.0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.06,
+                0,
+                -0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.08,
+                0.0,
+                0.12
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.06,
+                -0.1,
+                0.0
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0.092
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                0.12
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.47,
+                0,
+                -0.08
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.15,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                -0.092
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.28,
+                0,
+                -0.12
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0.08
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.3,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 1.5,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.0217,
+                0.0,
+                -0.0318
+              ],
+              "pos_mc": [
+                -0.283,
+                10.01,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                -0.0611,
+                0,
+                0.0164
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.0303,
+                0,
+                0.0636
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                -0.0514,
+                0,
+                -0.1436
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.0517,
+                0,
+                -0.0255
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.0717,
+                0,
+                0.0318
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.08,
+                -0.0566,
+                0.1109
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.06,
+                -0.0707,
+                -0.1273
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.2,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0.1061
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.2507,
+                0,
+                0.12
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.4349,
+                0,
+                -0.08
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.2561,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                -0.1061
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.2507,
+                0,
+                -0.12
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.4349,
+                0,
+                0.08
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.2561,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 1.8,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.01,
+                0.0,
+                -0.045
+              ],
+              "pos_mc": [
+                -0.4,
+                9.6,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                -0.0431,
+                0,
+                -0.01
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.2,
+                0,
+                0.09
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.0703,
+                0,
+                -0.17
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.04,
+                0,
+                -0.036
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.1,
+                0,
+                0.045
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.08,
+                -0.08,
+                0.0849
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.06,
+                -0.0,
+                -0.18
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0.14
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.28,
+                0,
+                0.12
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                -0.08
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.3,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                -0.14
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                -0.12
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.47,
+                0,
+                0.08
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.15,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 2.1,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.0217,
+                0.0,
+                -0.0318
+              ],
+              "pos_mc": [
+                -0.283,
+                10.01,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.0881,
+                0,
+                0.0164
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.3697,
+                0,
+                0.0636
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.2386,
+                0,
+                -0.1436
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.0517,
+                0,
+                -0.0255
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.1283,
+                0,
+                0.0318
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.08,
+                -0.0566,
+                0.0459
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.06,
+                0.0707,
+                -0.1273
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.08,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0.1739
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.2507,
+                0,
+                0.12
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.2651,
+                0,
+                -0.08
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.2561,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                -0.1739
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.1093,
+                0,
+                -0.12
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.4349,
+                0,
+                0.08
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.0439,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 2.4,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.05,
+                0.0,
+                -0.0
+              ],
+              "pos_mc": [
+                -0.0,
+                11.0,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.2555,
+                0,
+                0.08
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.44,
+                0,
+                0.0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.355,
+                0,
+                -0.08
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.08,
+                0,
+                -0.0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.08,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.06,
+                0.1,
+                -0.0
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0.188
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                0.12
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.23,
+                0,
+                -0.08
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.15,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                -0.188
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.08,
+                0,
+                -0.12
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0.08
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "stalk_drift": {
+      "loop": true,
+      "keyframes": [
+        {
+          "time_sec": 0.0,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.18,
+                0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                10.6,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.5474,
+                0,
+                0.12
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.77,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.6964,
+                0,
+                -0.12
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.16,
+                0.0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.22,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                0.0
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.29,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                0.26
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                0.14
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.29,
+                0,
+                -0.15
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                -0.26
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                -0.14
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.61,
+                0,
+                0.15
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.175,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.18,
+                0.0566,
+                0.0424
+              ],
+              "pos_mc": [
+                0.424,
+                11.307,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.6817,
+                0,
+                0.12
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.7056,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.6543,
+                0,
+                -0.12
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.16,
+                0.0566,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.22,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                0.099
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.36,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                0.26
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.4369,
+                0,
+                0.14
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.3369,
+                0,
+                -0.15
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                -0.26
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.6631,
+                0,
+                -0.14
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.5631,
+                0,
+                0.15
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.35,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.18,
+                0.08,
+                0.06
+              ],
+              "pos_mc": [
+                0.6,
+                11.6,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.6803,
+                0,
+                0.12
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.55,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.4925,
+                0,
+                -0.12
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.16,
+                0.08,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.22,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                0.14
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.29,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                0.26
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.39,
+                0,
+                0.14
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.45,
+                0,
+                -0.15
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                -0.26
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.71,
+                0,
+                -0.14
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.45,
+                0,
+                0.15
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.525,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.18,
+                0.0566,
+                0.0424
+              ],
+              "pos_mc": [
+                0.424,
+                11.307,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.544,
+                0,
+                0.12
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.3944,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.3058,
+                0,
+                -0.12
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.16,
+                0.0566,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.22,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                0.099
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.22,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                0.26
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.4369,
+                0,
+                0.14
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.5631,
+                0,
+                -0.15
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                -0.26
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.6631,
+                0,
+                -0.14
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.3369,
+                0,
+                0.15
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.7,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.18,
+                0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                10.6,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.3526,
+                0,
+                0.12
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.33,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.2036,
+                0,
+                -0.12
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.16,
+                0.0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.22,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                0.0
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.29,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                0.26
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                0.14
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.61,
+                0,
+                -0.15
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                -0.26
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                -0.14
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.29,
+                0,
+                0.15
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.875,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.18,
+                -0.0566,
+                -0.0424
+              ],
+              "pos_mc": [
+                -0.424,
+                9.893,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.2183,
+                0,
+                0.12
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.3944,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.2457,
+                0,
+                -0.12
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.16,
+                -0.0566,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.22,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                -0.099
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.36,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                0.26
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.6631,
+                0,
+                0.14
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.5631,
+                0,
+                -0.15
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                -0.26
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.4369,
+                0,
+                -0.14
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.3369,
+                0,
+                0.15
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 1.05,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.18,
+                -0.08,
+                -0.06
+              ],
+              "pos_mc": [
+                -0.6,
+                9.6,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.2197,
+                0,
+                0.12
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.55,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.4075,
+                0,
+                -0.12
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.16,
+                -0.08,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.22,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                -0.14
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.29,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                0.26
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.71,
+                0,
+                0.14
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.45,
+                0,
+                -0.15
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                -0.26
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.39,
+                0,
+                -0.14
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.45,
+                0,
+                0.15
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 1.225,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.18,
+                -0.0566,
+                -0.0424
+              ],
+              "pos_mc": [
+                -0.424,
+                9.893,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.356,
+                0,
+                0.12
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.7056,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.5942,
+                0,
+                -0.12
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.16,
+                -0.0566,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.22,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                -0.099
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.22,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                0.26
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.6631,
+                0,
+                0.14
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.3369,
+                0,
+                -0.15
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                -0.26
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.4369,
+                0,
+                -0.14
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.5631,
+                0,
+                0.15
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 1.4,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.18,
+                -0.0,
+                -0.0
+              ],
+              "pos_mc": [
+                -0.0,
+                10.6,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.5474,
+                0,
+                0.12
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.77,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.6964,
+                0,
+                -0.12
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.14,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.16,
+                -0.0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.22,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                -0.0
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.29,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                0.26
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                0.14
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.29,
+                0,
+                -0.15
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                -0.26
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                -0.14
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.61,
+                0,
+                0.15
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.2,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "enraged_rush": {
+      "loop": true,
+      "keyframes": [
+        {
+          "time_sec": 0.0,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.32,
+                0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                9.8,
+                -1.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.85,
+                0,
+                0.15
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                1.23,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.85,
+                0,
+                -0.15
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.2,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.22,
+                0.0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.34,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.22,
+                0.0,
+                0.0
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.62,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                0.32
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -1.05,
+                0,
+                0.1
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.05,
+                0,
+                -0.2
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                -0.32
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -1.05,
+                0,
+                -0.1
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.75,
+                0,
+                0.2
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.0813,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.32,
+                0.0849,
+                0.0566
+              ],
+              "pos_mc": [
+                0.566,
+                10.7,
+                -1.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                1.0621,
+                0,
+                0.15
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                1.148,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.6379,
+                0,
+                -0.15
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.2,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.22,
+                0.099,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.34,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.22,
+                0.08,
+                0.1273
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.76,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                0.32
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.7318,
+                0,
+                0.1
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.1525,
+                0,
+                -0.2
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                -0.32
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -1.3682,
+                0,
+                -0.1
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.6475,
+                0,
+                0.2
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.1625,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.32,
+                0.12,
+                0.08
+              ],
+              "pos_mc": [
+                0.8,
+                9.8,
+                -1.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                1.15,
+                0,
+                0.15
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.95,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.55,
+                0,
+                -0.15
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.2,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.22,
+                0.14,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.34,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.22,
+                0.0,
+                0.18
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.62,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                0.32
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.6,
+                0,
+                0.1
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.4,
+                0,
+                -0.2
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                -0.32
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -1.5,
+                0,
+                -0.1
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.4,
+                0,
+                0.2
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.2438,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.32,
+                0.0849,
+                0.0566
+              ],
+              "pos_mc": [
+                0.566,
+                8.9,
+                -1.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                1.0621,
+                0,
+                0.15
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.752,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.6379,
+                0,
+                -0.15
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.2,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.22,
+                0.099,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.34,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.22,
+                -0.08,
+                0.1273
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.48,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                0.32
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.7318,
+                0,
+                0.1
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.6475,
+                0,
+                -0.2
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                -0.32
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -1.3682,
+                0,
+                -0.1
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.1525,
+                0,
+                0.2
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.325,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.32,
+                0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                9.8,
+                -1.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.85,
+                0,
+                0.15
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.67,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.85,
+                0,
+                -0.15
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.2,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.22,
+                0.0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.34,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.22,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.62,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                0.32
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -1.05,
+                0,
+                0.1
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.75,
+                0,
+                -0.2
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                -0.32
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -1.05,
+                0,
+                -0.1
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.05,
+                0,
+                0.2
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.4062,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.32,
+                -0.0849,
+                -0.0566
+              ],
+              "pos_mc": [
+                -0.566,
+                10.7,
+                -1.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.6379,
+                0,
+                0.15
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.752,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                1.0621,
+                0,
+                -0.15
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.2,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.22,
+                -0.099,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.34,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.22,
+                0.08,
+                -0.1273
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.76,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                0.32
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -1.3682,
+                0,
+                0.1
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.6475,
+                0,
+                -0.2
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                -0.32
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.7318,
+                0,
+                -0.1
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.1525,
+                0,
+                0.2
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.4875,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.32,
+                -0.12,
+                -0.08
+              ],
+              "pos_mc": [
+                -0.8,
+                9.8,
+                -1.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.55,
+                0,
+                0.15
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.95,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                1.15,
+                0,
+                -0.15
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.2,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.22,
+                -0.14,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.34,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.22,
+                0.0,
+                -0.18
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.62,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                0.32
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -1.5,
+                0,
+                0.1
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.4,
+                0,
+                -0.2
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                -0.32
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.6,
+                0,
+                -0.1
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.4,
+                0,
+                0.2
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.5687,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.32,
+                -0.0849,
+                -0.0566
+              ],
+              "pos_mc": [
+                -0.566,
+                8.9,
+                -1.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.6379,
+                0,
+                0.15
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                1.148,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                1.0621,
+                0,
+                -0.15
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.2,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.22,
+                -0.099,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.34,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.22,
+                -0.08,
+                -0.1273
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.48,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                0.32
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -1.3682,
+                0,
+                0.1
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.1525,
+                0,
+                -0.2
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                -0.32
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.7318,
+                0,
+                -0.1
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.6475,
+                0,
+                0.2
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.65,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.32,
+                -0.0,
+                -0.0
+              ],
+              "pos_mc": [
+                -0.0,
+                9.8,
+                -1.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.85,
+                0,
+                0.15
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                1.23,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.85,
+                0,
+                -0.15
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.2,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.22,
+                -0.0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.34,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.22,
+                -0.0,
+                -0.0
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.62,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                0.32
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -1.05,
+                0,
+                0.1
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.05,
+                0,
+                -0.2
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.55,
+                0,
+                -0.32
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -1.05,
+                0,
+                -0.1
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.75,
+                0,
+                0.2
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "attack_bite": {
+      "loop": false,
+      "keyframes": [
+        {
+          "time_sec": 0.0,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                11.0,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.3,
+                0,
+                0.0
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.35,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.3,
+                0,
+                -0.0
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0.0
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0.0
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0.0
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                -0.0
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                -0.0
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                -0.0
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0.0
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.1,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                -0.0868,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                10.479,
+                1.085
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.3,
+                0,
+                0.1085
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.35,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.3,
+                0,
+                -0.1085
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                -0.0651,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                -0.0781,
+                0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.0434,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.0868,
+                0,
+                0.0651
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.4122,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.1302,
+                0,
+                0.282
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.3688,
+                0,
+                0.1736
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.2603,
+                0,
+                -0.0868
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.1736,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.1302,
+                0,
+                -0.282
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.3688,
+                0,
+                -0.1736
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.2603,
+                0,
+                0.0868
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.1736,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.2,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                -0.1564,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                10.062,
+                1.955
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.3,
+                0,
+                0.1955
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.35,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.3,
+                0,
+                -0.1955
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                -0.1173,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                -0.1407,
+                0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.0782,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.1564,
+                0,
+                0.1173
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.7427,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.2345,
+                0,
+                0.5082
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.6646,
+                0,
+                0.3127
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.4691,
+                0,
+                -0.1564
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.3127,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.2345,
+                0,
+                -0.5082
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.6646,
+                0,
+                -0.3127
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.4691,
+                0,
+                0.1564
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.3127,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.3,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                -0.195,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                9.83,
+                2.437
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.3,
+                0,
+                0.2437
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.35,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.3,
+                0,
+                -0.2437
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                -0.1462,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                -0.1755,
+                0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.0975,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.195,
+                0,
+                0.1462
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.9262,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.2925,
+                0,
+                0.6337
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.8287,
+                0,
+                0.39
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.585,
+                0,
+                -0.195
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.39,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.2925,
+                0,
+                -0.6337
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.8287,
+                0,
+                -0.39
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.585,
+                0,
+                0.195
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.39,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.4,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                -0.0587,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                9.93,
+                1.087
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.4739,
+                0,
+                0.1
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.5348,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.4739,
+                0,
+                -0.1
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                -0.0522,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                -0.067,
+                0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.0761,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.1739,
+                0,
+                -0.0217
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.76,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.4522,
+                0,
+                0.4652
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.9913,
+                0,
+                0.237
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.5457,
+                0,
+                -0.2652
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.4652,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.4522,
+                0,
+                -0.4652
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.9913,
+                0,
+                -0.237
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.5457,
+                0,
+                0.2652
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.4652,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.5,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.2239,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                10.191,
+                -1.739
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.8217,
+                0,
+                0.1
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.9043,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.8217,
+                0,
+                -0.1
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.1435,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.1591,
+                0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.2283,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.1217,
+                0,
+                -0.0652
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.38,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.7565,
+                0,
+                0.0957
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -1.2739,
+                0,
+                -0.0891
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.437,
+                0,
+                -0.3957
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.5957,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.7565,
+                0,
+                -0.0957
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -1.2739,
+                0,
+                0.0891
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.437,
+                0,
+                0.3957
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.5957,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.6,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.4286,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                10.429,
+                -3.81
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                1.1976,
+                0,
+                0.0952
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                1.3429,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                1.1976,
+                0,
+                -0.0952
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.2857,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.3238,
+                0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.3333,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.0762,
+                0,
+                0
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.08,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.9524,
+                0,
+                -0.1838
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -1.4371,
+                0,
+                -0.3276
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                -0.48
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.6738,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.9524,
+                0,
+                0.1838
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -1.4371,
+                0,
+                0.3276
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0.48
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.6738,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.7,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.3214,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                10.571,
+                -2.857
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.9357,
+                0,
+                0.0714
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                1.0571,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.9357,
+                0,
+                -0.0714
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.2143,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.2429,
+                0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.25,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.0571,
+                0,
+                0
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.08,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.7143,
+                0,
+                -0.1029
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -1.1229,
+                0,
+                -0.2157
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                -0.38
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.5429,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.7143,
+                0,
+                0.1029
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -1.1229,
+                0,
+                0.2157
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0.38
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.5429,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.8,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.2143,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                10.714,
+                -1.905
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.6738,
+                0,
+                0.0476
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.7714,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.6738,
+                0,
+                -0.0476
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.1429,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.1619,
+                0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.1667,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.0381,
+                0,
+                0
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.08,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.4762,
+                0,
+                -0.0219
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.8086,
+                0,
+                -0.1038
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                -0.28
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.4119,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.4762,
+                0,
+                0.0219
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.8086,
+                0,
+                0.1038
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0.28
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.4119,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.9,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.1071,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                10.857,
+                -0.952
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.4119,
+                0,
+                0.0238
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.4857,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.4119,
+                0,
+                -0.0238
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                0.0714,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                0.081,
+                0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.0833,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.019,
+                0,
+                0
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.08,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                -0.2381,
+                0,
+                0.059
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.4943,
+                0,
+                0.0081
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                -0.18
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.281,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                -0.2381,
+                0,
+                -0.059
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.4943,
+                0,
+                -0.0081
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0.18
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.281,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 1.0,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                11.0,
+                0.0
+              ]
+            },
+            "Tendril_L": {
+              "rot_rad_mc": [
+                0.15,
+                0,
+                -0.0
+              ]
+            },
+            "Tendril_C": {
+              "rot_rad_mc": [
+                0.2,
+                0,
+                0
+              ]
+            },
+            "Tendril_R": {
+              "rot_rad_mc": [
+                0.15,
+                0,
+                0.0
+              ]
+            },
+            "Torso_Lower": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0
+              ]
+            },
+            "Torso_Upper": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0
+              ]
+            },
+            "Jaw": {
+              "rot_rad_mc": [
+                0.08,
+                0,
+                0
+              ]
+            },
+            "Shoulder_L": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0.14
+              ]
+            },
+            "UpperArm_L": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                0.12
+              ]
+            },
+            "Forearm_L": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                -0.08
+              ]
+            },
+            "Claw_L": {
+              "rot_rad_mc": [
+                -0.15,
+                0,
+                0
+              ]
+            },
+            "Shoulder_R": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                -0.14
+              ]
+            },
+            "UpperArm_R": {
+              "rot_rad_mc": [
+                -0.18,
+                0,
+                -0.12
+              ]
+            },
+            "Forearm_R": {
+              "rot_rad_mc": [
+                -0.35,
+                0,
+                0.08
+              ]
+            },
+            "Claw_R": {
+              "rot_rad_mc": [
+                -0.15,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
