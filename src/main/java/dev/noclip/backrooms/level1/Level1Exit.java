@@ -14,6 +14,8 @@ public enum Level1Exit {
 	CELLAR_HATCH("1.01", Shape.HATCH),
 	DOOR_FRAME("1.1", Shape.FRAME),
 	CONCRETE_DOOR("1.2", Shape.CORE_DOOR),
+	ROOT_TWO("\u221a2", Shape.CORE_DOOR),
+	INVERTED_WALL("1.5", Shape.CORE_PAINTING),
 	STAIRS_DOWN("2", Shape.STAIRS_DOWN),
 	WHITE_DOOR("4.3", Shape.CORE_DOOR),
 	ATTIC_HATCH("19", Shape.CORE_PAINTING),
@@ -66,7 +68,12 @@ public enum Level1Exit {
 	Level1Exit(String level, Shape shape) {
 		this.level = level;
 		this.shape = shape;
-		this.chance = findability(Double.parseDouble(level));
+		this.chance = findability(number(level));
+	}
+
+	/** The number of a level, which for the square-root-of-two level is its value. */
+	public static double number(String level) {
+		return level.startsWith("\u221a") ? Math.sqrt(Double.parseDouble(level.substring(1))) : Double.parseDouble(level);
 	}
 
 	/** Lower levels are harder to find: the chance per district grows with the logarithm of the level number. */

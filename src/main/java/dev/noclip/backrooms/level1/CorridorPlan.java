@@ -3,7 +3,9 @@ package dev.noclip.backrooms.level1;
 import dev.noclip.backrooms.level1.Level1Layout.Ceiling;
 import dev.noclip.backrooms.level1.Level1Layout.Tile;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.SplittableRandom;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,6 +36,12 @@ final class CorridorPlan {
 	private record Box(int i, int j, int w, int h, Room type) {
 	}
 
+	/** A room's way in and out: lockX, lockZ is where a natural lock hangs; tiles are every doorway block of that room. */
+	record Doorway(int lockX, int lockZ, int[][] tiles) {
+	}
+
+	private final List<Doorway> doorways = new ArrayList<>();
+
 	/** east[c]: open between cell c and the cell east of it. south[c]: open to the cell south of it. */
 	private final boolean[] east = new boolean[N * N];
 	private final boolean[] south = new boolean[N * N];
@@ -57,8 +65,40 @@ final class CorridorPlan {
 		carveMaze(random);
 		addLoops(random);
 		addRooms(random);
+		findDoorways();
 		placeDoor(random);
 		lightCells(random);
+	}
+
+	List<Doorway> doorways() {
+		return doorways;
+	}
+
+	/** Each room's doorways: the open walls between one of its cells and a cell outside it, three blocks wide. */
+	private void findDoorways() {
+		for (int room = 0; room < rooms; room++) {
+			List<int[]> tiles = new ArrayList<>();
+			int[] mid = null;
+			for (int cell = 0; cell < N * N; cell++) {
+				if (roomOf[cell] != room) continue;
+				int ci = cell % N, cj = cell / N;
+				int[][] edges = new int[4][];
+				if (ci < N - 1 && east[cell] && roomOf[cell + 1] != room) edges[0] = new int[] {(ci + 1) * CELL, cj * CELL + 1, 1, 0};
+				if (ci > 0 && east[cell - 1] && roomOf[cell - 1] != room) edges[1] = new int[] {ci * CELL, cj * CELL + 1, 1, 0};
+				if (cj < N - 1 && south[cell] && roomOf[cell + N] != room) edges[2] = new int[] {ci * CELL + 1, (cj + 1) * CELL, 0, 1};
+				if (cj > 0 && south[cell - N] && roomOf[cell - N] != room) edges[3] = new int[] {ci * CELL + 1, cj * CELL, 0, 1};
+				for (int[] edge : edges) {
+					// Walls on the district's own edge lines belong to Level1Layout, not to this plan.
+					if (edge == null || (edge[2] == 1 ? edge[0] : edge[1]) == 0) continue;
+					for (int k = 0; k < 3; k++) {
+						int[] tile = {edge[0] + (edge[2] == 0 ? k : 0), edge[1] + (edge[3] == 0 ? k : 0)};
+						tiles.add(tile);
+						if (mid == null && k == 1) mid = tile;
+					}
+				}
+			}
+			if (mid != null) doorways.add(new Doorway(mid[0], mid[1], tiles.toArray(new int[0][])));
+		}
 	}
 
 	int doorX() {

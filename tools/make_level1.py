@@ -1324,9 +1324,49 @@ def wall_vent():
     return m
 
 
-NEW_DOORS = {"concrete_door": concrete_door, "glass_door": glass_door, "symbol_door": symbol_door, "frozen_door": frozen_door,
+def root_door(top):
+    """A dark door with the radical sign and a 2, glowing across both halves."""
+    m = metal((36, 40, 46), 0.4)
+
+    def glyph(draw, s):
+        # A 128 x 256 sheet: the top half of the door is rows 0..127.
+        draw.line([(22 * s, 150 * s), (34 * s, 140 * s), (50 * s, 200 * s), (74 * s, 70 * s), (110 * s, 70 * s)], fill=255, width=7 * s)
+        draw.line([(80 * s, 110 * s), (92 * s, 94 * s), (106 * s, 108 * s), (92 * s, 140 * s), (78 * s, 170 * s), (110 * s, 170 * s)], fill=255, width=7 * s)
+    sheet = mask(glyph, SIZE * 2)
+    paint(m, sheet[:SIZE] if top else sheet[SIZE:], (210, 240, 120), glow=0.9)
+    return m
+
+
+def inverted_wall():
+    m = flat((130, 128, 122), 0.2, 8, 40)
+    m.color *= (1 + noise(790, 8, 128)[..., None] * 0.06)
+    paint(m, box(40, 16, 88, 96), (20, 20, 24), height=-2)
+    arch = (1 - step(0, 1.5, np.hypot(X - 64, Y - 96) - 24)) * (Y > 96)
+    paint(m, arch, (20, 20, 24), height=-2)  # the arch is at the bottom: the doorway is upside down
+    return m
+
+
+def pipe_gauge():
+    m = flat((54, 52, 48), 0.3, 40)
+    paint(m, 1 - step(0, 1.5, np.hypot(X - 64, Y - 64) - 46), (150, 112, 52), height=2, f0=230)
+    paint(m, 1 - step(0, 1.5, np.hypot(X - 64, Y - 64) - 38), (230, 226, 210))
+    for a in range(-120, 121, 30):
+        r = np.radians(a - 90)
+        tick = (1 - step(1.0, 2.0, np.abs((X - 64) * np.cos(r) + (Y - 64) * np.sin(r)))) * ((X - 64) * np.sin(r) - (Y - 64) * np.cos(r) > 24) * (np.hypot(X - 64, Y - 64) < 36)
+        paint(m, tick, (40, 40, 40))
+    needle = (1 - step(1.2, 2.4, np.abs((X - 64) * 0.7 - (Y - 64) * 0.7))) * (X > 64) * (Y < 64) * (np.hypot(X - 64, Y - 64) < 30)
+    paint(m, needle, (190, 40, 36), glow=0.4)
+    return m
+
+
+def padlock_texture():
+    m = metal((150, 154, 158), 0.5)
+    return m
+
+
+NEW_DOORS = {"root_door": root_door, "concrete_door": concrete_door, "glass_door": glass_door, "symbol_door": symbol_door, "frozen_door": frozen_door,
              "bunker_door": bunker_door, "cold_door": cold_door, "elevator_door": elevator_door}
-GLOWING = {"symbol_door", "cold_door"}
+GLOWING = {"symbol_door", "cold_door", "root_door"}
 
 
 def exit_textures(t):
@@ -1340,6 +1380,8 @@ def exit_textures(t):
         t[name] = fn(False)
         t[name + "_top"] = fn(True)
     t["attic_hatch"] = attic_hatch()
+    t["inverted_wall"] = inverted_wall()
+    t["pipe_gauge"] = pipe_gauge()
     t["outdoor_gap"] = outdoor_gap()
     t["wall_vent"] = wall_vent()
     t["door_jamb"] = metal((66, 68, 70), 0.5)
@@ -1793,7 +1835,7 @@ def all_models():
     # The pure white wooden door to 998.2 looks like the white door to 4.3.
     m["white_wood_door"] = exit_door_model("white_door", knob=True)
     m["white_wood_door_top"] = exit_door_model("white_door_top", knob=False)
-    for name in ("palace_painting", "outlet_wall", "cracked_pillar", "darkness", "attic_hatch", "outdoor_gap", "wall_vent"):
+    for name in ("palace_painting", "outlet_wall", "cracked_pillar", "darkness", "attic_hatch", "outdoor_gap", "wall_vent", "inverted_wall"):
         m[name] = cube_all(name)
     m["cellar_hatch"] = bottom_top("cellar_hatch", "garage_floor")
     m["standalone_door_frame"] = door_frame_model(False)
@@ -1832,6 +1874,14 @@ def all_models():
     m["sunken_chair"] = sunken_chair_model()
     m["floor_painting"] = floor_painting_model()
     m["signup_booth"] = cube_all("signup_sign")
+    m["sealed_door"] = cube_all("door_jamb")
+    m["natural_lock"] = {"parent": "minecraft:block/block",
+                         "textures": {"particle": NS + "door_jamb", "body": NS + "door_knob", "metal": NS + "door_jamb"},
+                         "elements": [el((5, 6, 7), (11, 12, 9), sides("#body")), el((6, 12, 7.5), (7, 16, 8.5), sides("#metal")),
+                                      el((9, 12, 7.5), (10, 16, 8.5), sides("#metal")), el((6, 15, 7.5), (10, 16, 8.5), sides("#metal"))]}
+    m["pipe_gauge"] = {"parent": "minecraft:block/block",
+                       "textures": {"particle": NS + "pipe_gauge", "dial": NS + "pipe_gauge"},
+                       "elements": [el((3, 0.05, 3), (13, 0.4, 13), {"up": "#dial", "down": "#dial"}, shade=False)]}
     m["phosphor_mark"] = {"parent": "minecraft:block/block",
                           "textures": {"particle": NS + "phosphor_mark", "mark": NS + "phosphor_mark"},
                           "elements": [el((2, 0.05, 2), (14, 0.15, 14), {"up": "#mark", "down": "#mark"}, shade=False, light_emission=15)]}
@@ -1888,7 +1938,7 @@ def all_blockstates():
     for door in ("white_door", "reinforced_door", "pickaxe_door", "automatic_door", *NEW_DOORS, "white_wood_door"):
         for name in (door, door + "_top"):
             b[name] = {"variants": {"axis=z": {"model": NS + name}, "axis=x": {"model": NS + name, "y": 90}}}
-    for name in ("palace_painting", "outlet_wall", "cracked_pillar", "cellar_hatch", "attic_hatch", "outdoor_gap", "wall_vent", "standalone_door_frame",
+    for name in ("palace_painting", "outlet_wall", "cracked_pillar", "cellar_hatch", "attic_hatch", "outdoor_gap", "wall_vent", "inverted_wall", "standalone_door_frame",
                  "standalone_door_frame_top"):
         b[name] = single(name)
     b["darkness_below"] = single("darkness")
@@ -1897,13 +1947,14 @@ def all_blockstates():
     for name in ("booth_wall", "booth_roof", "barrier_base", "barrier_arm", "fuel_drum", "caged_lamp", "eyed_crate", "shut_eyed_crate"):
         b[name] = single(name)
     b["booth_drawer"] = {"variants": {"empty=false": {"model": NS + "booth_drawer"}, "empty=true": {"model": NS + "booth_drawer_open"}}}
-    for name in ("first_light_sign", "blink_sign", "floodlight", "cot", "bedroll", "supply_locker", "barrel_fire", "tarp", "gallery_wall", "hospital_bed", "debris_pile", "sunken_chair", "floor_painting", "trader_sign", "clinic_sign", "tom_sign", "signup_sign", "justice_sign", "trade_counter", "tom_counter", "signup_booth"):
+    for name in ("first_light_sign", "blink_sign", "floodlight", "cot", "bedroll", "supply_locker", "barrel_fire", "tarp", "gallery_wall", "hospital_bed", "debris_pile", "sunken_chair", "floor_painting", "trader_sign", "clinic_sign", "tom_sign", "signup_sign", "justice_sign", "trade_counter", "tom_counter", "signup_booth", "sealed_door", "natural_lock"):
         b[name] = single(name)
     b["jersey_barrier"] = {"variants": {"axis=x": {"model": NS + "jersey_barrier"}, "axis=z": {"model": NS + "jersey_barrier", "y": 90}}}
     # The same turns as an end rod: the smear lies against the block it was dabbed on.
     turns = {"up": {}, "down": {"x": 180}, "north": {"x": 90}, "south": {"x": 90, "y": 180}, "east": {"x": 90, "y": 90},
              "west": {"x": 90, "y": 270}}
     b["phosphor_mark"] = {"variants": {f"facing={f}": {"model": NS + "phosphor_mark", **turn} for f, turn in turns.items()}}
+    b["pipe_gauge"] = {"variants": {f"facing={f}": {"model": NS + "pipe_gauge", **turn} for f, turn in turns.items()}}
     b["clinic_bed"] = {"variants": {"": {"model": NS + "hospital_bed"}}}
     for taken in ("false", "true"):
         model = "settlement_marker" + ("_taken" if taken == "true" else "")
@@ -1990,7 +2041,7 @@ def check(blockstates):
 
 
 # Blocks that only exist placed in the world, with no item of their own.
-NO_ITEM = {"phosphor_mark", "settlement_marker"}
+NO_ITEM = {"phosphor_mark", "settlement_marker", "pipe_gauge"}
 
 
 ITEM_MODELS = {"clinic_bed": "hospital_bed", "garage_floor": "garage_floor", "garage_floor_line": "garage_floor_line", "damp_garage_floor": "damp_garage_floor",

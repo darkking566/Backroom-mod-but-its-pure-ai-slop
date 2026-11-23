@@ -234,5 +234,19 @@
   "resident.noclip_backrooms.tom": "Tom",
   "resident.noclip_backrooms.aiko": "佐藤愛子",
   "resident.noclip_backrooms.speednoclipper": "速切玩家",
-  "resident.noclip_backrooms.justice": "丰饒角的正義追尋者"
+  "resident.noclip_backrooms.justice": "丰饒角的正義追尋者",
+  "message.noclip_backrooms.patrol_coming": "遠處傳來腳步聲，有人朝你走來。",
+  "message.noclip_backrooms.patrol_found": "M.E.G. 巡邏隊員：「別怕，你是新來的吧？跟我們走，我們帶你去基地。」",
+  "message.noclip_backrooms.patrol_arrived": "M.E.G. 巡邏隊員：「到了，這裡是『第一道光』，先歇口氣。」",
+  "message.noclip_backrooms.worker_hit": "施工的影子掄起機具，擦過你的身子。",
+  "message.noclip_backrooms.smoke_choke": "營火的煙在沒有通風口的走廊裡嗆得你直咳嗽。",
+  "resident.noclip_backrooms.worker": "施工的影子",
+  "block.noclip_backrooms.natural_lock": "天然的鎖",
+  "block.noclip_backrooms.sealed_door": "鎖死的門",
+  "block.noclip_backrooms.pipe_gauge": "管線儀表",
+  "block.noclip_backrooms.root_door": "刻著根號的門",
+  "block.noclip_backrooms.root_door_top": "刻著根號的門",
+  "block.noclip_backrooms.inverted_wall": "顛倒的牆",
+  "message.noclip_backrooms.lock_gone": "鎖喀的一聲鎖上，然後在你眼前消失了。這間房的門再也打不開。",
+  "message.noclip_backrooms.hub_route": "你照著順序穿過了那些門和走廊，空氣忽然變得寬闊……"
 }

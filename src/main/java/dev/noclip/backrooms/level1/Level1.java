@@ -40,6 +40,11 @@ public final class Level1 {
 		Residents.register();
 		Warps.register();
 		Thresholds.register();
+		Patrols.register();
+		Workers.register();
+		Smoke.register();
+		Locks.register();
+		HubRoute.register();
 		Strays.register();
 		Marauders.register();
 		Smilers.register();

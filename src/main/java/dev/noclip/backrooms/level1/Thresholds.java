@@ -28,6 +28,8 @@ final class Thresholds {
 			if (player.isSpectator()) continue;
 			double zone = Level1Layout.pipeZone(seed, player.getBlockX(), player.getBlockZ());
 			if (zone >= 0 && zone <= CENTRE) LevelExits.use(player, "2");
+			double glitch = Level1Layout.glitchZone(seed, player.getBlockX(), player.getBlockZ());
+			if (glitch >= 0 && glitch <= 0.15) LevelExits.use(player, "38");
 		}
 	}
 }

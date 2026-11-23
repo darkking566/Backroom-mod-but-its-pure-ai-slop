@@ -55,6 +55,17 @@ public final class Level1Blocks {
 	public static final Block SUPPLY_CRATE = register("supply_crate", Properties.of()
 			.mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD), SupplyCrateBlock::new);
 
+	/** A lock hanging in a room's doorway; use it and the room is shut for good. */
+	public static final Block NATURAL_LOCK = register("natural_lock", Properties.of()
+			.mapColor(MapColor.METAL).strength(0.5F).sound(SoundType.CHAIN).noOcclusion().noCollision().noLootTable(),
+			p -> new NaturalLockBlock(p, Block.box(5, 6, 7, 11, 16, 9)));
+	/** What a natural lock leaves in the doorways of its room. */
+	public static final Block SEALED_DOOR = register("sealed_door", Properties.of()
+			.mapColor(MapColor.METAL).strength(25.0F, 3600000.0F).sound(SoundType.METAL).noLootTable());
+	/** A gauge on a pillar where the pipes crowd in toward Level 2; no item of its own. */
+	public static final Block PIPE_GAUGE = registerBlockOnly("pipe_gauge", Properties.of()
+			.mapColor(MapColor.COLOR_ORANGE).instabreak().noCollision().noOcclusion().noLootTable().replaceable()
+			.sound(SoundType.METAL), PhosphorMarkBlock::new);
 	/** Wreckage on the floor: planks, scrap and, now and then, a crowbar. Opens like a crate. */
 	public static final Block DEBRIS_PILE = register("debris_pile", Properties.of()
 			.mapColor(MapColor.WOOD).strength(1.0F).sound(SoundType.WOOD).noOcclusion(), SupplyCrateBlock::new);
@@ -114,6 +125,10 @@ public final class Level1Blocks {
 			p -> new ExitBlock(p, Level1Exit.OUTDOOR_GAP.level));
 	public static final Block WALL_VENT = register("wall_vent", exitProperties(MapColor.STONE, SoundType.METAL),
 			p -> new ExitBlock(p, Level1Exit.WALL_VENT.level));
+	public static final Block ROOT_DOOR = door("root_door", Level1Exit.ROOT_TWO, SoundType.METAL, 4);
+	public static final Block ROOT_DOOR_TOP = door("root_door_top", Level1Exit.ROOT_TWO, SoundType.METAL, 4);
+	public static final Block INVERTED_WALL = register("inverted_wall", exitProperties(MapColor.STONE, SoundType.STONE),
+			p -> new ExitBlock(p, Level1Exit.INVERTED_WALL.level));
 	public static final Block PALACE_PAINTING = register("palace_painting", exitProperties(MapColor.COLOR_PINK, SoundType.WOOD),
 			p -> new ExitBlock(p, Level1Exit.PAINTING.level));
 	public static final Block OUTLET_WALL = register("outlet_wall", exitProperties(MapColor.STONE, SoundType.STONE),

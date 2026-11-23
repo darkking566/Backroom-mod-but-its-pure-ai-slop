@@ -51,7 +51,9 @@ final class Level1Exits {
 				case COLD_DOOR -> door(Level1Blocks.COLD_DOOR, Level1Blocks.COLD_DOOR_TOP, y, axis);
 				case ELEVATOR_DOOR -> door(Level1Blocks.ELEVATOR_DOOR, Level1Blocks.ELEVATOR_DOOR_TOP, y, axis);
 				case WHITE_WOOD_DOOR -> door(Level1Blocks.WHITE_WOOD_DOOR, Level1Blocks.WHITE_WOOD_DOOR_TOP, y, axis);
-				case ATTIC_HATCH -> y == FLOOR + 2 ? state(Level1Blocks.ATTIC_HATCH) : null;
+				case ROOT_TWO -> door(Level1Blocks.ROOT_DOOR, Level1Blocks.ROOT_DOOR_TOP, y, axis);
+					case INVERTED_WALL -> y == FLOOR + 2 ? state(Level1Blocks.INVERTED_WALL) : null;
+					case ATTIC_HATCH -> y == FLOOR + 2 ? state(Level1Blocks.ATTIC_HATCH) : null;
 				case OUTDOOR_GAP -> y == FLOOR + 2 ? state(Level1Blocks.OUTDOOR_GAP) : null;
 				case WALL_VENT -> y == FLOOR + 1 ? state(Level1Blocks.WALL_VENT) : null;
 				case PAINTING -> y == FLOOR + 2 ? state(Level1Blocks.PALACE_PAINTING) : null;

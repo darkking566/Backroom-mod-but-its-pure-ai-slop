@@ -30,6 +30,14 @@ final class Level1Sectors {
 		if (zone >= 0 && roll < (1 - zone) * 85 && (block == Level1Blocks.GARAGE_PILLAR || block == Level1Blocks.GARAGE_PILLAR_MARKED || block == Level1Blocks.GARAGE_PILLAR_BASE)) {
 			return Blocks.RAW_COPPER_BLOCK.defaultBlockState();
 		}
+		if (zone >= 0 && state.isAir()) {
+			BlockState piping = piping(seed, tile, zone, roll, x, y, z);
+			if (piping != null) return piping;
+		}
+		double glitch = Level1Layout.glitchZone(seed, x, z);
+		if (glitch >= 0 && roll < (1 - glitch) * 55 && (block == Level1Blocks.PAINTED_CONCRETE_WALL || block == Level1Blocks.CORRIDOR_FLOOR)) {
+			return GLITCH[roll % GLITCH.length].defaultBlockState();
+		}
 		if (sector == Sector.TALON) return state;
 		BlockState dressed = switch (sector) {
 			case GILD -> gild(block, seed, x, z);
@@ -46,6 +54,23 @@ final class Level1Sectors {
 			if (scene != null) return scene;
 		}
 		return state;
+	}
+
+	private static final Block[] GLITCH = {Blocks.CONCRETE.black(), Blocks.CONCRETE.magenta(), Blocks.CONCRETE.cyan(), Blocks.CONCRETE.black()};
+
+	/** Thicker pipes overhead and gauges on the pillars the nearer you come to the way into Level 2. */
+	private static BlockState piping(long seed, Tile tile, double zone, int roll, int x, int y, int z) {
+		boolean open = tile == Tile.FLOOR || tile == Tile.LINE || tile == Tile.DAMP;
+		if (!open) return null;
+		if (y == Level1ChunkGenerator.CEILING_Y - 1 && roll < (1 - zone) * 60) return Level1Blocks.CEILING_PIPE.defaultBlockState();
+		if (y == FLOOR + 2 && roll < (1 - zone) * 45) {
+			for (net.minecraft.core.Direction side : net.minecraft.core.Direction.Plane.HORIZONTAL) {
+				if (Level1Layout.tile(seed, x + side.getStepX(), z + side.getStepZ()) == Tile.PILLAR) {
+					return Level1Blocks.PIPE_GAUGE.defaultBlockState().setValue(PhosphorMarkBlock.FACING, side.getOpposite());
+				}
+			}
+		}
+		return null;
 	}
 
 	private static BlockState gild(Block block, long seed, int x, int z) {

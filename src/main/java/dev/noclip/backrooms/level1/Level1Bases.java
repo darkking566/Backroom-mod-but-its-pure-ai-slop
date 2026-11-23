@@ -35,6 +35,7 @@ final class Level1Bases {
 			case BEDROLL -> y == FLOOR + 1 ? state(Level1Blocks.BEDROLL) : null;
 			case TENT_WALL -> y > FLOOR && y <= TENT_ROOF ? state(Level1Blocks.TARP) : null;
 			case TENT_FLOOR -> y == TENT_ROOF ? state(Level1Blocks.TARP) : null;
+			case ALPHA_FRAME -> y == FLOOR + 1 ? state(Level1Blocks.DOOR_FRAME) : y == FLOOR + 2 ? state(Level1Blocks.DOOR_FRAME_TOP) : null;
 			case COUNTER_TRADE -> y == FLOOR + 1 ? state(Level1Blocks.TRADE_COUNTER) : null;
 			case COUNTER_TOM -> y == FLOOR + 1 ? state(Level1Blocks.TOM_COUNTER) : null;
 			case CLINIC_BED -> y == FLOOR + 1 ? state(Level1Blocks.CLINIC_BED) : null;

@@ -136,7 +136,7 @@ class Level1LayoutTest {
 	void lowerLevelsAreHarderToFind() {
 		Level1Exit[] exits = Level1Exit.values();
 		for (int i = 1; i < exits.length; i++) {
-			assertTrue(Double.parseDouble(exits[i].level) > Double.parseDouble(exits[i - 1].level), "exits must be listed by level");
+			assertTrue(Level1Exit.number(exits[i].level) > Level1Exit.number(exits[i - 1].level), "exits must be listed by level");
 			assertTrue(exits[i].chance > exits[i - 1].chance, exits[i] + " should be easier to find than " + exits[i - 1]);
 		}
 

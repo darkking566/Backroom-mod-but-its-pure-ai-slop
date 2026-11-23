@@ -60,6 +60,22 @@ public final class Level1Layout {
 		return distance < 1 ? distance : -1;
 	}
 
+	/** The doorways of the rooms in a corridor district, each with the lock that hangs in it. */
+	static java.util.List<CorridorPlan.Doorway> doorways(long seed, int dx, int dz) {
+		return kind(seed, dx, dz) == Kind.CORRIDORS ? CorridorPlan.of(seed, dx, dz).doorways() : java.util.List.of();
+	}
+
+	/**
+	 * How tangled the "glitch trail" is at (x, z): some corridor districts are a trail that grows more and more broken
+	 * toward its middle (0 at the centre, 1 at the edge), which is the way on to Level 38; -1 elsewhere.
+	 */
+	public static double glitchZone(long seed, int x, int z) {
+		int dx = Math.floorDiv(x, DISTRICT), dz = Math.floorDiv(z, DISTRICT);
+		if (kind(seed, dx, dz) != Kind.CORRIDORS || Math.floorMod(hash(seed, dx, dz, SECTOR + 2), 100) >= 12) return -1;
+		double distance = Math.hypot(x - (dx * DISTRICT + DISTRICT / 2.0), z - (dz * DISTRICT + DISTRICT / 2.0)) / 40.0;
+		return distance < 1 ? distance : -1;
+	}
+
 	/** The settlements players have found in Level 1. */
 	public enum Base {
 		NONE,

@@ -234,5 +234,19 @@
   "resident.noclip_backrooms.tom": "Tom",
   "resident.noclip_backrooms.aiko": "Aiko Sato",
   "resident.noclip_backrooms.speednoclipper": "Speednoclipper",
-  "resident.noclip_backrooms.justice": "Cornucopia Justice Seeker"
+  "resident.noclip_backrooms.justice": "Cornucopia Justice Seeker",
+  "message.noclip_backrooms.patrol_coming": "Footsteps in the distance. Someone is coming for you.",
+  "message.noclip_backrooms.patrol_found": "M.E.G. patrol member: \"Easy, you're new, aren't you? Come with us; we'll take you to the base.\"",
+  "message.noclip_backrooms.patrol_arrived": "M.E.G. patrol member: \"Here we are: First Light. Catch your breath.\"",
+  "message.noclip_backrooms.worker_hit": "A shadow at work swings its tool and clips you.",
+  "message.noclip_backrooms.smoke_choke": "The campfire smoke chokes you in a corridor with no vent.",
+  "resident.noclip_backrooms.worker": "Shadow at Work",
+  "block.noclip_backrooms.natural_lock": "Natural Lock",
+  "block.noclip_backrooms.sealed_door": "Sealed Door",
+  "block.noclip_backrooms.pipe_gauge": "Pipe Gauge",
+  "block.noclip_backrooms.root_door": "Door with a Radical Sign",
+  "block.noclip_backrooms.root_door_top": "Door with a Radical Sign",
+  "block.noclip_backrooms.inverted_wall": "Inverted Wall",
+  "message.noclip_backrooms.lock_gone": "The lock clicks shut and vanishes before your eyes. This room's doors will never open again.",
+  "message.noclip_backrooms.hub_route": "You went through the doors and corridors in the right order, and the air opens up..."
 }

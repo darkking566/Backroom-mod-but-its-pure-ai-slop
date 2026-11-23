@@ -18,7 +18,9 @@ final class BasePlan {
 		SIGN_X, SIGN_Z,
 		FLOODLIGHT, COT, LOCKER, DESK, COMPUTER_DESK,
 		FIRE, BEDROLL, TENT_WALL, TENT_FLOOR, TENT_BEDROLL,
-		COUNTER_TRADE, COUNTER_TOM, CLINIC_BED, SIGNUP_BOOTH
+		COUNTER_TRADE, COUNTER_TOM, CLINIC_BED, SIGNUP_BOOTH,
+		/** A lone door frame at the south end of Alpha Base: the way into Level 1.1. */
+		ALPHA_FRAME
 	}
 
 	private static final int[][] FLOODLIGHTS = {{16, 18}, {47, 18}, {16, 45}, {47, 45}, {24, 36}, {40, 26}};
@@ -63,6 +65,7 @@ final class BasePlan {
 		if (lz == 44 && lx >= 34 && lx <= 44 && lx % 2 == 0) return Piece.LOCKER;
 		if (lz == 23 && lx == 38) return Piece.COMPUTER_DESK;
 		if (lz == 23 && lx == 40) return Piece.DESK;
+		if (lz == 45 && lx == 24) return Piece.ALPHA_FRAME;
 		return null;
 	}
 
