@@ -25,13 +25,14 @@ import net.minecraft.world.phys.Vec3;
  *
  * After a few minutes in Level 0, a stretch of wall somewhere out of sight starts to flicker and crackle.
  * Walking into it drops the player into Level 1. Each player has at most one; it goes back to plain wall
- * once used, once its player wanders far off or leaves, and when the server stops.
+ * once used, once its player wanders far off or leaves, and when the server stops. If Level 0 reshapes
+ * itself over it, it opens again somewhere else. Red Room walls never flicker: those rooms are meant to trap.
  */
 final class FlickeringWalls {
 	/** Level 0 wall blocks that may start to flicker; listed in data, so this needs nothing from Level 0's code. */
 	private static final TagKey<Block> LEVEL_0_WALLS = TagKey.create(Registries.BLOCK, Level1.id("level_0_walls"));
 	private static final int FIRST_DELAY = 3 * 60 * 20, DELAY_SPREAD = 2 * 60 * 20;
-	private static final int RETRY_DELAY = 10 * 20, REOPEN_DELAY = 60 * 20;
+	private static final int RETRY_DELAY = 10 * 20, REOPEN_DELAY = 60 * 20, MOVED_DELAY = 20 * 20;
 	private static final int GIVE_UP_DISTANCE = 80;
 	private static final int CRACKLE_INTERVAL = 50;
 
@@ -75,7 +76,11 @@ final class FlickeringWalls {
 			}
 
 			if (wall != null) {
-				if (!player.blockPosition().closerThan(wall.bottom(), GIVE_UP_DISTANCE)) {
+				if (level0.isLoaded(wall.bottom()) && !level0.getBlockState(wall.bottom()).is(Level1Blocks.FLICKERING_WALLPAPER)) {
+					// Level 0 reshaped itself over it (Edge Shift), or it was broken: it turns up somewhere else soon.
+					close(level0, WALLS.remove(id));
+					DUE.put(id, TIME_INSIDE.getOrDefault(id, 0) + MOVED_DELAY);
+				} else if (!player.blockPosition().closerThan(wall.bottom(), GIVE_UP_DISTANCE)) {
 					close(level0, WALLS.remove(id));
 					DUE.put(id, TIME_INSIDE.getOrDefault(id, 0) + REOPEN_DELAY);
 				} else if (now % CRACKLE_INTERVAL == 0) {

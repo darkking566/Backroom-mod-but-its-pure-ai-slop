@@ -28,8 +28,14 @@ final class ModBlocks {
 	static final Block RED_WALLPAPER = register("red_wallpaper", wall(MapColor.COLOR_RED));
 	static final Block RED_WALLPAPER_BASEBOARD = register("red_wallpaper_baseboard", wall(MapColor.COLOR_RED));
 	static final Block PEELING_RED_WALLPAPER = register("peeling_red_wallpaper", wall(MapColor.TERRACOTTA_RED));
+	static final Block ROUGH_WALLPAPER = register("rough_wallpaper", Properties.of()
+			.mapColor(MapColor.SAND).strength(2.2F).sound(SoundType.TUFF));
+	static final Block ROUGH_WALLPAPER_BASEBOARD = register("rough_wallpaper_baseboard", Properties.of()
+			.mapColor(MapColor.SAND).strength(2.2F).sound(SoundType.TUFF));
 	static final Block CARPET = register("carpet", Properties.of()
 			.mapColor(MapColor.COLOR_BROWN).strength(0.8F).sound(SoundType.WOOL));
+	static final Block DRY_CARPET = register("dry_carpet", Properties.of()
+			.mapColor(MapColor.SAND).strength(0.7F).sound(SoundType.WOOL).speedFactor(1.04F));
 	static final Block THICK_CARPET = register("thick_carpet", Properties.of()
 			.mapColor(MapColor.TERRACOTTA_BROWN).strength(1.0F).sound(SoundType.WOOL).speedFactor(0.72F));
 	static final Block CEILING_TILE = register("ceiling_tile", Properties.of()

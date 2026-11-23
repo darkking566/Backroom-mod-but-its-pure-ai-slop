@@ -11,8 +11,17 @@ final class Maze {
 	static final int CELL = 7;
 	static final int CENTER = 3;
 	static final int SECTOR = 8;
+	static final int LARGE_ZONE_SPAN = 3;
 
-	private static final int TREE = 1, WEST = 2, NORTH = 3, PILLAR = 4, LAMP = 5, ZONE = 6, FEATURE = 7, WARNING = 8;
+	private static final int TREE = 1, WEST = 2, NORTH = 3, PILLAR = 4, LAMP = 5, ZONE = 6, FEATURE = 7, WARNING = 8,
+			SHIFT_PILLAR = 9, STAIRWELL = 10;
+
+	@FunctionalInterface
+	interface EpochSource {
+		EpochSource ZERO = (cx, cz) -> 0;
+
+		int epochAt(int cx, int cz);
+	}
 
 	enum Zone {
 		CLASSIC,
@@ -36,13 +45,52 @@ final class Maze {
 		// Keep the origin sector classic so first-time landings always look familiar.
 		if (sx == 0 && sz == 0) return Zone.CLASSIC;
 
+		Zone large = largeZoneAtSector(seed, sx, sz);
+		if (large != null) return large;
+
+		// Pillar halls span 2x2 sectors (112x112 blocks) to capture their vast, dizzying scale.
+		int mx = Math.floorDiv(sx, 2), mz = Math.floorDiv(sz, 2);
+		if (Math.floorMod(hash(seed, mx, mz, ZONE + 1), 100) < 17 && !macroHasLargeZone(seed, mx, mz)) {
+			return Zone.PILLARS;
+		}
+
 		int roll = Math.floorMod(hash(seed, sx, sz, ZONE), 100);
-		if (roll < 42) return Zone.CLASSIC;
-		if (roll < 59) return Zone.PILLARS;
-		if (roll < 72) return Zone.ARCHES;
-		if (roll < 84) return Zone.DARKENED;
-		if (roll < 95) return Zone.PITS;
-		return Zone.RED_ROOM;
+		if (roll < 56) return Zone.CLASSIC;
+		if (roll < 78) return Zone.ARCHES;
+		return Zone.PITS;
+	}
+
+	private static Zone largeZoneAtSector(long seed, int sx, int sz) {
+		// Darkened zones and Red Rooms span 3x3 sectors (168x168 blocks) at lower occurrence frequency.
+		int lx = Math.floorDiv(sx, LARGE_ZONE_SPAN), lz = Math.floorDiv(sz, LARGE_ZONE_SPAN);
+		if (lx == 0 && lz == 0) return null;
+		int roll = Math.floorMod(hash(seed, lx, lz, ZONE + 2), 100);
+		if (roll < 3) return Zone.RED_ROOM;
+		if (roll < 9) return Zone.DARKENED;
+		return null;
+	}
+
+	private static boolean macroHasLargeZone(long seed, int mx, int mz) {
+		int baseSx = mx * 2, baseSz = mz * 2;
+		for (int dx = 0; dx < 2; dx++) {
+			for (int dz = 0; dz < 2; dz++) {
+				if (largeZoneAtSector(seed, baseSx + dx, baseSz + dz) != null) return true;
+			}
+		}
+		return false;
+	}
+
+	static int largeZoneOriginSector(int sectorCoord) {
+		return Math.floorDiv(sectorCoord, LARGE_ZONE_SPAN) * LARGE_ZONE_SPAN;
+	}
+
+	/** Whether a RED_ROOM cell is strictly inside the zone (all four cardinal neighbors are also RED_ROOM). */
+	static boolean isRedRoomInteriorCell(long seed, int cx, int cz) {
+		return zoneForCell(seed, cx, cz) == Zone.RED_ROOM
+				&& zoneForCell(seed, cx - 1, cz) == Zone.RED_ROOM
+				&& zoneForCell(seed, cx + 1, cz) == Zone.RED_ROOM
+				&& zoneForCell(seed, cx, cz - 1) == Zone.RED_ROOM
+				&& zoneForCell(seed, cx, cz + 1) == Zone.RED_ROOM;
 	}
 
 	/** Whether (x, z) is in the 2-cell transition warning band outside a RED_ROOM sector. */
@@ -67,11 +115,45 @@ final class Maze {
 		return zoneForCell(seed, sx * SECTOR, sz * SECTOR);
 	}
 
+	/** Relative frequency of Edge Shift in this zone (0 means completely stable). */
+	static int shiftWeight(Zone zone) {
+		return switch (zone) {
+			case ARCHES -> 0;
+			case RED_ROOM -> 1;
+			case PITS -> 2;
+			case CLASSIC -> 4;
+			case PILLARS -> 7;
+			case DARKENED -> 9;
+		};
+	}
+
+	/** Minimum ticks before the same cell can shift again. */
+	static int shiftCooldownTicks(Zone zone) {
+		return switch (zone) {
+			case DARKENED -> 200;
+			case PILLARS -> 280;
+			case CLASSIC -> 400;
+			case PITS -> 500;
+			case RED_ROOM -> 700;
+			case ARCHES -> Integer.MAX_VALUE;
+		};
+	}
+
+	private static int effectiveEpoch(Zone zone, int cx, int cz, EpochSource epochs) {
+		return zone == Zone.ARCHES ? 0 : epochs.epochAt(cx, cz);
+	}
+
 	/** Whether a wall block should show peeling yellow wallpaper exposing dark red underneath. */
 	static boolean isRedWarningWall(long seed, int x, int z) {
+		return isRedWarningWall(seed, x, z, EpochSource.ZERO);
+	}
+
+	static boolean isRedWarningWall(long seed, int x, int z, EpochSource epochs) {
 		int cx = Math.floorDiv(x, CELL), cz = Math.floorDiv(z, CELL);
+		Zone zone = zoneForCell(seed, cx, cz);
 		if (!nearRedRoom(seed, cx, cz)) return false;
-		return (hash(seed, x, z, WARNING) & 1) == 0;
+		int epoch = effectiveEpoch(zone, cx, cz, epochs);
+		return (mixEpoch(hash(seed, x, z, WARNING), epoch) & 1) == 0;
 	}
 
 	/** Whether the floor at (x, z) uses thick soaked carpet (arches, red rooms, and red-room warning edges). */
@@ -102,6 +184,14 @@ final class Maze {
 		return Math.floorMod(hash(seed, cx, cz, FEATURE), 3) == 0;
 	}
 
+	/** Whether a classic cell hosts a cramped dead-end concrete stairwell alcove. */
+	static boolean isStairwellCell(long seed, int cx, int cz) {
+		if (cx == 0 && cz == 0) return false;
+		if (zoneForCell(seed, cx, cz) != Zone.CLASSIC) return false;
+		if (Exits.isProtectedCell(seed, cx, cz)) return false;
+		return Math.floorMod(hash(seed, cx, cz, STAIRWELL), 18) == 0;
+	}
+
 	/** Whether the walkable layers (floor+1 and floor+2) are solid wall at (x, z). */
 	static boolean isWall(long seed, int x, int z) {
 		return isWall(seed, x, z, false);
@@ -112,19 +202,42 @@ final class Maze {
 	 * below the ceiling), arched openings narrow by one block on each side to form an arch silhouette.
 	 */
 	static boolean isWall(long seed, int x, int z, boolean topLayer) {
+		return isWall(seed, x, z, topLayer, EpochSource.ZERO);
+	}
+
+	static boolean isWall(long seed, int x, int z, boolean topLayer, EpochSource epochs) {
 		int cx = Math.floorDiv(x, CELL), cz = Math.floorDiv(z, CELL);
 		int ix = Math.floorMod(x, CELL), iz = Math.floorMod(z, CELL);
-
-		if (ix != 0 && iz != 0) return false;
-		if (iz != 0) return westEdge(seed, cx, cz).blocks(iz, topLayer);
-		if (ix != 0) return northEdge(seed, cx, cz).blocks(ix, topLayer);
-
 		Zone zone = zoneForCell(seed, cx, cz);
+		int epoch = effectiveEpoch(zone, cx, cz, epochs);
+
+		if (ix != 0 && iz != 0) {
+			if (isStairwellCell(seed, cx, cz)) {
+				if (iz == 5 && ix >= 2 && ix <= 5) return true;
+				if (ix == 5 && iz == 4) return true;
+			}
+			return zone == Zone.PILLARS && epoch > 0 && isShiftedPillar(seed, cx, cz, ix, iz, epoch);
+		}
+		if (iz != 0) return westEdge(seed, cx, cz, zone, epoch).blocks(iz, topLayer);
+		if (ix != 0) return northEdge(seed, cx, cz, zone, epoch).blocks(ix, topLayer);
+
 		if (zone == Zone.PILLARS || zone == Zone.PITS) return true;
 
-		return !westEdge(seed, cx, cz).open() || !westEdge(seed, cx, cz - 1).open()
-				|| !northEdge(seed, cx, cz).open() || !northEdge(seed, cx - 1, cz).open()
-				|| Math.floorMod(hash(seed, cx, cz, PILLAR), 3) == 0;
+		Zone northNeighbor = zoneForCell(seed, cx, cz - 1);
+		Zone westNeighbor = zoneForCell(seed, cx - 1, cz);
+		return !westEdge(seed, cx, cz, zone, epoch).open()
+				|| !westEdge(seed, cx, cz - 1, northNeighbor, effectiveEpoch(northNeighbor, cx, cz - 1, epochs)).open()
+				|| !northEdge(seed, cx, cz, zone, epoch).open()
+				|| !northEdge(seed, cx - 1, cz, westNeighbor, effectiveEpoch(westNeighbor, cx - 1, cz, epochs)).open()
+				|| Math.floorMod(mixEpoch(hash(seed, cx, cz, PILLAR), epoch), 3) == 0;
+	}
+
+	private static boolean isShiftedPillar(long seed, int cx, int cz, int ix, int iz, int epoch) {
+		long h = mixEpoch(hash(seed, cx, cz, SHIFT_PILLAR), epoch);
+		if (Math.floorMod(h, 3) == 0) return false;
+		int px = 2 + Math.floorMod(h >>> 8, 3);
+		int pz = 2 + Math.floorMod(h >>> 16, 3);
+		return ix == px && iz == pz;
 	}
 
 	static boolean isLamp(int x, int z) {
@@ -133,32 +246,42 @@ final class Maze {
 	}
 
 	static boolean lampWorks(long seed, int x, int z) {
+		return lampWorks(seed, x, z, EpochSource.ZERO);
+	}
+
+	static boolean lampWorks(long seed, int x, int z, EpochSource epochs) {
 		int cx = Math.floorDiv(x, CELL), cz = Math.floorDiv(z, CELL);
 		Zone zone = zoneForCell(seed, cx, cz);
+		int epoch = effectiveEpoch(zone, cx, cz, epochs);
+		long h = mixEpoch(hash(seed, cx, cz, LAMP), epoch);
 		return switch (zone) {
 			case DARKENED -> false;
-			case RED_ROOM -> Math.floorMod(hash(seed, cx, cz, LAMP), 100) < 65;
-			case PITS -> Math.floorMod(hash(seed, cx, cz, LAMP), 5) >= 2;
-			case PILLARS -> Math.floorMod(hash(seed, cx, cz, LAMP), 10) != 0;
-			case ARCHES -> Math.floorMod(hash(seed, cx, cz, LAMP), 7) != 0;
-			case CLASSIC -> Math.floorMod(hash(seed, cx, cz, LAMP), 5) != 0;
+			case RED_ROOM -> Math.floorMod(h, 100) < 65;
+			case PITS -> Math.floorMod(h, 5) >= 2;
+			case PILLARS -> Math.floorMod(h, 10) != 0;
+			case ARCHES -> Math.floorMod(h, 7) != 0;
+			case CLASSIC -> Math.floorMod(h, 5) != 0;
 		};
 	}
 
-	private static Edge westEdge(long seed, int cx, int cz) {
+	private static Edge westEdge(long seed, int cx, int cz, Zone zone, int epoch) {
 		int lx = Math.floorMod(cx, SECTOR), lz = Math.floorMod(cz, SECTOR);
 		boolean required = lz == 0 || (lx != 0 && pathGoesWest(seed, cx, cz));
-		return Edge.random(hash(seed, cx, cz, WEST), required, zoneForCell(seed, cx, cz));
+		return Edge.random(mixEpoch(hash(seed, cx, cz, WEST), epoch), required, zone, epoch > 0);
 	}
 
-	private static Edge northEdge(long seed, int cx, int cz) {
+	private static Edge northEdge(long seed, int cx, int cz, Zone zone, int epoch) {
 		int lx = Math.floorMod(cx, SECTOR), lz = Math.floorMod(cz, SECTOR);
 		boolean required = lx == 0 || (lz != 0 && !pathGoesWest(seed, cx, cz));
-		return Edge.random(hash(seed, cx, cz, NORTH), required, zoneForCell(seed, cx, cz));
+		return Edge.random(mixEpoch(hash(seed, cx, cz, NORTH), epoch), required, zone, epoch > 0);
 	}
 
 	private static boolean pathGoesWest(long seed, int cx, int cz) {
 		return (hash(seed, cx, cz, TREE) & 1) == 0;
+	}
+
+	private static long mixEpoch(long baseHash, int epoch) {
+		return epoch == 0 ? baseHash : mix(baseHash ^ epoch * 0x9E3779B97F4A7C15L);
 	}
 
 	private static long hash(long seed, int x, int z, int salt) {
@@ -177,10 +300,18 @@ final class Maze {
 
 	/** The passable span of one cell edge; a width of 0 is a solid wall. */
 	private record Edge(int start, int width, boolean arched) {
-		static Edge random(long hash, boolean required, Zone zone) {
+		static Edge random(long hash, boolean required, Zone zone, boolean shifted) {
 			int roll = Math.floorMod(hash, 100);
 			return switch (zone) {
-				case PILLARS, PITS -> {
+				case PILLARS -> {
+					int openReq = shifted ? 70 : 95;
+					int openOpt = shifted ? 55 : 90;
+					if (roll < (required ? openReq : openOpt)) yield new Edge(1, CELL - 1, false);
+					if (!required && shifted && roll >= 85) yield new Edge(1, 0, false);
+					if (!required && !shifted) yield new Edge(1, 0, false);
+					yield doorway(hash, 3, 4, false);
+				}
+				case PITS -> {
 					if (roll < (required ? 95 : 90)) yield new Edge(1, CELL - 1, false);
 					if (!required) yield new Edge(1, 0, false);
 					yield doorway(hash, 3, 4, false);

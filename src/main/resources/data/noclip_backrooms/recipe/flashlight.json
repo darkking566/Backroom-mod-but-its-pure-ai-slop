@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "R": "minecraft:redstone",
+    "T": "minecraft:torch"
+  },
+  "pattern": [
+    "ITI",
+    "IRI",
+    " I "
+  ],
+  "result": {
+    "id": "noclip_backrooms:flashlight"
+  }
+}

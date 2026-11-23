@@ -24,8 +24,9 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			save = game.getWorldSave();
 			var server = game.getServer();
 			game.getConnection().waitForChunksRender();
-			// Keeps chat out of the screenshots.
+			// Keeps chat out of the screenshots, and holds Edge Shift until baseline block checks finish.
 			server.runCommand("gamerule send_command_feedback false");
+			server.runCommand("gamerule noclip_backrooms:edge_shift false");
 			server.runCommand("gamemode survival @a");
 			server.runCommand("give @a minecraft:apple 3");
 
@@ -63,6 +64,10 @@ public final class Level0ClientTest implements FabricClientGameTest {
 
 			checkBlocks(context, game);
 			ExitClientChecks.run(context, game, 3, 3);
+			checkEdgeShift(context, game, standY);
+			checkRedRoomLoop(context, game, standY);
+			checkShadowHallucination(context, game, standY);
+			checkFlashlight(context, game, standY);
 			server.runOnServer(s -> {
 				for (int i = 0; i < ModBlocks.ALL.size(); i++) {
 					player(s).getInventory().setItem(i, new ItemStack(ModBlocks.ALL.get(i)));
@@ -142,6 +147,181 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		context.getInput().pressMouse(1);
 	}
 
+	private static void checkEdgeShift(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
+		var server = game.getServer();
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5 0 5");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(10);
+
+		int frontZ = 3 * Maze.CELL + Maze.CENTER;
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			for (int cz = -5; cz <= -3; cz++) {
+				for (int cx = -3; cx <= 3; cx++) {
+					level.setBlockAndUpdate(new BlockPos(cx * Maze.CELL + Maze.CENTER, standY, cz * Maze.CELL + Maze.CENTER),
+							Blocks.COBBLESTONE.defaultBlockState());
+				}
+			}
+			level.setBlockAndUpdate(new BlockPos(Maze.CENTER, standY, frontZ), Blocks.COBBLESTONE.defaultBlockState());
+		});
+
+		// With the gamerule off, nothing may shift.
+		context.waitTicks(45);
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			EdgeShift.ShiftState state = level.getDataStorage().computeIfAbsent(EdgeShift.ShiftState.TYPE);
+			check(state.epochAt(0, -3) == 0
+					&& level.getBlockState(new BlockPos(Maze.CENTER, standY, -3 * Maze.CELL + Maze.CENTER)).is(Blocks.COBBLESTONE),
+					"edge shift ran while gamerule was disabled");
+		});
+
+		// Enable Edge Shift and wait for at least one behind-cell to shift while facing +Z.
+		server.runCommand("gamerule noclip_backrooms:edge_shift true");
+		server.waitFor(s -> {
+			ServerLevel level = player(s).level();
+			EdgeShift.ShiftState state = level.getDataStorage().computeIfAbsent(EdgeShift.ShiftState.TYPE);
+			for (int cz = -5; cz <= -3; cz++) {
+				for (int cx = -3; cx <= 3; cx++) {
+					if (state.epochAt(cx, cz) > 0) return true;
+				}
+			}
+			return false;
+		}, 400);
+
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			EdgeShift.ShiftState state = level.getDataStorage().computeIfAbsent(EdgeShift.ShiftState.TYPE);
+			boolean verifiedShift = false;
+			for (int cz = -5; cz <= -3; cz++) {
+				for (int cx = -3; cx <= 3; cx++) {
+					BlockPos markerPos = new BlockPos(cx * Maze.CELL + Maze.CENTER, standY, cz * Maze.CELL + Maze.CENTER);
+					if (state.epochAt(cx, cz) > 0) {
+						check(!level.getBlockState(markerPos).is(Blocks.COBBLESTONE),
+								"shifted cell did not erase placed marker at " + markerPos);
+						verifiedShift = true;
+					} else if (level.getBlockState(markerPos).is(Blocks.COBBLESTONE)) {
+						level.setBlockAndUpdate(markerPos, Blocks.AIR.defaultBlockState());
+					}
+				}
+			}
+			check(verifiedShift, "no behind-cell shifted");
+			BlockPos frontPos = new BlockPos(Maze.CENTER, standY, frontZ);
+			check(state.epochAt(0, 3) == 0 && level.getBlockState(frontPos).is(Blocks.COBBLESTONE),
+					"observed cell in front of the player shifted");
+			level.setBlockAndUpdate(frontPos, Blocks.AIR.defaultBlockState());
+		});
+		server.runCommand("gamerule noclip_backrooms:edge_shift false");
+
+		// Watch mode should continuously shift cells right in front of the player (including (0, 3)), then turn off cleanly.
+		server.runCommand("execute as @a run backrooms edgeshift watch on");
+		server.runOnServer(s -> check(EdgeShift.isWatching(player(s)), "watch mode failed to enable"));
+		server.waitFor(s -> player(s).level().getDataStorage().computeIfAbsent(EdgeShift.ShiftState.TYPE).epochAt(0, 3) > 0, 400);
+		server.runCommand("execute as @a run backrooms edgeshift watch off");
+		server.runOnServer(s -> check(!EdgeShift.isWatching(player(s)), "watch mode failed to disable"));
+		server.runCommand("execute as @a run backrooms edgeshift status");
+		server.runCommand("execute as @a run backrooms edgeshift pulse");
+	}
+
+	private static void checkRedRoomLoop(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
+		var server = game.getServer();
+		int[] redSector = server.computeOnServer(s -> {
+			ServerLevel level = s.getLevel(BackroomsMod.LEVEL_0);
+			long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
+			int sectorBlocks = Maze.CELL * Maze.SECTOR;
+			for (int radius = 1; radius <= 40; radius++) {
+				for (int sx = -radius; sx <= radius; sx++) {
+					for (int sz = -radius; sz <= radius; sz++) {
+						int osx = Maze.largeZoneOriginSector(sx);
+						int osz = Maze.largeZoneOriginSector(sz);
+						if (Maze.zoneAt(seed, osx * sectorBlocks + Maze.CENTER, osz * sectorBlocks + Maze.CENTER) == Maze.Zone.RED_ROOM
+								&& Maze.zoneAt(seed, (osx - 1) * sectorBlocks + Maze.CENTER, osz * sectorBlocks + Maze.CENTER) != Maze.Zone.RED_ROOM) {
+							return new int[] {osx, osz};
+						}
+					}
+				}
+			}
+			throw new AssertionError("no RED_ROOM macro-zone found within radius 40");
+		});
+
+		int rsx = redSector[0], rsz = redSector[1];
+		int innerX = (rsx * Maze.SECTOR + 3) * Maze.CELL + Maze.CENTER;
+		int innerZ = (rsz * Maze.SECTOR + 3) * Maze.CELL + Maze.CENTER;
+		server.runCommand("gamemode survival @a");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + (innerX + 0.5) + " " + standY + " " + (innerZ + 0.5));
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(5);
+
+		server.runOnServer(s -> {
+			ServerPlayer player = player(s);
+			check(RedRoomLoop.isTrapped(player), "player entering Red Room interior was not trapped");
+			check(!RedRoomLoop.canBreakBlock(player.level(), player, new BlockPos(innerX, standY, innerZ),
+					ModBlocks.RED_WALLPAPER.defaultBlockState()), "survival player could break Red Room wall");
+		});
+
+		// Stepping onto the outer perimeter cell of the Red Room macro-zone must loop the player back into rlx,rlz in 2..redCells-3.
+		int perimeterX = (rsx * Maze.SECTOR) * Maze.CELL + Maze.CENTER;
+		int redCells = Maze.LARGE_ZONE_SPAN * Maze.SECTOR;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + (perimeterX + 0.5) + " " + standY + " " + (innerZ + 0.5));
+		server.waitFor(s -> {
+			ServerPlayer player = player(s);
+			int rlx = Math.floorDiv(player.getBlockX(), Maze.CELL) - rsx * Maze.SECTOR;
+			int rlz = Math.floorDiv(player.getBlockZ(), Maze.CELL) - rsz * Maze.SECTOR;
+			return rlx >= 2 && rlx <= redCells - 3 && rlz >= 2 && rlz <= redCells - 3;
+		}, 40);
+
+		server.runOnServer(s -> check(RedRoomLoop.isTrapped(player(s)), "looped player lost trap state"));
+
+		// Returning to the starting sector clears the trap and effects for subsequent screenshot checks.
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
+		server.runCommand("effect clear @a");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(5);
+		server.runOnServer(s -> {
+			ServerPlayer player = player(s);
+			check(!RedRoomLoop.isTrapped(player), "distant teleport did not release Red Room trap");
+			check(!player.isInWall(), "stuck in wall after returning from Red Room");
+		});
+	}
+
+	private static void checkShadowHallucination(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
+		var server = game.getServer();
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5 0 0");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(5);
+
+		server.runCommand("execute as @a run backrooms shadow");
+		server.runOnServer(s -> {
+			ServerPlayer player = player(s);
+			check(ShadowHallucination.hasActiveShadow(player), "shadow hallucination failed to spawn");
+			for (var entity : player.level().getAllEntities()) check(!(entity instanceof Mob), "shadow spawned a Mob");
+		});
+
+		server.runCommand("execute as @a run backrooms shadow clear");
+		server.runOnServer(s -> check(!ShadowHallucination.hasActiveShadow(player(s)), "shadow clear command failed"));
+		server.runCommand("effect clear @a");
+	}
+
+	private static void checkFlashlight(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
+		var server = game.getServer();
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5 0 0");
+		server.runCommand("item replace entity @a weapon.mainhand with noclip_backrooms:flashlight");
+		context.waitTicks(3);
+
+		context.getInput().pressMouse(1);
+		server.waitFor(s -> {
+			ServerPlayer p = player(s);
+			return FlashlightItem.isLit(p.getMainHandItem()) && FlashlightLight.hasActiveBeam(p);
+		}, 40);
+
+		context.getInput().pressMouse(1);
+		server.waitFor(s -> {
+			ServerPlayer p = player(s);
+			return !FlashlightItem.isLit(p.getMainHandItem()) && !FlashlightLight.hasActiveBeam(p);
+		}, 40);
+
+		server.runCommand("item replace entity @a weapon.mainhand with minecraft:air");
+	}
+
 	private static void checkBlocks(ClientGameTestContext context, TestSingleplayerContext game) {
 		game.getServer().runOnServer(s -> {
 			ServerLevel level = player(s).level();
@@ -156,6 +336,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 				check(Language.getInstance().has(block.getDescriptionId()), "no name for " + block);
 				check(block.asItem().getDescriptionId().equals(block.getDescriptionId()), "wrong item name key for " + block);
 			}
+			check(Language.getInstance().has(ModItems.FLASHLIGHT.getDescriptionId()), "no name for flashlight");
 		});
 	}
 

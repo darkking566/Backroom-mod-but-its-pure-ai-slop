@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.NoiseColumn;
@@ -11,6 +12,7 @@ import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -42,30 +44,40 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 	}
 
 	static BlockState blockAt(long seed, int x, int y, int z) {
+		return blockAt(seed, x, y, z, Maze.EpochSource.ZERO);
+	}
+
+	static BlockState blockAt(long seed, int x, int y, int z, Maze.EpochSource epochs) {
 		// Solid bedrock at y=0 and above the ceiling so nothing can escape underneath or land on the roof.
-		if (y == 0 || y > CEILING_Y) return Blocks.BEDROCK.defaultBlockState();
+		if (y == 0) return Blocks.BEDROCK.defaultBlockState();
 		if (y < FLOOR_Y) {
 			if (Maze.isPit(seed, x, z)) {
-				return (y == 1 ? Blocks.CONCRETE.black() : Blocks.AIR).defaultBlockState();
+				return Blocks.AIR.defaultBlockState();
 			}
 			if (y == FLOOR_Y - 1 && Maze.isPuddle(seed, x, z)) {
 				return ModBlocks.CARPET.defaultBlockState();
 			}
 			return Blocks.CONCRETE.black().defaultBlockState();
 		}
+		Maze.Zone zone = Maze.zoneAt(seed, x, z);
 		if (y == FLOOR_Y) {
 			if (Maze.isPit(seed, x, z)) return Blocks.AIR.defaultBlockState();
 			if (Maze.isPuddle(seed, x, z)) return Blocks.WATER.defaultBlockState();
-			return (Maze.isThickCarpet(seed, x, z) ? ModBlocks.THICK_CARPET : ModBlocks.CARPET).defaultBlockState();
+			if (Maze.isThickCarpet(seed, x, z)) return ModBlocks.THICK_CARPET.defaultBlockState();
+			return (zone == Maze.Zone.PILLARS ? ModBlocks.DRY_CARPET : ModBlocks.CARPET).defaultBlockState();
 		}
-		Maze.Zone zone = Maze.zoneAt(seed, x, z);
+
+		BlockState stairwell = stairwellBlockAt(seed, x, y, z);
+		if (stairwell != null) return stairwell;
+
+		if (y > CEILING_Y) return Blocks.BEDROCK.defaultBlockState();
 		if (y == CEILING_Y) {
 			if (!Maze.isLamp(x, z)) return ModBlocks.CEILING_TILE.defaultBlockState();
 			if (Exits.lampPointsToExit(seed, x, z)) return ModBlocks.EXIT_LIGHT.defaultBlockState();
-			if (!Maze.lampWorks(seed, x, z)) return ModBlocks.BROKEN_FLUORESCENT_LIGHT.defaultBlockState();
+			if (!Maze.lampWorks(seed, x, z, epochs)) return ModBlocks.BROKEN_FLUORESCENT_LIGHT.defaultBlockState();
 			return (zone == Maze.Zone.RED_ROOM ? ModBlocks.RED_FLUORESCENT_LIGHT : ModBlocks.FLUORESCENT_LIGHT).defaultBlockState();
 		}
-		if (!Maze.isWall(seed, x, z, y == CEILING_Y - 1)) return Blocks.AIR.defaultBlockState();
+		if (!Maze.isWall(seed, x, z, y == CEILING_Y - 1, epochs)) return Blocks.AIR.defaultBlockState();
 		boolean baseboard = y == FLOOR_Y + 1;
 		if (Exits.isDoor(seed, x, z)) {
 			if (baseboard) return ModBlocks.EXIT_DOOR.defaultBlockState();
@@ -77,10 +89,41 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		if (zone == Maze.Zone.RED_ROOM) {
 			return (baseboard ? ModBlocks.RED_WALLPAPER_BASEBOARD : ModBlocks.RED_WALLPAPER).defaultBlockState();
 		}
-		if (!baseboard && Maze.isRedWarningWall(seed, x, z)) {
+		if (zone == Maze.Zone.DARKENED) {
+			return (baseboard ? ModBlocks.ROUGH_WALLPAPER_BASEBOARD : ModBlocks.ROUGH_WALLPAPER).defaultBlockState();
+		}
+		if (!baseboard && Maze.isRedWarningWall(seed, x, z, epochs)) {
 			return ModBlocks.PEELING_RED_WALLPAPER.defaultBlockState();
 		}
 		return (baseboard ? ModBlocks.WALLPAPER_BASEBOARD : ModBlocks.WALLPAPER).defaultBlockState();
+	}
+
+	private static BlockState stairwellBlockAt(long seed, int x, int y, int z) {
+		int cx = Math.floorDiv(x, Maze.CELL), cz = Math.floorDiv(z, Maze.CELL);
+		if (!Maze.isStairwellCell(seed, cx, cz)) return null;
+		int ix = Math.floorMod(x, Maze.CELL), iz = Math.floorMod(z, Maze.CELL);
+
+		if ((iz == 5 && ix >= 2 && ix <= 5) || (ix == 5 && iz == 4)) {
+			if (y == FLOOR_Y + 1) return ModBlocks.WALLPAPER_BASEBOARD.defaultBlockState();
+			if (y <= FLOOR_Y + 7) return ModBlocks.WALLPAPER.defaultBlockState();
+			return Blocks.BEDROCK.defaultBlockState();
+		}
+		if (iz == 4 && ix >= 2 && ix <= 4) {
+			int step = ix - 2;
+			int relY = y - FLOOR_Y;
+			if (relY <= step) return Blocks.SMOOTH_SANDSTONE.defaultBlockState();
+			if (relY == step + 1) {
+				return step < 2
+						? Blocks.SMOOTH_SANDSTONE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.EAST)
+						: Blocks.SMOOTH_SANDSTONE.defaultBlockState();
+			}
+			if (relY <= 6) return Blocks.AIR.defaultBlockState();
+			if (relY == 7) {
+				return (step == 1 ? ModBlocks.BROKEN_FLUORESCENT_LIGHT : ModBlocks.CEILING_TILE).defaultBlockState();
+			}
+			return Blocks.BEDROCK.defaultBlockState();
+		}
+		return null;
 	}
 
 	@Override

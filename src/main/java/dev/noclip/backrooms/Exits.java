@@ -3,13 +3,13 @@ package dev.noclip.backrooms;
 import java.util.SplittableRandom;
 
 /**
- * Where the ways out of Level 0 are. There is one in every region of 3x3 sectors.
+ * Where the ways out of Level 0 are. There is one in every region of 10x10 sectors.
  *
  * An exit only replaces blocks that are already wall, so it never changes which positions are passable
  * and new chunks still line up with ones generated before exits existed.
  */
 final class Exits {
-	static final int REGION_CELLS = Maze.SECTOR * 3;
+	static final int REGION_CELLS = Maze.SECTOR * 10;
 	static final int REGION = REGION_CELLS * Maze.CELL;
 	/** How many cells away the lamps start to turn green. */
 	static final int HINT_CELLS = 3;
@@ -65,6 +65,22 @@ final class Exits {
 			}
 		}
 		return null;
+	}
+
+	/** Whether a cell houses or directly borders an exit door and must never be reshaped by Edge Shift. */
+	static boolean isProtectedCell(long seed, int cx, int cz) {
+		int rxCenter = Math.floorDiv(cx, REGION_CELLS);
+		int rzCenter = Math.floorDiv(cz, REGION_CELLS);
+		for (int rx = rxCenter - 1; rx <= rxCenter + 1; rx++) {
+			for (int rz = rzCenter - 1; rz <= rzCenter + 1; rz++) {
+				Door door = doorIn(seed, rx, rz);
+				if (door == null) continue;
+				int doorCx = Math.floorDiv(door.x(), Maze.CELL);
+				int doorCz = Math.floorDiv(door.z(), Maze.CELL);
+				if (Math.abs(cx - doorCx) <= 1 && Math.abs(cz - doorCz) <= 1) return true;
+			}
+		}
+		return false;
 	}
 
 	private static boolean hasSolidWestWall(long seed, int x, int z) {

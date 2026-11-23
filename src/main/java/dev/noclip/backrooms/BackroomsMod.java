@@ -19,11 +19,17 @@ public final class BackroomsMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		ModBlocks.register();
+		ModItems.register();
 		ModSounds.register();
 		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, id("level_0"), Level0ChunkGenerator.CODEC);
 		Noclip.register();
 		Level0Ambience.register();
 		RedRoomEffects.register();
+		RedRoomLoop.register();
+		EdgeShift.register();
+		ShadowHallucination.register();
+		PitEffects.register();
+		FlashlightLight.register();
 		// Level 1 keeps everything in its own package.
 		dev.noclip.backrooms.level1.Level1.register();
 	}

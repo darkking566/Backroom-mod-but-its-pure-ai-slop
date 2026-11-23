@@ -31,6 +31,8 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			var server = game.getServer();
 			game.getConnection().waitForChunksRender();
 			server.runCommand("gamerule send_command_feedback false");
+			// Level 0 reshaping itself is tested on its own; here it would only move the flickering wall away.
+			server.runCommand("gamerule noclip_backrooms:edge_shift false");
 			server.runCommand("gamemode survival @a");
 			server.runCommand("clear @a");
 

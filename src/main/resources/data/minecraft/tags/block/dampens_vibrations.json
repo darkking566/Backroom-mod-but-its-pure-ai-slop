@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "noclip_backrooms:carpet",
+    "noclip_backrooms:dry_carpet",
     "noclip_backrooms:thick_carpet"
   ]
 }

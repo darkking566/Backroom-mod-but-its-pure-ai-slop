@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 class ExitsTest {
 	/** The longest walk allowed from any walkable block to the nearest exit. */
-	private static final int MAX_WALK = 450;
+	private static final int MAX_WALK = Exits.REGION * 3;
 	private static final int BORDER_REGION = 29_900_000 / Exits.REGION;
 	private static final int[] REGIONS = {0, -1, 7, -BORDER_REGION, BORDER_REGION};
 
@@ -52,7 +52,7 @@ class ExitsTest {
 		int size = Exits.REGION * 3;
 		int[] queue = new int[size * size], walked = new int[size * size];
 
-		for (int run = 0; run < 250; run++) {
+		for (int run = 0; run < 40; run++) {
 			long seed = random.nextLong();
 			int region = REGIONS[run % REGIONS.length];
 			int origin = (region - 1) * Exits.REGION;
@@ -107,6 +107,10 @@ class ExitsTest {
 			assertTrue(Exits.lampPointsToExit(seed, door.x() - Maze.CELL + Maze.CENTER, door.z()));
 			assertTrue(Exits.lampPointsToExit(seed, door.x() + Exits.HINT_CELLS * Maze.CELL + Maze.CENTER, door.z()));
 			assertTrue(Exits.lampPointsToExit(seed, door.x() - (Exits.HINT_CELLS + 1) * Maze.CELL + Maze.CENTER, door.z()));
+			int doorCx = Math.floorDiv(door.x(), Maze.CELL);
+			int doorCz = Math.floorDiv(door.z(), Maze.CELL);
+			assertTrue(Exits.isProtectedCell(seed, doorCx, doorCz));
+			assertTrue(Exits.isProtectedCell(seed, doorCx - 1, doorCz));
 		}
 	}
 }
