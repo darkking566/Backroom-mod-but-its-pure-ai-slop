@@ -16,6 +16,7 @@ src/main/java/dev/noclip/backrooms/
 │  └─ LevelExits.java       出口登記處：每個出口寫著通往哪一層，這裡決定通不通
 ├─ level0/                  Level 0「大廳」（入口檔 Level0.java）
 ├─ level1/                  Level 1「停車場」（入口檔 Level1.java）
+├─ core/people/             人物（居民、巡邏隊、施工影子）：Person、People 登記八種造型；模型 `monsters/people.json`、貼圖 `textures/entity/people/`、Blender 原檔 `art/people/`，由 `tools/make_people.py` 與 `tools/blender_people.py` 產生
 └─ monsters/                怪物（可能出現在好幾層）：Monsters.java 登記全部怪物，一隻一個資料夾（hound/）
 
 src/client/java/dev/noclip/backrooms/   只在遊戲畫面端執行的程式（伺服器不會載入）

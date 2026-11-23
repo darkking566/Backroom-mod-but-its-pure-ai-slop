@@ -34,11 +34,19 @@ public final class BoxRig {
 	private final Map<String, String> parents = new LinkedHashMap<>();
 	private final Map<String, Clip> clips = new HashMap<>();
 	private final int textureWidth, textureHeight;
+	private final Map<String, List<String>> looks = new LinkedHashMap<>();
 
 	private BoxRig(JsonObject spec) {
 		JsonObject atlas = spec.getAsJsonObject("texture_atlas");
 		textureWidth = atlas.get("width").getAsInt();
 		textureHeight = atlas.get("height").getAsInt();
+		if (spec.has("looks")) {
+			for (Map.Entry<String, JsonElement> look : spec.getAsJsonObject("looks").entrySet()) {
+				List<String> shown = new ArrayList<>();
+				look.getValue().getAsJsonArray().forEach(name -> shown.add(name.getAsString()));
+				looks.put(look.getKey(), shown);
+			}
+		}
 		// Parents first, whatever order the file lists them in.
 		List<JsonObject> pending = new ArrayList<>();
 		spec.getAsJsonArray("parts").forEach(part -> pending.add(part.getAsJsonObject()));
@@ -101,7 +109,7 @@ public final class BoxRig {
 		return LayerDefinition.create(mesh, textureWidth, textureHeight);
 	}
 
-	private static CubeListBuilder addBox(CubeListBuilder boxes, JsonObject cube) {
+	private CubeListBuilder addBox(CubeListBuilder boxes, JsonObject cube) {
 		JsonArray uv = cube.getAsJsonArray("uv_region");
 		float[] origin = floats(cube, "origin_mc"), size = floats(cube, "size_mc");
 		return boxes.texOffs(uv.get(0).getAsInt(), uv.get(1).getAsInt()).addBox(origin[0], origin[1], origin[2], size[0], size[1], size[2]);
@@ -115,6 +123,20 @@ public final class BoxRig {
 			joints.put(joint.getKey(), parent.getChild(joint.getKey()));
 		}
 		return joints;
+	}
+
+	/** The accessory joints a look shows (people only). */
+	public List<String> look(String name) {
+		List<String> shown = looks.get(name);
+		if (shown == null) throw new IllegalArgumentException("no look " + name);
+		return shown;
+	}
+
+	/** Every joint some look shows or hides. */
+	public java.util.Set<String> accessories() {
+		java.util.Set<String> all = new java.util.LinkedHashSet<>();
+		looks.values().forEach(all::addAll);
+		return all;
 	}
 
 	public Clip clip(String name) {

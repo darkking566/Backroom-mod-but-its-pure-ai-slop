@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level1;
 
+import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.level1.Level1Layout.Base;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -107,7 +108,7 @@ final class Patrols {
 		Patrol patrol = new Patrol();
 		patrol.base = base;
 		for (int i = 0; i < 2; i++) {
-			Mob mob = EntityTypes.VILLAGER.create(level, EntitySpawnReason.EVENT);
+			Mob mob = People.type("meg_patrol").create(level, EntitySpawnReason.EVENT);
 			if (mob == null) break;
 			mob.snapTo(spot.getX() + 0.5 + i, spot.getY(), spot.getZ() + 0.5, 0, 0);
 			mob.setNoAi(true);

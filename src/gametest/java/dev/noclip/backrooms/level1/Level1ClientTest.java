@@ -72,6 +72,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			secrets(context, game, seed);
 			items(context, game, seed);
 			monsters(context, game, seed);
+			people(context, game, seed);
 			hounds(context, game, seed);
 			checkBlocks(context, game);
 			leaveThroughDoor(context, game, seed);
@@ -832,6 +833,32 @@ public final class Level1ClientTest implements FabricClientGameTest {
 	}
 
 	/** The Hound: how it looks standing and mid-lunge, its eyes in a blackout, a real bite, and leaving when the lights come back. */
+	/** Every look of the people, standing in a row in a hall, from afar and close up. */
+	private static void people(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		int[] spot = Level1Layout.landing(seed, 0, 0);
+		server.runCommand("gamemode spectator @a");
+		var looks = dev.noclip.backrooms.core.people.People.LOOKS;
+		server.runOnServer(s -> {
+			for (int i = 0; i < looks.size(); i++) {
+				var type = dev.noclip.backrooms.core.people.People.type(looks.get(i));
+				var mob = type.create(level1(s), net.minecraft.world.entity.EntitySpawnReason.EVENT);
+				mob.snapTo(spot[0] + 0.5 + (i - 3.5) * 1.1, STAND, spot[1] + 4.5, 180, 0);
+				mob.setYBodyRot(180);
+				mob.setYHeadRot(180);
+				mob.setNoAi(true);
+				mob.setInvulnerable(true);
+				mob.addTag("test_person");
+				level1(s).addFreshEntity(mob);
+			}
+		});
+		shoot(context, game, spot[0] + 0.5, STAND + 0.6, spot[1] - 1.0, 0, 5, "level1_people_row");
+		shoot(context, game, spot[0] + 0.5 - 1.65, STAND + 0.9, spot[1] + 2.4, 0, 5, "level1_people_close_left");
+		shoot(context, game, spot[0] + 0.5 + 1.65, STAND + 0.9, spot[1] + 2.4, 0, 5, "level1_people_close_right");
+		shoot(context, game, spot[0] + 0.5, STAND + 0.9, spot[1] + 8.5, 180, 5, "level1_people_backs");
+		server.runCommand("kill @e[tag=test_person]");
+	}
+
 	private static void hounds(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
 		var server = game.getServer();
 		int[] spot = Level1Layout.landing(seed, 0, 0);

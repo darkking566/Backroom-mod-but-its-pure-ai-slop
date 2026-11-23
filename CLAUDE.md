@@ -67,6 +67,12 @@
   - 修掉自己的兩個 bug：巡邏隊一生出來就被「清掉舊巡邏」的載入事件刪掉（標籤要在加入世界後才加）；巡邏隊從「找人」切到「帶路」那一刻拿玩家位置當終點，立刻判定已抵達
   - 沒做：怪物（照指示）
 
+- 居民、巡邏隊、施工影子換成自製人形（用 Blender，沿用獵犬的盒子骨架格式）：
+  - 新增 `core/people/`（`Person`、`People`：八種造型各一個實體型別）與客戶端 `PersonModel`、`PersonRenderer`；`BoxRig` 多支援貼圖解析度倍率（4 倍，臉 32 像素）與依造型顯示／隱藏配件
+  - `tools/make_people.py` 產生骨架 `monsters/people.json`（兩段手腳、帽子、背包、外套、圍裙、護目鏡、工具、待機／走路／揮動三段動畫）與八張 512 像素貼圖；`tools/blender_people.py` 在 Blender 5.3 無頭模式組出 `art/people/people.blend` 與八張預覽圖
+  - `Residents`、`Patrols`、`Workers` 改用新實體（敵對的正義使者仍是原版掠奪者）；施工影子不再穿下界合金裝備
+  - `Level1ClientTest` 新增 `people`（八種造型一排、近照、背面）
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23

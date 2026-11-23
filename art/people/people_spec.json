@@ -1,0 +1,2858 @@
+{
+ "entity_id": "noclip_backrooms:people",
+ "texture_atlas": {
+  "width": 160,
+  "height": 160
+ },
+ "looks": {
+  "meg_patrol": [
+   "Cap",
+   "Backpack",
+   "Vest"
+  ],
+  "colonist": [
+   "Beanie",
+   "Scarf"
+  ],
+  "trader": [
+   "WideHat",
+   "Backpack"
+  ],
+  "medic": [
+   "Coat",
+   "Clipboard"
+  ],
+  "tom": [
+   "ChefHat",
+   "Apron"
+  ],
+  "aiko": [
+   "LongHair",
+   "Apron"
+  ],
+  "speednoclipper": [
+   "Goggles",
+   "Backpack"
+  ],
+  "shadow_worker": [
+   "Cap",
+   "Vest",
+   "Tool"
+  ]
+ },
+ "parts": [
+  {
+   "name": "Body",
+   "parent": "root",
+   "pivot_mc": [
+    0,
+    0,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -4,
+      0,
+      -2
+     ],
+     "size_mc": [
+      8,
+      8,
+      4
+     ],
+     "uv_region": [
+      0,
+      0
+     ],
+     "material": "shirt"
+    },
+    {
+     "origin_mc": [
+      -3.8,
+      8,
+      -1.8
+     ],
+     "size_mc": [
+      7.6,
+      4,
+      3.6
+     ],
+     "uv_region": [
+      25,
+      0
+     ],
+     "material": "pants"
+    },
+    {
+     "origin_mc": [
+      -4.1,
+      7.2,
+      -2.1
+     ],
+     "size_mc": [
+      8.2,
+      1.2,
+      4.2
+     ],
+     "uv_region": [
+      49,
+      0
+     ],
+     "material": "belt"
+    }
+   ]
+  },
+  {
+   "name": "Head",
+   "parent": "Body",
+   "pivot_mc": [
+    0,
+    0,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -4,
+      -8,
+      -4
+     ],
+     "size_mc": [
+      8,
+      8,
+      8
+     ],
+     "uv_region": [
+      75,
+      0
+     ],
+     "material": "skin"
+    },
+    {
+     "origin_mc": [
+      -4.25,
+      -8.25,
+      -4.25
+     ],
+     "size_mc": [
+      8.5,
+      2.5,
+      8.5
+     ],
+     "uv_region": [
+      108,
+      0
+     ],
+     "material": "hair"
+    },
+    {
+     "origin_mc": [
+      -4.25,
+      -6,
+      1.8
+     ],
+     "size_mc": [
+      8.5,
+      6,
+      2.45
+     ],
+     "uv_region": [
+      0,
+      18
+     ],
+     "material": "hair"
+    },
+    {
+     "origin_mc": [
+      -1,
+      -3.2,
+      -5
+     ],
+     "size_mc": [
+      2,
+      2.6,
+      1
+     ],
+     "uv_region": [
+      23,
+      18
+     ],
+     "material": "skin"
+    },
+    {
+     "origin_mc": [
+      -4.7,
+      -4.5,
+      -1.2
+     ],
+     "size_mc": [
+      0.7,
+      2,
+      2
+     ],
+     "uv_region": [
+      30,
+      18
+     ],
+     "material": "skin"
+    },
+    {
+     "origin_mc": [
+      4,
+      -4.5,
+      -1.2
+     ],
+     "size_mc": [
+      0.7,
+      2,
+      2
+     ],
+     "uv_region": [
+      37,
+      18
+     ],
+     "material": "skin"
+    }
+   ]
+  },
+  {
+   "name": "ArmR",
+   "parent": "Body",
+   "pivot_mc": [
+    -5,
+    2,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -3,
+      -2,
+      -2
+     ],
+     "size_mc": [
+      4,
+      6,
+      4
+     ],
+     "uv_region": [
+      44,
+      18
+     ],
+     "material": "shirt"
+    }
+   ]
+  },
+  {
+   "name": "ForeR",
+   "parent": "ArmR",
+   "pivot_mc": [
+    -1,
+    4,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -2,
+      0,
+      -2
+     ],
+     "size_mc": [
+      4,
+      4.5,
+      4
+     ],
+     "uv_region": [
+      61,
+      18
+     ],
+     "material": "shirt"
+    },
+    {
+     "origin_mc": [
+      -1.6,
+      4.5,
+      -1.6
+     ],
+     "size_mc": [
+      3.2,
+      2.5,
+      3.2
+     ],
+     "uv_region": [
+      78,
+      18
+     ],
+     "material": "skin"
+    }
+   ]
+  },
+  {
+   "name": "ArmL",
+   "parent": "Body",
+   "pivot_mc": [
+    5,
+    2,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -1,
+      -2,
+      -2
+     ],
+     "size_mc": [
+      4,
+      6,
+      4
+     ],
+     "uv_region": [
+      92,
+      18
+     ],
+     "material": "shirt"
+    }
+   ]
+  },
+  {
+   "name": "ForeL",
+   "parent": "ArmL",
+   "pivot_mc": [
+    1,
+    4,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -2,
+      0,
+      -2
+     ],
+     "size_mc": [
+      4,
+      4.5,
+      4
+     ],
+     "uv_region": [
+      109,
+      18
+     ],
+     "material": "shirt"
+    },
+    {
+     "origin_mc": [
+      -1.6,
+      4.5,
+      -1.6
+     ],
+     "size_mc": [
+      3.2,
+      2.5,
+      3.2
+     ],
+     "uv_region": [
+      126,
+      18
+     ],
+     "material": "skin"
+    }
+   ]
+  },
+  {
+   "name": "LegR",
+   "parent": "Body",
+   "pivot_mc": [
+    -1.9,
+    12,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -2,
+      0,
+      -2
+     ],
+     "size_mc": [
+      4,
+      6,
+      4
+     ],
+     "uv_region": [
+      140,
+      18
+     ],
+     "material": "pants"
+    }
+   ]
+  },
+  {
+   "name": "ShinR",
+   "parent": "LegR",
+   "pivot_mc": [
+    0,
+    6,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -2,
+      0,
+      -2
+     ],
+     "size_mc": [
+      4,
+      4.6,
+      4
+     ],
+     "uv_region": [
+      0,
+      30
+     ],
+     "material": "pants"
+    },
+    {
+     "origin_mc": [
+      -2.2,
+      4.6,
+      -3.2
+     ],
+     "size_mc": [
+      4.4,
+      1.4,
+      5.4
+     ],
+     "uv_region": [
+      17,
+      30
+     ],
+     "material": "shoe"
+    }
+   ]
+  },
+  {
+   "name": "LegL",
+   "parent": "Body",
+   "pivot_mc": [
+    1.9,
+    12,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -2,
+      0,
+      -2
+     ],
+     "size_mc": [
+      4,
+      6,
+      4
+     ],
+     "uv_region": [
+      38,
+      30
+     ],
+     "material": "pants"
+    }
+   ]
+  },
+  {
+   "name": "ShinL",
+   "parent": "LegL",
+   "pivot_mc": [
+    0,
+    6,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -2,
+      0,
+      -2
+     ],
+     "size_mc": [
+      4,
+      4.6,
+      4
+     ],
+     "uv_region": [
+      55,
+      30
+     ],
+     "material": "pants"
+    },
+    {
+     "origin_mc": [
+      -2.2,
+      4.6,
+      -3.2
+     ],
+     "size_mc": [
+      4.4,
+      1.4,
+      5.4
+     ],
+     "uv_region": [
+      72,
+      30
+     ],
+     "material": "shoe"
+    }
+   ]
+  },
+  {
+   "name": "Cap",
+   "parent": "Head",
+   "pivot_mc": [
+    0,
+    0,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -4.4,
+      -9,
+      -4.4
+     ],
+     "size_mc": [
+      8.8,
+      2.4,
+      8.8
+     ],
+     "uv_region": [
+      93,
+      30
+     ],
+     "material": "cap"
+    },
+    {
+     "origin_mc": [
+      -4.4,
+      -7.4,
+      -7
+     ],
+     "size_mc": [
+      8.8,
+      0.8,
+      2.8
+     ],
+     "uv_region": [
+      130,
+      30
+     ],
+     "material": "cap"
+    }
+   ]
+  },
+  {
+   "name": "Beanie",
+   "parent": "Head",
+   "pivot_mc": [
+    0,
+    0,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -4.5,
+      -9.2,
+      -4.5
+     ],
+     "size_mc": [
+      9,
+      3.4,
+      9
+     ],
+     "uv_region": [
+      0,
+      44
+     ],
+     "material": "cap"
+    },
+    {
+     "origin_mc": [
+      -1,
+      -10.4,
+      -1
+     ],
+     "size_mc": [
+      2,
+      1.4,
+      2
+     ],
+     "uv_region": [
+      37,
+      44
+     ],
+     "material": "cap"
+    }
+   ]
+  },
+  {
+   "name": "ChefHat",
+   "parent": "Head",
+   "pivot_mc": [
+    0,
+    0,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -4.4,
+      -9,
+      -4.4
+     ],
+     "size_mc": [
+      8.8,
+      1.8,
+      8.8
+     ],
+     "uv_region": [
+      46,
+      44
+     ],
+     "material": "white"
+    },
+    {
+     "origin_mc": [
+      -4.9,
+      -15,
+      -4.9
+     ],
+     "size_mc": [
+      9.8,
+      6.2,
+      9.8
+     ],
+     "uv_region": [
+      83,
+      44
+     ],
+     "material": "white"
+    }
+   ]
+  },
+  {
+   "name": "WideHat",
+   "parent": "Head",
+   "pivot_mc": [
+    0,
+    0,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -7,
+      -8.6,
+      -7
+     ],
+     "size_mc": [
+      14,
+      0.8,
+      14
+     ],
+     "uv_region": [
+      0,
+      62
+     ],
+     "material": "cap"
+    },
+    {
+     "origin_mc": [
+      -4.4,
+      -12,
+      -4.4
+     ],
+     "size_mc": [
+      8.8,
+      3.6,
+      8.8
+     ],
+     "uv_region": [
+      57,
+      62
+     ],
+     "material": "cap"
+    }
+   ]
+  },
+  {
+   "name": "Goggles",
+   "parent": "Head",
+   "pivot_mc": [
+    0,
+    0,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -4.4,
+      -6.8,
+      -4.4
+     ],
+     "size_mc": [
+      8.8,
+      1.6,
+      1
+     ],
+     "uv_region": [
+      94,
+      62
+     ],
+     "material": "trim"
+    },
+    {
+     "origin_mc": [
+      -3.6,
+      -7.2,
+      -5.2
+     ],
+     "size_mc": [
+      3,
+      2.4,
+      0.8
+     ],
+     "uv_region": [
+      115,
+      62
+     ],
+     "material": "lens"
+    },
+    {
+     "origin_mc": [
+      0.6,
+      -7.2,
+      -5.2
+     ],
+     "size_mc": [
+      3,
+      2.4,
+      0.8
+     ],
+     "uv_region": [
+      124,
+      62
+     ],
+     "material": "lens"
+    }
+   ]
+  },
+  {
+   "name": "LongHair",
+   "parent": "Head",
+   "pivot_mc": [
+    0,
+    0,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -4.5,
+      -2,
+      2.2
+     ],
+     "size_mc": [
+      9,
+      12,
+      2.3
+     ],
+     "uv_region": [
+      133,
+      62
+     ],
+     "material": "hair"
+    }
+   ]
+  },
+  {
+   "name": "Backpack",
+   "parent": "Body",
+   "pivot_mc": [
+    0,
+    0,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -3.2,
+      0.6,
+      2
+     ],
+     "size_mc": [
+      6.4,
+      8.4,
+      3.4
+     ],
+     "uv_region": [
+      0,
+      79
+     ],
+     "material": "pack"
+    },
+    {
+     "origin_mc": [
+      -3.4,
+      0.2,
+      2.2
+     ],
+     "size_mc": [
+      6.8,
+      1.2,
+      3.2
+     ],
+     "uv_region": [
+      21,
+      79
+     ],
+     "material": "trim"
+    }
+   ]
+  },
+  {
+   "name": "Coat",
+   "parent": "Body",
+   "pivot_mc": [
+    0,
+    0,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -4.35,
+      -0.1,
+      -2.35
+     ],
+     "size_mc": [
+      8.7,
+      14.5,
+      4.7
+     ],
+     "uv_region": [
+      42,
+      79
+     ],
+     "material": "white"
+    }
+   ]
+  },
+  {
+   "name": "Apron",
+   "parent": "Body",
+   "pivot_mc": [
+    0,
+    0,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -3.4,
+      1.5,
+      -2.5
+     ],
+     "size_mc": [
+      6.8,
+      11,
+      0.6
+     ],
+     "uv_region": [
+      70,
+      79
+     ],
+     "material": "white"
+    }
+   ]
+  },
+  {
+   "name": "Scarf",
+   "parent": "Body",
+   "pivot_mc": [
+    0,
+    0,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -4.5,
+      -1.2,
+      -2.5
+     ],
+     "size_mc": [
+      9,
+      2.6,
+      5
+     ],
+     "uv_region": [
+      86,
+      79
+     ],
+     "material": "cloth"
+    },
+    {
+     "origin_mc": [
+      -3,
+      1,
+      -2.7
+     ],
+     "size_mc": [
+      2.2,
+      4,
+      0.8
+     ],
+     "uv_region": [
+      115,
+      79
+     ],
+     "material": "cloth"
+    }
+   ]
+  },
+  {
+   "name": "Vest",
+   "parent": "Body",
+   "pivot_mc": [
+    0,
+    0,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -4.3,
+      0,
+      -2.3
+     ],
+     "size_mc": [
+      8.6,
+      9,
+      4.6
+     ],
+     "uv_region": [
+      122,
+      79
+     ],
+     "material": "vest"
+    }
+   ]
+  },
+  {
+   "name": "Tool",
+   "parent": "ForeR",
+   "pivot_mc": [
+    0,
+    6.5,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -0.5,
+      -7.5,
+      -1
+     ],
+     "size_mc": [
+      1,
+      11,
+      1
+     ],
+     "uv_region": [
+      150,
+      79
+     ],
+     "material": "wood"
+    },
+    {
+     "origin_mc": [
+      -1,
+      -8,
+      -2.5
+     ],
+     "size_mc": [
+      2,
+      2.2,
+      5
+     ],
+     "uv_region": [
+      0,
+      101
+     ],
+     "material": "metal"
+    }
+   ]
+  },
+  {
+   "name": "Clipboard",
+   "parent": "ForeL",
+   "pivot_mc": [
+    0,
+    6.5,
+    0
+   ],
+   "rest_rot_rad_mc": [
+    0,
+    0,
+    0
+   ],
+   "cubes": [
+    {
+     "origin_mc": [
+      -0.6,
+      -2,
+      -2.5
+     ],
+     "size_mc": [
+      0.8,
+      6,
+      5
+     ],
+     "uv_region": [
+      15,
+      101
+     ],
+     "material": "wood"
+    },
+    {
+     "origin_mc": [
+      -1,
+      -1.4,
+      -2
+     ],
+     "size_mc": [
+      0.4,
+      5,
+      4
+     ],
+     "uv_region": [
+      28,
+      101
+     ],
+     "material": "white"
+    }
+   ]
+  }
+ ],
+ "animations": {
+  "idle": {
+   "loop": true,
+   "keyframes": [
+    {
+     "time_sec": 0.0,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        -0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.06
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.08,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        -0.0,
+        0.0,
+        -0.06
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.08,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 0.4,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        0.12727922061357855,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        -0.0212,
+        0.05,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        0.0283,
+        0.0,
+        0.06
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.0659,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        -0.0283,
+        0.0,
+        -0.06
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.0941,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 0.8,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        0.18,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        -0.03,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        0.04,
+        0.0,
+        0.06
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.06,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        -0.04,
+        0.0,
+        -0.06
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.1,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 1.2,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        0.12727922061357855,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        -0.0212,
+        -0.05,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        0.0283,
+        0.0,
+        0.06
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.0659,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        -0.0283,
+        0.0,
+        -0.06
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.0941,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 1.6,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        2.2043642384652358e-17,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        -0.0,
+        -0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.06
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.08,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        -0.0,
+        0.0,
+        -0.06
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.08,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 2.0,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        -0.12727922061357855,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.0212,
+        0.05,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        -0.0283,
+        0.0,
+        0.06
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.0941,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        0.0283,
+        0.0,
+        -0.06
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.0659,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 2.4,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        -0.18,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.03,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        -0.04,
+        0.0,
+        0.06
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.1,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        0.04,
+        0.0,
+        -0.06
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.06,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 2.8,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        -0.12727922061357858,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.0212,
+        -0.05,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        -0.0283,
+        0.0,
+        0.06
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.0941,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        0.0283,
+        0.0,
+        -0.06
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.0659,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    }
+   ]
+  },
+  "walk": {
+   "loop": true,
+   "keyframes": [
+    {
+     "time_sec": 0.0,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        -0.5,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.02,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        -0.0,
+        0.0,
+        0.05
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.25,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        -0.0,
+        0.0,
+        -0.05
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.25,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.1,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.1,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 0.125,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        -0.3535533905932738,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.02,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        -0.4243,
+        0.0,
+        0.05
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.25,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        0.4243,
+        0.0,
+        -0.05
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.3914,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.495,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.1,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        -0.495,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 0.25,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        -3.061616997868383e-17,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.02,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        -0.6,
+        0.0,
+        0.05
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.25,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        0.6,
+        0.0,
+        -0.05
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.45,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.7,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.1,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        -0.7,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.3505,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 0.375,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        -0.35355339059327373,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.02,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        -0.4243,
+        0.0,
+        0.05
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.25,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        0.4243,
+        0.0,
+        -0.05
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.3914,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.495,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.1,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        -0.495,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.834,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 0.5,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        -0.5,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.02,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        -0.0,
+        0.0,
+        0.05
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.25,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        -0.05
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.25,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.1,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        -0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.829,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 0.625,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        -0.35355339059327384,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.02,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        0.4243,
+        0.0,
+        0.05
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.3914,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        -0.4243,
+        0.0,
+        -0.05
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.25,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        -0.495,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.495,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.1,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 0.75,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        -9.184850993605148e-17,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.02,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        0.6,
+        0.0,
+        0.05
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.45,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        -0.6,
+        0.0,
+        -0.05
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.25,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        -0.7,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.3505,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.7,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.1,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 0.875,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        -0.3535533905932737,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.02,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        0.4243,
+        0.0,
+        0.05
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.3914,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        -0.4243,
+        0.0,
+        -0.05
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        -0.25,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        -0.495,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.834,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.495,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.1,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    }
+   ]
+  },
+  "work": {
+   "loop": false,
+   "keyframes": [
+    {
+     "time_sec": 0.0,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        -0.2,
+        0.0,
+        0.05
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.3,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 0.12,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        -0.08,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        -2.5,
+        0.0,
+        0.05
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.5,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 0.24,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        -0.1,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        -2.7,
+        0.0,
+        0.05
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.2,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 0.36,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.1,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        -0.6,
+        0.0,
+        0.05
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -1.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    },
+    {
+     "time_sec": 0.48,
+     "joints": {
+      "Body": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ],
+       "pos_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "Head": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmR": {
+       "rot_rad_mc": [
+        -0.2,
+        0.0,
+        0.05
+       ]
+      },
+      "ForeR": {
+       "rot_rad_mc": [
+        -0.3,
+        0.0,
+        0.0
+       ]
+      },
+      "ArmL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ForeL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinR": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "LegL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      },
+      "ShinL": {
+       "rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+       ]
+      }
+     }
+    }
+   ]
+  }
+ }
+}

@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level1;
 
+import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.level1.Level1Layout.Sector;
 import dev.noclip.backrooms.level1.Level1Layout.Tile;
 import java.util.HashMap;

@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level1;
 
+import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.level1.Level1Layout.Base;
 import java.util.List;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -73,10 +74,13 @@ final class Residents {
 			for (int attempt = 0; attempt < 60; attempt++) {
 				BlockPos at = new BlockPos(x0 + 26 + random.nextInt(13), Level1ChunkGenerator.FLOOR_Y + 1, z0 + 24 + random.nextInt(14));
 				if (!level.isLoaded(at) || !free(level, at)) continue;
-				EntityType<? extends Mob> type = hostile ? EntityTypes.PILLAGER : EntityTypes.VILLAGER;
+				EntityType<? extends Mob> type = hostile ? EntityTypes.PILLAGER : People.type(who);
 				Mob mob = type.create(level, EntitySpawnReason.EVENT);
 				if (mob == null) break;
-				mob.snapTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, random.nextFloat() * 360, 0);
+				float yaw = random.nextFloat() * 360;
+					mob.snapTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, yaw, 0);
+					mob.setYBodyRot(yaw);
+					mob.setYHeadRot(yaw);
 				if (hostile) {
 					mob.finalizeSpawn(level, level.getCurrentDifficultyAt(at), EntitySpawnReason.EVENT, null);
 				} else {
