@@ -937,6 +937,26 @@ PHOSPHOR = [
 ]
 
 
+BANDAGE = [
+    "................",
+    "................",
+    "................",
+    "....wwwwwwww....",
+    "...wwhhhhhhww...",
+    "..wwhhhhhhhhww..",
+    "..wwhhrrrrhhww..",
+    "..wwhrrrrrrhww..",
+    "..wwhhrrrrhhww..",
+    "..wwhhhhhhhhww..",
+    "...wwhhhhhhww...",
+    "....wwwwwwww....",
+    "................",
+    "................",
+    "................",
+    "................",
+]
+
+
 def item_textures():
     ITEMS.mkdir(parents=True, exist_ok=True)
     glass = (190, 214, 222, 255)
@@ -944,6 +964,7 @@ def item_textures():
                              "h": (255, 252, 240, 255)}).save(ITEMS / "almond_water.png")
     pixel_art(ALLOY, {"h": (214, 220, 226, 255), "m": (150, 158, 168, 255), "d": (96, 102, 112, 255)}).save(ITEMS / "alloy.png")
     pixel_art(PHOSPHOR, {"k": (120, 96, 70, 255), "g": glass, "b": (170, 255, 190, 255), "p": (220, 255, 226, 255)}).save(ITEMS / "phosphor_powder.png")
+    pixel_art(BANDAGE, {"w": (196, 190, 176, 255), "h": (238, 232, 216, 255), "r": (176, 52, 48, 255)}).save(ITEMS / "bandage.png")
     smiler_face().save(ITEMS / "smiler_face.png")
 
 
@@ -976,6 +997,25 @@ def phosphor_mark():
     field = 1 - np.hypot((X - 64) / 50, (Y - 64) / 44) + clouds(960, 6) * 0.5
     alpha = step(0.02, 0.06, field)
     tint(m, step(0.3, 0.6, noise(961, 32)) * 0.4, (0.8, 0.9, 0.8))
+    return m, alpha
+
+
+def settlement_marker(taken):
+    """A torn strip of bright orange cloth; untaken, it has a bottle and a pinned note hanging from it."""
+    m = flat((226, 120, 30), 0.1, 6)
+    ragged = clouds(970, 6) * 0.05
+    alpha = ((X > 30) & (X < 98) & (Y > 4) & (Y < 118 + ragged * 80)).astype(float)
+    tint(m, step(-0.2, 0.6, noise(971, 20, 12)) * 0.35 + 0.65, (1, 1, 1))
+    stripe_ = (np.abs(Y - 26) < 5) & (alpha > 0)
+    m.color[stripe_] = rgb(250, 240, 225)
+    if not taken:
+        for box_, color in (((44, 84, 20, 36), (232, 226, 200)),   # the note, pinned near the top
+                            ((50, 90, 64, 84), (190, 214, 222)),   # a bottle: glass
+                            ((56, 84, 70, 80), (240, 232, 200))):  # almond water inside
+            x0, x1, y0, y1 = box_[0], box_[1], box_[2], box_[3]
+            region = (X >= x0) & (X < x1) & (Y >= y0) & (Y < y1)
+            m.color[region] = rgb(*color)
+            alpha[region] = 1.0
     return m, alpha
 
 
@@ -1462,6 +1502,11 @@ def all_models():
     m["phosphor_mark"] = {"parent": "minecraft:block/block",
                           "textures": {"particle": NS + "phosphor_mark", "mark": NS + "phosphor_mark"},
                           "elements": [el((2, 0.05, 2), (14, 0.15, 14), {"up": "#mark", "down": "#mark"}, shade=False, light_emission=15)]}
+    # The cloth lies against the block it hangs on, like the phosphor smear.
+    for name in ("settlement_marker", "settlement_marker_taken"):
+        m[name] = {"parent": "minecraft:block/block",
+                   "textures": {"particle": NS + name, "cloth": NS + name},
+                   "elements": [el((0, 0.05, 0), (16, 0.15, 16), {"up": "#cloth", "down": "#cloth"}, shade=False)]}
     return m
 
 
@@ -1526,6 +1571,10 @@ def all_blockstates():
     turns = {"up": {}, "down": {"x": 180}, "north": {"x": 90}, "south": {"x": 90, "y": 180}, "east": {"x": 90, "y": 90},
              "west": {"x": 90, "y": 270}}
     b["phosphor_mark"] = {"variants": {f"facing={f}": {"model": NS + "phosphor_mark", **turn} for f, turn in turns.items()}}
+    for taken in ("false", "true"):
+        model = "settlement_marker" + ("_taken" if taken == "true" else "")
+        for f, turn in turns.items():
+            b.setdefault("settlement_marker", {"variants": {}})["variants"][f"facing={f},taken={taken}"] = {"model": NS + model, **turn}
     b["generator"] = {"variants": {f"facing={f}": ({"model": NS + "generator", "y": y} if y else {"model": NS + "generator"})
                                    for f, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}}
     return b
@@ -1607,7 +1656,7 @@ def check(blockstates):
 
 
 # Blocks that only exist placed in the world, with no item of their own.
-NO_ITEM = {"phosphor_mark"}
+NO_ITEM = {"phosphor_mark", "settlement_marker"}
 
 ITEM_MODELS = {"garage_floor": "garage_floor", "garage_floor_line": "garage_floor_line", "damp_garage_floor": "damp_garage_floor",
                "puddled_garage_floor": "puddled_garage_floor", "garage_wall": "garage_wall", "garage_ceiling": "garage_ceiling",
@@ -1623,8 +1672,10 @@ def main():
         mt.save(name, material)
     save_animated("flickering_wallpaper", flicker_frames(), FLICKER)
     save_cutout("phosphor_mark", *phosphor_mark())
+    save_cutout("settlement_marker", *settlement_marker(False))
+    save_cutout("settlement_marker_taken", *settlement_marker(True))
     item_textures()
-    for item in ("almond_water", "alloy", "phosphor_powder", "smiler_face"):
+    for item in ("almond_water", "alloy", "phosphor_powder", "bandage", "smiler_face"):
         write_json(ASSETS / f"models/item/level1/{item}.json",
                    {"parent": "minecraft:item/generated", "textures": {"layer0": f"noclip_backrooms:item/level1/{item}"}})
         write_json(ASSETS / f"items/{item}.json", {"model": {"type": "minecraft:model", "model": f"noclip_backrooms:item/level1/{item}"}})

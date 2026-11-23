@@ -153,5 +153,20 @@
   "subtitles.noclip_backrooms.hound.growl": "Hound growls",
   "subtitles.noclip_backrooms.hound.roar": "Hound lunges",
   "subtitles.noclip_backrooms.hound.hurt": "Hound hurts",
-  "subtitles.noclip_backrooms.hound.death": "Hound dies"
+  "subtitles.noclip_backrooms.hound.death": "Hound dies",
+  "item.noclip_backrooms.bandage": "Bandage",
+  "block.noclip_backrooms.settlement_marker": "Settlement Marker",
+  "message.noclip_backrooms.crate_cut": "Something in the crate cuts your hand.",
+  "message.noclip_backrooms.marker_note": "Note: head %2$s, about %3$s blocks, to find the people of \"%1$s\". Leave the cloth.",
+  "message.noclip_backrooms.marker_note_none": "The note is scrawled too badly to tell which way it points.",
+  "base.noclip_backrooms.first_light": "First Light",
+  "base.noclip_backrooms.blink": "Blink",
+  "direction.noclip_backrooms.0": "east",
+  "direction.noclip_backrooms.1": "south-east",
+  "direction.noclip_backrooms.2": "south",
+  "direction.noclip_backrooms.3": "south-west",
+  "direction.noclip_backrooms.4": "west",
+  "direction.noclip_backrooms.5": "north-west",
+  "direction.noclip_backrooms.6": "north",
+  "direction.noclip_backrooms.7": "north-east"
 }

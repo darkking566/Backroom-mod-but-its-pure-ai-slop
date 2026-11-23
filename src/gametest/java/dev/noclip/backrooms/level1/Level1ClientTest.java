@@ -56,6 +56,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 
 			blackout(context, game);
 			crate(context, game);
+			marker(context, game);
 			views(context, game, seed);
 			exits(context, game, seed);
 			events(context, game, seed);
@@ -187,6 +188,25 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			// Whatever spilled lands at the player's feet and may already be picked up.
 			boolean spilled = !level.getEntitiesOfClass(ItemEntity.class, new AABB(crate).inflate(3)).isEmpty();
 			check(spilled || !player(s).getInventory().isEmpty(), "crate was empty");
+		});
+		server.runCommand("gamemode spectator @a");
+	}
+
+	/** A settlement marker is hung on a pillar nearby; right-clicking takes its supplies once and leaves the bare cloth. */
+	private static void marker(ClientGameTestContext context, TestSingleplayerContext game) {
+		var server = game.getServer();
+		BlockPos marker = server.computeOnServer(s -> Markers.hangNear(level1(s), player(s)));
+		check(marker != null, "no marker was hung");
+		Direction out = server.computeOnServer(s -> level1(s).getBlockState(marker).getValue(SettlementMarkerBlock.FACING));
+		BlockPos stand = marker.relative(out, 2);
+		server.runOnServer(s -> check(level1(s).getBlockState(new BlockPos(stand.getX(), STAND, stand.getZ())).isAir(), "nowhere to stand by the marker"));
+		server.runOnServer(s -> player(s).getInventory().clearContent());
+		standAndUse(context, game, stand.getX() + 0.5, stand.getZ() + 0.5, out.getOpposite().toYRot(), 0);
+		context.takeScreenshot("level1_marker");
+		server.runOnServer(s -> {
+			check(level1(s).getBlockState(marker).getValue(SettlementMarkerBlock.TAKEN), "the marker's supplies were not taken");
+			boolean spilled = !level1(s).getEntitiesOfClass(ItemEntity.class, new AABB(marker).inflate(4)).isEmpty();
+			check(spilled || !player(s).getInventory().isEmpty(), "the marker gave nothing");
 		});
 		server.runCommand("gamemode spectator @a");
 	}

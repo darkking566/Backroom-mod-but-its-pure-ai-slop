@@ -153,5 +153,20 @@
   "subtitles.noclip_backrooms.hound.growl": "獵犬低吼",
   "subtitles.noclip_backrooms.hound.roar": "獵犬撲了過來",
   "subtitles.noclip_backrooms.hound.hurt": "獵犬受傷",
-  "subtitles.noclip_backrooms.hound.death": "獵犬死亡"
+  "subtitles.noclip_backrooms.hound.death": "獵犬死亡",
+  "item.noclip_backrooms.bandage": "繃帶",
+  "block.noclip_backrooms.settlement_marker": "定居點地標",
+  "message.noclip_backrooms.crate_cut": "箱子裡有東西割傷了你的手。",
+  "message.noclip_backrooms.marker_note": "紙條：往%2$s走約 %3$s 格，有「%1$s」的人。取了補給，記得把布留著。",
+  "message.noclip_backrooms.marker_note_none": "紙條字跡潦草，看不出是往哪裡走。",
+  "base.noclip_backrooms.first_light": "第一道光",
+  "base.noclip_backrooms.blink": "眨眼",
+  "direction.noclip_backrooms.0": "東",
+  "direction.noclip_backrooms.1": "東南",
+  "direction.noclip_backrooms.2": "南",
+  "direction.noclip_backrooms.3": "西南",
+  "direction.noclip_backrooms.4": "西",
+  "direction.noclip_backrooms.5": "西北",
+  "direction.noclip_backrooms.6": "北",
+  "direction.noclip_backrooms.7": "東北"
 }

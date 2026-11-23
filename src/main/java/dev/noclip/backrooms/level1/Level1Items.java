@@ -34,6 +34,12 @@ public final class Level1Items {
 	public static final Item ALLOY = register("alloy", new Item.Properties(), Item::new);
 	/** Dab it on a wall, floor or ceiling to leave a mark that glows in the dark. */
 	public static final Item PHOSPHOR_POWDER = register("phosphor_powder", new Item.Properties(), PhosphorPowderItem::new);
+	/** Cloth and tape from the crates: eaten like food, it mends two hearts. */
+	public static final Item BANDAGE = register("bandage", new Item.Properties().stacksTo(16)
+			.food(new FoodProperties.Builder().nutrition(0).saturationModifier(0F).alwaysEdible().build(),
+					Consumables.defaultFood()
+							.onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.INSTANT_HEALTH, 1, 0)))
+							.build()), Item::new);
 	/** What a smiler looks like: only ever shown floating in the dark, never handed out. */
 	static final Item SMILER_FACE = register("smiler_face", new Item.Properties().stacksTo(1), Item::new);
 
@@ -43,7 +49,10 @@ public final class Level1Items {
 	static void register() {
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.FOOD_AND_DRINKS).register(output -> output.accept(ALMOND_WATER));
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.INGREDIENTS).register(output -> output.accept(ALLOY));
-		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(output -> output.accept(PHOSPHOR_POWDER));
+		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(output -> {
+			output.accept(PHOSPHOR_POWDER);
+			output.accept(BANDAGE);
+		});
 	}
 
 	private static Item register(String name, Item.Properties properties, Function<Item.Properties, Item> factory) {

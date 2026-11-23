@@ -47,6 +47,12 @@
   - 新增 `tools/make_hound.py`（眼睛發光貼圖、生怪蛋圖示與模型），音效與語言檔加獵犬條目，`Level1ClientTest` 加獵犬測試
 - 使用者同意後，把 `claude` 快轉合併進 `main`，並把 `main` 與 `claude` 推送到 GitHub（停車場事件／據點／道具／怪物、資料夾照樓層整理、獵犬）；合併前主資料夾 `CLAUDE.md` 裡 Antigravity 未提交的紀錄已確認全部在本檔，才還原該檔（備份在暫存區）；主資料夾的 `exports/hound/` 沒有刪；沒有強制推送、沒有改寫歷史
 
+- 照 Backrooms 中文維基 Level 1 原文補板條箱與地標（完整讀過原文，含折疊的實體表與六個區段分頁）：
+  - 板條箱：新增繃帶（`bandage`，吃了回 2 顆心）、皮靴、皮護腿、書與筆、腐肉／玻璃片／鐵粒／火藥等垃圾與化學品；8% 是整箱 4 瓶杏仁水；徒手撬箱 20% 被割傷（拿斧頭或劍不會）
+  - 定居點地標（`SettlementMarkerBlock`、`Markers`）：柱子上掛橘布、瓶子與紙條，右鍵拿一次補給並讀紙條，指出最近據點的方向與距離
+  - 更新 `tools/make_level1.py`（貼圖、模型、blockstate）、語言檔、戰利品表、`docs/levels/level1/README.md`、`Level1ClientTest`；`gradlew build` 與 `runClientGameTest` 通過
+  - 還沒做（wiki 有）：撬棍與殘骸堆、福友玉／滋水槍／遷躍漿果、醫務室與裝飾房、其餘區段、更多實體（手臂、鈍人、窃皮者等）、更多據點、Level 2
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23

@@ -35,6 +35,7 @@ public final class Level1 {
 		FlickeringWalls.register();
 		Blackouts.register();
 		Crates.register();
+		Markers.register();
 		Strays.register();
 		Marauders.register();
 		Smilers.register();

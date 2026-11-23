@@ -157,6 +157,10 @@ public final class Level1Blocks {
 	public static final Block TARP = register("tarp", Properties.of()
 			.mapColor(MapColor.COLOR_BLUE).strength(0.8F).sound(SoundType.WOOL));
 
+	/** Hung on pillars by the settlement teams; no item of its own, gives its supplies once. */
+	public static final Block SETTLEMENT_MARKER = registerBlockOnly("settlement_marker", Properties.of()
+			.mapColor(MapColor.COLOR_ORANGE).strength(0.2F).noCollision().noOcclusion().sound(SoundType.WOOL), SettlementMarkerBlock::new);
+
 	/** Left by phosphor powder; no item of its own. */
 	public static final Block PHOSPHOR_MARK = registerBlockOnly("phosphor_mark", Properties.of()
 			.mapColor(MapColor.COLOR_LIGHT_GREEN).instabreak().noCollision().noOcclusion().noLootTable().replaceable()
