@@ -2,6 +2,7 @@ package dev.noclip.backrooms.monsters;
 
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.monsters.clump.Clump;
+import dev.noclip.backrooms.monsters.duller.Duller;
 import dev.noclip.backrooms.monsters.hound.Hound;
 import dev.noclip.backrooms.monsters.skinstealer.SkinStealer;
 import dev.noclip.backrooms.monsters.smiler.Smiler;
@@ -37,6 +38,9 @@ public final class Monsters {
 	public static final EntityType<Clump> CLUMP = register("clump",
 			EntityType.Builder.of(Clump::new, MobCategory.MONSTER).sized(1.05F, 0.95F).eyeHeight(0.55F).clientTrackingRange(10));
 	public static final Item CLUMP_SPAWN_EGG = registerEgg("clump_spawn_egg", CLUMP);
+	public static final EntityType<Duller> DULLER = register("duller",
+			EntityType.Builder.of(Duller::new, MobCategory.MONSTER).sized(0.65F, 2.25F).eyeHeight(1.98F).clientTrackingRange(10));
+	public static final Item DULLER_SPAWN_EGG = registerEgg("duller_spawn_egg", DULLER);
 
 	public static final SoundEvent HOUND_GROWL = sound("hound.growl");
 	public static final SoundEvent HOUND_ROAR = sound("hound.roar");
@@ -51,11 +55,13 @@ public final class Monsters {
 		FabricDefaultAttributeRegistry.register(SMILER, Smiler.createAttributes());
 		FabricDefaultAttributeRegistry.register(SKIN_STEALER, SkinStealer.createAttributes());
 		FabricDefaultAttributeRegistry.register(CLUMP, Clump.createAttributes());
+		FabricDefaultAttributeRegistry.register(DULLER, Duller.createAttributes());
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.SPAWN_EGGS).register(output -> {
 			output.accept(HOUND_SPAWN_EGG);
 			output.accept(SMILER_SPAWN_EGG);
 			output.accept(SKIN_STEALER_SPAWN_EGG);
 			output.accept(CLUMP_SPAWN_EGG);
+			output.accept(DULLER_SPAWN_EGG);
 		});
 	}
 

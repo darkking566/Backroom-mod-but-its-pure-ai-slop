@@ -50,6 +50,7 @@ public final class Level1 {
 		Smilers.register();
 		SkinStealers.register();
 		Clumps.register();
+		Dullers.register();
 		Hounds.register();
 		Level1Ambience.register();
 	}
