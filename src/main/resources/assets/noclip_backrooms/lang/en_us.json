@@ -168,5 +168,7 @@
   "direction.noclip_backrooms.4": "west",
   "direction.noclip_backrooms.5": "north-west",
   "direction.noclip_backrooms.6": "north",
-  "direction.noclip_backrooms.7": "north-east"
+  "direction.noclip_backrooms.7": "north-east",
+  "block.noclip_backrooms.gallery_wall": "Gallery Wall",
+  "block.noclip_backrooms.hospital_bed": "Hospital Bed"
 }

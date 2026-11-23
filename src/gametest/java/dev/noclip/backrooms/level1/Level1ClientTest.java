@@ -231,6 +231,15 @@ public final class Level1ClientTest implements FabricClientGameTest {
 
 		BlockPos desk = findNear(seed, Tile.DESK);
 		shoot(context, game, desk.getX() + 0.5, STAND, desk.getZ() + 2.5, 180, 25, "level1_office");
+		BlockPos bed = findNear(seed, Tile.BED);
+		shoot(context, game, bed.getX() + 0.5, STAND, bed.getZ() + 2.5, 180, 25, "level1_infirmary");
+		BlockPos gallery = findNear(seed, Tile.GALLERY);
+		for (Direction side : Direction.Plane.HORIZONTAL) {
+			if (Level1Layout.tile(seed, gallery.getX() + side.getStepX(), gallery.getZ() + side.getStepZ()).walkable()) {
+				lookBack(context, game, seed, gallery, side, "level1_gallery", 5);
+				break;
+			}
+		}
 		BlockPos brick = findNear(seed, Tile.BRICK);
 		for (Direction side : Direction.Plane.HORIZONTAL) {
 			if (Level1Layout.tile(seed, brick.getX() + side.getStepX(), brick.getZ() + side.getStepZ()).walkable()) {

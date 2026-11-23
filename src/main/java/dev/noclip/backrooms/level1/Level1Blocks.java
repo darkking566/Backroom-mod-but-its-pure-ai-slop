@@ -142,6 +142,11 @@ public final class Level1Blocks {
 	public static final Block FLOODLIGHT = register("floodlight", Properties.of()
 			.mapColor(MapColor.METAL).strength(1.5F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 15),
 			p -> new ShapedBlock(p, Block.box(3, 0, 3, 13, 16, 13)));
+	public static final Block GALLERY_WALL = register("gallery_wall", Properties.of()
+			.mapColor(MapColor.QUARTZ).strength(2.0F).sound(SoundType.STONE));
+	public static final Block HOSPITAL_BED = register("hospital_bed", Properties.of()
+			.mapColor(MapColor.METAL).strength(0.8F).sound(SoundType.METAL).noOcclusion(),
+			p -> new ShapedBlock(p, Block.box(0, 0, 1, 16, 11, 15)));
 	public static final Block COT = register("cot", Properties.of()
 			.mapColor(MapColor.COLOR_GREEN).strength(0.8F).sound(SoundType.WOOL).noOcclusion(),
 			p -> new RestBlock(p, Block.box(0, 0, 1, 16, 8, 15), "first_light"));

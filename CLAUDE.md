@@ -53,6 +53,9 @@
   - 更新 `tools/make_level1.py`（貼圖、模型、blockstate）、語言檔、戰利品表、`docs/levels/level1/README.md`、`Level1ClientTest`；`gradlew build` 與 `runClientGameTest` 通過
   - 還沒做（wiki 有）：撬棍與殘骸堆、福友玉／滋水槍／遷躍漿果、醫務室與裝飾房、其餘區段、更多實體（手臂、鈍人、窃皮者等）、更多據點、Level 2
 
+- 走廊區新增兩種房間（照 wiki 的小徑房間）：醫務室（`Room.MEDICAL`，中間病床加四角桌子）與掛畫房（`Room.GALLERY`，牆壁是掛畫的方塊）；新增方塊 `hospital_bed`、`gallery_wall`、對應貼圖／模型／戰利品表／語言條目，新增 `Tile.BED`、`TABLE`、`GALLERY`；房間種類機率調整（辦公室 35%、儲藏室 25%、空房 10%、醫務室 15%、掛畫房 15%，只影響 2×2 房，迷宮與房間位置不變）；`gradlew build`（含 160 個種子的連通測試）與 `runClientGameTest` 通過
+  - 還沒做：橡膠房的椅子嵌進地板、地板上的畫、小徑門前會消失的畫
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23

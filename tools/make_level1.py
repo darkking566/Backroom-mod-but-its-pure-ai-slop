@@ -1026,7 +1026,20 @@ def save_cutout(name, m, alpha):
     Image.fromarray(np.dstack([rgb_, a]), "RGBA").save(TEXTURES / f"{name}.png", optimize=True)
 
 
+def gallery_wall():
+    """Painted block wall hung with two framed pictures: a room where someone hung paintings on every wall."""
+    m = block_wall((214, 209, 196), 960)
+    for x0, y0, x1, y1, sky, ground in ((10, 22, 58, 70, (150, 182, 206), (96, 128, 84)),
+                                        (70, 56, 118, 112, (226, 190, 150), (84, 70, 98))):
+        paint(m, box(x0 - 5, y0 - 5, x1 + 5, y1 + 5), (150, 112, 60), height=2)
+        paint(m, box(x0, y0, x1, y1), sky)
+        paint(m, box(x0, (y0 + y1) // 2 + 6, x1, y1), ground)
+    return m
+
+
 def prop_textures(t):
+    t["gallery_wall"] = gallery_wall()
+    t["bed_sheet"] = canvas((224, 226, 228), 985)
     t["booth_wall"] = booth_panel(800)
     t["booth_drawer"] = booth_drawer(False)
     t["booth_drawer_open"] = booth_drawer(True)
@@ -1409,6 +1422,14 @@ def cot_model():
             "elements": legs + [el((0, 6, 1), (16, 8, 15), sides("#canvas"))]}
 
 
+def hospital_bed_model():
+    legs = [el((x, 0, z), (x + 1, 6, z + 1), sides("#metal", ("north", "south", "east", "west")))
+            for x in (0.5, 14.5) for z in (1.5, 13.5)]
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": NS + "bed_sheet", "sheet": NS + "bed_sheet", "metal": NS + "door_jamb"},
+            "elements": legs + [el((0, 6, 1), (16, 9, 15), sides("#sheet")), el((1, 9, 3), (6, 11, 13), sides("#sheet"))]}
+
+
 def bedroll_model():
     return {"parent": "minecraft:block/block",
             "textures": {"particle": NS + "bedroll", "roll": NS + "bedroll", "pillow": NS + "cot_canvas"},
@@ -1499,6 +1520,8 @@ def all_models():
     m["supply_locker"] = locker_model()
     m["barrel_fire"] = barrel_fire_model()
     m["tarp"] = cube_all("tarp")
+    m["gallery_wall"] = cube_all("gallery_wall")
+    m["hospital_bed"] = hospital_bed_model()
     m["phosphor_mark"] = {"parent": "minecraft:block/block",
                           "textures": {"particle": NS + "phosphor_mark", "mark": NS + "phosphor_mark"},
                           "elements": [el((2, 0.05, 2), (14, 0.15, 14), {"up": "#mark", "down": "#mark"}, shade=False, light_emission=15)]}
@@ -1564,7 +1587,7 @@ def all_blockstates():
     for name in ("booth_wall", "booth_roof", "barrier_base", "barrier_arm", "fuel_drum", "caged_lamp", "eyed_crate", "shut_eyed_crate"):
         b[name] = single(name)
     b["booth_drawer"] = {"variants": {"empty=false": {"model": NS + "booth_drawer"}, "empty=true": {"model": NS + "booth_drawer_open"}}}
-    for name in ("first_light_sign", "blink_sign", "floodlight", "cot", "bedroll", "supply_locker", "barrel_fire", "tarp"):
+    for name in ("first_light_sign", "blink_sign", "floodlight", "cot", "bedroll", "supply_locker", "barrel_fire", "tarp", "gallery_wall", "hospital_bed"):
         b[name] = single(name)
     b["jersey_barrier"] = {"variants": {"axis=x": {"model": NS + "jersey_barrier"}, "axis=z": {"model": NS + "jersey_barrier", "y": 90}}}
     # The same turns as an end rod: the smear lies against the block it was dabbed on.

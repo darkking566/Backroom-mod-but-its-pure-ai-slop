@@ -168,5 +168,7 @@
   "direction.noclip_backrooms.4": "西",
   "direction.noclip_backrooms.5": "西北",
   "direction.noclip_backrooms.6": "北",
-  "direction.noclip_backrooms.7": "東北"
+  "direction.noclip_backrooms.7": "東北",
+  "block.noclip_backrooms.gallery_wall": "掛滿畫的牆",
+  "block.noclip_backrooms.hospital_bed": "病床"
 }

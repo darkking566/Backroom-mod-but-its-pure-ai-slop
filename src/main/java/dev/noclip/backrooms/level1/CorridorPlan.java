@@ -21,7 +21,11 @@ final class CorridorPlan {
 	private static final ConcurrentHashMap<Key, CorridorPlan> CACHE = new ConcurrentHashMap<>();
 
 	enum Room {
-		OFFICE, STORAGE, BRICK, PADDED, EMPTY
+		OFFICE, STORAGE, BRICK, PADDED, EMPTY,
+		/** A bed in the middle with tables round it. */
+		MEDICAL,
+		/** Pictures on every wall. */
+		GALLERY
 	}
 
 	private record Key(long seed, int dx, int dz) {
@@ -37,7 +41,7 @@ final class CorridorPlan {
 	private final Room[] roomTypes = new Room[8];
 	private int rooms;
 	private final Ceiling[] bulbs = new Ceiling[N * N];
-	/** 0 nothing, 1 desk, 2 shelf; by local block position. */
+	/** 0 nothing, 1 desk, 2 shelf, 3 bed, 4 table; by local block position. */
 	private final byte[] furniture = new byte[SIZE * SIZE];
 	private int doorX = -1, doorZ = -1;
 
@@ -74,6 +78,8 @@ final class CorridorPlan {
 		int item = furniture[lx + lz * SIZE];
 		if (item == 1) return Tile.DESK;
 		if (item == 2) return Tile.ROOM_SHELF;
+		if (item == 3) return Tile.BED;
+		if (item == 4) return Tile.TABLE;
 
 		int ci = lx / CELL, cj = lz / CELL, px = lx % CELL, pz = lz % CELL;
 		if (px != 0 && pz != 0) return Tile.CORRIDOR;
@@ -100,6 +106,7 @@ final class CorridorPlan {
 			if (room < 0) continue;
 			if (roomTypes[room] == Room.BRICK) return Tile.BRICK;
 			if (roomTypes[room] == Room.PADDED) tile = Tile.PADDED;
+			else if (roomTypes[room] == Room.GALLERY && tile == Tile.WALL) tile = Tile.GALLERY;
 		}
 		return tile;
 	}
@@ -152,7 +159,7 @@ final class CorridorPlan {
 				w = 2;
 				h = 2;
 				int pick = random.nextInt(100);
-				type = pick < 45 ? Room.OFFICE : pick < 80 ? Room.STORAGE : Room.EMPTY;
+				type = pick < 35 ? Room.OFFICE : pick < 60 ? Room.STORAGE : pick < 70 ? Room.EMPTY : pick < 85 ? Room.MEDICAL : Room.GALLERY;
 			} else {
 				boolean wide = random.nextBoolean();
 				w = wide ? 3 : 2;
@@ -193,6 +200,11 @@ final class CorridorPlan {
 		if (room.type() == Room.OFFICE) {
 			int z = (z0 + z1) / 2;
 			for (int x = x0 + 1; x < x1; x += 2) furniture[x + z * SIZE] = 1;
+		} else if (room.type() == Room.MEDICAL) {
+			furniture[(x0 + x1) / 2 + (z0 + z1) / 2 * SIZE] = 3;
+			for (int x : new int[] {x0, x1 - 1}) {
+				for (int z : new int[] {z0, z1 - 1}) furniture[x + z * SIZE] = 4;
+			}
 		} else if (room.type() == Room.STORAGE) {
 			for (int z = z0 + 1; z < z1; z += 2) {
 				for (int x = x0; x < x1; x++) furniture[x + z * SIZE] = 2;
