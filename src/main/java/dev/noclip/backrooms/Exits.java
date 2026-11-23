@@ -67,6 +67,22 @@ final class Exits {
 		return null;
 	}
 
+	/** Whether a cell houses or directly borders an exit door and must never be reshaped by Edge Shift. */
+	static boolean isProtectedCell(long seed, int cx, int cz) {
+		int rxCenter = Math.floorDiv(cx, REGION_CELLS);
+		int rzCenter = Math.floorDiv(cz, REGION_CELLS);
+		for (int rx = rxCenter - 1; rx <= rxCenter + 1; rx++) {
+			for (int rz = rzCenter - 1; rz <= rzCenter + 1; rz++) {
+				Door door = doorIn(seed, rx, rz);
+				if (door == null) continue;
+				int doorCx = Math.floorDiv(door.x(), Maze.CELL);
+				int doorCz = Math.floorDiv(door.z(), Maze.CELL);
+				if (Math.abs(cx - doorCx) <= 1 && Math.abs(cz - doorCz) <= 1) return true;
+			}
+		}
+		return false;
+	}
+
 	private static boolean hasSolidWestWall(long seed, int x, int z) {
 		for (int offset = 1; offset < Maze.CELL; offset++) {
 			if (!Maze.isWall(seed, x, z + offset)) return false;

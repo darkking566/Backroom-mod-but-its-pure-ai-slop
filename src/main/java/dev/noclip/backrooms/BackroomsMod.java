@@ -24,5 +24,6 @@ public final class BackroomsMod implements ModInitializer {
 		Noclip.register();
 		Level0Ambience.register();
 		RedRoomEffects.register();
+		EdgeShift.register();
 	}
 }

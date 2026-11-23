@@ -18,5 +18,7 @@
   "block.noclip_backrooms.exit_sign": "出口標誌",
   "subtitles.noclip_backrooms.ambient.fluorescent_hum": "日光燈嗡嗡作響",
   "subtitles.noclip_backrooms.ambient.wall_scratch": "牆後傳來刮擦聲",
-  "subtitles.noclip_backrooms.ambient.distant_whisper": "遠處傳來模糊低語"
+  "subtitles.noclip_backrooms.ambient.distant_whisper": "遠處傳來模糊低語",
+  "gamerule.noclip_backrooms.edge_shift": "Level 0 邊緣位移",
+  "gamerule.noclip_backrooms.edge_shift.description": "在玩家視線之外動態重組 Level 0 的走廊、立柱、燈光並抹除留下的記號。"
 }

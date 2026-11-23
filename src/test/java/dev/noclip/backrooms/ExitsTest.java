@@ -107,6 +107,10 @@ class ExitsTest {
 			assertTrue(Exits.lampPointsToExit(seed, door.x() - Maze.CELL + Maze.CENTER, door.z()));
 			assertTrue(Exits.lampPointsToExit(seed, door.x() + Exits.HINT_CELLS * Maze.CELL + Maze.CENTER, door.z()));
 			assertTrue(Exits.lampPointsToExit(seed, door.x() - (Exits.HINT_CELLS + 1) * Maze.CELL + Maze.CENTER, door.z()));
+			int doorCx = Math.floorDiv(door.x(), Maze.CELL);
+			int doorCz = Math.floorDiv(door.z(), Maze.CELL);
+			assertTrue(Exits.isProtectedCell(seed, doorCx, doorCz));
+			assertTrue(Exits.isProtectedCell(seed, doorCx - 1, doorCz));
 		}
 	}
 }

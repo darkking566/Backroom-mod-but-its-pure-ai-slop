@@ -151,4 +151,94 @@ class MazeTest {
 		assertTrue(sawRedWarningWall, "never saw peeling red warning wall beside a red room");
 		assertTrue(sawThickCarpet, "never saw thick carpet");
 	}
+
+	@Test
+	void everyOpenBlockRemainsReachableUnderRandomEdgeShifts() {
+		Random random = new Random(99);
+		int[] origins = {0, -SIZE};
+
+		for (int run = 0; run < 500; run++) {
+			long seed = random.nextLong();
+			int origin = origins[run % origins.length];
+			Maze.EpochSource epochs = (cx, cz) -> {
+				long mix = seed ^ (cx * 0x9E3779B97F4A7C15L) ^ (cz * 0xC2B2AE3D27D4EB4FL);
+				return Math.floorMod(mix, 6);
+			};
+
+			boolean[] unvisited = new boolean[SIZE * SIZE];
+			int open = 0;
+			for (int i = 0; i < unvisited.length; i++) {
+				int x = origin + i % SIZE, z = origin + i / SIZE;
+				unvisited[i] = !Maze.isWall(seed, x, z, false, epochs) && !Maze.isPit(seed, x, z);
+				if (unvisited[i]) open++;
+			}
+
+			ArrayDeque<Integer> queue = new ArrayDeque<>();
+			int start = 1 + SIZE;
+			assertTrue(unvisited[start]);
+			unvisited[start] = false;
+			queue.add(start);
+			int reached = 0;
+			while (!queue.isEmpty()) {
+				int at = queue.poll(), x = at % SIZE, z = at / SIZE;
+				reached++;
+				int[] next = {x > 0 ? at - 1 : -1, x < SIZE - 1 ? at + 1 : -1, z > 0 ? at - SIZE : -1, z < SIZE - 1 ? at + SIZE : -1};
+				for (int n : next) {
+					if (n >= 0 && unvisited[n]) {
+						unvisited[n] = false;
+						queue.add(n);
+					}
+				}
+			}
+			assertEquals(open, reached, "unreachable area after edge shifts, seed " + seed);
+		}
+	}
+
+	@Test
+	void archesStayImmutableWhilePillarsLoseSymmetryWhenShifted() {
+		long seed = 12345L;
+		int sectorBlocks = Maze.CELL * Maze.SECTOR;
+		boolean checkedArches = false;
+		boolean sawShiftedPillarDiff = false;
+		Maze.EpochSource shifted = (cx, cz) -> 3;
+
+		for (int sx = -8; sx <= 8; sx++) {
+			for (int sz = -8; sz <= 8; sz++) {
+				int ox = sx * sectorBlocks, oz = sz * sectorBlocks;
+				Maze.Zone zone = Maze.zoneAt(seed, ox + Maze.CENTER, oz + Maze.CENTER);
+				if (zone == Maze.Zone.ARCHES) {
+					checkedArches = true;
+					assertEquals(0, Maze.shiftWeight(zone));
+					for (int x = ox + Maze.CELL; x < ox + sectorBlocks - Maze.CELL; x++) {
+						for (int z = oz + Maze.CELL; z < oz + sectorBlocks - Maze.CELL; z++) {
+							assertEquals(Maze.isWall(seed, x, z, false), Maze.isWall(seed, x, z, false, shifted));
+							assertEquals(Maze.isWall(seed, x, z, true), Maze.isWall(seed, x, z, true, shifted));
+						}
+					}
+				} else if (zone == Maze.Zone.PILLARS) {
+					for (int x = ox; x < ox + sectorBlocks; x++) {
+						for (int z = oz; z < oz + sectorBlocks; z++) {
+							if (Maze.isWall(seed, x, z, false) != Maze.isWall(seed, x, z, false, shifted)) {
+								sawShiftedPillarDiff = true;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		assertTrue(checkedArches, "never found ARCHES sector");
+		assertTrue(sawShiftedPillarDiff, "shifted PILLARS sector did not change layout");
+	}
+
+	@Test
+	void edgeShiftObservationGeometryChecksAllCorners() {
+		// Player at (0.5, 0.5) looking toward +Z (0, 1).
+		assertFalse(EdgeShift.isOutOfObservation(0.5, 0.5, 0.0, 1.0, 0, 21));
+		assertFalse(EdgeShift.isOutOfObservation(0.5, 0.5, 0.0, 1.0, 14, 14));
+		assertTrue(EdgeShift.isOutOfObservation(0.5, 0.5, 0.0, 1.0, -3, -28));
+		assertTrue(EdgeShift.isOutOfObservation(0.5, 0.5, 0.0, 1.0, 0, -28));
+		// Side cell whose southern corner peeks forward must count as observed.
+		assertFalse(EdgeShift.isOutOfObservation(0.5, 0.5, 0.0, 1.0, 14, -2));
+	}
 }

@@ -42,6 +42,10 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 	}
 
 	static BlockState blockAt(long seed, int x, int y, int z) {
+		return blockAt(seed, x, y, z, Maze.EpochSource.ZERO);
+	}
+
+	static BlockState blockAt(long seed, int x, int y, int z, Maze.EpochSource epochs) {
 		// Solid bedrock at y=0 and above the ceiling so nothing can escape underneath or land on the roof.
 		if (y == 0 || y > CEILING_Y) return Blocks.BEDROCK.defaultBlockState();
 		if (y < FLOOR_Y) {
@@ -62,10 +66,10 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		if (y == CEILING_Y) {
 			if (!Maze.isLamp(x, z)) return ModBlocks.CEILING_TILE.defaultBlockState();
 			if (Exits.lampPointsToExit(seed, x, z)) return ModBlocks.EXIT_LIGHT.defaultBlockState();
-			if (!Maze.lampWorks(seed, x, z)) return ModBlocks.BROKEN_FLUORESCENT_LIGHT.defaultBlockState();
+			if (!Maze.lampWorks(seed, x, z, epochs)) return ModBlocks.BROKEN_FLUORESCENT_LIGHT.defaultBlockState();
 			return (zone == Maze.Zone.RED_ROOM ? ModBlocks.RED_FLUORESCENT_LIGHT : ModBlocks.FLUORESCENT_LIGHT).defaultBlockState();
 		}
-		if (!Maze.isWall(seed, x, z, y == CEILING_Y - 1)) return Blocks.AIR.defaultBlockState();
+		if (!Maze.isWall(seed, x, z, y == CEILING_Y - 1, epochs)) return Blocks.AIR.defaultBlockState();
 		boolean baseboard = y == FLOOR_Y + 1;
 		if (Exits.isDoor(seed, x, z)) {
 			if (baseboard) return ModBlocks.EXIT_DOOR.defaultBlockState();
@@ -77,7 +81,7 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		if (zone == Maze.Zone.RED_ROOM) {
 			return (baseboard ? ModBlocks.RED_WALLPAPER_BASEBOARD : ModBlocks.RED_WALLPAPER).defaultBlockState();
 		}
-		if (!baseboard && Maze.isRedWarningWall(seed, x, z)) {
+		if (!baseboard && Maze.isRedWarningWall(seed, x, z, epochs)) {
 			return ModBlocks.PEELING_RED_WALLPAPER.defaultBlockState();
 		}
 		return (baseboard ? ModBlocks.WALLPAPER_BASEBOARD : ModBlocks.WALLPAPER).defaultBlockState();

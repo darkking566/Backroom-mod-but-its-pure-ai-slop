@@ -18,5 +18,7 @@
   "block.noclip_backrooms.exit_sign": "Exit Sign",
   "subtitles.noclip_backrooms.ambient.fluorescent_hum": "Fluorescent light hums",
   "subtitles.noclip_backrooms.ambient.wall_scratch": "Something scratches behind the wall",
-  "subtitles.noclip_backrooms.ambient.distant_whisper": "Faint whispers echo"
+  "subtitles.noclip_backrooms.ambient.distant_whisper": "Faint whispers echo",
+  "gamerule.noclip_backrooms.edge_shift": "Level 0 Edge Shift",
+  "gamerule.noclip_backrooms.edge_shift.description": "Reshapes Level 0 corridors, pillars, lights, and placed markers outside players' line of sight."
 }
