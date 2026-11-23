@@ -20,6 +20,25 @@
       {
         "model": "noclip_backrooms:block/wallpaper_3",
         "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/peeling_red_wallpaper_4",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/peeling_red_wallpaper_5",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/peeling_red_wallpaper_6",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/peeling_red_wallpaper_7",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/peeling_red_wallpaper_8"
       }
     ]
   }

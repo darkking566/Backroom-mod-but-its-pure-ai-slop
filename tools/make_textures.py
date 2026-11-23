@@ -160,11 +160,93 @@ def board(color):
     return m
 
 
+def streaks(m, seed):
+    """Water that ran down the wall from above."""
+    rng = np.random.default_rng(seed)
+    run = np.zeros((SIZE, SIZE))
+    for i in range(rng.integers(3, 7)):
+        x, top, length, width = rng.uniform(30, 98), rng.uniform(20, 46), rng.uniform(30, 70), rng.uniform(1.5, 4)
+        line = 1 - step(width * 0.4, width, np.abs(X - x - 2.5 * noise(seed + i, 2, 6)))
+        fade = step(top - 3, top + 3, Y) * (1 - step(top + length * 0.5, top + length, Y))
+        head = 1 - step(width * 0.6, width * 1.2, np.hypot(X - x, Y - top - length * 0.8))
+        run = np.maximum(run, np.maximum(line * fade, head * 0.8))
+    run *= inside()
+    tint(m, run, (0.84, 0.78, 0.64))
+    paint(m, run, smooth=0.42)
+    return m
+
+
+def picture(m, seed):
+    """Where a frame once hung: cleaner paper, a dusty outline and the nail hole."""
+    rng = np.random.default_rng(seed)
+    w, h = rng.uniform(32, 50), rng.uniform(28, 42)
+    cx, cy = rng.uniform(54, 74), rng.uniform(60, 72)
+    outer = box(cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2, 2)
+    inner = box(cx - w / 2 + 2, cy - h / 2 + 2, cx + w / 2 - 2, cy + h / 2 - 2, 2)
+    tint(m, inner, (1.07, 1.06, 1.03))
+    tint(m, np.clip(outer - inner, 0, 1), (0.86, 0.83, 0.76))
+    nail = 1 - step(0.8, 1.7, np.hypot(X - cx, Y - (cy - h / 2 - 7)))
+    paint(m, nail, (44, 38, 30), height=-1.5)
+    return m
+
+
+def blisters(m, seed):
+    """Damp has lifted the paper into small bubbles."""
+    rng = np.random.default_rng(seed)
+    for _ in range(rng.integers(4, 9)):
+        x, y, r = rng.uniform(32, 96), rng.uniform(32, 96), rng.uniform(3, 8)
+        bump = 1 - step(r * 0.5, r, np.hypot(X - x, (Y - y) * 1.2))
+        m.height += bump * 1.8
+        tint(m, bump, 1 - 0.18 * np.clip((Y - y) / r, -1, 1)[..., None])  # lit from above
+        tint(m, (1 - step(0.5, 1.4, np.abs(np.hypot(X - x, (Y - y) * 1.2) - r))) * 0.7, (0.88, 0.85, 0.78))
+    return m
+
+
+def nick(m, seed):
+    """A small gouge through to the backing paper."""
+    field = spot(seed, (9, 6), 0.3) + noise(seed + 3, 64) * 0.35
+    torn = step(0.02, 0.08, field)
+    lifted = step(-0.12, -0.02, field) * (1 - torn)
+    tint(m, lifted, (1.08, 1.06, 1.0))
+    paint(m, torn, (214, 198, 158), height=-0.7, smooth=0.1)
+    return m
+
+
+def turned(angle, cx=64, cy=64):
+    """Distance along a line through (cx, cy) at this angle, and across it."""
+    dx, dy = X - cx, Y - cy
+    return dx * np.cos(angle) + dy * np.sin(angle), -dx * np.sin(angle) + dy * np.cos(angle)
+
+
 def peeling(seed, size, centre):
-    m = wallpaper(YELLOW)
     cx, cy = centre
-    distance = np.hypot((X - cx) / size[0], (Y - cy) / size[1])
-    field = 1 - distance + clouds(seed, 6) * 0.75 + noise(seed + 9, 64) * 0.07
+    return peel(seed, 1 - np.hypot((X - cx) / size[0], (Y - cy) / size[1]))
+
+
+def seam_tear(seed):
+    """Paper parting along a vertical seam of the pattern."""
+    return peel(seed, 1 - np.hypot((X - 70) / 9, np.maximum(np.abs(Y - 62) - 22, 0) / 10), 0.45, 0.25)
+
+
+def small_tears(seed):
+    holes = [1 - np.hypot((X - x) / r, (Y - y) / (r * 0.8)) for x, y, r in ((44, 46, 13), (82, 58, 10), (58, 86, 11), (90, 92, 7))]
+    return peel(seed, np.maximum.reduce(holes), 0.5, 0.25)
+
+
+def long_tear(seed):
+    a, b = turned(0.8)
+    return peel(seed, 1 - np.hypot(a / 52, b / 11), 0.45, 0.25)
+
+
+def scratches(seed):
+    """Three parallel gouges."""
+    a, b = turned(1.15)
+    return peel(seed, np.maximum.reduce([1 - np.hypot(a / 40, (b - 9 * k) / 2.2) for k in (-1, 0, 1)]), 0.08)
+
+
+def peel(seed, shape, wobble=0.75, rough=0.07):
+    m = wallpaper(YELLOW)
+    field = shape + clouds(seed, 6) * wobble + noise(seed + 9, 64) * rough
     field = field * inside() - 0.6 * (1 - inside())
     below = wallpaper(RED)
     torn = step(0.04, 0.07, field)
@@ -411,12 +493,14 @@ def exit_sign():
 
 def all_textures():
     t = {}
-    for prefix, palette in (("", YELLOW), ("pale_", PALE), ("red_", RED)):
+    for p, (prefix, palette) in enumerate((("", YELLOW), ("pale_", PALE), ("red_", RED))):
         name = prefix + "wallpaper"
         t[name] = wallpaper(palette)
         t[name + "_1"] = damp(wallpaper(palette), 110)
         t[name + "_2"] = scuffs(wallpaper(palette), 120)
         t[name + "_3"] = damp(scuffs(wallpaper(palette), 130), 140, 0.7)
+        for i, stain in enumerate((streaks, picture, blisters, nick, mould, drips), 4):
+            t[f"{name}_{i}"] = stain(wallpaper(palette), 600 + 100 * p + 10 * i)
         t[name + "_baseboard"] = grime(wallpaper(palette))
         t[name + "_baseboard_1"] = damp(grime(wallpaper(palette)), 150)
         t[prefix + "board"] = board(palette["board"])
@@ -425,6 +509,11 @@ def all_textures():
     t["peeling_red_wallpaper_1"] = peeling(210, (24, 56), (48, 66))
     t["peeling_red_wallpaper_2"] = peeling(220, (56, 26), (64, 48))
     t["peeling_red_wallpaper_3"] = peeling(230, (22, 24), (78, 80))
+    t["peeling_red_wallpaper_4"] = seam_tear(240)
+    t["peeling_red_wallpaper_5"] = small_tears(250)
+    t["peeling_red_wallpaper_6"] = peeling(260, (44, 18), (64, 36))  # a sheet hanging from the top
+    t["peeling_red_wallpaper_7"] = long_tear(270)
+    t["peeling_red_wallpaper_8"] = scratches(280)
 
     t["carpet"] = carpet(300)
     t["carpet_1"] = carpet(310)
