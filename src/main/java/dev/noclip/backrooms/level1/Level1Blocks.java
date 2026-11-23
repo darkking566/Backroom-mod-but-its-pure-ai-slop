@@ -255,6 +255,18 @@ public final class Level1Blocks {
 	/** A dusty 90s abandoned sedan parked in the garage halls and indoor overpasses. */
 	public static final Block ABANDONED_CAR = register("abandoned_car", Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F).sound(SoundType.METAL).noOcclusion(),
 			p -> new OldComputerBlock(p, Block.box(0, 0, 0, 16, 16, 16)));
+	/** A boxy 90s cargo delivery van parked in garage stalls and loading docks. */
+	public static final Block ABANDONED_VAN = register("abandoned_van", Properties.of().mapColor(MapColor.SNOW).strength(3.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new OldComputerBlock(p, Block.box(0, 0, 0, 16, 16, 16)));
+	/** A softly humming retro vending machine with a lit display window. */
+	public static final Block VENDING_MACHINE = register("vending_machine", Properties.of().mapColor(MapColor.COLOR_RED).strength(2.5F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 7),
+			p -> new OldComputerBlock(p, Block.box(1, 0, 2, 15, 16, 14)));
+	/** A wooden shipping pallet stacked with boxes and a red hand-truck. */
+	public static final Block PALLET_STACK = register("pallet_stack", Properties.of().mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD).noOcclusion(),
+			p -> new OldComputerBlock(p, Block.box(0, 0, 0, 16, 15, 16)));
+	/** A tall industrial electrical switchgear cabinet with conduits and indicator lights. */
+	public static final Block ELECTRICAL_CABINET = register("electrical_cabinet", Properties.of().mapColor(MapColor.COLOR_GRAY).strength(3.0F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 4),
+			p -> new OldComputerBlock(p, Block.box(1, 0, 2, 15, 16, 14)));
 	public static final Block GLITCH_BLACK = register("glitch_black", Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 0));
 	public static final Block GLITCH_MAGENTA = register("glitch_magenta", Properties.of().mapColor(MapColor.COLOR_MAGENTA).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 6));
 	public static final Block GLITCH_CYAN = register("glitch_cyan", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 6));

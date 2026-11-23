@@ -193,6 +193,10 @@ public final class Level1Landmarks {
 		if ((u == 12 || u == 19) && (v == 11 || v == 17) && y == lowerY + 1) {
 			return state(Level1Blocks.FUEL_DRUM);
 		}
+		if ((u == 6 || u == 25) && (v == 10 || v == 18) && y == lowerY + 1) {
+			return Level1Blocks.ELECTRICAL_CABINET.defaultBlockState()
+					.setValue(OldComputerBlock.FACING, u == 6 ? Direction.EAST : Direction.WEST);
+		}
 		// Overhead X-aligned pipe grid mounted directly under the ceiling
 		if (y == topCeil - 1 && v % 6 == 0) return state(Level1Blocks.CEILING_PIPE);
 		if (y == topCeil - 1) return hallFixture(ceiling);
@@ -481,6 +485,7 @@ public final class Level1Landmarks {
 			if (y == 39) return state((v == 15 || v == 16) ? Level1Blocks.GARAGE_FLOOR_LINE : Level1Blocks.GARAGE_FLOOR);
 			if (y == 40 && (v == 12 || v == 19)) return barrier(Direction.Axis.X);
 			if (y == 40 && u == 7 && v == 14) return Level1Blocks.ABANDONED_CAR.defaultBlockState().setValue(OldComputerBlock.FACING, Direction.EAST);
+			if (y == 40 && u == 23 && v == 17) return Level1Blocks.ABANDONED_VAN.defaultBlockState().setValue(OldComputerBlock.FACING, Direction.WEST);
 			if (y == 38 && u % 8 == 4 && v == 15) return state(Level1Blocks.CAGED_LAMP);
 		}
 		// Highway 2 deck (y = 46)

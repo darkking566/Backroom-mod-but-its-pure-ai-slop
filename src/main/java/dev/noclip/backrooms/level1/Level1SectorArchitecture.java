@@ -152,14 +152,29 @@ public final class Level1SectorArchitecture {
 		boolean hasMainFloor = profile != Level1Elevation.Profile.SUNKEN_BASIN
 				|| (lx < 11 || lx > 52 || lz < 11 || lz > 52);
 
-		// Occasional abandoned 90s sedan parked neatly inside parking stalls (never blocking driving aisles)
+		// Occasional abandoned 90s sedan or cargo van parked neatly inside parking stalls (never blocking aisles)
 		if (hasMainFloor && y == FLOOR + 1 && current.isAir() && tile == Tile.FLOOR
 				&& Level1Layout.kindAt(seed, x, z) == Kind.PARKING) {
 			int bx = Math.floorMod(x, Level1Layout.BAY_X), bz = Math.floorMod(z, Level1Layout.BAY_Z);
 			if ((bx == 3 || bx == 6) && (bz == 4 || bz == 13)
-					&& Math.floorMod(Level1Layout.hash(seed, x, z, 163), 100) < 9) {
+					&& Math.floorMod(Level1Layout.hash(seed, x, z, 163), 100) < 10) {
 				Direction dir = Math.floorMod(Level1Layout.hash(seed, x, z, 167), 2) == 0 ? Direction.NORTH : Direction.SOUTH;
-				return Level1Blocks.ABANDONED_CAR.defaultBlockState().setValue(OldComputerBlock.FACING, dir);
+				Block vehicle = Math.floorMod(Level1Layout.hash(seed, x, z, 173), 3) == 0
+						? Level1Blocks.ABANDONED_VAN : Level1Blocks.ABANDONED_CAR;
+				return vehicle.defaultBlockState().setValue(OldComputerBlock.FACING, dir);
+			}
+			// Rare softly glowing retro vending machine tucked beside a pillar
+			if (bx == 2 && bz == 1 && Math.floorMod(Level1Layout.hash(seed, x, z, 179), 100) < 6) {
+				return Level1Blocks.VENDING_MACHINE.defaultBlockState().setValue(OldComputerBlock.FACING, Direction.EAST);
+			}
+		}
+		// Occasional pallet stack in warehouse bays
+		if (hasMainFloor && y == FLOOR + 1 && current.isAir() && tile == Tile.FLOOR
+				&& Level1Layout.kindAt(seed, x, z) == Kind.WAREHOUSE) {
+			int bx = Math.floorMod(x, Level1Layout.BAY_X), bz = Math.floorMod(z, Level1Layout.BAY_Z);
+			if (bx == 2 && bz == 7 && Math.floorMod(Level1Layout.hash(seed, x, z, 181), 100) < 18) {
+				Direction dir = Math.floorMod(Level1Layout.hash(seed, x, z, 191), 2) == 0 ? Direction.EAST : Direction.SOUTH;
+				return Level1Blocks.PALLET_STACK.defaultBlockState().setValue(OldComputerBlock.FACING, dir);
 			}
 		}
 		BlockState override = switch (v) {
