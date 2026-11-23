@@ -278,4 +278,47 @@ class MazeTest {
 		assertTrue(sawStairwell, "never generated a classic stairwell cell");
 		assertTrue(sawMacroPillar, "never generated a 2x2 macro pillar hall");
 	}
+
+	@Test
+	void macroDarkenedAndRedRoomZonesSpanThreeByThreeSectors() {
+		long seed = 12345L;
+		int sectorBlocks = Maze.CELL * Maze.SECTOR;
+		boolean sawMacroDarkened = false;
+		boolean sawMacroRedRoom = false;
+
+		for (int sx = -12; sx <= 12; sx += Maze.LARGE_ZONE_SPAN) {
+			for (int sz = -12; sz <= 12; sz += Maze.LARGE_ZONE_SPAN) {
+				int osx = Maze.largeZoneOriginSector(sx);
+				int osz = Maze.largeZoneOriginSector(sz);
+				Maze.Zone zone = Maze.zoneAt(seed, osx * sectorBlocks + Maze.CENTER, osz * sectorBlocks + Maze.CENTER);
+				if (zone == Maze.Zone.DARKENED || zone == Maze.Zone.RED_ROOM) {
+					if (zone == Maze.Zone.DARKENED) sawMacroDarkened = true;
+					if (zone == Maze.Zone.RED_ROOM) sawMacroRedRoom = true;
+					for (int dx = 0; dx < Maze.LARGE_ZONE_SPAN; dx++) {
+						for (int dz = 0; dz < Maze.LARGE_ZONE_SPAN; dz++) {
+							assertEquals(zone, Maze.zoneAt(seed,
+									(osx + dx) * sectorBlocks + Maze.CENTER,
+									(osz + dz) * sectorBlocks + Maze.CENTER));
+						}
+					}
+					if (zone == Maze.Zone.RED_ROOM) {
+						int baseCx = osx * Maze.SECTOR;
+						int baseCz = osz * Maze.SECTOR;
+						int spanCells = Maze.LARGE_ZONE_SPAN * Maze.SECTOR;
+						assertTrue(Maze.isRedRoomInteriorCell(seed, baseCx + 1, baseCz + 1));
+						assertTrue(Maze.isRedRoomInteriorCell(seed, baseCx + Maze.SECTOR, baseCz + Maze.SECTOR));
+						if (Maze.zoneAt(seed, (osx - 1) * sectorBlocks + Maze.CENTER, osz * sectorBlocks + Maze.CENTER) != Maze.Zone.RED_ROOM) {
+							assertFalse(Maze.isRedRoomInteriorCell(seed, baseCx, baseCz + 1));
+						}
+						if (Maze.zoneAt(seed, (osx + Maze.LARGE_ZONE_SPAN) * sectorBlocks + Maze.CENTER, osz * sectorBlocks + Maze.CENTER) != Maze.Zone.RED_ROOM) {
+							assertFalse(Maze.isRedRoomInteriorCell(seed, baseCx + spanCells - 1, baseCz + 1));
+						}
+					}
+				}
+			}
+		}
+
+		assertTrue(sawMacroDarkened, "never verified 3x3 macro darkened zone");
+		assertTrue(sawMacroRedRoom, "never verified 3x3 macro red room zone");
+	}
 }

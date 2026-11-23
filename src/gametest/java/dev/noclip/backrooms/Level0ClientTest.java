@@ -227,16 +227,19 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			ServerLevel level = s.getLevel(BackroomsMod.LEVEL_0);
 			long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
 			int sectorBlocks = Maze.CELL * Maze.SECTOR;
-			for (int radius = 1; radius <= 20; radius++) {
+			for (int radius = 1; radius <= 40; radius++) {
 				for (int sx = -radius; sx <= radius; sx++) {
 					for (int sz = -radius; sz <= radius; sz++) {
-						if (Maze.zoneAt(seed, sx * sectorBlocks + Maze.CENTER, sz * sectorBlocks + Maze.CENTER) == Maze.Zone.RED_ROOM) {
-							return new int[] {sx, sz};
+						int osx = Maze.largeZoneOriginSector(sx);
+						int osz = Maze.largeZoneOriginSector(sz);
+						if (Maze.zoneAt(seed, osx * sectorBlocks + Maze.CENTER, osz * sectorBlocks + Maze.CENTER) == Maze.Zone.RED_ROOM
+								&& Maze.zoneAt(seed, (osx - 1) * sectorBlocks + Maze.CENTER, osz * sectorBlocks + Maze.CENTER) != Maze.Zone.RED_ROOM) {
+							return new int[] {osx, osz};
 						}
 					}
 				}
 			}
-			throw new AssertionError("no RED_ROOM sector found within radius 20");
+			throw new AssertionError("no RED_ROOM macro-zone found within radius 40");
 		});
 
 		int rsx = redSector[0], rsz = redSector[1];
@@ -254,14 +257,15 @@ public final class Level0ClientTest implements FabricClientGameTest {
 					ModBlocks.RED_WALLPAPER.defaultBlockState()), "survival player could break Red Room wall");
 		});
 
-		// Stepping onto the outer perimeter cell of the Red Room sector must loop the player back into lx,lz in 2..5.
+		// Stepping onto the outer perimeter cell of the Red Room macro-zone must loop the player back into rlx,rlz in 2..redCells-3.
 		int perimeterX = (rsx * Maze.SECTOR) * Maze.CELL + Maze.CENTER;
+		int redCells = Maze.LARGE_ZONE_SPAN * Maze.SECTOR;
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + (perimeterX + 0.5) + " " + standY + " " + (innerZ + 0.5));
 		server.waitFor(s -> {
 			ServerPlayer player = player(s);
-			int lx = Math.floorMod(Math.floorDiv(player.getBlockX(), Maze.CELL), Maze.SECTOR);
-			int lz = Math.floorMod(Math.floorDiv(player.getBlockZ(), Maze.CELL), Maze.SECTOR);
-			return lx >= 2 && lx <= Maze.SECTOR - 3 && lz >= 2 && lz <= Maze.SECTOR - 3;
+			int rlx = Math.floorDiv(player.getBlockX(), Maze.CELL) - rsx * Maze.SECTOR;
+			int rlz = Math.floorDiv(player.getBlockZ(), Maze.CELL) - rsz * Maze.SECTOR;
+			return rlx >= 2 && rlx <= redCells - 3 && rlz >= 2 && rlz <= redCells - 3;
 		}, 40);
 
 		server.runOnServer(s -> check(RedRoomLoop.isTrapped(player(s)), "looped player lost trap state"));

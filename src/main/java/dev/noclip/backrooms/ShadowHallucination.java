@@ -191,8 +191,10 @@ final class ShadowHallucination {
 				player.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 45, 0, true, false, true));
 				level.playSound(null, shadow.x(), shadow.y() + 1.5, shadow.z(),
 						SoundEvents.ENDERMAN_STARE, SoundSource.AMBIENT, 0.14F, 0.55F);
-				level.playSound(null, shadow.x(), shadow.y() + 1.5, shadow.z(),
-						ModSounds.DISTANT_WHISPER, SoundSource.AMBIENT, 0.28F, 0.85F);
+				if (level.getRandom().nextFloat() < 0.35F) {
+					level.playSound(null, shadow.x(), shadow.y() + 1.5, shadow.z(),
+							ModSounds.DISTANT_WHISPER, SoundSource.AMBIENT, 0.28F, 0.85F);
+				}
 			}
 			if (seen >= STARE_VANISH_TICKS) {
 				vanish(level, shadow);

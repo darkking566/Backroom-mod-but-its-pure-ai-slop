@@ -3,13 +3,13 @@ package dev.noclip.backrooms;
 import java.util.SplittableRandom;
 
 /**
- * Where the ways out of Level 0 are. There is one in every region of 3x3 sectors.
+ * Where the ways out of Level 0 are. There is one in every region of 10x10 sectors.
  *
  * An exit only replaces blocks that are already wall, so it never changes which positions are passable
  * and new chunks still line up with ones generated before exits existed.
  */
 final class Exits {
-	static final int REGION_CELLS = Maze.SECTOR * 3;
+	static final int REGION_CELLS = Maze.SECTOR * 10;
 	static final int REGION = REGION_CELLS * Maze.CELL;
 	/** How many cells away the lamps start to turn green. */
 	static final int HINT_CELLS = 3;

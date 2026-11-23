@@ -23,8 +23,8 @@ import net.minecraft.world.phys.Vec3;
 final class Level0Ambience {
 	// Replay slightly before the 14s clip ends so the gentle fade edges overlap smoothly.
 	private static final int HUM_INTERVAL_TICKS = 260;
-	private static final int EERIE_MIN_TICKS = 500;
-	private static final int EERIE_MAX_TICKS = 1100;
+	private static final int EERIE_MIN_TICKS = 700;
+	private static final int EERIE_MAX_TICKS = 1500;
 	private static final int SURGE_STRAIN_DELAY_TICKS = 50;
 	private static final double SURGE_STRAIN_RADIUS = 8.5;
 	private static final int ECHO_DELAY_TICKS = 50;
@@ -159,7 +159,7 @@ final class Level0Ambience {
 
 	private static void playEerieSound(ServerLevel level, ServerPlayer player, RandomSource random, int now) {
 		long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
-		boolean scratch = random.nextFloat() < 0.55F;
+		boolean scratch = random.nextFloat() < 0.80F;
 
 		// Pick a nearby offset 7..15 blocks away; for scratches prefer a solid wall block.
 		double sx = player.getX();
@@ -186,7 +186,7 @@ final class Level0Ambience {
 			level.playSound(null, soundPos, ModSounds.DISTANT_WHISPER, SoundSource.AMBIENT,
 					0.28F + random.nextFloat() * 0.18F, 0.84F + random.nextFloat() * 0.20F);
 		}
-		if (random.nextFloat() < 0.45F) {
+		if (random.nextFloat() < (scratch ? 0.45F : 0.25F)) {
 			PENDING_ECHO.put(player.getUUID(), new PendingEcho(scratch, now + ECHO_DELAY_TICKS));
 		}
 	}

@@ -38,6 +38,8 @@ final class RedRoomLoop {
 	private static final int LOOP_COOLDOWN_TICKS = 10;
 	private static final double ADMIN_ESCAPE_DISTANCE = 8.0;
 	private static final int SECTOR_BLOCKS = Maze.CELL * Maze.SECTOR;
+	private static final int RED_ROOM_CELLS = Maze.LARGE_ZONE_SPAN * Maze.SECTOR;
+	private static final int RED_ROOM_BLOCKS = Maze.CELL * RED_ROOM_CELLS;
 	private static final Map<UUID, Integer> LAST_LOOP_TICK = new HashMap<>();
 
 	private RedRoomLoop() {
@@ -114,17 +116,17 @@ final class RedRoomLoop {
 		UUID id = player.getUUID();
 		int bx = player.getBlockX(), bz = player.getBlockZ();
 		int cx = Math.floorDiv(bx, Maze.CELL), cz = Math.floorDiv(bz, Maze.CELL);
-		int sx = Math.floorDiv(cx, Maze.SECTOR), sz = Math.floorDiv(cz, Maze.SECTOR);
-		int lx = Math.floorMod(cx, Maze.SECTOR), lz = Math.floorMod(cz, Maze.SECTOR);
+		int originSx = Maze.largeZoneOriginSector(Math.floorDiv(cx, Maze.SECTOR));
+		int originSz = Maze.largeZoneOriginSector(Math.floorDiv(cz, Maze.SECTOR));
 
 		if (Maze.zoneAt(seed, bx, bz) == Maze.Zone.RED_ROOM) {
-			if (isInteriorCell(lx, lz)) {
-				state.setTrap(id, sx, sz);
+			if (Maze.isRedRoomInteriorCell(seed, cx, cz)) {
+				state.setTrap(id, originSx, originSz);
 				return;
 			}
-			if (state.hasTrap(id) && state.trappedSector(id) == ChunkPos.pack(sx, sz)) {
-				// Stepped onto the perimeter ring of the trapped Red Room: loop back inside.
-				loopPlayerInside(level, player, sx, sz, now);
+			if (state.hasTrap(id) && state.trappedSector(id) == ChunkPos.pack(originSx, originSz)) {
+				// Stepped onto the outer perimeter ring of the trapped Red Room: loop back inside.
+				loopPlayerInside(level, seed, player, originSx, originSz, now);
 			}
 			return;
 		}
@@ -132,36 +134,33 @@ final class RedRoomLoop {
 		if (!state.hasTrap(id)) return;
 
 		long trapped = state.trappedSector(id);
-		int tsx = ChunkPos.getX(trapped), tsz = ChunkPos.getZ(trapped);
-		double distOutside = distanceOutsideSector(player.getX(), player.getZ(), tsx, tsz);
+		int tsx = Maze.largeZoneOriginSector(ChunkPos.getX(trapped));
+		int tsz = Maze.largeZoneOriginSector(ChunkPos.getZ(trapped));
+		double distOutside = distanceOutsideRedRoom(player.getX(), player.getZ(), tsx, tsz);
 		if (distOutside > ADMIN_ESCAPE_DISTANCE) {
 			// Teleported out via command or external mechanic: release the trap cleanly.
 			state.clearTrap(id);
 			LAST_LOOP_TICK.remove(id);
 			return;
 		}
-		loopPlayerInside(level, player, tsx, tsz, now);
+		loopPlayerInside(level, seed, player, tsx, tsz, now);
 	}
 
-	private static boolean isInteriorCell(int lx, int lz) {
-		return lx >= 1 && lx <= Maze.SECTOR - 2 && lz >= 1 && lz <= Maze.SECTOR - 2;
-	}
-
-	private static double distanceOutsideSector(double px, double pz, int sx, int sz) {
-		double minX = sx * SECTOR_BLOCKS;
-		double maxX = minX + SECTOR_BLOCKS;
-		double minZ = sz * SECTOR_BLOCKS;
-		double maxZ = minZ + SECTOR_BLOCKS;
+	private static double distanceOutsideRedRoom(double px, double pz, int originSx, int originSz) {
+		double minX = originSx * SECTOR_BLOCKS;
+		double maxX = minX + RED_ROOM_BLOCKS;
+		double minZ = originSz * SECTOR_BLOCKS;
+		double maxZ = minZ + RED_ROOM_BLOCKS;
 		double cx = Math.clamp(px, minX, maxX);
 		double cz = Math.clamp(pz, minZ, maxZ);
 		return Math.hypot(px - cx, pz - cz);
 	}
 
-	private static void loopPlayerInside(ServerLevel level, ServerPlayer player, int sx, int sz, int now) {
+	private static void loopPlayerInside(ServerLevel level, long seed, ServerPlayer player, int originSx, int originSz, int now) {
 		UUID id = player.getUUID();
 		if (now - LAST_LOOP_TICK.getOrDefault(id, -LOOP_COOLDOWN_TICKS) < LOOP_COOLDOWN_TICKS) return;
 
-		Vec3 dest = findLoopDestination(level, player, sx, sz);
+		Vec3 dest = findLoopDestination(level, seed, player, originSx, originSz);
 		if (dest == null) return;
 
 		LAST_LOOP_TICK.put(id, now);
@@ -172,7 +171,7 @@ final class RedRoomLoop {
 				SoundEvents.WARDEN_HEARTBEAT, SoundSource.AMBIENT, 0.45F, 0.60F);
 	}
 
-	private static Vec3 findLoopDestination(ServerLevel level, ServerPlayer player, int sx, int sz) {
+	private static Vec3 findLoopDestination(ServerLevel level, long seed, ServerPlayer player, int originSx, int originSz) {
 		int bx = player.getBlockX(), bz = player.getBlockZ();
 		int ix = Math.floorMod(bx, Maze.CELL), iz = Math.floorMod(bz, Maze.CELL);
 		double fracX = player.getX() - bx;
@@ -185,45 +184,45 @@ final class RedRoomLoop {
 		int curCx = Math.floorDiv(bx, Maze.CELL);
 		int curCz = Math.floorDiv(bz, Maze.CELL);
 
-		Vec3 best = null;
-		int bestScore = Integer.MIN_VALUE;
+		List<LoopCandidate> candidates = new ArrayList<>();
 
-		// Search inner 4x4 cells (lx, lz in 2..5) so the player lands well away from any exit border.
-		for (int lx = 2; lx <= Maze.SECTOR - 3; lx++) {
-			for (int lz = 2; lz <= Maze.SECTOR - 3; lz++) {
-				int cx = sx * Maze.SECTOR + lx;
-				int cz = sz * Maze.SECTOR + lz;
+		// Search inner cells (rlx, rlz in 2..RED_ROOM_CELLS-3) so the player lands well away from any exit border.
+		for (int rlx = 2; rlx <= RED_ROOM_CELLS - 3; rlx++) {
+			for (int rlz = 2; rlz <= RED_ROOM_CELLS - 3; rlz++) {
+				int cx = originSx * Maze.SECTOR + rlx;
+				int cz = originSz * Maze.SECTOR + rlz;
 				int tx = cx * Maze.CELL + ix;
 				int tz = cz * Maze.CELL + iz;
-				Vec3 candidate = new Vec3(tx + fracX, player.getY(), tz + fracZ);
-				if (!isSafeSpot(level, player, tx, tz, candidate)) continue;
+				if (Maze.isWall(seed, tx, tz, false) || Maze.isWall(seed, tx, tz, true)) continue;
 
-				int score = 0;
-				// Prefer a corridor that remains open directly ahead of the player's gaze.
-				if (isOpenHeadroom(level, tx + dirX, tz + dirZ) && isOpenHeadroom(level, tx + dirX * 2, tz + dirZ * 2)) {
+				int score = Math.abs(cx - curCx) + Math.abs(cz - curCz);
+				if (!Maze.isWall(seed, tx + dirX, tz + dirZ, false)
+						&& !Maze.isWall(seed, tx + dirX * 2, tz + dirZ * 2, false)) {
 					score += 100;
 				}
-				// Prefer wrapping across the room rather than staying near the same corner.
-				score += Math.abs(cx - curCx) + Math.abs(cz - curCz);
-				if (score > bestScore) {
-					bestScore = score;
-					best = candidate;
-				}
+				candidates.add(new LoopCandidate(tx, tz, new Vec3(tx + fracX, player.getY(), tz + fracZ), score));
 			}
 		}
 
-		if (best != null) return best;
+		candidates.sort((a, b) -> Integer.compare(b.score(), a.score()));
+		for (LoopCandidate c : candidates) {
+			if (isSafeSpot(level, player, c.tx(), c.tz(), c.pos())) return c.pos();
+		}
 
 		// Fallback to any open inner cell center.
-		for (int lx = 2; lx <= Maze.SECTOR - 3; lx++) {
-			for (int lz = 2; lz <= Maze.SECTOR - 3; lz++) {
-				int tx = (sx * Maze.SECTOR + lx) * Maze.CELL + Maze.CENTER;
-				int tz = (sz * Maze.SECTOR + lz) * Maze.CELL + Maze.CENTER;
+		for (int rlx = 2; rlx <= RED_ROOM_CELLS - 3; rlx++) {
+			for (int rlz = 2; rlz <= RED_ROOM_CELLS - 3; rlz++) {
+				int tx = (originSx * Maze.SECTOR + rlx) * Maze.CELL + Maze.CENTER;
+				int tz = (originSz * Maze.SECTOR + rlz) * Maze.CELL + Maze.CENTER;
+				if (Maze.isWall(seed, tx, tz, false)) continue;
 				Vec3 center = new Vec3(tx + 0.5, Level0ChunkGenerator.FLOOR_Y + 1, tz + 0.5);
 				if (isSafeSpot(level, player, tx, tz, center)) return center;
 			}
 		}
 		return null;
+	}
+
+	private record LoopCandidate(int tx, int tz, Vec3 pos, int score) {
 	}
 
 	private static boolean isSafeSpot(ServerLevel level, ServerPlayer player, int bx, int bz, Vec3 pos) {
@@ -253,27 +252,28 @@ final class RedRoomLoop {
 
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		for (long packed : trappedSectors) {
-			int sx = ChunkPos.getX(packed), sz = ChunkPos.getZ(packed);
-			sealSectorPerimeter(level, seed, sx, sz, pos);
+			int sx = Maze.largeZoneOriginSector(ChunkPos.getX(packed));
+			int sz = Maze.largeZoneOriginSector(ChunkPos.getZ(packed));
+			sealRedRoomPerimeter(level, seed, sx, sz, pos);
 		}
 	}
 
-	private static void sealSectorPerimeter(ServerLevel level, long seed, int sx, int sz,
+	private static void sealRedRoomPerimeter(ServerLevel level, long seed, int originSx, int originSz,
 			BlockPos.MutableBlockPos pos) {
-		int baseCx = sx * Maze.SECTOR;
-		int baseCz = sz * Maze.SECTOR;
+		int baseCx = originSx * Maze.SECTOR;
+		int baseCz = originSz * Maze.SECTOR;
 
-		// West and East perimeter walls of the Red Room sector.
-		for (int lz = 0; lz < Maze.SECTOR; lz++) {
+		// West and East perimeter walls of the Red Room macro-zone.
+		for (int lz = 0; lz < RED_ROOM_CELLS; lz++) {
 			int cz = baseCz + lz;
 			sealEdgeIfUnseen(level, seed, baseCx * Maze.CELL, cz * Maze.CELL, true, pos);
-			sealEdgeIfUnseen(level, seed, (baseCx + Maze.SECTOR) * Maze.CELL, cz * Maze.CELL, true, pos);
+			sealEdgeIfUnseen(level, seed, (baseCx + RED_ROOM_CELLS) * Maze.CELL, cz * Maze.CELL, true, pos);
 		}
-		// North and South perimeter walls of the Red Room sector.
-		for (int lx = 0; lx < Maze.SECTOR; lx++) {
+		// North and South perimeter walls of the Red Room macro-zone.
+		for (int lx = 0; lx < RED_ROOM_CELLS; lx++) {
 			int cx = baseCx + lx;
 			sealEdgeIfUnseen(level, seed, cx * Maze.CELL, baseCz * Maze.CELL, false, pos);
-			sealEdgeIfUnseen(level, seed, cx * Maze.CELL, (baseCz + Maze.SECTOR) * Maze.CELL, false, pos);
+			sealEdgeIfUnseen(level, seed, cx * Maze.CELL, (baseCz + RED_ROOM_CELLS) * Maze.CELL, false, pos);
 		}
 	}
 
@@ -283,8 +283,11 @@ final class RedRoomLoop {
 		int cz = Math.floorDiv(edgeZ, Maze.CELL);
 		int otherCx = alongZ ? cx - 1 : cx;
 		int otherCz = alongZ ? cz : cz - 1;
-		if (Maze.zoneAt(seed, cx * Maze.CELL, cz * Maze.CELL) == Maze.Zone.ARCHES
-				|| Maze.zoneAt(seed, otherCx * Maze.CELL, otherCz * Maze.CELL) == Maze.Zone.ARCHES
+		Maze.Zone zoneA = Maze.zoneAt(seed, cx * Maze.CELL, cz * Maze.CELL);
+		Maze.Zone zoneB = Maze.zoneAt(seed, otherCx * Maze.CELL, otherCz * Maze.CELL);
+		if (zoneA == zoneB
+				|| zoneA == Maze.Zone.ARCHES
+				|| zoneB == Maze.Zone.ARCHES
 				|| Exits.isProtectedCell(seed, cx, cz)
 				|| Exits.isProtectedCell(seed, otherCx, otherCz)) {
 			return;
