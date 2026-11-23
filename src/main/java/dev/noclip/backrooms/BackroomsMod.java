@@ -30,6 +30,7 @@ public final class BackroomsMod implements ModInitializer {
 		ShadowHallucination.register();
 		PitEffects.register();
 		FlashlightLight.register();
+		StaircaseBreaker.register();
 		// Level 1 keeps everything in its own package.
 		dev.noclip.backrooms.level1.Level1.register();
 	}

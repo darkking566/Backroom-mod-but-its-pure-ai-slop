@@ -273,6 +273,7 @@ final class EdgeShift {
 		if (Maze.shiftWeight(zone) <= 0) return false;
 		if (Exits.isProtectedCell(seed, cx, cz)) return false;
 		if (ManilaRoomPlan.isProtectedCell(seed, cx, cz)) return false;
+		if (StaircasePlan.isProtectedCell(seed, cx, cz)) return false;
 		if (Maze.isStairwellCell(seed, cx, cz)) return false;
 
 		// Keep Red Room perimeter rings sealed so trapped players never get an unexpected opening out.

@@ -60,6 +60,11 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		if (zone == Maze.Zone.MEGATHALL) return megahallBlockAt(seed, x, y, z, cx, cz, ix, iz, epochs);
 		ManilaRoomPlan.Room manila = ManilaRoomPlan.roomAtBlock(seed, x, z);
 		if (manila != null) return manilaBlockAt(manila, x, y, z);
+		StaircasePlan.Complex staircase = StaircasePlan.complexAtBlock(seed, x, z);
+		if (staircase != null) {
+			BlockState state = StaircasePlan.blockAt(staircase, x, y, z);
+			if (state != null) return state;
+		}
 
 		if (y < FLOOR_Y) {
 			if (Maze.isPit(seed, x, z)) {
@@ -93,9 +98,6 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 			}
 			return ModBlocks.CARPET.defaultBlockState();
 		}
-
-		BlockState stairwell = stairwellBlockAt(seed, x, y, z);
-		if (stairwell != null) return stairwell;
 
 		int ceilY = Maze.cellCeilingY(seed, cx, cz);
 		Maze.CeilingStyle ceiling = Maze.ceilingStyle(seed, cx, cz);
@@ -343,53 +345,6 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 			case 2 -> Direction.NORTH;
 			default -> Direction.SOUTH;
 		};
-	}
-
-	private static BlockState stairwellBlockAt(long seed, int x, int y, int z) {
-		int cx = Math.floorDiv(x, Maze.CELL), cz = Math.floorDiv(z, Maze.CELL);
-		int dir = Maze.stairwellDir(seed, cx, cz);
-		if (dir < 0) return null;
-		int ix = Math.floorMod(x, Maze.CELL), iz = Math.floorMod(z, Maze.CELL);
-
-		boolean isWall = switch (dir) {
-			case 0 -> (iz == 5 && ix >= 2 && ix <= 5) || (ix == 5 && iz == 4);
-			case 1 -> (iz == 5 && ix >= 2 && ix <= 5) || (ix == 2 && iz == 4);
-			case 2 -> (ix == 5 && iz >= 2 && iz <= 5) || (iz == 5 && ix == 4);
-			default -> (ix == 5 && iz >= 2 && iz <= 5) || (iz == 2 && ix == 4);
-		};
-		if (isWall) {
-			if (y == FLOOR_Y + 1) return ModBlocks.WALLPAPER_BASEBOARD.defaultBlockState();
-			if (y <= FLOOR_Y + 7) return ModBlocks.WALLPAPER.defaultBlockState();
-			return Blocks.BEDROCK.defaultBlockState();
-		}
-
-		int step = switch (dir) {
-			case 0 -> (iz == 4 && ix >= 2 && ix <= 4) ? ix - 2 : -1;
-			case 1 -> (iz == 4 && ix >= 3 && ix <= 5) ? 5 - ix : -1;
-			case 2 -> (ix == 4 && iz >= 2 && iz <= 4) ? iz - 2 : -1;
-			default -> (ix == 4 && iz >= 3 && iz <= 5) ? 5 - iz : -1;
-		};
-		if (step >= 0) {
-			int relY = y - FLOOR_Y;
-			if (relY <= step) return Blocks.SMOOTH_SANDSTONE.defaultBlockState();
-			if (relY == step + 1) {
-				Direction facing = switch (dir) {
-					case 0 -> Direction.EAST;
-					case 1 -> Direction.WEST;
-					case 2 -> Direction.SOUTH;
-					default -> Direction.NORTH;
-				};
-				return step < 2
-						? Blocks.SMOOTH_SANDSTONE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, facing)
-						: Blocks.SMOOTH_SANDSTONE.defaultBlockState();
-			}
-			if (relY <= 6) return Blocks.AIR.defaultBlockState();
-			if (relY == 7) {
-				return (step == 1 ? ModBlocks.BROKEN_FLUORESCENT_LIGHT : ModBlocks.CEILING_TILE).defaultBlockState();
-			}
-			return Blocks.BEDROCK.defaultBlockState();
-		}
-		return null;
 	}
 
 	@Override

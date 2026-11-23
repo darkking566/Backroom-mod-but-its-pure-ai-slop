@@ -30,6 +30,7 @@
   "block.noclip_backrooms.manila_cabinet": "Manila Supply Cabinet",
   "block.noclip_backrooms.manila_chair": "Manila Room Chair",
   "block.noclip_backrooms.manila_note": "Manila Mary Foundation Folder",
+  "block.noclip_backrooms.field_note": "Wanderer Field Note",
   "item.noclip_backrooms.flashlight": "Flashlight",
   "item.noclip_backrooms.almond_water": "Almond Water",
   "subtitles.noclip_backrooms.ambient.fluorescent_hum": "Fluorescent light hums",
@@ -96,5 +97,14 @@
   "message.noclip_backrooms.manila_guide.already": "You already carry the Manila Mary Foundation guide.",
   "book.noclip_backrooms.manila_guide.page1": "To whoever is reading this:\n\nWe are the Manila Mary Foundation, and we are here to help. Please take any food or Almond Water from the cabinet below and rest.\n\nYou have made it through the hardest part.",
   "book.noclip_backrooms.manila_guide.page2": "This place is Level 0 of the Backrooms. Outside these tan walls, the halls shift when no one is watching.\n\nInside the Manila Room, the humming fades, the walls stay still, and wanderers can meet safely.",
-  "book.noclip_backrooms.manila_guide.page3": "The cabinet below holds supplies to keep you going.\n\nWatch the yellow walls nearby: when a wall begins to flicker and crackle, step through to reach Level 1.\n\n- In memory of Manila Mary"
+  "book.noclip_backrooms.manila_guide.page3": "The cabinet below holds supplies to keep you going.\n\nWatch the yellow walls nearby: when a wall begins to flicker and crackle, step through to reach Level 1.\n\n- In memory of Manila Mary",
+  "message.noclip_backrooms.field_note.already": "You already have a copy of this field note.",
+  "message.noclip_backrooms.breaker.restored": "Backup breaker engaged — %s dead ceiling lights flickered back on.",
+  "message.noclip_backrooms.breaker.already_lit": "Backup breaker engaged — nearby lines are already powered.",
+  "book.noclip_backrooms.field_note.0.page1": "Shift Note - Upper Breaker Lofts\n\nWhoever built the wiring above Level 0 hid secondary breaker panels inside the stair lofts above ceiling height.",
+  "book.noclip_backrooms.field_note.0.page2": "Throwing the wall lever in a Utility Loft pushes voltage down through the sub-grid and brings nearby dead fluorescent lamps back online.\n\nLeave the cabinet supplies for the next shift.",
+  "book.noclip_backrooms.field_note.1.page1": "Observation Post - Above Ceiling Y=36\n\nI stayed upstairs for six hours watching the yellow halls through the smoked floor panes. Nobody passed below, yet footsteps kept pacing in the next crawlspace.",
+  "book.noclip_backrooms.field_note.1.page2": "Some stairwells aren't dead ends at all - look for crawlspace bridges over the lights or concrete stairs dropping below the damp carpet.",
+  "book.noclip_backrooms.field_note.2.page1": "Maintenance & Seal Log\n\nWater has been seeping into the lower service basements beneath several corridors. Pipes up top never stay dry for long.",
+  "book.noclip_backrooms.field_note.2.page2": "Warning regarding upper red-lit landings: one door was framed where no room ever existed behind it. Only black Void Stone sits beyond the latch."
 }

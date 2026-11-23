@@ -519,4 +519,36 @@ class MazeTest {
 		}
 		assertEquals(open, reached, "Manila Room window has unreachable blocks");
 	}
+
+	@Test
+	void staircaseComplexesGenerateAllTypesWithoutOverlap() {
+		long seed = 12345L;
+		EnumSet<StaircasePlan.Type> seenTypes = EnumSet.noneOf(StaircasePlan.Type.class);
+		int[] seenRots = new int[4];
+
+		for (int sx = -24; sx <= 24; sx++) {
+			for (int sz = -24; sz <= 24; sz++) {
+				StaircasePlan.Complex complex = StaircasePlan.complexInSector(seed, sx, sz);
+				if (complex == null) continue;
+				seenTypes.add(complex.type());
+				seenRots[complex.rot()]++;
+				assertFalse(sx == 0 && sz == 0, "origin sector must stay clean");
+				Maze.Zone zone = Maze.baseZoneForSector(seed, sx, sz);
+				assertTrue(zone == Maze.Zone.CLASSIC || zone == Maze.Zone.CORRIDORS);
+				for (int cu = 0; cu < StaircasePlan.SPAN_CELLS; cu++) {
+					for (int cv = 0; cv < StaircasePlan.SPAN_CELLS; cv++) {
+						int cx = complex.cx0() + cu, cz = complex.cz0() + cv;
+						assertFalse(ManilaRoomPlan.isRoomCell(seed, cx, cz), "staircase overlapped Manila Room");
+						assertFalse(Maze.isAtriumCell(seed, cx, cz), "staircase overlapped atrium");
+						assertFalse(Maze.isStandardFloorCell(seed, cx, cz), "staircase cell must block Exits");
+					}
+				}
+			}
+		}
+
+		assertEquals(EnumSet.allOf(StaircasePlan.Type.class), seenTypes, "missing staircase types: " + seenTypes);
+		for (int r = 0; r < 4; r++) {
+			assertTrue(seenRots[r] > 0, "missing rotation " + r);
+		}
+	}
 }

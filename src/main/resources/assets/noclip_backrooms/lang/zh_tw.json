@@ -30,6 +30,7 @@
   "block.noclip_backrooms.manila_cabinet": "馬尼拉補給櫥櫃",
   "block.noclip_backrooms.manila_chair": "馬尼拉房間木椅",
   "block.noclip_backrooms.manila_note": "馬尼拉瑪麗基金會文件夾",
+  "block.noclip_backrooms.field_note": "流浪者調查筆記",
   "item.noclip_backrooms.flashlight": "手電筒",
   "item.noclip_backrooms.almond_water": "杏仁水",
   "subtitles.noclip_backrooms.ambient.fluorescent_hum": "日光燈嗡嗡作響",
@@ -96,5 +97,14 @@
   "message.noclip_backrooms.manila_guide.already": "你已經帶著《馬尼拉瑪麗基金會指南》了。",
   "book.noclip_backrooms.manila_guide.page1": "致正在閱讀此文的你：\n\n我們是馬尼拉瑪麗基金會，在此為您提供幫助。請取用桌下櫥櫃裡的食物與杏仁水，好好休息。\n\n你已經走過最艱難的旅途了。",
   "book.noclip_backrooms.manila_guide.page2": "你所處的空間是後室的 Level 0。在這面米棕色牆外，走廊會在無人注視時悄悄改組。\n\n但在馬尼拉房間內，嗡嗡聲會漸漸退去，結構保持靜止，流浪者也能在此安全會合。",
-  "book.noclip_backrooms.manila_guide.page3": "桌下的櫥櫃放著撐過下一段路程的補給。\n\n留意附近的黃色牆壁：當有牆壁開始閃爍並冒出電火花時，走進去便能抵達 Level 1。\n\n——紀念「馬尼拉瑪麗」瑪麗・米切爾"
+  "book.noclip_backrooms.manila_guide.page3": "桌下的櫥櫃放著撐過下一段路程的補給。\n\n留意附近的黃色牆壁：當有牆壁開始閃爍並冒出電火花時，走進去便能抵達 Level 1。\n\n——紀念「馬尼拉瑪麗」瑪麗・米切爾",
+  "message.noclip_backrooms.field_note.already": "你已經帶著這份調查筆記了。",
+  "message.noclip_backrooms.breaker.restored": "備用斷路器已接通——附近 %s 盞損壞的燈具重新亮起。",
+  "message.noclip_backrooms.breaker.already_lit": "備用斷路器已接通——附近線路目前已供電。",
+  "book.noclip_backrooms.field_note.0.page1": "班次紀錄——上層斷路器機房\n\n建造 Level 0 配線的人在天花板上方的閣樓裡藏了備用配電盤。",
+  "book.noclip_backrooms.field_note.0.page2": "拉下配電室牆上的開關，能將電力送回下方的次迴路，讓附近熄滅的日光燈管重新亮起。\n\n櫥櫃裡的物資請留給下一位流浪者。",
+  "book.noclip_backrooms.field_note.1.page1": "上方觀察點紀錄——天花板 Y=36 之上\n\n我透過腳下的煙燻玻璃俯瞰底下黃色走廊整整六個小時。樓下空無一人，但隔壁夾層的腳步聲從未停過。",
+  "book.noclip_backrooms.field_note.1.page2": "別以為每座樓梯都是死路——試著走過日光燈上方的維護夾層天橋，或是沿著水泥階梯走進地底積水機房。",
+  "book.noclip_backrooms.field_note.2.page1": "下層維護與封鎖備忘\n\n多條走廊底下的維護地下室正在滲水，天花板上的舊管線一直滴著水。",
+  "book.noclip_backrooms.field_note.2.page2": "關於紅燈上層迴廊的警告：那裡有一扇門框立在根本不該有房間的位置，門後只有封死的黑曜虛空石。"
 }

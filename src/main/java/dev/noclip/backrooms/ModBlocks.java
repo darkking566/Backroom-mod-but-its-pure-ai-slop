@@ -78,6 +78,9 @@ final class ModBlocks {
 	static final Block MANILA_NOTE = register("manila_note", Properties.of()
 			.mapColor(MapColor.SAND).strength(0.2F).sound(SoundType.WOOL).noOcclusion().noCollision().noLootTable(),
 			ManilaNoteBlock::new);
+	static final Block FIELD_NOTE = register("field_note", Properties.of()
+			.mapColor(MapColor.SAND).strength(0.2F).sound(SoundType.WOOL).noOcclusion().noCollision().noLootTable(),
+			FieldNoteBlock::new);
 
 	private ModBlocks() {
 	}

@@ -1,10 +1,16 @@
 package dev.noclip.backrooms;
 
+import dev.noclip.backrooms.level1.Level1Blocks;
+import java.util.ArrayDeque;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.Set;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.world.TestWorldSave;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.locale.Language;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -14,6 +20,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 /** Plays the first version in a real client: fall in, look around, die out, reload. */
 public final class Level0ClientTest implements FabricClientGameTest {
@@ -69,6 +77,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			checkShadowHallucination(context, game, standY);
 			checkFlashlight(context, game, standY);
 			checkManilaRoom(context, game, standY);
+			checkStaircaseComplexes(context, game, standY);
 			server.runOnServer(s -> {
 				for (int i = 0; i < ModBlocks.ALL.size(); i++) {
 					player(s).getInventory().setItem(i, new ItemStack(ModBlocks.ALL.get(i)));
@@ -405,6 +414,200 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(5);
+	}
+
+	private static void checkStaircaseComplexes(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
+		var server = game.getServer();
+		EnumMap<StaircasePlan.Type, StaircasePlan.Complex> found = server.computeOnServer(s -> {
+			ServerLevel level = s.getLevel(BackroomsMod.LEVEL_0);
+			long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
+			EnumMap<StaircasePlan.Type, StaircasePlan.Complex> map = new EnumMap<>(StaircasePlan.Type.class);
+			for (int radius = 1; radius <= 24 && map.size() < StaircasePlan.Type.values().length; radius++) {
+				for (int sx = -radius; sx <= radius; sx++) {
+					for (int sz = -radius; sz <= radius; sz++) {
+						if (Math.max(Math.abs(sx), Math.abs(sz)) != radius) continue;
+						StaircasePlan.Complex c = StaircasePlan.complexInSector(seed, sx, sz);
+						if (c != null) {
+							map.putIfAbsent(c.type(), c);
+						}
+					}
+				}
+			}
+			for (StaircasePlan.Type t : StaircasePlan.Type.values()) {
+				check(map.containsKey(t), "missing staircase type " + t);
+			}
+			for (StaircasePlan.Complex c : map.values()) {
+				verify3DReachabilityAndNoExposedBedrock(seed, c);
+			}
+			return map;
+		});
+
+		// Live test in a Utility Loft: verify furniture, notes, breaker lever, and light restoration.
+		StaircasePlan.Complex loft = found.get(StaircasePlan.Type.UTILITY_LOFT);
+		int standX = loft.worldX(14, 10);
+		int standZ = loft.worldZ(14, 10);
+		int leverX = loft.worldX(15, 10);
+		int leverZ = loft.worldZ(15, 10);
+		Direction toWall = loft.worldDir(Direction.EAST);
+		float yaw = switch (toWall) {
+			case SOUTH -> 0F;
+			case WEST -> 90F;
+			case NORTH -> 180F;
+			default -> -90F;
+		};
+
+		server.runCommand("gamemode survival @a");
+		server.runCommand("item replace entity @a hotbar.0 with minecraft:air");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + (standX + 0.5) + " 38 " + (standZ + 0.5) + " " + yaw + " 12");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(10);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_staircase_loft");
+
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(loft.worldX(11, 6), 39, loft.worldZ(11, 6))).is(Level1Blocks.OLD_COMPUTER),
+					"Utility Loft computer missing");
+			check(level.getBlockState(new BlockPos(loft.worldX(12, 6), 39, loft.worldZ(12, 6))).is(ModBlocks.FIELD_NOTE),
+					"Utility Loft field note missing");
+			check(level.getBlockState(new BlockPos(loft.worldX(11, 14), 38, loft.worldZ(11, 14))).is(ModBlocks.MANILA_CABINET),
+					"Utility Loft cabinet missing");
+			check(level.getBlockState(new BlockPos(loft.worldX(12, 14), 38, loft.worldZ(12, 14))).is(Level1Blocks.SUPPLY_CRATE),
+					"Utility Loft supply crate missing");
+			BlockState lever = level.getBlockState(new BlockPos(leverX, 39, leverZ));
+			check(lever.is(Blocks.LEVER) && !lever.getValue(LeverBlock.POWERED), "Utility Loft lever missing or already on");
+			check(level.getBlockState(new BlockPos(loft.worldX(14, 7), 42, loft.worldZ(14, 7))).is(ModBlocks.BROKEN_FLUORESCENT_LIGHT),
+					"expected broken fluorescent light in Utility Loft before breaker throw");
+		});
+
+		// Aim directly at wall-mounted lever hitbox and flip it.
+		double aimX = leverX + 0.5 + toWall.getStepX() * 0.35;
+		double aimZ = leverZ + 0.5 + toWall.getStepZ() * 0.35;
+		double ddx = aimX - (standX + 0.5);
+		double ddz = aimZ - (standZ + 0.5);
+		double ddy = 39.5 - 39.62;
+		float exactYaw = (float) Math.toDegrees(Math.atan2(-ddx, ddz));
+		float exactPitch = (float) Math.toDegrees(-Math.atan2(ddy, Math.hypot(ddx, ddz)));
+		context.getInput().lookAt(exactYaw, exactPitch);
+		context.waitTicks(3);
+		context.getInput().pressMouse(1);
+		server.waitFor(s -> {
+			ServerLevel level = player(s).level();
+			BlockState lever = level.getBlockState(new BlockPos(leverX, 39, leverZ));
+			return lever.is(Blocks.LEVER) && lever.getValue(LeverBlock.POWERED)
+					&& level.getBlockState(new BlockPos(loft.worldX(14, 7), 42, loft.worldZ(14, 7))).is(ModBlocks.FLUORESCENT_LIGHT);
+		}, 60);
+
+		// Live test in a Flooded Basement: verify stairs, water sump, pipe, and field note.
+		StaircasePlan.Complex basement = found.get(StaircasePlan.Type.FLOODED_BASEMENT);
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (basement.worldX(11, 10) + 0.5) + " 25 " + (basement.worldZ(11, 10) + 0.5) + " " + yaw + " 10");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(10);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_flooded_basement");
+
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(basement.worldX(13, 10), 24, basement.worldZ(13, 10))).is(Blocks.WATER),
+					"Flooded Basement sump water missing");
+			check(level.getBlockState(new BlockPos(basement.worldX(13, 10), 28, basement.worldZ(13, 10))).is(Level1Blocks.LEAKING_CEILING_PIPE),
+					"Flooded Basement leaking pipe missing");
+			check(level.getBlockState(new BlockPos(basement.worldX(17, 10), 26, basement.worldZ(17, 10))).is(ModBlocks.FIELD_NOTE),
+					"Flooded Basement field note missing");
+			check(level.getBlockState(new BlockPos(basement.worldX(8, 10), 25, basement.worldZ(8, 10))).is(Level1Blocks.CONCRETE_STAIRS),
+					"Flooded Basement concrete stairs missing");
+		});
+
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(5);
+	}
+
+	private static void verify3DReachabilityAndNoExposedBedrock(long seed, StaircasePlan.Complex c) {
+		int bx = c.baseX(), bz = c.baseZ();
+		int minY = 23, maxY = 43;
+
+		// Verify no exposed bedrock touches any open or transparent block inside the 21x21 structure.
+		for (int dx = 0; dx < StaircasePlan.SPAN_BLOCKS; dx++) {
+			for (int dz = 0; dz < StaircasePlan.SPAN_BLOCKS; dz++) {
+				int x = bx + dx, z = bz + dz;
+				for (int y = minY; y <= maxY; y++) {
+					BlockState state = Level0ChunkGenerator.blockAt(seed, x, y, z);
+					if (state.isAir() || state.is(Blocks.WATER) || state.is(Blocks.STAINED_GLASS.gray()) || state.is(Blocks.LEVER)) {
+						for (Direction dir : Direction.values()) {
+							BlockState neighbor = Level0ChunkGenerator.blockAt(seed, x + dir.getStepX(), y + dir.getStepY(), z + dir.getStepZ());
+							check(!neighbor.is(Blocks.BEDROCK), "exposed bedrock near (" + x + "," + y + "," + z + ") in " + c.type());
+						}
+					}
+				}
+			}
+		}
+
+		// Run 3D voxel BFS starting from entry ground block (lu=1, lv=10, floor=32).
+		Set<Long> visited = new HashSet<>();
+		ArrayDeque<BlockPos> queue = new ArrayDeque<>();
+		BlockPos start = new BlockPos(c.worldX(1, 10), Level0ChunkGenerator.FLOOR_Y, c.worldZ(1, 10));
+		check(isWalkableVoxel(seed, start.getX(), start.getY(), start.getZ()), "stair entry not walkable for " + c.type());
+		visited.add(start.asLong());
+		queue.add(start);
+
+		while (!queue.isEmpty()) {
+			BlockPos cur = queue.poll();
+			for (Direction dir : Direction.Plane.HORIZONTAL) {
+				int nx = cur.getX() + dir.getStepX(), nz = cur.getZ() + dir.getStepZ();
+				if (nx < bx || nx >= bx + StaircasePlan.SPAN_BLOCKS || nz < bz || nz >= bz + StaircasePlan.SPAN_BLOCKS) {
+					continue;
+				}
+				for (int dy = -1; dy <= 1; dy++) {
+					int ny = cur.getY() + dy;
+					if (ny < minY || ny > maxY) continue;
+					BlockPos next = new BlockPos(nx, ny, nz);
+					if (!visited.contains(next.asLong()) && isWalkableVoxel(seed, nx, ny, nz)) {
+						visited.add(next.asLong());
+						queue.add(next);
+					}
+				}
+			}
+		}
+
+		switch (c.type()) {
+			case ATTIC_SHORTCUT -> {
+				check(visited.contains(new BlockPos(c.worldX(10, 10), StaircasePlan.UPPER_FLOOR_Y, c.worldZ(10, 10)).asLong()),
+						"ATTIC_SHORTCUT center unreachable");
+				check(visited.contains(new BlockPos(c.worldX(20, 10), Level0ChunkGenerator.FLOOR_Y, c.worldZ(20, 10)).asLong()),
+						"ATTIC_SHORTCUT exit ground unreachable");
+			}
+			case PARADOX_LOOP -> {
+				check(visited.contains(new BlockPos(c.worldX(10, 8), StaircasePlan.UPPER_FLOOR_Y, c.worldZ(10, 8)).asLong()),
+						"PARADOX_LOOP sealed-door alcove unreachable");
+				check(visited.contains(new BlockPos(c.worldX(20, 10), Level0ChunkGenerator.FLOOR_Y, c.worldZ(20, 10)).asLong()),
+						"PARADOX_LOOP exit ground unreachable");
+			}
+			case UTILITY_LOFT -> check(visited.contains(new BlockPos(c.worldX(14, 10), StaircasePlan.UPPER_FLOOR_Y, c.worldZ(14, 10)).asLong()),
+					"UTILITY_LOFT breaker area unreachable");
+			case OBSERVATION_OVERLOOK -> check(visited.contains(new BlockPos(c.worldX(12, 10), StaircasePlan.UPPER_FLOOR_Y, c.worldZ(12, 10)).asLong()),
+					"OBSERVATION_OVERLOOK glass deck unreachable");
+			case FLOODED_BASEMENT -> {
+				check(visited.contains(new BlockPos(c.worldX(15, 10), StaircasePlan.BASEMENT_FLOOR_Y, c.worldZ(15, 10)).asLong()),
+						"FLOODED_BASEMENT dry platform unreachable");
+				check(visited.contains(new BlockPos(c.worldX(13, 10), StaircasePlan.BASEMENT_FLOOR_Y - 1, c.worldZ(13, 10)).asLong()),
+						"FLOODED_BASEMENT water sump unreachable");
+			}
+		}
+	}
+
+	private static boolean isWalkableVoxel(long seed, int x, int y, int z) {
+		BlockState floor = Level0ChunkGenerator.blockAt(seed, x, y, z);
+		if (floor.isAir() || floor.is(Blocks.WATER) || floor.is(ModBlocks.FIELD_NOTE) || floor.is(Blocks.LEVER)) {
+			return false;
+		}
+		return isPassableHeadroom(Level0ChunkGenerator.blockAt(seed, x, y + 1, z))
+				&& isPassableHeadroom(Level0ChunkGenerator.blockAt(seed, x, y + 2, z));
+	}
+
+	private static boolean isPassableHeadroom(BlockState state) {
+		return state.isAir() || state.is(Blocks.WATER) || state.is(Blocks.LEVER) || state.is(ModBlocks.FIELD_NOTE);
 	}
 
 	private static void checkGeneratedBlocks(ServerLevel level) {

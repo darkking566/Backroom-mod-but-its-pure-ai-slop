@@ -270,6 +270,7 @@ final class Maze {
 
 	/** Whether a cell has flat standard FLOOR_Y = 32 across its whole floor (safe for Exits). */
 	static boolean isStandardFloorCell(long seed, int cx, int cz) {
+		if (StaircasePlan.isProtectedCell(seed, cx, cz)) return false;
 		Zone zone = zoneForCell(seed, cx, cz);
 		if (zone == Zone.CHASM) return ChasmPlan.isFlatRimCell(seed, cx, cz);
 		if (zone == Zone.MEGATHALL) return MegahallPlan.isRimCell(cx, cz);
@@ -287,7 +288,10 @@ final class Maze {
 		if (Math.floorDiv(baseCx, SECTOR) == 0 && Math.floorDiv(baseCz, SECTOR) == 0) return false;
 		for (int dx = 0; dx < 3; dx++) {
 			for (int dz = 0; dz < 3; dz++) {
-				if (ManilaRoomPlan.isRoomCell(seed, baseCx + dx, baseCz + dz)) return false;
+				if (ManilaRoomPlan.isRoomCell(seed, baseCx + dx, baseCz + dz)
+						|| StaircasePlan.isProtectedCell(seed, baseCx + dx, baseCz + dz)) {
+					return false;
+				}
 			}
 		}
 		return zoneForCell(seed, baseCx + 2, baseCz) == zone
@@ -302,6 +306,8 @@ final class Maze {
 		Zone zone = zoneForCell(seed, cx, cz);
 		if (zone == Zone.CHASM) return ChasmPlan.walkableFloorY(seed, x, z);
 		if (zone == Zone.MEGATHALL) return MegahallPlan.walkableFloorY(seed, x, z);
+		StaircasePlan.Complex staircase = StaircasePlan.complexAtBlock(seed, x, z);
+		if (staircase != null) return StaircasePlan.groundWalkableY(staircase, x, z);
 		if (isPit(seed, x, z)) return Integer.MIN_VALUE;
 		int ix = Math.floorMod(x, CELL), iz = Math.floorMod(z, CELL);
 		if (ix >= 2 && ix <= 5 && iz >= 2 && iz <= 5 && isSunkenCell(seed, cx, cz)) {
@@ -322,35 +328,26 @@ final class Maze {
 		return Level0ChunkGenerator.CEILING_Y;
 	}
 
-	/** Whether a cell hosts a cramped dead-end concrete stairwell alcove. */
+	/** Whether a cell hosts a multi-level staircase entrance (up to attic/loft/overlook/loop or down to basement). */
 	static boolean isStairwellCell(long seed, int cx, int cz) {
 		return stairwellDir(seed, cx, cz) >= 0;
 	}
 
 	/**
-	 * Orientation of a cell's dead-end stairwell (0=east, 1=west, 2=south, 3=north), or -1 if none.
+	 * Orientation of a cell's staircase entrance (0=east, 1=west, 2=south, 3=north), or -1 if none.
 	 */
 	static int stairwellDir(long seed, int cx, int cz) {
-		if (cx == 0 && cz == 0) return -1;
-		if (ManilaRoomPlan.isRoomCell(seed, cx, cz)) return -1;
-		Zone zone = zoneForCell(seed, cx, cz);
-		int freq = switch (zone) {
-			case CLASSIC -> 18;
-			case CORRIDORS -> 24;
-			default -> 0;
-		};
-		if (freq == 0) return -1;
-		long h = hash(seed, cx, cz, STAIRWELL);
-		if (Math.floorMod(h, freq) != 0) return -1;
-		if (zone == Zone.CLASSIC && isAtriumCell(seed, cx, cz)) return -1;
-		if (Exits.isProtectedCell(seed, cx, cz)) return -1;
-		return Math.floorMod(h >>> 8, 4);
+		StaircasePlan.Complex complex = StaircasePlan.complexForCell(seed, cx, cz);
+		if (complex == null) return -1;
+		if (complex.isEntryCell(cx, cz)) return complex.rot();
+		if (complex.isExitStairCell(cx, cz)) return (complex.rot() + 2) & 3;
+		return -1;
 	}
 
 	/** Whether a cell features a 1-block sunken carpeted basin in its 4x4 core. */
 	static boolean isSunkenCell(long seed, int cx, int cz) {
 		if (cx == 0 && cz == 0) return false;
-		if (ManilaRoomPlan.isRoomCell(seed, cx, cz)) return false;
+		if (ManilaRoomPlan.isRoomCell(seed, cx, cz) || StaircasePlan.isComplexCell(seed, cx, cz)) return false;
 		Zone zone = zoneForCell(seed, cx, cz);
 		if (zone != Zone.CLASSIC && zone != Zone.ARCHES && zone != Zone.CUBICLES) return false;
 		if (Math.floorMod(hash(seed, cx, cz, FLOOR), 22) != 0) return false;
@@ -366,7 +363,8 @@ final class Maze {
 
 	static CeilingStyle ceilingStyle(long seed, int cx, int cz) {
 		if ((cx == 0 && cz == 0) || isStairwellCell(seed, cx, cz) || isAtriumCell(seed, cx, cz)
-				|| ManilaRoomPlan.isRoomCell(seed, cx, cz) || Exits.isProtectedCell(seed, cx, cz)) {
+				|| ManilaRoomPlan.isRoomCell(seed, cx, cz) || StaircasePlan.isComplexCell(seed, cx, cz)
+				|| Exits.isProtectedCell(seed, cx, cz)) {
 			return CeilingStyle.FLAT;
 		}
 		Zone zone = zoneForCell(seed, cx, cz);
@@ -452,9 +450,9 @@ final class Maze {
 		int epoch = effectiveEpoch(zone, cx, cz, epochs);
 
 		if (ix != 0 && iz != 0) {
-			int stairDir = stairwellDir(seed, cx, cz);
-			if (stairDir >= 0) {
-				return isStairwellWall(stairDir, ix, iz);
+			StaircasePlan.Complex staircase = StaircasePlan.complexAtBlock(seed, x, z);
+			if (staircase != null) {
+				return StaircasePlan.isGroundWall(staircase, x, z);
 			}
 			if (ix < 2 || ix > 5 || iz < 2 || iz > 5) return false;
 			if (ix == CENTER && iz == CENTER) return false;
@@ -485,15 +483,6 @@ final class Maze {
 				|| !northEdge(seed, cx, cz, zone, epoch).open()
 				|| !northEdge(seed, cx - 1, cz, westNeighbor, effectiveEpoch(westNeighbor, cx - 1, cz, epochs)).open()
 				|| Math.floorMod(mixEpoch(hash(seed, cx, cz, PILLAR), epoch), 3) == 0;
-	}
-
-	private static boolean isStairwellWall(int dir, int ix, int iz) {
-		return switch (dir) {
-			case 0 -> (iz == 5 && ix >= 2 && ix <= 5) || (ix == 5 && iz == 4);
-			case 1 -> (iz == 5 && ix >= 2 && ix <= 5) || (ix == 2 && iz == 4);
-			case 2 -> (ix == 5 && iz >= 2 && iz <= 5) || (iz == 5 && ix == 4);
-			default -> (ix == 5 && iz >= 2 && iz <= 5) || (iz == 2 && ix == 4);
-		};
 	}
 
 	static RoomLayout roomLayout(long seed, int cx, int cz, Zone zone, int epoch) {
