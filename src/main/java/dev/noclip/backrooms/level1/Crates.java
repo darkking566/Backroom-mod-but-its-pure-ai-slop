@@ -24,7 +24,7 @@ import net.minecraft.world.phys.Vec3;
  */
 final class Crates {
 	private static final int FIRST_DELAY = 40 * 20, DELAY = 60 * 20, DELAY_SPREAD = 90 * 20;
-	private static final int MAX_NEAR = 3, NEAR = 32;
+	private static final int MAX_NEAR = 3, NEAR = 32, DEBRIS_PERCENT = 25;
 	private static final int VANISH_CHECK = 40, VANISH_CHANCE = 10, VANISH_MIN_DISTANCE = 12;
 
 	private static final List<BlockPos> PLACED = new ArrayList<>();
@@ -52,21 +52,54 @@ final class Crates {
 				if (player.isSpectator()) continue;
 				int next = NEXT.computeIfAbsent(player.getUUID(), id -> now + FIRST_DELAY + random.nextInt(DELAY_SPREAD));
 				if (now < next) continue;
-				spawnBehind(player);
+				spawnBehind(player, random.nextInt(100) < DEBRIS_PERCENT);
+				if (random.nextInt(100) < 40) paintingNear(level, player);
 				NEXT.put(player.getUUID(), now + DELAY + random.nextInt(DELAY_SPREAD));
 			}
 		}
 		if (now % VANISH_CHECK == 0) vanishUnwatched(level, random);
 	}
 
+	/** A free hall-floor block in front of a corridor doorway near the player, or null. */
+	static BlockPos floorBeforeDoor(ServerLevel level, ServerPlayer player) {
+		long seed = Level1ChunkGenerator.planSeed(level.getChunkSource().randomState());
+		RandomSource random = level.getRandom();
+		for (int attempt = 0; attempt < 300; attempt++) {
+			int x = player.getBlockX() + random.nextInt(81) - 40, z = player.getBlockZ() + random.nextInt(81) - 40;
+			if (Level1Layout.tile(seed, x, z) != Tile.OPENING_SIGN) continue;
+			for (Direction side : Direction.Plane.HORIZONTAL) {
+				int fx = x + side.getStepX(), fz = z + side.getStepZ();
+				Tile front = Level1Layout.tile(seed, fx, fz);
+				if (front != Tile.FLOOR && front != Tile.LINE && front != Tile.DAMP) continue;
+				BlockPos pos = new BlockPos(fx, Level1ChunkGenerator.FLOOR_Y + 1, fz);
+				if (level.isLoaded(pos) && level.getBlockState(pos).isAir()) return pos;
+			}
+		}
+		return null;
+	}
+
+	/** A painting lies before the door to the corridors; like the crates, it is gone once nobody is looking. */
+	static BlockPos paintingNear(ServerLevel level, ServerPlayer player) {
+		BlockPos pos = floorBeforeDoor(level, player);
+		if (pos == null) return null;
+		level.setBlock(pos, Level1Blocks.FLOOR_PAINTING.defaultBlockState(), Block.UPDATE_ALL);
+		PLACED.add(pos);
+		return pos;
+	}
+
 	static void afterFlickering(ServerLevel level) {
 		for (ServerPlayer player : level.players()) {
-			if (!player.isSpectator() && level.getRandom().nextInt(100) < 70) spawnBehind(player);
+			if (!player.isSpectator() && level.getRandom().nextInt(100) < 70) spawnBehind(player, false);
 		}
 	}
 
 	/** Puts a crate on the floor somewhere behind the player; returns where, or null. */
 	static BlockPos spawnBehind(ServerPlayer player) {
+		return spawnBehind(player, false);
+	}
+
+	/** Or a heap of debris, which counts the same and can hold a crowbar. */
+	static BlockPos spawnBehind(ServerPlayer player, boolean debris) {
 		ServerLevel level = player.level();
 		if (level.dimension() != Level1.LEVEL_1) return null;
 		int near = 0;
@@ -91,7 +124,7 @@ final class Crates {
 			// Most of the time tucked against something; now and then out in the open.
 			if (attempt < 30 && !againstSomething(level, pos)) continue;
 
-			level.setBlock(pos, Level1Blocks.SUPPLY_CRATE.defaultBlockState(), Block.UPDATE_ALL);
+			level.setBlock(pos, (debris ? Level1Blocks.DEBRIS_PILE : Level1Blocks.SUPPLY_CRATE).defaultBlockState(), Block.UPDATE_ALL);
 			PLACED.add(pos);
 			Strays.maybeBeside(level, pos);
 			return pos;
@@ -110,7 +143,8 @@ final class Crates {
 		for (Iterator<BlockPos> it = PLACED.iterator(); it.hasNext(); ) {
 			BlockPos pos = it.next();
 			if (!level.isLoaded(pos)) continue;
-			if (!level.getBlockState(pos).is(Level1Blocks.SUPPLY_CRATE)) {
+			if (!level.getBlockState(pos).is(Level1Blocks.SUPPLY_CRATE) && !level.getBlockState(pos).is(Level1Blocks.DEBRIS_PILE)
+					&& !level.getBlockState(pos).is(Level1Blocks.FLOOR_PAINTING)) {
 				it.remove();
 				continue;
 			}

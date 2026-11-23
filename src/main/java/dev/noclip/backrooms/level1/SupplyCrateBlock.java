@@ -29,7 +29,7 @@ final class SupplyCrateBlock extends Block {
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		if (level instanceof ServerLevel server) {
 			ItemStack held = player.getMainHandItem();
-			if (!(held.is(ItemTags.AXES) || held.is(ItemTags.SWORDS)) && server.getRandom().nextInt(100) < CUT_PERCENT) {
+			if (!(held.is(ItemTags.AXES) || held.is(ItemTags.SWORDS) || held.is(Level1Items.CROWBAR)) &&server.getRandom().nextInt(100) < CUT_PERCENT) {
 				player.hurtServer(server, server.damageSources().generic(), 2.0F);
 				if (player instanceof ServerPlayer serverPlayer) serverPlayer.sendOverlayMessage(Component.translatable("message.noclip_backrooms.crate_cut"));
 			}

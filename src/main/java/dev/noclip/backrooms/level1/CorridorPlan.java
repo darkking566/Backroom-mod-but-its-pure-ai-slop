@@ -41,7 +41,7 @@ final class CorridorPlan {
 	private final Room[] roomTypes = new Room[8];
 	private int rooms;
 	private final Ceiling[] bulbs = new Ceiling[N * N];
-	/** 0 nothing, 1 desk, 2 shelf, 3 bed, 4 table; by local block position. */
+	/** 0 nothing, 1 desk, 2 shelf, 3 bed, 4 table, 5 chair, 6 floor painting; by local block position. */
 	private final byte[] furniture = new byte[SIZE * SIZE];
 	private int doorX = -1, doorZ = -1;
 
@@ -79,6 +79,8 @@ final class CorridorPlan {
 		if (item == 1) return Tile.DESK;
 		if (item == 2) return Tile.ROOM_SHELF;
 		if (item == 3) return Tile.BED;
+		if (item == 5) return Tile.CHAIR;
+		if (item == 6) return Tile.FLOOR_PAINTING;
 		if (item == 4) return Tile.TABLE;
 
 		int ci = lx / CELL, cj = lz / CELL, px = lx % CELL, pz = lz % CELL;
@@ -196,10 +198,15 @@ final class CorridorPlan {
 	private void furnish(Box room) {
 		int x0 = room.i() * CELL + 2, x1 = (room.i() + room.w()) * CELL - 2;
 		int z0 = room.j() * CELL + 2, z1 = (room.j() + room.h()) * CELL - 2;
+		if (room.type() == Room.PADDED) furniture[room.i() * CELL + 2 + (room.j() * CELL + 2) * SIZE] = 5;
 		if (x1 - x0 < 4 || z1 - z0 < 4) return;
 		if (room.type() == Room.OFFICE) {
 			int z = (z0 + z1) / 2;
 			for (int x = x0 + 1; x < x1; x += 2) furniture[x + z * SIZE] = 1;
+		} else if (room.type() == Room.GALLERY) {
+			furniture[x0 + 1 + z0 * SIZE] = 6;
+			furniture[x1 - 2 + (z1 - 1) * SIZE] = 6;
+			furniture[x0 + (z0 + z1) / 2 * SIZE] = 6;
 		} else if (room.type() == Room.MEDICAL) {
 			furniture[(x0 + x1) / 2 + (z0 + z1) / 2 * SIZE] = 3;
 			for (int x : new int[] {x0, x1 - 1}) {

@@ -38,9 +38,25 @@ public final class LevelExits {
 		return OPEN.containsKey(level);
 	}
 
+	private static final Map<UUID, Integer> LOCKED_UNTIL = new HashMap<>();
+
+	/** For this long no exit takes the player anywhere (a teleport berry's price). */
+	public static void lock(ServerPlayer player, int ticks) {
+		LOCKED_UNTIL.put(player.getUUID(), player.level().getServer().getTickCount() + ticks);
+	}
+
 	/** Takes the player through an exit to the given level, or tells them nothing is there yet. */
 	public static void use(ServerPlayer player, String level) {
 		MinecraftServer server = player.level().getServer();
+		Integer lockedUntil = LOCKED_UNTIL.get(player.getUUID());
+		if (lockedUntil != null && server.getTickCount() < lockedUntil) {
+			Integer last = LAST_REFUSED.get(player.getUUID());
+			if (last == null || server.getTickCount() - last >= REFUSE_INTERVAL) {
+				LAST_REFUSED.put(player.getUUID(), server.getTickCount());
+				player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.exit_locked"));
+			}
+			return;
+		}
 		Arrival arrival = OPEN.get(level);
 		if (arrival == null) {
 			refuse(player, level, server.getTickCount());

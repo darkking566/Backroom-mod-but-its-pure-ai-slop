@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "noclip_backrooms:item/level1/teleport_berry"
+  }
+}

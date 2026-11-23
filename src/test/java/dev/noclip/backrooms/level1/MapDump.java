@@ -32,6 +32,8 @@ class MapDump {
 					case DESK -> 0x8040c0;
 					case ROOM_SHELF -> 0xa06030;
 					case BED -> 0xe0e0ff;
+					case CHAIR -> 0x606060;
+					case FLOOR_PAINTING -> 0xc09040;
 					case TABLE -> 0x8060a0;
 					case GALLERY -> 0xe0c060;
 					case WALL -> 0x404858;

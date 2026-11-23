@@ -170,5 +170,15 @@
   "direction.noclip_backrooms.6": "北",
   "direction.noclip_backrooms.7": "東北",
   "block.noclip_backrooms.gallery_wall": "掛滿畫的牆",
-  "block.noclip_backrooms.hospital_bed": "病床"
+  "block.noclip_backrooms.hospital_bed": "病床",
+  "item.noclip_backrooms.crowbar": "撬棍",
+  "item.noclip_backrooms.friend_orb": "福友玉",
+  "item.noclip_backrooms.squirt_gun": "滋水槍",
+  "item.noclip_backrooms.teleport_berry": "遷躍漿果",
+  "block.noclip_backrooms.debris_pile": "殘骸堆",
+  "message.noclip_backrooms.friend_orb_glows": "福友玉發出微光……附近有東西。",
+  "message.noclip_backrooms.berry_jump": "世界一陣扭曲，你被拋到了別處。接下來一陣子，出口不會帶你去任何地方。",
+  "message.noclip_backrooms.exit_locked": "遷躍漿果的效力還在，這個出口暫時打不開。",
+  "block.noclip_backrooms.sunken_chair": "嵌進地板的椅子",
+  "block.noclip_backrooms.floor_painting": "地上的畫"
 }

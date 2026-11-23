@@ -40,6 +40,16 @@ public final class Level1Items {
 					Consumables.defaultFood()
 							.onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.INSTANT_HEALTH, 1, 0)))
 							.build()), Item::new);
+	/** Found in debris: opens crates without cutting your hands. */
+	public static final Item CROWBAR = register("crowbar", new Item.Properties().stacksTo(1), Item::new);
+	/** Glows when something hostile is near. */
+	public static final Item FRIEND_ORB = register("friend_orb", new Item.Properties().stacksTo(1), FriendOrbItem::new);
+	/** Shoves things back with a jet of water. */
+	public static final Item SQUIRT_GUN = register("squirt_gun", new Item.Properties().stacksTo(1), SquirtGunItem::new);
+	/** An escape from certain death: a long jump, and no exits afterwards for a while. */
+	public static final Item TELEPORT_BERRY = register("teleport_berry", new Item.Properties().stacksTo(8)
+			.food(new FoodProperties.Builder().nutrition(1).saturationModifier(0.2F).alwaysEdible().build(),
+					Consumables.defaultFood().build()), TeleportBerryItem::new);
 	/** What a smiler looks like: only ever shown floating in the dark, never handed out. */
 	static final Item SMILER_FACE = register("smiler_face", new Item.Properties().stacksTo(1), Item::new);
 
@@ -52,6 +62,10 @@ public final class Level1Items {
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(output -> {
 			output.accept(PHOSPHOR_POWDER);
 			output.accept(BANDAGE);
+			output.accept(CROWBAR);
+			output.accept(FRIEND_ORB);
+			output.accept(SQUIRT_GUN);
+			output.accept(TELEPORT_BERRY);
 		});
 	}
 

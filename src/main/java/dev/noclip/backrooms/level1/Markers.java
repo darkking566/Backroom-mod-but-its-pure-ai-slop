@@ -61,8 +61,17 @@ final class Markers {
 		}
 		if (near >= MAX_NEAR) return null;
 
-		long seed = Level1ChunkGenerator.planSeed(level.getChunkSource().randomState());
 		RandomSource random = level.getRandom();
+		// Some wait on the floor by a doorway, the way the first bottle of almond water is found.
+		if (random.nextInt(100) < 35) {
+			BlockPos byDoor = Crates.floorBeforeDoor(level, player);
+			if (byDoor != null) {
+				level.setBlock(byDoor, Level1Blocks.SETTLEMENT_MARKER.defaultBlockState().setValue(SettlementMarkerBlock.FACING, Direction.UP), Block.UPDATE_ALL);
+				PLACED.add(byDoor);
+				return byDoor;
+			}
+		}
+		long seed = Level1ChunkGenerator.planSeed(level.getChunkSource().randomState());
 		for (int attempt = 0; attempt < 60; attempt++) {
 			double angle = random.nextDouble() * Math.PI * 2, distance = 10 + random.nextDouble() * 18;
 			int x = (int) Math.floor(player.getX() + Math.cos(angle) * distance);

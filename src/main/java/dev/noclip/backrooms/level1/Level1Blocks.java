@@ -55,6 +55,10 @@ public final class Level1Blocks {
 	public static final Block SUPPLY_CRATE = register("supply_crate", Properties.of()
 			.mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD), SupplyCrateBlock::new);
 
+	/** Wreckage on the floor: planks, scrap and, now and then, a crowbar. Opens like a crate. */
+	public static final Block DEBRIS_PILE = register("debris_pile", Properties.of()
+			.mapColor(MapColor.WOOD).strength(1.0F).sound(SoundType.WOOD).noOcclusion(), SupplyCrateBlock::new);
+
 	// The corridors
 	public static final Block PAINTED_CONCRETE_WALL = register("painted_concrete_wall", concrete(MapColor.QUARTZ));
 	public static final Block CORRIDOR_FLOOR = register("corridor_floor", concrete(MapColor.COLOR_LIGHT_GRAY));
@@ -144,6 +148,14 @@ public final class Level1Blocks {
 			p -> new ShapedBlock(p, Block.box(3, 0, 3, 13, 16, 13)));
 	public static final Block GALLERY_WALL = register("gallery_wall", Properties.of()
 			.mapColor(MapColor.QUARTZ).strength(2.0F).sound(SoundType.STONE));
+	/** The chair in the rubber room, sunk into the floor. */
+	public static final Block SUNKEN_CHAIR = register("sunken_chair", Properties.of()
+			.mapColor(MapColor.COLOR_GRAY).strength(0.8F).sound(SoundType.WOOL).noOcclusion(),
+			p -> new ShapedBlock(p, Block.box(4, 0, 4, 12, 13, 12)));
+	/** A painting lying on the floor, where no one would put one. */
+	public static final Block FLOOR_PAINTING = register("floor_painting", Properties.of()
+			.mapColor(MapColor.COLOR_BROWN).instabreak().sound(SoundType.WOOD).noOcclusion().noCollision().noLootTable(),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 0.5, 14)));
 	public static final Block HOSPITAL_BED = register("hospital_bed", Properties.of()
 			.mapColor(MapColor.METAL).strength(0.8F).sound(SoundType.METAL).noOcclusion(),
 			p -> new ShapedBlock(p, Block.box(0, 0, 1, 16, 11, 15)));

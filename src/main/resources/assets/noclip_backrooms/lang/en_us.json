@@ -170,5 +170,15 @@
   "direction.noclip_backrooms.6": "north",
   "direction.noclip_backrooms.7": "north-east",
   "block.noclip_backrooms.gallery_wall": "Gallery Wall",
-  "block.noclip_backrooms.hospital_bed": "Hospital Bed"
+  "block.noclip_backrooms.hospital_bed": "Hospital Bed",
+  "item.noclip_backrooms.crowbar": "Crowbar",
+  "item.noclip_backrooms.friend_orb": "Friend Jade",
+  "item.noclip_backrooms.squirt_gun": "Squirt Gun",
+  "item.noclip_backrooms.teleport_berry": "Teleport Berry",
+  "block.noclip_backrooms.debris_pile": "Debris Pile",
+  "message.noclip_backrooms.friend_orb_glows": "The jade glows faintly... something is near.",
+  "message.noclip_backrooms.berry_jump": "The world twists and throws you elsewhere. For a while, no exit will take you anywhere.",
+  "message.noclip_backrooms.exit_locked": "The berry's effect lingers; this exit will not open for now.",
+  "block.noclip_backrooms.sunken_chair": "Sunken Chair",
+  "block.noclip_backrooms.floor_painting": "Painting on the Floor"
 }

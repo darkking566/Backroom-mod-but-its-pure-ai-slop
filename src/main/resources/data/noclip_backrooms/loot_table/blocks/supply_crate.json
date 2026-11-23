@@ -307,6 +307,71 @@
               }
             }
           ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:friend_orb",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:squirt_gun",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:teleport_berry",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:flashlight",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:bedroll",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:crowbar",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:bundle",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:campfire",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_sword",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:leather_helmet",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:shears",
+          "weight": 1
         }
       ]
     },

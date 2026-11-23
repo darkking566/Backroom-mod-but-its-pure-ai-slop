@@ -750,7 +750,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		game.getServer().runOnServer(s -> {
 			ServerLevel level = level1(s);
 			for (Block block : Level1Blocks.ALL) {
-				if (block.getLootTable().isEmpty() || block == Level1Blocks.SUPPLY_CRATE || block == Level1Blocks.EYED_CRATE
+				if (block.getLootTable().isEmpty() || block == Level1Blocks.SUPPLY_CRATE || block == Level1Blocks.DEBRIS_PILE || block == Level1Blocks.EYED_CRATE
 						|| block == Level1Blocks.SUPPLY_LOCKER) continue; // these hand out their contents instead
 				var drops = Block.getDrops(block.defaultBlockState(), level, new BlockPos(3, 3, 3), null);
 				check(drops.size() == 1 && drops.getFirst().is(block.asItem()), "wrong drop for " + block);

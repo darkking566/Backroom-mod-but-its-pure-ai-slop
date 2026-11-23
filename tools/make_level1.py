@@ -957,6 +957,80 @@ BANDAGE = [
 ]
 
 
+CROWBAR = [
+    "................",
+    "..........ggg...",
+    ".........gddg...",
+    "........gd.g....",
+    ".......gd.......",
+    "......gd........",
+    ".....gd.........",
+    "....gd..........",
+    "...gd...........",
+    "..gd............",
+    ".gdr............",
+    "gdrg............",
+    "ggg.............",
+    "................",
+    "................",
+    "................",
+]
+FRIEND_ORB = [
+    "................",
+    ".....kkkkkk.....",
+    "...kkbbbbbbkk...",
+    "..kbbwwbbbbbbk..",
+    "..kbwwbbbbbbbk..",
+    ".kbbwbbbbbbbbbk.",
+    ".kbbbbbbbbbbbbk.",
+    ".kbbbbbbbbbbbbk.",
+    ".kbbbbbbbbbbddk.",
+    "..kbbbbbbbbddk..",
+    "..kbbbbbbbddbk..",
+    "...kkbbbbbbkk...",
+    ".....kkkkkk.....",
+    "................",
+    "................",
+    "................",
+]
+SQUIRT_GUN = [
+    "................",
+    "................",
+    "...bbbbbbbb.....",
+    "..bwwwwwwwbb....",
+    "..bwwwwwwwwbbb..",
+    "..bbbbbbbbbbbb..",
+    "....bbbb.bb.....",
+    "....bkkb........",
+    "....bkkb........",
+    "....bkb.........",
+    "....bb..........",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+]
+TELEPORT_BERRY = [
+    "................",
+    "......gg........",
+    ".....gggg.......",
+    "......g.........",
+    ".....ppppp......",
+    "...ppvvppppp....",
+    "..ppvvvppppppp..",
+    "..pppvppppppdp..",
+    "..pppppppppddp..",
+    "...pppppppddp...",
+    "....ppppppdp....",
+    ".....pppppp.....",
+    "................",
+    "................",
+    "................",
+    "................",
+]
+
+
 def item_textures():
     ITEMS.mkdir(parents=True, exist_ok=True)
     glass = (190, 214, 222, 255)
@@ -965,6 +1039,10 @@ def item_textures():
     pixel_art(ALLOY, {"h": (214, 220, 226, 255), "m": (150, 158, 168, 255), "d": (96, 102, 112, 255)}).save(ITEMS / "alloy.png")
     pixel_art(PHOSPHOR, {"k": (120, 96, 70, 255), "g": glass, "b": (170, 255, 190, 255), "p": (220, 255, 226, 255)}).save(ITEMS / "phosphor_powder.png")
     pixel_art(BANDAGE, {"w": (196, 190, 176, 255), "h": (238, 232, 216, 255), "r": (176, 52, 48, 255)}).save(ITEMS / "bandage.png")
+    pixel_art(CROWBAR, {"g": (110, 112, 118, 255), "d": (170, 174, 180, 255), "r": (150, 70, 50, 255)}).save(ITEMS / "crowbar.png")
+    pixel_art(FRIEND_ORB, {"k": (40, 70, 110, 255), "b": (110, 190, 240, 255), "w": (235, 250, 255, 255), "d": (70, 130, 200, 255)}).save(ITEMS / "friend_orb.png")
+    pixel_art(SQUIRT_GUN, {"b": (60, 120, 220, 255), "w": (150, 200, 250, 255), "k": (40, 40, 50, 255)}).save(ITEMS / "squirt_gun.png")
+    pixel_art(TELEPORT_BERRY, {"g": (60, 150, 70, 255), "p": (140, 60, 170, 255), "v": (200, 150, 230, 255), "d": (90, 30, 120, 255)}).save(ITEMS / "teleport_berry.png")
     smiler_face().save(ITEMS / "smiler_face.png")
 
 
@@ -1037,7 +1115,19 @@ def gallery_wall():
     return m
 
 
+def floor_painting():
+    """A small framed landscape, lying face up."""
+    m = flat((150, 112, 60), 0.3, 40)
+    paint(m, box(8, 8, 120, 120), (176, 138, 74), height=2)
+    paint(m, box(16, 16, 112, 112), (140, 176, 206))
+    paint(m, box(16, 70, 112, 112), (90, 124, 82))
+    sun = 1 - step(9, 11, np.hypot(X - 88, Y - 38))
+    paint(m, sun, (244, 214, 130))
+    return m
+
+
 def prop_textures(t):
+    t["floor_painting"] = floor_painting()
     t["gallery_wall"] = gallery_wall()
     t["bed_sheet"] = canvas((224, 226, 228), 985)
     t["booth_wall"] = booth_panel(800)
@@ -1430,6 +1520,18 @@ def hospital_bed_model():
             "elements": legs + [el((0, 6, 1), (16, 9, 15), sides("#sheet")), el((1, 9, 3), (6, 11, 13), sides("#sheet"))]}
 
 
+def sunken_chair_model():
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": NS + "padded_wall", "pad": NS + "padded_wall"},
+            "elements": [el((4, 0, 4), (12, 3, 12), sides("#pad")), el((4, 3, 11), (12, 13, 12), sides("#pad"))]}
+
+
+def floor_painting_model():
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": NS + "floor_painting", "art": NS + "floor_painting"},
+            "elements": [el((2, 0.05, 2), (14, 0.15, 14), {"up": "#art", "down": "#art"}, shade=False)]}
+
+
 def bedroll_model():
     return {"parent": "minecraft:block/block",
             "textures": {"particle": NS + "bedroll", "roll": NS + "bedroll", "pillow": NS + "cot_canvas"},
@@ -1520,8 +1622,15 @@ def all_models():
     m["supply_locker"] = locker_model()
     m["barrel_fire"] = barrel_fire_model()
     m["tarp"] = cube_all("tarp")
+    side = {"north": "#side", "south": "#side", "east": "#side", "west": "#side", "up": "#top"}
+    m["debris_pile"] = {"parent": "minecraft:block/block",
+                        "textures": {"particle": NS + "crate_side", "side": NS + "crate_side", "top": NS + "crate_top"},
+                        "elements": [el((1, 0, 2), (11, 5, 9), side), el((6, 0, 8), (15, 4, 15), side),
+                                     el((2, 5, 3), (13, 7, 6), side, rotation={"angle": 22.5, "axis": "y", "origin": [8, 6, 4]})]}
     m["gallery_wall"] = cube_all("gallery_wall")
     m["hospital_bed"] = hospital_bed_model()
+    m["sunken_chair"] = sunken_chair_model()
+    m["floor_painting"] = floor_painting_model()
     m["phosphor_mark"] = {"parent": "minecraft:block/block",
                           "textures": {"particle": NS + "phosphor_mark", "mark": NS + "phosphor_mark"},
                           "elements": [el((2, 0.05, 2), (14, 0.15, 14), {"up": "#mark", "down": "#mark"}, shade=False, light_emission=15)]}
@@ -1587,7 +1696,7 @@ def all_blockstates():
     for name in ("booth_wall", "booth_roof", "barrier_base", "barrier_arm", "fuel_drum", "caged_lamp", "eyed_crate", "shut_eyed_crate"):
         b[name] = single(name)
     b["booth_drawer"] = {"variants": {"empty=false": {"model": NS + "booth_drawer"}, "empty=true": {"model": NS + "booth_drawer_open"}}}
-    for name in ("first_light_sign", "blink_sign", "floodlight", "cot", "bedroll", "supply_locker", "barrel_fire", "tarp", "gallery_wall", "hospital_bed"):
+    for name in ("first_light_sign", "blink_sign", "floodlight", "cot", "bedroll", "supply_locker", "barrel_fire", "tarp", "gallery_wall", "hospital_bed", "debris_pile", "sunken_chair", "floor_painting"):
         b[name] = single(name)
     b["jersey_barrier"] = {"variants": {"axis=x": {"model": NS + "jersey_barrier"}, "axis=z": {"model": NS + "jersey_barrier", "y": 90}}}
     # The same turns as an end rod: the smear lies against the block it was dabbed on.
@@ -1698,7 +1807,7 @@ def main():
     save_cutout("settlement_marker", *settlement_marker(False))
     save_cutout("settlement_marker_taken", *settlement_marker(True))
     item_textures()
-    for item in ("almond_water", "alloy", "phosphor_powder", "bandage", "smiler_face"):
+    for item in ("almond_water", "alloy", "phosphor_powder", "bandage", "crowbar", "friend_orb", "squirt_gun", "teleport_berry", "smiler_face"):
         write_json(ASSETS / f"models/item/level1/{item}.json",
                    {"parent": "minecraft:item/generated", "textures": {"layer0": f"noclip_backrooms:item/level1/{item}"}})
         write_json(ASSETS / f"items/{item}.json", {"model": {"type": "minecraft:model", "model": f"noclip_backrooms:item/level1/{item}"}})
