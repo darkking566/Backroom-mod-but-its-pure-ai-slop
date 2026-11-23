@@ -17,7 +17,8 @@ final class BasePlan {
 		/** A barrier with the settlement's sign on top, beside each way in. */
 		SIGN_X, SIGN_Z,
 		FLOODLIGHT, COT, LOCKER, DESK, COMPUTER_DESK,
-		FIRE, BEDROLL, TENT_WALL, TENT_FLOOR, TENT_BEDROLL
+		FIRE, BEDROLL, TENT_WALL, TENT_FLOOR, TENT_BEDROLL,
+		COUNTER_TRADE, COUNTER_TOM, CLINIC_BED, SIGNUP_BOOTH
 	}
 
 	private static final int[][] FLOODLIGHTS = {{16, 18}, {47, 18}, {16, 45}, {47, 45}, {24, 36}, {40, 26}};
@@ -43,7 +44,16 @@ final class BasePlan {
 			boolean sign = along == GAP_FROM - 1 || along == GAP_TO + 1;
 			return end ? (sign ? Piece.SIGN_X : Piece.BARRIER_X) : (sign ? Piece.SIGN_Z : Piece.BARRIER_Z);
 		}
-		return base == Level1Layout.Base.FIRST_LIGHT ? outpost(lx, lz) : camp(lx, lz);
+		return switch (base) {
+			case FIRST_LIGHT -> outpost(lx, lz);
+			case BLINK -> camp(lx, lz);
+			case TRADERS_KEEP -> keep(lx, lz);
+			case HIPPOCRATES -> clinic(lx, lz);
+			case TOMS -> diner(lx, lz);
+			case SIGNUP -> signup(lx, lz);
+			case CORNUCOPIA -> fort(lx, lz);
+			case NONE -> null;
+		};
 	}
 
 	/** First Light: floodlights that never go out, two rows of cots, lockers of supplies, a command desk. */
@@ -53,6 +63,59 @@ final class BasePlan {
 		if (lz == 44 && lx >= 34 && lx <= 44 && lx % 2 == 0) return Piece.LOCKER;
 		if (lz == 23 && lx == 38) return Piece.COMPUTER_DESK;
 		if (lz == 23 && lx == 40) return Piece.DESK;
+		return null;
+	}
+
+	/** The Trader's Keep: three barter counters, a vault of lockers, a desk with a computer. */
+	private static Piece keep(int lx, int lz) {
+		if (at(FLOODLIGHTS, lx, lz)) return Piece.FLOODLIGHT;
+		if (lz == 24 && lx >= 22 && lx <= 26 && lx % 2 == 0) return Piece.COUNTER_TRADE;
+		if (lz == 44 && lx >= 34 && lx <= 44 && lx % 2 == 0) return Piece.LOCKER;
+		if (lz == 23 && lx == 38) return Piece.COMPUTER_DESK;
+		if (lz == 23 && lx == 40) return Piece.DESK;
+		return null;
+	}
+
+	/** Hippocrates-1: a row of clinic beds, tables, a small store of medicine. */
+	private static Piece clinic(int lx, int lz) {
+		if (at(FLOODLIGHTS, lx, lz)) return Piece.FLOODLIGHT;
+		if (lz == 22 && lx >= 20 && lx <= 28 && lx % 2 == 0) return Piece.CLINIC_BED;
+		if (lz == 26 && (lx == 20 || lx == 24 || lx == 28)) return Piece.DESK;
+		if (lz == 44 && (lx == 34 || lx == 36)) return Piece.LOCKER;
+		return null;
+	}
+
+	/** Tom's Restaurant: tables for the diners, a counter along the back, a stove. */
+	private static Piece diner(int lx, int lz) {
+		if (at(FLOODLIGHTS, lx, lz)) return Piece.FLOODLIGHT;
+		if ((lz == 22 || lz == 26) && (lx == 20 || lx == 24 || lx == 28)) return Piece.DESK;
+		if (lz == 22 && lx >= 38 && lx <= 42 && lx % 2 == 0) return Piece.COUNTER_TOM;
+		if (lx == 44 && lz == 40) return Piece.FIRE;
+		return null;
+	}
+
+	/** A Speednoclipper sign-up point: a booth with a desk on each side, two tents. */
+	private static Piece signup(int lx, int lz) {
+		if (lz == 24 && lx == 31) return Piece.SIGNUP_BOOTH;
+		if (lz == 24 && (lx == 29 || lx == 33)) return Piece.DESK;
+		return tents(lx, lz);
+	}
+
+	/** Cornucopia: tents, fires, a stash, floodlights on the corners. */
+	private static Piece fort(int lx, int lz) {
+		if (at(FLOODLIGHTS, lx, lz) && lx != 24 && lx != 40) return Piece.FLOODLIGHT;
+		if (at(FIRES, lx, lz)) return Piece.FIRE;
+		if (at(STASHES, lx, lz)) return Piece.LOCKER;
+		return tents(lx, lz);
+	}
+
+	private static Piece tents(int lx, int lz) {
+		for (int[] tent : TENTS) {
+			int u = lx - tent[0], v = lz - tent[1];
+			if (u < 0 || u > 2 || v < 0 || v > 2) continue;
+			if (v == 0 || u != 1) return Piece.TENT_WALL;
+			return Piece.TENT_FLOOR;
+		}
 		return null;
 	}
 

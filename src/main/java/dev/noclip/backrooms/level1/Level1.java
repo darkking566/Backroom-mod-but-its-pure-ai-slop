@@ -36,6 +36,7 @@ public final class Level1 {
 		Blackouts.register();
 		Crates.register();
 		Markers.register();
+		Gardens.register();
 		Strays.register();
 		Marauders.register();
 		Smilers.register();

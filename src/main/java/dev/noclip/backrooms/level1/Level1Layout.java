@@ -29,13 +29,43 @@ public final class Level1Layout {
 		CORRIDORS
 	}
 
+	/** The wiki's sectors of the Habitable Zone: broad regions that dress the same halls in other materials. */
+	public enum Sector {
+		TALON, GILD, GOTHIC, TAILCHASE, GARDEN, LEGEND
+	}
+
+	private static final int SECTOR = 9, SECTOR_DISTRICTS = 4;
+
+	/** The sector at (x, z): square regions four districts wide; the one around the origin is always Talon. */
+	public static Sector sector(long seed, int x, int z) {
+		int size = DISTRICT * SECTOR_DISTRICTS, rx = Math.floorDiv(x, size), rz = Math.floorDiv(z, size);
+		if (rx == 0 && rz == 0) return Sector.TALON;
+		int roll = Math.floorMod(hash(seed, rx, rz, SECTOR), 100);
+		if (roll < 40) return Sector.TALON;
+		if (roll < 58) return Sector.GILD;
+		if (roll < 70) return Sector.GOTHIC;
+		if (roll < 80) return Sector.GARDEN;
+		if (roll < 90) return Sector.LEGEND;
+		return Sector.TAILCHASE;
+	}
+
 	/** The settlements players have found in Level 1. */
 	public enum Base {
 		NONE,
 		/** The M.E.G. outpost, in a parking hall. */
 		FIRST_LIGHT,
 		/** The colonists' camp, in a warehouse. */
-		BLINK
+		BLINK,
+		/** B.N.T.G.'s Trader's Keep: barter counters and a vault, in the Gild Sector. */
+		TRADERS_KEEP,
+		/** Hippocrates-1, the Ariane Circle's clinic, in the Gothic Sector. */
+		HIPPOCRATES,
+		/** Tom's Restaurant: the biggest place to eat and meet. */
+		TOMS,
+		/** A Speednoclipper sign-up point: a booth and a couple of tents. */
+		SIGNUP,
+		/** Cornucopia, the self-appointed justice seekers' fort, in the Legend Sector. */
+		CORNUCOPIA
 	}
 
 	/** What fills a column between the floor and the ceiling. */
@@ -92,8 +122,19 @@ public final class Level1Layout {
 	public static Base base(long seed, int dx, int dz) {
 		if (dx == 0 && dz == 0) return Base.NONE;
 		Kind kind = kind(seed, dx, dz);
-		if (kind == Kind.CORRIDORS || Math.floorMod(hash(seed, dx, dz, BASE), 100) >= BASE_PERCENT) return Base.NONE;
-		return kind == Kind.PARKING ? Base.FIRST_LIGHT : Base.BLINK;
+		if (kind == Kind.CORRIDORS) return Base.NONE;
+		int roll = Math.floorMod(hash(seed, dx, dz, BASE), 100);
+		if (roll >= BASE_PERCENT + 6) return Base.NONE;
+		Sector sector = sector(seed, dx * DISTRICT + DISTRICT / 2, dz * DISTRICT + DISTRICT / 2);
+		if (sector == Sector.GARDEN || sector == Sector.TAILCHASE) return Base.NONE;
+		// The extra rolls past the old settlements: a restaurant, then a sign-up point, in any habitable sector.
+		if (roll >= BASE_PERCENT) return roll < BASE_PERCENT + 3 ? Base.TOMS : Base.SIGNUP;
+		return switch (sector) {
+			case GILD -> Base.TRADERS_KEEP;
+			case GOTHIC -> Base.HIPPOCRATES;
+			case LEGEND -> Base.CORNUCOPIA;
+			default -> kind == Kind.PARKING ? Base.FIRST_LIGHT : Base.BLINK;
+		};
 	}
 
 	/** The settlement piece at (x, z), or null. */

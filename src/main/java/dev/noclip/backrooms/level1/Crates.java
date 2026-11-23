@@ -54,7 +54,9 @@ final class Crates {
 				if (now < next) continue;
 				spawnBehind(player, random.nextInt(100) < DEBRIS_PERCENT);
 				if (random.nextInt(100) < 40) paintingNear(level, player);
-				NEXT.put(player.getUUID(), now + DELAY + random.nextInt(DELAY_SPREAD));
+				// Gild Sector is full of crates.
+				boolean gild = Level1Layout.sector(Level1ChunkGenerator.planSeed(level.getChunkSource().randomState()), player.getBlockX(), player.getBlockZ()) == Level1Layout.Sector.GILD;
+				NEXT.put(player.getUUID(), now + (DELAY + random.nextInt(DELAY_SPREAD)) / (gild ? 3 : 1));
 			}
 		}
 		if (now % VANISH_CHECK == 0) vanishUnwatched(level, random);

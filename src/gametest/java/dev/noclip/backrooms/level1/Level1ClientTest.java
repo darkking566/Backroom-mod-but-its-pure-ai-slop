@@ -58,9 +58,11 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			crate(context, game);
 			marker(context, game);
 			views(context, game, seed);
+			sectors(context, game, seed);
 			exits(context, game, seed);
 			events(context, game, seed);
 			settlements(context, game, seed);
+			wikiSettlements(context, game, seed);
 			items(context, game, seed);
 			monsters(context, game, seed);
 			hounds(context, game, seed);
@@ -190,6 +192,52 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			check(spilled || !player(s).getInventory().isEmpty(), "crate was empty");
 		});
 		server.runCommand("gamemode spectator @a");
+	}
+
+	/** The Trader's Keep sells for alloy, Hippocrates-1 mends for free; a picture of each other settlement too. */
+	private static void wikiSettlements(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		server.runCommand("gamemode spectator @a");
+		for (Level1Layout.Base base : new Level1Layout.Base[] {Level1Layout.Base.TOMS, Level1Layout.Base.SIGNUP, Level1Layout.Base.CORNUCOPIA}) {
+			int[] at = nearestBase(seed, base);
+			shoot(context, game, at[0] * 64 + 31.5, STAND, at[1] * 64 + 11.5, 0, 0, "level1_" + base.name().toLowerCase());
+		}
+		int[] keep = nearestBase(seed, Level1Layout.Base.TRADERS_KEEP);
+		shoot(context, game, keep[0] * 64 + 31.5, STAND, keep[1] * 64 + 11.5, 0, 0, "level1_traders_keep");
+		server.runOnServer(s -> player(s).getInventory().clearContent());
+		server.runCommand("give @a noclip_backrooms:alloy 1");
+		standAndUse(context, game, keep[0] * 64 + 24.5, keep[1] * 64 + 26.5, 180, 35);
+		server.runOnServer(s -> {
+			check(player(s).getInventory().countItem(Level1Items.ALLOY) == 0, "the counter took no alloy");
+			boolean got = !level1(s).getEntitiesOfClass(ItemEntity.class, new AABB(player(s).blockPosition()).inflate(5)).isEmpty()
+					|| !player(s).getInventory().isEmpty();
+			check(got, "the counter gave nothing");
+		});
+		int[] clinic = nearestBase(seed, Level1Layout.Base.HIPPOCRATES);
+		shoot(context, game, clinic[0] * 64 + 31.5, STAND, clinic[1] * 64 + 11.5, 0, 0, "level1_hippocrates");
+		server.runOnServer(s -> player(s).setHealth(4.0F));
+		standAndUse(context, game, clinic[0] * 64 + 24.5, clinic[1] * 64 + 25.5, 180, 22);
+		server.runOnServer(s -> check(player(s).getHealth() >= player(s).getMaxHealth() - 0.1F, "the clinic bed did not mend the player"));
+		server.runCommand("gamemode spectator @a");
+	}
+
+	/** One picture of every sector, found by scanning the regions around the origin for a hall floor in each. */
+	private static void sectors(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		for (Level1Layout.Sector sector : Level1Layout.Sector.values()) {
+			BlockPos spot = null;
+			for (int rx = -4; rx <= 4 && spot == null; rx++) {
+				for (int rz = -4; rz <= 4 && spot == null; rz++) {
+					int x = rx * 256 + 128, z = rz * 256 + 128;
+					if (Level1Layout.sector(seed, x, z) != sector) continue;
+					for (int dx = 0; dx < 128 && spot == null; dx += 9) {
+						Tile tile = Level1Layout.tile(seed, x + dx, z);
+						if (tile == Tile.FLOOR && Level1Layout.kindAt(seed, x + dx, z) != Kind.CORRIDORS) spot = new BlockPos(x + dx, STAND, z);
+					}
+				}
+			}
+			check(spot != null, "no " + sector + " sector near the origin");
+			shoot(context, game, spot.getX() + 0.5, STAND, spot.getZ() + 0.5, 90, 5, "level1_sector_" + sector.name().toLowerCase());
+		}
 	}
 
 	/** A settlement marker is hung on a pillar nearby; right-clicking takes its supplies once and leaves the bare cloth. */
@@ -751,7 +799,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			ServerLevel level = level1(s);
 			for (Block block : Level1Blocks.ALL) {
 				if (block.getLootTable().isEmpty() || block == Level1Blocks.SUPPLY_CRATE || block == Level1Blocks.DEBRIS_PILE || block == Level1Blocks.EYED_CRATE
-						|| block == Level1Blocks.SUPPLY_LOCKER) continue; // these hand out their contents instead
+						|| block == Level1Blocks.SUPPLY_LOCKER || block == Level1Blocks.TRADE_COUNTER || block == Level1Blocks.TOM_COUNTER) continue; // these hand out their contents instead
 				var drops = Block.getDrops(block.defaultBlockState(), level, new BlockPos(3, 3, 3), null);
 				check(drops.size() == 1 && drops.getFirst().is(block.asItem()), "wrong drop for " + block);
 			}

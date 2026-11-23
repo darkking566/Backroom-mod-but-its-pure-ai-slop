@@ -1,0 +1,91 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:friend_orb",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:squirt_gun",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:crowbar",
+          "weight": 3
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:teleport_berry",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:bundle",
+          "weight": 3
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:golden_apple",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:shield",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:iron_chestplate",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:clock",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:flashlight",
+          "weight": 3
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:bandage",
+          "weight": 4,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 3,
+                "max": 5
+              }
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:almond_water",
+          "weight": 5,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 2,
+                "max": 3
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "random_sequence": "noclip_backrooms:blocks/trade_counter"
+}

@@ -68,7 +68,7 @@ final class SettlementMarkerBlock extends Block {
 		for (int dx = dx0 - SEARCH; dx <= dx0 + SEARCH; dx++) {
 			for (int dz = dz0 - SEARCH; dz <= dz0 + SEARCH; dz++) {
 				Level1Layout.Base base = Level1Layout.base(seed, dx, dz);
-				if (base == Level1Layout.Base.NONE) continue;
+				if (base == Level1Layout.Base.NONE || base == Level1Layout.Base.CORNUCOPIA) continue;
 				int cx = dx * Level1Layout.DISTRICT + Level1Layout.DISTRICT / 2, cz = dz * Level1Layout.DISTRICT + Level1Layout.DISTRICT / 2;
 				double distance = Math.hypot(cx - pos.getX(), cz - pos.getZ());
 				if (distance < best) {

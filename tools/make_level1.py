@@ -778,6 +778,60 @@ def blink_sign():
     return m
 
 
+def plate(color, seed):
+    m = metal(color, 0.5)
+    m.color *= (1 + noise(seed, 3, 64)[..., None] * 0.04)
+    paint(m, np.clip(1 - box(4, 4, 124, 124, 1), 0, 1), tuple(int(c * 0.6) for c in color), height=1.5)
+    return m
+
+
+def trader_sign():
+    """B.N.T.G.: a gold coin over a trader's scales, on teal."""
+    m = plate((40, 96, 108), 910)
+    paint(m, (1 - step(0, 1.5, np.hypot(X - 64, Y - 78) - 30)), (222, 180, 64), glow=0.2)
+    paint(m, (1 - step(0, 1.5, np.hypot(X - 64, Y - 78) - 22)), (190, 148, 44))
+    paint(m, box(18, 26, 110, 31), (222, 180, 64))
+    paint(m, box(61, 26, 67, 48), (222, 180, 64))
+    return m
+
+
+def clinic_sign():
+    """Hippocrates-1: a green cross on white."""
+    m = plate((226, 230, 228), 911)
+    paint(m, box(52, 24, 76, 104), (46, 150, 90))
+    paint(m, box(24, 52, 104, 76), (46, 150, 90))
+    return m
+
+
+def tom_sign():
+    """Tom's: a burger on red, lit from within."""
+    m = plate((190, 56, 48), 912)
+    paint(m, ((1 - step(0, 1.5, np.hypot(X - 64, Y - 62) - 38)) * (Y < 62)), (214, 160, 84), glow=0.4)
+    paint(m, box(24, 64, 104, 72), (96, 54, 34))
+    paint(m, box(22, 74, 106, 80), (90, 168, 70))
+    paint(m, box(26, 82, 102, 94), (214, 160, 84))
+    return m
+
+
+def signup_sign():
+    """Speednoclippers: a lightning bolt on yellow."""
+    m = plate((232, 196, 40), 913)
+
+    def bolt(draw, s):
+        draw.polygon([(74 * s, 16 * s), (36 * s, 72 * s), (60 * s, 72 * s), (50 * s, 112 * s), (92 * s, 52 * s), (66 * s, 52 * s)], fill=255)
+    paint(m, mask(bolt), (30, 30, 28), height=0.5)
+    return m
+
+
+def justice_sign():
+    """Cornucopia: a sword across a dark red plate."""
+    m = plate((110, 28, 30), 914)
+    paint(m, box(58, 14, 70, 94), (214, 218, 222), height=1)
+    paint(m, box(36, 70, 92, 80), (190, 150, 60))
+    paint(m, box(58, 94, 70, 112), (80, 60, 40))
+    return m
+
+
 def floodlight_lens():
     m = flat((255, 252, 236), 0.9, 30)
     m.glow[:] = 1.0
@@ -1127,6 +1181,13 @@ def floor_painting():
 
 
 def prop_textures(t):
+    t["trader_sign"] = trader_sign()
+    t["clinic_sign"] = clinic_sign()
+    t["tom_sign"] = tom_sign()
+    t["signup_sign"] = signup_sign()
+    t["justice_sign"] = justice_sign()
+    t["counter_trade"] = canvas((44, 86, 96), 990)
+    t["counter_tom"] = canvas((176, 60, 52), 991)
     t["floor_painting"] = floor_painting()
     t["gallery_wall"] = gallery_wall()
     t["bed_sheet"] = canvas((224, 226, 228), 985)
@@ -1629,8 +1690,15 @@ def all_models():
                                      el((2, 5, 3), (13, 7, 6), side, rotation={"angle": 22.5, "axis": "y", "origin": [8, 6, 4]})]}
     m["gallery_wall"] = cube_all("gallery_wall")
     m["hospital_bed"] = hospital_bed_model()
+    for name in ("trader_sign", "clinic_sign", "tom_sign", "signup_sign", "justice_sign"):
+        m[name] = cube_all(name)
+    for name in ("trade", "tom"):
+        m[name + "_counter"] = {"parent": "minecraft:block/block",
+                                "textures": {"particle": NS + "counter_" + name, "t": NS + "counter_" + name},
+                                "elements": [el((0, 0, 1), (16, 14, 15), sides("#t"))]}
     m["sunken_chair"] = sunken_chair_model()
     m["floor_painting"] = floor_painting_model()
+    m["signup_booth"] = cube_all("signup_sign")
     m["phosphor_mark"] = {"parent": "minecraft:block/block",
                           "textures": {"particle": NS + "phosphor_mark", "mark": NS + "phosphor_mark"},
                           "elements": [el((2, 0.05, 2), (14, 0.15, 14), {"up": "#mark", "down": "#mark"}, shade=False, light_emission=15)]}
@@ -1696,13 +1764,14 @@ def all_blockstates():
     for name in ("booth_wall", "booth_roof", "barrier_base", "barrier_arm", "fuel_drum", "caged_lamp", "eyed_crate", "shut_eyed_crate"):
         b[name] = single(name)
     b["booth_drawer"] = {"variants": {"empty=false": {"model": NS + "booth_drawer"}, "empty=true": {"model": NS + "booth_drawer_open"}}}
-    for name in ("first_light_sign", "blink_sign", "floodlight", "cot", "bedroll", "supply_locker", "barrel_fire", "tarp", "gallery_wall", "hospital_bed", "debris_pile", "sunken_chair", "floor_painting"):
+    for name in ("first_light_sign", "blink_sign", "floodlight", "cot", "bedroll", "supply_locker", "barrel_fire", "tarp", "gallery_wall", "hospital_bed", "debris_pile", "sunken_chair", "floor_painting", "trader_sign", "clinic_sign", "tom_sign", "signup_sign", "justice_sign", "trade_counter", "tom_counter", "signup_booth"):
         b[name] = single(name)
     b["jersey_barrier"] = {"variants": {"axis=x": {"model": NS + "jersey_barrier"}, "axis=z": {"model": NS + "jersey_barrier", "y": 90}}}
     # The same turns as an end rod: the smear lies against the block it was dabbed on.
     turns = {"up": {}, "down": {"x": 180}, "north": {"x": 90}, "south": {"x": 90, "y": 180}, "east": {"x": 90, "y": 90},
              "west": {"x": 90, "y": 270}}
     b["phosphor_mark"] = {"variants": {f"facing={f}": {"model": NS + "phosphor_mark", **turn} for f, turn in turns.items()}}
+    b["clinic_bed"] = {"variants": {"": {"model": NS + "hospital_bed"}}}
     for taken in ("false", "true"):
         model = "settlement_marker" + ("_taken" if taken == "true" else "")
         for f, turn in turns.items():
@@ -1790,7 +1859,8 @@ def check(blockstates):
 # Blocks that only exist placed in the world, with no item of their own.
 NO_ITEM = {"phosphor_mark", "settlement_marker"}
 
-ITEM_MODELS = {"garage_floor": "garage_floor", "garage_floor_line": "garage_floor_line", "damp_garage_floor": "damp_garage_floor",
+
+ITEM_MODELS = {"clinic_bed": "hospital_bed", "garage_floor": "garage_floor", "garage_floor_line": "garage_floor_line", "damp_garage_floor": "damp_garage_floor",
                "puddled_garage_floor": "puddled_garage_floor", "garage_wall": "garage_wall", "garage_ceiling": "garage_ceiling",
                "metal_shelf": "metal_shelf_boxes", "painted_concrete_wall": "painted_wall", "corridor_floor": "corridor_floor",
                "old_brick": "old_brick", "padded_wall": "padded_wall", "darkness_below": "darkness", "darkness_above": "darkness"}

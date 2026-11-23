@@ -146,6 +146,25 @@ public final class Level1Blocks {
 	public static final Block FLOODLIGHT = register("floodlight", Properties.of()
 			.mapColor(MapColor.METAL).strength(1.5F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 15),
 			p -> new ShapedBlock(p, Block.box(3, 0, 3, 13, 16, 13)));
+	public static final Block TRADER_SIGN = register("trader_sign", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(2.0F).sound(SoundType.METAL));
+	public static final Block CLINIC_SIGN = register("clinic_sign", Properties.of().mapColor(MapColor.SNOW).strength(2.0F).sound(SoundType.METAL));
+	public static final Block TOM_SIGN = register("tom_sign", Properties.of().mapColor(MapColor.COLOR_RED).strength(2.0F).sound(SoundType.METAL).lightLevel(state -> 6));
+	public static final Block SIGNUP_SIGN = register("signup_sign", Properties.of().mapColor(MapColor.COLOR_YELLOW).strength(2.0F).sound(SoundType.METAL));
+	public static final Block JUSTICE_SIGN = register("justice_sign", Properties.of().mapColor(MapColor.CRIMSON_NYLIUM).strength(2.0F).sound(SoundType.METAL));
+	/** Pay an alloy, get something from the Keep's stock. */
+	public static final Block TRADE_COUNTER = register("trade_counter", Properties.of()
+			.mapColor(MapColor.COLOR_CYAN).strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new CounterBlock(p, Block.box(0, 0, 1, 16, 14, 15), "trade"));
+	/** Pay an alloy, get a hot meal. */
+	public static final Block TOM_COUNTER = register("tom_counter", Properties.of()
+			.mapColor(MapColor.COLOR_RED).strength(-1.0F, 3600000.0F).sound(SoundType.WOOD).noOcclusion(),
+			p -> new CounterBlock(p, Block.box(0, 0, 1, 16, 14, 15), "meal"));
+	/** Free care at Hippocrates-1. */
+	public static final Block CLINIC_BED = register("clinic_bed", Properties.of()
+			.mapColor(MapColor.SNOW).strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new ClinicBedBlock(p, Block.box(0, 0, 1, 16, 11, 15)));
+	public static final Block SIGNUP_BOOTH = register("signup_booth", Properties.of()
+			.mapColor(MapColor.COLOR_YELLOW).strength(-1.0F, 3600000.0F).sound(SoundType.WOOD), SignupBoothBlock::new);
 	public static final Block GALLERY_WALL = register("gallery_wall", Properties.of()
 			.mapColor(MapColor.QUARTZ).strength(2.0F).sound(SoundType.STONE));
 	/** The chair in the rubber room, sunk into the floor. */

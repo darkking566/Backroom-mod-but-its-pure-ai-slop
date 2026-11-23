@@ -60,6 +60,12 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 
 	private static BlockState block(long seed, Tile tile, Ceiling ceiling, HallPlan.Cell exit, HallPlan.PropCell prop,
 			BasePlan.Piece piece, int x, int y, int z) {
+		BlockState state = plainBlock(seed, tile, ceiling, exit, prop, piece, x, y, z);
+		return Level1Sectors.dress(Level1Layout.sector(seed, x, z), tile, state, seed, x, y, z);
+	}
+
+	private static BlockState plainBlock(long seed, Tile tile, Ceiling ceiling, HallPlan.Cell exit, HallPlan.PropCell prop,
+			BasePlan.Piece piece, int x, int y, int z) {
 		if (piece != null && tile != Tile.PILLAR) {
 			Level1Layout.Base base = Level1Layout.base(seed, Math.floorDiv(x, Level1Layout.DISTRICT), Math.floorDiv(z, Level1Layout.DISTRICT));
 			BlockState state = Level1Bases.block(base, piece, y);

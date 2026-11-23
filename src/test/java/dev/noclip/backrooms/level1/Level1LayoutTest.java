@@ -146,6 +146,8 @@ class Level1LayoutTest {
 		for (long seed = 0; seed < 6; seed++) {
 			for (int dx = -20; dx < 20; dx++) {
 				for (int dz = -20; dz < 20; dz++) {
+					// Settlements take most of a district's bays, so they are left out of the count.
+					if (Level1Layout.base(seed, dx, dz) != Level1Layout.Base.NONE) continue;
 					Kind kind = Level1Layout.kind(seed, dx, dz);
 					if (kind == Kind.PARKING) parking++;
 					if (kind == Kind.WAREHOUSE) warehouse++;
@@ -252,7 +254,8 @@ class Level1LayoutTest {
 					Level1Layout.Base base = Level1Layout.base(seed, dx, dz);
 					if (base == Level1Layout.Base.NONE) continue;
 					Kind kind = Level1Layout.kind(seed, dx, dz);
-					assertEquals(base == Level1Layout.Base.FIRST_LIGHT ? Kind.PARKING : Kind.WAREHOUSE, kind);
+					if (base == Level1Layout.Base.FIRST_LIGHT) assertEquals(Kind.PARKING, kind);
+					if (base == Level1Layout.Base.BLINK) assertEquals(Kind.WAREHOUSE, kind);
 					if (base == Level1Layout.Base.FIRST_LIGHT) outposts++;
 					else camps++;
 					// No exit or prop inside or right around the ring.
