@@ -16,11 +16,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -105,19 +101,13 @@ final class Workers {
 			if (Level1Layout.tile(seed, x, z) != Tile.FLOOR) continue;
 			BlockPos at = new BlockPos(x, Level1ChunkGenerator.FLOOR_Y + 1, z);
 			if (!level.isLoaded(at) || !level.getBlockState(at).isAir() || !level.getBlockState(at.above()).isAir()) continue;
-			// A zombie body (it shows armour, which a villager's does not), with no mind: a shadow in dark work clothes.
-			Mob worker = EntityTypes.ZOMBIE.create(level, EntitySpawnReason.EVENT);
+			Mob worker = People.type("shadow_worker").create(level, EntitySpawnReason.EVENT);
 			if (worker == null) return false;
 			worker.snapTo(x + 0.5, at.getY(), z + 0.5, random.nextFloat() * 360, 0);
 			worker.setNoAi(true);
 			worker.setInvulnerable(true);
 			worker.setSilent(true);
 			worker.setPersistenceRequired();
-			// A shadow in work clothes: dark armour over the whole figure.
-			worker.setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.NETHERITE_HELMET));
-			worker.setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.NETHERITE_CHESTPLATE));
-			worker.setItemSlot(EquipmentSlot.LEGS, new ItemStack(Items.NETHERITE_LEGGINGS));
-			worker.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.IRON_PICKAXE));
 			worker.setCustomName(Component.translatable("resident.noclip_backrooms.worker"));
 			level.addFreshEntity(worker);
 			worker.addTag(TAG);
