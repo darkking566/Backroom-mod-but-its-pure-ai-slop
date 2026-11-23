@@ -51,6 +51,7 @@ public final class Level1 {
 		SkinStealers.register();
 		Clumps.register();
 		Dullers.register();
+		Level1Arms.register();
 		Hounds.register();
 		Level1Ambience.register();
 	}

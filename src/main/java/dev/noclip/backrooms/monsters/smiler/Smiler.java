@@ -175,7 +175,7 @@ public class Smiler extends Monster {
 		return isLightItem(player.getMainHandItem()) || isLightItem(player.getOffhandItem());
 	}
 
-	static boolean isLightItem(ItemStack stack) {
+	public static boolean isLightItem(ItemStack stack) {
 		if (stack.isEmpty()) return false;
 		String id = stack.getItem().toString();
 		if (id.contains("flashlight") || id.contains("torch") || id.contains("lantern") || id.contains("glow")) return true;
