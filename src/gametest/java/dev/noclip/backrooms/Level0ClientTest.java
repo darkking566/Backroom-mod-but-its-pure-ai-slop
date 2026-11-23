@@ -66,6 +66,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			ExitClientChecks.run(context, game, 3, 3);
 			checkEdgeShift(context, game, standY);
 			checkRedRoomLoop(context, game, standY);
+			checkShadowHallucination(context, game, standY);
 			server.runOnServer(s -> {
 				for (int i = 0; i < ModBlocks.ALL.size(); i++) {
 					player(s).getInventory().setItem(i, new ItemStack(ModBlocks.ALL.get(i)));
@@ -275,6 +276,24 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			check(!RedRoomLoop.isTrapped(player), "distant teleport did not release Red Room trap");
 			check(!player.isInWall(), "stuck in wall after returning from Red Room");
 		});
+	}
+
+	private static void checkShadowHallucination(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
+		var server = game.getServer();
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5 0 0");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(5);
+
+		server.runCommand("execute as @a run backrooms shadow");
+		server.runOnServer(s -> {
+			ServerPlayer player = player(s);
+			check(ShadowHallucination.hasActiveShadow(player), "shadow hallucination failed to spawn");
+			for (var entity : player.level().getAllEntities()) check(!(entity instanceof Mob), "shadow spawned a Mob");
+		});
+
+		server.runCommand("execute as @a run backrooms shadow clear");
+		server.runOnServer(s -> check(!ShadowHallucination.hasActiveShadow(player(s)), "shadow clear command failed"));
+		server.runCommand("effect clear @a");
 	}
 
 	private static void checkBlocks(ClientGameTestContext context, TestSingleplayerContext game) {
