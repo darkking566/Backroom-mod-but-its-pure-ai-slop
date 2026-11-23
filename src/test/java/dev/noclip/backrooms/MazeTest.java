@@ -245,14 +245,22 @@ class MazeTest {
 	@Test
 	void stairwellsAndMacroPillarHallsGenerateCleanly() {
 		long seed = 12345L;
-		boolean sawStairwell = false;
+		EnumSet<net.minecraft.core.Direction> seenStairDirs = EnumSet.noneOf(net.minecraft.core.Direction.class);
 		boolean sawMacroPillar = false;
 
 		for (int cx = -64; cx < 64; cx++) {
 			for (int cz = -64; cz < 64; cz++) {
-				if (Maze.isStairwellCell(seed, cx, cz)) {
-					sawStairwell = true;
-					assertEquals(Maze.Zone.CLASSIC, Maze.zoneAt(seed, cx * Maze.CELL, cz * Maze.CELL));
+				int dir = Maze.stairwellDir(seed, cx, cz);
+				if (dir >= 0) {
+					seenStairDirs.add(switch (dir) {
+						case 0 -> net.minecraft.core.Direction.EAST;
+						case 1 -> net.minecraft.core.Direction.WEST;
+						case 2 -> net.minecraft.core.Direction.SOUTH;
+						default -> net.minecraft.core.Direction.NORTH;
+					});
+					Maze.Zone zone = Maze.zoneAt(seed, cx * Maze.CELL, cz * Maze.CELL);
+					assertTrue(zone == Maze.Zone.CLASSIC || zone == Maze.Zone.CORRIDORS,
+							"unexpected zone for stairwell: " + zone);
 					assertFalse(Maze.isWall(seed, cx * Maze.CELL + Maze.CENTER, cz * Maze.CELL + Maze.CENTER));
 				}
 			}
@@ -275,8 +283,54 @@ class MazeTest {
 			}
 		}
 
-		assertTrue(sawStairwell, "never generated a classic stairwell cell");
+		assertEquals(4, seenStairDirs.size(), "expected all 4 stairwell directions, saw " + seenStairDirs);
 		assertTrue(sawMacroPillar, "never generated a 2x2 macro pillar hall");
+	}
+
+	@Test
+	void newRoomAndCeilingVariantsGenerateCleanly() {
+		long seed = 12345L;
+		EnumSet<Maze.CeilingStyle> seenCeilings = EnumSet.noneOf(Maze.CeilingStyle.class);
+		EnumSet<Maze.FloorAccent> seenFloors = EnumSet.noneOf(Maze.FloorAccent.class);
+		EnumSet<Maze.RoomLayout> seenLayouts = EnumSet.noneOf(Maze.RoomLayout.class);
+		boolean sawHalfWall = false;
+		boolean sawFramedDoor = false;
+		boolean sawSunken = false;
+
+		for (int cx = -64; cx < 64; cx++) {
+			for (int cz = -64; cz < 64; cz++) {
+				Maze.Zone zone = Maze.zoneAt(seed, cx * Maze.CELL, cz * Maze.CELL);
+				seenCeilings.add(Maze.ceilingStyle(seed, cx, cz));
+				seenFloors.add(Maze.floorAccent(seed, cx, cz));
+				seenLayouts.add(Maze.roomLayout(seed, cx, cz, zone, 0));
+
+				if (Maze.isSunkenCell(seed, cx, cz)) {
+					sawSunken = true;
+					assertFalse(Maze.isStairwellCell(seed, cx, cz));
+					assertFalse(Maze.isWall(seed, cx * Maze.CELL + Maze.CENTER, cz * Maze.CELL + Maze.CENTER));
+				}
+
+				int ox = cx * Maze.CELL, oz = cz * Maze.CELL;
+				for (int i = 1; i < Maze.CELL; i++) {
+					if (!Maze.isWall(seed, ox, oz + i, false) && Maze.isWall(seed, ox, oz + i, true)
+							&& zone != Maze.Zone.ARCHES) {
+						sawFramedDoor = true;
+					}
+					for (int j = 1; j < Maze.CELL; j++) {
+						if (Maze.isWall(seed, ox + i, oz + j, false) && !Maze.isWall(seed, ox + i, oz + j, true)) {
+							sawHalfWall = true;
+						}
+					}
+				}
+			}
+		}
+
+		assertEquals(EnumSet.allOf(Maze.CeilingStyle.class), seenCeilings, "missing ceiling styles");
+		assertEquals(EnumSet.allOf(Maze.FloorAccent.class), seenFloors, "missing floor accents");
+		assertTrue(seenLayouts.size() >= 10, "too few room layouts seen: " + seenLayouts);
+		assertTrue(sawHalfWall, "never generated a half-height cubicle partition");
+		assertTrue(sawFramedDoor, "never generated a framed 2-high doorway");
+		assertTrue(sawSunken, "never generated a sunken split-level room");
 	}
 
 	@Test

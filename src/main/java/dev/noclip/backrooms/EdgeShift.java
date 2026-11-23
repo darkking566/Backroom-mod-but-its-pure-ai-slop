@@ -386,7 +386,7 @@ final class EdgeShift {
 
 	private static void rewriteColumn(ServerLevel level, long seed, int x, int z,
 			ShiftState state, BlockPos.MutableBlockPos pos) {
-		for (int y = Level0ChunkGenerator.FLOOR_Y; y <= Level0ChunkGenerator.CEILING_Y; y++) {
+		for (int y = Level0ChunkGenerator.FLOOR_Y; y <= Level0ChunkGenerator.CEILING_Y + 1; y++) {
 			pos.set(x, y, z);
 			BlockState current = level.getBlockState(pos);
 			if (isProtectedBlock(current)) continue;
