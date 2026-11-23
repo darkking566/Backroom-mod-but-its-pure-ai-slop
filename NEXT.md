@@ -16,7 +16,9 @@ Fabric・Minecraft 26.2・Java 25・模組代號 `noclip_backrooms`
 
 ## 常用指令（在專案資料夾執行）
 
-- 開遊戲試玩：`.\gradlew.bat runClient`
+- 開遊戲試玩：雙擊 `play.bat`（等同 `.\gradlew.bat runClient`）
+- 改了貼圖、模型、文字：在終端機執行 `.\gradlew.bat processResources`，再到遊戲裡按 F3+T，不用重開
+- 改了 Java 程式：要關掉遊戲重開；改了維度設定（`data/`）：至少退回主選單再進世界
 - 編譯與迷宮測試：`.\gradlew.bat build`
 - 真實遊戲自動測試：`.\gradlew.bat runClientGameTest`
 
