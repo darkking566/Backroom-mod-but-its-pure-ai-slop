@@ -1,0 +1,33 @@
+{
+  "ambient.fluorescent_hum": {
+    "subtitle": "subtitles.noclip_backrooms.ambient.fluorescent_hum",
+    "sounds": [
+      {
+        "name": "noclip_backrooms:fluorescent_hum",
+        "attenuation_distance": 24
+      }
+    ]
+  },
+  "ambient.wall_scratch": {
+    "subtitle": "subtitles.noclip_backrooms.ambient.wall_scratch",
+    "sounds": [
+      {
+        "name": "noclip_backrooms:wall_scratch_1",
+        "attenuation_distance": 22
+      },
+      {
+        "name": "noclip_backrooms:wall_scratch_2",
+        "attenuation_distance": 22
+      }
+    ]
+  },
+  "ambient.distant_whisper": {
+    "subtitle": "subtitles.noclip_backrooms.ambient.distant_whisper",
+    "sounds": [
+      {
+        "name": "noclip_backrooms:distant_whisper",
+        "attenuation_distance": 26
+      }
+    ]
+  }
+}
