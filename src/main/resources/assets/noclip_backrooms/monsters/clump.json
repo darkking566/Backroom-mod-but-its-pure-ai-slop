@@ -1,0 +1,6394 @@
+{
+  "entity_id": "noclip_backrooms:clump",
+  "display_name_zh_tw": "\u80a2\u5718",
+  "display_name_en_us": "Clump",
+  "texture_atlas": {
+    "file": "clump.png",
+    "width": 512,
+    "height": 512,
+    "regions": {
+      "skin": {
+        "u": 8,
+        "v": 8,
+        "w": 152,
+        "h": 152
+      },
+      "bruise": {
+        "u": 180,
+        "v": 8,
+        "w": 152,
+        "h": 152
+      },
+      "flesh": {
+        "u": 352,
+        "v": 8,
+        "w": 152,
+        "h": 152
+      },
+      "nail": {
+        "u": 8,
+        "v": 180,
+        "w": 152,
+        "h": 152
+      }
+    }
+  },
+  "parts": [
+    {
+      "name": "Core",
+      "parent": "root",
+      "pivot_mc": [
+        0,
+        14.5,
+        0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -4.5,
+            -4.0,
+            -4.5
+          ],
+          "size_mc": [
+            9.0,
+            8.0,
+            9.0
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -3.2,
+            -1.2,
+            -3.0
+          ],
+          "size_mc": [
+            6.4,
+            2.4,
+            6.0
+          ],
+          "uv_region": [
+            8,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            -4.0,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.15,
+            0.25,
+            -0.1
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.1,
+            -2.6,
+            -2.5
+          ],
+          "size_mc": [
+            2.2,
+            5.2,
+            5.0
+          ],
+          "uv_region": [
+            352,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -4.3,
+            0.1,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.0,
+            0.1,
+            0.18
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.1,
+            -2.7,
+            -2.4
+          ],
+          "size_mc": [
+            2.2,
+            5.4,
+            4.8
+          ],
+          "uv_region": [
+            8,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            4.3,
+            -0.1,
+            0.2
+          ],
+          "subpart_rot_rad_mc": [
+            0.12,
+            -0.15,
+            -0.15
+          ]
+        },
+        {
+          "origin_mc": [
+            -2.6,
+            -2.2,
+            -5.2
+          ],
+          "size_mc": [
+            5.2,
+            4.6,
+            2.2
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -2.4,
+            -2.6,
+            3.2
+          ],
+          "size_mc": [
+            4.8,
+            5.0,
+            2.2
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_FL",
+      "parent": "Core",
+      "pivot_mc": [
+        -3.6,
+        -1.2,
+        -3.8
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        -0.55,
+        0.28
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -7.5,
+            -1.2,
+            -1.2
+          ],
+          "size_mc": [
+            7.5,
+            2.4,
+            2.4
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -4.5,
+            -1.35,
+            -1.35
+          ],
+          "size_mc": [
+            2.2,
+            2.7,
+            2.7
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fore_FL",
+      "parent": "Arm_FL",
+      "pivot_mc": [
+        -7.2,
+        0.0,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        -0.25
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            8.6,
+            2.0
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.3,
+            8.2,
+            -1.2
+          ],
+          "size_mc": [
+            2.6,
+            1.8,
+            2.4
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.2,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.4,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.95,
+            10.8,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            -0.15
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.3,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.6,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            10.9,
+            -0.95
+          ],
+          "subpart_rot_rad_mc": [
+            0.25,
+            0,
+            0.0
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.15,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.3,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.95,
+            10.75,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            0.15
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_FR",
+      "parent": "Core",
+      "pivot_mc": [
+        3.6,
+        -1.2,
+        -3.8
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.55,
+        -0.28
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            0.0,
+            -1.2,
+            -1.2
+          ],
+          "size_mc": [
+            7.5,
+            2.4,
+            2.4
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            2.0,
+            -1.35,
+            -1.35
+          ],
+          "size_mc": [
+            2.2,
+            2.7,
+            2.7
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fore_FR",
+      "parent": "Arm_FR",
+      "pivot_mc": [
+        7.2,
+        0.0,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.25
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            8.6,
+            2.0
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.3,
+            8.2,
+            -1.2
+          ],
+          "size_mc": [
+            2.6,
+            1.8,
+            2.4
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.2,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.4,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.95,
+            10.8,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            -0.15
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.3,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.6,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            10.9,
+            -0.95
+          ],
+          "subpart_rot_rad_mc": [
+            0.25,
+            0,
+            0.0
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.15,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.3,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.95,
+            10.75,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            0.15
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_ML",
+      "parent": "Core",
+      "pivot_mc": [
+        -4.4,
+        -0.4,
+        -1.2
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        -0.18,
+        0.28
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -7.5,
+            -1.2,
+            -1.2
+          ],
+          "size_mc": [
+            7.5,
+            2.4,
+            2.4
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -4.5,
+            -1.35,
+            -1.35
+          ],
+          "size_mc": [
+            2.2,
+            2.7,
+            2.7
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fore_ML",
+      "parent": "Arm_ML",
+      "pivot_mc": [
+        -7.2,
+        0.0,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        -0.25
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            8.6,
+            2.0
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.3,
+            8.2,
+            -1.2
+          ],
+          "size_mc": [
+            2.6,
+            1.8,
+            2.4
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.2,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.4,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.95,
+            10.8,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            -0.15
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.3,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.6,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            10.9,
+            -0.95
+          ],
+          "subpart_rot_rad_mc": [
+            0.25,
+            0,
+            0.0
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.15,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.3,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.95,
+            10.75,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            0.15
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_MR",
+      "parent": "Core",
+      "pivot_mc": [
+        4.4,
+        -0.4,
+        -1.2
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.18,
+        -0.28
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            0.0,
+            -1.2,
+            -1.2
+          ],
+          "size_mc": [
+            7.5,
+            2.4,
+            2.4
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            2.0,
+            -1.35,
+            -1.35
+          ],
+          "size_mc": [
+            2.2,
+            2.7,
+            2.7
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fore_MR",
+      "parent": "Arm_MR",
+      "pivot_mc": [
+        7.2,
+        0.0,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.25
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            8.6,
+            2.0
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.3,
+            8.2,
+            -1.2
+          ],
+          "size_mc": [
+            2.6,
+            1.8,
+            2.4
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.2,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.4,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.95,
+            10.8,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            -0.15
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.3,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.6,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            10.9,
+            -0.95
+          ],
+          "subpart_rot_rad_mc": [
+            0.25,
+            0,
+            0.0
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.15,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.3,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.95,
+            10.75,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            0.15
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_BL",
+      "parent": "Core",
+      "pivot_mc": [
+        -4.4,
+        -0.4,
+        1.6
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.22,
+        0.28
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -7.5,
+            -1.2,
+            -1.2
+          ],
+          "size_mc": [
+            7.5,
+            2.4,
+            2.4
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -4.5,
+            -1.35,
+            -1.35
+          ],
+          "size_mc": [
+            2.2,
+            2.7,
+            2.7
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fore_BL",
+      "parent": "Arm_BL",
+      "pivot_mc": [
+        -7.2,
+        0.0,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        -0.25
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            8.6,
+            2.0
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.3,
+            8.2,
+            -1.2
+          ],
+          "size_mc": [
+            2.6,
+            1.8,
+            2.4
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.2,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.4,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.95,
+            10.8,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            -0.15
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.3,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.6,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            10.9,
+            -0.95
+          ],
+          "subpart_rot_rad_mc": [
+            0.25,
+            0,
+            0.0
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.15,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.3,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.95,
+            10.75,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            0.15
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_BR",
+      "parent": "Core",
+      "pivot_mc": [
+        4.4,
+        -0.4,
+        1.6
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        -0.22,
+        -0.28
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            0.0,
+            -1.2,
+            -1.2
+          ],
+          "size_mc": [
+            7.5,
+            2.4,
+            2.4
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            2.0,
+            -1.35,
+            -1.35
+          ],
+          "size_mc": [
+            2.2,
+            2.7,
+            2.7
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fore_BR",
+      "parent": "Arm_BR",
+      "pivot_mc": [
+        7.2,
+        0.0,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.25
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            8.6,
+            2.0
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.3,
+            8.2,
+            -1.2
+          ],
+          "size_mc": [
+            2.6,
+            1.8,
+            2.4
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.2,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.4,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.95,
+            10.8,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            -0.15
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.3,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.6,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            10.9,
+            -0.95
+          ],
+          "subpart_rot_rad_mc": [
+            0.25,
+            0,
+            0.0
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.15,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.3,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.95,
+            10.75,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            0.15
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_RL",
+      "parent": "Core",
+      "pivot_mc": [
+        -3.4,
+        -1.0,
+        3.8
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.6,
+        0.28
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -7.5,
+            -1.2,
+            -1.2
+          ],
+          "size_mc": [
+            7.5,
+            2.4,
+            2.4
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -4.5,
+            -1.35,
+            -1.35
+          ],
+          "size_mc": [
+            2.2,
+            2.7,
+            2.7
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fore_RL",
+      "parent": "Arm_RL",
+      "pivot_mc": [
+        -7.2,
+        0.0,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        -0.25
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            8.6,
+            2.0
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.3,
+            8.2,
+            -1.2
+          ],
+          "size_mc": [
+            2.6,
+            1.8,
+            2.4
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.2,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.4,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.95,
+            10.8,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            -0.15
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.3,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.6,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            10.9,
+            -0.95
+          ],
+          "subpart_rot_rad_mc": [
+            0.25,
+            0,
+            0.0
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.15,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.3,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.95,
+            10.75,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            0.15
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_RR",
+      "parent": "Core",
+      "pivot_mc": [
+        3.4,
+        -1.0,
+        3.8
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        -0.6,
+        -0.28
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            0.0,
+            -1.2,
+            -1.2
+          ],
+          "size_mc": [
+            7.5,
+            2.4,
+            2.4
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            2.0,
+            -1.35,
+            -1.35
+          ],
+          "size_mc": [
+            2.2,
+            2.7,
+            2.7
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fore_RR",
+      "parent": "Arm_RR",
+      "pivot_mc": [
+        7.2,
+        0.0,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.25
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            8.6,
+            2.0
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.3,
+            8.2,
+            -1.2
+          ],
+          "size_mc": [
+            2.6,
+            1.8,
+            2.4
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.2,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.4,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.95,
+            10.8,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            -0.15
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.3,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.6,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            10.9,
+            -0.95
+          ],
+          "subpart_rot_rad_mc": [
+            0.25,
+            0,
+            0.0
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.25,
+            -1.15,
+            -0.25
+          ],
+          "size_mc": [
+            0.5,
+            2.3,
+            0.5
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.95,
+            10.75,
+            -0.75
+          ],
+          "subpart_rot_rad_mc": [
+            0.2,
+            0,
+            0.15
+          ]
+        }
+      ]
+    }
+  ],
+  "animations": {
+    "idle_writhe": {
+      "loop": true,
+      "keyframes": [
+        {
+          "time_sec": 0.0,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.0,
+                0.08,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                14.5,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.43,
+                0.28
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                0.12,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.0452,
+                0.451,
+                -0.359
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.099,
+                0.0,
+                0.3403
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                -0.0746,
+                -0.2235,
+                0.4105
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.0435,
+                0.0,
+                -0.3991
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0779,
+                0.1527,
+                -0.1437
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.0273,
+                0.0,
+                0.0942
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.054,
+                0.1315,
+                0.1854
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                -0.0885,
+                0.0,
+                -0.1419
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                -0.0113,
+                -0.1012,
+                -0.2998
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0.1188,
+                0.0,
+                0.2726
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0354,
+                0.7076,
+                0.218
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0.1076,
+                0.0,
+                -0.1792
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                -0.0697,
+                -0.6588,
+                -0.402
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                -0.0588,
+                0.0,
+                0.3895
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.275,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.0424,
+                0.0566,
+                0.023
+              ],
+              "pos_mc": [
+                0.0,
+                14.96,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                0.0566,
+                -0.4651,
+                0.181
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                0.0849,
+                0.0,
+                -0.1369
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.0786,
+                0.5279,
+                -0.4176
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.0221,
+                0.0,
+                0.4073
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                -0.0732,
+                -0.1317,
+                0.4081
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                0.0483,
+                0.0,
+                -0.3964
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0422,
+                0.0781,
+                -0.2061
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.1019,
+                0.0,
+                0.1655
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                -0.0035,
+                0.1001,
+                0.2861
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                -0.1199,
+                0.0,
+                -0.257
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.048,
+                -0.124,
+                -0.196
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0.096,
+                0.0,
+                0.154
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0758,
+                0.6385,
+                0.1474
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0.0385,
+                0.0,
+                -0.0985
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                -0.077,
+                -0.5676,
+                -0.4148
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0.0324,
+                0.0,
+                0.4041
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.55,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.06,
+                0.0,
+                0.0424
+              ],
+              "pos_mc": [
+                0.0,
+                15.15,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                0.08,
+                -0.55,
+                0.14
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                -0.09
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.066,
+                0.6178,
+                -0.3955
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                0.0678,
+                0.0,
+                0.3821
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                -0.029,
+                -0.0682,
+                0.3307
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                0.1118,
+                0.0,
+                -0.308
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                -0.0182,
+                0.0631,
+                -0.3118
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.1169,
+                0.0,
+                0.2864
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                -0.059,
+                0.1389,
+                0.3832
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                -0.0811,
+                0.0,
+                -0.368
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0792,
+                -0.2031,
+                -0.1414
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0.0169,
+                0.0,
+                0.0916
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0717,
+                0.5469,
+                0.1545
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                -0.0531,
+                0.0,
+                -0.1065
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                -0.0392,
+                -0.4954,
+                -0.3486
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0.1046,
+                0.0,
+                0.3284
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.825,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.0424,
+                -0.0566,
+                0.0554
+              ],
+              "pos_mc": [
+                0.0,
+                14.96,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                0.0566,
+                -0.6349,
+                0.181
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.0849,
+                0.0,
+                -0.1369
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.0147,
+                0.6679,
+                -0.3058
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                0.1179,
+                0.0,
+                0.2795
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0322,
+                -0.0702,
+                0.2236
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                0.1098,
+                0.0,
+                -0.1855
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                -0.0679,
+                0.1166,
+                -0.3989
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.0634,
+                0.0,
+                0.3859
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                -0.0799,
+                0.2253,
+                0.4199
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0.0053,
+                0.0,
+                -0.4098
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.064,
+                -0.292,
+                -0.168
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                -0.072,
+                0.0,
+                0.122
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0257,
+                0.4864,
+                0.235
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                -0.1136,
+                0.0,
+                -0.1986
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0216,
+                -0.4844,
+                -0.2423
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0.1156,
+                0.0,
+                0.2069
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 1.1,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.0,
+                -0.08,
+                0.06
+              ],
+              "pos_mc": [
+                0.0,
+                14.5,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.67,
+                0.28
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.12,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                0.0452,
+                0.649,
+                -0.201
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                0.099,
+                0.0,
+                0.1597
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0746,
+                -0.1365,
+                0.1495
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                0.0435,
+                0.0,
+                -0.1009
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                -0.0779,
+                0.2073,
+                -0.4163
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                0.0273,
+                0.0,
+                0.4058
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                -0.054,
+                0.3085,
+                0.3746
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0.0885,
+                0.0,
+                -0.3581
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0113,
+                -0.3388,
+                -0.2602
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                -0.1188,
+                0.0,
+                0.2274
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                -0.0354,
+                0.4924,
+                0.342
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                -0.1076,
+                0.0,
+                -0.3208
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0697,
+                -0.5412,
+                -0.158
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0.0588,
+                0.0,
+                0.1105
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 1.375,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                -0.0424,
+                -0.0566,
+                0.0554
+              ],
+              "pos_mc": [
+                0.0,
+                14.04,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.0566,
+                -0.6349,
+                0.379
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.0849,
+                0.0,
+                -0.3631
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                0.0786,
+                0.5721,
+                -0.1424
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                0.0221,
+                0.0,
+                0.0927
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0732,
+                -0.2283,
+                0.1519
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.0483,
+                0.0,
+                -0.1036
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                -0.0422,
+                0.2819,
+                -0.3539
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                0.1019,
+                0.0,
+                0.3345
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0035,
+                0.3399,
+                0.2739
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0.1199,
+                0.0,
+                -0.243
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                -0.048,
+                -0.316,
+                -0.364
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                -0.096,
+                0.0,
+                0.346
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                -0.0758,
+                0.5615,
+                0.4126
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                -0.0385,
+                0.0,
+                -0.4015
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.077,
+                -0.6324,
+                -0.1452
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                -0.0324,
+                0.0,
+                0.0959
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 1.65,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                -0.06,
+                -0.0,
+                0.0424
+              ],
+              "pos_mc": [
+                0.0,
+                13.85,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.08,
+                -0.55,
+                0.42
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                -0.41
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                0.066,
+                0.4822,
+                -0.1645
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.0678,
+                0.0,
+                0.1179
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.029,
+                -0.2918,
+                0.2293
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.1118,
+                0.0,
+                -0.192
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0182,
+                0.2969,
+                -0.2482
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                0.1169,
+                0.0,
+                0.2136
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.059,
+                0.3011,
+                0.1768
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0.0811,
+                0.0,
+                -0.132
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                -0.0792,
+                -0.2369,
+                -0.4186
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                -0.0169,
+                0.0,
+                0.4084
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                -0.0717,
+                0.6531,
+                0.4055
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0.0531,
+                0.0,
+                -0.3935
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0392,
+                -0.7046,
+                -0.2114
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                -0.1046,
+                0.0,
+                0.1716
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 1.925,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                -0.0424,
+                0.0566,
+                0.023
+              ],
+              "pos_mc": [
+                0.0,
+                14.04,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.0566,
+                -0.4651,
+                0.379
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                0.0849,
+                0.0,
+                -0.3631
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                0.0147,
+                0.4321,
+                -0.2542
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.1179,
+                0.0,
+                0.2205
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                -0.0322,
+                -0.2898,
+                0.3364
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.1098,
+                0.0,
+                -0.3145
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0679,
+                0.2434,
+                -0.1611
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                0.0634,
+                0.0,
+                0.1141
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0799,
+                0.2147,
+                0.1401
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                -0.0053,
+                0.0,
+                -0.0902
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                -0.064,
+                -0.148,
+                -0.392
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0.072,
+                0.0,
+                0.378
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                -0.0257,
+                0.7136,
+                0.325
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0.1136,
+                0.0,
+                -0.3014
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                -0.0216,
+                -0.7156,
+                -0.3177
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                -0.1156,
+                0.0,
+                0.2931
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 2.2,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                -0.0,
+                0.08,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                14.5,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.0,
+                -0.43,
+                0.28
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                0.12,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.0452,
+                0.451,
+                -0.359
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.099,
+                0.0,
+                0.3403
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                -0.0746,
+                -0.2235,
+                0.4105
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.0435,
+                0.0,
+                -0.3991
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0779,
+                0.1527,
+                -0.1437
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.0273,
+                0.0,
+                0.0942
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.054,
+                0.1315,
+                0.1854
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                -0.0885,
+                0.0,
+                -0.1419
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                -0.0113,
+                -0.1012,
+                -0.2998
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0.1188,
+                0.0,
+                0.2726
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0354,
+                0.7076,
+                0.218
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0.1076,
+                0.0,
+                -0.1792
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                -0.0697,
+                -0.6588,
+                -0.402
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                -0.0588,
+                0.0,
+                0.3895
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "scuttle_walk": {
+      "loop": true,
+      "keyframes": [
+        {
+          "time_sec": 0.0,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.1,
+                0.0,
+                0.08
+              ],
+              "pos_mc": [
+                0.0,
+                14.2,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.55,
+                0.7
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                -0.5125
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                0.0,
+                0.55,
+                -0.25
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                -0.18,
+                0.25
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.18,
+                -0.7
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.5125
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.22,
+                0.7
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                -0.5125
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.22,
+                -0.25
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.6,
+                0.25
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.6,
+                -0.7
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.5125
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.1125,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.1,
+                0.0707,
+                0.0566
+              ],
+              "pos_mc": [
+                0.354,
+                14.624,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.847,
+                0.5682
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                -0.4268
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                0.0,
+                0.253,
+                -0.25
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                0.117,
+                0.25
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.477,
+                -0.5682
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                0.4268
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.077,
+                0.5682
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                -0.4268
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.517,
+                -0.25
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.897,
+                0.25
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.303,
+                -0.5682
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                0.4268
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.225,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.1,
+                0.1,
+                0.0
+              ],
+              "pos_mc": [
+                0.5,
+                14.8,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.97,
+                0.25
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                0.105,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                0.0,
+                0.13,
+                -0.25
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.105,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                0.24,
+                0.25
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.105,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.6,
+                -0.25
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                0.105,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.2,
+                0.25
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0.105,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.64,
+                -0.25
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                -0.105,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                1.02,
+                0.25
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                -0.105,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.18,
+                -0.25
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0.105,
+                0.0,
+                0.22
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.3375,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.1,
+                0.0707,
+                -0.0566
+              ],
+              "pos_mc": [
+                0.354,
+                14.624,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.847,
+                0.25
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                0.0,
+                0.253,
+                -0.5682
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                0.4268
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                0.117,
+                0.5682
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                -0.4268
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.477,
+                -0.25
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.077,
+                0.25
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.517,
+                -0.5682
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                0.4268
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.897,
+                0.5682
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                -0.4268
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.303,
+                -0.25
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                0.22
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.45,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.1,
+                0.0,
+                -0.08
+              ],
+              "pos_mc": [
+                0.0,
+                14.2,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.55,
+                0.25
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                0.0,
+                0.55,
+                -0.7
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                0.5125
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                -0.18,
+                0.7
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                -0.5125
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.18,
+                -0.25
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.22,
+                0.25
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.22,
+                -0.7
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                0.5125
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.6,
+                0.7
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                -0.5125
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.6,
+                -0.25
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.22
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.5625,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.1,
+                -0.0707,
+                -0.0566
+              ],
+              "pos_mc": [
+                -0.354,
+                14.624,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.253,
+                0.25
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                0.0,
+                0.847,
+                -0.5682
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                0.4268
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                -0.477,
+                0.5682
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                -0.4268
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.117,
+                -0.25
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.517,
+                0.25
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                0.077,
+                -0.5682
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                0.4268
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.303,
+                0.5682
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                -0.4268
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.897,
+                -0.25
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                0.22
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.675,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.1,
+                -0.1,
+                -0.0
+              ],
+              "pos_mc": [
+                -0.5,
+                14.8,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.13,
+                0.25
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.105,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                0.0,
+                0.97,
+                -0.25
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                0.105,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                -0.6,
+                0.25
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                0.105,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.24,
+                -0.25
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.105,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.64,
+                0.25
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                -0.105,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                0.2,
+                -0.25
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0.105,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.18,
+                0.25
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0.105,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -1.02,
+                -0.25
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                -0.105,
+                0.0,
+                0.22
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.7875,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.1,
+                -0.0707,
+                0.0566
+              ],
+              "pos_mc": [
+                -0.354,
+                14.624,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.253,
+                0.5682
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                -0.4268
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                0.0,
+                0.847,
+                -0.25
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                -0.477,
+                0.25
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.117,
+                -0.5682
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                0.4268
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.517,
+                0.5682
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                -0.4268
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                0.077,
+                -0.25
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.303,
+                0.25
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0.0742,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.897,
+                -0.5682
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                -0.0742,
+                0.0,
+                0.4268
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.9,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.1,
+                -0.0,
+                0.08
+              ],
+              "pos_mc": [
+                -0.0,
+                14.2,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.55,
+                0.7
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                -0.5125
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                0.0,
+                0.55,
+                -0.25
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                -0.18,
+                0.25
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.18,
+                -0.7
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                0.5125
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.22,
+                0.7
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                -0.5125
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.22,
+                -0.25
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.22
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.6,
+                0.25
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                -0.22
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.6,
+                -0.7
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                0.5125
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "sound_charge": {
+      "loop": true,
+      "keyframes": [
+        {
+          "time_sec": 0.0,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.22,
+                0.0,
+                0.12
+              ],
+              "pos_mc": [
+                0.0,
+                13.6,
+                -1.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.35,
+                -0.1,
+                0.55
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.5,
+                0.0,
+                -0.15
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.35,
+                0.1,
+                -0.55
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -1.0,
+                0.0,
+                0.15
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                -0.18,
+                0.28
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.18,
+                -0.83
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.635
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.22,
+                0.83
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                -0.635
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.22,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.6,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.6,
+                -0.83
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.635
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.0563,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.22,
+                0.099,
+                0.0849
+              ],
+              "pos_mc": [
+                0.566,
+                14.3,
+                -1.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.1732,
+                -0.1,
+                0.55
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.5732,
+                0.0,
+                -0.15
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.5268,
+                0.1,
+                -0.55
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.9268,
+                0.0,
+                0.15
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                0.2301,
+                0.28
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.123,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.5901,
+                -0.6689
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                0.123,
+                0.0,
+                0.5222
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.1901,
+                0.6689
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0.123,
+                0.0,
+                -0.5222
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.6301,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                -0.123,
+                0.0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                1.0101,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                -0.123,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.1899,
+                -0.6689
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0.123,
+                0.0,
+                0.5222
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.1125,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.22,
+                0.14,
+                0.0
+              ],
+              "pos_mc": [
+                0.8,
+                13.6,
+                -1.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.1,
+                -0.1,
+                0.55
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.75,
+                0.0,
+                -0.15
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.6,
+                0.1,
+                -0.55
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.75,
+                0.0,
+                0.15
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                0.4,
+                0.28
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.174,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.76,
+                -0.28
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                0.174,
+                0.0,
+                0.25
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.36,
+                0.28
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0.174,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.8,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                -0.174,
+                0.0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                1.18,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                -0.174,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.02,
+                -0.28
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0.174,
+                0.0,
+                0.25
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.1688,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.22,
+                0.099,
+                -0.0849
+              ],
+              "pos_mc": [
+                0.566,
+                14.3,
+                -1.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.1732,
+                -0.1,
+                0.55
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.9268,
+                0.0,
+                -0.15
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.5268,
+                0.1,
+                -0.55
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.5732,
+                0.0,
+                0.15
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                0.2301,
+                0.6689
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.123,
+                0.0,
+                -0.5222
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.5901,
+                -0.28
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                0.123,
+                0.0,
+                0.25
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                -0.1901,
+                0.28
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0.123,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.6301,
+                -0.6689
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                -0.123,
+                0.0,
+                0.5222
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                1.0101,
+                0.6689
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                -0.123,
+                0.0,
+                -0.5222
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.1899,
+                -0.28
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0.123,
+                0.0,
+                0.25
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.225,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.22,
+                0.0,
+                -0.12
+              ],
+              "pos_mc": [
+                0.0,
+                13.6,
+                -1.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.35,
+                -0.1,
+                0.55
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -1.0,
+                0.0,
+                -0.15
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.35,
+                0.1,
+                -0.55
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.5,
+                0.0,
+                0.15
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                -0.18,
+                0.83
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                -0.635
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.18,
+                -0.28
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.25
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.22,
+                0.28
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.22,
+                -0.83
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                0.635
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.6,
+                0.83
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                -0.635
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.6,
+                -0.28
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.25
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.2812,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.22,
+                -0.099,
+                -0.0849
+              ],
+              "pos_mc": [
+                -0.566,
+                14.3,
+                -1.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.5268,
+                -0.1,
+                0.55
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.9268,
+                0.0,
+                -0.15
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.1732,
+                0.1,
+                -0.55
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.5732,
+                0.0,
+                0.15
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                -0.5901,
+                0.6689
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                0.123,
+                0.0,
+                -0.5222
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.2301,
+                -0.28
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.123,
+                0.0,
+                0.25
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.6301,
+                0.28
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                -0.123,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                0.1901,
+                -0.6689
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0.123,
+                0.0,
+                0.5222
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.1899,
+                0.6689
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0.123,
+                0.0,
+                -0.5222
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -1.0101,
+                -0.28
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                -0.123,
+                0.0,
+                0.25
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.3375,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.22,
+                -0.14,
+                -0.0
+              ],
+              "pos_mc": [
+                -0.8,
+                13.6,
+                -1.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.6,
+                -0.1,
+                0.55
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.75,
+                0.0,
+                -0.15
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.1,
+                0.1,
+                -0.55
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.75,
+                0.0,
+                0.15
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                -0.76,
+                0.28
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                0.174,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.4,
+                -0.28
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.174,
+                0.0,
+                0.25
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.8,
+                0.28
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                -0.174,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                0.36,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0.174,
+                0.0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.02,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0.174,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -1.18,
+                -0.28
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                -0.174,
+                0.0,
+                0.25
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.3937,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.22,
+                -0.099,
+                0.0849
+              ],
+              "pos_mc": [
+                -0.566,
+                14.3,
+                -1.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.5268,
+                -0.1,
+                0.55
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.5732,
+                0.0,
+                -0.15
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.1732,
+                0.1,
+                -0.55
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.9268,
+                0.0,
+                0.15
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                -0.5901,
+                0.28
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                0.123,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.2301,
+                -0.6689
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.123,
+                0.0,
+                0.5222
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.6301,
+                0.6689
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                -0.123,
+                0.0,
+                -0.5222
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                0.1901,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0.123,
+                0.0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.1899,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0.123,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -1.0101,
+                -0.6689
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                -0.123,
+                0.0,
+                0.5222
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.45,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.22,
+                -0.0,
+                0.12
+              ],
+              "pos_mc": [
+                -0.0,
+                13.6,
+                -1.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.35,
+                -0.1,
+                0.55
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.5,
+                0.0,
+                -0.15
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.35,
+                0.1,
+                -0.55
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -1.0,
+                0.0,
+                0.15
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                0.0,
+                -0.18,
+                0.28
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                0.0,
+                0.18,
+                -0.83
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                0.635
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0.0,
+                0.22,
+                0.83
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                -0.635
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.22,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.6,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0.0,
+                -0.6,
+                -0.83
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                0.635
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "attack_grab": {
+      "loop": false,
+      "keyframes": [
+        {
+          "time_sec": 0.0,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                14.0,
+                0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.0,
+                -0.55,
+                0.25
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                -0.1
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.0,
+                0.55,
+                -0.25
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0.1
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                -0.0,
+                -0.18,
+                0.25
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                -0.1
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                -0.0,
+                0.18,
+                -0.25
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0.1
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0,
+                0.22,
+                0.28
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0,
+                -0.22,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0,
+                0.6,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0,
+                -0.6,
+                -0.28
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.0889,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                -0.0585,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                13.649,
+                0.585
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.0585,
+                -0.7108,
+                0.4401
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.1462,
+                0,
+                -0.1
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.0585,
+                0.7108,
+                -0.4401
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.1462,
+                0,
+                0.1
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                -0.0585,
+                -0.3408,
+                0.4401
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.1462,
+                0,
+                -0.1
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                -0.0585,
+                0.3408,
+                -0.4401
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.1462,
+                0,
+                0.1
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0,
+                0.22,
+                0.28
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0,
+                -0.22,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0,
+                0.6,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0,
+                -0.6,
+                -0.28
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.1778,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                -0.117,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                13.298,
+                1.17
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.117,
+                -0.8716,
+                0.6301
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.2924,
+                0,
+                -0.1
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.117,
+                0.8716,
+                -0.6301
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.2924,
+                0,
+                0.1
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                -0.117,
+                -0.5016,
+                0.6301
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.2924,
+                0,
+                -0.1
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                -0.117,
+                0.5016,
+                -0.6301
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.2924,
+                0,
+                0.1
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0,
+                0.22,
+                0.28
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0,
+                -0.22,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0,
+                0.6,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0,
+                -0.6,
+                -0.28
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.2667,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                -0.1754,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                12.947,
+                1.754
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.1754,
+                -1.0325,
+                0.8202
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.4386,
+                0,
+                -0.1
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.1754,
+                1.0325,
+                -0.8202
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.4386,
+                0,
+                0.1
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                -0.1754,
+                -0.6625,
+                0.8202
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.4386,
+                0,
+                -0.1
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                -0.1754,
+                0.6625,
+                -0.8202
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.4386,
+                0,
+                0.1
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0,
+                0.22,
+                0.28
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0,
+                -0.22,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0,
+                0.6,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0,
+                -0.6,
+                -0.28
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.3556,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                -0.0687,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                13.039,
+                0.687
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.3074,
+                -0.8016,
+                0.7687
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.6074,
+                0,
+                0.0074
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.3074,
+                0.8016,
+                -0.7687
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.6074,
+                0,
+                -0.0074
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                -0.3074,
+                -0.4316,
+                0.7687
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.6074,
+                0,
+                0.0074
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                -0.3074,
+                0.4316,
+                -0.7687
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.6074,
+                0,
+                -0.0074
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0,
+                0.22,
+                0.28
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0,
+                -0.22,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0,
+                0.6,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0,
+                -0.6,
+                -0.28
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.4444,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.1576,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                13.45,
+                -1.576
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.4926,
+                -0.2872,
+                0.5424
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.7926,
+                0,
+                0.1926
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.4926,
+                0.2872,
+                -0.5424
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.7926,
+                0,
+                -0.1926
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                -0.4926,
+                0.0828,
+                0.5424
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.7926,
+                0,
+                0.1926
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                -0.4926,
+                -0.0828,
+                -0.5424
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.7926,
+                0,
+                -0.1926
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0,
+                0.22,
+                0.28
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0,
+                -0.22,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0,
+                0.6,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0,
+                -0.6,
+                -0.28
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.5333,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.3333,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                13.833,
+                -3.333
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.619,
+                0.1167,
+                0.3467
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.9048,
+                0,
+                0.3214
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.619,
+                -0.1167,
+                -0.3467
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.9048,
+                0,
+                -0.3214
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                -0.619,
+                0.4867,
+                0.3467
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.9048,
+                0,
+                0.3214
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                -0.619,
+                -0.4867,
+                -0.3467
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.9048,
+                0,
+                -0.3214
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0,
+                0.22,
+                0.28
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0,
+                -0.22,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0,
+                0.6,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0,
+                -0.6,
+                -0.28
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.6222,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.2222,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                14.056,
+                -2.222
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.4127,
+                -0.1056,
+                0.3244
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.6032,
+                0,
+                0.131
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.4127,
+                0.1056,
+                -0.3244
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.6032,
+                0,
+                -0.131
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                -0.4127,
+                0.2644,
+                0.3244
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.6032,
+                0,
+                0.131
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                -0.4127,
+                -0.2644,
+                -0.3244
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.6032,
+                0,
+                -0.131
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0,
+                0.22,
+                0.28
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0,
+                -0.22,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0,
+                0.6,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0,
+                -0.6,
+                -0.28
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.7111,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.1111,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                14.278,
+                -1.111
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.2063,
+                -0.3278,
+                0.3022
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.3016,
+                0,
+                -0.0595
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.2063,
+                0.3278,
+                -0.3022
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.3016,
+                0,
+                0.0595
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                -0.2063,
+                0.0422,
+                0.3022
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.3016,
+                0,
+                -0.0595
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                -0.2063,
+                -0.0422,
+                -0.3022
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.3016,
+                0,
+                0.0595
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0,
+                0.22,
+                0.28
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0,
+                -0.22,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0,
+                0.6,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0,
+                -0.6,
+                -0.28
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.8,
+          "joints": {
+            "Core": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                14.5,
+                -0.0
+              ]
+            },
+            "Arm_FL": {
+              "rot_rad_mc": [
+                -0.0,
+                -0.55,
+                0.28
+              ]
+            },
+            "Fore_FL": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_FR": {
+              "rot_rad_mc": [
+                -0.0,
+                0.55,
+                -0.28
+              ]
+            },
+            "Fore_FR": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0.25
+              ]
+            },
+            "Arm_ML": {
+              "rot_rad_mc": [
+                -0.0,
+                -0.18,
+                0.28
+              ]
+            },
+            "Fore_ML": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_MR": {
+              "rot_rad_mc": [
+                -0.0,
+                0.18,
+                -0.28
+              ]
+            },
+            "Fore_MR": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0.25
+              ]
+            },
+            "Arm_BL": {
+              "rot_rad_mc": [
+                0,
+                0.22,
+                0.28
+              ]
+            },
+            "Fore_BL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_BR": {
+              "rot_rad_mc": [
+                0,
+                -0.22,
+                -0.28
+              ]
+            },
+            "Fore_BR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            },
+            "Arm_RL": {
+              "rot_rad_mc": [
+                0,
+                0.6,
+                0.28
+              ]
+            },
+            "Fore_RL": {
+              "rot_rad_mc": [
+                0,
+                0,
+                -0.25
+              ]
+            },
+            "Arm_RR": {
+              "rot_rad_mc": [
+                0,
+                -0.6,
+                -0.28
+              ]
+            },
+            "Fore_RR": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0.25
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
