@@ -48,6 +48,10 @@ final class Exits {
 
 	/** The door of a region, or null if it has no solid wall to hold one. */
 	static Door doorIn(long seed, int rx, int rz) {
+		return DOOR_CACHE.get().getOrCompute(seed, rx, rz);
+	}
+
+	private static Door computeDoorIn(long seed, int rx, int rz) {
 		int cells = REGION_CELLS * REGION_CELLS;
 		long regionSeed = seed ^ rx * 0x9E3779B97F4A7C15L ^ rz * 0xC2B2AE3D27D4EB4FL;
 		int first = new SplittableRandom(regionSeed).nextInt(cells);
@@ -71,8 +75,14 @@ final class Exits {
 	static boolean isProtectedCell(long seed, int cx, int cz) {
 		int rxCenter = Math.floorDiv(cx, REGION_CELLS);
 		int rzCenter = Math.floorDiv(cz, REGION_CELLS);
-		for (int rx = rxCenter - 1; rx <= rxCenter + 1; rx++) {
-			for (int rz = rzCenter - 1; rz <= rzCenter + 1; rz++) {
+		int lx = Math.floorMod(cx, REGION_CELLS);
+		int lz = Math.floorMod(cz, REGION_CELLS);
+		int minRx = lx == 0 ? rxCenter - 1 : rxCenter;
+		int maxRx = lx == REGION_CELLS - 1 ? rxCenter + 1 : rxCenter;
+		int minRz = lz == 0 ? rzCenter - 1 : rzCenter;
+		int maxRz = lz == REGION_CELLS - 1 ? rzCenter + 1 : rzCenter;
+		for (int rx = minRx; rx <= maxRx; rx++) {
+			for (int rz = minRz; rz <= maxRz; rz++) {
 				Door door = doorIn(seed, rx, rz);
 				if (door == null) continue;
 				int doorCx = Math.floorDiv(door.x(), Maze.CELL);
@@ -81,6 +91,31 @@ final class Exits {
 			}
 		}
 		return false;
+	}
+
+	private static final ThreadLocal<DoorCache> DOOR_CACHE = ThreadLocal.withInitial(DoorCache::new);
+
+	private static final class DoorCache {
+		private static final int MASK = 255;
+		private final long[] seeds = new long[MASK + 1];
+		private final int[] rxs = new int[MASK + 1];
+		private final int[] rzs = new int[MASK + 1];
+		private final Door[] doors = new Door[MASK + 1];
+		private final boolean[] valid = new boolean[MASK + 1];
+
+		Door getOrCompute(long seed, int rx, int rz) {
+			int idx = (int) ((seed ^ (rx * 0x9E3779B97F4A7C15L) ^ (rz * 0xC2B2AE3D27D4EB4FL)) >>> 32) & MASK;
+			if (valid[idx] && seeds[idx] == seed && rxs[idx] == rx && rzs[idx] == rz) {
+				return doors[idx];
+			}
+			Door computed = computeDoorIn(seed, rx, rz);
+			seeds[idx] = seed;
+			rxs[idx] = rx;
+			rzs[idx] = rz;
+			doors[idx] = computed;
+			valid[idx] = true;
+			return computed;
+		}
 	}
 
 	private static boolean hasSolidWestWall(long seed, int x, int z) {
