@@ -152,6 +152,16 @@ public final class Level1SectorArchitecture {
 		boolean hasMainFloor = profile != Level1Elevation.Profile.SUNKEN_BASIN
 				|| (lx < 11 || lx > 52 || lz < 11 || lz > 52);
 
+		// Occasional abandoned 90s sedan parked neatly inside parking stalls (never blocking driving aisles)
+		if (hasMainFloor && y == FLOOR + 1 && current.isAir() && tile == Tile.FLOOR
+				&& Level1Layout.kindAt(seed, x, z) == Kind.PARKING) {
+			int bx = Math.floorMod(x, Level1Layout.BAY_X), bz = Math.floorMod(z, Level1Layout.BAY_Z);
+			if ((bx == 3 || bx == 6) && (bz == 4 || bz == 13)
+					&& Math.floorMod(Level1Layout.hash(seed, x, z, 163), 100) < 9) {
+				Direction dir = Math.floorMod(Level1Layout.hash(seed, x, z, 167), 2) == 0 ? Direction.NORTH : Direction.SOUTH;
+				return Level1Blocks.ABANDONED_CAR.defaultBlockState().setValue(OldComputerBlock.FACING, dir);
+			}
+		}
 		BlockState override = switch (v) {
 			case TALON_SPLIT_RAMPS -> talonSplitRamps(tile, current, lx, lz, y, hasMainFloor);
 			case TALON_PIPE_GANTRY -> talonPipeGantry(seed, tile, current, x, y, z, lx, lz, topCeil);

@@ -1,105 +1,247 @@
 {
   "parent": "minecraft:block/block",
   "textures": {
-    "particle": "noclip_backrooms:block/level1/crate_side",
-    "side": "noclip_backrooms:block/level1/crate_side",
-    "top": "noclip_backrooms:block/level1/crate_top"
+    "particle": "noclip_backrooms:block/level1/crate_top",
+    "wood": "noclip_backrooms:block/level1/crate_top",
+    "steel": "noclip_backrooms:block/level1/door_jamb",
+    "copper": "noclip_backrooms:block/level1/copper_pillar"
   },
   "elements": [
     {
       "from": [
-        1,
-        0,
-        2
+        1.5,
+        0.0,
+        2.0
       ],
       "to": [
-        11,
-        5,
-        9
+        14.5,
+        2.6,
+        14.0
       ],
       "faces": {
         "north": {
-          "texture": "#side"
+          "texture": "#wood"
         },
         "south": {
-          "texture": "#side"
+          "texture": "#wood"
         },
         "east": {
-          "texture": "#side"
+          "texture": "#wood"
         },
         "west": {
-          "texture": "#side"
+          "texture": "#wood"
         },
         "up": {
-          "texture": "#top"
+          "texture": "#wood"
+        },
+        "down": {
+          "texture": "#wood"
         }
       }
     },
     {
       "from": [
-        6,
-        0,
-        8
+        3.0,
+        2.0,
+        4.0
       ],
       "to": [
-        15,
-        4,
-        15
+        10.5,
+        6.8,
+        11.2
       ],
       "faces": {
         "north": {
-          "texture": "#side"
+          "texture": "#wood"
         },
         "south": {
-          "texture": "#side"
+          "texture": "#wood"
         },
         "east": {
-          "texture": "#side"
+          "texture": "#wood"
         },
         "west": {
-          "texture": "#side"
+          "texture": "#wood"
         },
         "up": {
-          "texture": "#top"
-        }
-      }
-    },
-    {
-      "from": [
-        2,
-        5,
-        3
-      ],
-      "to": [
-        13,
-        7,
-        6
-      ],
-      "faces": {
-        "north": {
-          "texture": "#side"
+          "texture": "#wood"
         },
-        "south": {
-          "texture": "#side"
-        },
-        "east": {
-          "texture": "#side"
-        },
-        "west": {
-          "texture": "#side"
-        },
-        "up": {
-          "texture": "#top"
+        "down": {
+          "texture": "#wood"
         }
       },
       "rotation": {
-        "angle": 22.5,
-        "axis": "y",
         "origin": [
-          8,
-          6,
-          4
-        ]
+          6.8,
+          4.0,
+          7.6
+        ],
+        "axis": "y",
+        "angle": 22.5
+      }
+    },
+    {
+      "from": [
+        1.0,
+        2.2,
+        6.5
+      ],
+      "to": [
+        14.8,
+        3.4,
+        9.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#wood"
+        },
+        "south": {
+          "texture": "#wood"
+        },
+        "east": {
+          "texture": "#wood"
+        },
+        "west": {
+          "texture": "#wood"
+        },
+        "up": {
+          "texture": "#wood"
+        },
+        "down": {
+          "texture": "#wood"
+        }
+      },
+      "rotation": {
+        "origin": [
+          8.0,
+          3.0,
+          8.0
+        ],
+        "axis": "z",
+        "angle": 22.5
+      }
+    },
+    {
+      "from": [
+        5.5,
+        3.5,
+        1.5
+      ],
+      "to": [
+        8.2,
+        4.7,
+        14.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#wood"
+        },
+        "south": {
+          "texture": "#wood"
+        },
+        "east": {
+          "texture": "#wood"
+        },
+        "west": {
+          "texture": "#wood"
+        },
+        "up": {
+          "texture": "#wood"
+        },
+        "down": {
+          "texture": "#wood"
+        }
+      },
+      "rotation": {
+        "origin": [
+          7.0,
+          4.0,
+          8.0
+        ],
+        "axis": "x",
+        "angle": -22.5
+      }
+    },
+    {
+      "from": [
+        9.0,
+        1.5,
+        2.0
+      ],
+      "to": [
+        10.8,
+        3.3,
+        15.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#steel"
+        },
+        "south": {
+          "texture": "#steel"
+        },
+        "east": {
+          "texture": "#steel"
+        },
+        "west": {
+          "texture": "#steel"
+        },
+        "up": {
+          "texture": "#steel"
+        },
+        "down": {
+          "texture": "#steel"
+        }
+      },
+      "rotation": {
+        "origin": [
+          10.0,
+          2.5,
+          8.0
+        ],
+        "axis": "y",
+        "angle": -22.5
+      }
+    },
+    {
+      "from": [
+        2.0,
+        0.5,
+        10.5
+      ],
+      "to": [
+        6.5,
+        3.8,
+        13.8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#copper"
+        },
+        "south": {
+          "texture": "#copper"
+        },
+        "east": {
+          "texture": "#copper"
+        },
+        "west": {
+          "texture": "#copper"
+        },
+        "up": {
+          "texture": "#copper"
+        },
+        "down": {
+          "texture": "#copper"
+        }
+      },
+      "rotation": {
+        "origin": [
+          4.2,
+          2.0,
+          12.0
+        ],
+        "axis": "y",
+        "angle": 45.0
       }
     }
   ]

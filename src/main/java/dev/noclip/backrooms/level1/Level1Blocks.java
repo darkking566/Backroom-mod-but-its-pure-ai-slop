@@ -252,6 +252,9 @@ public final class Level1Blocks {
 			p -> new ShapedBlock(p, Block.box(7, 0, 7, 9, 16, 9)));
 	public static final Block SITE_MACHINE = register("site_machine", Properties.of().mapColor(MapColor.COLOR_YELLOW).strength(0.5F).sound(SoundType.METAL).noOcclusion(),
 			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 14, 14)));
+	/** A dusty 90s abandoned sedan parked in the garage halls and indoor overpasses. */
+	public static final Block ABANDONED_CAR = register("abandoned_car", Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new OldComputerBlock(p, Block.box(0, 0, 0, 16, 16, 16)));
 	public static final Block GLITCH_BLACK = register("glitch_black", Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 0));
 	public static final Block GLITCH_MAGENTA = register("glitch_magenta", Properties.of().mapColor(MapColor.COLOR_MAGENTA).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 6));
 	public static final Block GLITCH_CYAN = register("glitch_cyan", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 6));

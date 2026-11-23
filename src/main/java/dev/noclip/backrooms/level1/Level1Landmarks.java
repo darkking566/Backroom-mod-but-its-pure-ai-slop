@@ -480,12 +480,14 @@ public final class Level1Landmarks {
 		if (hwy1) {
 			if (y == 39) return state((v == 15 || v == 16) ? Level1Blocks.GARAGE_FLOOR_LINE : Level1Blocks.GARAGE_FLOOR);
 			if (y == 40 && (v == 12 || v == 19)) return barrier(Direction.Axis.X);
+			if (y == 40 && u == 7 && v == 14) return Level1Blocks.ABANDONED_CAR.defaultBlockState().setValue(OldComputerBlock.FACING, Direction.EAST);
 			if (y == 38 && u % 8 == 4 && v == 15) return state(Level1Blocks.CAGED_LAMP);
 		}
 		// Highway 2 deck (y = 46)
 		if (hwy2) {
 			if (y == 46) return state((u == 15 || u == 16) ? Level1Blocks.GARAGE_FLOOR_LINE : Level1Blocks.GARAGE_FLOOR);
 			if (y == 47 && (u == 12 || u == 19)) return barrier(Direction.Axis.Z);
+			if (y == 47 && u == 14 && v == 8) return Level1Blocks.ABANDONED_CAR.defaultBlockState().setValue(OldComputerBlock.FACING, Direction.SOUTH);
 			if (y == 45 && v % 8 == 4 && u == 15) return state(Level1Blocks.CAGED_LAMP);
 		}
 		return y == topCeil - 1 ? hallFixture(ceiling) : air();
