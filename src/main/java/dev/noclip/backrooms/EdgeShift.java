@@ -273,6 +273,12 @@ final class EdgeShift {
 		if (Maze.shiftWeight(zone) <= 0) return false;
 		if (Exits.isProtectedCell(seed, cx, cz)) return false;
 
+		// Keep Red Room perimeter rings sealed so trapped players never get an unexpected opening out.
+		if (zone == Maze.Zone.RED_ROOM) {
+			int lx = Math.floorMod(cx, Maze.SECTOR), lz = Math.floorMod(cz, Maze.SECTOR);
+			if (lx == 0 || lx == Maze.SECTOR - 1 || lz == 0 || lz == Maze.SECTOR - 1) return false;
+		}
+
 		// Keep shared walls with stable ARCHES or protected Exit cells completely unchanged.
 		if (cellZone(seed, cx - 1, cz) == Maze.Zone.ARCHES || Exits.isProtectedCell(seed, cx - 1, cz)) return false;
 		if (cellZone(seed, cx, cz - 1) == Maze.Zone.ARCHES || Exits.isProtectedCell(seed, cx, cz - 1)) return false;

@@ -49,7 +49,7 @@ final class RedRoomEffects {
 				RED_EXPOSURE.put(id, exposure);
 
 				player.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 90, 0, true, false, true));
-				player.addEffect(new MobEffectInstance(MobEffects.MINING_FATIGUE, 90, 0, true, false, true));
+				player.addEffect(new MobEffectInstance(MobEffects.MINING_FATIGUE, 90, 2, true, false, true));
 
 				// Periodic nausea after 6+ seconds inside, pulsing on and off so it stays unsettling without being unplayable.
 				if (exposure >= 3 && exposure % 4 != 0) {

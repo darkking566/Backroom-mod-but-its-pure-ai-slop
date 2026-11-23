@@ -65,6 +65,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			checkBlocks(context, game);
 			ExitClientChecks.run(context, game, 3, 3);
 			checkEdgeShift(context, game, standY);
+			checkRedRoomLoop(context, game, standY);
 			server.runOnServer(s -> {
 				for (int i = 0; i < ModBlocks.ALL.size(); i++) {
 					player(s).getInventory().setItem(i, new ItemStack(ModBlocks.ALL.get(i)));
@@ -217,6 +218,63 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		server.runOnServer(s -> check(!EdgeShift.isWatching(player(s)), "watch mode failed to disable"));
 		server.runCommand("execute as @a run backrooms edgeshift status");
 		server.runCommand("execute as @a run backrooms edgeshift pulse");
+	}
+
+	private static void checkRedRoomLoop(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
+		var server = game.getServer();
+		int[] redSector = server.computeOnServer(s -> {
+			ServerLevel level = s.getLevel(BackroomsMod.LEVEL_0);
+			long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
+			int sectorBlocks = Maze.CELL * Maze.SECTOR;
+			for (int radius = 1; radius <= 20; radius++) {
+				for (int sx = -radius; sx <= radius; sx++) {
+					for (int sz = -radius; sz <= radius; sz++) {
+						if (Maze.zoneAt(seed, sx * sectorBlocks + Maze.CENTER, sz * sectorBlocks + Maze.CENTER) == Maze.Zone.RED_ROOM) {
+							return new int[] {sx, sz};
+						}
+					}
+				}
+			}
+			throw new AssertionError("no RED_ROOM sector found within radius 20");
+		});
+
+		int rsx = redSector[0], rsz = redSector[1];
+		int innerX = (rsx * Maze.SECTOR + 3) * Maze.CELL + Maze.CENTER;
+		int innerZ = (rsz * Maze.SECTOR + 3) * Maze.CELL + Maze.CENTER;
+		server.runCommand("gamemode survival @a");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + (innerX + 0.5) + " " + standY + " " + (innerZ + 0.5));
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(5);
+
+		server.runOnServer(s -> {
+			ServerPlayer player = player(s);
+			check(RedRoomLoop.isTrapped(player), "player entering Red Room interior was not trapped");
+			check(!RedRoomLoop.canBreakBlock(player.level(), player, new BlockPos(innerX, standY, innerZ),
+					ModBlocks.RED_WALLPAPER.defaultBlockState()), "survival player could break Red Room wall");
+		});
+
+		// Stepping onto the outer perimeter cell of the Red Room sector must loop the player back into lx,lz in 2..5.
+		int perimeterX = (rsx * Maze.SECTOR) * Maze.CELL + Maze.CENTER;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + (perimeterX + 0.5) + " " + standY + " " + (innerZ + 0.5));
+		server.waitFor(s -> {
+			ServerPlayer player = player(s);
+			int lx = Math.floorMod(Math.floorDiv(player.getBlockX(), Maze.CELL), Maze.SECTOR);
+			int lz = Math.floorMod(Math.floorDiv(player.getBlockZ(), Maze.CELL), Maze.SECTOR);
+			return lx >= 2 && lx <= Maze.SECTOR - 3 && lz >= 2 && lz <= Maze.SECTOR - 3;
+		}, 40);
+
+		server.runOnServer(s -> check(RedRoomLoop.isTrapped(player(s)), "looped player lost trap state"));
+
+		// Returning to the starting sector clears the trap and effects for subsequent screenshot checks.
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
+		server.runCommand("effect clear @a");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(5);
+		server.runOnServer(s -> {
+			ServerPlayer player = player(s);
+			check(!RedRoomLoop.isTrapped(player), "distant teleport did not release Red Room trap");
+			check(!player.isInWall(), "stuck in wall after returning from Red Room");
+		});
 	}
 
 	private static void checkBlocks(ClientGameTestContext context, TestSingleplayerContext game) {
