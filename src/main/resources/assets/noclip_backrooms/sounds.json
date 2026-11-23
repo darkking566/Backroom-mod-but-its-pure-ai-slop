@@ -177,5 +177,52 @@
         "type": "event"
       }
     ]
+  },
+  "hound.growl": {
+    "subtitle": "subtitles.noclip_backrooms.hound.growl",
+    "sounds": [
+      {
+        "name": "minecraft:entity.wolf.growl",
+        "type": "event",
+        "pitch": 0.55
+      },
+      {
+        "name": "minecraft:entity.zoglin.ambient",
+        "type": "event",
+        "pitch": 0.7,
+        "volume": 0.7
+      }
+    ]
+  },
+  "hound.roar": {
+    "subtitle": "subtitles.noclip_backrooms.hound.roar",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ravager.roar",
+        "type": "event",
+        "pitch": 1.35,
+        "volume": 0.9
+      }
+    ]
+  },
+  "hound.hurt": {
+    "subtitle": "subtitles.noclip_backrooms.hound.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:entity.wolf.hurt",
+        "type": "event",
+        "pitch": 0.6
+      }
+    ]
+  },
+  "hound.death": {
+    "subtitle": "subtitles.noclip_backrooms.hound.death",
+    "sounds": [
+      {
+        "name": "minecraft:entity.wolf.death",
+        "type": "event",
+        "pitch": 0.5
+      }
+    ]
   }
 }

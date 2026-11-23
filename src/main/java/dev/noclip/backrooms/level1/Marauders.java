@@ -76,7 +76,7 @@ final class Marauders {
 		ServerLevel level = player.level();
 		int near = level.getEntitiesOfClass(Mob.class, new AABB(player.blockPosition()).inflate(NEAR), mob -> mob.entityTags().contains(TAG)).size();
 		if (near >= MAX_NEAR) return 0;
-		BlockPos spot = findSpot(player);
+		BlockPos spot = findSpot(player, NEAREST, FARTHEST);
 		if (spot == null) return 0;
 		RandomSource random = level.getRandom();
 		int size = 2 + random.nextInt(2), came = 0;
@@ -100,13 +100,14 @@ final class Marauders {
 		return mob;
 	}
 
-	private static BlockPos findSpot(ServerPlayer player) {
+	/** A free floor spot out in the halls, behind the player, between the two distances; null if none turned up. */
+	static BlockPos findSpot(ServerPlayer player, int nearest, int farthest) {
 		ServerLevel level = player.level();
 		long seed = Level1ChunkGenerator.planSeed(level.getChunkSource().randomState());
 		RandomSource random = level.getRandom();
 		Vec3 look = player.getLookAngle().multiply(1, 0, 1).normalize();
 		for (int attempt = 0; attempt < 40; attempt++) {
-			double angle = random.nextDouble() * Math.PI * 2, distance = NEAREST + random.nextDouble() * (FARTHEST - NEAREST);
+			double angle = random.nextDouble() * Math.PI * 2, distance = nearest + random.nextDouble() * (farthest - nearest);
 			double ax = Math.cos(angle), az = Math.sin(angle);
 			if (ax * look.x + az * look.z > 0.2) continue;
 			int x = (int) Math.floor(player.getX() + ax * distance), z = (int) Math.floor(player.getZ() + az * distance);

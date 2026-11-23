@@ -44,6 +44,8 @@ public final class Level1ClientTest implements FabricClientGameTest {
 				Blackouts.holdOff(20 * 60 * 10);
 				// Marauders are tested on their own below; until then none turn up by chance.
 				Marauders.holdOff(s, 20 * 60 * 10);
+				// Same for hounds, which come out in blackouts.
+				Hounds.holdOff(s, 20 * 60 * 10);
 			});
 			server.runCommand("gamemode spectator @a");
 			BlockPos arrival = server.computeOnServer(s -> player(s).blockPosition());
@@ -60,6 +62,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			settlements(context, game, seed);
 			items(context, game, seed);
 			monsters(context, game, seed);
+			hounds(context, game, seed);
 			checkBlocks(context, game);
 			leaveThroughDoor(context, game, seed);
 		}
@@ -528,6 +531,85 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		context.waitTicks(5);
 		check(server.computeOnServer(s -> Smilers.count()) == 0, "smilers stayed after the lights came back");
 		server.runOnServer(s -> Blackouts.holdOff(20 * 60 * 10));
+	}
+
+	/** The Hound: how it looks standing and mid-lunge, its eyes in a blackout, a real bite, and leaving when the lights come back. */
+	private static void hounds(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		int[] spot = Level1Layout.landing(seed, 0, 0);
+		// A straight run of open floor from the landing spot to put it on.
+		int[] way = server.computeOnServer(s -> {
+			ServerLevel level = level1(s);
+			for (Direction direction : Direction.Plane.HORIZONTAL) {
+				boolean open = true;
+				for (int k = 1; k <= 6 && open; k++) {
+					BlockPos at = new BlockPos(spot[0] + direction.getStepX() * k, STAND, spot[1] + direction.getStepZ() * k);
+					open = level.getBlockState(at).isAir() && level.getBlockState(at.above()).isAir()
+							&& !level.getBlockState(at.below()).getCollisionShape(level, at.below()).isEmpty();
+				}
+				if (open) return new int[] {direction.getStepX(), direction.getStepZ()};
+			}
+			return null;
+		});
+		check(way != null, "no open floor next to the landing spot");
+		float yaw = (float) Math.toDegrees(Math.atan2(-way[0], way[1]));
+		double hx = spot[0] + 0.5 + way[0] * 4, hz = spot[1] + 0.5 + way[1] * 4;
+		server.runCommand("gamemode spectator @a");
+		server.runCommand(String.format(Locale.ROOT,
+				"execute in noclip_backrooms:level_1 run summon noclip_backrooms:hound %.1f %d %.1f {NoAI:1b,Tags:[\"test_hound\"]}", hx, STAND, hz));
+		server.runOnServer(s -> {
+			var hound = testHound(s);
+			float facing = yaw + 180 + 35; // turned a little, to see its side
+			hound.setYRot(facing);
+			hound.setYBodyRot(facing);
+			hound.setYHeadRot(facing);
+		});
+		shoot(context, game, spot[0] + 0.5, STAND, spot[1] + 0.5, yaw, 15, "level1_hound");
+		shoot(context, game, spot[0] + 0.5 + way[0] * 1.8, STAND - 0.6, spot[1] + 0.5 + way[1] * 1.8, yaw, 15, "level1_hound_close");
+		server.runOnServer(s -> testHound(s).lunge(player(s)));
+		context.waitTicks(17);
+		context.takeScreenshot("level1_hound_lunge");
+		context.waitTicks(40);
+		server.runOnServer(s -> Blackouts.startNow());
+		server.waitFor(s -> Blackouts.phase() == Blackouts.Phase.DARK, 200);
+		context.waitTicks(10);
+		context.takeScreenshot("level1_hound_in_the_dark");
+		server.runOnServer(s -> Blackouts.endNow());
+		server.waitFor(s -> Blackouts.phase() == Blackouts.Phase.NORMAL, 60);
+		server.runOnServer(s -> Blackouts.holdOff(20 * 60 * 10));
+		server.runCommand("kill @e[type=noclip_backrooms:hound]");
+		context.waitTicks(25); // the body takes a second to go
+
+		// A real one: it comes for a player in survival and its lunge lands.
+		server.runCommand("gamemode survival @a");
+		server.runCommand("clear @a");
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f %.1f 0",
+				spot[0] + 0.5, STAND, spot[1] + 0.5, yaw));
+		server.runOnServer(s -> player(s).setHealth(player(s).getMaxHealth()));
+		server.runCommand(String.format(Locale.ROOT,
+				"execute in noclip_backrooms:level_1 run summon noclip_backrooms:hound %.1f %d %.1f {Tags:[\"test_hound\"]}", hx, STAND, hz));
+		context.waitTicks(8);
+		context.takeScreenshot("level1_hound_coming");
+		server.waitFor(s -> player(s).getHealth() < player(s).getMaxHealth(), 200);
+		server.runCommand("kill @e[type=noclip_backrooms:hound]");
+		server.runOnServer(s -> player(s).setHealth(player(s).getMaxHealth()));
+		context.waitTicks(25);
+
+		// Out in the halls, and gone again once the lights are back with nobody near it.
+		Vec3 out = server.computeOnServer(s -> {
+			var hound = Hounds.spawnNear(player(s));
+			return hound == null ? null : hound.position();
+		});
+		check(out != null, "no hound came out of the halls");
+		check(out.distanceTo(new Vec3(spot[0] + 0.5, STAND, spot[1] + 0.5)) > 16, "a hound came out right next to the player");
+		int gone = server.computeOnServer(s -> Hounds.slinkOff(level1(s)));
+		check(gone == 1, "a far-off hound did not leave when the lights came back (" + gone + ")");
+		server.runCommand("gamemode spectator @a");
+	}
+
+	private static dev.noclip.backrooms.monsters.hound.Hound testHound(MinecraftServer server) {
+		return level1(server).getEntitiesOfClass(dev.noclip.backrooms.monsters.hound.Hound.class,
+				new AABB(player(server).blockPosition()).inflate(16), hound -> hound.entityTags().contains("test_hound")).getFirst();
 	}
 
 	private static double nearestSmiler(MinecraftServer server) {

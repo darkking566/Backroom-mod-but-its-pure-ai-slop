@@ -102,3 +102,4 @@ Fabric・Minecraft 26.2・Java 25・模組代號 `noclip_backrooms`
 - 離開：白色走廊區裡的鐵製出口門（有 EXIT 標誌，附近燈泡是綠色）
 - 通往其他樓層的 11 種出口（樓層越低越難找），還沒做的樓層會顯示尚未開放：見 docs/levels/level1/README.md
 - 改貼圖或模型：`python tools/make_level1.py`
+- 獵犬（第一隻怪物，Antigravity 的模型）：停電時出現；也有生怪蛋。想看牠：`/summon noclip_backrooms:hound`

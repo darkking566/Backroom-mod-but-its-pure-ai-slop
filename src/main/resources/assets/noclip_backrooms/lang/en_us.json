@@ -121,5 +121,11 @@
   "entity.noclip_backrooms.marauder": "Marauder",
   "item.noclip_backrooms.smiler_face": "Smiler",
   "subtitles.noclip_backrooms.level1.smiler": "Something giggles in the dark",
-  "subtitles.noclip_backrooms.level1.smiler_bite": "A smiler bites"
+  "subtitles.noclip_backrooms.level1.smiler_bite": "A smiler bites",
+  "entity.noclip_backrooms.hound": "Hound",
+  "item.noclip_backrooms.hound_spawn_egg": "Hound Spawn Egg",
+  "subtitles.noclip_backrooms.hound.growl": "Hound growls",
+  "subtitles.noclip_backrooms.hound.roar": "Hound lunges",
+  "subtitles.noclip_backrooms.hound.hurt": "Hound hurts",
+  "subtitles.noclip_backrooms.hound.death": "Hound dies"
 }

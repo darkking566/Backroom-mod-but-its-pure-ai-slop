@@ -121,5 +121,11 @@
   "entity.noclip_backrooms.marauder": "掠奪者",
   "item.noclip_backrooms.smiler_face": "微笑者",
   "subtitles.noclip_backrooms.level1.smiler": "黑暗中有東西在竊笑",
-  "subtitles.noclip_backrooms.level1.smiler_bite": "微笑者咬了上來"
+  "subtitles.noclip_backrooms.level1.smiler_bite": "微笑者咬了上來",
+  "entity.noclip_backrooms.hound": "獵犬",
+  "item.noclip_backrooms.hound_spawn_egg": "獵犬生怪蛋",
+  "subtitles.noclip_backrooms.hound.growl": "獵犬低吼",
+  "subtitles.noclip_backrooms.hound.roar": "獵犬撲了過來",
+  "subtitles.noclip_backrooms.hound.hurt": "獵犬受傷",
+  "subtitles.noclip_backrooms.hound.death": "獵犬死亡"
 }

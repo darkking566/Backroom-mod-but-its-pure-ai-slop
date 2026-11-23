@@ -15,7 +15,12 @@ src/main/java/dev/noclip/backrooms/
 ├─ core/                    好幾層都會用到的機制
 │  └─ LevelExits.java       出口登記處：每個出口寫著通往哪一層，這裡決定通不通
 ├─ level0/                  Level 0「大廳」（入口檔 Level0.java）
-└─ level1/                  Level 1「停車場」（入口檔 Level1.java）
+├─ level1/                  Level 1「停車場」（入口檔 Level1.java）
+└─ monsters/                怪物（可能出現在好幾層）：Monsters.java 登記全部怪物，一隻一個資料夾（hound/）
+
+src/client/java/dev/noclip/backrooms/   只在遊戲畫面端執行的程式（伺服器不會載入）
+├─ BackroomsClient.java     畫面端入口：登記怪物的模型和繪製方式
+└─ monsters/                BoxRig.java 讀 Blender 匯出的怪物規格檔；hound/ 是獵犬的模型與繪製
 
 src/main/resources/assets/noclip_backrooms/
 ├─ textures/block/level0/  textures/block/level1/      方塊貼圖（含光影用的 _n、_s）
@@ -23,6 +28,8 @@ src/main/resources/assets/noclip_backrooms/
 ├─ textures/item/level0/   textures/item/level1/       物品圖示
 ├─ models/item/level0/     models/item/level1/         物品模型
 ├─ sounds/level0/                                      音效檔
+├─ monsters/hound.json                                 怪物規格檔（Blender 匯出：關節、長方體、動畫）
+├─ textures/entity/                                    怪物貼圖
 └─ blockstates/  items/  lang/  sounds.json            ← Minecraft 規定只能放在一起（檔名就是方塊或物品 ID）
 
 src/main/resources/data/noclip_backrooms/
@@ -36,6 +43,9 @@ src/gametest/java/dev/noclip/backrooms/level0/  level1/    真實遊戲測試；
 
 tools/make_textures.py      畫 Level 0 的貼圖，也是共用的繪圖工具
 tools/make_level1.py        畫 Level 1 的貼圖，並寫出 Level 1 的模型、blockstates、物品模型
+tools/make_hound.py         獵犬的發光眼睛貼圖與生怪蛋
+
+art/monsters/hound/         怪物的原始檔（Blender .blend、.glb、預覽圖、交接說明），不會打包進模組
 
 docs/levels/level0/         Level 0 的截圖與貼圖預覽
 docs/levels/level1/         Level 1 的說明（README.md）與貼圖預覽
@@ -55,10 +65,12 @@ docs/levels/level1/         Level 1 的說明（README.md）與貼圖預覽
 | 到達某層時站在哪 | 被到達的那層，並在入口檔用 `LevelExits.open("層號", ...)` 登記 | 到達 Level 0 的 `Level0Arrival` 在 `level0/` |
 | 長在別層裡、專門通往這層的入口 | 被進入的那層（誰被進入，誰負責入口） | Level 0 的閃爍牆通往 Level 1，所以 `FlickeringWalls` 在 `level1/` |
 | 好幾層都會用到的機制 | `core/` | `LevelExits` |
+| 怪物本身（長相、動作、AI） | `monsters/` | 獵犬在 `monsters/hound/` |
+| 某層什麼時候生出哪種怪物 | 那一層 | 停車場停電放出獵犬：`level1/Hounds.java` |
 
 出口只要寫上目的地的層號（例如 `"188"`）就好。那層還沒做的話，出口會顯示「尚未開放」；等那層用 `LevelExits.open` 登記，所有通往它的出口就一起接通，不用回頭改。
 
-git 分支不是用來分樓層的：`main` 是整合好的版本，`claude` 是 Claude 的工作區（規則見 AGENTS.md）。
+git 分支不是用來分樓層的：大家都在 `Desktop\Backroom - Claude`（`claude` 分支）工作，`main` 是整合好、推上 GitHub 的版本（規則見 AGENTS.md）。`src/main` 是 Gradle 的「主程式」資料夾，跟 git 的 `main` 分支無關。
 
 ## 新增一層（以 Level 2 為例）
 
@@ -68,6 +80,13 @@ git 分支不是用來分樓層的：`main` 是整合好的版本，`claude` 是
 4. 在 `Level2.register()` 裡寫 `LevelExits.open("2", 到達的方法)`，Level 1 往下的樓梯就會自動通到這裡。
 5. 貼圖、模型放 `textures/block/level2/`、`models/block/level2/`。
 6. 測試放 `src/test/.../level2/`、`src/gametest/.../level2/`，並把遊戲測試登記到 `src/gametest/resources/fabric.mod.json`。
+
+## 新增怪物
+
+1. 在 Blender 照獵犬的標準做（純長方體骨骼、3×3 貼圖分區），匯出成跟 `monsters/hound.json` 一樣格式的規格檔，放到 `assets/noclip_backrooms/monsters/`，貼圖放 `textures/entity/`，原始檔放 `art/monsters/<名字>/`。
+2. 在 `Monsters.java` 登記實體與生怪蛋，AI 寫在 `monsters/<名字>/`。
+3. 在 `src/client/.../monsters/<名字>/` 寫模型（用 `BoxRig.load("<名字>")` 讀規格檔，動畫直接用規格檔裡的片段）和繪製，並在 `BackroomsClient` 登記。
+4. 要牠在哪層出現，就在那層寫生怪規則。
 
 ## ID 規則
 
