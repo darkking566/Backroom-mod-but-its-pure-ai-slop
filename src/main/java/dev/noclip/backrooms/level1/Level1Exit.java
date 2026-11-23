@@ -13,14 +13,25 @@ public enum Level1Exit {
 	STAIRS_UP("0", Shape.STAIRS_UP),
 	CELLAR_HATCH("1.01", Shape.HATCH),
 	DOOR_FRAME("1.1", Shape.FRAME),
+	CONCRETE_DOOR("1.2", Shape.CORE_DOOR),
 	STAIRS_DOWN("2", Shape.STAIRS_DOWN),
 	WHITE_DOOR("4.3", Shape.CORE_DOOR),
+	ATTIC_HATCH("19", Shape.CORE_PAINTING),
+	GLASS_DOOR("22", Shape.CORE_DOOR),
 	REINFORCED_DOOR("54", Shape.CORE_DOOR),
+	OUTDOOR_GAP("128", Shape.CORE_PAINTING),
 	PAINTING("143", Shape.CORE_PAINTING),
+	SYMBOL_DOOR("154", Shape.CORE_DOOR),
+	FROZEN_DOOR("159", Shape.CORE_DOOR),
 	OUTLETS("188", Shape.CORE_OUTLETS),
 	AUTOMATIC_DOOR("197", Shape.CORE_DOOR),
+	BUNKER_DOOR("218", Shape.CORE_DOOR),
 	PICKAXE_DOOR("389", Shape.CORE_DOOR),
-	CRACKED_PILLAR("960", Shape.PILLAR);
+	COLD_DOOR("740", Shape.CORE_DOOR),
+	WALL_VENT("800", Shape.CORE_OUTLETS),
+	CRACKED_PILLAR("960", Shape.PILLAR),
+	ELEVATOR_DOOR("998", Shape.CORE_DOOR),
+	WHITE_WOOD_DOOR("998.2", Shape.CORE_DOOR);
 
 	/** How an exit sits in a parking bay; see HallPlan for the footprints. */
 	enum Shape {
@@ -60,6 +71,6 @@ public enum Level1Exit {
 
 	/** Lower levels are harder to find: the chance per district grows with the logarithm of the level number. */
 	static double findability(double level) {
-		return 0.06 + 0.18 * Math.log10(1 + level);
+		return 0.03 + 0.09 * Math.log10(1 + level);
 	}
 }

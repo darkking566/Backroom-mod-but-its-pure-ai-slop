@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.Block;
  */
 final class Markers {
 	private static final int FIRST_DELAY = 30 * 20, DELAY = 90 * 20, DELAY_SPREAD = 120 * 20;
-	private static final int MAX_NEAR = 2, NEAR = 48;
+	private static final int MAX_NEAR = 2, NEAR = 48, DOOR_PERCENT = 35;
 
 	private static final List<BlockPos> PLACED = new ArrayList<>();
 	private static final Map<UUID, Integer> NEXT = new HashMap<>();
@@ -54,6 +54,15 @@ final class Markers {
 
 	/** Hangs a marker at eye height on a pillar 10 to 28 blocks from the player; returns where, or null. */
 	static BlockPos hangNear(ServerLevel level, ServerPlayer player) {
+		return hang(level, player, DOOR_PERCENT);
+	}
+
+	/** The same, always on a pillar. */
+	static BlockPos hangOnPillar(ServerLevel level, ServerPlayer player) {
+		return hang(level, player, 0);
+	}
+
+	private static BlockPos hang(ServerLevel level, ServerPlayer player, int doorPercent) {
 		PLACED.removeIf(pos -> !level.isLoaded(pos) || !level.getBlockState(pos).is(Level1Blocks.SETTLEMENT_MARKER));
 		int near = 0;
 		for (BlockPos pos : PLACED) {
@@ -63,7 +72,7 @@ final class Markers {
 
 		RandomSource random = level.getRandom();
 		// Some wait on the floor by a doorway, the way the first bottle of almond water is found.
-		if (random.nextInt(100) < 35) {
+		if (random.nextInt(100) < doorPercent) {
 			BlockPos byDoor = Crates.floorBeforeDoor(level, player);
 			if (byDoor != null) {
 				level.setBlock(byDoor, Level1Blocks.SETTLEMENT_MARKER.defaultBlockState().setValue(SettlementMarkerBlock.FACING, Direction.UP), Block.UPDATE_ALL);

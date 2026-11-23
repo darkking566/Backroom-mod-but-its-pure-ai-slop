@@ -43,6 +43,17 @@ final class Level1Exits {
 				case REINFORCED_DOOR -> door(Level1Blocks.REINFORCED_DOOR, Level1Blocks.REINFORCED_DOOR_TOP, y, axis);
 				case AUTOMATIC_DOOR -> door(Level1Blocks.AUTOMATIC_DOOR, Level1Blocks.AUTOMATIC_DOOR_TOP, y, axis);
 				case PICKAXE_DOOR -> door(Level1Blocks.PICKAXE_DOOR, Level1Blocks.PICKAXE_DOOR_TOP, y, axis);
+				case CONCRETE_DOOR -> door(Level1Blocks.CONCRETE_DOOR, Level1Blocks.CONCRETE_DOOR_TOP, y, axis);
+				case GLASS_DOOR -> door(Level1Blocks.GLASS_DOOR, Level1Blocks.GLASS_DOOR_TOP, y, axis);
+				case SYMBOL_DOOR -> door(Level1Blocks.SYMBOL_DOOR, Level1Blocks.SYMBOL_DOOR_TOP, y, axis);
+				case FROZEN_DOOR -> door(Level1Blocks.FROZEN_DOOR, Level1Blocks.FROZEN_DOOR_TOP, y, axis);
+				case BUNKER_DOOR -> door(Level1Blocks.BUNKER_DOOR, Level1Blocks.BUNKER_DOOR_TOP, y, axis);
+				case COLD_DOOR -> door(Level1Blocks.COLD_DOOR, Level1Blocks.COLD_DOOR_TOP, y, axis);
+				case ELEVATOR_DOOR -> door(Level1Blocks.ELEVATOR_DOOR, Level1Blocks.ELEVATOR_DOOR_TOP, y, axis);
+				case WHITE_WOOD_DOOR -> door(Level1Blocks.WHITE_WOOD_DOOR, Level1Blocks.WHITE_WOOD_DOOR_TOP, y, axis);
+				case ATTIC_HATCH -> y == FLOOR + 2 ? state(Level1Blocks.ATTIC_HATCH) : null;
+				case OUTDOOR_GAP -> y == FLOOR + 2 ? state(Level1Blocks.OUTDOOR_GAP) : null;
+				case WALL_VENT -> y == FLOOR + 1 ? state(Level1Blocks.WALL_VENT) : null;
 				case PAINTING -> y == FLOOR + 2 ? state(Level1Blocks.PALACE_PAINTING) : null;
 				case OUTLETS -> y == FLOOR + 1 ? state(Level1Blocks.OUTLET_WALL) : null;
 				default -> null;

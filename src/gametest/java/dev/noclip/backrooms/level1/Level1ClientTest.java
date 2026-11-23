@@ -243,7 +243,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 	/** A settlement marker is hung on a pillar nearby; right-clicking takes its supplies once and leaves the bare cloth. */
 	private static void marker(ClientGameTestContext context, TestSingleplayerContext game) {
 		var server = game.getServer();
-		BlockPos marker = server.computeOnServer(s -> Markers.hangNear(level1(s), player(s)));
+		BlockPos marker = server.computeOnServer(s -> Markers.hangOnPillar(level1(s), player(s)));
 		check(marker != null, "no marker was hung");
 		Direction out = server.computeOnServer(s -> level1(s).getBlockState(marker).getValue(SettlementMarkerBlock.FACING));
 		BlockPos stand = marker.relative(out, 2);

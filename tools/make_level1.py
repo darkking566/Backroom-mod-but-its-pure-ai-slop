@@ -1208,6 +1208,106 @@ def prop_textures(t):
     return t
 
 
+def concrete_door(top):
+    m = flat((132, 130, 124), 0.2, 8, 40)
+    m.color *= (1 + noise(740, 8, 128)[..., None] * 0.08)
+    for x in (30, 64, 98):
+        paint(m, box(x - 1.5, 0, x + 1.5, 128), (92, 70, 54), height=1)  # rebar rusting through
+    tint(m, step(0.3, 0.6, clouds(741 + top, 4)) * 0.4, (0.8, 0.78, 0.74))
+    return m
+
+
+def glass_door(top):
+    m = metal((150, 156, 160), 0.6)
+    glass = box(12, 26 if top else -2, 116, 130 if not top else 128)
+    if not top:
+        glass = box(12, -2, 116, 116)
+    paint(m, glass, (150, 190, 204), height=-1.5, smooth=0.96, f0=20)
+    paint(m, box(62, -2, 66, 130) * glass, (130, 136, 140), height=1)
+    return m
+
+
+def symbol_door(top):
+    m = metal((40, 44, 50), 0.4)
+    cy = 128 if top else 0
+    ring = (1 - step(1.5, 3.5, np.abs(np.hypot(X - 64, Y - cy) - 48)))
+    paint(m, ring, (90, 230, 240), glow=0.9)
+    cross = np.maximum(1 - step(1.5, 3.5, np.abs(X - 64)), 1 - step(1.5, 3.5, np.abs(Y - cy))) * (np.hypot(X - 64, Y - cy) < 44)
+    paint(m, cross, (90, 230, 240), glow=0.9)
+    return m
+
+
+def frozen_door(top):
+    m = metal((172, 204, 220), 0.5)
+    frost = step(0.35, 0.65, clouds(750 + top, 6)) * 0.8
+    tint(m, frost, (1.18, 1.14, 1.1))
+    paint(m, step(0.55, 0.8, noise(752 + top, 20)), (240, 248, 252), height=0.8, smooth=0.3)
+    return m
+
+
+def bunker_door(top):
+    m = metal((74, 86, 64), 0.45)
+    for y in ((24, 104) if top else (24, 104)):
+        paint(m, box(0, y - 6, 128, y + 6, 1), (60, 70, 52), height=2, smooth=0.5)
+    if not top:
+        wheel = np.abs(np.hypot(X - 64, Y - 64) - 22)
+        paint(m, 1 - step(2, 4, wheel), (150, 154, 150), height=2, f0=230)
+        for a in range(0, 180, 45):
+            r = np.radians(a)
+            paint(m, (1 - step(1.5, 3, np.abs((X - 64) * np.sin(r) - (Y - 64) * np.cos(r)))) * (np.hypot(X - 64, Y - 64) < 22), (150, 154, 150), height=1.5)
+    return m
+
+
+def cold_door(top):
+    m = metal((58, 68, 86), 0.45)
+    tint(m, step(0.4, 0.7, clouds(760 + top, 5)) * 0.5, (0.9, 1.0, 1.2))
+    paint(m, np.clip(1 - box(8, 8, 120, 120, 2), 0, 1), (120, 170, 220), glow=0.25, height=0.8)
+    return m
+
+
+def elevator_door(top):
+    m = metal((172, 174, 176), 0.7)
+    m.color *= (1 + noise(770, 2, 128)[..., None] * 0.03)
+    paint(m, box(61, -2, 67, 130), (70, 72, 74), height=-2)
+    if top:
+        paint(m, box(40, 14, 88, 40), (24, 26, 28))
+        for x in (56, 72):
+            paint(m, box(x - 4, 22, x + 4, 32), (250, 190, 60), glow=0.8)
+    return m
+
+
+def attic_hatch():
+    m = flat((130, 128, 122), 0.2, 8, 40)
+    m.color *= (1 + noise(780, 8, 128)[..., None] * 0.06)
+    paint(m, box(36, 12, 92, 116), (14, 14, 16), height=-2)
+    for y in range(22, 112, 14):
+        paint(m, box(44, y, 84, y + 4), (150, 100, 56), height=2)
+    paint(m, box(44, 12, 49, 116), (150, 100, 56), height=2)
+    paint(m, box(79, 12, 84, 116), (150, 100, 56), height=2)
+    return m
+
+
+def outdoor_gap():
+    m = flat((130, 128, 122), 0.2, 8, 40)
+    sky = rgb(130, 180, 230) + (rgb(210, 226, 240) - rgb(130, 180, 230)) * (Y / SIZE)[..., None]
+    paint(m, box(18, 18, 110, 110), sky, glow=0.5)
+    paint(m, box(18, 84, 110, 110), (104, 138, 80), glow=0.3)
+    return m
+
+
+def wall_vent():
+    m = flat((130, 128, 122), 0.2, 8, 40)
+    paint(m, box(16, 16, 112, 112), (24, 24, 26), height=-2)
+    for y in range(22, 108, 14):
+        paint(m, box(16, y, 112, y + 6), (150, 154, 156), height=2, f0=230)
+    return m
+
+
+NEW_DOORS = {"concrete_door": concrete_door, "glass_door": glass_door, "symbol_door": symbol_door, "frozen_door": frozen_door,
+             "bunker_door": bunker_door, "cold_door": cold_door, "elevator_door": elevator_door}
+GLOWING = {"symbol_door", "cold_door"}
+
+
 def exit_textures(t):
     for top in (False, True):
         suffix = "_top" if top else ""
@@ -1215,6 +1315,12 @@ def exit_textures(t):
         t["reinforced_door" + suffix] = reinforced_door(top)
         t["pickaxe_door" + suffix] = pickaxe_door(top)
         t["automatic_door" + suffix] = automatic_door(top)
+    for name, fn in NEW_DOORS.items():
+        t[name] = fn(False)
+        t[name + "_top"] = fn(True)
+    t["attic_hatch"] = attic_hatch()
+    t["outdoor_gap"] = outdoor_gap()
+    t["wall_vent"] = wall_vent()
     t["door_jamb"] = metal((66, 68, 70), 0.5)
     t["door_knob"] = metal((196, 198, 196), 0.85)
     t["door_knob"].f0[:] = 255
@@ -1660,7 +1766,13 @@ def all_models():
         glow = door == "automatic_door"
         m[door] = exit_door_model(door, knob=door in ("white_door", "pickaxe_door"), glow=glow)
         m[door + "_top"] = exit_door_model(door + "_top", knob=False, glow=glow)
-    for name in ("palace_painting", "outlet_wall", "cracked_pillar", "darkness"):
+    for name in NEW_DOORS:
+        m[name] = exit_door_model(name, knob=False, glow=name in GLOWING)
+        m[name + "_top"] = exit_door_model(name + "_top", knob=False, glow=name in GLOWING)
+    # The pure white wooden door to 998.2 looks like the white door to 4.3.
+    m["white_wood_door"] = exit_door_model("white_door", knob=True)
+    m["white_wood_door_top"] = exit_door_model("white_door_top", knob=False)
+    for name in ("palace_painting", "outlet_wall", "cracked_pillar", "darkness", "attic_hatch", "outdoor_gap", "wall_vent"):
         m[name] = cube_all(name)
     m["cellar_hatch"] = bottom_top("cellar_hatch", "garage_floor")
     m["standalone_door_frame"] = door_frame_model(False)
@@ -1752,10 +1864,10 @@ def all_blockstates():
     b["padded_wall"] = {"variants": {"": [{"model": NS + "padded_wall", "weight": 5}, {"model": NS + "padded_wall_1"}]}}
     b["old_computer"] = {"variants": {f"facing={f}": ({"model": NS + "old_computer", "y": y} if y else {"model": NS + "old_computer"})
                                       for f, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}}
-    for door in ("white_door", "reinforced_door", "pickaxe_door", "automatic_door"):
+    for door in ("white_door", "reinforced_door", "pickaxe_door", "automatic_door", *NEW_DOORS, "white_wood_door"):
         for name in (door, door + "_top"):
             b[name] = {"variants": {"axis=z": {"model": NS + name}, "axis=x": {"model": NS + name, "y": 90}}}
-    for name in ("palace_painting", "outlet_wall", "cracked_pillar", "cellar_hatch", "standalone_door_frame",
+    for name in ("palace_painting", "outlet_wall", "cracked_pillar", "cellar_hatch", "attic_hatch", "outdoor_gap", "wall_vent", "standalone_door_frame",
                  "standalone_door_frame_top"):
         b[name] = single(name)
     b["darkness_below"] = single("darkness")

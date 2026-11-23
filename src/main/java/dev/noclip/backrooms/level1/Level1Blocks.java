@@ -92,6 +92,28 @@ public final class Level1Blocks {
 	public static final Block AUTOMATIC_DOOR_TOP = door("automatic_door_top", Level1Exit.AUTOMATIC_DOOR, SoundType.GLASS, 12);
 	public static final Block PICKAXE_DOOR = door("pickaxe_door", Level1Exit.PICKAXE_DOOR, SoundType.WOOD, 0);
 	public static final Block PICKAXE_DOOR_TOP = door("pickaxe_door_top", Level1Exit.PICKAXE_DOOR, SoundType.WOOD, 0);
+	public static final Block CONCRETE_DOOR = door("concrete_door", Level1Exit.CONCRETE_DOOR, SoundType.STONE, 0);
+	public static final Block CONCRETE_DOOR_TOP = door("concrete_door_top", Level1Exit.CONCRETE_DOOR, SoundType.STONE, 0);
+	public static final Block GLASS_DOOR = door("glass_door", Level1Exit.GLASS_DOOR, SoundType.GLASS, 0);
+	public static final Block GLASS_DOOR_TOP = door("glass_door_top", Level1Exit.GLASS_DOOR, SoundType.GLASS, 0);
+	public static final Block SYMBOL_DOOR = door("symbol_door", Level1Exit.SYMBOL_DOOR, SoundType.METAL, 8);
+	public static final Block SYMBOL_DOOR_TOP = door("symbol_door_top", Level1Exit.SYMBOL_DOOR, SoundType.METAL, 8);
+	public static final Block FROZEN_DOOR = door("frozen_door", Level1Exit.FROZEN_DOOR, SoundType.METAL, 0);
+	public static final Block FROZEN_DOOR_TOP = door("frozen_door_top", Level1Exit.FROZEN_DOOR, SoundType.METAL, 0);
+	public static final Block BUNKER_DOOR = door("bunker_door", Level1Exit.BUNKER_DOOR, SoundType.METAL, 0);
+	public static final Block BUNKER_DOOR_TOP = door("bunker_door_top", Level1Exit.BUNKER_DOOR, SoundType.METAL, 0);
+	public static final Block COLD_DOOR = door("cold_door", Level1Exit.COLD_DOOR, SoundType.METAL, 3);
+	public static final Block COLD_DOOR_TOP = door("cold_door_top", Level1Exit.COLD_DOOR, SoundType.METAL, 3);
+	public static final Block ELEVATOR_DOOR = door("elevator_door", Level1Exit.ELEVATOR_DOOR, SoundType.METAL, 0);
+	public static final Block ELEVATOR_DOOR_TOP = door("elevator_door_top", Level1Exit.ELEVATOR_DOOR, SoundType.METAL, 0);
+	public static final Block WHITE_WOOD_DOOR = door("white_wood_door", Level1Exit.WHITE_WOOD_DOOR, SoundType.WOOD, 0);
+	public static final Block WHITE_WOOD_DOOR_TOP = door("white_wood_door_top", Level1Exit.WHITE_WOOD_DOOR, SoundType.WOOD, 0);
+	public static final Block ATTIC_HATCH = register("attic_hatch", exitProperties(MapColor.STONE, SoundType.WOOD),
+			p -> new ExitBlock(p, Level1Exit.ATTIC_HATCH.level));
+	public static final Block OUTDOOR_GAP = register("outdoor_gap", exitProperties(MapColor.STONE, SoundType.STONE),
+			p -> new ExitBlock(p, Level1Exit.OUTDOOR_GAP.level));
+	public static final Block WALL_VENT = register("wall_vent", exitProperties(MapColor.STONE, SoundType.METAL),
+			p -> new ExitBlock(p, Level1Exit.WALL_VENT.level));
 	public static final Block PALACE_PAINTING = register("palace_painting", exitProperties(MapColor.COLOR_PINK, SoundType.WOOD),
 			p -> new ExitBlock(p, Level1Exit.PAINTING.level));
 	public static final Block OUTLET_WALL = register("outlet_wall", exitProperties(MapColor.STONE, SoundType.STONE),
