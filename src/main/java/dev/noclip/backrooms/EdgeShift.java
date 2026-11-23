@@ -5,12 +5,19 @@ import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleBuilder;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,14 +43,20 @@ import net.minecraft.world.phys.Vec3;
 final class EdgeShift {
 	private static GameRule<Boolean> edgeShiftRule;
 
-	private static final int CHECK_INTERVAL_TICKS = 20;
+	private static final int CHECK_INTERVAL_TICKS = 15;
+	private static final int WATCH_INTERVAL_TICKS = 10;
 	private static final int CELL_SCAN_RADIUS = 6;
-	private static final double MIN_DISTANCE_LIT = 13.0;
-	private static final double MIN_DISTANCE_DARK = 10.0;
+	private static final int WATCH_CELL_RADIUS = 3;
+	private static final int WATCH_SHIFTS_PER_PULSE = 3;
+	private static final double MIN_DISTANCE_LIT = 9.0;
+	private static final double MIN_DISTANCE_DARK = 7.0;
+	private static final double NEAR_PRIORITY_DISTANCE = 22.0;
 	private static final double MAX_DISTANCE = 45.0;
 	private static final double OBSERVED_RADIUS = 48.0;
 	// cos(81.4 deg) -> outside wide-FOV screen edges.
 	private static final double MAX_UNSEEN_DOT = 0.15;
+
+	private static final Set<UUID> WATCHING_PLAYERS = new HashSet<>();
 
 	private EdgeShift() {
 	}
@@ -55,23 +68,122 @@ final class EdgeShift {
 					.buildAndRegister(BackroomsMod.id("edge_shift"));
 		}
 		ServerTickEvents.END_SERVER_TICK.register(EdgeShift::tick);
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
+				Commands.literal("backrooms")
+						.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+						.then(Commands.literal("edgeshift")
+								.then(Commands.literal("watch")
+										.executes(ctx -> toggleWatch(ctx.getSource(), null))
+										.then(Commands.literal("on").executes(ctx -> toggleWatch(ctx.getSource(), true)))
+										.then(Commands.literal("off").executes(ctx -> toggleWatch(ctx.getSource(), false))))
+								.then(Commands.literal("pulse").executes(ctx -> pulseOnce(ctx.getSource())))
+								.then(Commands.literal("status").executes(ctx -> showStatus(ctx.getSource()))))));
+	}
+
+	private static int toggleWatch(CommandSourceStack source, Boolean enable) {
+		ServerPlayer player = source.getPlayer();
+		if (player == null) {
+			source.sendFailure(Component.literal("Must be run by a player."));
+			return 0;
+		}
+		boolean next = enable != null ? enable : !WATCHING_PLAYERS.contains(player.getUUID());
+		if (next) {
+			WATCHING_PLAYERS.add(player.getUUID());
+			source.sendSuccess(() -> Component.literal(
+					"Edge Shift watch mode ON: nearby corridors will morph every 0.5s right in front of you."), false);
+		} else {
+			WATCHING_PLAYERS.remove(player.getUUID());
+			source.sendSuccess(() -> Component.literal("Edge Shift watch mode OFF."), false);
+		}
+		return 1;
+	}
+
+	private static int pulseOnce(CommandSourceStack source) {
+		ServerPlayer player = source.getPlayer();
+		if (player == null) {
+			source.sendFailure(Component.literal("Must be run by a player."));
+			return 0;
+		}
+		if (player.level().dimension() != BackroomsMod.LEVEL_0) {
+			source.sendFailure(Component.literal("You must be inside Level 0."));
+			return 0;
+		}
+		ServerLevel level = player.level();
+		ShiftState state = level.getDataStorage().computeIfAbsent(ShiftState.TYPE);
+		long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
+		int shifted = shiftRingAroundPlayer(level, seed, state, player, level.getServer().getTickCount(),
+				WATCH_CELL_RADIUS, Integer.MAX_VALUE);
+		source.sendSuccess(() -> Component.literal("Shifted " + shifted + " nearby cells."), false);
+		return shifted;
+	}
+
+	private static int showStatus(CommandSourceStack source) {
+		ServerPlayer player = source.getPlayer();
+		if (player == null) {
+			source.sendFailure(Component.literal("Must be run by a player."));
+			return 0;
+		}
+		ServerLevel level0 = source.getServer().getLevel(BackroomsMod.LEVEL_0);
+		boolean ruleEnabled = level0 != null && edgeShiftRule != null && level0.getGameRules().get(edgeShiftRule);
+		boolean watching = WATCHING_PLAYERS.contains(player.getUUID());
+		if (player.level().dimension() != BackroomsMod.LEVEL_0 || level0 == null) {
+			source.sendSuccess(() -> Component.literal(
+					"Edge Shift rule=" + ruleEnabled + ", watch=" + watching + " (outside Level 0)"), false);
+			return 1;
+		}
+		ShiftState state = level0.getDataStorage().computeIfAbsent(ShiftState.TYPE);
+		long seed = Level0ChunkGenerator.mazeSeed(level0.getChunkSource().randomState());
+		Maze.Zone zone = Maze.zoneAt(seed, player.getBlockX(), player.getBlockZ());
+		int pcx = Math.floorDiv(player.getBlockX(), Maze.CELL);
+		int pcz = Math.floorDiv(player.getBlockZ(), Maze.CELL);
+		int shiftedNearby = 0;
+		for (int dx = -CELL_SCAN_RADIUS; dx <= CELL_SCAN_RADIUS; dx++) {
+			for (int dz = -CELL_SCAN_RADIUS; dz <= CELL_SCAN_RADIUS; dz++) {
+				if (state.epochAt(pcx + dx, pcz + dz) > 0) shiftedNearby++;
+			}
+		}
+		int nearby = shiftedNearby;
+		source.sendSuccess(() -> Component.literal(
+				"Zone=" + zone + ", rule=" + ruleEnabled + ", watch=" + watching
+						+ ", shiftedCellsWithin6=" + nearby), false);
+		return 1;
+	}
+
+	static boolean isWatching(ServerPlayer player) {
+		return WATCHING_PLAYERS.contains(player.getUUID());
 	}
 
 	private static void tick(MinecraftServer server) {
 		int now = server.getTickCount();
-		if (now % CHECK_INTERVAL_TICKS != 0) return;
+		boolean runNormal = now % CHECK_INTERVAL_TICKS == 0;
+		boolean runWatch = !WATCHING_PLAYERS.isEmpty() && now % WATCH_INTERVAL_TICKS == 0;
+		if (!runNormal && !runWatch) return;
 
 		ServerLevel level = server.getLevel(BackroomsMod.LEVEL_0);
-		if (level == null || edgeShiftRule == null || !level.getGameRules().get(edgeShiftRule)) return;
-
-		List<ServerPlayer> activePlayers = new ArrayList<>();
-		for (ServerPlayer player : level.players()) {
-			if (!player.isSpectator()) activePlayers.add(player);
-		}
-		if (activePlayers.isEmpty()) return;
+		if (level == null) return;
 
 		ShiftState state = level.getDataStorage().computeIfAbsent(ShiftState.TYPE);
 		long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
+
+		if (runWatch) {
+			WATCHING_PLAYERS.removeIf(id -> server.getPlayerList().getPlayer(id) == null);
+			for (ServerPlayer player : level.players()) {
+				if (WATCHING_PLAYERS.contains(player.getUUID())) {
+					shiftRingAroundPlayer(level, seed, state, player, now, WATCH_CELL_RADIUS, WATCH_SHIFTS_PER_PULSE);
+				}
+			}
+		}
+
+		if (!runNormal || edgeShiftRule == null || !level.getGameRules().get(edgeShiftRule)) return;
+
+		List<ServerPlayer> activePlayers = new ArrayList<>();
+		for (ServerPlayer player : level.players()) {
+			if (!player.isSpectator() && !WATCHING_PLAYERS.contains(player.getUUID())) {
+				activePlayers.add(player);
+			}
+		}
+		if (activePlayers.isEmpty()) return;
+
 		RandomSource random = level.getRandom();
 
 		// Cap to at most 2 shifts per tick cycle across the dimension to keep server load negligible.
@@ -82,6 +194,41 @@ final class EdgeShift {
 				shiftsBudget--;
 			}
 		}
+	}
+
+	private static int shiftRingAroundPlayer(ServerLevel level, long seed, ShiftState state,
+			ServerPlayer player, int now, int radius, int maxShifts) {
+		int pcx = Math.floorDiv(player.getBlockX(), Maze.CELL);
+		int pcz = Math.floorDiv(player.getBlockZ(), Maze.CELL);
+		List<int[]> eligible = new ArrayList<>();
+
+		for (int dx = -radius; dx <= radius; dx++) {
+			for (int dz = -radius; dz <= radius; dz++) {
+				// Never morph the exact cell the player stands in.
+				if (dx == 0 && dz == 0) continue;
+				int cx = pcx + dx;
+				int cz = pcz + dz;
+				if (!canReshapeCell(level, seed, cx, cz)) continue;
+				eligible.add(new int[] {cx, cz});
+			}
+		}
+		if (eligible.isEmpty()) return 0;
+
+		RandomSource random = level.getRandom();
+		int count = Math.min(maxShifts, eligible.size());
+		int shifted = 0;
+		for (int i = 0; i < count; i++) {
+			int pick = i + random.nextInt(eligible.size() - i);
+			int[] cell = eligible.get(pick);
+			eligible.set(pick, eligible.get(i));
+			int cx = cell[0], cz = cell[1];
+			Maze.Zone zone = cellZone(seed, cx, cz);
+			state.bumpEpoch(cx, cz);
+			state.setCooldown(cx, cz, now + Maze.shiftCooldownTicks(zone));
+			applyCellShift(level, seed, cx, cz, state);
+			shifted++;
+		}
+		return shifted;
 	}
 
 	private static boolean tryShiftNearPlayer(ServerLevel level, long seed, ShiftState state,
@@ -99,7 +246,8 @@ final class EdgeShift {
 				if (!isEligibleCell(level, seed, state, allPlayers, cx, cz, now)) continue;
 
 				Maze.Zone zone = cellZone(seed, cx, cz);
-				int weight = Maze.shiftWeight(zone);
+				double distSq = distanceSqToCell(anchor.getX(), anchor.getZ(), cx * Maze.CELL, cz * Maze.CELL);
+				int weight = Maze.shiftWeight(zone) * (distSq <= NEAR_PRIORITY_DISTANCE * NEAR_PRIORITY_DISTANCE ? 3 : 1);
 				candidates.add(new Candidate(cx, cz, zone, weight));
 				totalWeight += weight;
 			}
@@ -120,10 +268,7 @@ final class EdgeShift {
 		return false;
 	}
 
-	private static boolean isEligibleCell(ServerLevel level, long seed, ShiftState state,
-			List<ServerPlayer> allPlayers, int cx, int cz, int now) {
-		if (!state.isCooldownReady(cx, cz, now)) return false;
-
+	private static boolean canReshapeCell(ServerLevel level, long seed, int cx, int cz) {
 		Maze.Zone zone = cellZone(seed, cx, cz);
 		if (Maze.shiftWeight(zone) <= 0) return false;
 		if (Exits.isProtectedCell(seed, cx, cz)) return false;
@@ -132,9 +277,17 @@ final class EdgeShift {
 		if (cellZone(seed, cx - 1, cz) == Maze.Zone.ARCHES || Exits.isProtectedCell(seed, cx - 1, cz)) return false;
 		if (cellZone(seed, cx, cz - 1) == Maze.Zone.ARCHES || Exits.isProtectedCell(seed, cx, cz - 1)) return false;
 
+		return areCellChunksLoaded(level, cx * Maze.CELL, cz * Maze.CELL);
+	}
+
+	private static boolean isEligibleCell(ServerLevel level, long seed, ShiftState state,
+			List<ServerPlayer> allPlayers, int cx, int cz, int now) {
+		if (!state.isCooldownReady(cx, cz, now)) return false;
+		if (!canReshapeCell(level, seed, cx, cz)) return false;
+
+		Maze.Zone zone = cellZone(seed, cx, cz);
 		int minX = cx * Maze.CELL;
 		int minZ = cz * Maze.CELL;
-		if (!areCellChunksLoaded(level, minX, minZ)) return false;
 
 		double minDist = zone == Maze.Zone.DARKENED ? MIN_DISTANCE_DARK : MIN_DISTANCE_LIT;
 		boolean withinRange = false;

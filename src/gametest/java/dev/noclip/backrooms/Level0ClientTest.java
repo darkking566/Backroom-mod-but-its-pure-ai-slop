@@ -208,6 +208,15 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			level.setBlockAndUpdate(frontPos, Blocks.AIR.defaultBlockState());
 		});
 		server.runCommand("gamerule noclip_backrooms:edge_shift false");
+
+		// Watch mode should continuously shift cells right in front of the player (including (0, 3)), then turn off cleanly.
+		server.runCommand("execute as @a run backrooms edgeshift watch on");
+		server.runOnServer(s -> check(EdgeShift.isWatching(player(s)), "watch mode failed to enable"));
+		server.waitFor(s -> player(s).level().getDataStorage().computeIfAbsent(EdgeShift.ShiftState.TYPE).epochAt(0, 3) > 0, 400);
+		server.runCommand("execute as @a run backrooms edgeshift watch off");
+		server.runOnServer(s -> check(!EdgeShift.isWatching(player(s)), "watch mode failed to disable"));
+		server.runCommand("execute as @a run backrooms edgeshift status");
+		server.runCommand("execute as @a run backrooms edgeshift pulse");
 	}
 
 	private static void checkBlocks(ClientGameTestContext context, TestSingleplayerContext game) {
