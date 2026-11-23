@@ -57,6 +57,9 @@ final class Exits {
 			int cx = rx * REGION_CELLS + cell % REGION_CELLS, cz = rz * REGION_CELLS + cell / REGION_CELLS;
 			// None in the first sector, so the first visit involves some searching.
 			if (Math.floorDiv(cx, Maze.SECTOR) == 0 && Math.floorDiv(cz, Maze.SECTOR) == 0) continue;
+			// Red Rooms have no easy way out: never place an exit door inside or bordering a RED_ROOM.
+			if (Maze.zoneAt(seed, cx * Maze.CELL, cz * Maze.CELL) == Maze.Zone.RED_ROOM
+					|| Maze.zoneAt(seed, (cx - 1) * Maze.CELL, cz * Maze.CELL) == Maze.Zone.RED_ROOM) continue;
 			if (hasSolidWestWall(seed, cx * Maze.CELL, cz * Maze.CELL)) {
 				return new Door(cx * Maze.CELL, cz * Maze.CELL + Maze.CENTER);
 			}

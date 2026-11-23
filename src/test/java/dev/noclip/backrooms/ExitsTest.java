@@ -2,6 +2,7 @@ package dev.noclip.backrooms;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -29,6 +30,8 @@ class ExitsTest {
 						assertTrue(Exits.isDoor(seed, x, z));
 						assertEquals(rx, Math.floorDiv(x, Exits.REGION));
 						assertEquals(rz, Math.floorDiv(z, Exits.REGION));
+						assertNotEquals(Maze.Zone.RED_ROOM, Maze.zoneAt(seed, x, z), "door placed inside a red room");
+						assertNotEquals(Maze.Zone.RED_ROOM, Maze.zoneAt(seed, x - 1, z), "door borders a red room");
 						for (int dz = -1; dz <= 1; dz++) {
 							assertTrue(Maze.isWall(seed, x, z + dz, false) && Maze.isWall(seed, x, z + dz, true), "door not set in a wall");
 						}
