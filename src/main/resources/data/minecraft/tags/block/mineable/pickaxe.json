@@ -1,6 +1,23 @@
 {
   "replace": false,
   "values": [
-    "noclip_backrooms:ceiling_tile"
+    "noclip_backrooms:ceiling_tile",
+    "noclip_backrooms:garage_floor",
+    "noclip_backrooms:garage_floor_line",
+    "noclip_backrooms:damp_garage_floor",
+    "noclip_backrooms:puddled_garage_floor",
+    "noclip_backrooms:garage_wall",
+    "noclip_backrooms:garage_pillar",
+    "noclip_backrooms:garage_pillar_base",
+    "noclip_backrooms:garage_pillar_marked",
+    "noclip_backrooms:garage_ceiling",
+    "noclip_backrooms:painted_concrete_wall",
+    "noclip_backrooms:corridor_floor",
+    "noclip_backrooms:old_brick",
+    "noclip_backrooms:metal_shelf",
+    "noclip_backrooms:ceiling_pipe",
+    "noclip_backrooms:leaking_ceiling_pipe",
+    "noclip_backrooms:emergency_sign",
+    "noclip_backrooms:old_computer"
   ]
 }

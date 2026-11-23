@@ -1,0 +1,24 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/garage_ceiling",
+        "weight": 8
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_ceiling",
+        "y": 180,
+        "weight": 8
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_ceiling_1",
+        "weight": 1
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_ceiling_1",
+        "y": 180,
+        "weight": 1
+      }
+    ]
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/metal_shelf",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/level1/metal_shelf_boxes",
+        "weight": 3
+      }
+    ]
+  }
+}

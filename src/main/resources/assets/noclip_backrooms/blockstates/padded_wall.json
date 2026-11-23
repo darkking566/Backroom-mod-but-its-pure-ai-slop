@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/padded_wall",
+        "weight": 5
+      },
+      {
+        "model": "noclip_backrooms:block/level1/padded_wall_1"
+      }
+    ]
+  }
+}

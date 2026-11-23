@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/old_brick",
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level1/old_brick_1"
+      }
+    ]
+  }
+}

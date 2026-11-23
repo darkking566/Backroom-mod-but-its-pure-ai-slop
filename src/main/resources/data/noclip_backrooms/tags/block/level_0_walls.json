@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "noclip_backrooms:wallpaper",
+    "noclip_backrooms:wallpaper_baseboard",
+    "noclip_backrooms:pale_wallpaper",
+    "noclip_backrooms:pale_wallpaper_baseboard",
+    "noclip_backrooms:red_wallpaper",
+    "noclip_backrooms:red_wallpaper_baseboard",
+    "noclip_backrooms:peeling_red_wallpaper"
+  ]
+}

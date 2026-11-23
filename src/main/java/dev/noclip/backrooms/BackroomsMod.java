@@ -24,5 +24,7 @@ public final class BackroomsMod implements ModInitializer {
 		Noclip.register();
 		Level0Ambience.register();
 		RedRoomEffects.register();
+		// Level 1 keeps everything in its own package.
+		dev.noclip.backrooms.level1.Level1.register();
 	}
 }

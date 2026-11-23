@@ -1,0 +1,24 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_line",
+        "weight": 6
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_line",
+        "y": 180,
+        "weight": 6
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_line_1",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_line_1",
+        "y": 180,
+        "weight": 2
+      }
+    ]
+  }
+}

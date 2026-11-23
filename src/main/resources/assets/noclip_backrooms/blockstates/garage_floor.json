@@ -1,0 +1,120 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor",
+        "weight": 30
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor",
+        "y": 90,
+        "weight": 30
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor",
+        "y": 180,
+        "weight": 30
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor",
+        "y": 270,
+        "weight": 30
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_1",
+        "weight": 30
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_1",
+        "y": 90,
+        "weight": 30
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_1",
+        "y": 180,
+        "weight": 30
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_1",
+        "y": 270,
+        "weight": 30
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_2",
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_2",
+        "y": 90,
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_2",
+        "y": 180,
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_2",
+        "y": 270,
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_3",
+        "weight": 4
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_3",
+        "y": 90,
+        "weight": 4
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_3",
+        "y": 180,
+        "weight": 4
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_3",
+        "y": 270,
+        "weight": 4
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_4",
+        "weight": 6
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_4",
+        "y": 90,
+        "weight": 6
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_4",
+        "y": 180,
+        "weight": 6
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_4",
+        "y": 270,
+        "weight": 6
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_5",
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_5",
+        "y": 90,
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_5",
+        "y": 180,
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garage_floor_5",
+        "y": 270,
+        "weight": 3
+      }
+    ]
+  }
+}
