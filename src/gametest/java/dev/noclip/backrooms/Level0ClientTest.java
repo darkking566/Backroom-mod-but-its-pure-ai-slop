@@ -68,6 +68,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			checkRedRoomLoop(context, game, standY);
 			checkShadowHallucination(context, game, standY);
 			checkFlashlight(context, game, standY);
+			checkManilaRoom(context, game, standY);
 			server.runOnServer(s -> {
 				for (int i = 0; i < ModBlocks.ALL.size(); i++) {
 					player(s).getInventory().setItem(i, new ItemStack(ModBlocks.ALL.get(i)));
@@ -337,7 +338,73 @@ public final class Level0ClientTest implements FabricClientGameTest {
 				check(block.asItem().getDescriptionId().equals(block.getDescriptionId()), "wrong item name key for " + block);
 			}
 			check(Language.getInstance().has(ModItems.FLASHLIGHT.getDescriptionId()), "no name for flashlight");
+			check(Language.getInstance().has(ModItems.ALMOND_WATER.getDescriptionId()), "no name for almond water");
 		});
+	}
+
+	private static void checkManilaRoom(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
+		var server = game.getServer();
+		ManilaRoomPlan.Room room = server.computeOnServer(s -> {
+			ServerLevel level = s.getLevel(BackroomsMod.LEVEL_0);
+			long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
+			for (int radius = 0; radius <= 12; radius++) {
+				for (int rx = -radius; rx <= radius; rx++) {
+					for (int rz = -radius; rz <= radius; rz++) {
+						if (Math.max(Math.abs(rx), Math.abs(rz)) != radius) continue;
+						ManilaRoomPlan.Room found = ManilaRoomPlan.roomInRegion(seed, rx, rz);
+						if (found != null) return found;
+					}
+				}
+			}
+			throw new AssertionError("no Manila Room found within radius 12 regions");
+		});
+
+		int bx = room.baseX(), bz = room.baseZ();
+		server.runCommand("gamemode survival @a");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + (bx + 4.5) + " " + standY + " " + (bz + 4.5) + " -45 5");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(10);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_manila_room");
+
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(bx + 4, Level0ChunkGenerator.FLOOR_Y, bz + 4)).is(ModBlocks.MANILA_WOOD_FLOOR),
+					"Manila Room floor missing");
+			check(level.getBlockState(new BlockPos(bx + 6, standY, bz + 6)).is(ModBlocks.MANILA_TABLE),
+					"Manila Room table missing");
+			check(level.getBlockState(new BlockPos(bx + 7, standY, bz + 7)).is(ModBlocks.MANILA_CABINET),
+					"Manila Room cabinet missing");
+			check(level.getBlockState(new BlockPos(bx + 6, standY + 1, bz + 6)).is(ModBlocks.MANILA_NOTE),
+					"Manila Room guide folder missing");
+			check(level.getBlockState(new BlockPos(bx + 5, standY, bz + 6)).is(ModBlocks.MANILA_CHAIR),
+					"Manila Room chair missing");
+			check(level.getBlockState(new BlockPos(bx + 1, standY, bz + 6)).is(ModBlocks.MANILA_DOOR),
+					"Manila Room door missing");
+			check(level.getBlockState(new BlockPos(bx + 1, standY, bz + 3)).is(ModBlocks.VOID_STONE),
+					"Manila Room hidden Void Stone missing");
+			check(level.getBlockState(new BlockPos(bx + 6, Level0ChunkGenerator.CEILING_Y, bz + 6)).is(ModBlocks.MANILA_LIGHT),
+					"Manila Room warm light missing");
+		});
+
+		// Standing inside the Manila Room must trigger a nearby Level 1 flickering wall quickly.
+		server.waitFor(s -> {
+			ServerLevel level = player(s).level();
+			BlockPos center = player(s).blockPosition();
+			for (int dx = -42; dx <= 42; dx++) {
+				for (int dz = -42; dz <= 42; dz++) {
+					if (level.getBlockState(center.offset(dx, 0, dz)).is(dev.noclip.backrooms.level1.Level1Blocks.FLICKERING_WALLPAPER)) {
+						return true;
+					}
+				}
+			}
+			return false;
+		}, 120);
+
+		// Return to origin sector before remaining checks.
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(5);
 	}
 
 	private static void checkGeneratedBlocks(ServerLevel level) {

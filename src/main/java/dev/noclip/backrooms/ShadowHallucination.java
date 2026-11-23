@@ -138,6 +138,10 @@ final class ShadowHallucination {
 		long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
 		for (ServerPlayer player : level.players()) {
 			UUID id = player.getUUID();
+			if (ManilaRoomPlan.nearbyRoom(seed, player.getBlockX(), player.getBlockZ(), 12) != null) {
+				if (ACTIVE.containsKey(id)) discardActive(level, id);
+				continue;
+			}
 			if (player.isSpectator() || !player.isAlive() || ACTIVE.containsKey(id)) continue;
 
 			int nextTick = NEXT_SPAWN_TICK.computeIfAbsent(id, k -> now + randomCooldown(random, false));
@@ -263,6 +267,8 @@ final class ShadowHallucination {
 	}
 
 	private static Vec3 validStandingSpot(ServerLevel level, int bx, int refY, int bz) {
+		long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
+		if (ManilaRoomPlan.roomAtBlock(seed, bx, bz) != null) return null;
 		for (int dy = 0; Math.abs(dy) <= 3; dy = dy <= 0 ? -dy + 1 : -dy) {
 			int floorY = refY - 1 + dy;
 			if (floorY < Level0ChunkGenerator.MIN_Y + 1 || floorY > Level0ChunkGenerator.MAX_Y - 2) continue;

@@ -89,8 +89,8 @@ final class Maze {
 			int macroRoll = Math.floorMod(hash(seed, mx, mz, ZONE + 1), 100);
 			if (macroRoll < 14) return Zone.PILLARS;
 			if (!nearOriginEdgeShiftCheck(mx, mz)) {
-				if (macroRoll < 27) return Zone.MEGATHALL;
-				if (macroRoll < 40) return Zone.CHASM;
+				if (macroRoll < 20) return Zone.MEGATHALL;
+				if (macroRoll < 26) return Zone.CHASM;
 			}
 		}
 
@@ -151,6 +151,10 @@ final class Maze {
 		if (lz < 2 && zoneForSector(seed, sx, sz - 1) == Zone.RED_ROOM) return true;
 		if (lz >= SECTOR - 2 && zoneForSector(seed, sx, sz + 1) == Zone.RED_ROOM) return true;
 		return false;
+	}
+
+	static Zone baseZoneForSector(long seed, int sx, int sz) {
+		return zoneForCell(seed, sx * SECTOR, sz * SECTOR);
 	}
 
 	private static Zone zoneForSector(long seed, int sx, int sz) {
@@ -276,11 +280,16 @@ final class Maze {
 	static boolean isAtriumCell(long seed, int cx, int cz) {
 		int ax = Math.floorDiv(cx, 3), az = Math.floorDiv(cz, 3);
 		if (ax == 0 && az == 0) return false;
-		if (Math.floorMod(hash(seed, ax, az, ATRIUM), 8) != 0) return false;
+		if (Math.floorMod(hash(seed, ax, az, ATRIUM), 18) != 0) return false;
 		int baseCx = ax * 3, baseCz = az * 3;
 		Zone zone = zoneForCell(seed, baseCx, baseCz);
 		if (zone != Zone.CLASSIC && zone != Zone.ARCHES) return false;
 		if (Math.floorDiv(baseCx, SECTOR) == 0 && Math.floorDiv(baseCz, SECTOR) == 0) return false;
+		for (int dx = 0; dx < 3; dx++) {
+			for (int dz = 0; dz < 3; dz++) {
+				if (ManilaRoomPlan.isRoomCell(seed, baseCx + dx, baseCz + dz)) return false;
+			}
+		}
 		return zoneForCell(seed, baseCx + 2, baseCz) == zone
 				&& zoneForCell(seed, baseCx, baseCz + 2) == zone
 				&& zoneForCell(seed, baseCx + 2, baseCz + 2) == zone;
@@ -323,6 +332,7 @@ final class Maze {
 	 */
 	static int stairwellDir(long seed, int cx, int cz) {
 		if (cx == 0 && cz == 0) return -1;
+		if (ManilaRoomPlan.isRoomCell(seed, cx, cz)) return -1;
 		Zone zone = zoneForCell(seed, cx, cz);
 		int freq = switch (zone) {
 			case CLASSIC -> 18;
@@ -340,6 +350,7 @@ final class Maze {
 	/** Whether a cell features a 1-block sunken carpeted basin in its 4x4 core. */
 	static boolean isSunkenCell(long seed, int cx, int cz) {
 		if (cx == 0 && cz == 0) return false;
+		if (ManilaRoomPlan.isRoomCell(seed, cx, cz)) return false;
 		Zone zone = zoneForCell(seed, cx, cz);
 		if (zone != Zone.CLASSIC && zone != Zone.ARCHES && zone != Zone.CUBICLES) return false;
 		if (Math.floorMod(hash(seed, cx, cz, FLOOR), 22) != 0) return false;
@@ -355,7 +366,7 @@ final class Maze {
 
 	static CeilingStyle ceilingStyle(long seed, int cx, int cz) {
 		if ((cx == 0 && cz == 0) || isStairwellCell(seed, cx, cz) || isAtriumCell(seed, cx, cz)
-				|| Exits.isProtectedCell(seed, cx, cz)) {
+				|| ManilaRoomPlan.isRoomCell(seed, cx, cz) || Exits.isProtectedCell(seed, cx, cz)) {
 			return CeilingStyle.FLAT;
 		}
 		Zone zone = zoneForCell(seed, cx, cz);
@@ -387,7 +398,8 @@ final class Maze {
 	}
 
 	static FloorAccent floorAccent(long seed, int cx, int cz) {
-		if ((cx == 0 && cz == 0) || isStairwellCell(seed, cx, cz) || isSunkenCell(seed, cx, cz)) {
+		if ((cx == 0 && cz == 0) || isStairwellCell(seed, cx, cz) || isSunkenCell(seed, cx, cz)
+				|| ManilaRoomPlan.isRoomCell(seed, cx, cz)) {
 			return FloorAccent.DEFAULT;
 		}
 		Zone zone = zoneForCell(seed, cx, cz);
@@ -432,6 +444,11 @@ final class Maze {
 		Zone zone = zoneForCell(seed, cx, cz);
 		if (zone == Zone.CHASM) return ChasmPlan.isWallAt(seed, x, z, topLayer);
 		if (zone == Zone.MEGATHALL) return MegahallPlan.isWallAt(seed, x, z, topLayer);
+		ManilaRoomPlan.Room manila = ManilaRoomPlan.roomForCell(seed, cx, cz);
+		if (manila != null) {
+			if (manila.containsBlock(x, z)) return manila.isWall(x, z, topLayer);
+			if (manila.isNeighborDoorClear(x, z)) return topLayer;
+		}
 		int epoch = effectiveEpoch(zone, cx, cz, epochs);
 
 		if (ix != 0 && iz != 0) {
@@ -631,6 +648,11 @@ final class Maze {
 	}
 
 	static boolean isLamp(long seed, int x, int z, EpochSource epochs) {
+		ManilaRoomPlan.Room manila = ManilaRoomPlan.roomAtBlock(seed, x, z);
+		if (manila != null) {
+			int dx = x - manila.baseX(), dz = z - manila.baseZ();
+			return (dx == 6 || dx == 7) && (dz == 6 || dz == 7);
+		}
 		int cx = Math.floorDiv(x, CELL), cz = Math.floorDiv(z, CELL);
 		int ix = Math.floorMod(x, CELL), iz = Math.floorMod(z, CELL);
 		if (cx == 0 && cz == 0) return isLamp(x, z);
@@ -676,6 +698,7 @@ final class Maze {
 	}
 
 	static boolean lampWorks(long seed, int x, int z, EpochSource epochs) {
+		if (ManilaRoomPlan.roomAtBlock(seed, x, z) != null) return true;
 		int cx = Math.floorDiv(x, CELL), cz = Math.floorDiv(z, CELL);
 		Zone zone = zoneForCell(seed, cx, cz);
 		if (zone == Zone.MEGATHALL) return MegahallPlan.isLamp(seed, x, z);
@@ -699,7 +722,7 @@ final class Maze {
 	private static boolean isOpenQuadEdge(long seed, int qx, int qz, Zone zoneA, Zone zoneB) {
 		if (zoneA != zoneB) return false;
 		if (zoneA != Zone.CLASSIC && zoneA != Zone.CUBICLES) return false;
-		return Math.floorMod(hash(seed, qx, qz, MERGE), 5) == 0;
+		return Math.floorMod(hash(seed, qx, qz, MERGE), 9) == 0;
 	}
 
 	private static Edge westEdge(long seed, int cx, int cz, Zone zone, int epoch) {
@@ -729,6 +752,11 @@ final class Maze {
 	}
 
 	private static boolean pathGoesWest(long seed, int cx, int cz) {
+		ManilaRoomPlan.Room manila = ManilaRoomPlan.roomForCell(seed, cx, cz);
+		if (manila != null) {
+			if (cx == manila.cx0() + 2 && cz == manila.cz0() + 1) return false;
+			if (cx == manila.cx0() + 1 && cz == manila.cz0() + 2) return true;
+		}
 		return (hash(seed, cx, cz, TREE) & 1) == 0;
 	}
 

@@ -23,6 +23,9 @@ import net.minecraft.world.phys.Vec3;
 final class Level0Ambience {
 	// Replay slightly before the 14s clip ends so the gentle fade edges overlap smoothly.
 	private static final int HUM_INTERVAL_TICKS = 260;
+	private static final int PIANO_INTERVAL_TICKS = 360;
+	private static final int MANILA_PIANO_RADIUS = 20;
+	private static final int MANILA_HUM_SILENCE_RADIUS = 12;
 	private static final int EERIE_MIN_TICKS = 700;
 	private static final int EERIE_MAX_TICKS = 1500;
 	private static final int SURGE_STRAIN_DELAY_TICKS = 50;
@@ -30,6 +33,7 @@ final class Level0Ambience {
 	private static final int ECHO_DELAY_TICKS = 50;
 
 	private static final Map<UUID, Integer> NEXT_HUM_TICK = new HashMap<>();
+	private static final Map<UUID, Integer> NEXT_PIANO_TICK = new HashMap<>();
 	private static final Map<UUID, Integer> NEXT_EERIE_TICK = new HashMap<>();
 	private static final Map<UUID, Boolean> DARK_DECOY_BEHIND = new HashMap<>();
 	private static final Map<UUID, SurgeWarning> PENDING_SURGE = new HashMap<>();
@@ -48,6 +52,7 @@ final class Level0Ambience {
 			UUID id = player.getUUID();
 			if (player.level().dimension() != BackroomsMod.LEVEL_0) {
 				NEXT_HUM_TICK.remove(id);
+				NEXT_PIANO_TICK.remove(id);
 				NEXT_EERIE_TICK.remove(id);
 				DARK_DECOY_BEHIND.remove(id);
 				PENDING_SURGE.remove(id);
@@ -56,6 +61,35 @@ final class Level0Ambience {
 			}
 			ServerLevel level = player.level();
 			RandomSource random = level.getRandom();
+			long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
+			ManilaRoomPlan.Room nearbyManila = ManilaRoomPlan.nearbyRoom(
+					seed, player.getBlockX(), player.getBlockZ(), MANILA_PIANO_RADIUS);
+
+			if (nearbyManila != null) {
+				PENDING_SURGE.remove(id);
+				PENDING_ECHO.remove(id);
+				if (nearbyManila.isInteriorBlock(player.getBlockX(), player.getBlockZ())
+						&& player.hasEffect(MobEffects.NAUSEA)) {
+					player.removeEffect(MobEffects.NAUSEA);
+				}
+				int nextPiano = NEXT_PIANO_TICK.getOrDefault(id, now);
+				if (now >= nextPiano) {
+					level.playSound(null, nearbyManila.centerX() + 0.5, Level0ChunkGenerator.CEILING_Y - 0.5,
+							nearbyManila.centerZ() + 0.5, ModSounds.MANILA_PIANO, SoundSource.AMBIENT, 0.55F, 1.0F);
+					NEXT_PIANO_TICK.put(id, now + PIANO_INTERVAL_TICKS);
+				}
+				double distSq = Math.pow(player.getX() - (nearbyManila.centerX() + 0.5), 2)
+						+ Math.pow(player.getZ() - (nearbyManila.centerZ() + 0.5), 2);
+				if (distSq > MANILA_HUM_SILENCE_RADIUS * MANILA_HUM_SILENCE_RADIUS) {
+					int nextHum = NEXT_HUM_TICK.getOrDefault(id, now);
+					if (now >= nextHum) {
+						playLampHum(level, player, random, now);
+						NEXT_HUM_TICK.put(id, now + HUM_INTERVAL_TICKS);
+					}
+				}
+				continue;
+			}
+			NEXT_PIANO_TICK.remove(id);
 
 			checkPendingSurge(level, player, now);
 			checkPendingEcho(level, player, random, now);

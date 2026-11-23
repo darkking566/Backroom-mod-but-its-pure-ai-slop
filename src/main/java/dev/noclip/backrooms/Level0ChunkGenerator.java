@@ -58,6 +58,8 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 
 		if (zone == Maze.Zone.CHASM) return chasmBlockAt(seed, x, y, z, cx, cz, ix, iz, epochs);
 		if (zone == Maze.Zone.MEGATHALL) return megahallBlockAt(seed, x, y, z, cx, cz, ix, iz, epochs);
+		ManilaRoomPlan.Room manila = ManilaRoomPlan.roomAtBlock(seed, x, z);
+		if (manila != null) return manilaBlockAt(manila, x, y, z);
 
 		if (y < FLOOR_Y) {
 			if (Maze.isPit(seed, x, z)) {
@@ -223,6 +225,53 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		}
 		if (MegahallPlan.isHighBeam(seed, x, y, z, ceilY)) {
 			return ModBlocks.CEILING_TILE.defaultBlockState();
+		}
+		return Blocks.AIR.defaultBlockState();
+	}
+
+	private static BlockState manilaBlockAt(ManilaRoomPlan.Room room, int x, int y, int z) {
+		int dx = x - room.baseX(), dz = z - room.baseZ();
+		if (y < FLOOR_Y) return Blocks.CONCRETE.black().defaultBlockState();
+		if (y == FLOOR_Y) {
+			if ((dx >= 2 && dx <= 11 && dz >= 2 && dz <= 11) || room.isDoorwayTunnel(dx, dz)) {
+				return ModBlocks.MANILA_WOOD_FLOOR.defaultBlockState();
+			}
+			return Blocks.CONCRETE.black().defaultBlockState();
+		}
+		if (y > CEILING_Y) return Blocks.BEDROCK.defaultBlockState();
+		if (y == CEILING_Y) {
+			if ((dx == 6 || dx == 7) && (dz == 6 || dz == 7)) {
+				return ModBlocks.MANILA_LIGHT.defaultBlockState();
+			}
+			return ModBlocks.CEILING_TILE.defaultBlockState();
+		}
+
+		if (dx <= 2 || dx >= 11 || dz <= 2 || dz >= 11) {
+			if (room.isDoorwayTunnel(dx, dz)) {
+				if (y == CEILING_Y - 1) return ModBlocks.MANILA_WALLPAPER.defaultBlockState();
+				Direction doorFacing = ManilaRoomPlan.doorFacing(room, dx, dz);
+				if (doorFacing != null) {
+					BlockState door = (y == FLOOR_Y + 1 ? ModBlocks.MANILA_DOOR : ModBlocks.MANILA_DOOR_TOP).defaultBlockState();
+					return door.setValue(ManilaDoorBlock.FACING, doorFacing).setValue(ManilaDoorBlock.OPEN, true);
+				}
+				return Blocks.AIR.defaultBlockState();
+			}
+			if (room.isCoreVoidLayer(dx, dz)) return ModBlocks.VOID_STONE.defaultBlockState();
+			return (y == FLOOR_Y + 1 ? ModBlocks.MANILA_WALLPAPER_BASEBOARD : ModBlocks.MANILA_WALLPAPER).defaultBlockState();
+		}
+
+		if (y == FLOOR_Y + 1) {
+			if (dx == 6 && dz == 6) return ModBlocks.MANILA_TABLE.defaultBlockState().setValue(ManilaFurnitureBlock.FACING, Direction.NORTH);
+			if (dx == 7 && dz == 6) return ModBlocks.MANILA_TABLE.defaultBlockState().setValue(ManilaFurnitureBlock.FACING, Direction.EAST);
+			if (dx == 7 && dz == 7) return ModBlocks.MANILA_CABINET.defaultBlockState()
+					.setValue(ManilaCabinetBlock.FACING, Direction.SOUTH)
+					.setValue(ManilaCabinetBlock.OPENED, false);
+			if (dx == 6 && dz == 7) return ModBlocks.MANILA_TABLE.defaultBlockState().setValue(ManilaFurnitureBlock.FACING, Direction.WEST);
+			if (dx == 5 && dz == 6) return ModBlocks.MANILA_CHAIR.defaultBlockState().setValue(ManilaFurnitureBlock.FACING, Direction.EAST);
+			if (dx == 8 && dz == 7) return ModBlocks.MANILA_CHAIR.defaultBlockState().setValue(ManilaFurnitureBlock.FACING, Direction.WEST);
+		}
+		if (y == FLOOR_Y + 2 && dx == 6 && dz == 6) {
+			return ModBlocks.MANILA_NOTE.defaultBlockState().setValue(ManilaNoteBlock.FACING, Direction.NORTH);
 		}
 		return Blocks.AIR.defaultBlockState();
 	}

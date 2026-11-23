@@ -450,4 +450,73 @@ class MazeTest {
 		assertTrue(sawMegaRaisedOrSunken, "megahall never generated sunken/raised floor bays");
 		assertTrue(sawAtrium, "never generated 3x3 high-ceiling atrium in CLASSIC/ARCHES");
 	}
+
+	@Test
+	void manilaRoomGeneratesRarelyAndIsFullyConnected() {
+		long seed = 12345L;
+		int found = 0;
+		int checkedRegions = 0;
+		ManilaRoomPlan.Room sample = null;
+
+		for (int rx = -6; rx <= 6; rx++) {
+			for (int rz = -6; rz <= 6; rz++) {
+				checkedRegions++;
+				ManilaRoomPlan.Room room = ManilaRoomPlan.roomInRegion(seed, rx, rz);
+				if (room != null) {
+					found++;
+					if (sample == null) sample = room;
+				}
+			}
+		}
+
+		assertTrue(found > 0 && found < checkedRegions / 2,
+				"expected rare Manila Room placement, found " + found + " in " + checkedRegions + " regions");
+
+		int bx = sample.baseX();
+		int bz = sample.baseZ();
+		assertTrue(ManilaRoomPlan.isRoomCell(seed, sample.cx0(), sample.cz0()));
+		assertTrue(ManilaRoomPlan.isProtectedCell(seed, sample.cx0() - 1, sample.cz0()));
+		assertFalse(Maze.isWall(seed, bx + 6, bz, false));
+		assertTrue(Maze.isWall(seed, bx + 6, bz, true));
+		assertFalse(Maze.isWall(seed, bx + 14, bz + 6, false));
+		assertFalse(Maze.isWall(seed, bx + 6, bz + 14, false));
+		assertFalse(Maze.isWall(seed, bx + 4, bz + 4, false));
+		assertTrue(Maze.isWall(seed, bx + 1, bz + 3, false));
+		assertTrue(sample.isCoreVoidLayer(1, 3));
+
+		// Verify 100% cardinal reachability in the 3x3-sector window centered on the Manila Room's sector.
+		int sx = Math.floorDiv(sample.cx0(), Maze.SECTOR);
+		int sz = Math.floorDiv(sample.cz0(), Maze.SECTOR);
+		int winOriginX = (sx - 1) * Maze.SECTOR * Maze.CELL;
+		int winOriginZ = (sz - 1) * Maze.SECTOR * Maze.CELL;
+		int[] floorY = new int[SIZE * SIZE];
+		boolean[] unvisited = new boolean[SIZE * SIZE];
+		int open = 0;
+		for (int i = 0; i < unvisited.length; i++) {
+			int x = winOriginX + i % SIZE, z = winOriginZ + i / SIZE;
+			floorY[i] = Maze.walkableFloorY(seed, x, z, Maze.EpochSource.ZERO);
+			unvisited[i] = floorY[i] != Integer.MIN_VALUE;
+			if (unvisited[i]) open++;
+		}
+
+		ArrayDeque<Integer> queue = new ArrayDeque<>();
+		int startIdx = (bz + 4 - winOriginZ) * SIZE + (bx + 4 - winOriginX);
+		assertTrue(unvisited[startIdx], "Manila Room interior should be walkable");
+		unvisited[startIdx] = false;
+		queue.add(startIdx);
+		int reached = 0;
+		while (!queue.isEmpty()) {
+			int at = queue.poll(), x = at % SIZE, z = at / SIZE;
+			int curY = floorY[at];
+			reached++;
+			int[] next = {x > 0 ? at - 1 : -1, x < SIZE - 1 ? at + 1 : -1, z > 0 ? at - SIZE : -1, z < SIZE - 1 ? at + SIZE : -1};
+			for (int n : next) {
+				if (n >= 0 && unvisited[n] && Math.abs(floorY[n] - curY) <= 1) {
+					unvisited[n] = false;
+					queue.add(n);
+				}
+			}
+		}
+		assertEquals(open, reached, "Manila Room window has unreachable blocks");
+	}
 }

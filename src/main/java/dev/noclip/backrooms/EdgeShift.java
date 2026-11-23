@@ -272,6 +272,7 @@ final class EdgeShift {
 		Maze.Zone zone = cellZone(seed, cx, cz);
 		if (Maze.shiftWeight(zone) <= 0) return false;
 		if (Exits.isProtectedCell(seed, cx, cz)) return false;
+		if (ManilaRoomPlan.isProtectedCell(seed, cx, cz)) return false;
 		if (Maze.isStairwellCell(seed, cx, cz)) return false;
 
 		// Keep Red Room perimeter rings sealed so trapped players never get an unexpected opening out.
@@ -279,9 +280,11 @@ final class EdgeShift {
 			return false;
 		}
 
-		// Keep shared walls with stable ARCHES or protected Exit cells completely unchanged.
-		if (cellZone(seed, cx - 1, cz) == Maze.Zone.ARCHES || Exits.isProtectedCell(seed, cx - 1, cz)) return false;
-		if (cellZone(seed, cx, cz - 1) == Maze.Zone.ARCHES || Exits.isProtectedCell(seed, cx, cz - 1)) return false;
+		// Keep shared walls with stable ARCHES or protected Exit/Manila cells completely unchanged.
+		if (cellZone(seed, cx - 1, cz) == Maze.Zone.ARCHES || Exits.isProtectedCell(seed, cx - 1, cz)
+				|| ManilaRoomPlan.isProtectedCell(seed, cx - 1, cz)) return false;
+		if (cellZone(seed, cx, cz - 1) == Maze.Zone.ARCHES || Exits.isProtectedCell(seed, cx, cz - 1)
+				|| ManilaRoomPlan.isProtectedCell(seed, cx, cz - 1)) return false;
 
 		return areCellChunksLoaded(level, cx * Maze.CELL, cz * Maze.CELL);
 	}
@@ -376,10 +379,12 @@ final class EdgeShift {
 		}
 
 		// Sync adjacent corners that depend on this cell's north/west edges.
-		if (cellZone(seed, cx + 1, cz) != Maze.Zone.ARCHES && !Exits.isProtectedCell(seed, cx + 1, cz)) {
+		if (cellZone(seed, cx + 1, cz) != Maze.Zone.ARCHES && !Exits.isProtectedCell(seed, cx + 1, cz)
+				&& !ManilaRoomPlan.isProtectedCell(seed, cx + 1, cz)) {
 			rewriteColumn(level, seed, minX + Maze.CELL, minZ, state, pos);
 		}
-		if (cellZone(seed, cx, cz + 1) != Maze.Zone.ARCHES && !Exits.isProtectedCell(seed, cx, cz + 1)) {
+		if (cellZone(seed, cx, cz + 1) != Maze.Zone.ARCHES && !Exits.isProtectedCell(seed, cx, cz + 1)
+				&& !ManilaRoomPlan.isProtectedCell(seed, cx, cz + 1)) {
 			rewriteColumn(level, seed, minX, minZ + Maze.CELL, state, pos);
 		}
 	}

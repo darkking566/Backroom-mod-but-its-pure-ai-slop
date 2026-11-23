@@ -31,6 +31,7 @@ import net.minecraft.world.phys.Vec3;
 final class FlickeringWalls {
 	/** Level 0 wall blocks that may start to flicker; listed in data, so this needs nothing from Level 0's code. */
 	private static final TagKey<Block> LEVEL_0_WALLS = TagKey.create(Registries.BLOCK, Level1.id("level_0_walls"));
+	private static final TagKey<Block> MANILA_ROOM_BLOCKS = TagKey.create(Registries.BLOCK, Level1.id("manila_room_blocks"));
 	// The way into the parking structure is meant to be one of the hardest to find: a long wait, and it opens well away.
 	private static final int FIRST_DELAY = 4 * 60 * 20, DELAY_SPREAD = 3 * 60 * 20;
 	private static final int NEAREST = 16, FARTHEST = 40;
@@ -97,6 +98,10 @@ final class FlickeringWalls {
 			if (now % 20 != 0) continue;
 			int time = TIME_INSIDE.merge(id, 20, Integer::sum);
 			int due = DUE.computeIfAbsent(id, key -> FIRST_DELAY + level0.getRandom().nextInt(DELAY_SPREAD));
+			if (level0.getBlockState(player.blockPosition().below()).is(MANILA_ROOM_BLOCKS)) {
+				due = Math.min(due, time + 40);
+				DUE.put(id, due);
+			}
 			if (time >= due && open(player) == null) DUE.put(id, time + RETRY_DELAY);
 		}
 	}

@@ -66,6 +66,7 @@ final class Exits {
 					|| Maze.zoneAt(seed, (cx - 1) * Maze.CELL, cz * Maze.CELL) == Maze.Zone.RED_ROOM) continue;
 			// Only place exit doors on standard flat FLOOR_Y = 32 cells (never over chasms, stairs, or megahall voids).
 			if (!Maze.isStandardFloorCell(seed, cx, cz) || !Maze.isStandardFloorCell(seed, cx - 1, cz)) continue;
+			if (ManilaRoomPlan.isProtectedCell(seed, cx, cz) || ManilaRoomPlan.isProtectedCell(seed, cx - 1, cz)) continue;
 			if (hasSolidWestWall(seed, cx * Maze.CELL, cz * Maze.CELL)) {
 				return new Door(cx * Maze.CELL, cz * Maze.CELL + Maze.CENTER);
 			}

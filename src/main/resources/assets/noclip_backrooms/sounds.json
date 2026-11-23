@@ -30,6 +30,15 @@
       }
     ]
   },
+  "ambient.manila_piano": {
+    "subtitle": "subtitles.noclip_backrooms.ambient.manila_piano",
+    "sounds": [
+      {
+        "name": "noclip_backrooms:manila_piano",
+        "attenuation_distance": 22
+      }
+    ]
+  },
   "level1.lamp_hum": {
     "subtitle": "subtitles.noclip_backrooms.level1.lamp_hum",
     "sounds": [

@@ -9,6 +9,7 @@ final class ModSounds {
 	static final SoundEvent FLUORESCENT_HUM = register("ambient.fluorescent_hum");
 	static final SoundEvent WALL_SCRATCH = register("ambient.wall_scratch");
 	static final SoundEvent DISTANT_WHISPER = register("ambient.distant_whisper");
+	static final SoundEvent MANILA_PIANO = register("ambient.manila_piano");
 
 	private ModSounds() {
 	}

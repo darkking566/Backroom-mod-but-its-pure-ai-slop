@@ -17,9 +17,12 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 final class ModBlocks {
 	static final List<Block> ALL = new ArrayList<>();
+	private static final VoxelShape TABLE_SHAPE = Block.box(0, 0, 0, 16, 16, 16);
+	private static final VoxelShape CHAIR_SHAPE = Block.box(2.5, 0, 2.5, 13.5, 16, 13.5);
 
 	static final Block WALLPAPER = register("wallpaper", wall(MapColor.COLOR_YELLOW));
 	static final Block WALLPAPER_BASEBOARD = register("wallpaper_baseboard", wall(MapColor.COLOR_YELLOW));
@@ -47,6 +50,34 @@ final class ModBlocks {
 	static final Block EXIT_DOOR = register("exit_door", exit().lightLevel(state -> 4), ExitDoorBlock::new);
 	static final Block EXIT_DOOR_TOP = register("exit_door_top", exit().lightLevel(state -> 4), ExitDoorBlock::new);
 	static final Block EXIT_SIGN = register("exit_sign", exit().lightLevel(state -> 10));
+
+	// Manila Room blocks & furniture
+	static final Block MANILA_WALLPAPER = register("manila_wallpaper", wall(MapColor.SAND));
+	static final Block MANILA_WALLPAPER_BASEBOARD = register("manila_wallpaper_baseboard", wall(MapColor.SAND));
+	static final Block MANILA_WOOD_FLOOR = register("manila_wood_floor", Properties.of()
+			.mapColor(MapColor.WOOD).strength(1.8F).sound(SoundType.WOOD));
+	static final Block MANILA_LIGHT = register("manila_light", lamp().lightLevel(state -> 13));
+	static final Block VOID_STONE = register("void_stone", Properties.of()
+			.mapColor(MapColor.COLOR_BLACK).strength(-1.0F, 3600000.0F).noLootTable().sound(SoundType.STONE),
+			VoidStoneBlock::new);
+	static final Block MANILA_DOOR = register("manila_door", Properties.of()
+			.mapColor(MapColor.WOOD).strength(2.0F).sound(SoundType.WOOD).noOcclusion(),
+			p -> new ManilaDoorBlock(p, false));
+	static final Block MANILA_DOOR_TOP = register("manila_door_top", Properties.of()
+			.mapColor(MapColor.WOOD).strength(2.0F).sound(SoundType.WOOD).noOcclusion(),
+			p -> new ManilaDoorBlock(p, true));
+	static final Block MANILA_TABLE = register("manila_table", Properties.of()
+			.mapColor(MapColor.WOOD).strength(1.8F).sound(SoundType.WOOD).noOcclusion(),
+			p -> new ManilaFurnitureBlock(p, TABLE_SHAPE));
+	static final Block MANILA_CABINET = register("manila_cabinet", Properties.of()
+			.mapColor(MapColor.WOOD).strength(1.8F).sound(SoundType.WOOD).noOcclusion(),
+			ManilaCabinetBlock::new);
+	static final Block MANILA_CHAIR = register("manila_chair", Properties.of()
+			.mapColor(MapColor.WOOD).strength(1.4F).sound(SoundType.WOOD).noOcclusion(),
+			p -> new ManilaFurnitureBlock(p, CHAIR_SHAPE));
+	static final Block MANILA_NOTE = register("manila_note", Properties.of()
+			.mapColor(MapColor.SAND).strength(0.2F).sound(SoundType.WOOL).noOcclusion().noCollision().noLootTable(),
+			ManilaNoteBlock::new);
 
 	private ModBlocks() {
 	}
