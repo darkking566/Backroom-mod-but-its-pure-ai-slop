@@ -2,37 +2,37 @@
   "variants": {
     "": [
       {
-        "model": "noclip_backrooms:block/pale_wallpaper",
+        "model": "noclip_backrooms:block/level0/pale_wallpaper",
         "weight": 40
       },
       {
-        "model": "noclip_backrooms:block/pale_wallpaper_1",
+        "model": "noclip_backrooms:block/level0/pale_wallpaper_1",
         "weight": 2
       },
       {
-        "model": "noclip_backrooms:block/pale_wallpaper_2",
+        "model": "noclip_backrooms:block/level0/pale_wallpaper_2",
         "weight": 3
       },
       {
-        "model": "noclip_backrooms:block/pale_wallpaper_3"
+        "model": "noclip_backrooms:block/level0/pale_wallpaper_3"
       },
       {
-        "model": "noclip_backrooms:block/pale_wallpaper_4"
+        "model": "noclip_backrooms:block/level0/pale_wallpaper_4"
       },
       {
-        "model": "noclip_backrooms:block/pale_wallpaper_5"
+        "model": "noclip_backrooms:block/level0/pale_wallpaper_5"
       },
       {
-        "model": "noclip_backrooms:block/pale_wallpaper_6"
+        "model": "noclip_backrooms:block/level0/pale_wallpaper_6"
       },
       {
-        "model": "noclip_backrooms:block/pale_wallpaper_7"
+        "model": "noclip_backrooms:block/level0/pale_wallpaper_7"
       },
       {
-        "model": "noclip_backrooms:block/pale_wallpaper_8"
+        "model": "noclip_backrooms:block/level0/pale_wallpaper_8"
       },
       {
-        "model": "noclip_backrooms:block/pale_wallpaper_9"
+        "model": "noclip_backrooms:block/level0/pale_wallpaper_9"
       }
     ]
   }

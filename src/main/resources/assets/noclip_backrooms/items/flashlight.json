@@ -5,11 +5,11 @@
     "index": 0,
     "on_true": {
       "type": "minecraft:model",
-      "model": "noclip_backrooms:item/flashlight_on"
+      "model": "noclip_backrooms:item/level0/flashlight_on"
     },
     "on_false": {
       "type": "minecraft:model",
-      "model": "noclip_backrooms:item/flashlight"
+      "model": "noclip_backrooms:item/level0/flashlight"
     }
   }
 }

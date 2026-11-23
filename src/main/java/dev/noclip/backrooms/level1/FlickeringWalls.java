@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level1;
 
+import dev.noclip.backrooms.level0.Level0;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -58,7 +59,7 @@ final class FlickeringWalls {
 
 	private static void tick(MinecraftServer server) {
 		int now = server.getTickCount();
-		ServerLevel level0 = server.getLevel(Level1.LEVEL_0);
+		ServerLevel level0 = server.getLevel(Level0.LEVEL_0);
 		if (level0 == null) return;
 
 		// Walls of players who left the server.
@@ -109,7 +110,7 @@ final class FlickeringWalls {
 	/** Makes a wall flicker somewhere near the player and out of their sight; returns its bottom block, or null. */
 	static BlockPos open(ServerPlayer player) {
 		ServerLevel level = player.level();
-		if (level.dimension() != Level1.LEVEL_0 || !player.onGround() || WALLS.containsKey(player.getUUID())) return null;
+		if (level.dimension() != Level0.LEVEL_0 || !player.onGround() || WALLS.containsKey(player.getUUID())) return null;
 		RandomSource random = level.getRandom();
 		Vec3 look = player.getLookAngle().multiply(1, 0, 1).normalize();
 		int feet = player.getBlockY();
@@ -140,7 +141,7 @@ final class FlickeringWalls {
 		MinecraftServer server = player.level().getServer();
 		// Not in the middle of the movement tick; this runs every tick while inside, so check again when it runs.
 		server.schedule(new TickTask(server.getTickCount(), () -> {
-			if (player.level().dimension() != Level1.LEVEL_0) return;
+			if (player.level().dimension() != Level0.LEVEL_0) return;
 			ServerLevel level0 = player.level();
 			if (!Level1Travel.enter(player)) return;
 			UUID id = player.getUUID();
@@ -172,7 +173,7 @@ final class FlickeringWalls {
 	}
 
 	private static void closeAll(MinecraftServer server) {
-		ServerLevel level0 = server.getLevel(Level1.LEVEL_0);
+		ServerLevel level0 = server.getLevel(Level0.LEVEL_0);
 		if (level0 != null) WALLS.values().forEach(wall -> close(level0, wall));
 		WALLS.clear();
 		TIME_INSIDE.clear();

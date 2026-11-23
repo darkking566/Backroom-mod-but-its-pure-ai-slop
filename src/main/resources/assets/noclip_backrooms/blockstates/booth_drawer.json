@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "empty=false": {
+      "model": "noclip_backrooms:block/level1/booth_drawer"
+    },
+    "empty=true": {
+      "model": "noclip_backrooms:block/level1/booth_drawer_open"
+    }
+  }
+}

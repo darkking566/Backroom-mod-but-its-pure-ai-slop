@@ -1,6 +1,6 @@
 package dev.noclip.backrooms.level1;
 
-import dev.noclip.backrooms.levels.LevelExits;
+import dev.noclip.backrooms.core.LevelExits;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;

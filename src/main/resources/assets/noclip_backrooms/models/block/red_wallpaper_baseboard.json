@@ -1,8 +1,0 @@
-{
-  "parent": "noclip_backrooms:block/baseboard_wall",
-  "textures": {
-    "side": "noclip_backrooms:block/red_wallpaper_baseboard",
-    "top": "noclip_backrooms:block/red_wallpaper",
-    "board": "noclip_backrooms:block/red_board"
-  }
-}

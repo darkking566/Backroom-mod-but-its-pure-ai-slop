@@ -19,6 +19,9 @@
     "noclip_backrooms:manila_door_top",
     "noclip_backrooms:manila_table",
     "noclip_backrooms:manila_cabinet",
-    "noclip_backrooms:manila_chair"
+    "noclip_backrooms:manila_chair",
+    "noclip_backrooms:eyed_crate",
+    "noclip_backrooms:shut_eyed_crate",
+    "noclip_backrooms:blink_sign"
   ]
 }

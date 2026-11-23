@@ -96,9 +96,10 @@ Fabric・Minecraft 26.2・Java 25・模組代號 `noclip_backrooms`
 
 ## Level 1：停車場（等使用者試玩）
 
-- 說明：[docs/level1.md](docs/level1.md)
+- 說明：[docs/levels/level1/README.md](docs/levels/level1/README.md)
 - 從 Level 0 進入：在 Level 0 待 4～7 分鐘，16～40 格外會有一段牆開始閃爍、冒電火花，直接走進去
 - 直接進入：`/execute in noclip_backrooms:level_1 run tp @s 32.5 33 41.5`
 - 離開：白色走廊區裡的鐵製出口門（有 EXIT 標誌，附近燈泡是綠色）
-- 通往其他樓層的 11 種出口（樓層越低越難找），還沒做的樓層會顯示尚未開放：見 docs/level1.md
+- 通往其他樓層的 11 種出口（樓層越低越難找），還沒做的樓層會顯示尚未開放：見 docs/levels/level1/README.md
 - 改貼圖或模型：`python tools/make_level1.py`
+- 獵犬（第一隻怪物，Antigravity 的模型）：停電時出現；也有生怪蛋。想看牠：`/summon noclip_backrooms:hound`

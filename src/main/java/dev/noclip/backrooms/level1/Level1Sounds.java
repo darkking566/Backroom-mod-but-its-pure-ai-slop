@@ -16,6 +16,12 @@ final class Level1Sounds {
 	static final SoundEvent POWER_ON = register("level1.power_on");
 	static final SoundEvent CRATE_OPEN = register("level1.crate_open");
 	static final SoundEvent WALL_FLICKER = register("level1.wall_flicker");
+	static final SoundEvent GENERATOR = register("level1.generator");
+	static final SoundEvent DRAWER = register("level1.drawer");
+	static final SoundEvent EYES = register("level1.eyes");
+	static final SoundEvent CAT = register("level1.cat");
+	static final SoundEvent SMILER = register("level1.smiler");
+	static final SoundEvent SMILER_BITE = register("level1.smiler_bite");
 
 	private Level1Sounds() {
 	}

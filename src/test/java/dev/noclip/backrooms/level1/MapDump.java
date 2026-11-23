@@ -42,6 +42,12 @@ class MapDump {
 					case HATCH -> 0xff8000;
 					case FRAME -> 0x00ffff;
 					case STAIRWELL -> 0xff0000;
+					case BOOTH -> 0xf0f0f0;
+					case ROOM -> 0xc0a0ff;
+					case MACHINE -> 0x40a040;
+					case CRATE -> 0xffd000;
+					case BARRIER -> 0xff2020;
+					case FURNITURE -> 0x2040ff;
 				};
 				var ceiling = Level1Layout.ceiling(12345, x, z);
 				if (ceiling == Level1Layout.Ceiling.LAMP || ceiling == Level1Layout.Ceiling.BULB) rgb = 0xffffa0;

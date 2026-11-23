@@ -1,0 +1,74 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level1/bedroll",
+    "roll": "noclip_backrooms:block/level1/bedroll",
+    "pillow": "noclip_backrooms:block/level1/cot_canvas"
+  },
+  "elements": [
+    {
+      "from": [
+        1,
+        0,
+        1
+      ],
+      "to": [
+        15,
+        3,
+        15
+      ],
+      "faces": {
+        "north": {
+          "texture": "#roll"
+        },
+        "south": {
+          "texture": "#roll"
+        },
+        "east": {
+          "texture": "#roll"
+        },
+        "west": {
+          "texture": "#roll"
+        },
+        "up": {
+          "texture": "#roll"
+        },
+        "down": {
+          "texture": "#roll"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        3,
+        1.5
+      ],
+      "to": [
+        13,
+        4.5,
+        4.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#pillow"
+        },
+        "south": {
+          "texture": "#pillow"
+        },
+        "east": {
+          "texture": "#pillow"
+        },
+        "west": {
+          "texture": "#pillow"
+        },
+        "up": {
+          "texture": "#pillow"
+        },
+        "down": {
+          "texture": "#pillow"
+        }
+      }
+    }
+  ]
+}

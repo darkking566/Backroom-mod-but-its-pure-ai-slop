@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "noclip_backrooms:block/thick_carpet"
+    "model": "noclip_backrooms:block/level0/thick_carpet"
   }
 }

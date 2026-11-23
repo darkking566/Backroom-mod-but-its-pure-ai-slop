@@ -18,13 +18,24 @@ public final class Level1Layout {
 	/** Pillars stand every BAY_X blocks along X, in rows every BAY_Z blocks along Z. */
 	static final int BAY_X = 9;
 	static final int BAY_Z = 16;
-	private static final int KIND = 1, EDGE = 2, LAMP = 3, LEAK = 4, PUDDLE = 5;
+	private static final int KIND = 1, EDGE = 2, LAMP = 3, LEAK = 4, PUDDLE = 5, BASE = 8;
+	/** The share of hall districts that hold a settlement. */
+	private static final int BASE_PERCENT = 7;
 	static final int PLAN = 7;
 
 	public enum Kind {
 		PARKING,
 		WAREHOUSE,
 		CORRIDORS
+	}
+
+	/** The settlements players have found in Level 1. */
+	public enum Base {
+		NONE,
+		/** The M.E.G. outpost, in a parking hall. */
+		FIRST_LIGHT,
+		/** The colonists' camp, in a warehouse. */
+		BLINK
 	}
 
 	/** What fills a column between the floor and the ceiling. */
@@ -36,11 +47,15 @@ public final class Level1Layout {
 		// The wall around a corridor block, and the low doorways through it.
 		PERIMETER, OPENING, OPENING_SIGN,
 		// Exits to other levels (see HallPlan): a service room, a floor hatch, a lone door frame, a stairwell.
-		EXIT_CORE, HATCH, FRAME, STAIRWELL;
+		EXIT_CORE, HATCH, FRAME, STAIRWELL,
+		// Props in the halls (see HallPlan.Prop): booth walls, a room's floor, a machine, a crate.
+		BOOTH, ROOM, MACHINE, CRATE,
+		// Settlements (see BasePlan): the ring of barriers, and what stands inside.
+		BARRIER, FURNITURE;
 
 		public boolean walkable() {
 			return switch (this) {
-				case FLOOR, LINE, DAMP, PUDDLE, CORRIDOR, OPENING, OPENING_SIGN, HATCH, FRAME -> true;
+				case FLOOR, LINE, DAMP, PUDDLE, CORRIDOR, OPENING, OPENING_SIGN, HATCH, FRAME, ROOM -> true;
 				default -> false;
 			};
 		}
@@ -72,6 +87,21 @@ public final class Level1Layout {
 		if (roll < 48) return Kind.PARKING;
 		if (roll < 70) return Kind.WAREHOUSE;
 		return Kind.CORRIDORS;
+	}
+
+	public static Base base(long seed, int dx, int dz) {
+		if (dx == 0 && dz == 0) return Base.NONE;
+		Kind kind = kind(seed, dx, dz);
+		if (kind == Kind.CORRIDORS || Math.floorMod(hash(seed, dx, dz, BASE), 100) >= BASE_PERCENT) return Base.NONE;
+		return kind == Kind.PARKING ? Base.FIRST_LIGHT : Base.BLINK;
+	}
+
+	/** The settlement piece at (x, z), or null. */
+	static BasePlan.Piece basePiece(long seed, int x, int z) {
+		int dx = Math.floorDiv(x, DISTRICT), dz = Math.floorDiv(z, DISTRICT);
+		Base base = base(seed, dx, dz);
+		if (base == Base.NONE) return null;
+		return BasePlan.piece(base, Math.floorMod(x, DISTRICT), Math.floorMod(z, DISTRICT));
 	}
 
 	public static Kind kindAt(long seed, int x, int z) {
@@ -114,10 +144,33 @@ public final class Level1Layout {
 			Tile exit = exitTile(cell);
 			if (exit != null) return exit;
 		}
+		HallPlan.PropCell prop = propCell(seed, x, z);
+		if (prop != null) {
+			Tile tile = propTile(prop);
+			if (tile != null) return tile;
+		}
 		int bx = Math.floorMod(x, BAY_X), bz = Math.floorMod(z, BAY_Z);
 		if (bx < 2 && bz < 2) return Tile.PILLAR;
-		// Racks leave the aisle and the pillar line free, with a gap at every pillar.
-		if (kind == Kind.WAREHOUSE && bx >= 2 && bx <= 7 && (bz == 4 || bz == 5 || bz == 11 || bz == 12)) return Tile.SHELF;
+		Base base = base(seed, Math.floorDiv(x, DISTRICT), Math.floorDiv(z, DISTRICT));
+		boolean settled = base != Base.NONE && BasePlan.inside(Math.floorMod(x, DISTRICT), Math.floorMod(z, DISTRICT));
+		if (settled) {
+			BasePlan.Piece piece = BasePlan.piece(base, Math.floorMod(x, DISTRICT), Math.floorMod(z, DISTRICT));
+			if (piece != null) {
+				switch (piece) {
+					case BARRIER_X, BARRIER_Z, SIGN_X, SIGN_Z -> {
+						return Tile.BARRIER;
+					}
+					case TENT_FLOOR -> {
+						return Tile.ROOM;
+					}
+					default -> {
+						return Tile.FURNITURE;
+					}
+				}
+			}
+		}
+		// Racks leave the aisle and the pillar line free, with a gap at every pillar; the camp has cleared them away.
+		if (kind == Kind.WAREHOUSE && !settled && bx >= 2 && bx <= 7 && (bz == 4 || bz == 5 || bz == 11 || bz == 12)) return Tile.SHELF;
 		int wet = wetness(seed, x, z);
 		if (wet == 2) return Tile.PUDDLE;
 		if (wet == 1) return Tile.DAMP;
@@ -132,6 +185,47 @@ public final class Level1Layout {
 		int dx = Math.floorDiv(x, DISTRICT), dz = Math.floorDiv(z, DISTRICT);
 		if (kind(seed, dx, dz) == Kind.CORRIDORS) return null;
 		return HallPlan.of(seed, dx, dz).cell(x, z);
+	}
+
+	/** The prop footprint at (x, z) in a hall, or null. */
+	static HallPlan.PropCell propCell(long seed, int x, int z) {
+		int dx = Math.floorDiv(x, DISTRICT), dz = Math.floorDiv(z, DISTRICT);
+		if (kind(seed, dx, dz) == Kind.CORRIDORS) return null;
+		return HallPlan.of(seed, dx, dz).propCell(x, z);
+	}
+
+	/** The toll booths, generator rooms and eyed crates in a district. */
+	public static java.util.List<HallPlan.PlacedProp> props(long seed, int dx, int dz) {
+		return HallPlan.of(seed, dx, dz).props();
+	}
+
+	/** The tile of a prop footprint, or null where the ordinary hall floor shows (inside a booth, under the barrier arm). */
+	private static Tile propTile(HallPlan.PropCell cell) {
+		int bx = cell.bx(), bz = cell.bz();
+		HallPlan.PlacedProp prop = cell.prop();
+		return switch (prop.prop()) {
+			case TOLL_BOOTH -> {
+				if (bx == 5) yield Tile.BOOTH; // the barrier's housing
+				if (bx > 5 || bx == 3 && bz >= 8) yield null; // under the arm; the booth's inside and its doorway
+				yield Tile.BOOTH;
+			}
+			case GENERATOR_ROOM -> {
+				int x = prop.x0() + bx, z = prop.z0() + bz;
+				int[] door = prop.door();
+				if (x == door[0] && z == door[1]) yield Tile.ROOM;
+				if (bx == 3 || bx == 7 || bz == 6 || bz == 10) yield Tile.EXIT_CORE;
+				if (bx == 5 && bz == 8) yield Tile.MACHINE;
+				int[] drum = generatorDrum(prop);
+				yield bx == drum[0] && bz == drum[1] ? Tile.MACHINE : Tile.ROOM;
+			}
+			case EYED_CRATE -> Tile.CRATE;
+		};
+	}
+
+	/** The fuel drum stands in one inside corner of a generator room, in bay coordinates. */
+	static int[] generatorDrum(HallPlan.PlacedProp prop) {
+		int[][] corners = {{4, 7}, {6, 7}, {6, 9}, {4, 9}};
+		return corners[prop.variant()];
 	}
 
 	/** The exits in a district; none in corridor blocks, whose way out is the metal door home. */

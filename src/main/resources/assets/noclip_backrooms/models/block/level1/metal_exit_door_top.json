@@ -1,5 +1,5 @@
 {
-  "parent": "noclip_backrooms:block/exit_door_top",
+  "parent": "noclip_backrooms:block/level0/exit_door_top",
   "textures": {
     "particle": "noclip_backrooms:block/level1/metal_door_frame",
     "leaf": "noclip_backrooms:block/level1/metal_door_top",

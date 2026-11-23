@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "noclip_backrooms:alloy",
+    "noclip_backrooms:alloy",
+    "noclip_backrooms:alloy",
+    "noclip_backrooms:alloy"
+  ],
+  "result": {
+    "id": "minecraft:iron_ingot"
+  }
+}

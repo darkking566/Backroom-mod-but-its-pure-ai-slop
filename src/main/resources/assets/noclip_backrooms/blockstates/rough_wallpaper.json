@@ -2,11 +2,11 @@
   "variants": {
     "": [
       {
-        "model": "noclip_backrooms:block/rough_wallpaper",
+        "model": "noclip_backrooms:block/level0/rough_wallpaper",
         "weight": 5
       },
       {
-        "model": "noclip_backrooms:block/rough_wallpaper_1",
+        "model": "noclip_backrooms:block/level0/rough_wallpaper_1",
         "weight": 3
       }
     ]

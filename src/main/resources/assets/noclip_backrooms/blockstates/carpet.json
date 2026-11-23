@@ -2,161 +2,161 @@
   "variants": {
     "": [
       {
-        "model": "noclip_backrooms:block/carpet",
+        "model": "noclip_backrooms:block/level0/carpet",
         "weight": 36
       },
       {
-        "model": "noclip_backrooms:block/carpet",
+        "model": "noclip_backrooms:block/level0/carpet",
         "y": 90,
         "weight": 36
       },
       {
-        "model": "noclip_backrooms:block/carpet",
+        "model": "noclip_backrooms:block/level0/carpet",
         "y": 180,
         "weight": 36
       },
       {
-        "model": "noclip_backrooms:block/carpet",
+        "model": "noclip_backrooms:block/level0/carpet",
         "y": 270,
         "weight": 36
       },
       {
-        "model": "noclip_backrooms:block/carpet_1",
+        "model": "noclip_backrooms:block/level0/carpet_1",
         "weight": 36
       },
       {
-        "model": "noclip_backrooms:block/carpet_1",
+        "model": "noclip_backrooms:block/level0/carpet_1",
         "y": 90,
         "weight": 36
       },
       {
-        "model": "noclip_backrooms:block/carpet_1",
+        "model": "noclip_backrooms:block/level0/carpet_1",
         "y": 180,
         "weight": 36
       },
       {
-        "model": "noclip_backrooms:block/carpet_1",
+        "model": "noclip_backrooms:block/level0/carpet_1",
         "y": 270,
         "weight": 36
       },
       {
-        "model": "noclip_backrooms:block/carpet_2"
+        "model": "noclip_backrooms:block/level0/carpet_2"
       },
       {
-        "model": "noclip_backrooms:block/carpet_2",
+        "model": "noclip_backrooms:block/level0/carpet_2",
         "y": 90
       },
       {
-        "model": "noclip_backrooms:block/carpet_2",
+        "model": "noclip_backrooms:block/level0/carpet_2",
         "y": 180
       },
       {
-        "model": "noclip_backrooms:block/carpet_2",
+        "model": "noclip_backrooms:block/level0/carpet_2",
         "y": 270
       },
       {
-        "model": "noclip_backrooms:block/carpet_3"
+        "model": "noclip_backrooms:block/level0/carpet_3"
       },
       {
-        "model": "noclip_backrooms:block/carpet_3",
+        "model": "noclip_backrooms:block/level0/carpet_3",
         "y": 90
       },
       {
-        "model": "noclip_backrooms:block/carpet_3",
+        "model": "noclip_backrooms:block/level0/carpet_3",
         "y": 180
       },
       {
-        "model": "noclip_backrooms:block/carpet_3",
+        "model": "noclip_backrooms:block/level0/carpet_3",
         "y": 270
       },
       {
-        "model": "noclip_backrooms:block/carpet_4"
+        "model": "noclip_backrooms:block/level0/carpet_4"
       },
       {
-        "model": "noclip_backrooms:block/carpet_4",
+        "model": "noclip_backrooms:block/level0/carpet_4",
         "y": 90
       },
       {
-        "model": "noclip_backrooms:block/carpet_4",
+        "model": "noclip_backrooms:block/level0/carpet_4",
         "y": 180
       },
       {
-        "model": "noclip_backrooms:block/carpet_4",
+        "model": "noclip_backrooms:block/level0/carpet_4",
         "y": 270
       },
       {
-        "model": "noclip_backrooms:block/carpet_5"
+        "model": "noclip_backrooms:block/level0/carpet_5"
       },
       {
-        "model": "noclip_backrooms:block/carpet_5",
+        "model": "noclip_backrooms:block/level0/carpet_5",
         "y": 90
       },
       {
-        "model": "noclip_backrooms:block/carpet_5",
+        "model": "noclip_backrooms:block/level0/carpet_5",
         "y": 180
       },
       {
-        "model": "noclip_backrooms:block/carpet_5",
+        "model": "noclip_backrooms:block/level0/carpet_5",
         "y": 270
       },
       {
-        "model": "noclip_backrooms:block/carpet_6"
+        "model": "noclip_backrooms:block/level0/carpet_6"
       },
       {
-        "model": "noclip_backrooms:block/carpet_6",
+        "model": "noclip_backrooms:block/level0/carpet_6",
         "y": 90
       },
       {
-        "model": "noclip_backrooms:block/carpet_6",
+        "model": "noclip_backrooms:block/level0/carpet_6",
         "y": 180
       },
       {
-        "model": "noclip_backrooms:block/carpet_6",
+        "model": "noclip_backrooms:block/level0/carpet_6",
         "y": 270
       },
       {
-        "model": "noclip_backrooms:block/carpet_7"
+        "model": "noclip_backrooms:block/level0/carpet_7"
       },
       {
-        "model": "noclip_backrooms:block/carpet_7",
+        "model": "noclip_backrooms:block/level0/carpet_7",
         "y": 90
       },
       {
-        "model": "noclip_backrooms:block/carpet_7",
+        "model": "noclip_backrooms:block/level0/carpet_7",
         "y": 180
       },
       {
-        "model": "noclip_backrooms:block/carpet_7",
+        "model": "noclip_backrooms:block/level0/carpet_7",
         "y": 270
       },
       {
-        "model": "noclip_backrooms:block/carpet_8"
+        "model": "noclip_backrooms:block/level0/carpet_8"
       },
       {
-        "model": "noclip_backrooms:block/carpet_8",
+        "model": "noclip_backrooms:block/level0/carpet_8",
         "y": 90
       },
       {
-        "model": "noclip_backrooms:block/carpet_8",
+        "model": "noclip_backrooms:block/level0/carpet_8",
         "y": 180
       },
       {
-        "model": "noclip_backrooms:block/carpet_8",
+        "model": "noclip_backrooms:block/level0/carpet_8",
         "y": 270
       },
       {
-        "model": "noclip_backrooms:block/carpet_9"
+        "model": "noclip_backrooms:block/level0/carpet_9"
       },
       {
-        "model": "noclip_backrooms:block/carpet_9",
+        "model": "noclip_backrooms:block/level0/carpet_9",
         "y": 90
       },
       {
-        "model": "noclip_backrooms:block/carpet_9",
+        "model": "noclip_backrooms:block/level0/carpet_9",
         "y": 180
       },
       {
-        "model": "noclip_backrooms:block/carpet_9",
+        "model": "noclip_backrooms:block/level0/carpet_9",
         "y": 270
       }
     ]

@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level1;
 
+import dev.noclip.backrooms.level0.Level0;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -19,7 +20,7 @@ final class FlickeringWallBlock extends Block {
 
 	@Override
 	protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effects, boolean intersects) {
-		if (entity instanceof ServerPlayer player && level.dimension() == Level1.LEVEL_0) FlickeringWalls.throughWall(player, pos);
+		if (entity instanceof ServerPlayer player && level.dimension() == Level0.LEVEL_0) FlickeringWalls.throughWall(player, pos);
 	}
 
 	@Override

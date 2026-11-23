@@ -2,40 +2,40 @@
   "variants": {
     "": [
       {
-        "model": "noclip_backrooms:block/dry_carpet",
+        "model": "noclip_backrooms:block/level0/dry_carpet",
         "weight": 4
       },
       {
-        "model": "noclip_backrooms:block/dry_carpet",
+        "model": "noclip_backrooms:block/level0/dry_carpet",
         "y": 90,
         "weight": 4
       },
       {
-        "model": "noclip_backrooms:block/dry_carpet",
+        "model": "noclip_backrooms:block/level0/dry_carpet",
         "y": 180,
         "weight": 4
       },
       {
-        "model": "noclip_backrooms:block/dry_carpet",
+        "model": "noclip_backrooms:block/level0/dry_carpet",
         "y": 270,
         "weight": 4
       },
       {
-        "model": "noclip_backrooms:block/dry_carpet_1",
+        "model": "noclip_backrooms:block/level0/dry_carpet_1",
         "weight": 4
       },
       {
-        "model": "noclip_backrooms:block/dry_carpet_1",
+        "model": "noclip_backrooms:block/level0/dry_carpet_1",
         "y": 90,
         "weight": 4
       },
       {
-        "model": "noclip_backrooms:block/dry_carpet_1",
+        "model": "noclip_backrooms:block/level0/dry_carpet_1",
         "y": 180,
         "weight": 4
       },
       {
-        "model": "noclip_backrooms:block/dry_carpet_1",
+        "model": "noclip_backrooms:block/level0/dry_carpet_1",
         "y": 270,
         "weight": 4
       }

@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/cube_bottom_top",
-  "textures": {
-    "top": "noclip_backrooms:block/dry_carpet",
-    "bottom": "noclip_backrooms:block/dry_carpet",
-    "side": "noclip_backrooms:block/dry_carpet_edge"
-  }
-}

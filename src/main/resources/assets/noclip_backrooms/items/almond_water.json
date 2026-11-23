@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "noclip_backrooms:item/almond_water"
+    "model": "noclip_backrooms:item/level1/almond_water"
   }
 }

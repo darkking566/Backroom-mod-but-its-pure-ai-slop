@@ -1,0 +1,53 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level1/barrier_arm",
+    "arm": "noclip_backrooms:block/level1/barrier_arm"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        7,
+        7
+      ],
+      "to": [
+        16,
+        9.5,
+        9
+      ],
+      "faces": {
+        "north": {
+          "texture": "#arm"
+        },
+        "south": {
+          "texture": "#arm"
+        },
+        "up": {
+          "texture": "#arm"
+        },
+        "down": {
+          "texture": "#arm"
+        },
+        "east": {
+          "texture": "#arm",
+          "uv": [
+            0,
+            6,
+            2.5,
+            8
+          ]
+        },
+        "west": {
+          "texture": "#arm",
+          "uv": [
+            0,
+            6,
+            2.5,
+            8
+          ]
+        }
+      }
+    }
+  ]
+}

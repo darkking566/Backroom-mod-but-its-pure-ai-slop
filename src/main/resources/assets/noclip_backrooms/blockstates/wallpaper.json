@@ -2,37 +2,37 @@
   "variants": {
     "": [
       {
-        "model": "noclip_backrooms:block/wallpaper",
+        "model": "noclip_backrooms:block/level0/wallpaper",
         "weight": 40
       },
       {
-        "model": "noclip_backrooms:block/wallpaper_1",
+        "model": "noclip_backrooms:block/level0/wallpaper_1",
         "weight": 2
       },
       {
-        "model": "noclip_backrooms:block/wallpaper_2",
+        "model": "noclip_backrooms:block/level0/wallpaper_2",
         "weight": 3
       },
       {
-        "model": "noclip_backrooms:block/wallpaper_3"
+        "model": "noclip_backrooms:block/level0/wallpaper_3"
       },
       {
-        "model": "noclip_backrooms:block/wallpaper_4"
+        "model": "noclip_backrooms:block/level0/wallpaper_4"
       },
       {
-        "model": "noclip_backrooms:block/wallpaper_5"
+        "model": "noclip_backrooms:block/level0/wallpaper_5"
       },
       {
-        "model": "noclip_backrooms:block/wallpaper_6"
+        "model": "noclip_backrooms:block/level0/wallpaper_6"
       },
       {
-        "model": "noclip_backrooms:block/wallpaper_7"
+        "model": "noclip_backrooms:block/level0/wallpaper_7"
       },
       {
-        "model": "noclip_backrooms:block/wallpaper_8"
+        "model": "noclip_backrooms:block/level0/wallpaper_8"
       },
       {
-        "model": "noclip_backrooms:block/wallpaper_9"
+        "model": "noclip_backrooms:block/level0/wallpaper_9"
       }
     ]
   }

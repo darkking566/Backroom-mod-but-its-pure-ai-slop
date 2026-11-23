@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "noclip_backrooms:block/wallpaper_baseboard"
+    "model": "noclip_backrooms:block/level0/wallpaper_baseboard"
   }
 }

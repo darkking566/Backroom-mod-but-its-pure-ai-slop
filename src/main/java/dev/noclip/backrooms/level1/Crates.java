@@ -93,6 +93,7 @@ final class Crates {
 
 			level.setBlock(pos, Level1Blocks.SUPPLY_CRATE.defaultBlockState(), Block.UPDATE_ALL);
 			PLACED.add(pos);
+			Strays.maybeBeside(level, pos);
 			return pos;
 		}
 		return null;

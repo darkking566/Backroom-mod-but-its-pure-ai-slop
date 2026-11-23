@@ -3,7 +3,7 @@
     "subtitle": "subtitles.noclip_backrooms.ambient.fluorescent_hum",
     "sounds": [
       {
-        "name": "noclip_backrooms:fluorescent_hum",
+        "name": "noclip_backrooms:level0/fluorescent_hum",
         "attenuation_distance": 24
       }
     ]
@@ -12,11 +12,11 @@
     "subtitle": "subtitles.noclip_backrooms.ambient.wall_scratch",
     "sounds": [
       {
-        "name": "noclip_backrooms:wall_scratch_1",
+        "name": "noclip_backrooms:level0/wall_scratch_1",
         "attenuation_distance": 22
       },
       {
-        "name": "noclip_backrooms:wall_scratch_2",
+        "name": "noclip_backrooms:level0/wall_scratch_2",
         "attenuation_distance": 22
       }
     ]
@@ -25,7 +25,7 @@
     "subtitle": "subtitles.noclip_backrooms.ambient.distant_whisper",
     "sounds": [
       {
-        "name": "noclip_backrooms:distant_whisper",
+        "name": "noclip_backrooms:level0/distant_whisper",
         "attenuation_distance": 26
       }
     ]
@@ -130,6 +130,107 @@
       {
         "name": "minecraft:block.copper_bulb.turn_on",
         "type": "event"
+      }
+    ]
+  },
+  "level1.generator": {
+    "subtitle": "subtitles.noclip_backrooms.level1.generator",
+    "sounds": [
+      {
+        "name": "minecraft:entity.minecart.riding",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.drawer": {
+    "subtitle": "subtitles.noclip_backrooms.level1.drawer",
+    "sounds": [
+      {
+        "name": "minecraft:block.iron_trapdoor.open",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.eyes": {
+    "subtitle": "subtitles.noclip_backrooms.level1.eyes",
+    "sounds": [
+      {
+        "name": "minecraft:block.sculk_sensor.clicking",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.cat": {
+    "subtitle": "subtitles.noclip_backrooms.level1.cat",
+    "sounds": [
+      {
+        "name": "minecraft:entity.cat.hiss",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.smiler": {
+    "subtitle": "subtitles.noclip_backrooms.level1.smiler",
+    "sounds": [
+      {
+        "name": "minecraft:entity.vex.ambient",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.smiler_bite": {
+    "subtitle": "subtitles.noclip_backrooms.level1.smiler_bite",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ghast.scream",
+        "type": "event"
+      }
+    ]
+  },
+  "hound.growl": {
+    "subtitle": "subtitles.noclip_backrooms.hound.growl",
+    "sounds": [
+      {
+        "name": "minecraft:entity.wolf.growl",
+        "type": "event",
+        "pitch": 0.55
+      },
+      {
+        "name": "minecraft:entity.zoglin.ambient",
+        "type": "event",
+        "pitch": 0.7,
+        "volume": 0.7
+      }
+    ]
+  },
+  "hound.roar": {
+    "subtitle": "subtitles.noclip_backrooms.hound.roar",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ravager.roar",
+        "type": "event",
+        "pitch": 1.35,
+        "volume": 0.9
+      }
+    ]
+  },
+  "hound.hurt": {
+    "subtitle": "subtitles.noclip_backrooms.hound.hurt",
+    "sounds": [
+      {
+        "name": "minecraft:entity.wolf.hurt",
+        "type": "event",
+        "pitch": 0.6
+      }
+    ]
+  },
+  "hound.death": {
+    "subtitle": "subtitles.noclip_backrooms.hound.death",
+    "sounds": [
+      {
+        "name": "minecraft:entity.wolf.death",
+        "type": "event",
+        "pitch": 0.5
       }
     ]
   }

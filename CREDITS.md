@@ -1,6 +1,6 @@
 # Audio & Asset Credits
 
-All custom audio files in `src/main/resources/assets/noclip_backrooms/sounds/` are derived from real recordings licensed under **CC0 1.0 Universal (Public Domain)** on Freesound.org, converted to mono Ogg Vorbis for Minecraft 3D positional audio:
+All custom audio files in `src/main/resources/assets/noclip_backrooms/sounds/level0/` are derived from real recordings licensed under **CC0 1.0 Universal (Public Domain)** on Freesound.org, converted to mono Ogg Vorbis for Minecraft 3D positional audio:
 
 - `fluorescent_hum.ogg`
   - Source: *Fluorescent lightbulb hum buzz (Extended)* by **Developer_Jake**

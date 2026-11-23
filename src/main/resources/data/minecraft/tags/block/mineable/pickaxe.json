@@ -19,6 +19,16 @@
     "noclip_backrooms:leaking_ceiling_pipe",
     "noclip_backrooms:emergency_sign",
     "noclip_backrooms:old_computer",
-    "noclip_backrooms:concrete_stairs"
+    "noclip_backrooms:concrete_stairs",
+    "noclip_backrooms:booth_wall",
+    "noclip_backrooms:booth_roof",
+    "noclip_backrooms:booth_drawer",
+    "noclip_backrooms:barrier_base",
+    "noclip_backrooms:generator",
+    "noclip_backrooms:fuel_drum",
+    "noclip_backrooms:jersey_barrier",
+    "noclip_backrooms:first_light_sign",
+    "noclip_backrooms:floodlight",
+    "noclip_backrooms:barrel_fire"
   ]
 }
