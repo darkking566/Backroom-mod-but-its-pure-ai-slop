@@ -20,7 +20,14 @@ Fabric・Minecraft 26.2・Java 25・模組代號 `noclip_backrooms`
 - 編譯與迷宮測試：`.\gradlew.bat build`
 - 真實遊戲自動測試：`.\gradlew.bat runClientGameTest`
 
-- 改完顏色或圖案後重畫貼圖：`python tools/make_textures.py`（需要 Pillow）
+- 改完顏色或圖案後重畫貼圖：`python tools/make_textures.py`（需要 Pillow 與 NumPy；同時產生光影用的 `_n`、`_s` 貼圖）
+
+## 光影（選用，不隨模組附帶）
+
+- 測試過的組合：Iris 1.11.4、Sodium 0.9.2、Complementary Unbound r5.10（皆從 Modrinth 下載）。
+- 光影設定裡把 **Resource Pack Support（RP_MODE）改成 labPBR**，否則看不到本模組的法線與反光貼圖。
+- 限制：Complementary 的彩色光只認它自己列出的方塊，本模組的紅燈、綠燈不會投出彩色光（只有燈面本身發光）。要改得修改光影包，授權不允許，所以不做。
+- 光影版整體比原版暗 30–40%，昏暗區幾乎全黑；這是光影包的曝光，難度以原版為準。
 
 ## 試玩方法
 
@@ -47,6 +54,8 @@ Fabric・Minecraft 26.2・Java 25・模組代號 `noclip_backrooms`
 - [x] 世界高度 48：兩個既有存檔的副本都能載入、重新掉入、找到新區域的出口
 - [x] 使用者親手試玩認可（2026-11-23，使用者回報）：找出口的難度合適，驗收通過
 - [x] 協作規則（2026-11-23，使用者回報）：Antigravity 與 Claude 都讀得到
+- [x] 畫面升級（自動）：128px 材質、立體踢腳板／燈具／門框；17 個固定機位前後對比，原版亮度差在 ±5% 內；光影 Ultra 17 個機位無缺圖、無著色器錯誤；與音效提交合併後全部測試通過
+- [ ] 畫面升級：使用者親手試玩認可
 
 ## 尚未驗證
 
@@ -55,7 +64,10 @@ Fabric・Minecraft 26.2・Java 25・模組代號 `noclip_backrooms`
 - 加進從未裝過本模組的既有存檔（請先備份）
 - 所有專屬方塊的聲音與挖掘手感
 - 出口：床與重生錨本身（測試用的是 `/spawnpoint`）
-- 多人伺服器、光影與其他模組相容性
+- 多人伺服器與其他模組相容性
+- 實際 FPS（自動測試鎖在每秒約 20 格，量不出真實幀率）
+- 3D 方塊拿在手上、放在物品欄裡的樣子
+- 音效（Antigravity 提交）的聽感與素材授權來源
 
 ## 多工具同時開發
 
@@ -78,4 +90,4 @@ Fabric・Minecraft 26.2・Java 25・模組代號 `noclip_backrooms`
 
 ## 下一步
 
-第一版已驗收，等使用者選下一個功能。候選（尚未決定）：音效、第一隻怪物。
+畫面升級在 `claude` 分支等使用者試玩，同意後再合併進 `main`。之後候選（尚未決定）：第一隻怪物。
