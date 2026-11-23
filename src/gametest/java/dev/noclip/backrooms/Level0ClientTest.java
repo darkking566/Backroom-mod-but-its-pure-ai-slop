@@ -67,6 +67,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			checkEdgeShift(context, game, standY);
 			checkRedRoomLoop(context, game, standY);
 			checkShadowHallucination(context, game, standY);
+			checkFlashlight(context, game, standY);
 			server.runOnServer(s -> {
 				for (int i = 0; i < ModBlocks.ALL.size(); i++) {
 					player(s).getInventory().setItem(i, new ItemStack(ModBlocks.ALL.get(i)));
@@ -300,6 +301,27 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		server.runCommand("effect clear @a");
 	}
 
+	private static void checkFlashlight(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
+		var server = game.getServer();
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5 0 0");
+		server.runCommand("item replace entity @a weapon.mainhand with noclip_backrooms:flashlight");
+		context.waitTicks(3);
+
+		context.getInput().pressMouse(1);
+		server.waitFor(s -> {
+			ServerPlayer p = player(s);
+			return FlashlightItem.isLit(p.getMainHandItem()) && FlashlightLight.hasActiveBeam(p);
+		}, 40);
+
+		context.getInput().pressMouse(1);
+		server.waitFor(s -> {
+			ServerPlayer p = player(s);
+			return !FlashlightItem.isLit(p.getMainHandItem()) && !FlashlightLight.hasActiveBeam(p);
+		}, 40);
+
+		server.runCommand("item replace entity @a weapon.mainhand with minecraft:air");
+	}
+
 	private static void checkBlocks(ClientGameTestContext context, TestSingleplayerContext game) {
 		game.getServer().runOnServer(s -> {
 			ServerLevel level = player(s).level();
@@ -314,6 +336,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 				check(Language.getInstance().has(block.getDescriptionId()), "no name for " + block);
 				check(block.asItem().getDescriptionId().equals(block.getDescriptionId()), "wrong item name key for " + block);
 			}
+			check(Language.getInstance().has(ModItems.FLASHLIGHT.getDescriptionId()), "no name for flashlight");
 		});
 	}
 

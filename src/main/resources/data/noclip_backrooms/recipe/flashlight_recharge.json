@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "noclip_backrooms:flashlight",
+    "minecraft:redstone"
+  ],
+  "result": {
+    "id": "noclip_backrooms:flashlight"
+  }
+}
