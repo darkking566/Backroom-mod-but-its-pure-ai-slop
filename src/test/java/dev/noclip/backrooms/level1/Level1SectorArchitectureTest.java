@@ -31,7 +31,8 @@ class Level1SectorArchitectureTest {
 				for (int dz = -12; dz <= 12; dz++) {
 					Variant v = Level1SectorArchitecture.variant(seed, dx, dz);
 					if (dx == 0 && dz == 0 || Level1Layout.kind(seed, dx, dz) == Kind.CORRIDORS
-							|| Level1Layout.base(seed, dx, dz) != Base.NONE) {
+							|| Level1Layout.base(seed, dx, dz) != Base.NONE
+							|| Level1Landmarks.landmark(seed, dx, dz) != Level1Landmarks.Landmark.NONE) {
 						assertEquals(Variant.NONE, v);
 						continue;
 					}

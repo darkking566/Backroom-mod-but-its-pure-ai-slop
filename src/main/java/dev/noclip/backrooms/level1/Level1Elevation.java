@@ -24,8 +24,8 @@ public final class Level1Elevation {
 	private static final int PROFILE_SALT = 41;
 	private static final int VARIANT_SALT = 43;
 
-	/** All Y levels where blackout-controlled hall lamps may appear across all vertical profiles. */
-	static final int[] LAMP_YS = {18, 25, 29, 37, 41, 45, 47, 53};
+	/** All Y levels where blackout-controlled hall lamps may appear across all vertical profiles and landmarks. */
+	static final int[] LAMP_YS = {18, 25, 29, 37, 41, 43, 45, 47, 49, 53, 55};
 
 	public enum Profile {
 		/** Classic 5-block parking/warehouse ceiling (y = 38). */
@@ -64,6 +64,8 @@ public final class Level1Elevation {
 
 	/** Highest open ceiling Y for this district. */
 	public static int ceilingY(long seed, int dx, int dz) {
+		Level1Landmarks.Landmark lm = Level1Landmarks.landmark(seed, dx, dz);
+		if (lm != Level1Landmarks.Landmark.NONE) return Level1Landmarks.ceilingY(lm);
 		Profile p = profile(seed, dx, dz);
 		boolean extra = extraTier(seed, dx, dz);
 		return switch (p) {

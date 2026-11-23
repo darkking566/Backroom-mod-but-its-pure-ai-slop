@@ -83,11 +83,12 @@ public final class Level1SectorArchitecture {
 	private Level1SectorArchitecture() {
 	}
 
-	/** Picks one of the 3 dramatic variants for this district's sector, or NONE for origin/corridors/bases. */
+	/** Picks one of the 3 dramatic variants for this district's sector, or NONE for origin/corridors/bases/landmarks. */
 	public static Variant variant(long seed, int dx, int dz) {
 		if (dx == 0 && dz == 0) return Variant.NONE;
 		if (Level1Layout.kind(seed, dx, dz) == Kind.CORRIDORS) return Variant.NONE;
 		if (Level1Layout.base(seed, dx, dz) != Base.NONE) return Variant.NONE;
+		if (Level1Landmarks.landmark(seed, dx, dz) != Level1Landmarks.Landmark.NONE) return Variant.NONE;
 		Sector sector = Level1Layout.sector(seed, dx * D + D / 2, dz * D + D / 2);
 		int pick = Math.floorMod(Level1Layout.hash(seed, dx, dz, VARIANT_SALT), 3);
 		return switch (sector) {

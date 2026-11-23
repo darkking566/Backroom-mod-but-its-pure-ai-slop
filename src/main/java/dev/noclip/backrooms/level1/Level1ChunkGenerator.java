@@ -82,6 +82,8 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 		}
 		// Bedrock under the floor and over the roof, so nothing gets out underneath or lands on top.
 		if (y == 0 || y >= HEIGHT - 1) return Blocks.BEDROCK.defaultBlockState();
+		BlockState landmark = Level1Landmarks.block(seed, tile, ceiling, x, y, z);
+		if (landmark != null) return landmark;
 		BlockState elevated = Level1Elevation.block(seed, tile, ceiling, x, y, z);
 		if (elevated != null) return elevated;
 		if (y > CEILING_Y) return Blocks.CONCRETE.gray().defaultBlockState();
