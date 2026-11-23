@@ -23,5 +23,6 @@ public final class BackroomsMod implements ModInitializer {
 		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, id("level_0"), Level0ChunkGenerator.CODEC);
 		Noclip.register();
 		Level0Ambience.register();
+		RedRoomEffects.register();
 	}
 }

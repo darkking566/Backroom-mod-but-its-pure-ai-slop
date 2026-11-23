@@ -45,6 +45,12 @@ final class Maze {
 		return Zone.RED_ROOM;
 	}
 
+	/** Whether (x, z) is in the 2-cell transition warning band outside a RED_ROOM sector. */
+	static boolean isNearRedRoom(long seed, int x, int z) {
+		int cx = Math.floorDiv(x, CELL), cz = Math.floorDiv(z, CELL);
+		return nearRedRoom(seed, cx, cz);
+	}
+
 	/** Whether a non-red cell sits within 2 cells of a RED_ROOM sector border (transition warning band). */
 	private static boolean nearRedRoom(long seed, int cx, int cz) {
 		if (zoneForCell(seed, cx, cz) == Zone.RED_ROOM) return false;

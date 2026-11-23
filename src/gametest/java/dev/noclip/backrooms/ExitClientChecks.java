@@ -22,16 +22,21 @@ final class ExitClientChecks {
 		long seed = server.computeOnServer(s -> Level0ChunkGenerator.mazeSeed(
 				s.getLevel(BackroomsMod.LEVEL_0).getChunkSource().randomState()));
 
+		int expectedZones = Maze.Zone.values().length - 1; // Exits never spawn inside RED_ROOM.
 		Map<Maze.Zone, Exits.Door> doors = new EnumMap<>(Maze.Zone.class);
-		for (int radius = 0; radius < 30 && doors.size() < Maze.Zone.values().length; radius++) {
+		for (int radius = 0; radius < 30 && doors.size() < expectedZones; radius++) {
 			for (int rx = -radius; rx <= radius; rx++) {
 				for (int rz = -radius; rz <= radius; rz++) {
 					Exits.Door door = Exits.doorIn(seed, rx, rz);
-					if (door != null) doors.putIfAbsent(Maze.zoneAt(seed, door.x(), door.z()), door);
+					if (door != null) {
+						Maze.Zone zone = Maze.zoneAt(seed, door.x(), door.z());
+						check(zone != Maze.Zone.RED_ROOM, "exit generated inside RED_ROOM at " + door);
+						doors.putIfAbsent(zone, door);
+					}
 				}
 			}
 		}
-		check(doors.size() == Maze.Zone.values().length, "not every zone has an exit: " + doors.keySet());
+		check(doors.size() == expectedZones, "not every non-red zone has an exit: " + doors.keySet());
 
 		int i = 0;
 		for (var entry : doors.entrySet()) {
