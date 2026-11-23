@@ -225,7 +225,7 @@ final class ShadowHallucination {
 		for (int dist = 10; dist <= 18; dist++) {
 			int bx = (int) Math.floor(player.getX() + hx * dist);
 			int bz = (int) Math.floor(player.getZ() + hz * dist);
-			Vec3 candidate = validStandingSpot(level, bx, bz);
+			Vec3 candidate = validStandingSpot(level, bx, player.getBlockY(), bz);
 			if (candidate != null && hasClearLineOfSight(level, player, player.getEyePosition(),
 					candidate.add(0.0, 1.55, 0.0))) {
 				return candidate;
@@ -256,23 +256,32 @@ final class ShadowHallucination {
 
 			if (preferBehind && attempt < 16 && dot > 0.25) continue;
 
-			Vec3 candidate = validStandingSpot(level, (int) Math.floor(tx), (int) Math.floor(tz));
+			Vec3 candidate = validStandingSpot(level, (int) Math.floor(tx), player.getBlockY(), (int) Math.floor(tz));
 			if (candidate != null) return candidate;
 		}
 		return null;
 	}
 
-	private static Vec3 validStandingSpot(ServerLevel level, int bx, int bz) {
-		BlockPos floorPos = new BlockPos(bx, Level0ChunkGenerator.FLOOR_Y, bz);
-		if (!level.hasChunkAt(floorPos)) return null;
-		BlockState floor = level.getBlockState(floorPos);
-		if (floor.getCollisionShape(level, floorPos).isEmpty() || !floor.getFluidState().isEmpty()) return null;
+	private static Vec3 validStandingSpot(ServerLevel level, int bx, int refY, int bz) {
+		for (int dy = 0; Math.abs(dy) <= 3; dy = dy <= 0 ? -dy + 1 : -dy) {
+			int floorY = refY - 1 + dy;
+			if (floorY < Level0ChunkGenerator.MIN_Y + 1 || floorY > Level0ChunkGenerator.MAX_Y - 2) continue;
+			BlockPos floorPos = new BlockPos(bx, floorY, bz);
+			if (!level.hasChunkAt(floorPos)) return null;
+			BlockState floor = level.getBlockState(floorPos);
+			if (floor.getCollisionShape(level, floorPos).isEmpty() || !floor.getFluidState().isEmpty()) continue;
 
-		for (int y = Level0ChunkGenerator.FLOOR_Y + 1; y <= Level0ChunkGenerator.FLOOR_Y + 2; y++) {
-			BlockPos pos = new BlockPos(bx, y, bz);
-			if (!level.getBlockState(pos).getCollisionShape(level, pos).isEmpty()) return null;
+			boolean clear = true;
+			for (int y = floorY + 1; y <= floorY + 2; y++) {
+				BlockPos pos = new BlockPos(bx, y, bz);
+				if (!level.getBlockState(pos).getCollisionShape(level, pos).isEmpty()) {
+					clear = false;
+					break;
+				}
+			}
+			if (clear) return new Vec3(bx + 0.5, floorY + 1, bz + 0.5);
 		}
-		return new Vec3(bx + 0.5, Level0ChunkGenerator.FLOOR_Y + 1, bz + 0.5);
+		return null;
 	}
 
 	private static void spawnAt(ServerLevel level, ServerPlayer player, Vec3 pos, int now) {

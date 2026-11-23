@@ -21,32 +21,44 @@ class MazeTest {
 		for (int run = 0; run < 1000; run++) {
 			long seed = random.nextLong();
 			int origin = origins[run % origins.length];
+			int[] floorY = new int[SIZE * SIZE];
 			boolean[] unvisited = new boolean[SIZE * SIZE];
 			int open = 0;
 			for (int i = 0; i < unvisited.length; i++) {
 				int x = origin + i % SIZE, z = origin + i / SIZE;
-				unvisited[i] = !Maze.isWall(seed, x, z) && !Maze.isPit(seed, x, z);
+				floorY[i] = Maze.walkableFloorY(seed, x, z, Maze.EpochSource.ZERO);
+				unvisited[i] = floorY[i] != Integer.MIN_VALUE;
 				if (unvisited[i]) open++;
 			}
 
 			ArrayDeque<Integer> queue = new ArrayDeque<>();
-			int start = 1 + SIZE;
-			assertTrue(unvisited[start]);
+			int start = 0;
+			while (start < unvisited.length && !unvisited[start]) start++;
+			assertTrue(start < unvisited.length, "no walkable block in window, seed " + seed);
 			unvisited[start] = false;
 			queue.add(start);
 			int reached = 0;
 			while (!queue.isEmpty()) {
 				int at = queue.poll(), x = at % SIZE, z = at / SIZE;
+				int curY = floorY[at];
 				reached++;
 				int[] next = {x > 0 ? at - 1 : -1, x < SIZE - 1 ? at + 1 : -1, z > 0 ? at - SIZE : -1, z < SIZE - 1 ? at + SIZE : -1};
 				for (int n : next) {
-					if (n >= 0 && unvisited[n]) {
+					if (n >= 0 && unvisited[n] && Math.abs(floorY[n] - curY) <= 1) {
 						unvisited[n] = false;
 						queue.add(n);
 					}
 				}
 			}
-			assertEquals(open, reached, "unreachable area, seed " + seed);
+			if (open != reached) {
+				for (int i = 0; i < unvisited.length; i++) {
+					if (unvisited[i]) {
+						int ux = origin + i % SIZE, uz = origin + i / SIZE;
+						assertEquals(open, reached, "unreachable area at (" + ux + ", " + uz + ") zone="
+								+ Maze.zoneAt(seed, ux, uz) + " floorY=" + floorY[i] + ", seed " + seed);
+					}
+				}
+			}
 		}
 	}
 
@@ -165,32 +177,44 @@ class MazeTest {
 				return Math.floorMod(mix, 6);
 			};
 
+			int[] floorY = new int[SIZE * SIZE];
 			boolean[] unvisited = new boolean[SIZE * SIZE];
 			int open = 0;
 			for (int i = 0; i < unvisited.length; i++) {
 				int x = origin + i % SIZE, z = origin + i / SIZE;
-				unvisited[i] = !Maze.isWall(seed, x, z, false, epochs) && !Maze.isPit(seed, x, z);
+				floorY[i] = Maze.walkableFloorY(seed, x, z, epochs);
+				unvisited[i] = floorY[i] != Integer.MIN_VALUE;
 				if (unvisited[i]) open++;
 			}
 
 			ArrayDeque<Integer> queue = new ArrayDeque<>();
-			int start = 1 + SIZE;
-			assertTrue(unvisited[start]);
+			int start = 0;
+			while (start < unvisited.length && !unvisited[start]) start++;
+			assertTrue(start < unvisited.length, "no walkable block in window, seed " + seed);
 			unvisited[start] = false;
 			queue.add(start);
 			int reached = 0;
 			while (!queue.isEmpty()) {
 				int at = queue.poll(), x = at % SIZE, z = at / SIZE;
+				int curY = floorY[at];
 				reached++;
 				int[] next = {x > 0 ? at - 1 : -1, x < SIZE - 1 ? at + 1 : -1, z > 0 ? at - SIZE : -1, z < SIZE - 1 ? at + SIZE : -1};
 				for (int n : next) {
-					if (n >= 0 && unvisited[n]) {
+					if (n >= 0 && unvisited[n] && Math.abs(floorY[n] - curY) <= 1) {
 						unvisited[n] = false;
 						queue.add(n);
 					}
 				}
 			}
-			assertEquals(open, reached, "unreachable area after edge shifts, seed " + seed);
+			if (open != reached) {
+				for (int i = 0; i < unvisited.length; i++) {
+					if (unvisited[i]) {
+						int ux = origin + i % SIZE, uz = origin + i / SIZE;
+						assertEquals(open, reached, "unreachable area after edge shifts at (" + ux + ", " + uz
+								+ ") zone=" + Maze.zoneAt(seed, ux, uz) + " floorY=" + floorY[i] + ", seed " + seed);
+					}
+				}
+			}
 		}
 	}
 
@@ -374,5 +398,56 @@ class MazeTest {
 
 		assertTrue(sawMacroDarkened, "never verified 3x3 macro darkened zone");
 		assertTrue(sawMacroRedRoom, "never verified 3x3 macro red room zone");
+	}
+
+	@Test
+	void chasmMegahallAndAtriumGenerateMultiScaleDepths() {
+		long seed = 12345L;
+		int minChasmFloor = Integer.MAX_VALUE;
+		int maxMegaCeil = 0;
+		boolean sawChasmAbyss = false;
+		boolean sawChasmStair = false;
+		boolean sawChasmBuriedRoom = false;
+		boolean sawMegaRaisedOrSunken = false;
+		boolean sawAtrium = false;
+
+		for (int cx = -120; cx <= 120; cx++) {
+			for (int cz = -120; cz <= 120; cz++) {
+				int ox = cx * Maze.CELL, oz = cz * Maze.CELL;
+				Maze.Zone zone = Maze.zoneAt(seed, ox + Maze.CENTER, oz + Maze.CENTER);
+				int ceilY = Maze.cellCeilingY(seed, cx, cz);
+
+				if (zone == Maze.Zone.CHASM) {
+					if (ceilY <= Level0ChunkGenerator.FLOOR_Y + 6 && ChasmPlan.floorYAt(seed, cx, cz, 3, 3) < Level0ChunkGenerator.FLOOR_Y) {
+						sawChasmBuriedRoom = true;
+					}
+					for (int ix = 0; ix < Maze.CELL; ix++) {
+						for (int iz = 0; iz < Maze.CELL; iz++) {
+							int fy = Maze.walkableFloorY(seed, ox + ix, oz + iz, Maze.EpochSource.ZERO);
+							if (fy != Integer.MIN_VALUE) {
+								minChasmFloor = Math.min(minChasmFloor, fy);
+							}
+							if (Maze.isAbyss(seed, ox + ix, oz + iz)) sawChasmAbyss = true;
+							if (ChasmPlan.stairFacingAt(seed, ox + ix, oz + iz) != null) sawChasmStair = true;
+						}
+					}
+				} else if (zone == Maze.Zone.MEGATHALL) {
+					maxMegaCeil = Math.max(maxMegaCeil, ceilY);
+					int fy = Maze.walkableFloorY(seed, ox + 5, oz + 3, Maze.EpochSource.ZERO);
+					if (fy != Level0ChunkGenerator.FLOOR_Y) sawMegaRaisedOrSunken = true;
+				} else if (Maze.isAtriumCell(seed, cx, cz)) {
+					sawAtrium = true;
+					assertTrue(ceilY >= 44, "atrium ceiling too low: " + ceilY);
+				}
+			}
+		}
+
+		assertTrue(minChasmFloor <= 12, "chasm never descended deep enough: " + minChasmFloor);
+		assertTrue(sawChasmAbyss, "chasm never generated sheer abyss drops");
+		assertTrue(sawChasmStair, "chasm never generated descending stairs");
+		assertTrue(sawChasmBuriedRoom, "chasm never generated buried sub-level rooms");
+		assertTrue(maxMegaCeil >= 70, "megahall ceiling not soaring high enough: " + maxMegaCeil);
+		assertTrue(sawMegaRaisedOrSunken, "megahall never generated sunken/raised floor bays");
+		assertTrue(sawAtrium, "never generated 3x3 high-ceiling atrium in CLASSIC/ARCHES");
 	}
 }

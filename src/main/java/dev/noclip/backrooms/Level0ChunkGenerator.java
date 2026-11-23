@@ -27,7 +27,9 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 	static final int FLOOR_Y = 32;
 	static final int CEILING_Y = 36;
 	// Must match dimension_type/level_0.json
-	static final int HEIGHT = 48;
+	static final int MIN_Y = -32;
+	static final int HEIGHT = 128;
+	static final int MAX_Y = MIN_Y + HEIGHT - 1;
 
 	private Level0ChunkGenerator(BiomeSource biomeSource) {
 		super(biomeSource);
@@ -48,11 +50,14 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 	}
 
 	static BlockState blockAt(long seed, int x, int y, int z, Maze.EpochSource epochs) {
-		// Solid bedrock at y=0 and above the ceiling so nothing can escape underneath or land on the roof.
-		if (y == 0) return Blocks.BEDROCK.defaultBlockState();
+		// Solid bedrock at min_y and above the ceiling so nothing can escape underneath or land on the roof.
+		if (y == MIN_Y) return Blocks.BEDROCK.defaultBlockState();
 		int cx = Math.floorDiv(x, Maze.CELL), cz = Math.floorDiv(z, Maze.CELL);
 		int ix = Math.floorMod(x, Maze.CELL), iz = Math.floorMod(z, Maze.CELL);
 		Maze.Zone zone = Maze.zoneAt(seed, x, z);
+
+		if (zone == Maze.Zone.CHASM) return chasmBlockAt(seed, x, y, z, cx, cz, ix, iz, epochs);
+		if (zone == Maze.Zone.MEGATHALL) return megahallBlockAt(seed, x, y, z, cx, cz, ix, iz, epochs);
 
 		if (y < FLOOR_Y) {
 			if (Maze.isPit(seed, x, z)) {
@@ -90,25 +95,26 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		BlockState stairwell = stairwellBlockAt(seed, x, y, z);
 		if (stairwell != null) return stairwell;
 
+		int ceilY = Maze.cellCeilingY(seed, cx, cz);
 		Maze.CeilingStyle ceiling = Maze.ceilingStyle(seed, cx, cz);
 		boolean inCofferCore = ceiling == Maze.CeilingStyle.COFFERED && ix >= 2 && ix <= 5 && iz >= 2 && iz <= 5;
 		if (inCofferCore) {
-			if (y > CEILING_Y + 1) return Blocks.BEDROCK.defaultBlockState();
-			if (y == CEILING_Y + 1) return ceilingOrLampBlockAt(seed, x, z, zone, epochs);
-			if (y == CEILING_Y) {
+			if (y > ceilY + 1) return Blocks.BEDROCK.defaultBlockState();
+			if (y == ceilY + 1) return ceilingOrLampBlockAt(seed, x, z, zone, epochs);
+			if (y == ceilY) {
 				if (Maze.isWall(seed, x, z, true, epochs)) {
 					return wallBlockAt(seed, x, z, cx, cz, ix, iz, zone, false, epochs);
 				}
 				return Blocks.AIR.defaultBlockState();
 			}
 		} else {
-			if (y > CEILING_Y) return Blocks.BEDROCK.defaultBlockState();
-			if (y == CEILING_Y) return ceilingOrLampBlockAt(seed, x, z, zone, epochs);
+			if (y > ceilY) return Blocks.BEDROCK.defaultBlockState();
+			if (y == ceilY) return ceilingOrLampBlockAt(seed, x, z, zone, epochs);
 		}
 
-		boolean topLayer = y == CEILING_Y - 1;
+		boolean topLayer = y == ceilY - 1;
 		boolean baseboard = y == FLOOR_Y + 1;
-		if (Exits.isDoor(seed, x, z) && Maze.isWall(seed, x, z, topLayer, epochs)) {
+		if (Exits.isDoor(seed, x, z) && y <= FLOOR_Y + 3 && Maze.isWall(seed, x, z, y == FLOOR_Y + 3, epochs)) {
 			if (baseboard) return ModBlocks.EXIT_DOOR.defaultBlockState();
 			return (y == FLOOR_Y + 2 ? ModBlocks.EXIT_DOOR_TOP : ModBlocks.EXIT_SIGN).defaultBlockState();
 		}
@@ -119,6 +125,115 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 			return ModBlocks.CEILING_TILE.defaultBlockState();
 		}
 		return Blocks.AIR.defaultBlockState();
+	}
+
+	private static BlockState chasmBlockAt(long seed, int x, int y, int z, int cx, int cz, int ix, int iz,
+			Maze.EpochSource epochs) {
+		int floorY = ChasmPlan.floorYAt(seed, cx, cz, ix, iz);
+		int ceilY = ChasmPlan.cellCeilingY(seed, cx, cz);
+
+		if (floorY == Integer.MIN_VALUE) {
+			if (y == ChasmPlan.ABYSS_FLOOR_Y) return Blocks.CONCRETE.black().defaultBlockState();
+			if (y < ceilY) return Blocks.AIR.defaultBlockState();
+			if (y == ceilY) return ceilingOrLampBlockAt(seed, x, z, Maze.Zone.CHASM, epochs);
+			return Blocks.BEDROCK.defaultBlockState();
+		}
+
+		if (y < floorY) {
+			return cliffStrataBlock(y, false);
+		}
+		if (y == floorY) {
+			Direction stair = ChasmPlan.stairFacingAt(seed, x, z);
+			if (stair != null) {
+				return Blocks.SMOOTH_SANDSTONE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, stair);
+			}
+			if (floorY <= 12) return ModBlocks.THICK_CARPET.defaultBlockState();
+			return ModBlocks.CARPET.defaultBlockState();
+		}
+		if (y > ceilY) {
+			if (ceilY <= FLOOR_Y + 6 && y <= 64) {
+				return cliffStrataBlock(y, false);
+			}
+			return Blocks.BEDROCK.defaultBlockState();
+		}
+		if (y == ceilY) {
+			return ceilingOrLampBlockAt(seed, x, z, Maze.Zone.CHASM, epochs);
+		}
+
+		boolean baseboard = y == floorY + 1;
+		boolean topLayer = y == ceilY - 1;
+		if (ChasmPlan.isFlatRimCell(seed, cx, cz) && Exits.isDoor(seed, x, z) && y <= FLOOR_Y + 3
+				&& Maze.isWall(seed, x, z, y == FLOOR_Y + 3, epochs)) {
+			if (baseboard) return ModBlocks.EXIT_DOOR.defaultBlockState();
+			return (y == FLOOR_Y + 2 ? ModBlocks.EXIT_DOOR_TOP : ModBlocks.EXIT_SIGN).defaultBlockState();
+		}
+		if (ChasmPlan.isWallAt(seed, x, z, topLayer)) {
+			boolean openCavern = ceilY >= 58;
+			if (openCavern && ix != 0 && iz != 0 && y > floorY + 2) {
+				return Blocks.AIR.defaultBlockState();
+			}
+			boolean isCornerPier = (ix == 0 && (iz == 1 || iz == Maze.CELL - 1))
+					|| (iz == 0 && (ix == 1 || ix == Maze.CELL - 1))
+					|| (ix == 0 && iz == 0);
+			if (openCavern && !isCornerPier && y > floorY + 4) {
+				return Blocks.AIR.defaultBlockState();
+			}
+			return cliffStrataBlock(y, baseboard);
+		}
+		return Blocks.AIR.defaultBlockState();
+	}
+
+	private static BlockState megahallBlockAt(long seed, int x, int y, int z, int cx, int cz, int ix, int iz,
+			Maze.EpochSource epochs) {
+		int floorY = MegahallPlan.walkableFloorY(seed, x, z);
+		int ceilY = MegahallPlan.cellCeilingY(seed, cx, cz);
+
+		if (y < floorY) return Blocks.CONCRETE.black().defaultBlockState();
+		if (y == floorY) {
+			Direction stair = MegahallPlan.stairFacingAt(seed, x, z);
+			if (stair != null) {
+				return Blocks.SMOOTH_SANDSTONE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, stair);
+			}
+			if (floorY < FLOOR_Y) return ModBlocks.THICK_CARPET.defaultBlockState();
+			if (floorY > FLOOR_Y) return ModBlocks.DRY_CARPET.defaultBlockState();
+			if (((cx + cz) & 1) == 0 && ix >= 2 && ix <= 5 && iz >= 2 && iz <= 5) {
+				return ModBlocks.DRY_CARPET.defaultBlockState();
+			}
+			return ModBlocks.CARPET.defaultBlockState();
+		}
+		if (y > ceilY) return Blocks.BEDROCK.defaultBlockState();
+		if (y == ceilY) return ceilingOrLampBlockAt(seed, x, z, Maze.Zone.MEGATHALL, epochs);
+
+		boolean baseboard = y == floorY + 1;
+		boolean topLayer = y == ceilY - 1;
+		if (MegahallPlan.isRimCell(cx, cz) && Exits.isDoor(seed, x, z) && y <= FLOOR_Y + 3
+				&& Maze.isWall(seed, x, z, y == FLOOR_Y + 3, epochs)) {
+			if (baseboard) return ModBlocks.EXIT_DOOR.defaultBlockState();
+			return (y == FLOOR_Y + 2 ? ModBlocks.EXIT_DOOR_TOP : ModBlocks.EXIT_SIGN).defaultBlockState();
+		}
+		if (MegahallPlan.isWallAt(seed, x, z, topLayer)) {
+			if (y == FLOOR_Y + 14 || y == FLOOR_Y + 28) {
+				return ModBlocks.CEILING_TILE.defaultBlockState();
+			}
+			boolean paleColumn = ix != 0 && iz != 0 && Math.floorMod(cx + cz, 2) == 0;
+			if (paleColumn) {
+				return (baseboard ? ModBlocks.PALE_WALLPAPER_BASEBOARD : ModBlocks.PALE_WALLPAPER).defaultBlockState();
+			}
+			return (baseboard ? ModBlocks.WALLPAPER_BASEBOARD : ModBlocks.WALLPAPER).defaultBlockState();
+		}
+		if (MegahallPlan.isHighBeam(seed, x, y, z, ceilY)) {
+			return ModBlocks.CEILING_TILE.defaultBlockState();
+		}
+		return Blocks.AIR.defaultBlockState();
+	}
+
+	private static BlockState cliffStrataBlock(int y, boolean baseboard) {
+		if (baseboard) return ModBlocks.ROUGH_WALLPAPER_BASEBOARD.defaultBlockState();
+		int band = Math.floorMod(y, 10);
+		if (band == 0) return Blocks.CONCRETE.black().defaultBlockState();
+		if (band <= 4) return ModBlocks.ROUGH_WALLPAPER.defaultBlockState();
+		if (band <= 7) return ModBlocks.WALLPAPER.defaultBlockState();
+		return ModBlocks.PALE_WALLPAPER.defaultBlockState();
 	}
 
 	private static BlockState ceilingOrLampBlockAt(long seed, int x, int z, Maze.Zone zone, Maze.EpochSource epochs) {
@@ -239,7 +354,7 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
-				for (int y = 0; y < HEIGHT; y++) {
+				for (int y = MIN_Y; y <= MAX_Y; y++) {
 					BlockState state = blockAt(seed, minX + x, y, minZ + z);
 					chunk.setBlockState(pos.set(x, y, z), state);
 					oceanFloor.update(x, y, z, state);
@@ -254,13 +369,13 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 	public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor heightAccessor, RandomState randomState) {
 		long seed = mazeSeed(randomState);
 		BlockState[] column = new BlockState[HEIGHT];
-		for (int y = 0; y < HEIGHT; y++) column[y] = blockAt(seed, x, y, z);
-		return new NoiseColumn(0, column);
+		for (int i = 0; i < HEIGHT; i++) column[i] = blockAt(seed, x, MIN_Y + i, z);
+		return new NoiseColumn(MIN_Y, column);
 	}
 
 	@Override
 	public int getBaseHeight(int x, int z, Heightmap.Types type, LevelHeightAccessor heightAccessor, RandomState randomState) {
-		return HEIGHT;
+		return MAX_Y + 1;
 	}
 
 	@Override
@@ -282,7 +397,7 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 
 	@Override
 	public int getMinY() {
-		return 0;
+		return MIN_Y;
 	}
 
 	@Override
