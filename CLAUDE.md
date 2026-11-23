@@ -56,6 +56,11 @@
 - 走廊區新增兩種房間（照 wiki 的小徑房間）：醫務室（`Room.MEDICAL`，中間病床加四角桌子）與掛畫房（`Room.GALLERY`，牆壁是掛畫的方塊）；新增方塊 `hospital_bed`、`gallery_wall`、對應貼圖／模型／戰利品表／語言條目，新增 `Tile.BED`、`TABLE`、`GALLERY`；房間種類機率調整（辦公室 35%、儲藏室 25%、空房 10%、醫務室 15%、掛畫房 15%，只影響 2×2 房，迷宮與房間位置不變）；`gradlew build`（含 160 個種子的連通測試）與 `runClientGameTest` 通過
   - 還沒做：橡膠房的椅子嵌進地板、地板上的畫、小徑門前會消失的畫
 
+### 2026-11-24
+- Level 0 巨構房間新增三種版型（每個 16×16 格的巨構區隨機選一種，`MegahallPlan.Style`）：柱廊大廳（`COLONNADE`，整片密集的 2×2 柱子、無隔牆）、分隔房間群（`ROOM_GRID`，每條大廳邊界都是牆，只在中間開 3 格寬的門）、階梯下沉劇場（`TERRACED`，越往中間越低，每圈降 1 格，最低低 3 格，沒有樓梯方塊）；原本的大廳分區維持 40%
+- 新增測試 `megahallStylesAllAppearAndInteriorStaysWalkable`（四種版型都出現；內部每個可走方塊都走得到）
+- `gradlew build` 通過；`runClientGameTest` 失敗在 Level 1 的「橡膠房椅子 `sunken_chair` 掉落物不對」（`b623c12` 沒有附戰利品表，與本次改動無關，尚未修）
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23

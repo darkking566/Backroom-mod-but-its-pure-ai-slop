@@ -19,6 +19,14 @@ final class MegahallPlan {
 		RAISED_PODIUM
 	}
 
+	/** Per-macro layout: classic bays, open colonnade, walled room grid, or stepped sunken terraces. */
+	enum Style {
+		BAYS,
+		COLONNADE,
+		ROOM_GRID,
+		TERRACED
+	}
+
 	private MegahallPlan() {
 	}
 
@@ -48,6 +56,7 @@ final class MegahallPlan {
 		int baseCx = Math.floorDiv(cx, MACRO_CELLS) * MACRO_CELLS;
 		int baseCz = Math.floorDiv(cz, MACRO_CELLS) * MACRO_CELLS;
 		int mcx = cx - baseCx, mcz = cz - baseCz;
+		if (styleAt(seed, baseCx, baseCz) == Style.TERRACED) return terraceFloorY(mcx, mcz);
 		int bx = bayIndex(mcx), bz = bayIndex(mcz);
 		BayFloor floor = bayFloor(seed, baseCx, baseCz, bx, bz);
 		if (floor == BayFloor.FLAT) return Level0ChunkGenerator.FLOOR_Y;
@@ -64,6 +73,21 @@ final class MegahallPlan {
 			return floorYWithRamp(floor, ix, iz);
 		}
 		return Level0ChunkGenerator.FLOOR_Y;
+	}
+
+	/** Terraced macros drop 1 block per cell ring inward from the rim, bottoming out 3 blocks below FLOOR_Y. */
+	private static int terraceFloorY(int mcx, int mcz) {
+		int ring = Math.min(Math.min(mcx, mcz), Math.min(MACRO_CELLS - 1 - mcx, MACRO_CELLS - 1 - mcz));
+		// shortcut: terrace steps are plain 1-block ledges with no stair blocks, add stairs if the look needs them.
+		return Level0ChunkGenerator.FLOOR_Y - Math.min(3, Math.max(0, ring - 1));
+	}
+
+	static Style styleAt(long seed, int baseCx, int baseCz) {
+		int roll = Math.floorMod(hash(seed, baseCx, baseCz, MEGA_SALT + 8), 10);
+		if (roll < 4) return Style.BAYS;
+		if (roll < 6) return Style.COLONNADE;
+		if (roll < 8) return Style.ROOM_GRID;
+		return Style.TERRACED;
 	}
 
 	private static int floorYWithRamp(BayFloor floor, int ix, int iz) {
@@ -87,6 +111,7 @@ final class MegahallPlan {
 		int mcx = cx - baseCx, mcz = cz - baseCz;
 		int bx = bayIndex(mcx), bz = bayIndex(mcz);
 		if (mcx != bayCenter(bx) || mcz != bayCenter(bz)) return null;
+		if (styleAt(seed, baseCx, baseCz) == Style.TERRACED) return null;
 
 		BayFloor floor = bayFloor(seed, baseCx, baseCz, bx, bz);
 		if (floor == BayFloor.FLAT) return null;
@@ -122,6 +147,12 @@ final class MegahallPlan {
 		}
 
 		int bx = bayIndex(mcx), bz = bayIndex(mcz);
+		Style style = styleAt(seed, baseCx, baseCz);
+		if (style == Style.TERRACED) return false;
+		if (style == Style.COLONNADE) {
+			boolean center = mcx == bayCenter(bx) && mcz == bayCenter(bz);
+			return ix >= 4 && ix <= 5 && iz >= 4 && iz <= 5 && !center;
+		}
 		if (ix != 0 && iz != 0) {
 			// Never put columns on the central stair/platform cell or (3,3) or (1,1).
 			if (mcx == bayCenter(bx) && mcz == bayCenter(bz)) return false;
@@ -132,6 +163,13 @@ final class MegahallPlan {
 						&& Math.floorMod(hash(seed, cx, cz, MEGA_SALT + 5), 3) != 0;
 			}
 			return false;
+		}
+
+		if (style == Style.ROOM_GRID) {
+			// Every bay edge is a solid wall with one 3-block doorway at the middle of the edge.
+			if (ix == 0 && iz != 0 && mcx == bayStart(bx)) return !(mcz == bayCenter(bz) && iz >= 2 && iz <= 4);
+			if (iz == 0 && ix != 0 && mcz == bayStart(bz)) return !(mcx == bayCenter(bx) && ix >= 2 && ix <= 4);
+			return ix == 0 && iz == 0 && mcx == bayStart(bx) && mcz == bayStart(bz);
 		}
 
 		// Bay-to-bay edges: mostly huge open spans with occasional wide monumental portals.
