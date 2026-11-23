@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "noclip_backrooms:block/level1/jersey_barrier"
+    },
+    "axis=z": {
+      "model": "noclip_backrooms:block/level1/jersey_barrier",
+      "y": 90
+    }
+  }
+}

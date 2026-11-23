@@ -21,6 +21,7 @@ final class Level1Ambience {
 	private static final Map<UUID, Integer> NEXT_HUM = new HashMap<>();
 	private static final Map<UUID, Integer> NEXT_CLANG = new HashMap<>();
 	private static final Map<UUID, Integer> NEXT_RUMBLE = new HashMap<>();
+	private static final int GENERATOR_INTERVAL = 60, GENERATOR_REACH = 28;
 
 	private Level1Ambience() {
 	}
@@ -39,6 +40,7 @@ final class Level1Ambience {
 				NEXT_RUMBLE.remove(id);
 				continue;
 			}
+			if (now % GENERATOR_INTERVAL == Math.floorMod(id.hashCode(), GENERATOR_INTERVAL)) generator(player.level(), player);
 			ServerLevel level = player.level();
 			RandomSource random = level.getRandom();
 
@@ -60,6 +62,30 @@ final class Level1Ambience {
 				NEXT_RUMBLE.put(id, now + 1200 + random.nextInt(1500));
 			}
 		}
+	}
+
+	/** The nearest generator room rumbles loud enough to be followed from a good way down the aisles. */
+	private static void generator(ServerLevel level, ServerPlayer player) {
+		long seed = Level1ChunkGenerator.planSeed(level.getChunkSource().randomState());
+		int dx0 = Math.floorDiv(player.getBlockX(), Level1Layout.DISTRICT), dz0 = Math.floorDiv(player.getBlockZ(), Level1Layout.DISTRICT);
+		double best = GENERATOR_REACH * GENERATOR_REACH;
+		int[] loudest = null;
+		for (int dx = dx0 - 1; dx <= dx0 + 1; dx++) {
+			for (int dz = dz0 - 1; dz <= dz0 + 1; dz++) {
+				for (HallPlan.PlacedProp prop : Level1Layout.props(seed, dx, dz)) {
+					if (prop.prop() != HallPlan.Prop.GENERATOR_ROOM) continue;
+					int[] at = prop.spot();
+					double distance = player.distanceToSqr(at[0] + 0.5, Level1ChunkGenerator.FLOOR_Y + 1.5, at[1] + 0.5);
+					if (distance < best) {
+						best = distance;
+						loudest = at;
+					}
+				}
+			}
+		}
+		if (loudest == null) return;
+		level.playSound(null, loudest[0] + 0.5, Level1ChunkGenerator.FLOOR_Y + 1.5, loudest[1] + 0.5, Level1Sounds.GENERATOR,
+				SoundSource.BLOCKS, GENERATOR_REACH / 16.0F, 0.5F);
 	}
 
 	/** The nearest lit hall light or bulb within a few blocks hums; in the dark there is nothing. */

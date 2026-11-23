@@ -1,0 +1,31 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level1/phosphor_mark",
+    "mark": "noclip_backrooms:block/level1/phosphor_mark"
+  },
+  "elements": [
+    {
+      "from": [
+        2,
+        0.05,
+        2
+      ],
+      "to": [
+        14,
+        0.15,
+        14
+      ],
+      "faces": {
+        "up": {
+          "texture": "#mark"
+        },
+        "down": {
+          "texture": "#mark"
+        }
+      },
+      "shade": false,
+      "light_emission": 15
+    }
+  ]
+}

@@ -39,7 +39,11 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			enterThroughFlickeringWall(context, game);
 
 			long seed = server.computeOnServer(s -> Level1ChunkGenerator.planSeed(level1(s).getChunkSource().randomState()));
-			server.runOnServer(s -> Blackouts.holdOff(20 * 60 * 10));
+			server.runOnServer(s -> {
+				Blackouts.holdOff(20 * 60 * 10);
+				// Marauders are tested on their own below; until then none turn up by chance.
+				Marauders.holdOff(s, 20 * 60 * 10);
+			});
 			server.runCommand("gamemode spectator @a");
 			BlockPos arrival = server.computeOnServer(s -> player(s).blockPosition());
 			for (int yaw = 0; yaw < 360; yaw += 90) {
@@ -51,6 +55,10 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			crate(context, game);
 			views(context, game, seed);
 			exits(context, game, seed);
+			events(context, game, seed);
+			settlements(context, game, seed);
+			items(context, game, seed);
+			monsters(context, game, seed);
 			checkBlocks(context, game);
 			leaveThroughDoor(context, game, seed);
 		}
@@ -71,7 +79,13 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			check(level.getBlockState(wall).is(Level1Blocks.FLICKERING_WALLPAPER), "wall did not change");
 			check(level.getBlockState(wall.above()).is(Level1Blocks.FLICKERING_WALLPAPER), "upper wall did not change");
 			for (Direction side : Direction.Plane.HORIZONTAL) {
-				if (level.getBlockState(wall.relative(side)).isAir() && level.getBlockState(wall.relative(side).above()).isAir()) return side;
+				boolean clear = true;
+				for (int step = 1; step <= 2; step++) {
+					BlockPos at = wall.relative(side, step);
+					clear &= level.getBlockState(at).isAir() && level.getBlockState(at.above()).isAir()
+							&& !level.getBlockState(at.below()).getCollisionShape(level, at.below()).isEmpty();
+				}
+				if (clear) return side;
 			}
 			return null;
 		});
@@ -89,7 +103,11 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		check(server.computeOnServer(s -> player(s).level().dimension() == Level1.LEVEL_0), "left Level 0 too early");
 
 		context.getInput().holdKeyFor(options -> options.keyUp, 40);
-		server.waitFor(s -> player(s).level().dimension() == Level1.LEVEL_1, 200);
+		for (int waited = 0; waited < 200 && !server.computeOnServer(s -> player(s).level().dimension() == Level1.LEVEL_1); waited += 10) {
+			context.waitTicks(10);
+		}
+		server.runOnServer(s -> check(player(s).level().dimension() == Level1.LEVEL_1, "did not fall through the flickering wall at "
+				+ wall + " (" + player(s).level().getBlockState(wall) + "), player at " + player(s).position() + " in " + player(s).level().dimension()));
 		context.waitTicks(40);
 		game.getConnection().waitForChunksRender();
 		server.runOnServer(s -> {
@@ -288,6 +306,278 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		return (float) Math.toDegrees(Math.atan2(out[0], -out[1]));
 	}
 
+	/** The toll booth's drawer, the generator in a blackout, the crate with eyes, and a stray by a crate. */
+	private static void events(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		server.runCommand("gamemode spectator @a");
+		server.runCommand("clear @a");
+
+		HallPlan.PlacedProp booth = nearestProp(seed, HallPlan.Prop.TOLL_BOOTH);
+		shoot(context, game, booth.x0() + 3.5, STAND, booth.z0() + 12.5, 180, 0, "level1_toll_booth");
+		standAndUse(context, game, booth.x0() + 3.5, booth.z0() + 8.5, 180, 45);
+		server.runOnServer(s -> {
+			BlockPos drawer = new BlockPos(booth.x0() + 3, STAND, booth.z0() + 7);
+			check(level1(s).getBlockState(drawer).getValue(BoothDrawerBlock.EMPTY), "drawer not emptied");
+			boolean flashlight = false;
+			for (int i = 0; i < 36; i++) {
+				flashlight |= BuiltInRegistries.ITEM.getKey(player(s).getInventory().getItem(i).getItem()).getPath().equals("flashlight");
+			}
+			check(flashlight, "no flashlight from the drawer");
+		});
+		context.takeScreenshot("level1_booth_drawer");
+
+		HallPlan.PlacedProp room = nearestProp(seed, HallPlan.Prop.GENERATOR_ROOM);
+		int[] door = room.door();
+		int[] out = HallPlan.FACES[room.face()];
+		float inward = facing(out);
+		server.runCommand("gamemode spectator @a");
+		shoot(context, game, door[0] + 0.5 + out[0] * 4, STAND, door[1] + 0.5 + out[1] * 4, inward, 0, "level1_generator_room");
+		server.runOnServer(s -> Blackouts.startNow());
+		server.waitFor(s -> Blackouts.phase() == Blackouts.Phase.DARK, 200);
+		standAndUse(context, game, door[0] + 0.5 - out[0], door[1] + 0.5 - out[1], inward, 40);
+		context.takeScreenshot("level1_generator_in_blackout");
+		server.waitFor(s -> Blackouts.phase() == Blackouts.Phase.NORMAL, 60);
+		server.runOnServer(s -> Blackouts.holdOff(20 * 60 * 10));
+
+		HallPlan.PlacedProp crate = nearestProp(seed, HallPlan.Prop.EYED_CRATE);
+		int[] at = crate.spot();
+		server.runCommand("gamemode spectator @a");
+		shoot(context, game, at[0] - 1.5, STAND, at[1] + 0.5, -90, 25, "level1_eyed_crate");
+		server.runCommand("clear @a");
+		standAndUse(context, game, at[0] - 1.5, at[1] + 0.5, -90, 30);
+		server.runOnServer(s -> {
+			check(level1(s).getBlockState(new BlockPos(at[0], STAND, at[1])).is(Level1Blocks.SHUT_EYED_CRATE), "the eyes did not close");
+			boolean spilled = !level1(s).getEntitiesOfClass(ItemEntity.class, new AABB(new BlockPos(at[0], STAND, at[1])).inflate(3)).isEmpty();
+			check(spilled || !player(s).getInventory().isEmpty(), "the crate with eyes was empty");
+		});
+
+		// A stray turns up by a crate, and bolts once someone comes close.
+		server.runCommand("gamemode spectator @a");
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f",
+				at[0] + 0.5, STAND, at[1] + 14.5));
+		context.waitTicks(5);
+		BlockPos crateAt = new BlockPos(at[0], STAND, at[1]);
+		check(server.computeOnServer(s -> Strays.beside(level1(s), crateAt) != null), "no room for a stray by the crate");
+		server.runOnServer(s -> check(!level1(s).getEntitiesOfClass(net.minecraft.world.entity.animal.feline.Cat.class,
+				new AABB(crateAt).inflate(2)).isEmpty(), "no stray appeared"));
+		context.takeScreenshot("level1_stray");
+		standAndUse(context, game, at[0] - 1.5, at[1] + 0.5, -90, 0);
+		context.waitTicks(20);
+		server.runOnServer(s -> check(level1(s).getEntitiesOfClass(net.minecraft.world.entity.animal.feline.Cat.class,
+				new AABB(crateAt).inflate(6)).isEmpty(), "the stray did not run off"));
+	}
+
+	/** Both settlements: a look in through the way in, settling on a cot, and a share from a locker. */
+	private static void settlements(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		int[] outpost = nearestBase(seed, Level1Layout.Base.FIRST_LIGHT);
+		int x0 = outpost[0] * 64, z0 = outpost[1] * 64;
+		server.runCommand("gamemode spectator @a");
+		shoot(context, game, x0 + 31.5, STAND, z0 + 11.5, 0, 0, "level1_first_light");
+		shoot(context, game, x0 + 22.5, STAND, z0 + 30.5, 180, 10, "level1_first_light_cots");
+
+		server.runCommand("clear @a");
+		standAndUse(context, game, x0 + 18.5, z0 + 21.5, 180, 50);
+		server.runOnServer(s -> {
+			var respawn = player(s).getRespawnConfig();
+			check(respawn != null && respawn.respawnData().dimension() == Level1.LEVEL_1, "the cot did not set the respawn point");
+		});
+		standAndUse(context, game, x0 + 34.5, z0 + 42.5, 0, 30);
+		server.runOnServer(s -> {
+			boolean spilled = !level1(s).getEntitiesOfClass(ItemEntity.class, new AABB(new BlockPos(x0 + 34, STAND, z0 + 44)).inflate(3)).isEmpty();
+			check(spilled || !player(s).getInventory().isEmpty(), "the locker gave nothing");
+		});
+		// Empty now; a piece of alloy buys another share.
+		server.runCommand("clear @a");
+		server.runCommand("item replace entity @a hotbar.0 with noclip_backrooms:alloy 2");
+		standAndUse(context, game, x0 + 34.5, z0 + 42.5, 0, 30);
+		server.runOnServer(s -> check(player(s).getInventory().countItem(Level1Items.ALLOY) == 1, "the locker did not take alloy"));
+		// Settling is undone by sleeping elsewhere; for the rest of the test, home is the Overworld again.
+		server.runCommand("execute in minecraft:overworld run spawnpoint @a 0 -60 0");
+
+		int[] camp = nearestBase(seed, Level1Layout.Base.BLINK);
+		int cx = camp[0] * 64, cz = camp[1] * 64;
+		server.runCommand("gamemode spectator @a");
+		shoot(context, game, cx + 31.5, STAND, cz + 11.5, 0, 0, "level1_blink");
+		shoot(context, game, cx + 24.5, STAND, cz + 31.5, 180, 10, "level1_blink_fire");
+	}
+
+	/** Almond water clears a Red Room's effects and leaves the bottle; phosphor powder leaves a mark that glows in a blackout. */
+	private static void items(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		int[] spot = Level1Layout.landing(seed, 0, 0);
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f 0 0",
+				spot[0] + 0.5, STAND, spot[1] + 0.5));
+		server.runCommand("gamemode survival @a");
+		server.runCommand("clear @a");
+		server.runCommand("item replace entity @a hotbar.0 with noclip_backrooms:almond_water");
+		server.runCommand("effect give @a minecraft:nausea 30");
+		server.runCommand("effect give @a minecraft:darkness 30");
+		context.waitTicks(10);
+		context.getInput().holdMouse(1);
+		context.waitTicks(45);
+		context.getInput().releaseMouse(1);
+		context.waitTicks(5);
+		server.runOnServer(s -> {
+			ServerPlayer player = player(s);
+			check(!player.hasEffect(net.minecraft.world.effect.MobEffects.NAUSEA), "almond water left the nausea");
+			check(!player.hasEffect(net.minecraft.world.effect.MobEffects.DARKNESS), "almond water left the darkness");
+			check(player.getInventory().getItem(0).is(net.minecraft.world.item.Items.GLASS_BOTTLE), "no empty bottle after drinking");
+		});
+
+		server.runCommand("item replace entity @a hotbar.0 with noclip_backrooms:phosphor_powder 4");
+		context.waitTicks(5);
+		context.getInput().lookAt(0, 60);
+		context.waitTicks(3);
+		context.getInput().pressMouse(1);
+		context.waitTicks(5);
+		server.runOnServer(s -> {
+			ServerPlayer player = player(s);
+			int marks = 0;
+			for (BlockPos pos : BlockPos.betweenClosed(player.blockPosition().offset(-3, -1, -3), player.blockPosition().offset(3, 1, 3))) {
+				if (player.level().getBlockState(pos).is(Level1Blocks.PHOSPHOR_MARK)) marks++;
+			}
+			check(marks == 1, "phosphor left " + marks + " marks");
+			check(player.getInventory().getItem(0).getCount() == 3, "phosphor powder not used up");
+		});
+		server.runOnServer(s -> Blackouts.startNow());
+		server.waitFor(s -> Blackouts.phase() == Blackouts.Phase.DARK, 200);
+		context.waitTicks(10);
+		context.takeScreenshot("level1_phosphor_in_blackout");
+		server.runOnServer(s -> Blackouts.endNow());
+		server.waitFor(s -> Blackouts.phase() == Blackouts.Phase.NORMAL, 60);
+		server.runOnServer(s -> Blackouts.holdOff(20 * 60 * 10));
+	}
+
+	/** A band of marauders behind the player, who drop alloy; and in a blackout, a smiler drawn in by a torch. */
+	private static void monsters(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		int[] spot = Level1Layout.landing(seed, 0, 0);
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f 180 0",
+				spot[0] + 0.5, STAND, spot[1] + 0.5));
+		server.runCommand("gamemode survival @a");
+		server.runCommand("clear @a");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(20);
+
+		int came = server.computeOnServer(s -> Marauders.spawnBand(player(s)));
+		check(came >= 2, "only " + came + " marauders came");
+		Vec3 band = server.computeOnServer(s -> {
+			var marauders = level1(s).getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(player(s).blockPosition()).inflate(64),
+					mob -> mob.entityTags().contains(Marauders.TAG));
+			check(marauders.size() == came, "marauders missing");
+			for (var mob : marauders) {
+				check(mob instanceof net.minecraft.world.entity.monster.illager.AbstractIllager, "a marauder is not one of the raiders: " + mob);
+				check(mob.getCustomName() != null, "a marauder has no name");
+			}
+			return marauders.getFirst().position();
+		});
+		server.runCommand("gamemode spectator @a");
+		Vec3 toBand = band.subtract(spot[0] + 0.5, STAND, spot[1] + 0.5).normalize();
+		shoot(context, game, band.x - toBand.x * 6, STAND, band.z - toBand.z * 6, (float) Math.toDegrees(Math.atan2(-toBand.x, toBand.z)), 5, "level1_marauders");
+		server.runCommand("kill @e[tag=" + Marauders.TAG + "]");
+		context.waitTicks(10);
+		server.runOnServer(s -> {
+			var alloy = level1(s).getEntitiesOfClass(ItemEntity.class, new AABB(BlockPos.containing(band)).inflate(6),
+					item -> item.getItem().is(Level1Items.ALLOY));
+			check(!alloy.isEmpty(), "marauders dropped no alloy");
+		});
+
+		// Smilers: in the dark they wait; a torch in hand brings them on.
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f 180 0",
+				spot[0] + 0.5, STAND, spot[1] + 0.5));
+		server.runCommand("gamemode survival @a");
+		context.waitTicks(10);
+		server.runOnServer(s -> Blackouts.startNow());
+		server.waitFor(s -> Blackouts.phase() == Blackouts.Phase.DARK, 200);
+		context.waitTicks(10);
+		check(server.computeOnServer(s -> Smilers.count()) >= 1, "no smiler in the dark");
+		double before = server.computeOnServer(Level1ClientTest::nearestSmiler);
+		context.waitTicks(30);
+		double still = server.computeOnServer(Level1ClientTest::nearestSmiler);
+		check(before - still < 1.5, "a smiler rushed a player standing still in the dark");
+		server.runCommand("item replace entity @a hotbar.0 with minecraft:torch");
+		context.waitTicks(30);
+		double drawn = server.computeOnServer(Level1ClientTest::nearestSmiler);
+		check(still - drawn > 2.5, "a torch did not draw the smiler (" + still + " -> " + drawn + ")");
+		float[] view = server.computeOnServer(s -> {
+			var face = level1(s).getEntitiesOfClass(net.minecraft.world.entity.Display.ItemDisplay.class,
+					new AABB(player(s).blockPosition()).inflate(32), d -> d.entityTags().contains(Smilers.TAG)).getFirst();
+			Vec3 look = face.position().subtract(player(s).getEyePosition());
+			return new float[] {(float) Math.toDegrees(Math.atan2(-look.x, look.z)),
+					(float) -Math.toDegrees(Math.atan2(look.y, look.horizontalDistance()))};
+		});
+		context.getInput().lookAt(view[0], view[1]);
+		context.waitTicks(3);
+		context.takeScreenshot("level1_smiler");
+		// Face to face, for a good look: drop the torch so it holds still, then bring it right in front.
+		server.runCommand("clear @a");
+		context.getInput().lookAt(180, 0);
+		context.waitTicks(3);
+		server.runOnServer(s -> {
+			var face = level1(s).getEntitiesOfClass(net.minecraft.world.entity.Display.ItemDisplay.class,
+					new AABB(player(s).blockPosition()).inflate(40), d -> d.entityTags().contains(Smilers.TAG)).getFirst();
+			face.setPos(player(s).getX(), player(s).getEyeY(), player(s).getZ() - 3);
+		});
+		context.waitTicks(5);
+		context.takeScreenshot("level1_smiler_close");
+		server.runCommand("clear @a");
+		server.runOnServer(s -> Blackouts.endNow());
+		server.waitFor(s -> Blackouts.phase() == Blackouts.Phase.NORMAL, 60);
+		context.waitTicks(5);
+		check(server.computeOnServer(s -> Smilers.count()) == 0, "smilers stayed after the lights came back");
+		server.runOnServer(s -> Blackouts.holdOff(20 * 60 * 10));
+	}
+
+	private static double nearestSmiler(MinecraftServer server) {
+		ServerPlayer player = player(server);
+		double best = Double.MAX_VALUE;
+		for (var face : level1(server).getEntitiesOfClass(net.minecraft.world.entity.Display.ItemDisplay.class,
+				new AABB(player.blockPosition()).inflate(40), d -> d.entityTags().contains(Smilers.TAG))) {
+			best = Math.min(best, face.position().distanceTo(player.getEyePosition()));
+		}
+		return best;
+	}
+
+	private static int[] nearestBase(long seed, Level1Layout.Base base) {
+		for (int ring = 0; ring < 16; ring++) {
+			for (int dx = -ring; dx <= ring; dx++) {
+				for (int dz = -ring; dz <= ring; dz++) {
+					if (Math.max(Math.abs(dx), Math.abs(dz)) == ring && Level1Layout.base(seed, dx, dz) == base) return new int[] {dx, dz};
+				}
+			}
+		}
+		throw new AssertionError("no " + base + " near the origin");
+	}
+
+	/** Teleports there in survival, looks that way and right-clicks. */
+	private static void standAndUse(ClientGameTestContext context, TestSingleplayerContext game, double x, double z, float yaw, float pitch) {
+		var server = game.getServer();
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.2f %d %.2f %.1f %.1f",
+				x, STAND, z, yaw, pitch));
+		server.runCommand("gamemode survival @a");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		context.getInput().lookAt(yaw, pitch);
+		context.waitTicks(3);
+		context.getInput().pressMouse(1);
+		context.waitTicks(10);
+	}
+
+	private static HallPlan.PlacedProp nearestProp(long seed, HallPlan.Prop prop) {
+		for (int ring = 0; ring < 12; ring++) {
+			for (int dx = -ring; dx <= ring; dx++) {
+				for (int dz = -ring; dz <= ring; dz++) {
+					if (Math.max(Math.abs(dx), Math.abs(dz)) != ring) continue;
+					for (HallPlan.PlacedProp placed : Level1Layout.props(seed, dx, dz)) {
+						if (placed.prop() == prop) return placed;
+					}
+				}
+			}
+		}
+		throw new AssertionError("no " + prop + " near the origin");
+	}
+
 	private static HallPlan.Placed nearestExit(long seed, Level1Exit exit) {
 		for (int ring = 0; ring < 12; ring++) {
 			for (int dx = -ring; dx <= ring; dx++) {
@@ -348,7 +638,8 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		game.getServer().runOnServer(s -> {
 			ServerLevel level = level1(s);
 			for (Block block : Level1Blocks.ALL) {
-				if (block.getLootTable().isEmpty() || block == Level1Blocks.SUPPLY_CRATE) continue;
+				if (block.getLootTable().isEmpty() || block == Level1Blocks.SUPPLY_CRATE || block == Level1Blocks.EYED_CRATE
+						|| block == Level1Blocks.SUPPLY_LOCKER) continue; // these hand out their contents instead
 				var drops = Block.getDrops(block.defaultBlockState(), level, new BlockPos(3, 3, 3), null);
 				check(drops.size() == 1 && drops.getFirst().is(block.asItem()), "wrong drop for " + block);
 			}

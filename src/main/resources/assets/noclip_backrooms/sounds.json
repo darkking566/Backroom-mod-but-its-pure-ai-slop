@@ -123,5 +123,59 @@
         "type": "event"
       }
     ]
+  },
+  "level1.generator": {
+    "subtitle": "subtitles.noclip_backrooms.level1.generator",
+    "sounds": [
+      {
+        "name": "minecraft:entity.minecart.riding",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.drawer": {
+    "subtitle": "subtitles.noclip_backrooms.level1.drawer",
+    "sounds": [
+      {
+        "name": "minecraft:block.iron_trapdoor.open",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.eyes": {
+    "subtitle": "subtitles.noclip_backrooms.level1.eyes",
+    "sounds": [
+      {
+        "name": "minecraft:block.sculk_sensor.clicking",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.cat": {
+    "subtitle": "subtitles.noclip_backrooms.level1.cat",
+    "sounds": [
+      {
+        "name": "minecraft:entity.cat.hiss",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.smiler": {
+    "subtitle": "subtitles.noclip_backrooms.level1.smiler",
+    "sounds": [
+      {
+        "name": "minecraft:entity.vex.ambient",
+        "type": "event"
+      }
+    ]
+  },
+  "level1.smiler_bite": {
+    "subtitle": "subtitles.noclip_backrooms.level1.smiler_bite",
+    "sounds": [
+      {
+        "name": "minecraft:entity.ghast.scream",
+        "type": "event"
+      }
+    ]
   }
 }

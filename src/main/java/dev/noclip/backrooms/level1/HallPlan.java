@@ -40,7 +40,46 @@ final class HallPlan {
 	record Cell(Placed placed, int bx, int bz) {
 	}
 
+	/** Things in the halls that are not ways out: something to find, use or listen to. */
+	enum Prop {
+		/** A parking toll booth with a drawer, and its barrier arm across the aisle. */
+		TOLL_BOOTH(0.35, false),
+		/** A small concrete room with a running generator and a lamp that never goes out. */
+		GENERATOR_ROOM(0.3, true),
+		/** A supply crate with eyes peering out between its planks. */
+		EYED_CRATE(0.25, true);
+
+		final double chance;
+		final boolean warehouse;
+
+		Prop(double chance, boolean warehouse) {
+			this.chance = chance;
+			this.warehouse = warehouse;
+		}
+	}
+
+	/** A prop in a bay; face is the side a generator room's doorway opens to, variant picks small details. */
+	record PlacedProp(Prop prop, int x0, int z0, int face, int variant) {
+		/** The block a player uses: the booth drawer, the generator, the crate. */
+		int[] spot() {
+			return switch (prop) {
+				case TOLL_BOOTH -> new int[] {x0 + 3, z0 + 7};
+				case GENERATOR_ROOM -> new int[] {x0 + 5, z0 + 8};
+				case EYED_CRATE -> new int[] {x0 + 2, z0 + 3};
+			};
+		}
+
+		/** A generator room's doorway, in the middle of one face. */
+		int[] door() {
+			return new int[] {x0 + 5 + FACES[face][0] * 2, z0 + 8 + FACES[face][1] * 2};
+		}
+	}
+
+	record PropCell(PlacedProp prop, int bx, int bz) {
+	}
+
 	private final List<Placed> placed = new ArrayList<>();
+	private final List<PlacedProp> props = new ArrayList<>();
 
 	static HallPlan of(long seed, int dx, int dz) {
 		if (CACHE.size() > 1024) CACHE.clear();
@@ -58,6 +97,15 @@ final class HallPlan {
 		}
 		boolean[] used = new boolean[bays.size()];
 		boolean[] pillarUsed = new boolean[bays.size()];
+		if (Level1Layout.base(seed, dx, dz) != Level1Layout.Base.NONE) {
+			// Nothing else in or right around a settlement.
+			for (int b = 0; b < bays.size(); b++) {
+				int lx0 = bays.get(b)[0] - dx * D, lz0 = bays.get(b)[1] - dz * D;
+				boolean apart = lx0 + 8 < BasePlan.MIN_X - 2 || lx0 > BasePlan.MAX_X + 2
+						|| lz0 + 15 < BasePlan.MIN_Z - 2 || lz0 > BasePlan.MAX_Z + 2;
+				if (!apart) used[b] = pillarUsed[b] = true;
+			}
+		}
 
 		for (Level1Exit exit : Level1Exit.values()) {
 			if (kind == Kind.WAREHOUSE && !exit.shape.fitsWarehouse()) continue;
@@ -75,10 +123,62 @@ final class HallPlan {
 				break;
 			}
 		}
+
+		// Then the props, in bays the exits left free.
+		for (Prop prop : Prop.values()) {
+			if (kind == Kind.WAREHOUSE && !prop.warehouse) continue;
+			if (random.nextDouble() >= prop.chance) continue;
+			int first = random.nextInt(bays.size());
+			for (int i = 0; i < bays.size(); i++) {
+				int b = (first + i) % bays.size();
+				if (used[b]) continue;
+				int[] bay = bays.get(b);
+				int face = random.nextInt(4);
+				// Racks run along the north and south of a warehouse bay, so doors there open east or west.
+				if (kind == Kind.WAREHOUSE) face |= 1;
+				PlacedProp candidate = new PlacedProp(prop, bay[0], bay[1], face, random.nextInt(4));
+				if (!inside(propBox(prop), bay[0], bay[1], dx, dz)) continue;
+				used[b] = true;
+				props.add(candidate);
+				break;
+			}
+		}
 	}
 
 	List<Placed> placed() {
 		return placed;
+	}
+
+	List<PlacedProp> props() {
+		return props;
+	}
+
+	/** The prop footprint covering (x, z), or null. */
+	PropCell propCell(int x, int z) {
+		for (PlacedProp p : props) {
+			int bx = x - p.x0(), bz = z - p.z0();
+			boolean covered = switch (p.prop()) {
+				case TOLL_BOOTH -> bx >= 2 && bx <= 4 && bz >= 7 && bz <= 9 || bz == 8 && bx >= 5 && bx <= 8;
+				case GENERATOR_ROOM -> bx >= 3 && bx <= 7 && bz >= 6 && bz <= 10;
+				case EYED_CRATE -> bx == 2 && bz == 3;
+			};
+			if (covered) return new PropCell(p, bx, bz);
+		}
+		return null;
+	}
+
+	/** Footprint plus the floor needed around it: {minBx, minBz, maxBx, maxBz}. */
+	private static int[] propBox(Prop prop) {
+		return switch (prop) {
+			case TOLL_BOOTH -> new int[] {1, 6, 9, 10};
+			case GENERATOR_ROOM -> new int[] {2, 5, 8, 11};
+			case EYED_CRATE -> new int[] {1, 2, 3, 4};
+		};
+	}
+
+	private static boolean inside(int[] box, int x0, int z0, int dx, int dz) {
+		int minX = dx * D + 2, maxX = dx * D + D - 3, minZ = dz * D + 2, maxZ = dz * D + D - 3;
+		return x0 + box[0] >= minX && x0 + box[2] <= maxX && z0 + box[1] >= minZ && z0 + box[3] <= maxZ;
 	}
 
 	/** The exit footprint covering (x, z), or null. */

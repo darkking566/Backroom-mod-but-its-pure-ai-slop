@@ -1,6 +1,7 @@
 package dev.noclip.backrooms.level1;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -202,6 +203,75 @@ class Level1LayoutTest {
 			}
 		}
 		assertTrue(checked > 1000, "only " + checked + " exits");
+	}
+
+	@Test
+	void propsStandWhereTheyCanBeUsed() {
+		int[] counts = new int[HallPlan.Prop.values().length];
+		for (long seed = 0; seed < 8; seed++) {
+			for (int dx = -10; dx < 10; dx++) {
+				for (int dz = -10; dz < 10; dz++) {
+					for (HallPlan.PlacedProp prop : Level1Layout.props(seed, dx, dz)) {
+						counts[prop.prop().ordinal()]++;
+						int[] spot = prop.spot();
+						String where = prop + ", seed " + seed;
+						switch (prop.prop()) {
+							case TOLL_BOOTH -> {
+								assertEquals(Tile.BOOTH, Level1Layout.tile(seed, spot[0], spot[1]), where);
+								// The drawer is used from inside the booth, which is entered from behind.
+								assertTrue(Level1Layout.tile(seed, spot[0], spot[1] + 1).walkable(), where);
+								assertTrue(Level1Layout.tile(seed, spot[0], spot[1] + 3).walkable(), where);
+							}
+							case GENERATOR_ROOM -> {
+								assertEquals(Tile.MACHINE, Level1Layout.tile(seed, spot[0], spot[1]), where);
+								int[] door = prop.door();
+								int[] out = HallPlan.FACES[prop.face()];
+								assertEquals(Tile.ROOM, Level1Layout.tile(seed, door[0], door[1]), where);
+								assertEquals(Tile.ROOM, Level1Layout.tile(seed, door[0] - out[0], door[1] - out[1]), where);
+								assertTrue(Level1Layout.tile(seed, door[0] + out[0], door[1] + out[1]).walkable(), where);
+							}
+							case EYED_CRATE -> {
+								assertEquals(Tile.CRATE, Level1Layout.tile(seed, spot[0], spot[1]), where);
+								assertTrue(Level1Layout.tile(seed, spot[0] - 2, spot[1]).walkable(), where);
+							}
+						}
+					}
+				}
+			}
+		}
+		for (HallPlan.Prop prop : HallPlan.Prop.values()) assertTrue(counts[prop.ordinal()] > 100, prop + ": " + counts[prop.ordinal()]);
+	}
+
+	@Test
+	void settlementsStandInHallsWithAWayIn() {
+		int outposts = 0, camps = 0;
+		for (long seed = 0; seed < 10; seed++) {
+			assertEquals(Level1Layout.Base.NONE, Level1Layout.base(seed, 0, 0));
+			for (int dx = -15; dx < 15; dx++) {
+				for (int dz = -15; dz < 15; dz++) {
+					Level1Layout.Base base = Level1Layout.base(seed, dx, dz);
+					if (base == Level1Layout.Base.NONE) continue;
+					Kind kind = Level1Layout.kind(seed, dx, dz);
+					assertEquals(base == Level1Layout.Base.FIRST_LIGHT ? Kind.PARKING : Kind.WAREHOUSE, kind);
+					if (base == Level1Layout.Base.FIRST_LIGHT) outposts++;
+					else camps++;
+					// No exit or prop inside or right around the ring.
+					for (HallPlan.Placed exit : Level1Layout.exits(seed, dx, dz)) {
+						int lx = exit.spot()[0] - dx * D, lz = exit.spot()[1] - dz * D;
+						assertFalse(lx >= BasePlan.MIN_X - 2 && lx <= BasePlan.MAX_X + 2 && lz >= BasePlan.MIN_Z - 2 && lz <= BasePlan.MAX_Z + 2);
+					}
+					// Each side's way in is open floor.
+					int x0 = dx * D, z0 = dz * D;
+					boolean north = false, west = false;
+					for (int along = 30; along <= 32; along++) {
+						north |= Level1Layout.tile(seed, x0 + along, z0 + BasePlan.MIN_Z).walkable();
+						west |= Level1Layout.tile(seed, x0 + BasePlan.MIN_X, z0 + along).walkable();
+					}
+					assertTrue(north && west, "no way in, seed " + seed + ", district " + dx + ", " + dz);
+				}
+			}
+		}
+		assertTrue(outposts > 20 && camps > 10, outposts + " outposts, " + camps + " camps");
 	}
 
 	@Test

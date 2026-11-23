@@ -585,6 +585,425 @@ def darkness():
     return m
 
 
+# Props: toll booth, generator room, eyed crate
+
+def stripes(m, top, bottom, period=32, colors=((222, 178, 36), (34, 33, 30)), seed=800):
+    band = box(-2, top, 130, bottom, 0.8)
+    stripe = ((X + Y) % period < period / 2)[..., None]
+    color = np.where(stripe, np.array(colors[0]), np.array(colors[1]))
+    worn = step(0.62, 0.74, noise(seed, 40) * 0.6 + noise(seed + 1, 128) * 0.4)
+    mask = band * (1 - worn * 0.7)
+    m.color += (color - m.color) * mask[..., None]
+    paint(m, mask, smooth=0.4)
+    return m
+
+
+def booth_panel(seed):
+    m = metal((214, 214, 206), 0.45)
+    m.color *= (1 + noise(seed, 3, 64)[..., None] * 0.03)
+    seam = 1 - step(0.5, 1.4, np.minimum(np.abs(X - 1), np.abs(X - 126)))
+    paint(m, seam, (150, 150, 144), height=-1)
+    grime = step(70, 128, Y) * (0.5 + 0.5 * noise(seed + 1, 32))
+    tint(m, grime * 0.6, (0.82, 0.8, 0.74))
+    return stripes(m, 104, 130, seed=seed + 2)
+
+
+def booth_drawer(empty):
+    m = booth_panel(810)
+    front = box(22, 46, 106, 82, 1)
+    if empty:
+        paint(m, front, (18, 18, 18), height=-4, smooth=0.1)
+        paint(m, box(22, 46, 106, 50), (96, 96, 92), height=-2)
+    else:
+        paint(m, front, (176, 176, 170), height=1.5, smooth=0.55)
+        paint(m, np.clip(box(21, 45, 107, 83) - front, 0, 1), (60, 60, 58), height=-1)
+        paint(m, box(54, 60, 74, 66, 1), (90, 92, 92), height=1, f0=230)  # handle
+        paint(m, 1 - step(1.2, 2.2, np.hypot(X - 64, Y - 54)), (40, 40, 40), height=-1)  # keyhole
+    return m
+
+
+def booth_roof():
+    m = metal((150, 154, 156), 0.5)
+    ribs = 1 - step(1, 2.5, np.abs(X % 16 - 8))
+    paint(m, ribs, (170, 174, 176), height=1.2)
+    rust = step(0.3, 0.6, clouds(820, 4)) * 0.6
+    paint(m, rust, (118, 80, 50), smooth=0.15, f0=10)
+    return m
+
+
+def barrier_base():
+    m = flat((214, 172, 34), 0.45, 12)
+    m = stripes(m, -2, 130, 40, seed=830)
+    plate = box(36, 40, 92, 72, 1)
+    paint(m, plate, (230, 230, 224), height=1)
+    paint(m, box(44, 52, 84, 60), (190, 40, 36))  # a red bar: no entry
+    return m
+
+
+def barrier_arm():
+    m = flat((236, 236, 230), 0.5, 12)
+    red = ((X % 64) < 32).astype(float)
+    paint(m, red, (196, 36, 32))
+    tint(m, (1 - step(10, 30, np.minimum(Y, 127 - Y))) * 0.5, (0.8, 0.8, 0.78))
+    return m
+
+
+def generator_side(seed):
+    m = metal((84, 98, 64), 0.35)
+    m.color *= (1 + clouds(seed, 4)[..., None] * 0.06)
+    for y in range(28, 100, 12):
+        vent = box(20, y, 108, y + 5, 1)
+        paint(m, vent, (24, 28, 20), height=-2)
+    for x, y in ((8, 8), (120, 8), (8, 120), (120, 120)):
+        paint(m, 1 - step(1.5, 3, np.hypot(X - x, Y - y)), (150, 150, 140), height=1, f0=230)
+    oil = step(0.4, 0.7, clouds(seed + 1, 5)) * step(80, 128, Y)
+    tint(m, oil * 0.7, (0.6, 0.58, 0.54))
+    return m
+
+
+def generator_front():
+    m = generator_side(840)
+    paint(m, box(14, 14, 114, 74, 1), (40, 44, 38), height=1.5, smooth=0.5)
+    for cx in (36, 72):
+        dial = 1 - step(11, 12.5, np.hypot(X - cx, Y - 40))
+        paint(m, dial, (226, 222, 204), height=0.5, smooth=0.9)
+        needle = (1 - step(0.6, 1.4, np.abs((X - cx) * 0.6 - (Y - 40) * 0.8))) * dial * (Y < 40)
+        paint(m, needle, (190, 30, 30))
+    paint(m, box(96, 30, 104, 52, 1), (200, 36, 30), height=2)  # the lever
+    warn = (Y > 84) & (Y < 112) & (np.abs(X - 64) < (Y - 84) * 0.62)
+    paint(m, warn.astype(float), (230, 190, 40), height=0.5)
+    paint(m, box(62, 92, 66, 104), (20, 20, 20))
+    return m
+
+
+def generator_top():
+    m = generator_side(850)
+    r = np.hypot(X - 64, Y - 64)
+    grille = (1 - step(40, 42, r)) * (np.abs(np.sin(r * 0.8)) > 0.5)
+    paint(m, grille.astype(float) * (1 - step(40, 42, r)), (30, 32, 28), height=-1.5)
+    return m
+
+
+def drum(top):
+    m = metal((176, 40, 32), 0.35)
+    if top:
+        rim =1 - step(1.5, 3, np.abs(np.hypot(X - 64, Y - 64) - 56))
+        paint(m, rim, (140, 30, 24), height=1)
+        for cx, cy in ((40, 40), (86, 86)):
+            paint(m, 1 - step(5, 6.5, np.hypot(X - cx, Y - cy)), (160, 160, 156), height=1, f0=230)
+    else:
+        for y in (36, 92):
+            paint(m, box(-2, y - 4, 130, y + 4), (150, 32, 26), height=1.5)
+        scratches = step(0.7, 0.8, noise(860, 64, 8))
+        paint(m, scratches, (120, 110, 100))
+        tint(m, step(-0.2, 0.4, clouds(861, 4)) * 0.4, (0.8, 0.74, 0.7))
+    return m
+
+
+def eyed_crate_side(open_eyes):
+    m = crate(False, 520)
+    for cx in (48, 80):
+        cy = 64
+        if open_eyes:
+            eye = 1 - step(0, 1.2, np.hypot((X - cx) / 9, (Y - cy) / 4.2) - 1)
+            paint(m, eye, (232, 226, 210), height=-1, glow=0.4)
+            iris = 1 - step(2.2, 3.2, np.hypot(X - cx - 1, Y - cy))
+            paint(m, iris * eye, (30, 20, 16), glow=0)
+            paint(m, (1 - step(0.6, 1.2, np.hypot(X - cx + 0.5, Y - cy - 1.5))) * eye, (255, 255, 255), glow=0.6)
+        else:
+            lid = (1 - step(0.6, 1.4, np.abs(Y - cy - 0.15 * (X - cx) ** 2 / 9 + 1))) * (np.abs(X - cx) < 9)
+            paint(m, lid, (30, 22, 16))
+    return m
+
+
+# Settlements: First Light (M.E.G.) and Blink (colonists)
+
+def jersey(top):
+    m = concrete((168, 166, 158), 880)
+    if not top:
+        m = stripes(m, 6, 40, 48, ((230, 230, 226), (196, 38, 34)), 881)
+        tint(m, step(96, 128, Y) * 0.7, (0.78, 0.76, 0.7))
+    return m
+
+
+def first_light_sign():
+    """A yellow M.E.G. plate: a sun coming up over a line, and the letters."""
+    m = metal((214, 176, 40), 0.5)
+    m.color *= (1 + noise(890, 3, 64)[..., None] * 0.04)
+    sun = (1 - step(0, 1.5, np.hypot(X - 64, Y - 70) - 22)) * (Y < 70)
+    paint(m, sun, (250, 236, 200), glow=0.6)
+    for k in range(-3, 4):
+        a = np.pi / 2 + k * 0.38
+        ray = (1 - step(0.8, 1.8, np.abs((X - 64) * np.sin(a) + (Y - 70) * np.cos(a)))) \
+            * step(26, 28, np.hypot(X - 64, Y - 70)) * (1 - step(38, 40, np.hypot(X - 64, Y - 70))) * (Y < 66)
+        paint(m, ray, (250, 236, 200), glow=0.5)
+    paint(m, box(16, 70, 112, 74), (40, 40, 36))
+
+    def letters(draw, s):
+        def bar(l, t, r, b):
+            draw.rectangle([l * s, t * s, r * s, b * s], fill=255)
+        # M
+        bar(22, 84, 27, 112); bar(42, 84, 47, 112)
+        draw.polygon([(22 * s, 84 * s), (27 * s, 84 * s), (37 * s, 100 * s), (32 * s, 102 * s)], fill=255)
+        draw.polygon([(47 * s, 84 * s), (42 * s, 84 * s), (32 * s, 100 * s), (37 * s, 102 * s)], fill=255)
+        bar(50, 107, 54, 112)
+        # E
+        bar(58, 84, 63, 112); bar(58, 84, 74, 89); bar(58, 95, 72, 100); bar(58, 107, 74, 112)
+        bar(78, 107, 82, 112)
+        # G
+        draw.arc([86 * s, 84 * s, 112 * s, 112 * s], 40, 330, fill=255, width=5 * s)
+        bar(100, 98, 112, 102); bar(107, 98, 112, 108)
+    paint(m, mask(letters), (30, 30, 28), height=0.5)
+    paint(m, np.clip(1 - box(4, 4, 124, 124, 1), 0, 1), (60, 60, 56), height=1.5)
+    return m
+
+
+def blink_sign():
+    """Plywood with an eye painted on it, half shut."""
+    m = flat((176, 140, 90), 0.2, 8, 50)
+    m.color *= (1 + noise(900, 2, 128)[..., None] * 0.1 + noise(901, 32)[..., None] * 0.05)
+    lid = np.abs(Y - 64 - 0.012 * (X - 64) ** 2 + 18)
+    eye = (Y > 64 - 26 + 0.012 * (X - 64) ** 2) & (Y < 64 + 26 - 0.012 * (X - 64) ** 2) & (np.abs(X - 64) < 46)
+    paint(m, eye.astype(float), (236, 230, 214))
+    iris = 1 - step(13, 15, np.hypot(X - 64, Y - 64))
+    paint(m, iris * eye, (40, 90, 80))
+    paint(m, (1 - step(5, 7, np.hypot(X - 64, Y - 64))) * eye, (16, 16, 16))
+    upper = (Y < 64) & eye
+    paint(m, upper.astype(float) * 0.85, (150, 112, 70))  # the lid coming down
+    outline = (1 - step(1.2, 2.6, np.abs(lid))) * (np.abs(X - 64) < 47)
+    lower = (1 - step(1.2, 2.6, np.abs(Y - 64 - 26 + 0.012 * (X - 64) ** 2))) * (np.abs(X - 64) < 47)
+    paint(m, np.clip(outline + lower, 0, 1), (34, 26, 20))
+    for x in range(30, 100, 12):
+        paint(m, (1 - step(0.8, 1.6, np.abs(X - x - (Y - 34) * 0.3))) * (Y > 26) * (Y < 38), (34, 26, 20))
+    return m
+
+
+def floodlight_lens():
+    m = flat((255, 252, 236), 0.9, 30)
+    m.glow[:] = 1.0
+    grid = np.maximum(1 - step(0.6, 1.4, np.abs(X % 16 - 8)), 1 - step(0.6, 1.4, np.abs(Y % 16 - 8)))
+    paint(m, grid * 0.5, (210, 206, 190), glow=0.6)
+    return m
+
+
+def canvas(color, seed):
+    m = flat(color, 0.15, 8, 60)
+    weave = np.sin(X * 1.6) * np.sin(Y * 1.6)
+    m.color *= (1 + weave[..., None] * 0.03 + noise(seed, 48)[..., None] * 0.05)
+    tint(m, step(0.3, 0.6, clouds(seed + 1, 4)) * 0.4, (0.86, 0.84, 0.78))
+    return m
+
+
+def bedroll():
+    m = canvas((120, 52, 40), 910)
+    quilt = 1 - step(0.8, 1.6, np.abs(Y % 24 - 12))
+    paint(m, quilt, (90, 38, 30), height=-1)
+    paint(m, box(-2, -2, 130, 18), (190, 180, 150))  # the flannel turned back
+    return m
+
+
+def locker_front():
+    m = metal((92, 108, 94), 0.4)
+    for y in (14, 20, 26):
+        paint(m, box(40, y, 88, y + 3, 0.6), (30, 34, 30), height=-1.5)
+    paint(m, box(96, 56, 102, 76, 1), (160, 160, 156), height=1, f0=230)  # handle
+    seam = np.maximum(1 - step(0.5, 1.4, np.abs(X - 6)), 1 - step(0.5, 1.4, np.abs(X - 121)))
+    paint(m, seam, (50, 56, 50), height=-1)
+
+    def stencil_text(draw, s):
+        for i, x in enumerate((34, 52, 70, 88)):
+            if i % 2:
+                draw.ellipse([x * s, 101 * s, (x + 4) * s, 105 * s], fill=255)
+            else:
+                draw.rectangle([x * s, 96 * s, (x + 10) * s, 110 * s], outline=255, width=3 * s)
+    paint(m, mask(stencil_text) * 0.85, (226, 222, 200))
+    return m
+
+
+def barrel_side():
+    m = metal((40, 38, 36), 0.3)
+    for y in (36, 92):
+        paint(m, box(-2, y - 4, 130, y + 4), (58, 54, 50), height=1.5)
+    rust = step(0.1, 0.4, clouds(920, 5) + step(60, 128, Y) * 0.3)
+    paint(m, rust * 0.9, (110, 60, 32), smooth=0.1, f0=10, porosity=40)
+    soot = (1 - step(0, 40, Y)) * 0.8
+    tint(m, soot, (0.5, 0.48, 0.46))
+    return m
+
+
+def embers():
+    m = flat((40, 20, 10), 0.2, 8)
+    coals = step(0.1, 0.5, noise(930, 24) * 0.6 + noise(931, 64) * 0.4)
+    paint(m, coals, (255, 130, 40), glow=1.0)
+    paint(m, step(0.55, 0.8, noise(932, 32)) * coals, (255, 220, 120), glow=1.0)
+    return m
+
+
+def tarp():
+    m = flat((44, 88, 150), 0.3, 10, 20)
+    creases = step(0.55, 0.75, np.abs(noise(940, 6, 3)))
+    m.height += noise(941, 4) * 2
+    tint(m, creases * 0.5, (1.15, 1.15, 1.15))
+    for x, y in ((10, 10), (118, 10), (10, 118), (118, 118)):
+        ring = 1 - step(0.8, 1.8, np.abs(np.hypot(X - x, Y - y) - 3.5))
+        paint(m, ring, (200, 200, 196), height=1, f0=230)
+    return m
+
+
+def settlement_textures(t):
+    t["jersey_side"] = jersey(False)
+    t["jersey_top"] = jersey(True)
+    t["first_light_sign"] = first_light_sign()
+    t["blink_sign"] = blink_sign()
+    t["floodlight_lens"] = floodlight_lens()
+    t["cot_canvas"] = canvas((96, 106, 70), 950)
+    t["bedroll"] = bedroll()
+    t["locker_front"] = locker_front()
+    t["locker_side"] = metal((92, 108, 94), 0.4)
+    t["barrel_side"] = barrel_side()
+    t["embers"] = embers()
+    t["tarp"] = tarp()
+    return t
+
+
+# Items (16 x 16 pixel art, like the flashlight) and the phosphor mark
+
+ITEMS = ASSETS / "textures/item/level1"
+
+
+def pixel_art(rows, palette):
+    """rows: 16 strings of 16 characters; each character a key of palette, '.' transparent."""
+    image = Image.new("RGBA", (16, 16), (0, 0, 0, 0))
+    for y, row in enumerate(rows):
+        for x, key in enumerate(row):
+            if key != ".":
+                image.putpixel((x, y), palette[key])
+    return image
+
+
+ALMOND_WATER = [
+    "................",
+    "......cccc......",
+    "......cccc......",
+    ".......gg.......",
+    ".......gg.......",
+    "......g..g......",
+    ".....g....g.....",
+    "....gwwwwwwg....",
+    "...gwllllllwg...",
+    "...gllllllllg...",
+    "...glllllhllg...",
+    "...gllllllhlg...",
+    "...gllllllllg...",
+    "....glllllllg...",
+    ".....gggggg.....",
+    "................",
+]
+ALLOY = [
+    "................",
+    "................",
+    "................",
+    "......hhhhh.....",
+    ".....hmmmmmh....",
+    "....hmmmmmmmh...",
+    "...hmmmmmmmmmh..",
+    "..hmmmmmmmmmdd..",
+    "..ddmmmmmmmdd...",
+    "...dddmmmmdd....",
+    ".....ddddd......",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+]
+PHOSPHOR = [
+    "................",
+    "......kkkk......",
+    "......kkkk......",
+    ".......gg.......",
+    "......g..g......",
+    ".....g....g.....",
+    ".....g....g.....",
+    ".....gbbbbg.....",
+    ".....gbppbg.....",
+    ".....gpbbpg.....",
+    ".....gbppbg.....",
+    ".....gpbbpg.....",
+    ".....gbbbbg.....",
+    "......gggg......",
+    "................",
+    "................",
+]
+
+
+def item_textures():
+    ITEMS.mkdir(parents=True, exist_ok=True)
+    glass = (190, 214, 222, 255)
+    pixel_art(ALMOND_WATER, {"c": (150, 110, 70, 255), "g": glass, "w": (244, 238, 222, 255), "l": (236, 226, 196, 255),
+                             "h": (255, 252, 240, 255)}).save(ITEMS / "almond_water.png")
+    pixel_art(ALLOY, {"h": (214, 220, 226, 255), "m": (150, 158, 168, 255), "d": (96, 102, 112, 255)}).save(ITEMS / "alloy.png")
+    pixel_art(PHOSPHOR, {"k": (120, 96, 70, 255), "g": glass, "b": (170, 255, 190, 255), "p": (220, 255, 226, 255)}).save(ITEMS / "phosphor_powder.png")
+    smiler_face().save(ITEMS / "smiler_face.png")
+
+
+def smiler_face():
+    """Only eyes and teeth, on nothing: the rest of the face is the dark."""
+    size, s = 64, 4
+    image = Image.new("RGBA", (size * s, size * s), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(image)
+    for cx in (20, 44):
+        draw.ellipse([(cx - 8) * s, 14 * s, (cx + 8) * s, 26 * s], fill=(250, 250, 240, 255))
+        draw.ellipse([(cx - 2) * s, 18 * s, (cx + 2) * s, 22 * s], fill=(10, 10, 10, 255))
+    # A grin far too wide: a crescent of teeth, the gaps between them only inside the mouth.
+    grin = Image.new("L", image.size, 0)
+    shape = ImageDraw.Draw(grin)
+    shape.chord([6 * s, 22 * s, 58 * s, 56 * s], 10, 170, fill=255)
+    shape.chord([10 * s, 22 * s, 54 * s, 44 * s], 10, 170, fill=0)
+    teeth = Image.new("RGBA", image.size, (244, 240, 226, 255))
+    gaps = ImageDraw.Draw(teeth)
+    for x in range(10, 56, 5):
+        gaps.line([(x * s, 30 * s), (x * s, 58 * s)], fill=(120, 116, 104, 255), width=s)
+    gaps.line([(6 * s, 44 * s), (58 * s, 44 * s)], fill=(120, 116, 104, 255), width=s)
+    image.paste(teeth, (0, 0), grin)
+    return image.resize((size, size), Image.Resampling.LANCZOS)
+
+
+def phosphor_mark():
+    """A rough handprint-sized smear; transparent around it, so the game draws it cut out."""
+    m = flat((160, 255, 180), 0.2, 8)
+    m.glow[:] = 1.0
+    field = 1 - np.hypot((X - 64) / 50, (Y - 64) / 44) + clouds(960, 6) * 0.5
+    alpha = step(0.02, 0.06, field)
+    tint(m, step(0.3, 0.6, noise(961, 32)) * 0.4, (0.8, 0.9, 0.8))
+    return m, alpha
+
+
+def save_cutout(name, m, alpha):
+    mt.save("level1/" + name, m)
+    rgb_ = np.clip(np.rint(m.color), 0, 255).astype("uint8")
+    a = (alpha > 0.5).astype("uint8") * 255
+    Image.fromarray(np.dstack([rgb_, a]), "RGBA").save(TEXTURES / f"{name}.png", optimize=True)
+
+
+def prop_textures(t):
+    t["booth_wall"] = booth_panel(800)
+    t["booth_drawer"] = booth_drawer(False)
+    t["booth_drawer_open"] = booth_drawer(True)
+    t["booth_roof"] = booth_roof()
+    t["barrier_base"] = barrier_base()
+    t["barrier_arm"] = barrier_arm()
+    t["generator_side"] = generator_side(870)
+    t["generator_front"] = generator_front()
+    t["generator_top"] = generator_top()
+    t["drum_side"] = drum(False)
+    t["drum_top"] = drum(True)
+    t["lamp_glass"] = bulb_glass((255, 196, 110), 1.0)
+    t["crate_side_eyes"] = eyed_crate_side(True)
+    t["crate_side_shut"] = eyed_crate_side(False)
+    return t
+
+
 def exit_textures(t):
     for top in (False, True):
         suffix = "_top" if top else ""
@@ -704,7 +1123,7 @@ def all_textures():
     screen.color *= (1 + 0.25 * np.exp(-((X - 44) ** 2 + (Y - 40) ** 2) / 900))[..., None]
     paint(screen, np.clip(1 - box(10, 10, 118, 118, 3), 0, 1), (60, 60, 56), smooth=0.4)
     t["computer_screen"] = screen
-    return exit_textures(t)
+    return settlement_textures(prop_textures(exit_textures(t)))
 
 
 # Models
@@ -881,6 +1300,96 @@ def stairs_blockstate():
     return {"variants": variants}
 
 
+def generator_model():
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": NS + "generator_side", "side": NS + "generator_side", "front": NS + "generator_front",
+                         "top": NS + "generator_top", "base": NS + "door_jamb"},
+            "elements": [
+                el((0, 0, 1), (16, 1.5, 15), sides("#base")),
+                el((1, 1.5, 2), (15, 12, 14), {"north": "#front", "south": "#side", "east": "#side", "west": "#side", "up": "#top"}),
+                el((11, 12, 9), (13, 16, 11), sides("#base", ("north", "south", "east", "west"))),
+            ]}
+
+
+def drum_model():
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": NS + "drum_side", "side": NS + "drum_side", "top": NS + "drum_top"},
+            "elements": [el((2.5, 0, 2.5), (13.5, 15, 13.5), {"north": "#side", "south": "#side", "east": "#side", "west": "#side",
+                                                              "up": "#top", "down": "#top"})]}
+
+
+def caged_lamp_model():
+    bars = [el((x, 6, z), (x + 0.5, 11, z + 0.5), sides("#cap", ("north", "south", "east", "west")))
+            for x in (5.6, 9.9) for z in (5.6, 9.9)]
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": NS + "lamp_glass", "glass": NS + "lamp_glass", "cap": NS + "door_jamb"},
+            "elements": [
+                el((7.5, 12, 7.5), (8.5, 16, 8.5), sides("#cap", ("north", "south", "east", "west"))),
+                el((5.5, 11, 5.5), (10.5, 12, 10.5), sides("#cap")),
+                el((6.2, 6.5, 6.2), (9.8, 11, 9.8), sides("#glass"), shade=False, light_emission=15),
+                el((5.5, 5.8, 5.5), (10.5, 6.3, 10.5), sides("#cap")),
+            ] + bars}
+
+
+def barrier_arm_model():
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": NS + "barrier_arm", "arm": NS + "barrier_arm"},
+            "elements": [el((0, 7, 7), (16, 9.5, 9), {"north": "#arm", "south": "#arm", "up": "#arm", "down": "#arm",
+                                                      "east": {"texture": "#arm", "uv": [0, 6, 2.5, 8]},
+                                                      "west": {"texture": "#arm", "uv": [0, 6, 2.5, 8]}})]}
+
+
+def jersey_model():
+    faces = lambda: {"north": "#side", "south": "#side", "east": "#top", "west": "#top", "up": "#top", "down": "#top"}
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": NS + "jersey_side", "side": NS + "jersey_side", "top": NS + "jersey_top"},
+            "elements": [el((0, 0, 3), (16, 3, 13), faces()), el((0, 3, 4.5), (16, 8, 11.5), faces()),
+                         el((0, 8, 5.5), (16, 14, 10.5), faces())]}
+
+
+def floodlight_model():
+    legs = [el((x, 0, z), (x + 1, 9, z + 1), sides("#metal", ("north", "south", "east", "west")))
+            for x, z in ((3, 3), (12, 3), (3, 12), (12, 12))]
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": NS + "door_jamb", "metal": NS + "door_jamb", "lens": NS + "floodlight_lens"},
+            "elements": legs + [
+                el((3, 8.5, 3), (13, 9.5, 13), sides("#metal")),
+                el((7.5, 9.5, 7.5), (8.5, 11, 8.5), sides("#metal", ("north", "south", "east", "west"))),
+                el((3.5, 11, 3.5), (12.5, 16, 12.5), {**sides("#lens", ("north", "south", "east", "west")),
+                                                       "up": {"texture": "#metal"}, "down": {"texture": "#metal"}},
+                   shade=False, light_emission=15),
+            ]}
+
+
+def cot_model():
+    legs = [el((x, 0, z), (x + 1, 6, z + 1), sides("#metal", ("north", "south", "east", "west")))
+            for x in (0.5, 14.5) for z in (1.5, 13.5)]
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": NS + "cot_canvas", "canvas": NS + "cot_canvas", "metal": NS + "door_jamb"},
+            "elements": legs + [el((0, 6, 1), (16, 8, 15), sides("#canvas"))]}
+
+
+def bedroll_model():
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": NS + "bedroll", "roll": NS + "bedroll", "pillow": NS + "cot_canvas"},
+            "elements": [el((1, 0, 1), (15, 3, 15), sides("#roll")), el((3, 3, 1.5), (13, 4.5, 4.5), sides("#pillow"))]}
+
+
+def locker_model():
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": NS + "locker_side", "front": NS + "locker_front", "side": NS + "locker_side"},
+            "elements": [el((1, 0, 2), (15, 16, 14), {"north": "#front", "south": "#front", "east": "#side", "west": "#side",
+                                                      "up": "#side", "down": "#side"})]}
+
+
+def barrel_fire_model():
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": NS + "barrel_side", "side": NS + "barrel_side", "embers": NS + "embers"},
+            "elements": [el((2.5, 0, 2.5), (13.5, 15, 13.5), {"north": "#side", "south": "#side", "east": "#side",
+                                                              "west": "#side", "down": "#side"}),
+                         el((3, 14.4, 3), (13, 14.5, 13), {"up": "#embers"}, shade=False, light_emission=15)]}
+
+
 def cube_all(texture):
     return {"parent": "minecraft:block/cube_all", "textures": {"all": NS + texture}}
 
@@ -933,6 +1442,26 @@ def all_models():
     m["standalone_door_frame"] = door_frame_model(False)
     m["standalone_door_frame_top"] = door_frame_model(True)
     m.update(stairs_models())
+    for name in ("booth_wall", "booth_roof", "booth_drawer", "booth_drawer_open", "barrier_base"):
+        m[name] = cube_all(name)
+    m["barrier_arm"] = barrier_arm_model()
+    m["generator"] = generator_model()
+    m["fuel_drum"] = drum_model()
+    m["caged_lamp"] = caged_lamp_model()
+    m["eyed_crate"] = bottom_top("crate_top", "crate_side_eyes")
+    m["shut_eyed_crate"] = bottom_top("crate_top", "crate_side_shut")
+    m["jersey_barrier"] = jersey_model()
+    m["first_light_sign"] = cube_all("first_light_sign")
+    m["blink_sign"] = cube_all("blink_sign")
+    m["floodlight"] = floodlight_model()
+    m["cot"] = cot_model()
+    m["bedroll"] = bedroll_model()
+    m["supply_locker"] = locker_model()
+    m["barrel_fire"] = barrel_fire_model()
+    m["tarp"] = cube_all("tarp")
+    m["phosphor_mark"] = {"parent": "minecraft:block/block",
+                          "textures": {"particle": NS + "phosphor_mark", "mark": NS + "phosphor_mark"},
+                          "elements": [el((2, 0.05, 2), (14, 0.15, 14), {"up": "#mark", "down": "#mark"}, shade=False, light_emission=15)]}
     return m
 
 
@@ -987,6 +1516,18 @@ def all_blockstates():
     b["darkness_below"] = single("darkness")
     b["darkness_above"] = single("darkness")
     b["concrete_stairs"] = stairs_blockstate()
+    for name in ("booth_wall", "booth_roof", "barrier_base", "barrier_arm", "fuel_drum", "caged_lamp", "eyed_crate", "shut_eyed_crate"):
+        b[name] = single(name)
+    b["booth_drawer"] = {"variants": {"empty=false": {"model": NS + "booth_drawer"}, "empty=true": {"model": NS + "booth_drawer_open"}}}
+    for name in ("first_light_sign", "blink_sign", "floodlight", "cot", "bedroll", "supply_locker", "barrel_fire", "tarp"):
+        b[name] = single(name)
+    b["jersey_barrier"] = {"variants": {"axis=x": {"model": NS + "jersey_barrier"}, "axis=z": {"model": NS + "jersey_barrier", "y": 90}}}
+    # The same turns as an end rod: the smear lies against the block it was dabbed on.
+    turns = {"up": {}, "down": {"x": 180}, "north": {"x": 90}, "south": {"x": 90, "y": 180}, "east": {"x": 90, "y": 90},
+             "west": {"x": 90, "y": 270}}
+    b["phosphor_mark"] = {"variants": {f"facing={f}": {"model": NS + "phosphor_mark", **turn} for f, turn in turns.items()}}
+    b["generator"] = {"variants": {f"facing={f}": ({"model": NS + "generator", "y": y} if y else {"model": NS + "generator"})
+                                   for f, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}}
     return b
 
 
@@ -1059,9 +1600,14 @@ def check(blockstates):
         for entry in state["variants"].values():
             for variant in entry if isinstance(entry, list) else [entry]:
                 assert model_file(variant["model"]).is_file(), (name, variant["model"])
+        if name in NO_ITEM:
+            continue
         item = json.loads((ASSETS / f"items/{name}.json").read_text(encoding="utf8"))
         assert model_file(item["model"]["model"]).is_file(), name
 
+
+# Blocks that only exist placed in the world, with no item of their own.
+NO_ITEM = {"phosphor_mark"}
 
 ITEM_MODELS = {"garage_floor": "garage_floor", "garage_floor_line": "garage_floor_line", "damp_garage_floor": "damp_garage_floor",
                "puddled_garage_floor": "puddled_garage_floor", "garage_wall": "garage_wall", "garage_ceiling": "garage_ceiling",
@@ -1075,6 +1621,12 @@ def main():
     for name, material in textures.items():
         mt.save("level1/" + name, material)
     save_animated("flickering_wallpaper", flicker_frames(), FLICKER)
+    save_cutout("phosphor_mark", *phosphor_mark())
+    item_textures()
+    for item in ("almond_water", "alloy", "phosphor_powder", "smiler_face"):
+        write_json(ASSETS / f"models/item/level1/{item}.json",
+                   {"parent": "minecraft:item/generated", "textures": {"layer0": f"noclip_backrooms:item/level1/{item}"}})
+        write_json(ASSETS / f"items/{item}.json", {"model": {"type": "minecraft:model", "model": f"noclip_backrooms:item/level1/{item}"}})
     preview(textures)
 
     models = all_models()
@@ -1083,7 +1635,8 @@ def main():
     blockstates = all_blockstates()
     for name, state in blockstates.items():
         write_json(ASSETS / f"blockstates/{name}.json", state)
-        write_json(ASSETS / f"items/{name}.json", {"model": {"type": "minecraft:model", "model": NS + ITEM_MODELS.get(name, name)}})
+        if name not in NO_ITEM:
+            write_json(ASSETS / f"items/{name}.json", {"model": {"type": "minecraft:model", "model": NS + ITEM_MODELS.get(name, name)}})
     check(blockstates)
     print(f"{len(textures) + 1} materials, {len(models)} models, {len(blockstates)} blocks")
 

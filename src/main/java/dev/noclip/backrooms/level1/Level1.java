@@ -27,6 +27,7 @@ public final class Level1 {
 
 	public static void register() {
 		Level1Blocks.register();
+		Level1Items.register();
 		Level1Sounds.register();
 		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, id("level_1"), Level1ChunkGenerator.CODEC);
 		// The levels that exist so far; exits to any other level stay shut until it registers here too.
@@ -35,6 +36,9 @@ public final class Level1 {
 		FlickeringWalls.register();
 		Blackouts.register();
 		Crates.register();
+		Strays.register();
+		Marauders.register();
+		Smilers.register();
 		Level1Ambience.register();
 	}
 }

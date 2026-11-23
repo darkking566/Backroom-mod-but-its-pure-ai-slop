@@ -11,6 +11,9 @@
     "noclip_backrooms:rough_wallpaper",
     "noclip_backrooms:rough_wallpaper_baseboard",
     "noclip_backrooms:supply_crate",
-    "noclip_backrooms:office_desk"
+    "noclip_backrooms:office_desk",
+    "noclip_backrooms:eyed_crate",
+    "noclip_backrooms:shut_eyed_crate",
+    "noclip_backrooms:blink_sign"
   ]
 }

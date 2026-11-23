@@ -31,6 +31,10 @@ public final class Level1Blocks {
 	private static final VoxelShape DESK_SHAPE = Block.box(0, 0, 0.5, 16, 14, 15.5);
 	private static final VoxelShape COMPUTER_SHAPE = Block.box(2, 0, 2, 14, 11, 14);
 	private static final VoxelShape FRAME_SHAPE = Block.box(0, 0, 6.5, 16, 16, 9.5);
+	private static final VoxelShape ARM_SHAPE = Block.box(0, 6.5, 6.5, 16, 9.5, 9.5);
+	private static final VoxelShape GENERATOR_SHAPE = Block.box(1, 0, 2, 15, 14, 14);
+	private static final VoxelShape DRUM_SHAPE = Block.box(2.5, 0, 2.5, 13.5, 15, 13.5);
+	private static final VoxelShape CAGED_LAMP_SHAPE = Block.box(5, 6, 5, 11, 16, 11);
 
 	// The parking structure
 	public static final Block GARAGE_FLOOR = register("garage_floor", concrete(MapColor.STONE));
@@ -101,6 +105,63 @@ public final class Level1Blocks {
 	public static final Block DARKNESS_BELOW = register("darkness_below", darkness(), p -> new DarknessBlock(p, Level1Exit.STAIRS_DOWN.level));
 	public static final Block DARKNESS_ABOVE = register("darkness_above", darkness(), p -> new DarknessBlock(p, Level1Exit.STAIRS_UP.level));
 
+	// Things to find in the halls
+	public static final Block BOOTH_WALL = register("booth_wall", Properties.of()
+			.mapColor(MapColor.SNOW).strength(2.0F).sound(SoundType.METAL));
+	public static final Block BOOTH_ROOF = register("booth_roof", Properties.of()
+			.mapColor(MapColor.METAL).strength(2.0F).sound(SoundType.METAL));
+	public static final Block BOOTH_DRAWER = register("booth_drawer", Properties.of()
+			.mapColor(MapColor.SNOW).strength(2.0F).sound(SoundType.METAL), BoothDrawerBlock::new);
+	public static final Block BARRIER_BASE = register("barrier_base", Properties.of()
+			.mapColor(MapColor.COLOR_YELLOW).strength(2.0F).sound(SoundType.METAL));
+	public static final Block BARRIER_ARM = register("barrier_arm", Properties.of()
+			.mapColor(MapColor.COLOR_RED).strength(0.5F).sound(SoundType.METAL).noOcclusion().noCollision(),
+			p -> new ShapedBlock(p, ARM_SHAPE));
+	public static final Block GENERATOR = register("generator", Properties.of()
+			.mapColor(MapColor.COLOR_GREEN).strength(3.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new GeneratorBlock(p, GENERATOR_SHAPE));
+	public static final Block FUEL_DRUM = register("fuel_drum", Properties.of()
+			.mapColor(MapColor.COLOR_RED).strength(2.0F).sound(SoundType.METAL).noOcclusion(), p -> new ShapedBlock(p, DRUM_SHAPE));
+	/** Wired to the generator, so a blackout never reaches it. */
+	public static final Block CAGED_LAMP = register("caged_lamp", Properties.of()
+			.mapColor(MapColor.COLOR_ORANGE).strength(0.5F).sound(SoundType.LANTERN).noOcclusion().noCollision()
+			.lightLevel(state -> 12), p -> new ShapedBlock(p, CAGED_LAMP_SHAPE));
+	public static final Block EYED_CRATE = register("eyed_crate", Properties.of()
+			.mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD), EyedCrateBlock::new);
+	public static final Block SHUT_EYED_CRATE = register("shut_eyed_crate", Properties.of()
+			.mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD).noLootTable());
+
+	// Settlements
+	public static final Block JERSEY_BARRIER = register("jersey_barrier", concrete(MapColor.STONE).noOcclusion(),
+			p -> new AxisShapedBlock(p, Block.box(0, 0, 3, 16, 14, 13), Block.box(3, 0, 0, 13, 14, 16)));
+	public static final Block FIRST_LIGHT_SIGN = register("first_light_sign", Properties.of()
+			.mapColor(MapColor.COLOR_YELLOW).strength(2.0F).sound(SoundType.METAL).lightLevel(state -> 4));
+	public static final Block BLINK_SIGN = register("blink_sign", Properties.of()
+			.mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD));
+	/** On the settlement's own power: the Flickering never reaches it. */
+	public static final Block FLOODLIGHT = register("floodlight", Properties.of()
+			.mapColor(MapColor.METAL).strength(1.5F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 15),
+			p -> new ShapedBlock(p, Block.box(3, 0, 3, 13, 16, 13)));
+	public static final Block COT = register("cot", Properties.of()
+			.mapColor(MapColor.COLOR_GREEN).strength(0.8F).sound(SoundType.WOOL).noOcclusion(),
+			p -> new RestBlock(p, Block.box(0, 0, 1, 16, 8, 15), "first_light"));
+	public static final Block BEDROLL = register("bedroll", Properties.of()
+			.mapColor(MapColor.COLOR_BROWN).strength(0.5F).sound(SoundType.WOOL).noOcclusion(),
+			p -> new RestBlock(p, Block.box(1, 0, 1, 15, 3, 15), "blink"));
+	public static final Block SUPPLY_LOCKER = register("supply_locker", Properties.of()
+			.mapColor(MapColor.METAL).strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new LockerBlock(p, Block.box(1, 0, 2, 15, 16, 14)));
+	public static final Block BARREL_FIRE = register("barrel_fire", Properties.of()
+			.mapColor(MapColor.COLOR_BLACK).strength(2.0F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 14),
+			p -> new BarrelFireBlock(p, Block.box(2.5, 0, 2.5, 13.5, 15, 13.5)));
+	public static final Block TARP = register("tarp", Properties.of()
+			.mapColor(MapColor.COLOR_BLUE).strength(0.8F).sound(SoundType.WOOL));
+
+	/** Left by phosphor powder; no item of its own. */
+	public static final Block PHOSPHOR_MARK = registerBlockOnly("phosphor_mark", Properties.of()
+			.mapColor(MapColor.COLOR_LIGHT_GREEN).instabreak().noCollision().noOcclusion().noLootTable().replaceable()
+			.sound(SoundType.SAND).lightLevel(state -> 5).emissiveRendering(state -> true), PhosphorMarkBlock::new);
+
 	private Level1Blocks() {
 	}
 
@@ -152,6 +213,10 @@ public final class Level1Blocks {
 
 	private static Block register(String name, Properties properties) {
 		return register(name, properties, Block::new);
+	}
+
+	private static Block registerBlockOnly(String name, Properties properties, Function<Properties, Block> factory) {
+		return Blocks.register(ResourceKey.create(Registries.BLOCK, Level1.id(name)), factory, properties);
 	}
 
 	private static Block register(String name, Properties properties, Function<Properties, Block> factory) {
