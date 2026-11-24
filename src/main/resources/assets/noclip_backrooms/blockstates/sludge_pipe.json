@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "noclip_backrooms:block/level3/sludge_pipe"
+    },
+    "facing=west": {
+      "model": "noclip_backrooms:block/level3/sludge_pipe",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "noclip_backrooms:block/level3/sludge_pipe",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "noclip_backrooms:block/level3/sludge_pipe",
+      "y": 270
+    }
+  }
+}

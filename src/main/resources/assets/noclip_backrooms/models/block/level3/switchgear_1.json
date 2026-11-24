@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "noclip_backrooms:block/level3/green_steel",
+    "south": "noclip_backrooms:block/level3/switchgear_front_top",
+    "north": "noclip_backrooms:block/level3/green_steel",
+    "east": "noclip_backrooms:block/level3/green_steel",
+    "west": "noclip_backrooms:block/level3/green_steel",
+    "up": "noclip_backrooms:block/level3/green_steel",
+    "down": "noclip_backrooms:block/level3/green_steel"
+  }
+}

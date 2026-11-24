@@ -122,13 +122,20 @@ public final class Level2ClientTest implements FabricClientGameTest {
 			shoot(context, game, at[0] + 0.5 + Level2Plan.DX[out] * 2.6, STAND, at[1] + 0.5 + Level2Plan.DZ[out] * 2.6,
 					yaw(Level2Plan.opposite(out)), pitch, "level2_exit_" + exit.level);
 		}
-		int[] three = nearest(seed, from, tile -> tile.kind() == Kind.EXIT && tile.exit() == Level2Exit.MARKED_3, 0);
+		// The door marked "4" leads to a level that is not there yet: it refuses.
+		int[] four = nearest(seed, from, tile -> tile.kind() == Kind.EXIT && tile.exit() == Level2Exit.MARKED_4, 0);
 		int refused = LevelExits.refusals();
-		useBlockFrom(context, game, three, Level2Layout.tile(seed, three[0], three[1]).dir(), 1.6);
+		useBlockFrom(context, game, four, Level2Layout.tile(seed, four[0], four[1]).dir(), 1.6);
 		server.runOnServer(s -> {
-			check(LevelExits.refusals() > refused, "the door to Level 3 did not refuse");
+			check(LevelExits.refusals() > refused, "the door to Level 4 did not refuse");
 			check(player(s).level().dimension() == Level2.LEVEL_2, "a closed door let the player through");
 		});
+		// The door marked "3" goes on down to Level 3, and Level 3's way back is "2".
+		int[] three = nearest(seed, from, tile -> tile.kind() == Kind.EXIT && tile.exit() == Level2Exit.MARKED_3, 0);
+		useBlockFrom(context, game, three, Level2Layout.tile(seed, three[0], three[1]).dir(), 1.6);
+		server.waitFor(s -> player(s).level().dimension() == dev.noclip.backrooms.level3.Level3.LEVEL_3, 100);
+		server.runOnServer(s -> LevelExits.use(player(s), "2"));
+		server.waitFor(s -> player(s).level().dimension() == Level2.LEVEL_2, 100);
 		int[] one = nearest(seed, from, tile -> tile.kind() == Kind.EXIT && tile.exit() == Level2Exit.MARKED_1, 0);
 		useBlockFrom(context, game, one, Level2Layout.tile(seed, one[0], one[1]).dir(), 1.6);
 		server.waitFor(s -> player(s).level().dimension() == Level1.LEVEL_1, 100);

@@ -337,5 +337,176 @@
         "type": "event"
       }
     ]
+  },
+  "level3.spark": {
+    "subtitle": "subtitles.noclip_backrooms.level3.spark",
+    "sounds": [
+      {
+        "name": "minecraft:block.redstone_torch.burnout",
+        "type": "event",
+        "volume": 0.6,
+        "pitch": 1.6
+      }
+    ]
+  },
+  "level3.shock": {
+    "subtitle": "subtitles.noclip_backrooms.level3.shock",
+    "sounds": [
+      {
+        "name": "minecraft:entity.lightning_bolt.impact",
+        "type": "event",
+        "volume": 0.25,
+        "pitch": 1.8
+      },
+      {
+        "name": "minecraft:block.redstone_torch.burnout",
+        "type": "event",
+        "pitch": 1.2
+      }
+    ]
+  },
+  "level3.hum": {
+    "subtitle": "subtitles.noclip_backrooms.level3.hum",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.ambient",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 0.6
+      },
+      {
+        "name": "minecraft:block.conduit.ambient",
+        "type": "event",
+        "volume": 0.6,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "level3.overload": {
+    "subtitle": "subtitles.noclip_backrooms.level3.overload",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.power_select",
+        "type": "event",
+        "pitch": 0.5
+      },
+      {
+        "name": "minecraft:block.respawn_anchor.charge",
+        "type": "event",
+        "pitch": 0.6
+      }
+    ]
+  },
+  "level3.sludge": {
+    "subtitle": "subtitles.noclip_backrooms.level3.sludge",
+    "sounds": [
+      {
+        "name": "minecraft:block.lava.pop",
+        "type": "event",
+        "volume": 0.6,
+        "pitch": 0.5
+      },
+      {
+        "name": "minecraft:block.bubble_column.bubble_pop",
+        "type": "event",
+        "pitch": 0.5
+      }
+    ]
+  },
+  "level3.lockpick": {
+    "subtitle": "subtitles.noclip_backrooms.level3.lockpick",
+    "sounds": [
+      {
+        "name": "minecraft:block.tripwire.click_on",
+        "type": "event",
+        "pitch": 1.6
+      },
+      {
+        "name": "minecraft:block.chain.hit",
+        "type": "event",
+        "volume": 0.5,
+        "pitch": 1.8
+      }
+    ]
+  },
+  "level3.gate_open": {
+    "subtitle": "subtitles.noclip_backrooms.level3.gate_open",
+    "sounds": [
+      {
+        "name": "minecraft:block.iron_door.open",
+        "type": "event",
+        "pitch": 0.7
+      }
+    ]
+  },
+  "level3.shatter": {
+    "subtitle": "subtitles.noclip_backrooms.level3.shatter",
+    "sounds": [
+      {
+        "name": "minecraft:block.glass.break",
+        "type": "event",
+        "pitch": 1.1
+      }
+    ]
+  },
+  "level3.paranoia": {
+    "subtitle": "subtitles.noclip_backrooms.level3.paranoia",
+    "sounds": [
+      {
+        "name": "noclip_backrooms:ambient.distant_whisper",
+        "type": "event"
+      },
+      {
+        "name": "minecraft:ambient.cave",
+        "type": "event",
+        "volume": 0.8
+      },
+      {
+        "name": "minecraft:entity.ghast.ambient",
+        "type": "event",
+        "volume": 0.25,
+        "pitch": 0.6
+      },
+      {
+        "name": "minecraft:entity.witch.celebrate",
+        "type": "event",
+        "volume": 0.4,
+        "pitch": 0.5
+      },
+      {
+        "name": "minecraft:entity.warden.heartbeat",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 0.8
+      }
+    ]
+  },
+  "level3.elevator": {
+    "subtitle": "subtitles.noclip_backrooms.level3.elevator",
+    "sounds": [
+      {
+        "name": "minecraft:block.note_block.bell",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 0.9
+      }
+    ]
+  },
+  "level3.crackle": {
+    "subtitle": "subtitles.noclip_backrooms.level3.crackle",
+    "sounds": [
+      {
+        "name": "minecraft:block.redstone_torch.burnout",
+        "type": "event",
+        "volume": 0.5,
+        "pitch": 1.3
+      },
+      {
+        "name": "minecraft:block.fire.extinguish",
+        "type": "event",
+        "volume": 0.25,
+        "pitch": 1.6
+      }
+    ]
   }
 }

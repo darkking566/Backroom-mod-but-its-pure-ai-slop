@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "noclip_backrooms:block/level3/hoist_hook"
+    },
+    "axis=z": {
+      "model": "noclip_backrooms:block/level3/hoist_hook",
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "noclip_backrooms:block/level3/station_floodlight"
+    },
+    "axis=z": {
+      "model": "noclip_backrooms:block/level3/station_floodlight",
+      "y": 90
+    }
+  }
+}

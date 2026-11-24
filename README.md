@@ -17,6 +17,7 @@ src/main/java/dev/noclip/backrooms/
 ├─ level0/                  Level 0「大廳」（入口檔 Level0.java）
 ├─ level1/                  Level 1「停車場」（入口檔 Level1.java）
 ├─ level2/                  Level 2「廢棄維修通道」（入口檔 Level2.java）
+├─ level3/                  Level 3「發電站」（入口檔 Level3.java）
 └─ monsters/                怪物（可能出現在好幾層）：Monsters.java 登記全部怪物，一隻一個資料夾（hound/）
 
 src/client/java/dev/noclip/backrooms/   只在遊戲畫面端執行的程式（伺服器不會載入）
@@ -45,13 +46,14 @@ src/gametest/java/dev/noclip/backrooms/level0/  level1/    真實遊戲測試；
 tools/make_textures.py      畫 Level 0 的貼圖，也是共用的繪圖工具
 tools/make_level1.py        畫 Level 1 的貼圖，並寫出 Level 1 的模型、blockstates、物品模型
 tools/make_level2.py        畫 Level 2 的貼圖，並寫出 Level 2 的模型、blockstates、物品模型、掉落物表
+tools/make_level3.py        Level 3 的同上
 tools/make_hound.py         獵犬的發光眼睛貼圖與生怪蛋
 
 art/monsters/hound/         怪物的原始檔（Blender .blend、.glb、預覽圖、交接說明），不會打包進模組
 
 docs/levels/level0/         Level 0 的截圖與貼圖預覽
 docs/levels/level1/         Level 1 的說明（README.md）與貼圖預覽
-docs/levels/level2/         Level 2 的說明與貼圖預覽（其他樓層的企劃也在 docs/levels/，總覽見 docs/levels/README.md）
+docs/levels/level2/  level3/ Level 2、3 的說明與貼圖預覽（其他樓層的企劃也在 docs/levels/，總覽見 docs/levels/README.md）
 ```
 
 **每一層自己管自己**：方塊、物品、音效、維度、地形、事件都放在那一層的資料夾，那層的入口檔負責全部註冊。所以擴充 Level 0 只會動到 `level0/` 和 Level 0 的資源資料夾，不會碰到別層。

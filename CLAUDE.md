@@ -67,6 +67,12 @@
   - 管線依照片改成連續長管（拿掉一節一節的箍環、紅管只留閥門），截圖確認
   - 驗證：`gradlew build`（34 個單元測試）與 `runClientGameTest`（Level 0、1、2）全部通過；中途朋友的 Level 0 Edge Shift 測試偶爾逾時一次（看隨機），重跑通過
 - 使用者同意後，把 `main`（企劃書 `cd71cdb`、Level 2 `83e2946`）推送到 GitHub；沒有強制推送、沒有改寫歷史
+- 使用者要求接著做 Level 3：
+  - 讀 Wikidot Level 3（Electrical Station）全文；出口一節 WebFetch 只拿到摘要，改直接下載頁面 HTML 讀原文確認（電梯→4 或 5、Base Gamma 的門→11、車→69）；下載 17 張照片照著做
+  - 新增 `level3/`：地圖規劃（`Level3Plan`、`Level3Layout`：6 格單元迷宮，每格隨機寬／一般／窄／矮四種尺寸，矮的要蹲；多出來的通道一半用打不壞的鐵柵擋住，少數必經路上是可撬鎖的柵門）、六種大廳（`Level3Halls`：發電機房、鍋爐房、組裝線、聖所、車子房、Base Gamma 據點）、地形生成、51 個方塊、三種出口、危險（斷線觸電、黑泥燙傷、插座電人、燈管爆裂、發電機過載爆炸）、被窺視感熱點、天使嚇走獵犬、暗處的獵犬群
+  - 新增 Level 3 的維度、維度類型、生態域、掉落物表、語言檔、音效、挖掘標籤；`BackroomsMod` 加一行註冊；Level 2 噴了「3」的門從此接到 Level 3
+  - 新增 `tools/make_level3.py`、`docs/levels/level3/README.md`（取代企劃稿）與貼圖預覽；更新樓層索引、`README.md`、`NEXT.md`
+  - 新增單元測試 `Level3LayoutTest`、`MapDump`，實機測試 `Level3ClientTest`；看截圖後把紅磚調亮、鐵柵的斑點減少
 
 ## 動作記錄（Antigravity）
 
