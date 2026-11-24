@@ -1,0 +1,72 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": { "type": "minecraft:uniform", "min": 3, "max": 5 },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:anomaly_crystal",
+          "weight": 4, "functions": [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": 2, "max": 6}}]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:red_room_shard",
+          "weight": 4, "functions": [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": 2, "max": 6}}]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:purified_almond_essence",
+          "weight": 4, "functions": [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": 2, "max": 6}}]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:anomalous_mythril",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:reality_fragment",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:almond_mana_cell",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:west_hallowed_blade",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:west_rapier",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:magic_prism_light_staff",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:pastel_charm",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:astral_parchment",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:weapon_blueprint_blank",
+          "weight": 4
+        }
+
+      ]
+    }
+  ],
+  "random_sequence": "noclip_backrooms:blocks/anomaly_vault_chest"
+}

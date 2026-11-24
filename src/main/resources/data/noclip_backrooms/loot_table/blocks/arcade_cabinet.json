@@ -1,0 +1,39 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [{
+        "type": "minecraft:item",
+        "name": "noclip_backrooms:microchip",
+        "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 2 } }]
+      }]
+    },
+    {
+      "rolls": 1,
+      "entries": [{
+        "type": "minecraft:item",
+        "name": "noclip_backrooms:neon_tube",
+        "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 2 } }]
+      }]
+    },
+    {
+      "rolls": 1,
+      "entries": [{
+        "type": "minecraft:item",
+        "name": "noclip_backrooms:old_circuit_board",
+        "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 2 } }]
+      }]
+    },
+    {
+      "rolls": 1,
+      "entries": [{
+        "type": "minecraft:item",
+        "name": "noclip_backrooms:plastic_casing",
+        "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 2 } }]
+      }]
+    }
+
+  ],
+  "random_sequence": "noclip_backrooms:blocks/arcade_cabinet"
+}

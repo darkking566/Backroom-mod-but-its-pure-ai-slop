@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "noclip_backrooms:block/crafting/industrial_fuse_box_top",
+    "front": "noclip_backrooms:block/crafting/industrial_fuse_box_front",
+    "side": "noclip_backrooms:block/crafting/industrial_fuse_box_side"
+  }
+}

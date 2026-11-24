@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "noclip_backrooms:block/crafting/industrial_fuse_box" },
+    "facing=east":  { "model": "noclip_backrooms:block/crafting/industrial_fuse_box", "y": 90 },
+    "facing=south": { "model": "noclip_backrooms:block/crafting/industrial_fuse_box", "y": 180 },
+    "facing=west":  { "model": "noclip_backrooms:block/crafting/industrial_fuse_box", "y": 270 }
+  }
+}

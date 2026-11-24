@@ -1,0 +1,31 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [{
+        "type": "minecraft:item",
+        "name": "noclip_backrooms:anomaly_crystal",
+        "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 3 } }]
+      }]
+    },
+    {
+      "rolls": 1,
+      "entries": [{
+        "type": "minecraft:item",
+        "name": "noclip_backrooms:prism_glass",
+        "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 2 } }]
+      }]
+    },
+    {
+      "rolls": 1,
+      "entries": [{
+        "type": "minecraft:item",
+        "name": "noclip_backrooms:phosphor_powder",
+        "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 2 } }]
+      }]
+    }
+
+  ],
+  "random_sequence": "noclip_backrooms:blocks/crystal_vein_node"
+}

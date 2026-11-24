@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "noclip_backrooms:block/crafting/noclipped_folding_table" },
+    "facing=east":  { "model": "noclip_backrooms:block/crafting/noclipped_folding_table", "y": 90 },
+    "facing=south": { "model": "noclip_backrooms:block/crafting/noclipped_folding_table", "y": 180 },
+    "facing=west":  { "model": "noclip_backrooms:block/crafting/noclipped_folding_table", "y": 270 }
+  }
+}

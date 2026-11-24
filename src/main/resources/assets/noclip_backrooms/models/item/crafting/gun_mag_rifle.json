@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "noclip_backrooms:item/crafting/gun_mag_rifle"
+  }
+}

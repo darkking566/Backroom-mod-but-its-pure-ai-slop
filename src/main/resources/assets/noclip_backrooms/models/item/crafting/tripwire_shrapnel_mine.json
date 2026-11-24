@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "noclip_backrooms:item/crafting/tripwire_shrapnel_mine"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "P": "minecraft:oak_planks"
+  },
+  "pattern": [
+    "PPP",
+    "IPI",
+    "I I"
+  ],
+  "result": {
+    "id": "noclip_backrooms:salvage_bench",
+    "count": 1
+  }
+}

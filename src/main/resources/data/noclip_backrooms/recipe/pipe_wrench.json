@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "noclip_backrooms:alloy",
+    "noclip_backrooms:alloy",
+    "noclip_backrooms:alloy",
+    "noclip_backrooms:angle_iron",
+    "noclip_backrooms:rusty_screws",
+    "noclip_backrooms:rusty_screws",
+    "noclip_backrooms:weapon_grip_wrap"
+  ],
+  "result": {
+    "id": "noclip_backrooms:pipe_wrench",
+    "count": 1
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "noclip_backrooms:item/crafting/cn_alpha_tangdao"
+  }
+}

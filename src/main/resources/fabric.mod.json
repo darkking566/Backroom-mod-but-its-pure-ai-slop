@@ -8,7 +8,8 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": ["dev.noclip.backrooms.BackroomsMod"],
-		"client": ["dev.noclip.backrooms.BackroomsClient"]
+		"client": ["dev.noclip.backrooms.BackroomsClient"],
+		"jei_mod_plugin": ["dev.noclip.backrooms.crafting.jei.BackroomsJeiPlugin"]
 	},
 	"mixins": [
 		{"config": "noclip_backrooms.client.mixins.json", "environment": "client"}

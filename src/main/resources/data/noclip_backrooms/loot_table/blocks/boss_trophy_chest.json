@@ -1,0 +1,82 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": { "type": "minecraft:uniform", "min": 4, "max": 6 },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:core_crimson_heart",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:core_alpha_fang",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:core_steam_turbine",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:core_arc_reactor",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:core_acid_queen",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:core_melancholy_bell",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:core_abyssal_scale",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:core_stopmotion_gear",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:core_fate_die",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:core_void_weaver",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:tungsten_alloy",
+          "weight": 4, "functions": [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": 2, "max": 6}}]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:void_alloy_ingot",
+          "weight": 4, "functions": [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": 2, "max": 6}}]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:purified_almond_essence",
+          "weight": 4, "functions": [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": 2, "max": 6}}]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:almond_elixir",
+          "weight": 4
+        }
+
+      ]
+    }
+  ],
+  "random_sequence": "noclip_backrooms:blocks/boss_trophy_chest"
+}

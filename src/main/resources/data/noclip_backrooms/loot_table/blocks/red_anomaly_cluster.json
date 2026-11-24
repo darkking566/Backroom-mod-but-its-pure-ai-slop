@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "entries": [{
+        "type": "minecraft:item",
+        "name": "noclip_backrooms:red_room_shard",
+        "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 3 } }]
+      }]
+    },
+    {
+      "rolls": 1,
+      "entries": [{
+        "type": "minecraft:item",
+        "name": "noclip_backrooms:blood_resonance_core",
+        "functions": [{ "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 1, "max": 1 } }]
+      }]
+    }
+
+  ],
+  "random_sequence": "noclip_backrooms:blocks/red_anomaly_cluster"
+}

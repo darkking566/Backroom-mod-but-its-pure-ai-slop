@@ -250,3 +250,16 @@
   - 背包角色狀態面板（`InventoryStatsPanel.java`）改為原版 Minecraft 容器材質風格（`#C6C6C6` 灰石斜面視窗、圓角黑邊、白／深灰立體倒角、`#8B8B8B` 凹槽欄位、`#404040` 字色與自製原版斜面 `+` 按鈕，移除不搭的紫框）
   - 體質（`VIT`）新增自然回生命速度（每點 `+0.12 HP/秒`，飽食度 `>= 6` 時於伺服器端持續生效）；理智（`SAN`）強化回理智速度（每點回復倍率 `+10%` 並附 `+0.05/秒` 被動回穩），兩者皆即時顯示於面板與懸停說明
   - 下方 HUD 理智條（`SanityBarHud.java`）改為 Minecraft 風格 9×9 像素小圖示（新增 `assets/noclip_backrooms/textures/gui/sanity_icons.png`：空框／滿／半格 × 冷靜青／不安紫／低於 30% 紅眼抖動），每 100 理智為一排（10 顆圖示），自飽食度上方（`sh - 49`，並自動避讓水下氣泡與坐騎多排血條）**嚴格向上疊排**並採原版多排血量壓縮間距公式，確保無論理智加點擴充幾排都不會與飽食度重疊
+- 依使用者要求將完整後室合成表企劃（`docs/crafting/01_materials_and_props.md` ～ `06_weapons_magic_and_chests.md`）全部實裝進 Minecraft `26.2`，並整合 **JEI（Just Enough Items）`30.48.0.244`**：
+  - 依賴與 JEI 整合（`gradle.properties`、`build.gradle`、`fabric.mod.json`、`src/client/java/dev/noclip/backrooms/crafting/jei/`）：
+    - 加入 BlameJared Maven 與 `mezz.jei:jei-26.2-fabric:30.48.0.244`（透過 `play.bat` / `gradlew runClient` 啟動即自動載入 JEI）
+    - 實作 `BackroomsJeiPlugin`（`jei_mod_plugin` 入口）與 `StationRecipeCategory`：於 JEI 註冊 4 大自訂工作站配方分類（後室拆解台、後室改裝鍛造台、杏仁蒸餾化學組、異常煉成壇）、對應工作站催化劑、全 230 條工作站配方、10 種 Boss 核心與常見怪物掉落取得來源說明，並透過 `IGuiContainerHandler` 向 JEI 回報背包左側 RPG 角色面板區域，確保左側能力值面板與右側 JEI 清單零重疊
+  - 四大工作站與方塊（`src/main/java/dev/noclip/backrooms/props/`、`crafting/`、`src/client/.../crafting/BackroomsStationScreen.java`）：
+    - 實作 4 座可互動工作站方塊（`salvage_bench`、`workshop_bench`、`almond_distiller`、`anomaly_altar`）、原版灰石風格 `BackroomsStationScreen` + `BackroomsStationMenu`（捲動式配方列表、即時背包材料檢查、單次／×8 製作並獲得 RPG 經驗）、C2S `CraftStationPayload` 與共享資料驅動 `BackroomsRecipeRegistry`（`data/noclip_backrooms/backrooms_recipes/station_recipes.json`）
+    - 新增 24 種異常穿模家具與環境物件（`noclipped_wood_chair` ～ `wanderer_remains`，含 `FACING` 方向與拆解掉落表）與 3 種純方塊狀態寶箱（`locked_armory_crate` 需撬棍或開鎖組開啟、`anomaly_vault_chest`、`boss_trophy_chest`）
+  - 完整物品、工具、裝備與五大武器體系（`items/`、`tools/`、`weapons/`）：
+    - 新增 296 種新物品與 31 種新方塊（合計 327 項註冊物件），涵蓋 76 種加工與環境素材、42 種怪物／友善 NPC 掉落物、10 種 Boss 核心、39 種鍛造／槍械／彈藥／法器中間零件、《後室合成圖鑑》、10 種 Tier 1–4 特殊破壞工具、6 種求生消耗品、防毒面具與 4 套功能防具（含套裝被動效果）、41 把冷兵器（中世紀鈍器 11＋撬棍／西式 14／中式 16，含專屬攻速、距離與命中／右鍵特效）、18 把實戰熱兵器槍械（消耗對應 11 種彈藥、射線／霰彈／火焰／電擊／貫穿／聲波效果）與 6 種戰術配件、以及 19 件魔法與異常超自然武器（含短距穿牆短杖、聖光稜鏡杖、連鎖雷弧杖、時間遲緩懷錶、紅室血咒大鐮、命運骰杖、虛空裂隙巨杖與星界魔導書等）
+    - 註冊 4 個後室專屬創造物品欄分頁（素材與零件／工作站工具與裝備／冷兵器／槍械與異常法器），JEI 自動索引全部品項；另保留既有 Level 0/1 方塊戰利品表不動，改於拆解台收錄全 42 種既有方塊與 24 種穿模家具拆解配方，並補齊全 18 隻已實裝原生後室怪物之實體掉落表（`loot_table/entities/*.json`）
+  - 資源、配方與驗證：
+    - 產生全套 16×16 像素圖示與方塊貼圖、模型、blockstates、物品定義、28 個原版 3×3 配方 JSON、230 條工作站配方 JSON、49 個方塊／寶箱／實體戰利品表，以及完整 `en_us.json`／`zh_tw.json` 雙語條目
+    - 新增單元測試 `src/test/java/dev/noclip/backrooms/crafting/BackroomsCraftingTest.java`（驗證全 230 條工作站配方與所有原版 3×3 配方 JSON 及其參照的每個物品 ID 皆存在無誤）；`gradlew build` 與 `runClientGameTest -Plevels=look`（實機確認 JEI `30.48.0.244` 載入並索引 2,628 項物品與全套配方無報錯）全部通過

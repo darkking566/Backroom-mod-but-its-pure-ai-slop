@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "noclip_backrooms:item/crafting/west_hotel_greatsword"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "noclip_backrooms:block/crafting/boarded_barricade" },
+    "facing=east":  { "model": "noclip_backrooms:block/crafting/boarded_barricade", "y": 90 },
+    "facing=south": { "model": "noclip_backrooms:block/crafting/boarded_barricade", "y": 180 },
+    "facing=west":  { "model": "noclip_backrooms:block/crafting/boarded_barricade", "y": 270 }
+  }
+}

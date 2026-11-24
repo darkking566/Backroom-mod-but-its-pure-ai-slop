@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "noclip_backrooms:damp_paper_scrap",
+    "noclip_backrooms:damp_paper_scrap",
+    "noclip_backrooms:damp_paper_scrap",
+    "noclip_backrooms:damp_paper_scrap"
+  ],
+  "result": {
+    "id": "minecraft:paper",
+    "count": 2
+  }
+}

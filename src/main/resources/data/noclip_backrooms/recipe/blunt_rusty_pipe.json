@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "noclip_backrooms:iron_pipe",
+    "noclip_backrooms:weapon_grip_wrap"
+  ],
+  "result": {
+    "id": "noclip_backrooms:blunt_rusty_pipe",
+    "count": 1
+  }
+}
