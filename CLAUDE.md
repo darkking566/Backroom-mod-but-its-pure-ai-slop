@@ -66,6 +66,7 @@
   - 修正 `core/LevelExits` 的錯誤：「尚未開放」的提示用伺服器 tick 計時防止洗版，但換世界後 tick 從 0 重算、記錄卻沒清，會讓提示很久都不出現；改成 tick 倒退時不擋
   - 管線依照片改成連續長管（拿掉一節一節的箍環、紅管只留閥門），截圖確認
   - 驗證：`gradlew build`（34 個單元測試）與 `runClientGameTest`（Level 0、1、2）全部通過；中途朋友的 Level 0 Edge Shift 測試偶爾逾時一次（看隨機），重跑通過
+- 使用者同意後，把 `main`（企劃書 `cd71cdb`、Level 2 `83e2946`）推送到 GitHub；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
