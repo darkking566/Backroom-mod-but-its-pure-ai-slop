@@ -22,7 +22,7 @@ final class Level2BankBlock extends Block {
 	static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
 	enum Effect {
-		NONE, LEAK, STEAM
+		NONE, LEAK, STEAM, FROST, GAS
 	}
 
 	private final Effect effect;
@@ -54,6 +54,25 @@ final class Level2BankBlock extends Block {
 				}
 				if (random.nextInt(40) == 0) {
 					level.playLocalSound(x, pos.getY(), z, Level2Sounds.STEAM, SoundSource.BLOCKS, 0.4F, 0.6F + random.nextFloat() * 0.2F, false);
+				}
+			}
+			case FROST -> {
+				if (random.nextInt(3) == 0) {
+					double along = (random.nextDouble() - 0.5) * 0.8;
+					level.addParticle(ParticleTypes.SNOWFLAKE, x + out.getStepZ() * along, pos.getY() + 0.25 + random.nextDouble() * 0.5,
+							z + out.getStepX() * along, out.getStepX() * 0.01, -0.015, out.getStepZ() * 0.01);
+				}
+			}
+			case GAS -> {
+				if (random.nextInt(2) == 0) {
+					double along = (random.nextDouble() - 0.5) * 0.4;
+					level.addParticle(ParticleTypes.CAMPFIRE_COSY_SMOKE, x + out.getStepZ() * along, pos.getY() + 0.35 + random.nextDouble() * 0.2,
+							z + out.getStepX() * along, out.getStepX() * 0.04, 0.01, out.getStepZ() * 0.04);
+					level.addParticle(ParticleTypes.SPORE_BLOSSOM_AIR, x + out.getStepZ() * along, pos.getY() + 0.3,
+							z + out.getStepX() * along, out.getStepX() * 0.02, 0.005, out.getStepZ() * 0.02);
+				}
+				if (random.nextInt(35) == 0) {
+					level.playLocalSound(x, pos.getY(), z, Level2Sounds.STEAM, SoundSource.BLOCKS, 0.45F, 0.35F + random.nextFloat() * 0.15F, false);
 				}
 			}
 			case NONE -> {

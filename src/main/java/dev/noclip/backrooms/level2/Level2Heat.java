@@ -58,7 +58,7 @@ final class Level2Heat {
 			}
 			int x = player.getBlockX(), z = player.getBlockZ();
 			tickHeat(seed, player, x, z);
-			tickCold(seed, player, x, z);
+			tickCold(level, seed, player, x, z);
 			tickGas(level, seed, player, x, z);
 			tickOfficeLoop(level, seed, player, x, z);
 		}
@@ -83,7 +83,7 @@ final class Level2Heat {
 		}
 	}
 
-	private static void tickCold(long seed, ServerPlayer player, int x, int z) {
+	private static void tickCold(ServerLevel level, long seed, ServerPlayer player, int x, int z) {
 		if (!Level2Layout.cold(seed, x, z)) {
 			COLD_SECONDS.remove(player.getUUID());
 			return;
@@ -92,6 +92,8 @@ final class Level2Heat {
 		if (seconds == 1) player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level2.cold"));
 		player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 0, true, false, true));
 		player.setTicksFrozen(Math.min(player.getTicksRequiredToFreeze() + 40, player.getTicksFrozen() + 25));
+		level.sendParticles(ParticleTypes.SNOWFLAKE, player.getX(), player.getY() + 1.1, player.getZ(), 6, 2.0, 0.7, 2.0, 0.01);
+		level.sendParticles(ParticleTypes.CLOUD, player.getX(), player.getY() + 0.9, player.getZ(), 2, 1.4, 0.4, 1.4, 0.005);
 	}
 
 	private static void tickGas(ServerLevel level, long seed, ServerPlayer player, int x, int z) {

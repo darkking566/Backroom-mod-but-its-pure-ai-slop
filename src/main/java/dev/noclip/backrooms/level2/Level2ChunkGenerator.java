@@ -179,6 +179,9 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 			return Level2Blocks.FLOOR_CABLE_DUCT.defaultBlockState()
 					.setValue(Level2AxisBlock.AXIS, ductAxis == 0 ? Direction.Axis.X : Direction.Axis.Z);
 		}
+		if (Level2Layout.cold(seed, x, z) && !Level2Layout.isOfficePatch(seed, x, z)) {
+			return state(Level2Blocks.FROSTED_UTILITY_FLOOR);
+		}
 		return switch (Level2Layout.ground(seed, x, z)) {
 			case DEBRIS -> state(Level2Blocks.DEBRIS_UTILITY_FLOOR);
 			case DAMP -> state(Level2Blocks.DAMP_UTILITY_FLOOR);
@@ -187,6 +190,9 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 	}
 
 	private static BlockState wall(long seed, int x, int z) {
+		if (Level2Layout.cold(seed, x, z) && !Level2Layout.isOfficePatch(seed, x, z)) {
+			return state(Level2Blocks.FROSTED_UTILITY_WALL);
+		}
 		return switch (Level2Layout.finish(seed, x, z)) {
 			case CONCRETE -> state(Level2Blocks.UTILITY_WALL);
 			case STAINED -> state(Level2Blocks.STAINED_UTILITY_WALL);
@@ -212,6 +218,8 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 		if (Level2Layout.bladeTrail(seed, x, z)) return Level2Blocks.BLUE_LIGHT_PIPES;
 		int roll = Level2Layout.bankRoll(seed, x, y, z);
 		if (Level2Layout.hot(seed, x, z) && roll < 30) return Level2Blocks.STEAM_PIPES;
+		if (Level2Layout.gas(seed, x, z) && roll < 38) return Level2Blocks.BURST_GAS_PIPES;
+		if (Level2Layout.cold(seed, x, z) && roll < 45) return Level2Blocks.FROSTED_PIPES;
 		if (roll < 4) return Level2Blocks.LEAKING_PIPES;
 		if (roll < 12) return Level2Blocks.VALVE_PIPES;
 		return Level2Blocks.STEEL_PIPES;

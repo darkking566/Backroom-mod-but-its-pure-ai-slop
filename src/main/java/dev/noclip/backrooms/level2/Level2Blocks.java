@@ -133,6 +133,12 @@ public final class Level2Blocks {
 			p -> shaped(p, Block.box(2, 14.5, 2, 14, 16, 14)));
 	public static final Block SNAPPED_CABLES = register("snapped_cables", ceilingDetail(),
 			p -> shaped(p, Block.box(3, 5, 3, 13, 16, 13)));
+	public static final Block FROSTED_UTILITY_WALL = register("frosted_utility_wall", concrete(MapColor.ICE));
+	public static final Block FROSTED_UTILITY_FLOOR = register("frosted_utility_floor", concrete(MapColor.ICE).friction(0.75F));
+	public static final Block FROSTED_PIPES = register("frosted_pipes", pipe(MapColor.ICE),
+			p -> new Level2BankBlock(p, Level2BankBlock.Effect.FROST));
+	public static final Block BURST_GAS_PIPES = register("burst_gas_pipes", pipe(MapColor.COLOR_GREEN),
+			p -> new Level2BankBlock(p, Level2BankBlock.Effect.GAS));
 
 	private Level2Blocks() {
 	}
