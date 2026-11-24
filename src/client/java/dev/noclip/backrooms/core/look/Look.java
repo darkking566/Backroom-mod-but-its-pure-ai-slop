@@ -50,12 +50,12 @@ public final class Look {
 	/**
 	 * How dark a level looks through the camera: the dark starts {@code start} blocks out and is complete at
 	 * {@code end}; {@code falloff} (0..1) makes dim light sink toward black so that only what is close to a lamp stays
-	 * bright. With Level 0's 0.45 and the filter's exposure, light levels 13 to 15 near a lamp stay bright, 11 comes out
-	 * under a third, 9 about a tenth, 7 and below black. Level 0 is meant to be the eeriest; the levels with their own lighting
+	 * bright. With Level 0's 0.38 and the filter's exposure, light levels 13 to 15 near a lamp stay bright, 11 comes out
+	 * about a third, 9 about a seventh, 7 and below black. Level 0 is meant to be the eeriest; the levels with their own lighting
 	 * get a lighter touch.
 	 */
 	record Mood(int start, int end, float falloff) {
-		static final Mood LEVEL_0 = new Mood(3, 18, 0.45F), DEFAULT = new Mood(9, 44, 0.15F);
+		static final Mood LEVEL_0 = new Mood(3, 20, 0.38F), DEFAULT = new Mood(9, 44, 0.15F);
 
 		static Mood of(Identifier dimension) {
 			return dimension.getPath().equals("level_0") ? LEVEL_0 : DEFAULT;
