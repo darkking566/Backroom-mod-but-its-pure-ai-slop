@@ -114,6 +114,8 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 	private void details(ClientGameTestContext context, TestSingleplayerContext game, BlockPos from) {
 		int[] room = findRoom(from, Room.BEDROOM), cold = findZone(from, 1), hot = findZone(from, 2);
 		if (room != null) closeUp(context, game, room, ZenithLayout.Kind.SPEAKER, "speaker");
+		java.util.List<double[]> done = new java.util.ArrayList<>();
+		for (int n = 0; n < 3; n++) outside(context, game, from, done, n);
 		int[] lab = findRoom(from, Room.LAB), airlock = findRoom(from, Room.AIRLOCK);
 		if (lab != null) {
 			closeUp(context, game, lab, ZenithLayout.Kind.COIL, "coil");
@@ -131,6 +133,49 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 			closeUp(context, game, hot, ZenithLayout.Kind.SLAG, "slag");
 			closeUp(context, game, hot, ZenithLayout.Kind.VENT, "vent");
 		}
+	}
+
+	private static double pick0(int cell, double direction, double distance) {
+		return cell + 0.5 + direction * distance;
+	}
+
+	/** Looking out through an outer window at the sea of rooms: the nearest window with floor behind it. */
+	private void outside(ClientGameTestContext context, TestSingleplayerContext game, BlockPos from, java.util.List<double[]> done, int n) {
+		double best = Double.MAX_VALUE;
+		double[] pick = null;
+		for (int i = 0; i < 60000; i++) {
+			double yaw = i * 2.399963, pitch = Math.asin(((i * 0.618034) % 1.0) * 2 - 1);
+			double dx = Math.cos(pitch) * Math.cos(yaw), dy = Math.sin(pitch), dz = Math.cos(pitch) * Math.sin(yaw);
+			int x = (int) (478.5 * dx), y = (int) (478.5 * dy), z = (int) (478.5 * dz);
+			double distance = Math.hypot(Math.hypot(x - from.getX(), y - from.getY()), z - from.getZ());
+			final double px = x, py = y, pz = z;
+			if (distance >= best || done.stream().anyMatch(d -> Math.hypot(Math.hypot(d[0] - px, d[1] - py), d[2] - pz) < 40) || ZenithLayout.kind(ZenithLayout.cell(seed, x, y, z)) != ZenithLayout.Kind.WINDOW) continue;
+			int cx = (int) Math.round(473.5 * dx), cz = (int) Math.round(473.5 * dz), cy = (int) Math.round(473.5 * dy);
+			int fy = cy;
+			while (fy > cy - 6 && ZenithLayout.passable(ZenithLayout.cell(seed, cx, fy - 1, cz))) fy--;
+			if (ZenithLayout.passable(ZenithLayout.cell(seed, cx, fy - 1, cz)) || !ZenithLayout.passable(ZenithLayout.cell(seed, cx, fy, cz))
+					|| !ZenithLayout.passable(ZenithLayout.cell(seed, cx, fy + 1, cz))) continue;
+			// Looking straight out from here, the first thing in the way (at eye height) has to be the window.
+			double hx = dx / Math.hypot(dx, dz), hz = dz / Math.hypot(dx, dz);
+			boolean clear = false;
+			for (double r = 0; r < 14; r += 0.25) {
+				int rx = (int) Math.floor(pick0(cx, hx, r)), rz = (int) Math.floor(pick0(cz, hz, r));
+				ZenithLayout.Kind kind = ZenithLayout.kind(ZenithLayout.cell(seed, rx, fy + 1, rz));
+				if (ZenithLayout.passable(ZenithLayout.cell(seed, rx, fy + 1, rz)) && ZenithLayout.passable(ZenithLayout.cell(seed, rx, fy, rz))) continue;
+				clear = kind == ZenithLayout.Kind.WINDOW && r > 2;
+				break;
+			}
+			if (!clear) continue;
+			best = distance;
+			pick = new double[] {cx + 0.5, fy, cz + 0.5, hx, hz, dy, x, y, z};
+		}
+		if (pick == null) {
+			System.out.println("details: no outer window found");
+			return;
+		}
+		done.add(new double[] {pick[6], pick[7], pick[8]});
+		float yaw = (float) Math.toDegrees(Math.atan2(-pick[3], pick[4]));
+		shoot(context, game, pick[0], pick[1], pick[2], yaw, 0, "level0p1_detail_outside" + n);
 	}
 
 	private void closeUp(ClientGameTestContext context, TestSingleplayerContext game, int[] module, ZenithLayout.Kind kind, String name) {

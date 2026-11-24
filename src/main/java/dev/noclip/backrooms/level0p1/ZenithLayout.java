@@ -22,6 +22,8 @@ package dev.noclip.backrooms.level0p1;
  * </pre>
  */
 final class ZenithLayout {
+	/** How far the sea of Level 0 rooms around the station is worked out (beyond this: nothing; the fog hides the edge). */
+	static final int SEA = 260, SEA_GAP = 60;
 	static final int RO = 480, RI = 176, HULL = 3, SKIN = 2, PROMENADE = 10;
 	static final int PITCH = 8, MODULE = 16, GROUP = 3, GROUP_DECKS = 6;
 	/** The lake in the bottom of the middle is this deep at the centre. */
@@ -30,6 +32,8 @@ final class ZenithLayout {
 	static final int SPOKE = 4;
 
 	private static final long RO2 = (long) RO * RO;
+	private static final long RGAP2 = (long) (RO + SEA_GAP) * (RO + SEA_GAP);
+	private static final long ROUT2 = (long) (RO + SEA) * (RO + SEA);
 	private static final long HULL2 = (long) (RO - HULL) * (RO - HULL);
 	private static final long OUTER2 = (long) (RO - 1) * (RO - 1);
 	private static final long RI2 = (long) RI * RI;
@@ -49,7 +53,8 @@ final class ZenithLayout {
 		CATWALK, TRUSS, TETHER, GIRDER, GIRDER_LIGHT, SINGULARITY_CORE, SINGULARITY_SHELL, PLASMA, RAIL_LAMP,
 		DESK, WARDROBE, BUNK_BED, FRAME, ITEMS, SINK, FRIDGE, POTS, DISHES, BENCH_PRESS, BAG, MIRROR, DISPENSER, MATS, RACK, GROW_LIGHT, TANK, VINES,
 		SPEAKER(false), ICICLES(true), DRIFT(true), SLAG(true), VENT(true),
-		SCREEN, COIL, NOTES(true), COAT;
+		SCREEN, COIL, NOTES(true), COAT,
+		SEA_WALL, SEA_CARPET, SEA_LIGHT;
 
 		/** Whether a player can walk through it (a closed door counts: it opens). */
 		final boolean passable;
@@ -113,8 +118,8 @@ final class ZenithLayout {
 	/** What is at this block. */
 	static int cell(long seed, int x, int y, int z) {
 		long d2 = (long) x * x + (long) y * y + (long) z * z;
-		if (d2 > RO2) return of(Kind.AIR);
-		if (d2 >= HULL2) return hull(x, y, z, d2);
+		if (d2 > RO2) return d2 > RGAP2 && d2 <= ROUT2 ? sea(seed, x, y, z) : of(Kind.AIR);
+		if (d2 >= HULL2) return hull(seed, x, y, z, d2);
 		if (d2 < RI2) return cavity(seed, x, y, z, d2);
 		if (d2 < SKIN2) return skin(seed, x, y, z);
 		int k = Math.floorDiv(y, PITCH), t = Math.floorMod(y, PITCH);
@@ -127,15 +132,42 @@ final class ZenithLayout {
 	static boolean emptyBox(int minX, int maxX, int minZ, int maxZ) {
 		int nx = minX > 0 ? minX : maxX < 0 ? -maxX : 0;
 		int nz = minZ > 0 ? minZ : maxZ < 0 ? -maxZ : 0;
-		return (long) nx * nx + (long) nz * nz > RO2;
+		return (long) nx * nx + (long) nz * nz > ROUT2;
 	}
 
 	// The outer hull
 
-	private static int hull(int x, int y, int z, long d2) {
+	private static int hull(long seed, int x, int y, int z, long d2) {
+		if (window(seed, x, y, z, d2)) return of(Kind.WINDOW);
 		boolean seam = (x & 15) == 0 || (y & 15) == 0 || (z & 15) == 0;
 		if (d2 >= OUTER2) return of(seam ? Kind.HULL_SEAM : Kind.HULL);
 		return of(((x + y + z) & 7) == 0 ? Kind.HULL_SEAM : Kind.HULL);
+	}
+
+	/** Outer windows: in 4-block patches of the hull, wherever a corridor or room is right behind it, so someone can stand at the glass. */
+	private static boolean window(long seed, int x, int y, int z, long d2) {
+		if (hash(seed, x >> 2, y >> 2, z >> 2 ^ 0x51) % 3 != 0) return false;
+		double scale = (RO - HULL - 3.0) / Math.sqrt(d2);
+		int px = (int) Math.round(x * scale), py = (int) Math.round(y * scale), pz = (int) Math.round(z * scale);
+		return passable(cell(seed, px, py, pz)) && passable(cell(seed, px, py + 1, pz));
+	}
+
+	/**
+	 * What lies outside, as the Wiki's story has it: a sea of dim Level 0 rooms in the dark, stacked on one another far
+	 * beyond anything a person has seen. Rooms 11 across and 3 high, each floor the ceiling of the room below; holes and
+	 * cliffs where whole stretches are missing, doorways here and there, and every so often a lamp still burning.
+	 */
+	private static int sea(long seed, int x, int y, int z) {
+		if (hash(seed, Math.floorDiv(x, 60), Math.floorDiv(y, 24), Math.floorDiv(z, 60)) % 100 < 22) return of(Kind.AIR);
+		int cx = Math.floorDiv(x, 12), cy = Math.floorDiv(y, 4), cz = Math.floorDiv(z, 12);
+		if (hash(seed, cx, cy, cz + 999) % 10 == 0) return of(Kind.AIR);
+		int lx = Math.floorMod(x, 12), lz = Math.floorMod(z, 12), t = Math.floorMod(y, 4);
+		if (t == 0) return lx == 5 && lz == 5 && hash(seed, cx, cy, cz + 7) % 5 == 0 ? of(Kind.SEA_LIGHT) : of(Kind.SEA_CARPET);
+		if (lx != 0 && lz != 0) return of(Kind.AIR);
+		boolean corner = lx == 0 && lz == 0;
+		int along = lx == 0 ? lz : lx;
+		if (!corner && t <= 2 && along >= 5 && along <= 6 && hash(seed, cx, cy, cz * 2 + (lx == 0 ? 3 : 4)) % 3 == 0) return of(Kind.AIR);
+		return of(Kind.SEA_WALL);
 	}
 
 	// The inner skin: glass in a frame of ribs, one wedge of glass per sector of the sphere

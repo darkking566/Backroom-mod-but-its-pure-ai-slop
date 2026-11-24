@@ -239,3 +239,5 @@
 - Level 0.1 第二批細節：天花板廣播喇叭（走廊每 16 格、廣播時冒音符）、電纜電火花與排熱孔冒煙（`ZenithAmbience.details` 隨機抽樣）、冷區冰柱／積冰、熱區熔渣堆／排熱孔（5 個新方塊，皆可穿過，`Kind.SPEAKER/ICICLES/DRIFT/SLAG/VENT`）、拆解材料掉落（電纜、控制台、壞控制台、伺服器機櫃改掉銅／紅石／金粒／鐵／機率合金）；新增單元測試 `speakersAndZoneDetailsAppear`；`gradlew build` 與 `rooms,zones` 實機段通過；之後補拍近照（新增 `details` 段，`NOCLIP_ONLY=details`）：喇叭、冰柱、積冰、熔渣、排熱孔外觀都看過；火花、煙與音符粒子沒拍；尚未提交
 
 - Level 0.1 第三批（原文背景故事延伸）：新房間「實驗室」`Room.LAB`（橋接發射線圈、伺服器機櫃、桌子、控制台）、倒數螢幕 `countdown_screen`（實驗室與控制室牆上，停在 00:00）、Rhea 的研究筆記 `research_notes`（右鍵讀 4 頁之一，`ZenithNotesBlock`）與實驗袍 `lab_coat`（每個氣閘室一角）；4 個新方塊由 `make_level0p1_props.py` 產生；`ZenithShapedBlock` 拿掉 final 讓筆記繼承；單元測試加四種新 Kind；`gradlew build` 與 `details,rooms` 實機段通過，截圖看過；實驗袍在近照裡是側視、看不清，筆記右鍵文字沒實機點過；尚未提交
+
+- Level 0.1 窗外的房間海（原文背景故事）：外殼加外窗（`ZenithLayout.window`，後面有走廊或房間才開）、外殼外 60 格到半徑 740 生成 Level 0 的壁紙／地毯／日光燈房間堆（`ZenithLayout.sea`，有洞與斷崖，約 1/5 亮燈）；`ZenithChunkGenerator` 的生成範圍與 `emptyBox` 擴到 `RO+SEA`；單元測試 `outerWindowsLookOutOnASeaOfRooms`；`details` 段新增 3 張窗外照；`gradlew build` 與 `details` 實機段通過；實機看得到透過窗的黃色牆面但很暗；沒量過玩家貼著外殼時的區塊生成負擔；中途 Level 3 的「generator did not overload」測試失敗過一次，重跑通過，原因沒查；尚未提交

@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import dev.noclip.backrooms.level0p1.ZenithLayout.Kind;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.WorldGenRegion;
@@ -51,6 +52,13 @@ final class ZenithChunkGenerator extends ChunkGenerator {
 
 	static BlockState blockAt(long seed, int x, int y, int z) {
 		return state(ZenithLayout.cell(seed, x, y, z));
+	}
+
+	// The sea outside is Level 0's own blocks (the lamps still burn), looked up by name so Level 0 keeps them private.
+	private static final BlockState SEA_WALL = level0("wallpaper"), SEA_CARPET = level0("carpet"), SEA_LIGHT = level0("fluorescent_light");
+
+	private static BlockState level0(String name) {
+		return BuiltInRegistries.BLOCK.getValue(Level0p1.id(name)).defaultBlockState();
 	}
 
 	static BlockState state(int cell) {
@@ -130,6 +138,9 @@ final class ZenithChunkGenerator extends ChunkGenerator {
 			case COIL -> ZenithBlocks.BRIDGE_COIL.defaultBlockState();
 			case NOTES -> ZenithBlocks.RESEARCH_NOTES.defaultBlockState();
 			case COAT -> facing(ZenithBlocks.LAB_COAT, dir);
+			case SEA_WALL -> SEA_WALL;
+			case SEA_CARPET -> SEA_CARPET;
+			case SEA_LIGHT -> SEA_LIGHT;
 			case VINES -> ZenithBlocks.HANGING_VINES.defaultBlockState();
 			case BENCH -> ZenithBlocks.STATION_BENCH.defaultBlockState();
 			case PORTAL -> ZenithBlocks.YELLOW_DOORWAY.defaultBlockState().setValue(ZenithPortalBlock.PART, extra);
@@ -180,7 +191,7 @@ final class ZenithChunkGenerator extends ChunkGenerator {
 		Heightmap oceanFloor = chunk.getOrCreateHeightmapUnprimed(Heightmap.Types.OCEAN_FLOOR_WG);
 		Heightmap surface = chunk.getOrCreateHeightmapUnprimed(Heightmap.Types.WORLD_SURFACE_WG);
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-		long outer = (long) ZenithLayout.RO * ZenithLayout.RO;
+		long outer = (long) (ZenithLayout.RO + ZenithLayout.SEA) * (ZenithLayout.RO + ZenithLayout.SEA);
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				int wx = minX + x, wz = minZ + z;
