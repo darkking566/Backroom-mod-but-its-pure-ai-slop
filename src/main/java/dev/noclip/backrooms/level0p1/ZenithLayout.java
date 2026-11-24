@@ -70,6 +70,8 @@ final class ZenithLayout {
 
 	enum Room { BEDROOM, KITCHEN, GYM, GREENHOUSE, CONSOLES, MACHINES, STORAGE, EMPTY, WRECK, AIRLOCK, LAB }
 
+	enum Shape { STANDARD, NARROW_HALL, L_CORNER, CUBICLES, SUNKEN_PIT, RAISED_DAIS, ALCOVE_BAYS, DOUBLE_LOWER, DOUBLE_UPPER }
+
 	// Directions: 0 north (-z), 1 east (+x), 2 south (+z), 3 west (-x)
 	private static final int[][] RING = {{0, 0}, {1, 0}, {2, 0}, {3, 0}, {3, 1}, {3, 2}, {3, 3}, {2, 3}, {1, 3}, {0, 3}, {0, 2}, {0, 1}};
 	private static final int[] RING_DIR = {1, 1, 1, 2, 2, 2, 3, 3, 3, 0, 0, 0};
@@ -324,13 +326,15 @@ final class ZenithLayout {
 	// One deck of modules
 
 	private static int deck(long seed, int x, int y, int z, int k, int t, int mx, int mz, int u, int v) {
-		int zone = zone(seed, mx, mz, k);
+		Info info = info(seed, mx, mz, k);
+		int zone = info.zone;
 		boolean damaged = zone != 0;
-		boolean corridor = u < 4 || v < 4;
-		Room room = corridor ? null : room(seed, mx, mz, k);
-		if (t == 7) return ceiling(seed, x, z, u, v, corridor, zone, mx, mz, k);
-		if (t == 0) return floor(seed, x, z, u, v, corridor, zone, room);
+		boolean inRoomU = u >= 4 || (info.swallowW && (v >= 4 || info.swallowN));
+		boolean inRoomV = v >= 4 || (info.swallowN && (u >= 4 || info.swallowW));
+		boolean corridor = !(inRoomU && inRoomV);
+		if (t == 7) return ceiling(seed, x, z, u, v, corridor, zone, mx, mz, k, info);
 		if (corridor) {
+			if (t == 0) return floor(seed, x, z, u, v, true, zone, null, false);
 			// Cables hang from the ceiling in the dark stretches.
 			if (damaged && t >= 5 && hash(seed, x, z, k) % 9 == 0) return of(Kind.CABLES);
 			// Rime hangs from the cold stretches' ceilings and drifts on their floors; the hot ones have slag and venting floor grates.
@@ -343,12 +347,38 @@ final class ZenithLayout {
 			}
 			return of(Kind.AIR);
 		}
-		boolean wallW = u == 4, wallE = u == 15, wallN = v == 4, wallS = v == 15;
-		if (wallW || wallE || wallN || wallS) return wall(seed, mx, mz, k, u, v, t, wallW, wallE, wallN, wallS, room, zone);
-		return furnish(seed, room, mx, mz, k, u, v, t, damaged);
+		int W = (info.maxMx - info.minMx) * MODULE + 12;
+		int H = (info.maxMz - info.minMz) * MODULE + 12;
+		int rx = x - (info.minMx * MODULE + 4);
+		int rz = z - (info.minMz * MODULE + 4);
+		if (info.shape == Shape.DOUBLE_UPPER) return doubleUpperCell(seed, x, z, rx, rz, W, H, t, info);
+		if (t == 0) return roomFloor(seed, x, z, rx, rz, W, H, info);
+		boolean wallW = rx == 0, wallE = rx == W - 1, wallN = rz == 0, wallS = rz == H - 1;
+		if (wallW || wallE || wallN || wallS) return wall(seed, info, k, rx, rz, W, H, t, wallW, wallE, wallN, wallS);
+		return roomInterior(seed, x, z, mx, mz, k, rx, rz, W, H, t, info);
 	}
 
-	private static int ceiling(long seed, int x, int z, int u, int v, boolean corridor, int zone, int mx, int mz, int k) {
+	private static int ceiling(long seed, int x, int z, int u, int v, boolean corridor, int zone, int mx, int mz, int k, Info info) {
+		// If the deck directly above has a sunken pit, this ceiling layer becomes that pit's floor while staying solid below.
+		Info above = info(seed, mx, mz, k + 1);
+		if (!above.atrium && above.shape == Shape.SUNKEN_PIT && isInRoomFootprint(above, u, v)) {
+			int Wa = (above.maxMx - above.minMx) * MODULE + 12;
+			int Ha = (above.maxMz - above.minMz) * MODULE + 12;
+			int rxa = x - (above.minMx * MODULE + 4);
+			int rza = z - (above.minMz * MODULE + 4);
+			if (rxa >= 3 && rxa <= Wa - 4 && rza >= 3 && rza <= Ha - 4) {
+				return floor(seed, x, z, u, v, false, above.zone, above.room, false);
+			}
+		}
+		if (!corridor && info.shape == Shape.DOUBLE_LOWER) {
+			int W = (info.maxMx - info.minMx) * MODULE + 12;
+			int H = (info.maxMz - info.minMz) * MODULE + 12;
+			int rx = x - (info.minMx * MODULE + 4);
+			int rz = z - (info.minMz * MODULE + 4);
+			if (rx == 0 || rx == W - 1 || rz == 0 || rz == H - 1) return of(wallKind(info.room, zone, seed, rx, rz, k));
+			if (rx == 2 && rz == 1) return of(Kind.STAIR, 1);
+			return of(Kind.AIR);
+		}
 		boolean damaged = zone != 0;
 		boolean lamp;
 		if (corridor) lamp = v < 4 ? (x & 7) == 4 && v == 1 : (z & 7) == 4 && u == 1;
@@ -366,7 +396,26 @@ final class ZenithLayout {
 		return of(alive ? Kind.LIGHT : Kind.DEAD_LIGHT);
 	}
 
-	private static int floor(long seed, int x, int z, int u, int v, boolean corridor, int zone, Room room) {
+	private static boolean isInRoomFootprint(Info info, int u, int v) {
+		boolean inRoomU = u >= 4 || (info.swallowW && (v >= 4 || info.swallowN));
+		boolean inRoomV = v >= 4 || (info.swallowN && (u >= 4 || info.swallowW));
+		return inRoomU && inRoomV;
+	}
+
+	private static int roomFloor(long seed, int x, int z, int rx, int rz, int W, int H, Info info) {
+		if (info.shape == Shape.SUNKEN_PIT && rx >= 3 && rx <= W - 4 && rz >= 3 && rz <= H - 4) {
+			boolean crossX = isCrossSlot(rx, W), crossZ = isCrossSlot(rz, H);
+			if (rz == 3 && crossX) return of(Kind.STAIR, 0);
+			if (rz == H - 4 && crossX) return of(Kind.STAIR, 2);
+			if (rx == 3 && crossZ) return of(Kind.STAIR, 3);
+			if (rx == W - 4 && crossZ) return of(Kind.STAIR, 1);
+			return of(Kind.AIR);
+		}
+		boolean hazard = info.room == Room.AIRLOCK && rx >= 3 && rx <= 8 && rz >= 3 && rz <= 8;
+		return floor(seed, x, z, rx + 4, rz + 4, false, info.zone, info.room, hazard);
+	}
+
+	private static int floor(long seed, int x, int z, int u, int v, boolean corridor, int zone, Room room, boolean hazard) {
 		if (zone != 0) {
 			// A damaged stretch: worn plates, and in the cold and the hot ones plates under ice or burnt, over half the floor.
 			int h = hash(seed, x, z, 3) % 4;
@@ -378,13 +427,14 @@ final class ZenithLayout {
 			boolean stripe = u < 4 && v >= 4 ? u == 1 || u == 2 : v < 4 && u >= 4 && (v == 1 || v == 2);
 			return of(stripe ? Kind.FLOOR_STRIPE : Kind.FLOOR_CORRIDOR);
 		}
+		if (hazard) return of(Kind.FLOOR_HAZARD);
+		if (room == null) return of(Kind.FLOOR);
 		return switch (room) {
 			case BEDROOM -> of(Kind.FLOOR_QUARTERS);
 			case KITCHEN -> of(Kind.FLOOR_KITCHEN);
 			case GYM -> of(Kind.FLOOR_GYM);
 			case GREENHOUSE -> of(Kind.FLOOR_GARDEN);
 			case WRECK -> of(Kind.FLOOR_WORN);
-			case AIRLOCK -> u >= 7 && u <= 12 && v >= 7 && v <= 12 ? of(Kind.FLOOR_HAZARD) : of(Kind.FLOOR);
 			default -> of(Kind.FLOOR);
 		};
 	}
@@ -403,20 +453,36 @@ final class ZenithLayout {
 		return mask;
 	}
 
-	private static int wall(long seed, int mx, int mz, int k, int u, int v, int t, boolean w, boolean e, boolean n, boolean s,
-			Room room, int zone) {
-		int mask = doors(seed, mx, mz, k);
-		boolean alongZ = w || e; // the wall runs along z, so the door is at v 9 and 10
-		int along = alongZ ? v : u;
+	private static boolean isCrossSlot(int coord, int size) {
+		return coord == 5 || coord == 6 || (size > 12 && (coord == 13 || coord == 14 || coord == 21 || coord == 22));
+	}
+
+	private static int vestibuleSide(Info info) {
+		if (info.shape != Shape.STANDARD || info.room == Room.AIRLOCK || info.variant % 5 != 0) return -1;
+		for (int s = 0; s < 4; s++) {
+			int side = (info.variant + s) & 3;
+			if ((info.doors >> side & 1) != 0) return side;
+		}
+		return -1;
+	}
+
+	private static int wall(long seed, Info info, int k, int rx, int rz, int W, int H, int t, boolean w, boolean e, boolean n, boolean s) {
+		boolean alongZ = w || e;
+		int along = alongZ ? rz : rx;
+		int span = alongZ ? H : W;
 		boolean corner = (w || e) && (n || s);
-		if (!corner && along >= 9 && along <= 10) {
+		if (!corner && isCrossSlot(along, span)) {
 			int side = w ? 0 : n ? 1 : e ? 2 : 3;
-			if ((mask >> side & 1) != 0) {
-				if (t <= 2) return of(Kind.DOOR, alongZ ? 1 : 0, (along == 9 ? 0 : 1) | (t == 1 ? 0 : 2));
-				return of(wallKind(room, zone, seed, u, v, k));
+			// Swallowed internal corridors in merged rooms always pass through via doors at 13..14.
+			boolean corridorThru = span > 12 && (along == 13 || along == 14);
+			boolean open = corridorThru || (info.doors >> side & 1) != 0;
+			if (open) {
+				boolean recessed = (along == 5 || along == 6) && vestibuleSide(info) == side;
+				if (recessed) return t <= 2 ? of(Kind.AIR) : of(wallKind(info.room, info.zone, seed, rx, rz, k));
+				if (t <= 2) return of(Kind.DOOR, alongZ ? 1 : 0, ((along & 1) == 1 ? 0 : 1) | (t == 1 ? 0 : 2));
 			}
 		}
-		return of(wallKind(room, zone, seed, u, v, k));
+		return of(wallKind(info.room, info.zone, seed, rx, rz, k));
 	}
 
 	private static Kind wallKind(Room room, int zone, long seed, int u, int v, int k) {
@@ -436,24 +502,219 @@ final class ZenithLayout {
 		};
 	}
 
+	/** Upper deck (t = 0..6 of k+1) of a two-story chamber: mezzanine balcony, railings, stair top, and hanging orbs. */
+	private static int doubleUpperCell(long seed, int x, int z, int rx, int rz, int W, int H, int t, Info info) {
+		boolean wallW = rx == 0, wallE = rx == W - 1, wallN = rz == 0, wallS = rz == H - 1;
+		boolean onOuter = wallW || wallE || wallN || wallS;
+		if (t == 0) {
+			if (onOuter) {
+				boolean alongZ = wallW || wallE;
+				int along = alongZ ? rz : rx;
+				int span = alongZ ? H : W;
+				boolean corner = (wallW || wallE) && (wallN || wallS);
+				if (!corner && isCrossSlot(along, span)) return floor(seed, x, z, rx + 4, rz + 4, false, info.zone, info.room, false);
+				return of(wallKind(info.room, info.zone, seed, rx, rz, info.k));
+			}
+			if (rx == 3 && rz == 1) return of(Kind.STAIR, 1);
+			if (rx <= 2 && rz <= 2) return of(Kind.AIR);
+			boolean balcony = rx <= 2 || rx >= W - 3 || rz <= 2 || rz >= H - 3;
+			if (balcony) return floor(seed, x, z, rx + 4, rz + 4, false, info.zone, info.room, false);
+			if (W == 28 && H == 28 && rx >= 12 && rx <= 15 && rz >= 3 && rz <= 24) return of(Kind.CATWALK);
+			return of(Kind.AIR);
+		}
+		if (onOuter) return wall(seed, info, info.k, rx, rz, W, H, t, wallW, wallE, wallN, wallS);
+		if (t == 1) {
+			if ((rx == 1 || rx == 2) && rz == 3 || (rx == 3 && rz == 2)) return of(Kind.RAIL);
+			boolean bridgeRim = W == 28 && H == 28 && (rx == 12 || rx == 15) && rz >= 3 && rz <= 24;
+			boolean bridgeOpening = W == 28 && H == 28 && (rx == 13 || rx == 14) && (rz == 2 || rz == 25);
+			boolean innerRim = (rx == 2 || rx == W - 3 || rz == 2 || rz == H - 3)
+					&& rx >= 2 && rx <= W - 3 && rz >= 2 && rz <= H - 3
+					&& !(rx <= 3 && rz <= 2) && !bridgeOpening;
+			if (innerRim || bridgeRim) return of(Kind.RAIL);
+		}
+		if (t == 4 && rx > 3 && rx < W - 4 && rz > 3 && rz < H - 4 && (rx - 5) % 8 == 0 && (rz - 5) % 8 == 0) {
+			if (info.zone == 0 || hash(seed, x, z, info.k) % 4 == 0) return of(Kind.ORB);
+		}
+		return of(Kind.AIR);
+	}
+
+	/** Step height (1..6) for the NW corner stair inside a two-story room, or 0 if not on the stair. */
+	private static int doubleStairStep(int rx, int rz) {
+		if (rx == 3 && rz == 4) return 1;
+		if (rx == 2 && rz == 4) return 2;
+		if (rx == 1 && rz == 4) return 3;
+		if (rx == 1 && rz == 3) return 4;
+		if (rx == 1 && rz == 2) return 5;
+		if (rx == 1 && rz == 1) return 6;
+		return 0;
+	}
+
+	private static int doubleStairDir(int rx, int rz) {
+		if (rz == 4 && rx >= 2) return 3;
+		if (rx == 1 && rz >= 2) return 0;
+		return 1;
+	}
+
+	/** Maps (rx, rz) into rotated coordinates (px, pz) of size (PW, PH) for directional shapes like RAISED_DAIS. */
+	private static int rotX(int rx, int rz, int W, int H, int rot) {
+		return switch (rot & 3) {
+			case 1 -> rz;
+			case 2 -> W - 1 - rx;
+			case 3 -> H - 1 - rz;
+			default -> rx;
+		};
+	}
+
+	private static int rotZ(int rx, int rz, int W, int H, int rot) {
+		return switch (rot & 3) {
+			case 1 -> W - 1 - rx;
+			case 2 -> H - 1 - rz;
+			case 3 -> rx;
+			default -> rz;
+		};
+	}
+
+	private static int rotDir(int dir, int rot) {
+		return (dir + (rot & 3)) & 3;
+	}
+
 	/**
-	 * The inside of a room. A cross of free floor runs through the middle (where the doors are), and each of the four
-	 * quadrants (4x4) is filled by the room's kind. a and b count blocks away from the quadrant's own corner walls.
+	 * The inside of a room (standard 10x10 or merged 26x10 / 10x26 / 26x26), applying depth, height, and partition shapes
+	 * before furnishing each 10x10 bay.
 	 */
-	private static int furnish(long seed, Room room, int mx, int mz, int k, int u, int v, int t, boolean damaged) {
-		boolean crossU = u == 9 || u == 10, crossV = v == 9 || v == 10;
-		if (room == Room.AIRLOCK && t <= 3 && v == 9 && (u == 8 || u == 10 || u == 9)) {
-			if (u == 9) return t <= 2 ? of(Kind.PORTAL, 0, t - 1) : of(Kind.PORTAL_FRAME);
+	private static int roomInterior(long seed, int x, int z, int mx, int mz, int k, int rx, int rz, int W, int H, int t, Info info) {
+		Room room = info.room;
+		Shape shape = info.shape;
+		int wallBlock = of(wallKind(room, info.zone, seed, rx, rz, k));
+
+		if (room == Room.AIRLOCK && t <= 3 && rz == 5 && (rx == 4 || rx == 5 || rx == 6)) {
+			if (rx == 5) return t <= 2 ? of(Kind.PORTAL, 0, t - 1) : of(Kind.PORTAL_FRAME);
 			return of(Kind.PORTAL_FRAME);
 		}
-		if (room == Room.WRECK && t <= 2 && u == 9 && v == 10 && hash(seed, mx, mz, k + 77) % 5 == 0) return of(Kind.STATIC_TEAR);
-		if (crossU || crossV) return of(Kind.AIR);
-		boolean west = u < 9, north = v < 9;
-		int a = west ? u - 5 : 14 - u; // 0 at the east/west wall, up to 3 next to the cross
-		int b = north ? v - 5 : 14 - v;
-		// Which way things face: towards the middle of the room.
+		if (room == Room.WRECK && t <= 2 && rx == 5 && rz == 6 && hash(seed, info.minMx, info.minMz, k + 77) % 5 == 0) {
+			return of(Kind.STATIC_TEAR);
+		}
+
+		// Recessed door vestibule on one standard room wall.
+		int vest = vestibuleSide(info);
+		if (vest >= 0) {
+			if (vest == 0 && rx == 1 && (rz == 4 || rz == 7)) return wallBlock;
+			if (vest == 0 && rx == 1 && (rz == 5 || rz == 6)) return t <= 2 ? of(Kind.DOOR, 1, ((rz & 1) == 1 ? 0 : 1) | (t == 1 ? 0 : 2)) : wallBlock;
+			if (vest == 1 && rz == 1 && (rx == 4 || rx == 7)) return wallBlock;
+			if (vest == 1 && rz == 1 && (rx == 5 || rx == 6)) return t <= 2 ? of(Kind.DOOR, 0, ((rx & 1) == 1 ? 0 : 1) | (t == 1 ? 0 : 2)) : wallBlock;
+			if (vest == 2 && rx == W - 2 && (rz == 4 || rz == 7)) return wallBlock;
+			if (vest == 2 && rx == W - 2 && (rz == 5 || rz == 6)) return t <= 2 ? of(Kind.DOOR, 1, ((rz & 1) == 1 ? 0 : 1) | (t == 1 ? 0 : 2)) : wallBlock;
+			if (vest == 3 && rz == H - 2 && (rx == 4 || rx == 7)) return wallBlock;
+			if (vest == 3 && rz == H - 2 && (rx == 5 || rx == 6)) return t <= 2 ? of(Kind.DOOR, 0, ((rx & 1) == 1 ? 0 : 1) | (t == 1 ? 0 : 2)) : wallBlock;
+		}
+
+		if (shape == Shape.DOUBLE_LOWER) {
+			int step = doubleStairStep(rx, rz);
+			if (step > 0) return t == step ? of(Kind.STAIR, doubleStairDir(rx, rz)) : of(Kind.AIR);
+			if (rx <= 4 && rz <= 4 && (rx == 4 || rz == 4)) return of(Kind.AIR);
+		}
+
+		if (shape == Shape.L_CORNER) {
+			int corner = info.variant & 3;
+			int limX = W > 12 ? 11 : 4, limZ = H > 12 ? 11 : 4;
+			boolean blocked = switch (corner) {
+				case 0 -> rx <= limX && rz <= limZ;
+				case 1 -> rx >= W - 1 - limX && rz <= limZ;
+				case 2 -> rx <= limX && rz >= H - 1 - limZ;
+				default -> rx >= W - 1 - limX && rz >= H - 1 - limZ;
+			};
+			if (blocked) return wallBlock;
+		}
+
+		if (shape == Shape.NARROW_HALL) {
+			boolean alongX = W > H || (W == H && (info.variant & 1) == 0);
+			if (alongX) {
+				if ((rz == 3 || rz == H - 4) && !isCrossSlot(rx, W)) return wallBlock;
+				if ((rz <= 2 || rz >= H - 3) && (rx == 3 || rx == W - 4 || (W > 12 && (rx == 11 || rx == 16)))) return wallBlock;
+			} else {
+				if ((rx == 3 || rx == W - 4) && !isCrossSlot(rz, H)) return wallBlock;
+				if ((rx <= 2 || rx >= W - 3) && (rz == 3 || rz == H - 4 || (H > 12 && (rz == 11 || rz == 16)))) return wallBlock;
+			}
+		}
+
+		if (shape == Shape.CUBICLES) {
+			boolean halfWall = (info.variant & 2) != 0;
+			boolean wallX = (rx == 4 || rx == W - 5 || (W > 12 && (rx == 11 || rx == 16))) && !isCrossSlot(rz, H);
+			boolean wallZ = (rz == 4 || rz == H - 5 || (H > 12 && (rz == 11 || rz == 16))) && !isCrossSlot(rx, W);
+			boolean subDoorX = rz == 2 || rz == H - 3 || (H > 12 && (rz == 18 || rz == 19));
+			boolean subDoorZ = rx == 2 || rx == W - 3 || (W > 12 && (rx == 18 || rx == 19));
+			boolean divider = (wallX && !subDoorX) || (wallZ && !subDoorZ);
+			if (divider && (!halfWall || t <= 3)) return wallBlock;
+			if (divider) return of(Kind.AIR);
+		}
+
+		if (shape == Shape.ALCOVE_BAYS) {
+			boolean pilaster = ((rx == 1 || rx == W - 2) && (rz == 3 || rz == H - 4 || (H > 12 && (rz == 11 || rz == 16))))
+					|| ((rz == 1 || rz == H - 2) && (rx == 3 || rx == W - 4 || (W > 12 && (rx == 11 || rx == 16))));
+			boolean centerCol = W == 28 && H == 28 && (rx == 11 || rx == 16) && (rz == 11 || rz == 16);
+			boolean soffit = t == 6 && (rx == 3 || rx == W - 4 || rz == 3 || rz == H - 4
+					|| (W > 12 && (rx == 11 || rx == 16)) || (H > 12 && (rz == 11 || rz == 16)));
+			if (pilaster || centerCol || soffit) return wallBlock;
+		}
+
+		if (shape == Shape.SUNKEN_PIT) {
+			boolean onRim = (rx == 3 || rx == W - 4) && rz >= 3 && rz <= H - 4
+					|| (rz == 3 || rz == H - 4) && rx >= 3 && rx <= W - 4;
+			if (onRim && t == 1 && !isCrossSlot(rx, W) && !isCrossSlot(rz, H)) return of(Kind.RAIL);
+			if (onRim) return of(Kind.AIR);
+			if (rx >= 4 && rx <= W - 5 && rz >= 4 && rz <= H - 5) {
+				if (isCrossSlot(rx, W) || isCrossSlot(rz, H)) return of(Kind.AIR);
+				// Furniture inside the sunken pit rests one block lower (t=1 maps to t=0).
+				return t <= 5 ? furnishCoords(seed, room, mx, mz, k, rx, rz, W, H, t + 1) : of(Kind.AIR);
+			}
+		}
+
+		if (shape == Shape.RAISED_DAIS) {
+			int rot = W != H ? (W > H ? ((info.variant & 1) == 0 ? 0 : 2) : ((info.variant & 1) == 0 ? 1 : 3)) : (info.variant & 3);
+			int px = rotX(rx, rz, W, H, rot);
+			int pz = rotZ(rx, rz, W, H, rot);
+			int PW = (rot & 1) == 0 ? W : H;
+			boolean inLane = isCrossSlot(px, PW);
+			if (pz >= 1 && pz <= 3) {
+				if (!inLane) {
+					if (t == 1) return floor(seed, x, z, rx + 4, rz + 4, false, info.zone, room, false);
+					if (t == 6) return of(wallKind(room, info.zone, seed, rx, rz, k));
+					return furnishCoords(seed, room, mx, mz, k, rx, rz, W, H, t - 1);
+				}
+				if (t == 6) return of(wallKind(room, info.zone, seed, rx, rz, k));
+				return of(Kind.AIR);
+			}
+			if (pz == 4 && !inLane && t == 1) return of(Kind.STAIR, rotDir(0, rot));
+			if (pz == 4 && !inLane) return of(Kind.AIR);
+			if (pz >= 1 && pz <= 3 && inLane) return of(Kind.AIR);
+		}
+
+		if (W == 28 && H == 28 && (rx == 11 || rx == 16) && (rz == 11 || rz == 16)) return wallBlock;
+		return furnishCoords(seed, room, mx, mz, k, rx, rz, W, H, t);
+	}
+
+	private static int furnishCoords(long seed, Room room, int mx, int mz, int k, int rx, int rz, int W, int H, int t) {
+		if (isCrossSlot(rx, W) || isCrossSlot(rz, H)) return of(Kind.AIR);
+		int bx = rx <= 10 ? rx : (rx >= 17 ? rx - 16 : -1);
+		int bz = rz <= 10 ? rz : (rz >= 17 ? rz - 16 : -1);
+		if (bx < 0 || bz < 0) {
+			// In the swallowed corridor strip of a merged hall, place occasional wall-side crates, tables, or planters.
+			boolean againstWall = rx == 1 || rx == W - 2 || rz == 1 || rz == H - 2;
+			if (!againstWall || t != 1) return of(Kind.AIR);
+			int r = hash(seed, rx + mx * 16, rz + mz * 16, k + 19);
+			if (r % 3 != 0) return of(Kind.AIR);
+			return switch (room) {
+				case GREENHOUSE -> of(Kind.PLANTER);
+				case MACHINES, CONSOLES -> of(Kind.SERVER, rz == 1 ? 2 : 0);
+				case KITCHEN, BEDROOM -> of(Kind.TABLE);
+				default -> of(Kind.CRATE);
+			};
+		}
+		boolean west = bx < 5, north = bz < 5;
+		int a = west ? bx - 1 : 10 - bx; // 0 at the outer/bay edge, 3 next to the bay cross
+		int b = north ? bz - 1 : 10 - bz;
 		int faceV = north ? 2 : 0, faceU = west ? 1 : 3;
-		int roll = hash(seed, u + mx * 16, v + mz * 16, k);
+		int roll = hash(seed, rx + mx * 16, rz + mz * 16, k);
 		return switch (room) {
 			case BEDROOM -> bedroom(a, b, t, faceV, roll, hash(seed, mx, mz, k + 31));
 			case KITCHEN -> kitchen(a, b, t, faceV, roll);
@@ -581,11 +842,108 @@ final class ZenithLayout {
 		return info(seed, mx, mz, k).room;
 	}
 
-	private static Room computeRoom(long seed, int mx, int mz, int k, int zone) {
+	static Shape shape(long seed, int mx, int mz, int k) {
+		return info(seed, mx, mz, k).shape;
+	}
+
+	static boolean isMerged(long seed, int mx, int mz, int k) {
+		Info i = info(seed, mx, mz, k);
+		return i.maxMx > i.minMx || i.maxMz > i.minMz;
+	}
+
+	static int[] roomBounds(long seed, int mx, int mz, int k) {
+		Info i = info(seed, mx, mz, k);
+		return new int[] {i.minMx, i.minMz, i.maxMx, i.maxMz};
+	}
+
+	private static boolean isAirlockCandidate(long seed, int mx, int mz, int k) {
 		double cx = mx * MODULE + 9.5, cy = k * PITCH + 4, cz = mz * MODULE + 9.5;
 		double distance = Math.sqrt(cx * cx + cy * cy + cz * cz);
 		int h = hash(seed, mx, mz, k * 7 + 3);
-		if (distance >= RO - 40 && distance <= RO - 14 && h % 100 < 38) return Room.AIRLOCK;
+		return distance >= RO - 40 && distance <= RO - 14 && h % 100 < 38;
+	}
+
+	/** Group-local merge rect {minMx, minMz, maxMx, maxMz}. Never crosses 48x48 group boundaries or swallows airlocks. */
+	private static int[] mergeRect(long seed, int mx, int mz, int k) {
+		int ax = Math.floorDiv(mx, GROUP), az = Math.floorDiv(mz, GROUP);
+		if (atrium(seed, ax, az, Math.floorDiv(k, GROUP_DECKS))) return new int[] {mx, mz, mx, mz};
+		int gx = Math.floorMod(mx, GROUP), gz = Math.floorMod(mz, GROUP);
+		int p = hash(seed, ax, az, k * 19 + 5) % 100;
+		int gx0 = gx, gz0 = gz, gx1 = gx, gz1 = gz;
+		if (p >= 55 && p < 67) {
+			if (gx >= 1 && gz >= 1) { gx0 = 1; gz0 = 1; gx1 = 2; gz1 = 2; }
+		} else if (p >= 67 && p < 78) {
+			if (gx >= 1 && (gz == 0 || gz == 2)) { gx0 = 1; gx1 = 2; }
+		} else if (p >= 78 && p < 89) {
+			if (gz >= 1 && (gx == 0 || gx == 2)) { gz0 = 1; gz1 = 2; }
+		} else if (p >= 89) {
+			if (gx >= 1 && gz == 0) { gx0 = 1; gx1 = 2; }
+			else if (gx == 0 && gz >= 1) { gz0 = 1; gz1 = 2; }
+		}
+		if (gx0 == gx1 && gz0 == gz1) return new int[] {mx, mz, mx, mz};
+		int minMx = ax * GROUP + gx0, minMz = az * GROUP + gz0;
+		int maxMx = ax * GROUP + gx1, maxMz = az * GROUP + gz1;
+		for (int cx = minMx; cx <= maxMx; cx++) {
+			for (int cz = minMz; cz <= maxMz; cz++) {
+				if (isAirlockCandidate(seed, cx, cz, k)) return new int[] {mx, mz, mx, mz};
+			}
+		}
+		return new int[] {minMx, minMz, maxMx, maxMz};
+	}
+
+	private static boolean isDoubleLowerRect(long seed, int minMx, int minMz, int maxMx, int maxMz, int k) {
+		if ((k & 1) != 0 || Math.floorMod(k, GROUP_DECKS) >= GROUP_DECKS - 1) return false;
+		int ax = Math.floorDiv(minMx, GROUP), az = Math.floorDiv(minMz, GROUP);
+		if (atrium(seed, ax, az, Math.floorDiv(k, GROUP_DECKS))) return false;
+		int[] upper = mergeRect(seed, minMx, minMz, k + 1);
+		if (upper[0] != minMx || upper[1] != minMz || upper[2] != maxMx || upper[3] != maxMz) return false;
+		for (int cx = minMx; cx <= maxMx; cx++) {
+			for (int cz = minMz; cz <= maxMz; cz++) {
+				if (isAirlockCandidate(seed, cx, cz, k) || isAirlockCandidate(seed, cx, cz, k + 1)) return false;
+			}
+		}
+		int h = hash(seed, minMx, minMz, k * 23 + 11) % 100;
+		boolean quad = maxMx > minMx && maxMz > minMz;
+		return h < (quad ? 25 : 10);
+	}
+
+	private static boolean isDoubleUpperModule(long seed, int mx, int mz, int k) {
+		if ((k & 1) == 0) return false;
+		int[] lower = mergeRect(seed, mx, mz, k - 1);
+		return isDoubleLowerRect(seed, lower[0], lower[1], lower[2], lower[3], k - 1);
+	}
+
+	private static Shape computeShape(long seed, int minMx, int minMz, int maxMx, int maxMz, int k, Room room) {
+		if (room == Room.AIRLOCK) return Shape.STANDARD;
+		if (isDoubleLowerRect(seed, minMx, minMz, maxMx, maxMz, k)) return Shape.DOUBLE_LOWER;
+		if ((k & 1) != 0) {
+			int[] lower = mergeRect(seed, minMx, minMz, k - 1);
+			if (lower[0] == minMx && lower[1] == minMz && lower[2] == maxMx && lower[3] == maxMz
+					&& isDoubleLowerRect(seed, lower[0], lower[1], lower[2], lower[3], k - 1)) {
+				return Shape.DOUBLE_UPPER;
+			}
+		}
+		int s = hash(seed, minMx, minMz, k * 29 + 17) % 100;
+		if (s < 42) return Shape.STANDARD;
+		if (s < 53) return Shape.NARROW_HALL;
+		if (s < 63) return Shape.L_CORNER;
+		if (s < 73) return Shape.CUBICLES;
+		if (s < 82) {
+			boolean canSink = !atrium(seed, Math.floorDiv(minMx, GROUP), Math.floorDiv(minMz, GROUP), Math.floorDiv(k - 1, GROUP_DECKS));
+			for (int cx = minMx; cx <= maxMx && canSink; cx++) {
+				for (int cz = minMz; cz <= maxMz && canSink; cz++) {
+					if (isDoubleUpperModule(seed, cx, cz, k - 1)) canSink = false;
+				}
+			}
+			return canSink ? Shape.SUNKEN_PIT : Shape.ALCOVE_BAYS;
+		}
+		if (s < 91) return Shape.RAISED_DAIS;
+		return Shape.ALCOVE_BAYS;
+	}
+
+	private static Room computeRoom(long seed, int mx, int mz, int k, int zone) {
+		if (isAirlockCandidate(seed, mx, mz, k)) return Room.AIRLOCK;
+		int h = hash(seed, mx, mz, k * 7 + 3);
 		if (zone != 0 && h % 100 < 60) return Room.WRECK;
 		int roll = h / 100 % 100;
 		if (roll < 20) return Room.BEDROOM;
@@ -688,7 +1046,10 @@ final class ZenithLayout {
 		int mx, mz, k;
 		boolean valid;
 		Room room;
-		int zone, doors;
+		Shape shape;
+		int zone, doors, variant;
+		int minMx, minMz, maxMx, maxMz;
+		boolean swallowW, swallowN;
 		boolean atrium;
 	}
 
@@ -704,10 +1065,27 @@ final class ZenithLayout {
 		info.mx = mx;
 		info.mz = mz;
 		info.k = k;
-		info.zone = computeZone(seed, mx, mz, k);
-		info.room = computeRoom(seed, mx, mz, k, info.zone);
-		info.doors = computeDoors(seed, mx, mz, k);
 		info.atrium = atrium(seed, Math.floorDiv(mx, GROUP), Math.floorDiv(mz, GROUP), Math.floorDiv(k, GROUP_DECKS));
+		info.zone = computeZone(seed, mx, mz, k);
+		int[] rect = mergeRect(seed, mx, mz, k);
+		info.minMx = rect[0];
+		info.minMz = rect[1];
+		info.maxMx = rect[2];
+		info.maxMz = rect[3];
+		info.swallowW = mx > info.minMx;
+		info.swallowN = mz > info.minMz;
+		Room baseRoom = computeRoom(seed, info.minMx, info.minMz, k, info.zone);
+		info.shape = info.atrium ? Shape.STANDARD : computeShape(seed, info.minMx, info.minMz, info.maxMx, info.maxMz, k, baseRoom);
+		if (info.shape == Shape.DOUBLE_UPPER) {
+			int lowerZone = computeZone(seed, info.minMx, info.minMz, k - 1);
+			info.room = computeRoom(seed, info.minMx, info.minMz, k - 1, lowerZone);
+			info.doors = computeDoors(seed, info.minMx, info.minMz, k - 1);
+			info.variant = hash(seed, info.minMx, info.minMz, (k - 1) * 37 + 13);
+		} else {
+			info.room = baseRoom;
+			info.doors = computeDoors(seed, info.minMx, info.minMz, k);
+			info.variant = hash(seed, info.minMx, info.minMz, k * 37 + 13);
+		}
 		info.valid = true;
 		return info;
 	}
