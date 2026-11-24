@@ -4,15 +4,21 @@ import java.util.EnumSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.AnimationState;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -40,6 +46,9 @@ import net.minecraft.world.phys.Vec3;
 public class Duller extends Monster {
 	private static final int STRIKE_HIT_AT = 9, STRIKE_TICKS = 16;
 	private static final byte EVENT_PHASE = 4, EVENT_STRIKE = 5;
+	private static final EntityDataAccessor<Float> DATA_STOOP =
+			SynchedEntityData.defineId(Duller.class, EntityDataSerializers.FLOAT);
+	private static final EntityDimensions CROUCH_SIZE = EntityDimensions.scalable(0.7F, 2.35F).withEyeHeight(1.95F);
 
 	public final AnimationState phaseAnimation = new AnimationState();
 	public final AnimationState strikeAnimation = new AnimationState();
@@ -48,9 +57,25 @@ public class Duller extends Monster {
 	private LivingEntity strikeTarget;
 	private int phaseCooldown;
 	private int retreatTicks;
+	private float targetStoop;
 
 	public Duller(EntityType<? extends Duller> type, Level level) {
 		super(type, level);
+	}
+
+	@Override
+	protected void defineSynchedData(SynchedEntityData.Builder builder) {
+		super.defineSynchedData(builder);
+		builder.define(DATA_STOOP, 0.0F);
+	}
+
+	public float stoopAmount() {
+		return entityData.get(DATA_STOOP);
+	}
+
+	@Override
+	public EntityDimensions getDefaultDimensions(Pose pose) {
+		return pose == Pose.CROUCHING ? CROUCH_SIZE : super.getDefaultDimensions(pose);
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {
@@ -89,6 +114,22 @@ public class Duller extends Monster {
 		super.customServerAiStep(level);
 		if (phaseCooldown > 0) phaseCooldown--;
 		if (retreatTicks > 0) retreatTicks--;
+
+		// Dynamically measure ceiling clearance so the ~3.85-block Duller stoops smoothly under low ceilings
+		if (tickCount % 4 == 0) {
+			targetStoop = computeCeilingStoop(level);
+			Pose desiredPose = targetStoop > 0.35F ? Pose.CROUCHING : Pose.STANDING;
+			if (getPose() != desiredPose) {
+				setPose(desiredPose);
+				refreshDimensions();
+			}
+		}
+		float curStoop = stoopAmount();
+		if (Math.abs(curStoop - targetStoop) > 0.01F) {
+			entityData.set(DATA_STOOP, Mth.lerp(0.22F, curStoop, targetStoop));
+		} else if (curStoop != targetStoop) {
+			entityData.set(DATA_STOOP, targetStoop);
+		}
 
 		// Emit eerie wall-scraping warning sound + dust when near a wall and a player is nearby
 		if (tickCount % 35 == 0 && isNearSolidWall(blockPosition())) {
@@ -133,6 +174,27 @@ public class Duller extends Monster {
 		boolean hurt = super.hurtServer(level, source, amount);
 		if (hurt) retreatTicks = 36; // Briefly recoil toward a wall after taking a hit
 		return hurt;
+	}
+
+	/** Checks headroom above self and 1.2 blocks ahead; returns 1.0 under <=3-block ceilings, 0.0 in >=4-block halls. */
+	private float computeCeilingStoop(ServerLevel level) {
+		BlockPos feet = blockPosition();
+		Vec3 fwd = Vec3.directionFromRotation(0, getYRot()).scale(1.2);
+		BlockPos ahead = BlockPos.containing(getX() + fwd.x, getY(), getZ() + fwd.z);
+		int minClear = Math.min(headroom(level, feet), headroom(level, ahead));
+		if (minClear <= 3) return 1.0F;
+		if (minClear == 4) return 0.45F;
+		return 0.0F;
+	}
+
+	private int headroom(ServerLevel level, BlockPos feet) {
+		for (int dy = 2; dy <= 4; dy++) {
+			BlockPos check = feet.above(dy);
+			if (!level.getBlockState(check).getCollisionShape(level, check).isEmpty()) {
+				return dy;
+			}
+		}
+		return 5;
 	}
 
 	boolean isNearSolidWall(BlockPos pos) {

@@ -23,6 +23,7 @@ public final class DullerRenderer extends MobRenderer<Duller, DullerRenderer.Sta
 	@Override
 	public void extractRenderState(Duller mob, State state, float partialTick) {
 		super.extractRenderState(mob, state, partialTick);
+		state.stoop = mob.stoopAmount();
 		state.phase.copyFrom(mob.phaseAnimation);
 		state.strike.copyFrom(mob.strikeAnimation);
 	}
@@ -33,6 +34,7 @@ public final class DullerRenderer extends MobRenderer<Duller, DullerRenderer.Sta
 	}
 
 	public static final class State extends LivingEntityRenderState {
+		float stoop;
 		final AnimationState phase = new AnimationState();
 		final AnimationState strike = new AnimationState();
 	}

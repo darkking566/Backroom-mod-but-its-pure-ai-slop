@@ -9,7 +9,8 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.util.Mth;
 
 /**
- * The 3D Duller built in Blender (art/monsters/duller): 17 joints, 25 boxes, 4 smooth Catmull-Rom clips.
+ * The 3D Duller built in Blender (art/monsters/duller): ~3.85-block pitch-black silhouette with elongated
+ * pillar head, knee-length arms, and automatic low-ceiling stoop blending.
  */
 public final class DullerModel extends EntityModel<DullerRenderer.State> {
 	public static final ModelLayerLocation LAYER = new ModelLayerLocation(BackroomsMod.id("duller"), "main");
@@ -19,6 +20,7 @@ public final class DullerModel extends EntityModel<DullerRenderer.State> {
 	private final Map<String, ModelPart> joints;
 	private final BoxRig.Clip idle = RIG.clip("idle_sway");
 	private final BoxRig.Clip stride = RIG.clip("stalk_stride");
+	private final BoxRig.Clip stoopClip = RIG.clip("low_ceiling_stoop");
 	private final BoxRig.Clip emerge = RIG.clip("phase_emerge");
 	private final BoxRig.Clip strike = RIG.clip("attack_strike");
 
@@ -32,10 +34,18 @@ public final class DullerModel extends EntityModel<DullerRenderer.State> {
 		super.setupAnim(state);
 		float timeSec = state.ageInTicks / 20.0F;
 		float moveWeight = Mth.clamp(state.walkAnimationSpeed * 2.2F, 0.0F, 1.0F);
+		float stoop = Mth.clamp(state.stoop, 0.0F, 1.0F);
 
 		idle.apply(joints, timeSec, 1.0F);
 		if (moveWeight > 0.01F) {
 			stride.apply(joints, state.walkAnimationPos / 12.0F, moveWeight);
+		}
+		if (stoop > 0.01F) {
+			float stoopTime = moveWeight > 0.05F ? state.walkAnimationPos / 10.0F : timeSec * 0.35F;
+			stoopClip.apply(joints, stoopTime, stoop);
+			// Lower Pelvis vertically as knees fold so feet stay planted on the floor
+			ModelPart pelvis = joints.get("Pelvis");
+			if (pelvis != null) pelvis.y += stoop * 12.5F;
 		}
 		applyOneShot(emerge, state.phase, state.ageInTicks);
 		applyOneShot(strike, state.strike, state.ageInTicks);
