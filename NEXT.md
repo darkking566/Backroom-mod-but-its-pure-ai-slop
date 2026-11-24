@@ -97,7 +97,7 @@ Fabric・Minecraft 26.2・Java 25・模組代號 `noclip_backrooms`
 ## Level 1：停車場（等使用者試玩）
 
 - 說明：[docs/levels/level1/README.md](docs/levels/level1/README.md)
-- 從 Level 0 進入：在 Level 0 待 4～7 分鐘，16～40 格外會有一段牆開始閃爍、冒電火花，直接走進去
+- 從 Level 0 進入：在 Level 0 待 1.5～3 分鐘，16～40 格外會有一段牆開始閃爍、冒電火花，直接走進去
 - 直接進入：`/execute in noclip_backrooms:level_1 run tp @s 32.5 33 41.5`
 - 離開：白色走廊區裡的鐵製出口門（有 EXIT 標誌，附近燈泡是綠色）
 - 通往其他樓層的 11 種出口（樓層越低越難找），還沒做的樓層會顯示尚未開放：見 docs/levels/level1/README.md
@@ -111,3 +111,10 @@ Fabric・Minecraft 26.2・Java 25・模組代號 `noclip_backrooms`
 - 特色：窄走道一側整排管線、串聯的燈（打破一盞整組熄）、悶熱區、上鎖的門與房間、死路盡頭的窗戶（別靠近）、暗處的獵犬
 - 14 種出口（樓層越低越難找），還沒做的樓層會顯示尚未開放
 - 改貼圖或模型：`py tools/make_level2.py`
+
+## Level 3：發電站（等使用者試玩）
+
+- 說明：[docs/levels/level3/README.md](docs/levels/level3/README.md)（照 Wikidot Level 3 的文字和照片做）
+- 進入：Level 2 噴了紅色「3」的門；出口：電梯（Level 4／5）、Base Gamma 的門（Level 11）、生鏽的車（Level 69），都還沒開放
+- 特色：寬窄高矮都不一樣的磚造走道（矮的要蹲）、打不壞的鐵柵與可以撬開的柵門、電箱與黑泥管、斷線觸電、黑泥燙傷、燈管爆裂、發電機過載爆炸、被窺視感熱點、發電機房／鍋爐房／組裝線／聖所（天使會嚇走獵犬）／Base Gamma 據點
+- 改貼圖或模型：`py tools/make_level3.py`

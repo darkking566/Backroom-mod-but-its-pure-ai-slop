@@ -1,0 +1,32 @@
+{
+  "variants": {
+    "axis=x,half=lower,open=false": {
+      "model": "noclip_backrooms:block/level3/cage_gate_lower"
+    },
+    "axis=x,half=lower,open=true": {
+      "model": "noclip_backrooms:block/level3/cage_gate_lower_open"
+    },
+    "axis=x,half=upper,open=false": {
+      "model": "noclip_backrooms:block/level3/cage_gate_upper"
+    },
+    "axis=x,half=upper,open=true": {
+      "model": "noclip_backrooms:block/level3/cage_gate_upper_open"
+    },
+    "axis=z,half=lower,open=false": {
+      "model": "noclip_backrooms:block/level3/cage_gate_lower",
+      "y": 90
+    },
+    "axis=z,half=lower,open=true": {
+      "model": "noclip_backrooms:block/level3/cage_gate_lower_open",
+      "y": 90
+    },
+    "axis=z,half=upper,open=false": {
+      "model": "noclip_backrooms:block/level3/cage_gate_upper",
+      "y": 90
+    },
+    "axis=z,half=upper,open=true": {
+      "model": "noclip_backrooms:block/level3/cage_gate_upper_open",
+      "y": 90
+    }
+  }
+}

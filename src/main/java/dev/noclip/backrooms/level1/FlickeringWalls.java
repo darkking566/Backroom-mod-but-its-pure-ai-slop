@@ -34,7 +34,7 @@ final class FlickeringWalls {
 	private static final TagKey<Block> LEVEL_0_WALLS = TagKey.create(Registries.BLOCK, Level1.id("level_0_walls"));
 	private static final TagKey<Block> MANILA_ROOM_BLOCKS = TagKey.create(Registries.BLOCK, Level1.id("manila_room_blocks"));
 	// The way into the parking structure is meant to be one of the hardest to find: a long wait, and it opens well away.
-	private static final int FIRST_DELAY = 4 * 60 * 20, DELAY_SPREAD = 3 * 60 * 20;
+	private static final int FIRST_DELAY = 90 * 20, DELAY_SPREAD = 90 * 20;
 	private static final int NEAREST = 16, FARTHEST = 40;
 	private static final int RETRY_DELAY = 10 * 20, REOPEN_DELAY = 60 * 20, MOVED_DELAY = 20 * 20;
 	private static final int GIVE_UP_DISTANCE = 80;
@@ -152,13 +152,16 @@ final class FlickeringWalls {
 		}));
 	}
 
+	/** Two blocks of open floor in front, so the wall is in a room or corridor and not at the back of a niche. */
 	private static boolean facesOpenFloor(ServerLevel level, BlockPos bottom) {
 		for (Direction side : Direction.Plane.HORIZONTAL) {
-			BlockPos front = bottom.relative(side);
-			if (level.getBlockState(front).isAir() && level.getBlockState(front.above()).isAir()
-					&& !level.getBlockState(front.below()).getCollisionShape(level, front.below()).isEmpty()) {
-				return true;
+			boolean clear = true;
+			for (int step = 1; step <= 2 && clear; step++) {
+				BlockPos front = bottom.relative(side, step);
+				clear = level.getBlockState(front).isAir() && level.getBlockState(front.above()).isAir()
+						&& !level.getBlockState(front.below()).getCollisionShape(level, front.below()).isEmpty();
 			}
+			if (clear) return true;
 		}
 		return false;
 	}

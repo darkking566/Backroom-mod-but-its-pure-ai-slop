@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:conveyor_belt"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "noclip_backrooms:blocks/conveyor_belt"
+}

@@ -4,7 +4,7 @@
     "particle": "noclip_backrooms:block/level1/door_jamb",
     "steel": "noclip_backrooms:block/level1/door_jamb",
     "copper": "noclip_backrooms:block/level1/copper_pillar",
-    "glow": "noclip_backrooms:block/level1/garage_light"
+    "glow": "noclip_backrooms:block/level1/light_lens"
   },
   "elements": [
     {

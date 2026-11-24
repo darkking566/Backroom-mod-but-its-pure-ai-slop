@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "side": "noclip_backrooms:block/level3/parts_crate_side",
+    "top": "noclip_backrooms:block/level3/parts_crate_top",
+    "bottom": "noclip_backrooms:block/level3/parts_crate_top"
+  }
+}

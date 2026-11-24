@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "side": "noclip_backrooms:block/level3/pillar_capital",
+    "end": "noclip_backrooms:block/level3/pillar_end"
+  }
+}

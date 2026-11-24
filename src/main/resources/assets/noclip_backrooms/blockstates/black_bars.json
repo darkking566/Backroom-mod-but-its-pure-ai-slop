@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "noclip_backrooms:block/level3/black_bars"
+    },
+    "axis=z": {
+      "model": "noclip_backrooms:block/level3/black_bars",
+      "y": 90
+    }
+  }
+}

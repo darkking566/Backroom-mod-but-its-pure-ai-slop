@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "noclip_backrooms:block/level3/press_side",
+    "south": "noclip_backrooms:block/level3/press_front",
+    "north": "noclip_backrooms:block/level3/press_side",
+    "east": "noclip_backrooms:block/level3/press_side",
+    "west": "noclip_backrooms:block/level3/press_side",
+    "up": "noclip_backrooms:block/level3/press_side",
+    "down": "noclip_backrooms:block/level3/press_side"
+  }
+}

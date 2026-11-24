@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level2/wanderer_mark_2_l",
+    "paint": "noclip_backrooms:block/level2/wanderer_mark_2_l"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0.02
+      ],
+      "to": [
+        16,
+        16,
+        0.12
+      ],
+      "faces": {
+        "south": {
+          "texture": "#paint",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

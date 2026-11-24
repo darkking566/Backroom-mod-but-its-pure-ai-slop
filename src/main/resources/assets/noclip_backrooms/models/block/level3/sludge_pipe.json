@@ -1,0 +1,110 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level3/sludge_steel",
+    "pipe": "noclip_backrooms:block/level3/sludge_steel",
+    "bracket": "noclip_backrooms:block/level3/lock"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        6,
+        0.5
+      ],
+      "to": [
+        16,
+        13,
+        7.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#pipe",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#pipe",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#pipe",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#pipe",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#pipe",
+          "uv": [
+            0,
+            0,
+            7.0,
+            7
+          ]
+        },
+        "west": {
+          "texture": "#pipe",
+          "uv": [
+            0,
+            0,
+            7.0,
+            7
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        7,
+        4.5,
+        0
+      ],
+      "to": [
+        9,
+        14.5,
+        8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bracket"
+        },
+        "south": {
+          "texture": "#bracket"
+        },
+        "east": {
+          "texture": "#bracket"
+        },
+        "west": {
+          "texture": "#bracket"
+        },
+        "up": {
+          "texture": "#bracket"
+        },
+        "down": {
+          "texture": "#bracket"
+        }
+      }
+    }
+  ]
+}

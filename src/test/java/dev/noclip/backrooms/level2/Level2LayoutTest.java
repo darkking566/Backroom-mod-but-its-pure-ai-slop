@@ -133,6 +133,44 @@ class Level2LayoutTest {
 		}
 	}
 
+	/** Earlier wanderers' marks lead to the door they name, and are painted on a wall. */
+	@Test
+	void marksLeadToTheirDoors() {
+		int marks = 0;
+		for (int rx = -3; rx <= 3; rx++) {
+			for (int rz = -3; rz <= 3; rz++) {
+				Level2Plan plan = Level2Plan.of(SEED, rx, rz);
+				for (int c = 0; c < Level2Plan.N * Level2Plan.N; c++) {
+					if (plan.markTo[c] < 0) continue;
+					int at = c, steps = 0;
+					while (!hasExit(plan, at, plan.markFor[c])) {
+						assertTrue(plan.markTo[at] >= 0 && steps++ <= Level2Plan.MARK_DEPTH, "marks lose the way in region " + rx + ", " + rz);
+						int d = plan.markTo[at];
+						at = Level2Plan.cell(at % Level2Plan.N + Level2Plan.DX[d], at / Level2Plan.N + Level2Plan.DZ[d]);
+					}
+				}
+			}
+		}
+		for (int x = -2 * SIZE; x < 2 * SIZE; x++) {
+			for (int z = -2 * SIZE; z < 2 * SIZE; z++) {
+				Level2Layout.Mark mark = Level2Layout.mark(SEED, x, z);
+				if (mark == null) continue;
+				marks++;
+				assertEquals(Kind.FLOOR, Level2Layout.tile(SEED, x, z).kind(), "a mark floating off the floor at " + x + ", " + z);
+				int wx = x - Level2Plan.DX[mark.facing()], wz = z - Level2Plan.DZ[mark.facing()];
+				assertEquals(Kind.WALL, Level2Layout.tile(SEED, wx, wz).kind(), "a mark with no wall behind it at " + x + ", " + z);
+			}
+		}
+		assertTrue(marks > 5, "hardly any marks: " + marks);
+	}
+
+	private static boolean hasExit(Level2Plan plan, int cell, Level2Exit exit) {
+		for (int d = 0; d < 4; d++) {
+			if (plan.exits[cell * 4 + d] == exit) return true;
+		}
+		return false;
+	}
+
 	/** Some of the level is hot, most of it is not, and arriving never puts you in the heat. */
 	@Test
 	void heatIsPatchy() {

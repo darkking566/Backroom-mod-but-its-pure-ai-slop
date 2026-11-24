@@ -105,6 +105,32 @@
   - 管線依照片改成連續長管（拿掉一節一節的箍環、紅管只留閥門），截圖確認
   - 驗證：`gradlew build`（34 個單元測試）與 `runClientGameTest`（Level 0、1、2）全部通過；中途朋友的 Level 0 Edge Shift 測試偶爾逾時一次（看隨機），重跑通過
 - 使用者同意後，把 `main`（企劃書 `cd71cdb`、Level 2 `83e2946`）推送到 GitHub；沒有強制推送、沒有改寫歷史
+- 使用者要求接著做 Level 3：
+  - 讀 Wikidot Level 3（Electrical Station）全文；出口一節 WebFetch 只拿到摘要，改直接下載頁面 HTML 讀原文確認（電梯→4 或 5、Base Gamma 的門→11、車→69）；下載 17 張照片照著做
+  - 新增 `level3/`：地圖規劃（`Level3Plan`、`Level3Layout`：6 格單元迷宮，每格隨機寬／一般／窄／矮四種尺寸，矮的要蹲；多出來的通道一半用打不壞的鐵柵擋住，少數必經路上是可撬鎖的柵門）、六種大廳（`Level3Halls`：發電機房、鍋爐房、組裝線、聖所、車子房、Base Gamma 據點）、地形生成、51 個方塊、三種出口、危險（斷線觸電、黑泥燙傷、插座電人、燈管爆裂、發電機過載爆炸）、被窺視感熱點、天使嚇走獵犬、暗處的獵犬群
+  - 新增 Level 3 的維度、維度類型、生態域、掉落物表、語言檔、音效、挖掘標籤；`BackroomsMod` 加一行註冊；Level 2 噴了「3」的門從此接到 Level 3
+  - 新增 `tools/make_level3.py`、`docs/levels/level3/README.md`（取代企劃稿）與貼圖預覽；更新樓層索引、`README.md`、`NEXT.md`
+  - 新增單元測試 `Level3LayoutTest`、`MapDump`，實機測試 `Level3ClientTest`；看截圖後把紅磚調亮、鐵柵的斑點減少
+- 使用者問各層之間好不好走：用暫時的量測程式實測（量完已刪除），Level 1→2 最短路線中位數約 143 格、Level 2→3 約 196 格
+- 使用者要求縮短 Level 0 的等待、照 Wiki 加路標（回頭路先不做，使用者要和朋友討論）：
+  - 閃爍牆出現的時間從 4～7 分鐘改成 1.5～3 分鐘（`FlickeringWalls`）
+  - Level 2：依 Wiki「一般出口常有前人留下的記號」，在噴了 1／3／4 的門附近 7 格內的直走道牆上，加紅色噴漆的樓層號與箭頭（`Level2Plan.markTo`、`Level2Layout.mark`、新方塊 `wanderer_mark`）
+  - Level 3：依 Wiki「M.E.G. 在 Base Gamma 周圍立了許多路標」與「所有已知熱點都有警告標誌」，加藍色 Base Gamma 路標（14 格內）與黃黑熱點警告牌（`Level3Plan.baseTo`、`Level3Layout.sign`、新方塊 `meg_arrow_sign`、`meg_warning_sign`）
+  - 單元測試確認順著箭頭一定走得到它指的門或據點、記號和路標背後一定是牆；實機測試加截圖；更新各層說明與 `NEXT.md`
+- 提交前抓 GitHub，合併朋友新推的 44 個提交（停車場大改版：六大區、更多據點與出口、居民與人物模型、11 種 3D 怪物等）：
+  - 衝突只在兩個語言檔（兩邊的條目全部保留）和 abandoned_car：朋友的 Level 1 也新增了同 ID 的「廢棄的車」，所以把還沒推上去的 Level 3 的車改名為 rusted_car（生鏽的車），保留朋友的
+  - 順手修正朋友的照明燈、販賣機模型：發光貼圖指向不存在的 level1/garage_light，改成 level1/light_lens
+  - 合併後 gradlew build（49 個單元測試）通過
+  - 朋友的 Level 1 測試假設 Level 2 不存在（管線區通往 Level 2 應該拒絕），改成檢查會真的進到 Level 2；Level 0 測試通過
+- 再合併朋友新推的 3 個提交（Level 0 柱廊／房間格／階梯式大廳、停車場隔板），沒有衝突
+- 查清合併後停車場測試的兩個失敗：
+  - 「巡邏隊沒走到玩家」：Level 2 開放後，管線區會真的把玩家傳到 Level 2，測試的站立點剛好在管線區附近，玩家被傳走、巡邏隊跟著取消。測試改成選離管線區和故障區（通往 38）夠遠的站立點，失敗訊息加上玩家所在樓層
+  - 「閃爍牆前面沒有空地」：朋友的新大廳有很多一格深的凹處，閃爍牆只要求前面 1 格空地，會選到凹處。改成跟測試一樣要求前面 2 格空地（FlickeringWalls.facesOpenFloor）
+  - 「微笑者沒被火把吸引」：朋友把微笑者改成 3D 實體後，生成時先加標籤再放進世界，結果被「清掉停電時存檔的微笑者」的載入事件當場刪掉，遊戲裡停電時其實一直沒有微笑者。改成放進世界後才加標籤（`Smilers.spawnNear`，和巡邏隊同一個修法）；測試改找新的 `Smiler` 實體（原本找舊版的發光臉 `ItemDisplay`），站立點也避開據點與管線區
+  - 「獵犬測試找不到獵犬」：測試在旁觀模式生獵犬前沒先把玩家移到那裡，改成先傳送並等區塊載入
+  - 「掉落物不對」：朋友新加的 5 個道具（廢棄的車、廂型車、販賣機、棧板貨堆、配電櫃）沒有戰利品表，補上「打掉會掉自己」；其中 4 個也沒有名稱，補上英文與中文名稱（廢棄的廂型車、販賣機、棧板貨堆、配電櫃）
+  - 「微笑者衝向站著不動的玩家」：朋友的新微笑者在黑暗中會「靠近到 7～11 格再繞圈」，舊測試假設它站著不動。測試改成：黑暗中不會靠到 5.5 格內、不會暴怒；拿火把才會衝過來。這項改動還沒跑過驗證（Gemini 開工了，先停下 Gradle）
+  - 使用者要求先只提交自己的改動：Gemini 同時在改的語言檔與 CLAUDE.md 只提交我那幾行，`BackroomsClient`、`Monsters` 與新怪物檔案都留給 Gemini
 
 - 使用者要求加入子樓層，讀 Backrooms 中文維基 Level 0.1 原文後規劃；使用者決定：先把子樓層共用做法做好、機器人全部當中立環境角色（建模要在 Blender）、入口兩種都做、球殼要又大又深又壯觀（高度與深度要夠）：
   - 共用做法（`core/`）：`Sublevels`（登記子層級：父層、隨機切出權重）、`LevelExitBlock`（右鍵出口方塊：`to`／`leave`／`cutOut`）、`Landing`（落點檢查）；根目錄 `README.md` 加「子樓層」一節；維度 ID 照規則用句點 `level_0.1`，套件 `level0p1`
@@ -115,6 +141,8 @@
   - 中立機器人（`level0p1/robots/`、`src/client/.../level0p1/robots/`）：七足清洗機器人、廚房機器人、壞掉的服務機器人；`tools/make_robots.py` 產生 BoxRig 規格檔 `monsters/robots.json`、貼圖與三段動畫，`tools/blender_robots.py` 用 Blender 5.3 的 bpy 組出 `art/robots/robots.blend` 與三張預覽（容器裡用 `pip install bpy` 在虛擬環境跑，沒有 GUI）；機器人不攻擊、會閒逛、遠離玩家會消失，`ZenithRobots` 依房間在玩家附近生出（廚房→廚師、毀損／暗區→服務機器人、其他→清洗機器人）
   - 測試：`ZenithLayoutTest`（上樓、走廊到中央平台、降落點、氣閘出口、外殼封閉、區塊生成速度）；`Level0p1ClientTest`（用 Xvfb 虛擬螢幕真的跑遊戲客戶端：用信標進站、每種房間、樓梯、中庭、環廊窗、輻條與奇點、機器人、自動門、回 Level 0、切出、艙門）；這次在雲端容器裡裝了 Java 25（`/tmp/jdk25`）才能編譯與測試
   - 還沒做：站內材料的合成（Antigravity）、視聽幻覺與導航失效、機器人生怪蛋、站內更多事件
+- 使用者同意後，把 `main` 推送到 GitHub（Level 3、路標與 Level 0 等待縮短、合併朋友的停車場大改版與 Level 0.1、停車場測試與微笑者等修正、Gemini 的 7 隻新怪物）；推送前 `gradlew build`（57 個單元測試）通過；GitHub 上的 `claude` 分支已被刪除，本地的 `claude` 內容確認全部已在 `main` 裡，所以也刪掉本地這個分支（GitHub 上另外兩個分支 `claude-level0p1`、`level1-depth-polish` 也都已在 `main` 裡）；沒有強制推送、沒有改寫歷史
+  - 還沒跑實機測試的部分：Level 0.1、Gemini 的 7 隻新怪物、牧羊蛇低頭、停車場微笑者「黑暗中繞圈」的測試改動
 
 ## 動作記錄（Antigravity）
 
@@ -169,3 +197,15 @@
 - Level 0.1 冷區、熱區加地板外觀：新增方塊 `frost_floor`、`scorched_floor`（`ZenithLayout.floor` 改傳區域編號：1/4 磨損、3/4 之中的 2/3 結冰或焦黑）；`gradlew build` 與 `zones` 段截圖確認。`make_level0p1.py` 在 Windows 上偶爾寫檔報 Errno 22，重跑一次就好
 - Level 0.1 冷區、熱區加天花板外觀：新增方塊 `frost_ceiling`、`scorched_ceiling`（`ZenithLayout.ceiling` 改傳區域編號，3/4 的板換成結霜或焦黑，燈位置不變）；`zones` 段多拍天花板，`gradlew build` 通過
 - Level 0.1 完整客戶端測試（`NOCLIP_TEST=level0p1`，全部段落）在牆／地板／天花板／環境光／奇點改動後通過，約 2 分 23 秒、40 張截圖
+- 依使用者要求合併遠端最新進度與雙方製作的怪物（重疊怪物一律以朋友版本為準）：
+  - 先抓下並合併 `origin/main`（Level 0.1 天頂站與子樓層支援、牧蛇動態低頭系統，`2b4ec32`），解決 `fabric.mod.json`、`Level1ClientTest.java`、`sounds.json`、`mineable/pickaxe.json`、`en_us.json`、`zh_tw.json` 合併衝突並完整保留兩邊內容與 Claude 工作區既有修正
+  - 比對怪物清單：重疊的 3 隻怪物（`smiler` 微笑者、`skin_stealer` 竊皮者、`clump` 肢叢）以及朋友獨有的怪物（`duller`、`arms`、`wretch`、`shriek`、`crawler`、`shepherd_snake`、`nguithrxurh`）與共用的 `hound` 全數保留朋友既有程式碼、模型規格與貼圖，未做任何覆蓋；另補齊朋友前 5 隻怪物遺漏的 `en_us.json`／`zh_tw.json` 實體與生怪蛋翻譯條目
+  - 整合 Antigravity 於 Blender 5.3 完成且不重疊的 7 隻路線 A `BoxRig` 新怪物進遊戲（合計全模組共 18 種可召喚怪物）：
+    1. `deathmoth`（Entity 4 雌性死亡飛蛾）：懸浮飛行、趨光狂暴、中距離噴吐腐蝕酸液、可用杏仁水短暫安撫，含複眼與酸液囊全亮發光層
+    2. `faceling`（Entity 9 無面靈）：預設溫和中立並會好奇打量玩家、可用合金交換繃帶或杏仁水，受攻擊時群體反擊
+    3. `partygoer`（Entity 67 派對客）：遠處持紅氣球靜止偽裝雕像，獵物或掃興客靠近時裂顎突襲並跳躍追擊（附加反胃與凋零）
+    4. `bacteria`（無盡之菌）：黑菌絲與鏽蝕銅線高大掠食者，發現目標後尖嘯高速衝刺撲擊，受強光照射攻擊時短暫畏縮，含核心微光層
+    5. `bone_thief`（Entity 121 竊骨者）：高護甲四足怪物，張開巨顎露出催眠喉眼，玩家直視時施加緩速與挖掘疲勞後撲咬，含青紫喉眼發光層
+    6. `partypooper`（Entity 68 派對掃興客）：友善流浪者盟友，向玩家招手示警、收受合金或繃帶回贈杏仁水與再生效果，並主動獵殺派對客與周遭敵對怪物
+    7. `beast_level5`（Entity 18 第五層野獸紳士，Boss）：雙階段 Boss（紫色 Boss 血條），半血以下觸發 `phase2_unfurl` 展開隱藏深淵雙翼與背部觸手並釋放黑暗脈衝
+  - 新增對應之 `src/main/java/.../monsters/<套件>/`、`src/client/java/.../monsters/<套件>/`、`Monsters.java` 與 `BackroomsClient.java` 註冊、`assets/noclip_backrooms/monsters/*.json`、`textures/entity/*.png`（含 `*_eyes.png`）、16×16 生怪蛋貼圖與模型、以及 `art/monsters/<id>/`（`.blend` 與 `.glb` 原檔）

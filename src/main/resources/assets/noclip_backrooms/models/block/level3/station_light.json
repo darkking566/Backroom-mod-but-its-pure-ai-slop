@@ -1,0 +1,146 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level3/light_housing",
+    "housing": "noclip_backrooms:block/level3/light_housing",
+    "lens": "noclip_backrooms:block/level3/light_lens"
+  },
+  "elements": [
+    {
+      "from": [
+        2.5,
+        14,
+        7.6
+      ],
+      "to": [
+        3.3,
+        16,
+        8.4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#housing"
+        },
+        "south": {
+          "texture": "#housing"
+        },
+        "east": {
+          "texture": "#housing"
+        },
+        "west": {
+          "texture": "#housing"
+        }
+      }
+    },
+    {
+      "from": [
+        12.7,
+        14,
+        7.6
+      ],
+      "to": [
+        13.5,
+        16,
+        8.4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#housing"
+        },
+        "south": {
+          "texture": "#housing"
+        },
+        "east": {
+          "texture": "#housing"
+        },
+        "west": {
+          "texture": "#housing"
+        }
+      }
+    },
+    {
+      "from": [
+        0.5,
+        12,
+        5
+      ],
+      "to": [
+        15.5,
+        14,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#housing"
+        },
+        "south": {
+          "texture": "#housing"
+        },
+        "east": {
+          "texture": "#housing"
+        },
+        "west": {
+          "texture": "#housing"
+        },
+        "up": {
+          "texture": "#housing"
+        }
+      }
+    },
+    {
+      "from": [
+        1,
+        11.2,
+        5.5
+      ],
+      "to": [
+        15,
+        12,
+        10.5
+      ],
+      "faces": {
+        "down": {
+          "texture": "#lens"
+        },
+        "north": {
+          "texture": "#lens",
+          "uv": [
+            0,
+            4.5,
+            16,
+            5.5
+          ]
+        },
+        "south": {
+          "texture": "#lens",
+          "uv": [
+            0,
+            4.5,
+            16,
+            5.5
+          ]
+        },
+        "east": {
+          "texture": "#lens",
+          "uv": [
+            0,
+            4.5,
+            16,
+            5.5
+          ]
+        },
+        "west": {
+          "texture": "#lens",
+          "uv": [
+            0,
+            4.5,
+            16,
+            5.5
+          ]
+        }
+      },
+      "shade": false,
+      "light_emission": 15
+    }
+  ]
+}

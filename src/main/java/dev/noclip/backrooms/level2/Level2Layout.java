@@ -286,6 +286,32 @@ public final class Level2Layout {
 		return false;
 	}
 
+	/** A wanderer's spray-painted mark on a tunnel wall: which door it points to, facing out from the wall, arrow right or left. */
+	record Mark(Level2Exit exit, int facing, boolean right) {
+	}
+
+	/**
+	 * The mark on the wall beside this column, at eye height, or null: in straight cells near a standard exit,
+	 * on the wall without pipes, one block in from the cell's end (clear of any door in the middle of the wall).
+	 */
+	static Mark mark(long seed, int x, int z) {
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
+		Level2Plan plan = Level2Plan.of(seed, rx, rz);
+		int i = lx / CELL, j = lz / CELL, ox = lx % CELL, oz = lz % CELL;
+		int cell = Level2Plan.cell(i, j);
+		if (plan.roomOf[cell] >= 0 || plan.markTo[cell] < 0) return null;
+		int axis = plan.straightAxis(cell);
+		if (axis < 0) return null;
+		int bank = bankSide(seed, plan, rx, rz, i, j);
+		int wall = bank >= 0 ? Level2Plan.opposite(bank) : axis == 0 ? NORTH : WEST;
+		int along = axis == 0 ? ox : oz, across = axis == 0 ? oz : ox;
+		int beside = wall == NORTH || wall == WEST ? 1 : 3;
+		if (along != 1 || across != beside) return null;
+		boolean right = plan.markTo[cell] == ((wall + 1) & 3);
+		return new Mark(plan.markFor[cell], Level2Plan.opposite(wall), right);
+	}
+
 	/** The middle of the nearest tunnel cell to (x, z), as {x, z}: somewhere to stand on arriving. */
 	public static int[] landing(long seed, int x, int z) {
 		int gi0 = Math.floorDiv(x, CELL), gj0 = Math.floorDiv(z, CELL);

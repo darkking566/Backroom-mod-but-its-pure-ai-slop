@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:brass_boiler"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "noclip_backrooms:blocks/brass_boiler"
+}

@@ -95,8 +95,9 @@ final class Smilers {
 			if (smiler == null) return null;
 			smiler.setPos(bx + 0.5, feet.getY(), bz + 0.5);
 			smiler.setTarget(player);
-			smiler.addTag(TAG);
 			level.addFreshEntity(smiler);
+			// Tagged only once it is in the world, or the clean-up of smilers saved mid-blackout would take it at once.
+			smiler.addTag(TAG);
 			ACTIVE.add(smiler.getUUID());
 			level.playSound(null, smiler.getX(), smiler.getEyeY(), smiler.getZ(), Level1Sounds.SMILER, SoundSource.HOSTILE, 0.7F, 0.65F);
 			return smiler;

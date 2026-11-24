@@ -5,7 +5,7 @@
     "red": "noclip_backrooms:block/level1/legend_wall",
     "steel": "noclip_backrooms:block/level1/door_jamb",
     "dark": "noclip_backrooms:block/level1/glitch_black",
-    "glow": "noclip_backrooms:block/level1/garage_light",
+    "glow": "noclip_backrooms:block/level1/light_lens",
     "cyan": "noclip_backrooms:block/level1/neon_cyan",
     "amber": "noclip_backrooms:block/level1/neon_amber"
   },

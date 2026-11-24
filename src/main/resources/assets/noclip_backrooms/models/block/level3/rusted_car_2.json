@@ -1,0 +1,45 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level3/car_paint",
+    "paint": "noclip_backrooms:block/level3/car_paint",
+    "glass": "noclip_backrooms:block/level3/car_glass",
+    "front": "noclip_backrooms:block/level3/car_front",
+    "rear": "noclip_backrooms:block/level3/car_rear",
+    "tyre": "noclip_backrooms:block/level3/tyre"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        3,
+        0
+      ],
+      "to": [
+        14,
+        11,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#paint"
+        },
+        "south": {
+          "texture": "#paint"
+        },
+        "east": {
+          "texture": "#paint"
+        },
+        "west": {
+          "texture": "#paint"
+        },
+        "up": {
+          "texture": "#paint"
+        },
+        "down": {
+          "texture": "#paint"
+        }
+      }
+    }
+  ]
+}
