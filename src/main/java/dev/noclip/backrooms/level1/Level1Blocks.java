@@ -88,7 +88,7 @@ public final class Level1Blocks {
 	public static final Block BOOK_SHELF = register("book_shelf", Properties.of()
 			.mapColor(MapColor.WOOD).strength(1.2F).sound(SoundType.WOOD));
 	public static final Block CUBICLE_PANEL = register("cubicle_panel", Properties.of()
-			.mapColor(MapColor.COLOR_GRAY).strength(0.6F).sound(SoundType.WOOL));
+			.mapColor(MapColor.COLOR_GRAY).strength(0.6F).sound(SoundType.WOOL).noOcclusion(), CubiclePanelBlock::new);
 	public static final Block OFFICE_DESK = register("office_desk", Properties.of()
 			.mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD).noOcclusion(), p -> new ShapedBlock(p, DESK_SHAPE));
 	public static final Block OLD_COMPUTER = register("old_computer", Properties.of()

@@ -83,6 +83,9 @@
 - 自製垃圾桶方塊 `wastebasket`（穿孔鋼桶往上外擴、桶口鋁邊、裡面一堆紙團）：`tools/make_wastebasket.py` 寫方塊模型（箱子清單是唯一來源）、三張貼圖、blockstate、物品、戰利品表與語言條目；`tools/blender_wastebasket.py` 讀同一份規格在 Blender 5.3 組出 `art/props/wastebasket.blend` 與預覽圖；`Level1Blocks.WASTEBASKET` 取代原版鍋釜；`Level1ClientTest` 的 `rooms` 段加垃圾桶近照，`gradlew build` 與 `NOCLIP_ONLY=rooms` 客戶端測試通過
 - 桌上盆栽也換成自製（`desk_plant_dead` 枯枝、`desk_plant_leafy` 綠葉；陶盆＋兩片交叉透明貼圖）：`tools/make_desk_plants.py`、`tools/blender_desk_plants.py`（`art/props/desk_plants.blend` 與預覽）；`Level1ChunkGenerator.deskTop` 改用這兩個方塊。`gradlew build` 通過；遊戲畫面還沒確認（客戶端測試跟別的同時跑的測試撞到同一個 build 資料夾）。注意：多個人同時跑 gradle 會互相弄壞 `build/`，單元測試曾因此出現 EOFException，單獨重跑就過
 ### 2026-11-24
+- Level 0 巨構房間新增三種版型（每個 16×16 格的巨構區隨機選一種，`MegahallPlan.Style`）：柱廊大廳（`COLONNADE`，整片密集的 2×2 柱子、無隔牆）、分隔房間群（`ROOM_GRID`，每條大廳邊界都是牆，只在中間開 3 格寬的門）、階梯下沉劇場（`TERRACED`，越往中間越低，每圈降 1 格，最低低 3 格，沒有樓梯方塊）；原本的大廳分區維持 40%
+- 新增測試 `megahallStylesAllAppearAndInteriorStaysWalkable`（四種版型都出現；內部每個可走方塊都走得到）
+- `gradlew build` 通過；`runClientGameTest` 失敗在 Level 1 的「橡膠房椅子 `sunken_chair` 掉落物不對」（`b623c12` 沒有附戰利品表，與本次改動無關，尚未修）
 - 改在單一資料夾 `Desktop\Backroom`（`main`）工作；先把朋友在 GitHub 新推的 3 個提交（Level 0 馬尼拉房間、多層樓梯間、斷路器與筆記）快轉合併進來，沒有衝突
 - 使用者要求在 Gemini（Antigravity）規劃的 60 層之外，再找其他來源、把樓層企劃擴充到 200～300 層：
   - 查證來源：Backrooms Wikidot 樓層總表（0～199 主樓層、0～99 子樓層、無編號樓層）、後室中文維基原創層級、B 站後室 Wiki、Escape the Backrooms 攻略；Fandom 擋自動讀取，沒辦法查證
@@ -143,3 +146,7 @@
   - `docs/crafting/05_weapons_firearms.md`（槍械精密組裝零件樹、18 種土製／正規／異常實驗槍械、10 種細緻彈藥與 6 種戰術配件）
   - `docs/crafting/06_weapons_magic_and_chests.md`（19 件魔法與異常超自然武器、寶箱與 Boss 取得管道對照總表）
 - 建立給 Claude 閱讀與技術對齊的總體企劃與協作交接書 `docs/PROJECT_PLAN_FOR_CLAUDE.md`（整合核心玩法願景、Antigravity 與 Claude 分工邊界、合成表 v1 資料驅動套件分流提案、多樓層網狀出口擴充建議、單一資料夾短期分支策略與 5 項待對齊問題）
+- 依使用者要求同步本機與 GitHub 進度：
+  - 將主工作目錄切回 `main`，在 `.gitignore` 加入 `logs/`、`__pycache__/`、`*.blend1`
+  - 提交工作區既有的 Level 1 薄型相連辦公隔間板改動（`CubiclePanelBlock`、`make_cubicle_models.py`、模型與 blockstate，`b9121b0`）
+  - 將 `claude` 分支尚未進主線的提交 `bdad687`（Level 0 巨構房間新增柱廊、分隔房間群與階梯下沉劇場三種版型及測試）合併進 `main`，通過 `gradlew build` 後將 `main` 與 `claude` 推送至 GitHub（無強制推送、無改寫歷史）

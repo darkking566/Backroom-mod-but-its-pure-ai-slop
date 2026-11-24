@@ -13,10 +13,11 @@ textures = ml.all_textures()
 for name in NAMES:
     mt.save(name, textures[name])
 models = ml.all_models()
-for name in NAMES:
+# The cubicle panel models and blockstate come from tools/make_cubicle_models.py.
+for name in ("book_shelf", "cubicle_trim"):
     if name in models:
         ml.write_json(ml.MODELS / f"{name}.json", models[name])
 states = ml.all_blockstates()
-for name in ("book_shelf", "cubicle_panel"):
+for name in ("book_shelf",):
     ml.write_json(ml.ASSETS / f"blockstates/{name}.json", states[name])
 print("room props redrawn")
