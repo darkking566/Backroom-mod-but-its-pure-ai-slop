@@ -294,6 +294,8 @@
   "item.noclip_backrooms.wretch_spawn_egg": "悲屍生怪蛋",
   "entity.noclip_backrooms.shriek": "啼物",
   "item.noclip_backrooms.shriek_spawn_egg": "啼物生怪蛋",
+  "entity.noclip_backrooms.crawler": "爬菌",
+  "item.noclip_backrooms.crawler_spawn_egg": "爬菌生怪蛋",
   "block.noclip_backrooms.wastebasket": "辦公室垃圾桶",
   "block.noclip_backrooms.desk_plant_dead": "枯萎的桌上盆栽",
   "block.noclip_backrooms.desk_plant_leafy": "桌上盆栽"

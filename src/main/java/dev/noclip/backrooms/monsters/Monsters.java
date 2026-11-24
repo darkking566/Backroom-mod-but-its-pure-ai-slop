@@ -3,6 +3,7 @@ package dev.noclip.backrooms.monsters;
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.monsters.arms.Arms;
 import dev.noclip.backrooms.monsters.clump.Clump;
+import dev.noclip.backrooms.monsters.crawler.Crawler;
 import dev.noclip.backrooms.monsters.duller.Duller;
 import dev.noclip.backrooms.monsters.hound.Hound;
 import dev.noclip.backrooms.monsters.shriek.Shriek;
@@ -53,6 +54,9 @@ public final class Monsters {
 	public static final EntityType<Shriek> SHRIEK = register("shriek",
 			EntityType.Builder.of(Shriek::new, MobCategory.MONSTER).sized(1.45F, 1.85F).eyeHeight(1.3F).clientTrackingRange(10));
 	public static final Item SHRIEK_SPAWN_EGG = registerEgg("shriek_spawn_egg", SHRIEK);
+	public static final EntityType<Crawler> CRAWLER = register("crawler",
+			EntityType.Builder.of(Crawler::new, MobCategory.MONSTER).sized(1.25F, 0.9F).eyeHeight(0.55F).clientTrackingRange(10));
+	public static final Item CRAWLER_SPAWN_EGG = registerEgg("crawler_spawn_egg", CRAWLER);
 
 	public static final SoundEvent HOUND_GROWL = sound("hound.growl");
 	public static final SoundEvent HOUND_ROAR = sound("hound.roar");
@@ -71,6 +75,7 @@ public final class Monsters {
 		FabricDefaultAttributeRegistry.register(ARMS, Arms.createAttributes());
 		FabricDefaultAttributeRegistry.register(WRETCH, Wretch.createAttributes());
 		FabricDefaultAttributeRegistry.register(SHRIEK, Shriek.createAttributes());
+		FabricDefaultAttributeRegistry.register(CRAWLER, Crawler.createAttributes());
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.SPAWN_EGGS).register(output -> {
 			output.accept(HOUND_SPAWN_EGG);
 			output.accept(SMILER_SPAWN_EGG);
@@ -80,6 +85,7 @@ public final class Monsters {
 			output.accept(ARMS_SPAWN_EGG);
 			output.accept(WRETCH_SPAWN_EGG);
 			output.accept(SHRIEK_SPAWN_EGG);
+			output.accept(CRAWLER_SPAWN_EGG);
 		});
 	}
 
