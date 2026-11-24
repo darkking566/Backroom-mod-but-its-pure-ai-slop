@@ -686,25 +686,26 @@ final class Maze {
 		return lampWorks(seed, x, z, EpochSource.ZERO);
 	}
 
+	/**
+	 * Whether a lamp in this cell is lit; the rest hang dark (broken). About half are lit, so the lamps make pools of
+	 * light with dark stretches between them (the user asked for fewer lit lamps, 2026-11-24; before, 70 to 100% were).
+	 */
 	static boolean lampWorks(long seed, int x, int z, EpochSource epochs) {
 		if (ManilaRoomPlan.roomAtBlock(seed, x, z) != null) return true;
 		int cx = Math.floorDiv(x, CELL), cz = Math.floorDiv(z, CELL);
 		Zone zone = zoneForCell(seed, cx, cz);
-		if (zone == Zone.MEGATHALL) return MegahallPlan.isLamp(seed, x, z);
-		if (zone == Zone.CHASM) return isLamp(x, z);
 		int epoch = effectiveEpoch(zone, cx, cz, epochs);
-		long h = mixEpoch(hash(seed, cx, cz, LAMP), epoch);
+		int roll = Math.floorMod(mixEpoch(hash(seed, cx, cz, LAMP), epoch), 100);
 		return switch (zone) {
 			case DARKENED -> false;
-			case RED_ROOM -> Math.floorMod(h, 100) < 65;
-			case PITS -> Math.floorMod(h, 5) >= 2;
-			case CHASM -> Math.floorMod(h, 5) >= 1;
-			case MEGATHALL -> Math.floorMod(h, 6) != 0;
-			case PILLARS -> Math.floorMod(h, 10) != 0;
-			case ARCHES -> Math.floorMod(h, 7) != 0;
-			case CUBICLES -> Math.floorMod(h, 8) != 0;
-			case CORRIDORS -> Math.floorMod(h, 10) < 7;
-			case CLASSIC -> Math.floorMod(h, 5) != 0;
+			case RED_ROOM -> roll < 65;
+			case PITS -> roll < 40;
+			case CHASM -> isLamp(x, z) && roll < 50;
+			case MEGATHALL -> MegahallPlan.isLamp(seed, x, z) && roll < 50;
+			case PILLARS, ARCHES -> roll < 55;
+			case CUBICLES -> roll < 60;
+			case CORRIDORS -> roll < 45;
+			case CLASSIC -> roll < 50;
 		};
 	}
 

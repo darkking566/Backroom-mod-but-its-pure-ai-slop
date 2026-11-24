@@ -158,6 +158,11 @@
   - 試過在濾鏡裡用深度做遠處變黑，不行：遊戲畫手之前會清掉深度（濾鏡讀到的全是空的），而且 26.2 的深度是反的；改用霧
   - 沒動朋友的 Level 0 程式與資料（燈的數量、亮度、霧的設定都還是朋友的，只在濾鏡開著時從客戶端改看起來的樣子）
   - `runClientGameTest -Plevels=look` 與 `gradlew build`（57 個單元測試）通過；更新 `docs/look/README.md`、`docs/look/level0_ingame.jpg`
+- 提交前抓 GitHub，合併朋友新推的 2 個提交（Level 0.1 停電、機器人生怪蛋、冷熱區外觀），沒有衝突
+- 使用者要求再暗一點、可以減少第 0 層的燈（推之前要先給使用者確認）：
+  - 改朋友的 `level0/Maze.lampWorks`（使用者同意）：各區亮燈比例從 70～100% 降到大約一半（經典 50%、走廊 45%、柱廳與拱門 55%、隔間 60%、深坑 40%、超大廳與斷崖 50%，原本超大廳與斷崖的燈全亮），其餘是壞燈；紅室、昏暗區、馬尼拉房間不變；`docs/levels/level0/README.md` 加一句說明
+  - `Look.Mood` 的 Level 0 改成霧 3～18 格、光衰減 0.45（原本 5～24、0.35）
+  - `gradlew build`（57 個單元測試）、`runClientGameTest -Plevels=0,look`（朋友的 Level 0 測試與畫面風格測試）都通過；更新 `docs/look/README.md`、`docs/look/level0_ingame.jpg`
 
 ## 動作記錄（Antigravity）
 
