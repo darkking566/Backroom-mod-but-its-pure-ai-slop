@@ -84,6 +84,14 @@ public final class BackroomsMagicItem extends Item {
 		this.loreKey = loreKey;
 	}
 
+	public Spell spell() {
+		return spell;
+	}
+
+	public int cooldownTicks() {
+		return cooldownTicks;
+	}
+
 	private static Properties withMeleeDamage(Properties props, float dmg) {
 		return props.attributes(ItemAttributeModifiers.builder()
 				.add(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_ID, dmg - 1.0, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND)
@@ -344,6 +352,9 @@ public final class BackroomsMagicItem extends Item {
 		}
 		if (stack.isDamageableItem()) {
 			stack.hurtAndBreak(1, player, hand);
+		}
+		if (player instanceof ServerPlayer sp) {
+			BackroomsWeaponNetworking.sendHitmarker(sp, false);
 		}
 		player.getCooldowns().addCooldown(stack, cooldownTicks);
 		return InteractionResult.SUCCESS;

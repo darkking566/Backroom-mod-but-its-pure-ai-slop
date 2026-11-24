@@ -1,8 +1,72 @@
 {
-  "parent": "minecraft:block/orientable",
+  "parent": "minecraft:block/block",
   "textures": {
-    "top": "noclip_backrooms:block/crafting/boarded_barricade_top",
-    "front": "noclip_backrooms:block/crafting/boarded_barricade_front",
-    "side": "noclip_backrooms:block/crafting/boarded_barricade_side"
-  }
+    "0": "noclip_backrooms:block/crafting3d/boarded_barricade",
+    "particle": "noclip_backrooms:block/crafting3d/boarded_barricade"
+  },
+  "elements": [
+    {
+      "from": [1.50, 0.00, 6.80],
+      "to": [3.20, 16.00, 9.20],
+      "faces": {
+        "north": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"},
+        "east": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"},
+        "south": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"},
+        "west": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"},
+        "up": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"},
+        "down": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [12.80, 0.00, 6.80],
+      "to": [14.50, 16.00, 9.20],
+      "faces": {
+        "north": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"},
+        "east": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"},
+        "south": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"},
+        "west": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"},
+        "up": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"},
+        "down": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [0.20, 2.00, 5.60],
+      "to": [15.80, 4.80, 7.00],
+      "rotation": {"angle": 4.0, "axis": "z", "origin": [8.00, 3.40, 6.30]},
+      "faces": {
+        "north": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "east": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "south": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "west": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "up": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "down": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [0.20, 6.80, 5.50],
+      "to": [15.80, 9.60, 6.90],
+      "rotation": {"angle": -6.0, "axis": "z", "origin": [8.00, 8.20, 6.20]},
+      "faces": {
+        "north": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "east": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "south": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "west": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "up": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "down": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [0.20, 11.40, 5.60],
+      "to": [15.80, 14.20, 7.00],
+      "rotation": {"angle": 5.0, "axis": "z", "origin": [8.00, 12.80, 6.30]},
+      "faces": {
+        "north": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "east": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "south": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "west": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "up": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "down": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"}
+      }
+    }
+  ]
 }

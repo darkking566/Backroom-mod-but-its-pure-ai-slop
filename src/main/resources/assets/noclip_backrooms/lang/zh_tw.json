@@ -945,6 +945,7 @@
   "tooltip.noclip_backrooms.style.chinese": "中式冷兵器系",
   "tooltip.noclip_backrooms.firearm_stats": "Tier %s 熱兵器槍械 · 單發火力 %s",
   "tooltip.noclip_backrooms.firearm_ammo": "使用彈藥：%s",
+  "tooltip.noclip_backrooms.firearm_controls": "左鍵：開火射擊｜按住右鍵：舉槍瞄準／開鏡",
   "tooltip.noclip_backrooms.magic_tier": "Tier %s 後室異常法器",
   "tooltip.noclip_backrooms.magic_cost": "施法消耗：%s",
   "lore.noclip_backrooms.compendium": "右鍵檢視五大工作站與 JEI 合成查詢指南",

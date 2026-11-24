@@ -945,6 +945,7 @@
   "tooltip.noclip_backrooms.style.chinese": "Chinese Martial",
   "tooltip.noclip_backrooms.firearm_stats": "Tier %s Firearm · Power %s",
   "tooltip.noclip_backrooms.firearm_ammo": "Ammo: %s",
+  "tooltip.noclip_backrooms.firearm_controls": "Left-Click: Fire | Hold Right-Click: Aim Down Sights",
   "tooltip.noclip_backrooms.magic_tier": "Tier %s Anomaly / Magic Armament",
   "tooltip.noclip_backrooms.magic_cost": "Cast Cost: %s",
   "lore.noclip_backrooms.compendium": "Right-click for crafting station & JEI quick guide.",

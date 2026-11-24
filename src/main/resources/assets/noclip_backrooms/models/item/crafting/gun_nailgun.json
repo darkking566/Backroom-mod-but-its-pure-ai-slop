@@ -1,6 +1,92 @@
 {
-  "parent": "minecraft:item/handheld",
   "textures": {
-    "layer0": "noclip_backrooms:item/crafting/gun_nailgun"
+    "0": "noclip_backrooms:item/equipment3d/gun_nailgun",
+    "particle": "noclip_backrooms:item/equipment3d/gun_nailgun"
+  },
+  "gui_light": "side",
+  "elements": [
+    {
+      "from": [6.80, 1.60, 8.80],
+      "to": [9.20, 7.40, 11.60],
+      "rotation": {"angle": 12.0, "axis": "x", "origin": [8.00, 7.00, 10.00]},
+      "faces": {
+        "north": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "east": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "south": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "west": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "up": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "down": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [7.20, 1.20, 3.00],
+      "to": [8.80, 3.20, 10.20],
+      "rotation": {"angle": -20.0, "axis": "x", "origin": [8.00, 2.40, 6.50]},
+      "faces": {
+        "north": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"},
+        "east": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"},
+        "south": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"},
+        "west": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"},
+        "up": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"},
+        "down": {"uv": [4.15, 0.15, 7.85, 3.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [6.00, 6.80, 3.20],
+      "to": [10.00, 11.40, 12.20],
+      "faces": {
+        "north": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "east": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "south": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "west": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "up": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "down": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [6.40, 11.40, 5.20],
+      "to": [9.60, 12.40, 9.60],
+      "faces": {
+        "north": {"uv": [8.15, 4.15, 11.85, 7.85], "texture": "#0"},
+        "east": {"uv": [8.15, 4.15, 11.85, 7.85], "texture": "#0"},
+        "south": {"uv": [8.15, 4.15, 11.85, 7.85], "texture": "#0"},
+        "west": {"uv": [8.15, 4.15, 11.85, 7.85], "texture": "#0"},
+        "up": {"uv": [8.15, 4.15, 11.85, 7.85], "texture": "#0"},
+        "down": {"uv": [8.15, 4.15, 11.85, 7.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [7.20, 7.80, 0.60],
+      "to": [8.80, 9.60, 3.40],
+      "faces": {
+        "north": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "east": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "south": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "west": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "up": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "down": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [6.80, 7.20, 0.20],
+      "to": [9.20, 10.20, 1.00],
+      "faces": {
+        "north": {"uv": [12.15, 0.15, 15.85, 3.85], "texture": "#0"},
+        "east": {"uv": [12.15, 0.15, 15.85, 3.85], "texture": "#0"},
+        "south": {"uv": [12.15, 0.15, 15.85, 3.85], "texture": "#0"},
+        "west": {"uv": [12.15, 0.15, 15.85, 3.85], "texture": "#0"},
+        "up": {"uv": [12.15, 0.15, 15.85, 3.85], "texture": "#0"},
+        "down": {"uv": [12.15, 0.15, 15.85, 3.85], "texture": "#0"}
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {"rotation": [0, 0, 0], "translation": [0, 2.2, -1.0], "scale": [0.85, 0.85, 0.85]},
+    "thirdperson_lefthand": {"rotation": [0, 0, 0], "translation": [0, 2.2, -1.0], "scale": [0.85, 0.85, 0.85]},
+    "firstperson_righthand": {"rotation": [2, -2, 0], "translation": [1.6, 3.2, -2.4], "scale": [0.9, 0.9, 0.9]},
+    "firstperson_lefthand": {"rotation": [2, 2, 0], "translation": [1.6, 3.2, -2.4], "scale": [0.9, 0.9, 0.9]},
+    "ground": {"rotation": [0, 0, 90], "translation": [0, 2.5, 0], "scale": [0.65, 0.65, 0.65]},
+    "gui": {"rotation": [14, -68, 12], "translation": [-0.5, 0.5, 0], "scale": [1.05, 1.05, 1.05]},
+    "fixed": {"rotation": [0, 90, 0], "translation": [0, 0.5, 0], "scale": [1.0, 1.0, 1.0]}
   }
 }

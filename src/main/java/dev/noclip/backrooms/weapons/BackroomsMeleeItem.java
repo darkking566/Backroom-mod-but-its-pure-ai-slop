@@ -7,6 +7,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -21,6 +22,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.TooltipDisplay;
@@ -82,6 +84,34 @@ public final class BackroomsMeleeItem extends Item {
 		this.loreKey = loreKey;
 	}
 
+	public Style style() {
+		return style;
+	}
+
+	public Trait trait() {
+		return trait;
+	}
+
+	public boolean isThrustStyle() {
+		return trait == Trait.ARMOR_PIERCE_45 || trait == Trait.BACKSTAB
+				|| trait == Trait.PEACHWOOD_BANE || trait == Trait.STOPMOTION_FREEZE
+				|| (loreKey != null && (loreKey.contains("spear") || loreKey.contains("han_jian") || loreKey.contains("rapier")));
+	}
+
+	public boolean hasActiveRightClickSkill() {
+		return trait == Trait.VOID_WAVE || trait == Trait.METEOR_PULL || trait == Trait.SLEEVE_DARTS || trait == Trait.COIN_WARD;
+	}
+
+	@Override
+	public int getUseDuration(ItemStack stack, LivingEntity entity) {
+		return hasActiveRightClickSkill() ? 0 : 72000;
+	}
+
+	@Override
+	public ItemUseAnimation getUseAnimation(ItemStack stack) {
+		return hasActiveRightClickSkill() ? ItemUseAnimation.NONE : ItemUseAnimation.BLOCK;
+	}
+
 	private static ItemAttributeModifiers buildAttributes(float attackDamage, float attackSpeed, float extraReach) {
 		ItemAttributeModifiers.Builder builder = ItemAttributeModifiers.builder()
 				.add(Attributes.ATTACK_DAMAGE,
@@ -102,6 +132,9 @@ public final class BackroomsMeleeItem extends Item {
 	public void postHurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
 		super.postHurtEnemy(stack, target, attacker);
 		if (!(attacker.level() instanceof ServerLevel serverLevel)) return;
+		if (attacker instanceof ServerPlayer sp) {
+			BackroomsWeaponNetworking.sendHitmarker(sp, !target.isAlive());
+		}
 
 		String entityPath = target.getType().builtInRegistryHolder().key().identifier().getPath();
 		boolean isShadowOrSmiler = entityPath.contains("smiler") || entityPath.contains("duller")
@@ -205,8 +238,9 @@ public final class BackroomsMeleeItem extends Item {
 	@Override
 	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		ItemStack stack = player.getItemInHand(hand);
-		if (trait != Trait.VOID_WAVE && trait != Trait.METEOR_PULL && trait != Trait.SLEEVE_DARTS && trait != Trait.COIN_WARD) {
-			return super.use(level, player, hand);
+		if (!hasActiveRightClickSkill()) {
+			player.startUsingItem(hand);
+			return InteractionResult.CONSUME;
 		}
 		if (player.getCooldowns().isOnCooldown(stack)) return InteractionResult.PASS;
 		if (!(level instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS;

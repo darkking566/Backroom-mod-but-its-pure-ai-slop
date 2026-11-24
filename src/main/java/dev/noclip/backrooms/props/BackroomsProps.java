@@ -78,17 +78,17 @@ public final class BackroomsProps {
 
 	private static Block station(String id, StationType stationType, SoundType sound, float strength, int light) {
 		return register(id, props -> new WorkstationBlock(stationType, props),
-				BlockBehaviour.Properties.of().mapColor(MapColor.METAL).sound(sound).strength(strength, 8.0F).lightLevel(s -> light));
+				BlockBehaviour.Properties.of().mapColor(MapColor.METAL).sound(sound).strength(strength, 8.0F).lightLevel(s -> light).noOcclusion());
 	}
 
 	private static Block chest(String id, boolean locked, SoundType sound, float strength, int light) {
 		return register(id, props -> new BackroomsLootChestBlock(locked, props),
-				BlockBehaviour.Properties.of().mapColor(MapColor.METAL).sound(sound).strength(strength, 10.0F).lightLevel(s -> light));
+				BlockBehaviour.Properties.of().mapColor(MapColor.METAL).sound(sound).strength(strength, 10.0F).lightLevel(s -> light).noOcclusion());
 	}
 
 	private static Block prop(String id, SoundType sound, float strength, int light) {
 		return register(id, NoClipPropBlock::new,
-				BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(sound).strength(strength, strength * 1.5F).lightLevel(s -> light));
+				BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(sound).strength(strength, strength * 1.5F).lightLevel(s -> light).noOcclusion());
 	}
 
 	private static Block register(String name, Function<BlockBehaviour.Properties, Block> factory, BlockBehaviour.Properties props) {

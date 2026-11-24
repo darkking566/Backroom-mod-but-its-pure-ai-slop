@@ -8,6 +8,9 @@ import dev.noclip.backrooms.core.rpg.RpgClient;
 import dev.noclip.backrooms.crafting.BackroomsCrafting;
 import dev.noclip.backrooms.crafting.BackroomsStationScreen;
 import dev.noclip.backrooms.crafting.StationType;
+import dev.noclip.backrooms.items.armor.BackroomsArmorRenderer;
+import dev.noclip.backrooms.weapons.WeaponAnimState;
+import dev.noclip.backrooms.weapons.WeaponCrosshairHud;
 import dev.noclip.backrooms.level0p1.robots.Robot;
 import dev.noclip.backrooms.level0p1.robots.RobotModel;
 import dev.noclip.backrooms.level0p1.robots.RobotRenderer;
@@ -66,6 +69,9 @@ public final class BackroomsClient implements ClientModInitializer {
 		for (StationType station : StationType.values()) {
 			MenuScreens.register(BackroomsCrafting.menuType(station), BackroomsStationScreen::new);
 		}
+		BackroomsArmorRenderer.registerAll();
+		WeaponAnimState.register();
+		WeaponCrosshairHud.register();
 		ModelLayerRegistry.registerModelLayer(HoundModel.LAYER, HoundModel.RIG::layer);
 		EntityRendererRegistry.register(Monsters.HOUND, HoundRenderer::new);
 		ModelLayerRegistry.registerModelLayer(SmilerModel.LAYER, SmilerModel.RIG::layer);

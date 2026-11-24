@@ -96,4 +96,47 @@ final class BackroomsCraftingTest {
 					"Unknown noclip_backrooms item '" + id + "' referenced in " + context);
 		}
 	}
+
+	@Test
+	void all3dModelsAndArmorTexturesExistAndAreValid() throws IOException {
+		Path equipTexDir = Path.of("src/main/resources/assets/noclip_backrooms/textures/item/equipment3d");
+		Path modelDir = Path.of("src/main/resources/assets/noclip_backrooms/models/item/crafting");
+		assertTrue(Files.isDirectory(equipTexDir), "3D item texture dir missing");
+		List<Path> textures;
+		try (var stream = Files.list(equipTexDir)) {
+			textures = stream.filter(p -> p.toString().endsWith(".png")).toList();
+		}
+		assertTrue(textures.size() >= 296, "Expected all 296 3D item textures, got " + textures.size());
+		for (Path tex : textures) {
+			String fn = tex.getFileName().toString();
+			String id = fn.substring(0, fn.length() - 4);
+			Path modelFile = modelDir.resolve(id + ".json");
+			assertTrue(Files.exists(modelFile), "Missing 3D item model for " + id);
+			JsonObject obj = JsonParser.parseString(Files.readString(modelFile, StandardCharsets.UTF_8)).getAsJsonObject();
+			assertTrue(obj.has("elements") && !obj.getAsJsonArray("elements").isEmpty(), "Empty 3D elements in item " + id);
+			assertTrue(obj.has("display"), "Missing 3D display transforms in item " + id);
+		}
+
+		Path blockTexDir = Path.of("src/main/resources/assets/noclip_backrooms/textures/block/crafting3d");
+		Path blockModelDir = Path.of("src/main/resources/assets/noclip_backrooms/models/block/crafting");
+		assertTrue(Files.isDirectory(blockTexDir), "3D block texture dir missing");
+		List<Path> blockTextures;
+		try (var stream = Files.list(blockTexDir)) {
+			blockTextures = stream.filter(p -> p.toString().endsWith(".png")).toList();
+		}
+		assertTrue(blockTextures.size() >= 31, "Expected all 31 3D block textures, got " + blockTextures.size());
+		for (Path tex : blockTextures) {
+			String fn = tex.getFileName().toString();
+			String id = fn.substring(0, fn.length() - 4);
+			Path modelFile = blockModelDir.resolve(id + ".json");
+			assertTrue(Files.exists(modelFile), "Missing 3D block model for " + id);
+			JsonObject obj = JsonParser.parseString(Files.readString(modelFile, StandardCharsets.UTF_8)).getAsJsonObject();
+			assertTrue(obj.has("elements") && !obj.getAsJsonArray("elements").isEmpty(), "Empty 3D elements in block " + id);
+		}
+
+		Path armorDir = Path.of("src/main/resources/assets/noclip_backrooms/textures/entity/armor3d");
+		for (String set : List.of("almond_gas_mask", "scrap_tactical", "skin_stealer", "boiler_thermal", "abyssal_void")) {
+			assertTrue(Files.exists(armorDir.resolve(set + ".png")), "Missing worn 3D armor texture for " + set);
+		}
+	}
 }

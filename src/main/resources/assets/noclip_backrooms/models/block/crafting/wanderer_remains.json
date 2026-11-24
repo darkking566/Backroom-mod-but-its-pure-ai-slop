@@ -1,8 +1,58 @@
 {
-  "parent": "minecraft:block/orientable",
+  "parent": "minecraft:block/block",
   "textures": {
-    "top": "noclip_backrooms:block/crafting/wanderer_remains_top",
-    "front": "noclip_backrooms:block/crafting/wanderer_remains_front",
-    "side": "noclip_backrooms:block/crafting/wanderer_remains_side"
-  }
+    "0": "noclip_backrooms:block/crafting3d/wanderer_remains",
+    "particle": "noclip_backrooms:block/crafting3d/wanderer_remains"
+  },
+  "elements": [
+    {
+      "from": [2.00, 0.00, 3.00],
+      "to": [8.50, 5.20, 12.00],
+      "faces": {
+        "north": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "east": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "south": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "west": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "up": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "down": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [9.00, 0.00, 4.50],
+      "to": [14.00, 4.50, 9.50],
+      "faces": {
+        "north": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "east": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "south": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "west": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "up": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "down": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [8.20, 0.50, 9.80],
+      "to": [13.20, 5.50, 14.80],
+      "rotation": {"angle": 28.0, "axis": "y", "origin": [10.70, 3.00, 12.30]},
+      "faces": {
+        "north": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "east": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "south": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "west": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "up": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "down": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [3.00, 0.20, 1.00],
+      "to": [12.50, 1.40, 2.40],
+      "faces": {
+        "north": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "east": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "south": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "west": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "up": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "down": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"}
+      }
+    }
+  ]
 }

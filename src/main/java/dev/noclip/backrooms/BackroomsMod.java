@@ -11,6 +11,7 @@ import dev.noclip.backrooms.level2.Level2;
 import dev.noclip.backrooms.level3.Level3;
 import dev.noclip.backrooms.monsters.Monsters;
 import dev.noclip.backrooms.props.BackroomsProps;
+import dev.noclip.backrooms.weapons.BackroomsWeaponNetworking;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
 
@@ -32,6 +33,7 @@ public final class BackroomsMod implements ModInitializer {
 		BackroomsProps.register();
 		BackroomsItems.register();
 		BackroomsCrafting.register();
+		BackroomsWeaponNetworking.register();
 		Monsters.register();
 		People.register();
 		Level0.register();

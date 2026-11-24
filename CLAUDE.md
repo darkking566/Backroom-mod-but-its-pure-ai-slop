@@ -263,3 +263,24 @@
   - 資源、配方與驗證：
     - 產生全套 16×16 像素圖示與方塊貼圖、模型、blockstates、物品定義、28 個原版 3×3 配方 JSON、230 條工作站配方 JSON、49 個方塊／寶箱／實體戰利品表，以及完整 `en_us.json`／`zh_tw.json` 雙語條目
     - 新增單元測試 `src/test/java/dev/noclip/backrooms/crafting/BackroomsCraftingTest.java`（驗證全 230 條工作站配方與所有原版 3×3 配方 JSON 及其參照的每個物品 ID 皆存在無誤）；`gradlew build` 與 `runClientGameTest -Plevels=look`（實機確認 JEI `30.48.0.244` 載入並索引 2,628 項物品與全套配方無報錯）全部通過
+- 依使用者要求將全部裝備（武器、槍械、戰術配件、魔法異常法器、破壞工具與防具）全面升級為精緻 3D 模型（含穿戴於角色身上的 3D 立體防具渲染）：
+  - **112 件裝備全 3D 立體手持／物品欄／JEI 模型**（`assets/noclip_backrooms/models/item/crafting/*.json` 與 `textures/item/equipment3d/*.png`）：
+    - 涵蓋全 41 把冷兵器（中世紀鈍器 11／西式 14／中式 16，含立體雙刃菱形剖面、彎刀弧段、青龍偃月關刀、方天畫戟時鐘齒輪、八卦銅錢劍、鎖鏈流星錘／鏈枷與自發光血晶／雷弧／虛空紋路）、18 把熱兵器槍械（含槍托、握把、彈匣、左輪轉輪彈巢、霰彈泵動滑軌、噴火器油罐、高倍狙擊鏡、電磁軌道槍銅線圈加速環與自發光準星／電弧）＋ 6 件 3D 戰術配件、19 件魔法異常法器（含立體浮空晶核法杖、厚封面精裝魔典、紅室血咒大鐮、時間遲緩懷錶、短距穿牆短杖環繞裂片）、10 種 Tier 1–4 特殊破壞工具（撬棍、斷線鉗、工業管鉗、液壓剪、圓盤工業切割機、異常共振鎬、虛空裂解器等）＋ 戰術 UV 手電，以及全部 17 件防具的 3D 物品模型
+    - 每件皆配備獨立 64×64 多材質著色貼圖圖集（金屬拉絲、深槍灰、拋光刀刃、黃銅雕花、纏柄皮革、木紋、鉚釘鋼板、銅線圈、骨質、光學玻璃與 `light_emission: 15` 自發光核心）及依類別微調的第一／第三人稱手持朝向（槍械自然向前瞄準、兵器握柄對齊手心）與背包／JEI 斜角展示
+  - **5 套穿戴於角色身上的真實 3D 立體防具**（`src/client/java/dev/noclip/backrooms/items/armor/BackroomsArmorModels.java`、`BackroomsArmorRenderer.java`、`assets/noclip_backrooms/textures/entity/armor3d/*.png`）：
+    - 透過 Fabric `ArmorRenderer`（四部位獨立 `HumanoidModel` 確保延遲提交零互蓋）與 256×256 零溢色分區貼圖＋ `RenderTypes.eyes` 全亮自發光層，為過濾防毒面具（雙側斜角濾毒罐＋發光青色護目鏡）、廢料治安套（防暴盔側掛頭燈＋鉚釘鋼胸板與戰術彈袋）、竊皮偽裝套（垂墜兜帽＋破舊斗篷披肩）、焦熱隔熱套（黃銅潛水鍋爐盔＋背部雙筒高壓銅蒸氣罐與發光溫度錶）及深海虛空套（夜視複眼鏡面＋雙翼頭冠＋發光胸口虛空裂隙核心與符文肩甲）打造專屬立體穿戴模型
+  - 更新 `BackroomsClient.java` 註冊全 17 件防具 3D 渲染器，並於 `BackroomsCraftingTest.java` 新增全 112 件 3D 模型與 5 套穿戴貼圖完整性檢查；`gradlew build` 與 `runClientGameTest -Plevels=look` 皆零錯誤通過
+- 依使用者要求將其餘所有新增物品與方塊全面 3D 化，並實作槍械／全武器第一人稱使用動畫、開鏡瞄準（ADS）動畫與縮放、以及動態準心／狙擊鏡／命中回饋系統：
+  - **其餘全部 31 座方塊＋184 件物品全面 3D 化（合計全 327 項新增物件 100% 3D 模型）**：
+    - **31 座 3D 立體方塊**（`assets/noclip_backrooms/models/block/crafting/*.json` 與 `textures/block/crafting3d/*.png`）：涵蓋 4 座工作站（拆解台虎鉗與齒輪、改裝鍛造台鐵砧與工具架、杏仁蒸餾化學組燒瓶與冷凝蛇管、異常煉成壇四柱發光符文與懸浮 45° 晶體）、3 種立體帶鎖寶箱（軍械箱／異常金庫／Boss 戰利品箱）與 24 種異常穿模家具（辦公椅、木椅、摺疊桌、檔案櫃、CRT 電視、販賣機、冰箱、飲水機、醫院推床、街機、吊燈、蒸氣鍋爐、發光霓虹招牌、結晶礦脈、異常紅群、電箱、鐵絲網與流浪者遺骸等），並於 `BackroomsProps.java` 補上 `.noOcclusion()` 避免非滿格 3D 模型造成透視破圖
+    - **184 件剩餘 3D 物品**（`models/item/crafting/*.json` 與 `textures/item/equipment3d/*.png`）：涵蓋 76 種加工與環境素材、42 種怪物／NPC 掉落物、10 顆自發光立體 Boss 核心、39 種鍛造／槍械／彈藥／法器零件、立體精裝《後室合成圖鑑》、6 種藥瓶／針劑／求生消耗品與 11 種彈藥盒／彈頭／電磁軌道彈，統一配備 64×64 多材質著色貼圖與斜角 GUI 展示
+  - **槍械、冷兵器與魔法法器第一人稱使用動畫、瞄準（ADS）與動態準心系統**：
+    - **伺服器／連線與武器操作**（`weapons/FireWeaponPayload.java`、`WeaponHitPayload.java`、`BackroomsWeaponNetworking.java`、`BackroomsFirearmItem.java`、`BackroomsMeleeItem.java`、`BackroomsMagicItem.java`）：
+      - 槍械改為標準 FPS 操作：左鍵開火（自動槍長按連發，攔截挖方塊／揮手，並支援開鏡瞄準時左鍵不漏擊與無彈不觸發假後座力）、長按右鍵進入平滑舉槍瞄準（ADS，散布縮減 75%、狙擊／軌道槍開鏡增傷 +20%、第三人稱雙手舉槍姿態）
+      - 冷兵器支援三系連段揮擊（鈍器高舉砸擊／西式交替斜劈與細劍突刺／中式行雲流水橫斬挑斬與長槍直刺）、右鍵主動技揮擊脈衝，以及無主動技冷兵器長按右鍵進入立體橫刀格擋姿態（實戰減傷 35% 並播放金屬招架音效）
+      - 魔法與異常法器依類型區分專屬施法動作（法杖前推、魔典抬升翻頁、儀式鈴鐺阻尼搖鈴震盪、懷錶／魔鏡舉眼脈衝）
+      - 全武器命中目標皆回傳 `WeaponHitPayload` 顯示白／擊殺紅 `×` Hitmarker 並播放清脆命中／擊殺音效
+    - **客戶端動畫、FOV 縮放與動態準心 HUD**（`src/client/java/dev/noclip/backrooms/weapons/WeaponAnimState.java`、`WeaponCrosshairHud.java`、`mixin/client/ItemInHandRendererWeaponAnimation.java`、`AbstractClientPlayerAimFov.java`、`MinecraftFirearmInput.java`）：
+      - 槍械第一人稱支援自然呼吸晃動、平滑移至畫面正中準星對齊（ADS）、彈簧阻尼後座力後退／槍口上揚／滾轉微震與槍口火光；FOV 依槍種平滑放大（手槍／衝鋒槍約 1.25×、步槍 1.55×、栓動狙擊 3.6×、反器材／軌道槍 5.0×），狙擊槍與軌道槍在 ADS 達 72% 時切換為全螢幕圓形光學密位狙擊鏡（自動隱藏槍身模型）
+      - 透過 `HudElementRegistry.replaceElement(VanillaHudElements.CROSSHAIR, ...)` 依武器動態繪製專屬準心（手槍／步槍四向擴散準心與開鏡紅點、霰彈圓環、電弧／火焰／音波括弧、光學狙擊鏡、魔法菱形符文準心與冷卻條、冷兵器戰術準心與格擋括弧／蓄力條）與 Hitmarker `×`
+  - **驗證**：更新 `BackroomsCraftingTest.java` 驗證全 296 件 3D 物品模型、全 31 座 3D 方塊模型與 5 套穿戴 3D 防具貼圖，執行 `gradlew build` 與 `runClientGameTest -Plevels=look` 全部通過且客戶端日誌零模型／貼圖／Mixin 錯誤

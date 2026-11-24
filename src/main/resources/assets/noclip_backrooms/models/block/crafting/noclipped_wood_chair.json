@@ -1,8 +1,93 @@
 {
-  "parent": "minecraft:block/orientable",
+  "parent": "minecraft:block/block",
   "textures": {
-    "top": "noclip_backrooms:block/crafting/noclipped_wood_chair_top",
-    "front": "noclip_backrooms:block/crafting/noclipped_wood_chair_front",
-    "side": "noclip_backrooms:block/crafting/noclipped_wood_chair_side"
-  }
+    "0": "noclip_backrooms:block/crafting3d/noclipped_wood_chair",
+    "particle": "noclip_backrooms:block/crafting3d/noclipped_wood_chair"
+  },
+  "elements": [
+    {
+      "from": [2.50, 0.00, 2.50],
+      "to": [4.00, 7.50, 4.00],
+      "faces": {
+        "north": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "east": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "south": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "west": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "up": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "down": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [12.00, 0.00, 2.50],
+      "to": [13.50, 7.50, 4.00],
+      "faces": {
+        "north": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "east": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "south": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "west": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "up": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "down": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [2.50, 0.00, 12.00],
+      "to": [4.00, 15.50, 13.50],
+      "faces": {
+        "north": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "east": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "south": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "west": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "up": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "down": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [12.00, 0.00, 12.00],
+      "to": [13.50, 15.50, 13.50],
+      "faces": {
+        "north": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "east": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "south": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "west": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "up": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"},
+        "down": {"uv": [0.15, 4.15, 3.85, 7.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [2.20, 7.50, 2.20],
+      "to": [13.80, 8.80, 13.80],
+      "faces": {
+        "north": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "east": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "south": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "west": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "up": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "down": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [3.80, 10.50, 12.20],
+      "to": [12.20, 12.00, 13.30],
+      "faces": {
+        "north": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "east": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "south": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "west": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "up": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "down": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [3.80, 13.20, 12.20],
+      "to": [12.20, 15.00, 13.30],
+      "faces": {
+        "north": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "east": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "south": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "west": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "up": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "down": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"}
+      }
+    }
+  ]
 }
