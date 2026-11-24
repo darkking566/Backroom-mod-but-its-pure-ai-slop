@@ -2,6 +2,7 @@ package dev.noclip.backrooms;
 
 import dev.noclip.backrooms.level0.Level0;
 import dev.noclip.backrooms.level1.Level1;
+import dev.noclip.backrooms.level2.Level2;
 import dev.noclip.backrooms.monsters.Monsters;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.resources.Identifier;
@@ -23,5 +24,6 @@ public final class BackroomsMod implements ModInitializer {
 		Monsters.register();
 		Level0.register();
 		Level1.register();
+		Level2.register();
 	}
 }

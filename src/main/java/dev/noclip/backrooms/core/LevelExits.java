@@ -57,7 +57,8 @@ public final class LevelExits {
 
 	private static void refuse(ServerPlayer player, String level, int now) {
 		Integer last = LAST_REFUSED.get(player.getUUID());
-		if (last != null && now - last < REFUSE_INTERVAL) return;
+		// The tick count starts again from zero in every world loaded, while this map lives as long as the game.
+		if (last != null && now >= last && now - last < REFUSE_INTERVAL) return;
 		LAST_REFUSED.put(player.getUUID(), now);
 		refusals++;
 		player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.exit_closed", level));

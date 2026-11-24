@@ -55,6 +55,17 @@
   - 第二批只列在索引，不預先建立各層資料夾與 Java 套件（開工時再建）
 - 使用者提到看過「1980 阿帕拉契的荒涼」：查到是 Fandom 的 Level 161（Appalachian Desolation）與 161.1（Appalachian Lodge），Wikidot 的 161 是另一層；`docs/levels/README.md` 加「Fandom 版本」29 層（從搜尋結果確認得到標題的，和 Wikidot 同號的資料夾加 `_fd`），合計 316 層
 - 使用者定下分工：Claude 先把主樓層做好，Gemini（Antigravity）做合成表；讀了 Antigravity 的 `docs/PROJECT_PLAN_FOR_CLAUDE.md`，回覆寫在 `docs/PROJECT_PLAN_REPLY_FROM_CLAUDE.md`（五個問題的答覆、建議都在 `main` 小步提交、配方只在伺服器端等技術提醒）；`AGENTS.md` 加一行分工
+- 使用者同意後，把兩邊未提交的企劃（Antigravity 的 60 層骨架、合成表企劃、協作企劃書；Claude 擴充的樓層索引與回覆）一起提交（`cd71cdb`）
+- 使用者要求開始做 Level 2，並要求每一層都參考網路上的圖：
+  - 讀 Wikidot Level 2（Abandoned Utility Halls）全文，下載頁面上的實景照片照著做
+  - 新增 `level2/`：地圖規劃（`Level2Plan`、`Level2Layout`：5 格單元迷宮、寬 3 高 4 的走道、一側整排管線、轉角切斜、房間與門、悶熱區、窗戶）、地形生成、47 個方塊、14 種出口（`Level2Exit`，越低樓層越難找）、串聯電路（打破一盞燈整組熄）、悶熱區（飢餓、虛弱）、窗戶（靠近會受傷）、暗處的獵犬、環境音
+  - 新增 Level 2 的維度、維度類型、生態域、掉落物表、語言檔、音效、挖掘標籤；`BackroomsMod` 加一行註冊；Level 1 往下的樓梯從此接到 Level 2
+  - 新增 `tools/make_level2.py`（貼圖、模型、blockstates、物品模型、掉落物表）、`docs/levels/level2/README.md`（取代企劃稿）與貼圖預覽
+  - 新增單元測試 `Level2LayoutTest`、`MapDump`，實機測試 `Level2ClientTest`
+  - 順手修正朋友的馬尼拉房間踢腳板模型：還指向資料夾整理前的舊路徑（`block/baseboard_wall` → `block/level0/baseboard_wall`，`tools/make_manila.py` 一併改）
+  - 修正 `core/LevelExits` 的錯誤：「尚未開放」的提示用伺服器 tick 計時防止洗版，但換世界後 tick 從 0 重算、記錄卻沒清，會讓提示很久都不出現；改成 tick 倒退時不擋
+  - 管線依照片改成連續長管（拿掉一節一節的箍環、紅管只留閥門），截圖確認
+  - 驗證：`gradlew build`（34 個單元測試）與 `runClientGameTest`（Level 0、1、2）全部通過；中途朋友的 Level 0 Edge Shift 測試偶爾逾時一次（看隨機），重跑通過
 
 ## 動作記錄（Antigravity）
 

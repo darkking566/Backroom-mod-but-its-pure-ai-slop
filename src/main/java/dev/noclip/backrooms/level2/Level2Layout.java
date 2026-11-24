@@ -1,0 +1,317 @@
+package dev.noclip.backrooms.level2;
+
+import static dev.noclip.backrooms.level2.Level2Plan.CELL;
+import static dev.noclip.backrooms.level2.Level2Plan.EAST;
+import static dev.noclip.backrooms.level2.Level2Plan.N;
+import static dev.noclip.backrooms.level2.Level2Plan.NORTH;
+import static dev.noclip.backrooms.level2.Level2Plan.SIZE;
+import static dev.noclip.backrooms.level2.Level2Plan.SOUTH;
+import static dev.noclip.backrooms.level2.Level2Plan.WEST;
+
+import dev.noclip.backrooms.level2.Level2Plan.Feature;
+import dev.noclip.backrooms.level2.Level2Plan.Room;
+import dev.noclip.backrooms.level2.Level2Plan.RoomKind;
+
+/**
+ * Level 2's floor plan as a pure function of the seed and a column: what stands at (x, z), and what light,
+ * wall finish and heat it has. Tunnels are three blocks wide inside their cells; along straight runs one of the
+ * three is a bank of pipes floor to ceiling, which leaves two to walk in. Turns are cut off at the outer corner.
+ */
+public final class Level2Layout {
+	static final int BANK = 203, WALLS = 204, LIGHTS = 205, FLOORS = 206, PALETTE = 207, ROOM_PROPS = 208, BANK_PARTS = 209;
+	/** Lights are wired in series in blocks of 3x3 cells; one broken light takes its whole block down. */
+	static final int CIRCUIT = 3;
+	/** Cells around the door to 811 whose pipes carry blue pulsing lights. */
+	static final int BLADE_TRAIL = 6;
+
+	enum Kind {
+		WALL, FLOOR, BANK, MACHINE, DOOR, LOCKED_DOOR, EXIT, WINDOW, ROOM, VOID, VOID_WALL, CRATE, DRUM, SCRAP, CABINET;
+
+		/** Whether a player can stand here. Doors count: they open. */
+		public boolean walkable() {
+			return this == FLOOR || this == ROOM || this == VOID || this == DOOR;
+		}
+	}
+
+	/**
+	 * What stands in one column. dir is the direction a door, exit, window, machine or pipe bank faces: away from
+	 * the wall it is set into or bracketed to, towards where you stand.
+	 */
+	public record Tile(Kind kind, int dir, Level2Exit exit) {
+		static final Tile WALL = new Tile(Kind.WALL, 0, null);
+		static final Tile FLOOR = new Tile(Kind.FLOOR, 0, null);
+		static final Tile ROOM = new Tile(Kind.ROOM, 0, null);
+		static final Tile VOID = new Tile(Kind.VOID, 0, null);
+		static final Tile VOID_WALL = new Tile(Kind.VOID_WALL, 0, null);
+	}
+
+	enum Finish {
+		/** Withered, chalky concrete: most of the level. */
+		CONCRETE,
+		/** The same with peeling and water stains. */
+		STAINED,
+		MUDDY_BRICK, BLACK_BRICK,
+		/** White-painted brick. */
+		PAINTED
+	}
+
+	enum Light {
+		NONE, WHITE, WARM, DEAD, VIOLET, BULB, DEAD_BULB
+	}
+
+	enum Ground {
+		PLAIN, DEBRIS, DAMP
+	}
+
+	enum Palette {
+		/** Fat pipes in cream insulation, rusty steel above. */
+		INSULATED,
+		/** Fat pale green pipes. */
+		GREEN
+	}
+
+	private Level2Layout() {
+	}
+
+	static Level2Plan plan(long seed, int x, int z) {
+		return Level2Plan.of(seed, Math.floorDiv(x, SIZE), Math.floorDiv(z, SIZE));
+	}
+
+	public static Tile tile(long seed, int x, int z) {
+		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		Level2Plan plan = Level2Plan.of(seed, rx, rz);
+		int i = lx / CELL, j = lz / CELL, ox = lx % CELL, oz = lz % CELL;
+		int cell = Level2Plan.cell(i, j);
+		int room = plan.roomOf[cell];
+		if (room >= 0) return roomTile(seed, plan, plan.rooms.get(room), lx, lz, x, z);
+
+		boolean edgeX = ox == 0 || ox == CELL - 1, edgeZ = oz == 0 || oz == CELL - 1;
+		if (edgeX && edgeZ) return Tile.WALL;
+		if (edgeX || edgeZ) {
+			int d = oz == 0 ? NORTH : ox == CELL - 1 ? EAST : oz == CELL - 1 ? SOUTH : WEST;
+			int along = d == NORTH || d == SOUTH ? ox : oz;
+			if (plan.isOpen(cell, d)) return passage(seed, plan, rx, rz, i, j, d, along);
+			if (along != 2) return Tile.WALL;
+			int facing = Level2Plan.opposite(d);
+			return switch (plan.feature(cell, d)) {
+				case DOOR -> new Tile(Kind.DOOR, facing, null);
+				case LOCKED_DOOR -> new Tile(Kind.LOCKED_DOOR, facing, null);
+				case EXIT -> new Tile(Kind.EXIT, facing, plan.exits[cell * 4 + d]);
+				case WINDOW -> new Tile(Kind.WINDOW, facing, null);
+				case NONE -> Tile.WALL;
+			};
+		}
+		int bank = bankSide(seed, plan, rx, rz, i, j);
+		if (bank >= 0 && bankColumn(bank, ox, oz)) return new Tile(Kind.BANK, Level2Plan.opposite(bank), null);
+		if (outerCorner(plan.open[cell], ox, oz)) return Tile.WALL;
+		return Tile.FLOOR;
+	}
+
+	/** An open side of a cell: tunnel floor, or the pipe bank running on into the next cell (or ending here in a machine). */
+	private static Tile passage(long seed, Level2Plan plan, int rx, int rz, int i, int j, int d, int along) {
+		int bank = bankSide(seed, plan, rx, rz, i, j);
+		if (bank < 0) return Tile.FLOOR;
+		int axis = plan.straightAxis(Level2Plan.cell(i, j));
+		boolean inBank = axis == 0 ? (bank == NORTH ? along == 1 : along == 3) : (bank == WEST ? along == 1 : along == 3);
+		if (!inBank) return Tile.FLOOR;
+		// The next cell over, which may be in the next region.
+		int gi = rx * N + i + Level2Plan.DX[d], gj = rz * N + j + Level2Plan.DZ[d];
+		int nrx = Math.floorDiv(gi, N), nrz = Math.floorDiv(gj, N);
+		Level2Plan next = nrx == rx && nrz == rz ? plan : Level2Plan.of(seed, nrx, nrz);
+		int ni = Math.floorMod(gi, N), nj = Math.floorMod(gj, N);
+		boolean continues = next.roomOf[Level2Plan.cell(ni, nj)] < 0 && next.straightAxis(Level2Plan.cell(ni, nj)) == axis
+				&& bankSide(seed, next, nrx, nrz, ni, nj) == bank;
+		return new Tile(continues ? Kind.BANK : Kind.MACHINE, Level2Plan.opposite(bank), null);
+	}
+
+	private static boolean bankColumn(int bank, int ox, int oz) {
+		return switch (bank) {
+			case NORTH -> oz == 1;
+			case SOUTH -> oz == 3;
+			case WEST -> ox == 1;
+			default -> ox == 3;
+		};
+	}
+
+	/**
+	 * Which wall of a straight cell carries the pipe bank, or -1. Whole rows (columns) of cells prefer the same
+	 * side, so banks run on from cell to cell; a wall with a door or exit in it is kept clear.
+	 */
+	static int bankSide(long seed, Level2Plan plan, int rx, int rz, int i, int j) {
+		int cell = Level2Plan.cell(i, j);
+		int axis = plan.straightAxis(cell);
+		if (axis < 0) return -1;
+		int line = axis == 0 ? rz * N + j : rx * N + i;
+		int a = axis == 0 ? NORTH : WEST, b = Level2Plan.opposite(a);
+		int preferred = (hash(seed, line, axis, BANK) & 1) == 0 ? a : b;
+		if (plan.feature(cell, preferred) == Feature.NONE) return preferred;
+		int other = Level2Plan.opposite(preferred);
+		return plan.feature(cell, other) == Feature.NONE ? other : -1;
+	}
+
+	/** In a turn, the inside corner farthest from both openings is walled off, so the bend reads as a diagonal. */
+	private static boolean outerCorner(int open, int ox, int oz) {
+		if (Integer.bitCount(open) != 2) return false;
+		boolean n = (open & (1 << NORTH)) != 0, e = (open & (1 << EAST)) != 0, s = (open & (1 << SOUTH)) != 0, w = (open & (1 << WEST)) != 0;
+		if (n == s || e == w) return false;
+		return ox == (e ? 1 : 3) && oz == (n ? 3 : 1);
+	}
+
+	private static Tile roomTile(long seed, Level2Plan plan, Room room, int lx, int lz, int x, int z) {
+		boolean dark = room.kind() == RoomKind.VOID;
+		boolean ring = lx == room.x0() || lx == room.x1() || lz == room.z0() || lz == room.z1();
+		if (ring) {
+			if (plan.doorways.contains(lz * SIZE + lx)) return dark ? Tile.VOID : Tile.ROOM;
+			return dark ? Tile.VOID_WALL : Tile.WALL;
+		}
+		if (dark) return Tile.VOID;
+		if (nearDoorway(plan, lx, lz)) return Tile.ROOM;
+		boolean byWall = lx == room.x0() + 1 || lx == room.x1() - 1 || lz == room.z0() + 1 || lz == room.z1() - 1;
+		int roll = (int) Math.floorMod(hash(seed, x, z, ROOM_PROPS), 100);
+		return switch (room.kind()) {
+			case STORAGE -> !byWall ? Tile.ROOM
+					: roll < 38 ? new Tile(Kind.CRATE, 0, null) : roll < 58 ? new Tile(Kind.DRUM, 0, null)
+					: roll < 72 ? new Tile(Kind.SCRAP, 0, null) : Tile.ROOM;
+			case MACHINES -> (lz - room.z0()) % 3 == 2 && lx > room.x0() + 1 && lx < room.x1() - 1
+					? new Tile(Kind.CABINET, (lz - room.z0()) % 6 == 2 ? SOUTH : NORTH, null) : Tile.ROOM;
+			default -> Tile.ROOM;
+		};
+	}
+
+	/** Two blocks in from a doorway stay clear, so nothing blocks the way in. */
+	private static boolean nearDoorway(Level2Plan plan, int lx, int lz) {
+		for (int doorway : plan.doorways) {
+			if (Math.abs(doorway % SIZE - lx) + Math.abs(doorway / SIZE - lz) <= 2) return true;
+		}
+		return false;
+	}
+
+	/** The finish of the tunnel walls around here, in patches of 4x4 cells. */
+	static Finish finish(long seed, int x, int z) {
+		int px = Math.floorDiv(x, CELL * 4), pz = Math.floorDiv(z, CELL * 4);
+		int roll = Math.floorMod(hash(seed, px, pz, WALLS), 100);
+		Finish finish = roll < 52 ? Finish.CONCRETE : roll < 72 ? Finish.MUDDY_BRICK : roll < 84 ? Finish.PAINTED : Finish.BLACK_BRICK;
+		if (finish == Finish.CONCRETE && Math.floorMod(hash(seed, x, z, WALLS), 100) < 22) return Finish.STAINED;
+		return finish;
+	}
+
+	/** The light hanging over a column, if any: one in the middle of each tunnel cell and each lit room. */
+	static Light light(long seed, int x, int z) {
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		Level2Plan plan = plan(seed, x, z);
+		int room = plan.roomOf[Level2Plan.cell(lx / CELL, lz / CELL)];
+		boolean brick = switch (finish(seed, x, z)) {
+			case MUDDY_BRICK, BLACK_BRICK -> true;
+			default -> false;
+		};
+		if (room >= 0) {
+			Room r = plan.rooms.get(room);
+			if (lx != (r.x0() + r.x1()) / 2 || lz != (r.z0() + r.z1()) / 2 || r.kind() == RoomKind.VOID) return Light.NONE;
+			if (!r.lit()) return brick ? Light.DEAD_BULB : Light.DEAD;
+			return brick ? Light.BULB : Light.WHITE;
+		}
+		if (lx % CELL != 2 || lz % CELL != 2) return Light.NONE;
+		int gi = Math.floorDiv(x, CELL), gj = Math.floorDiv(z, CELL);
+		int ci = Math.floorDiv(gi, CIRCUIT), cj = Math.floorDiv(gj, CIRCUIT);
+		int roll = Math.floorMod(hash(seed, ci, cj, LIGHTS), 100);
+		boolean hot = hot(seed, x, z);
+		if (roll < 30) {
+			// A dead circuit; some have a violet emergency light in the middle.
+			boolean middle = Math.floorMod(gi, CIRCUIT) == 1 && Math.floorMod(gj, CIRCUIT) == 1;
+			if (middle && roll < 12) return Light.VIOLET;
+			return brick ? Light.DEAD_BULB : Light.DEAD;
+		}
+		if (brick) return Light.BULB;
+		return hot || roll >= 80 ? Light.WARM : Light.WHITE;
+	}
+
+	/** Which way a light hangs: along the tunnel (0 for X, 1 for Z); across X in junctions and rooms. */
+	static int lightAxis(long seed, int x, int z) {
+		Level2Plan plan = plan(seed, x, z);
+		int cell = Level2Plan.cell(Math.floorMod(x, SIZE) / CELL, Math.floorMod(z, SIZE) / CELL);
+		return plan.roomOf[cell] < 0 && plan.straightAxis(cell) == 1 ? 1 : 0;
+	}
+
+	/** The block box (min x, min z, max x, max z) of the lighting circuit a column belongs to. */
+	static int[] circuit(int x, int z) {
+		int ci = Math.floorDiv(Math.floorDiv(x, CELL), CIRCUIT), cj = Math.floorDiv(Math.floorDiv(z, CELL), CIRCUIT);
+		int span = CELL * CIRCUIT;
+		return new int[] {ci * span, cj * span, ci * span + span - 1, cj * span + span - 1};
+	}
+
+	static Ground ground(long seed, int x, int z) {
+		int roll = Math.floorMod(hash(seed, x, z, FLOORS), 100);
+		return roll < 14 ? Ground.DEBRIS : roll < 19 ? Ground.DAMP : Ground.PLAIN;
+	}
+
+	/** The pipes along a run of tunnel: the same for 20 blocks or so, so a run looks like one installation. */
+	static Palette palette(long seed, int x, int z, int axis) {
+		int along = axis == 0 ? Math.floorDiv(x, CELL * 4) : Math.floorDiv(z, CELL * 4);
+		int across = axis == 0 ? Math.floorDiv(z, CELL) : Math.floorDiv(x, CELL);
+		return Math.floorMod(hash(seed, along, across, PALETTE), 100) < 66 ? Palette.INSULATED : Palette.GREEN;
+	}
+
+	/** 0..99, for picking which pipe a bank block shows at one height. */
+	static int bankRoll(long seed, int x, int y, int z) {
+		return Math.floorMod(hash(seed, x * 31 + y, z, BANK_PARTS), 100);
+	}
+
+	/** Whether a column is inside a hot zone. */
+	public static boolean hot(long seed, int x, int z) {
+		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				Level2Plan plan = Level2Plan.of(seed, rx + dx, rz + dz);
+				if (plan.hotX < 0) continue;
+				int hx = (rx + dx) * SIZE + plan.hotX, hz = (rz + dz) * SIZE + plan.hotZ;
+				if (Math.abs(x - hx) + Math.abs(z - hz) <= Level2Plan.HOT_RADIUS) return true;
+			}
+		}
+		return false;
+	}
+
+	/** Whether a column is on the trail of blue pipe lights leading to the door to 811. */
+	static boolean bladeTrail(long seed, int x, int z) {
+		int gi = Math.floorDiv(x, CELL), gj = Math.floorDiv(z, CELL);
+		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				Level2Plan plan = Level2Plan.of(seed, rx + dx, rz + dz);
+				if (plan.bladeCell < 0) continue;
+				int bi = (rx + dx) * N + plan.bladeCell % N, bj = (rz + dz) * N + plan.bladeCell / N;
+				if (Math.abs(gi - bi) + Math.abs(gj - bj) <= BLADE_TRAIL) return true;
+			}
+		}
+		return false;
+	}
+
+	/** The middle of the nearest tunnel cell to (x, z), as {x, z}: somewhere to stand on arriving. */
+	public static int[] landing(long seed, int x, int z) {
+		int gi0 = Math.floorDiv(x, CELL), gj0 = Math.floorDiv(z, CELL);
+		for (int ring = 0; ring < 40; ring++) {
+			for (int gi = gi0 - ring; gi <= gi0 + ring; gi++) {
+				for (int gj = gj0 - ring; gj <= gj0 + ring; gj++) {
+					if (Math.max(Math.abs(gi - gi0), Math.abs(gj - gj0)) != ring) continue;
+					int cx = gi * CELL + 2, cz = gj * CELL + 2;
+					if (tile(seed, cx, cz).kind() == Kind.FLOOR && !hot(seed, cx, cz)) return new int[] {cx, cz};
+				}
+			}
+		}
+		return new int[] {gi0 * CELL + 2, gj0 * CELL + 2};
+	}
+
+	static int hash(long seed, int x, int z, int salt) {
+		long h = mix(seed + salt);
+		h = mix(h ^ x);
+		return (int) mix(h ^ z);
+	}
+
+	// SplitMix64 finalizer
+	private static long mix(long v) {
+		v += 0x9E3779B97F4A7C15L;
+		v = (v ^ (v >>> 30)) * 0xBF58476D1CE4E5B9L;
+		v = (v ^ (v >>> 27)) * 0x94D049BB133111EBL;
+		return v ^ (v >>> 31);
+	}
+}

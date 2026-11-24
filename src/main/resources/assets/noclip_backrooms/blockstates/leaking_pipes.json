@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "noclip_backrooms:block/level2/leaking_pipes"
+    },
+    "facing=west": {
+      "model": "noclip_backrooms:block/level2/leaking_pipes",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "noclip_backrooms:block/level2/leaking_pipes",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "noclip_backrooms:block/level2/leaking_pipes",
+      "y": 270
+    }
+  }
+}

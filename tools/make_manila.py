@@ -207,7 +207,7 @@ def write_assets():
 
     # 2. Baseboard wall
     write_json(ASSETS / "models/block/manila_wallpaper_baseboard.json", {
-        "parent": "noclip_backrooms:block/baseboard_wall",
+        "parent": "noclip_backrooms:block/level0/baseboard_wall",
         "textures": {
             "side": "noclip_backrooms:block/manila_wallpaper_baseboard",
             "top": "noclip_backrooms:block/manila_wallpaper",

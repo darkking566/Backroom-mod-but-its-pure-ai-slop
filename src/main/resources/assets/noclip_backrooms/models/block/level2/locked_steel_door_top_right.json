@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_top_right",
+  "textures": {
+    "bottom": "noclip_backrooms:block/level2/locked_steel_door_bottom",
+    "top": "noclip_backrooms:block/level2/locked_steel_door_top"
+  }
+}

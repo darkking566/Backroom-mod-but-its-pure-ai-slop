@@ -103,3 +103,11 @@ Fabric・Minecraft 26.2・Java 25・模組代號 `noclip_backrooms`
 - 通往其他樓層的 11 種出口（樓層越低越難找），還沒做的樓層會顯示尚未開放：見 docs/levels/level1/README.md
 - 改貼圖或模型：`python tools/make_level1.py`
 - 獵犬（第一隻怪物，Antigravity 的模型）：停電時出現；也有生怪蛋。想看牠：`/summon noclip_backrooms:hound`
+
+## Level 2：廢棄維修通道（等使用者試玩）
+
+- 說明：[docs/levels/level2/README.md](docs/levels/level2/README.md)（照 Wikidot Level 2 的文字和照片做）
+- 進入：Level 1 往下的樓梯；離開：噴了紅色「1」的鋼門回 Level 1（最難找）
+- 特色：窄走道一側整排管線、串聯的燈（打破一盞整組熄）、悶熱區、上鎖的門與房間、死路盡頭的窗戶（別靠近）、暗處的獵犬
+- 14 種出口（樓層越低越難找），還沒做的樓層會顯示尚未開放
+- 改貼圖或模型：`py tools/make_level2.py`

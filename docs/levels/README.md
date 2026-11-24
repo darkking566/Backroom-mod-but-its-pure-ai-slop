@@ -17,7 +17,7 @@
 |---|---|---|---|---|
 | [`level0`](level0/README.md) | Level 0：教學關卡／大廳（The Lobby） | `0` | Wikidot / Fandom 共通 | 已實作 |
 | [`level1`](level1/README.md) | Level 1：宜居地帶／停車場（Habitable Zone） | `1` | Wikidot / Fandom / 狐霖後室 | 已實作（詳見既有 README） |
-| [`level2`](level2/README.md) | Level 2：管道噩夢（Pipe Dreams） | `2` | Wikidot / Fandom 共通 | 未開放（Level 1 往下樓梯已預留出口） |
+| [`level2`](level2/README.md) | Level 2：廢棄維修通道（Abandoned Utility Halls；Fandom 叫 Pipe Dreams） | `2` | Wikidot（照片與文字）／Fandom | 已實作（從 Level 1 往下的樓梯進入） |
 | [`level3`](level3/README.md) | Level 3：發電站（Electrical Station） | `3` | Wikidot / Fandom 共通 | 未開放 |
 | [`level4`](level4/README.md) | Level 4：廢棄辦公室（Abandoned Office） | `4` | Wikidot / Fandom 共通 | 未開放 |
 | [`level5`](level5/README.md) | Level 5：恐怖旅館（Terror Hotel） | `5` | Wikidot / Fandom 共通 | 未開放 |
