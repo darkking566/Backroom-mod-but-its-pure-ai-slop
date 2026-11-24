@@ -77,7 +77,7 @@ final class Level2Hounds {
 		for (int attempt = 0; attempt < 40; attempt++) {
 			double angle = random.nextDouble() * Math.PI * 2, distance = NEAREST + random.nextDouble() * (FARTHEST - NEAREST);
 			int x = (int) Math.floor(player.getX() + Math.cos(angle) * distance), z = (int) Math.floor(player.getZ() + Math.sin(angle) * distance);
-			if (Level2Layout.tile(seed, x, z).kind() != Kind.FLOOR) continue;
+			if (Level2Layout.tile(seed, x, z).kind() != Kind.FLOOR || Level2Layout.isSafeZone(seed, x, z)) continue;
 			BlockPos at = new BlockPos(x, Level2ChunkGenerator.FLOOR_Y + 1, z);
 			if (level.isLoaded(at) && level.getBlockState(at).isAir() && level.getBlockState(at.above()).isAir()) return at;
 		}

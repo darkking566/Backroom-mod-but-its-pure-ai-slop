@@ -1,0 +1,42 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level2/floor_cable_duct",
+    "duct": "noclip_backrooms:block/level2/floor_cable_duct",
+    "floor": "noclip_backrooms:block/level2/utility_floor"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "up": {
+          "texture": "#duct"
+        },
+        "down": {
+          "texture": "#floor"
+        },
+        "north": {
+          "texture": "#floor"
+        },
+        "south": {
+          "texture": "#floor"
+        },
+        "east": {
+          "texture": "#floor"
+        },
+        "west": {
+          "texture": "#floor"
+        }
+      }
+    }
+  ]
+}

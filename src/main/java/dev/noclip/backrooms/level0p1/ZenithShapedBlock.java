@@ -8,7 +8,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /** A block smaller than a cube that needs no facing: a table, a bench, a hanging lamp. */
-final class ZenithShapedBlock extends Block {
+class ZenithShapedBlock extends Block {
 	private final VoxelShape shape;
 	private final boolean solid;
 

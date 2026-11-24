@@ -35,6 +35,8 @@ public final class Level2 {
 		Level2Heat.register();
 		Level2Windows.register();
 		Level2Hounds.register();
+		Level2Monsters.register();
+		Level2Bases.register();
 		Level2Ambience.register();
 	}
 }

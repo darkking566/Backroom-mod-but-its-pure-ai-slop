@@ -3,6 +3,8 @@ package dev.noclip.backrooms.level2;
 import com.mojang.serialization.MapCodec;
 import dev.noclip.backrooms.level2.Level2Layout.Kind;
 import dev.noclip.backrooms.level2.Level2Layout.Tile;
+import dev.noclip.backrooms.level2.Level2Plan.Room;
+import dev.noclip.backrooms.level2.Level2Plan.RoomKind;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.BlockPos;
@@ -16,9 +18,12 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.PoweredRailBlock;
+import net.minecraft.world.level.block.RailBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -64,12 +69,19 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 		boolean dark = tile.kind() == Kind.VOID || tile.kind() == Kind.VOID_WALL;
 		if (y < FLOOR_Y) return Blocks.CONCRETE.gray().defaultBlockState();
 		if (y == CEILING_Y) return state(dark ? Level2Blocks.VOID_CONCRETE : Level2Blocks.UTILITY_CEILING);
-		if (y == FLOOR_Y) return dark ? state(Level2Blocks.VOID_CONCRETE) : floor(seed, tile, x, z);
+		if (y == FLOOR_Y) {
+			if (dark) return state(Level2Blocks.VOID_CONCRETE);
+			if (Level2Layout.railAxis(seed, x, z) >= 0 && Math.floorMod(x + z, 8) == 0) {
+				return Blocks.REDSTONE_BLOCK.defaultBlockState();
+			}
+			return floor(seed, tile, x, z);
+		}
 		int h = y - FLOOR_Y; // 1..4
 		return switch (tile.kind()) {
 			case WALL -> wall(seed, x, z);
 			case VOID_WALL -> state(Level2Blocks.VOID_CONCRETE);
-			case FLOOR, ROOM -> h == 4 ? light(seed, x, z) : h == 2 ? mark(seed, x, z) : air();
+			case FLOOR -> floorBlock(seed, x, z, h);
+			case ROOM -> roomBlock(seed, x, z, h);
 			case VOID -> air();
 			case BANK -> bank(seed, x, y, z, tile.dir());
 			case MACHINE -> machine(seed, tile, x, y, z, h);
@@ -78,6 +90,9 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 			case CRATE -> h == 1 || h == 2 && Level2Layout.bankRoll(seed, x, y, z) < 45 ? state(Level2Blocks.WOODEN_CRATE) : roomAir(seed, x, z, h);
 			case DRUM -> h == 1 ? state(Level2Blocks.OIL_DRUM) : roomAir(seed, x, z, h);
 			case SCRAP -> h == 1 ? state(Level2Blocks.SCRAP_HEAP) : roomAir(seed, x, z, h);
+			case TOOLBOX -> h == 1 ? state(Level2Blocks.TOOLBOX) : roomAir(seed, x, z, h);
+			case CABLE_REEL -> h == 1 ? state(Level2Blocks.CABLE_REEL) : roomAir(seed, x, z, h);
+			case LUMBER_STACK -> h == 1 ? state(Level2Blocks.LUMBER_STACK) : roomAir(seed, x, z, h);
 			case DOOR, LOCKED_DOOR -> h <= 2 ? door(tile, h) : wall(seed, x, z);
 			case EXIT -> h <= tile.exit().height
 					? Level2Blocks.EXITS.get(tile.exit()).defaultBlockState().setValue(Level2ExitBlock.PART, h - 1) : wall(seed, x, z);
@@ -94,12 +109,88 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 				.setValue(Level2MarkBlock.LEVEL, Level2MarkBlock.level(mark.exit())).setValue(Level2MarkBlock.RIGHT, mark.right());
 	}
 
+	private static BlockState floorBlock(long seed, int x, int z, int h) {
+		if (h == 4) {
+			BlockState fixture = light(seed, x, z);
+			if (!fixture.isAir()) return fixture;
+			int overhead = Level2Layout.overheadPipe(seed, x, z);
+			if (overhead > 0) {
+				Block pipe = overhead >= 3 ? Level2Blocks.LEAKING_OVERHEAD_PIPE : Level2Blocks.OVERHEAD_PIPE_BRIDGE;
+				Direction.Axis axis = (overhead == 1 || overhead == 3) ? Direction.Axis.X : Direction.Axis.Z;
+				return pipe.defaultBlockState().setValue(Level2AxisBlock.AXIS, axis);
+			}
+			Level2Layout.CeilingProp prop = Level2Layout.ceilingDetail(seed, x, z);
+			if (prop == Level2Layout.CeilingProp.VENT) return state(Level2Blocks.CEILING_VENT);
+			if (prop == Level2Layout.CeilingProp.SNAPPED_CABLES) return state(Level2Blocks.SNAPPED_CABLES);
+			return air();
+		}
+		if (h == 2) {
+			BlockState m = mark(seed, x, z);
+			if (!m.isAir()) return m;
+			Level2Layout.WallDetail detail = Level2Layout.wallDetail(seed, x, z);
+			if (detail != null) {
+				Block block = switch (detail.prop()) {
+					case BREAKER_BOX -> Level2Blocks.BREAKER_BOX;
+					case PRESSURE_GAUGE -> Level2Blocks.PRESSURE_GAUGE;
+					case HAZARD_SIGN -> Level2Blocks.HAZARD_SIGN;
+				};
+				return block.defaultBlockState().setValue(Level2WallDetailBlock.FACING, Direction.from2DDataValue(horizontal(detail.dir())));
+			}
+			return air();
+		}
+		if (h == 1) {
+			int rail = Level2Layout.railAxis(seed, x, z);
+			if (rail >= 0) {
+				RailShape shape = rail == 0 ? RailShape.EAST_WEST : RailShape.NORTH_SOUTH;
+				if (Math.floorMod(x + z, 8) == 0) {
+					return Blocks.POWERED_RAIL.defaultBlockState().setValue(PoweredRailBlock.SHAPE, shape).setValue(PoweredRailBlock.POWERED, true);
+				}
+				return Blocks.RAIL.defaultBlockState().setValue(RailBlock.SHAPE, shape);
+			}
+		}
+		return air();
+	}
+
+	private static BlockState roomBlock(long seed, int x, int z, int h) {
+		if (h == 4) return light(seed, x, z);
+		int lx = Math.floorMod(x, Level2Plan.SIZE), lz = Math.floorMod(z, Level2Plan.SIZE);
+		Level2Plan plan = Level2Layout.plan(seed, x, z);
+		int r = plan.roomOf[Level2Plan.cell(lx / Level2Plan.CELL, lz / Level2Plan.CELL)];
+		if (r >= 0) {
+			Room room = plan.rooms.get(r);
+			int cx = (room.x0() + room.x1()) / 2, cz = (room.z0() + room.z1()) / 2;
+			if (room.kind() == RoomKind.EL3A) {
+				if (lx == cx && lz == cz) return h == 1 ? Blocks.CRAFTING_TABLE.defaultBlockState() : h == 2 ? Blocks.LANTERN.defaultBlockState() : air();
+				if (lx == cx + 1 && lz == cz && h == 1) return Blocks.CHEST.defaultBlockState();
+			} else if (room.kind() == RoomKind.MACCHINA) {
+				if (lx == cx && lz == cz) return h == 1 ? state(Level2Blocks.MACHINE_CABINET) : h == 2 ? Blocks.SOUL_LANTERN.defaultBlockState() : air();
+				if (lx == cx + 1 && lz == cz && h == 1) return Blocks.LECTERN.defaultBlockState();
+			}
+		}
+		return air();
+	}
+
 	private static BlockState roomAir(long seed, int x, int z, int h) {
 		return h == 4 ? light(seed, x, z) : air();
 	}
 
 	private static BlockState floor(long seed, Tile tile, int x, int z) {
 		if (tile.kind() != Kind.FLOOR && tile.kind() != Kind.ROOM) return state(Level2Blocks.UTILITY_FLOOR);
+		RoomKind kind = Level2Layout.roomKindAt(seed, x, z);
+		if (kind == RoomKind.EL3A) return state(Level2Blocks.UTILITY_FLOOR);
+		if (kind == RoomKind.MACCHINA) return state(Level2Blocks.BLACK_BRICK_WALL);
+		int flooded = Level2Layout.floodedStage(seed, x, z);
+		if (flooded == 2) return Blocks.WATER.defaultBlockState();
+		if (Level2Layout.isDrainGrate(seed, x, z)) return state(Level2Blocks.DRAIN_GRATE);
+		if (flooded == 1) return state(Level2Blocks.PUDDLED_UTILITY_FLOOR);
+		int ductAxis = Level2Layout.floorCableDuctAxis(seed, x, z);
+		if (ductAxis >= 0) {
+			return Level2Blocks.FLOOR_CABLE_DUCT.defaultBlockState()
+					.setValue(Level2AxisBlock.AXIS, ductAxis == 0 ? Direction.Axis.X : Direction.Axis.Z);
+		}
+		if (Level2Layout.cold(seed, x, z) && !Level2Layout.isOfficePatch(seed, x, z)) {
+			return state(Level2Blocks.FROSTED_UTILITY_FLOOR);
+		}
 		return switch (Level2Layout.ground(seed, x, z)) {
 			case DEBRIS -> state(Level2Blocks.DEBRIS_UTILITY_FLOOR);
 			case DAMP -> state(Level2Blocks.DAMP_UTILITY_FLOOR);
@@ -108,6 +199,9 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 	}
 
 	private static BlockState wall(long seed, int x, int z) {
+		if (Level2Layout.cold(seed, x, z) && !Level2Layout.isOfficePatch(seed, x, z)) {
+			return state(Level2Blocks.FROSTED_UTILITY_WALL);
+		}
 		return switch (Level2Layout.finish(seed, x, z)) {
 			case CONCRETE -> state(Level2Blocks.UTILITY_WALL);
 			case STAINED -> state(Level2Blocks.STAINED_UTILITY_WALL);
@@ -133,6 +227,8 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 		if (Level2Layout.bladeTrail(seed, x, z)) return Level2Blocks.BLUE_LIGHT_PIPES;
 		int roll = Level2Layout.bankRoll(seed, x, y, z);
 		if (Level2Layout.hot(seed, x, z) && roll < 30) return Level2Blocks.STEAM_PIPES;
+		if (Level2Layout.gas(seed, x, z) && roll < 38) return Level2Blocks.BURST_GAS_PIPES;
+		if (Level2Layout.cold(seed, x, z) && roll < 45) return Level2Blocks.FROSTED_PIPES;
 		if (roll < 4) return Level2Blocks.LEAKING_PIPES;
 		if (roll < 12) return Level2Blocks.VALVE_PIPES;
 		return Level2Blocks.STEEL_PIPES;

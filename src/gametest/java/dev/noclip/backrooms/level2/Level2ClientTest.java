@@ -1,6 +1,7 @@
 package dev.noclip.backrooms.level2;
 
 import dev.noclip.backrooms.core.LevelExits;
+import dev.noclip.backrooms.core.people.Person;
 import dev.noclip.backrooms.level1.Level1;
 import dev.noclip.backrooms.level2.Level2Layout.Kind;
 import dev.noclip.backrooms.level2.Level2Layout.Tile;
@@ -14,9 +15,11 @@ import net.minecraft.locale.Language;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.vehicle.minecart.MinecartChest;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 /**
  * Plays Level 2 in a real client: down Level 1's stairs into the tunnels, a look around, a room door and a locked
@@ -35,7 +38,10 @@ public final class Level2ClientTest implements FabricClientGameTest {
 			server.runCommand("gamerule noclip_backrooms:edge_shift false");
 			server.runCommand("gamemode survival @a");
 			// Packs are tested on their own below; until then none turn up by chance.
-			server.runOnServer(s -> Level2Hounds.holdOff(s, 20 * 60 * 20));
+			server.runOnServer(s -> {
+				Level2Hounds.holdOff(s, 20 * 60 * 20);
+				Level2Monsters.holdOff(s, 20 * 60 * 20);
+			});
 
 			enterFromLevel1(context, game);
 			long seed = server.computeOnServer(s -> Level2ChunkGenerator.planSeed(level2(s).getChunkSource().randomState()));
@@ -55,8 +61,11 @@ public final class Level2ClientTest implements FabricClientGameTest {
 			exits(context, game, seed, arrival);
 			circuit(context, game, seed, arrival);
 			heat(context, game, seed, arrival);
+			anomalies(context, game, seed, arrival);
 			window(context, game, seed, arrival);
 			hounds(context, game, seed, arrival);
+			monsters(context, game, seed, arrival);
+			facilities(context, game, seed, arrival);
 			checkBlocks(game);
 		}
 	}
@@ -186,6 +195,29 @@ public final class Level2ClientTest implements FabricClientGameTest {
 		server.runCommand("gamemode spectator @a");
 	}
 
+	/** Cold stretches freeze you, burst pipes leak putrid gas, and office corridors are bare. */
+	private static void anomalies(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
+		var server = game.getServer();
+		int[] cold = nearest(seed, from, tile -> tile.kind() == Kind.FLOOR, 0, (x, z) -> Level2Layout.cold(seed, x, z));
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_2 run tp @s %.1f %d %.1f 90 5", cold[0] + 0.5, STAND, cold[1] + 0.5));
+		server.runCommand("gamemode survival @a");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(35);
+		server.runOnServer(s -> check(Level2Heat.feelingCold(player(s)), "standing in a cold stretch did nothing"));
+		server.runCommand("gamemode spectator @a");
+
+		int[] gas = nearest(seed, from, tile -> tile.kind() == Kind.FLOOR, 0, (x, z) -> Level2Layout.gas(seed, x, z));
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_2 run tp @s %.1f %d %.1f 90 5", gas[0] + 0.5, STAND, gas[1] + 0.5));
+		server.runCommand("gamemode survival @a");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(35);
+		server.runOnServer(s -> check(Level2Heat.feelingGas(player(s)), "standing in a gas leak did nothing"));
+		server.runCommand("gamemode spectator @a");
+
+		int[] office = nearest(seed, from, tile -> tile.kind() == Kind.FLOOR, 0, (x, z) -> Level2Layout.isOfficePatch(seed, x, z));
+		shoot(context, game, office[0] + 0.5, STAND, office[1] + 0.5, 0, 5, "level2_office_corridor");
+	}
+
 	/** Do not go near the windows. */
 	private static void window(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
 		var server = game.getServer();
@@ -211,6 +243,61 @@ public final class Level2ClientTest implements FabricClientGameTest {
 		int came = server.computeOnServer(s -> Level2Hounds.spawnPack(player(s)));
 		check(came == 2, "a pack of " + came + " hounds");
 		server.runCommand("kill @e[tag=" + Level2Hounds.TAG + "]");
+		server.runCommand("gamemode spectator @a");
+	}
+
+	private static void monsters(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
+		var server = game.getServer();
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_2 run tp @s %.1f %d %.1f", from.getX() + 0.5, STAND, from.getZ() + 0.5));
+		server.runCommand("gamemode survival @a");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(20);
+		int spawned = server.computeOnServer(s -> {
+			ServerPlayer p = player(s);
+			int count = 0;
+			for (Level2Monsters.Entry entry : Level2Monsters.POOL) {
+				if (Level2Monsters.spawnOne(p, entry.type()) != null) count++;
+			}
+			return count;
+		});
+		check(spawned == Level2Monsters.POOL.size(), "only " + spawned + "/" + Level2Monsters.POOL.size() + " Level 2 monsters spawned");
+		server.runCommand("kill @e[tag=" + Level2Monsters.TAG + "]");
+		server.runCommand("gamemode spectator @a");
+	}
+
+	private static void facilities(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
+		var server = game.getServer();
+		int[] el3a = nearest(seed, from, tile -> tile.kind() == Kind.ROOM, 0,
+				(x, z) -> Level2Layout.roomKindAt(seed, x, z) == Level2Plan.RoomKind.EL3A);
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_2 run tp @s %.1f %d %.1f", el3a[0] + 0.5, STAND, el3a[1] + 0.5));
+		server.runCommand("gamemode survival @a");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(20);
+		int staff = server.computeOnServer(s -> {
+			ServerLevel l2 = level2(s);
+			ServerPlayer p = player(s);
+			Level2Bases.populateNearEl3a(l2, seed, p);
+			return l2.getEntitiesOfClass(Person.class, new AABB(p.blockPosition()).inflate(48)).size();
+		});
+		check(staff > 0, "no B.N.T.G. staff spawned at EL3A");
+		context.takeScreenshot("level2_el3a");
+
+		int[] rail = nearest(seed, from, tile -> tile.kind() == Kind.FLOOR, 0,
+				(x, z) -> Level2Layout.railAxis(seed, x, z) >= 0);
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_2 run tp @s %.1f %d %.1f", rail[0] + 0.5, STAND, rail[1] + 0.5));
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(20);
+		int carts = server.computeOnServer(s -> {
+			ServerLevel l2 = level2(s);
+			ServerPlayer p = player(s);
+			Level2Bases.populateNearRail(l2, seed, p);
+			return l2.getEntitiesOfClass(MinecartChest.class, new AABB(p.blockPosition()).inflate(36)).size();
+		});
+		check(carts > 0, "no cargo minecart spawned on Level 2 rail");
+		context.takeScreenshot("level2_rail");
+
+		server.runCommand("kill @e[tag=" + Level2Bases.STAFF_TAG + "]");
+		server.runCommand("kill @e[tag=" + Level2Bases.CART_TAG + "]");
 		server.runCommand("gamemode spectator @a");
 	}
 

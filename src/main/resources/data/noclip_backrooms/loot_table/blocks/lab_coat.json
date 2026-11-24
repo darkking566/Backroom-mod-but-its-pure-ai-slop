@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:lab_coat"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "noclip_backrooms:blocks/lab_coat"
+}

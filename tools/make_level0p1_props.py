@@ -246,6 +246,103 @@ def vines():
     return m
 
 
+# Second batch: ceiling speakers, cold and hot stretch details, salvage
+
+def speaker_bottom():
+    m = metal((176, 180, 188), 501)
+    paint(m, box(16, 16, 112, 112), (40, 42, 46), height=-3)
+    paint(m, lines(8, 1.0, axes="x") * box(16, 16, 112, 112), (92, 96, 104), height=1)
+    paint(m, box(58, 58, 70, 70), (60, 160, 230), glow=0.3, height=2)
+    return m
+
+
+def speaker_side():
+    return metal((150, 156, 166), 502, 64)
+
+
+def speaker_top():
+    return metal((120, 126, 136), 503)
+
+
+def icicles():
+    m = flat((200, 230, 246), 0.9, 90)
+    alpha = np.zeros((SIZE, SIZE))
+    rng = np.random.default_rng(511)
+    for i in range(9):
+        cx, length, width = rng.uniform(8, 120), rng.uniform(40, 100), rng.uniform(5, 9)
+        alpha = np.maximum(alpha, step(0.0, 1.0, 1 - np.abs(X - cx) / (width * (1 - Y / length)).clip(0.5)) * (Y < length))
+    tint(m, 0.25 * noise(512, 10), (0.8, 1.0, 1.1))
+    L.ALPHA["icicles"] = np.where(alpha > 0.5, 255.0, 0.0)
+    return m
+
+
+def ice_drift():
+    m = base((214, 232, 244), 521, 0.85, 80, 0.05)
+    paint(m, step(0.2, 0.7, noise(522, 14)) * 0.5, (160, 200, 232))
+    return m
+
+
+def slag_pile():
+    m = base((42, 36, 34), 531, 0.3, 10, 0.08)
+    paint(m, step(0.55, 0.8, noise(532, 12)), (255, 120, 30), glow=0.9)
+    return m
+
+
+def vent_top():
+    m = metal((70, 68, 70), 541, 32)
+    paint(m, lines(16, 3.0, axes="x") * box(8, 8, 120, 120), (255, 130, 40), glow=1.0)
+    return m
+
+
+def vent_side():
+    return metal((70, 68, 70), 542, 64)
+
+
+# Third batch: the wormhole lab and Rhea's things
+
+def countdown_front():
+    m = flat((20, 22, 26), 0.6, 20)
+    paint(m, 1 - box(4, 4, 124, 124, 0.6), (90, 94, 102), height=1.5)
+    red = (255, 40, 30)
+    for x0 in (10, 36, 72, 98):
+        paint(m, box(x0, 34, x0 + 20, 94) * (1 - box(x0 + 5, 40, x0 + 15, 88)), red, glow=1.0)
+    paint(m, box(58, 50, 66, 58), red, glow=1.0)
+    paint(m, box(58, 70, 66, 78), red, glow=1.0)
+    return m
+
+
+def coil_side():
+    m = metal((110, 104, 128), 601, 32)
+    paint(m, lines(32, 3.0, axes="y") * 0.8, (170, 90, 255), glow=0.8)
+    return m
+
+
+def coil_core():
+    m = flat((190, 130, 255), 0.7, 20)
+    m.glow += 1.0
+    paint(m, (0.5 + 0.5 * noise(602, 6)) * 0.5, (240, 220, 255), glow=1.0)
+    return m
+
+
+def lab_notes():
+    m = flat((232, 228, 214), 0.3, 10)
+    for i, y in enumerate(range(14, 120, 12)):
+        paint(m, box(12, y, 116 - (i * 7) % 30, y + 2), (60, 60, 90))
+    paint(m, box(0, 0, 128, 3), (190, 186, 172))
+    L.weather(m, 603, 0.2)
+    return m
+
+
+def lab_coat():
+    m = flat((226, 230, 234), 0.3, 10)
+    paint(m, box(44, 0, 84, 30), (200, 206, 212), height=-1)  # the collar
+    paint(m, box(60, 30, 68, 128), (190, 196, 204), height=-1)  # the opening
+    paint(m, box(16, 74, 44, 100), (206, 212, 218), height=1.5)  # a pocket
+    paint(m, box(18, 80, 24, 100), (50, 80, 170))  # a pen
+    L.weather(m, 604, 0.3)
+    return m
+
+
 TEXTURES = {
     "desk_top": desk_top, "desk_side": desk_side, "desk_lamp": desk_lamp, "wardrobe_front": wardrobe_front,
     "frame_art": frame_art, "frame_wood": frame_wood,
@@ -257,6 +354,9 @@ TEXTURES = {
     "dispenser": dispenser, "jug": jug, "mat_side": mat_side,
     "rack_frame": rack_frame, "rack_tray": rack_tray, "grow_light": grow_light, "tank_side": tank_side, "tank_front": tank_front,
     "hanging_vines": vines,
+    "speaker_bottom": speaker_bottom, "speaker_side": speaker_side, "speaker_top": speaker_top, "icicles": icicles, "ice_drift": ice_drift,
+    "slag_pile": slag_pile, "vent_top": vent_top, "vent_side": vent_side,
+    "countdown_front": countdown_front, "coil_side": coil_side, "coil_core": coil_core, "lab_notes": lab_notes, "lab_coat": lab_coat,
 }
 
 
@@ -390,26 +490,113 @@ def model_vines():
         el((8, 0, 0), (8, 16, 16), {"east": "#v", "west": "#v"}, shade=False)])
 
 
+def model_speaker():
+    return {"parent": "minecraft:block/cube_bottom_top", "textures": {"bottom": NS + "speaker_bottom", "side": NS + "speaker_side", "top": NS + "speaker_top"}}
+
+
+def model_icicles():
+    return model({"v": "icicles"}, [
+        el((0, 0, 8), (16, 16, 8), {"north": "#v", "south": "#v"}, shade=False),
+        el((8, 0, 0), (8, 16, 16), {"east": "#v", "west": "#v"}, shade=False)])
+
+
+def model_drift():
+    return model({"t": "ice_drift"}, [el((1, 0, 1), (15, 5, 15), {**sides("#t", uv=FULLUV)})])
+
+
+def model_slag():
+    return model({"t": "slag_pile"}, [el((2, 0, 2), (14, 4, 14), {**sides("#t", uv=FULLUV)})])
+
+
+def model_vent():
+    return model({"top": "vent_top", "side": "vent_side"}, [
+        el((1, 0, 1), (15, 2, 15), {"up": {"texture": "#top", "uv": FULLUV}, **sides("#side", ("north", "south", "east", "west", "down"), uv=FULLUV)})])
+
+
+def model_countdown():
+    return model({"front": "countdown_front", "side": "speaker_side"}, [
+        el((1, 3, 14), (15, 13, 16), {"north": {"texture": "#front", "uv": FULLUV}, **sides("#side", ("south", "east", "west", "up", "down"), uv=FULLUV)})])
+
+
+def model_coil():
+    rings = [cuboid((2, y, 2), (14, y + 2, 14), "#side") for y in (1, 7, 13)]
+    return model({"side": "coil_side", "core": "coil_core"}, [cuboid((5, 0, 5), (11, 16, 11), "#core")] + rings)
+
+
+def model_notes():
+    return model({"p": "lab_notes"}, [
+        cuboid((2, 0, 3), (12, 1, 13), "#p"),
+        el((4, 1, 2), (14, 2, 12), sides("#p", uv=FULLUV), rotation={"angle": 22.5, "axis": "y", "origin": [9, 1, 7]})])
+
+
+def model_coat():
+    return model({"c": "lab_coat"}, [
+        el((3, 0, 14), (13, 16, 16), {"north": {"texture": "#c", "uv": FULLUV}, **sides("#c", ("south", "east", "west", "up", "down"), uv=FULLUV)})])
+
+
 MODELS = {
     "crew_desk": model_desk, "open_wardrobe": model_wardrobe, "bunk_bed": model_bunk, "wall_frame": model_frame, "personal_items": model_items,
     "kitchen_sink": model_sink, "fridge": model_fridge, "hanging_pots": model_pots, "dish_stack": model_plates,
     "bench_press": model_bench_press, "punching_bag": model_bag, "wall_mirror": model_mirror, "water_dispenser": model_dispenser, "mat_stack": model_mats,
     "hydroponic_rack": model_rack, "grow_light": model_grow_light, "water_tank": model_tank, "hanging_vines": model_vines,
+    "ceiling_speaker": model_speaker, "icicles": model_icicles, "ice_drift": model_drift, "slag_pile": model_slag, "heat_vent": model_vent,
+    "countdown_screen": model_countdown, "bridge_coil": model_coil, "research_notes": model_notes, "lab_coat": model_coat,
 }
-FACING = {"open_wardrobe", "bunk_bed", "wall_frame", "kitchen_sink", "fridge", "hanging_pots", "bench_press", "wall_mirror", "water_dispenser", "water_tank"}
+FACING = {"open_wardrobe", "bunk_bed", "wall_frame", "kitchen_sink", "fridge", "hanging_pots", "bench_press", "wall_mirror", "water_dispenser", "water_tank", "countdown_screen", "lab_coat"}
 
 NAMES_EN = {
     "crew_desk": "Crew Desk", "open_wardrobe": "Open Wardrobe", "bunk_bed": "Bunk Bed", "wall_frame": "Framed Picture", "personal_items": "Personal Belongings",
     "kitchen_sink": "Galley Sink", "fridge": "Galley Fridge", "hanging_pots": "Hanging Pots", "dish_stack": "Stacked Dishes",
     "bench_press": "Bench Press", "punching_bag": "Punching Bag", "wall_mirror": "Wall Mirror", "water_dispenser": "Water Dispenser", "mat_stack": "Stacked Mats",
     "hydroponic_rack": "Hydroponic Rack", "grow_light": "Grow Light", "water_tank": "Water Tank", "hanging_vines": "Hanging Vines",
+    "ceiling_speaker": "Ceiling Speaker", "icicles": "Icicles", "ice_drift": "Ice Drift", "slag_pile": "Slag Pile", "heat_vent": "Heat Vent",
+    "countdown_screen": "Countdown Screen", "bridge_coil": "Bridge Emitter Coil", "research_notes": "Research Notes", "lab_coat": "Lab Coat",
 }
 NAMES_ZH = {
     "crew_desk": "船員書桌", "open_wardrobe": "敞開的衣櫃", "bunk_bed": "上下鋪", "wall_frame": "相框", "personal_items": "私人物品",
     "kitchen_sink": "廚房水槽", "fridge": "廚房冰箱", "hanging_pots": "掛著的鍋具", "dish_stack": "一疊餐盤",
     "bench_press": "臥推椅", "punching_bag": "沙包", "wall_mirror": "牆鏡", "water_dispenser": "飲水機", "mat_stack": "一疊墊子",
     "hydroponic_rack": "水培架", "grow_light": "植物生長燈", "water_tank": "水箱", "hanging_vines": "垂掛的藤蔓",
+    "ceiling_speaker": "天花板廣播喇叭", "icicles": "冰柱", "ice_drift": "積冰", "slag_pile": "熔渣堆", "heat_vent": "排熱孔",
+    "countdown_screen": "倒數螢幕", "bridge_coil": "橋接發射線圈", "research_notes": "研究筆記", "lab_coat": "實驗袍",
 }
+
+
+# What B.N.T.G. comes for: wiring and electronics broken down into raw materials (replaces these blocks' plain "drop itself" tables).
+def salvage(name, entries):
+    pools = []
+    for item, low, high, chance in entries:
+        entry = {"type": "minecraft:item", "name": item, "functions": [
+            {"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": low, "max": high}}]}
+        conditions = [{"condition": "minecraft:survives_explosion"}]
+        if chance < 1:
+            conditions.append({"condition": "minecraft:random_chance", "chance": chance})
+        pools.append({"rolls": 1.0, "conditions": conditions, "entries": [entry]})
+    return {"type": "minecraft:block", "pools": pools, "random_sequence": f"noclip_backrooms:blocks/{name}"}
+
+
+SALVAGE = {
+    "hanging_cables": [("minecraft:copper_ingot", 0, 2, 1), ("minecraft:redstone", 0, 1, 0.5)],
+    "console": [("minecraft:redstone", 1, 2, 1), ("minecraft:iron_nugget", 1, 3, 1)],
+    "broken_console": [("minecraft:redstone", 1, 3, 1), ("minecraft:iron_nugget", 2, 5, 1), ("minecraft:gold_nugget", 0, 2, 1),
+                       ("noclip_backrooms:alloy", 1, 1, 0.1)],
+    "server_rack": [("minecraft:redstone", 2, 4, 1), ("minecraft:gold_nugget", 1, 4, 1), ("minecraft:iron_ingot", 0, 2, 1),
+                    ("minecraft:copper_ingot", 1, 2, 1), ("noclip_backrooms:alloy", 1, 1, 0.15)],
+}
+
+
+MESSAGES_EN = [
+    "[Notes] Einstein-Rosen bridge, run 41: the field holds. Countdown set. If this works, nobody will ever be far from anywhere again.",
+    "[Notes] The countdown screens all read zero. They have read zero for a very long time. I do not remember turning them off.",
+    "[Notes] The bridge did not open where we aimed it. It opened under us. I could see the station from outside, and then I could not.",
+    "[Notes] Nobody answers. The corridors are yellow now, and I keep walking them. I am only going to sit down for a moment.",
+]
+MESSAGES_ZH = [
+    "【筆記】愛因斯坦－羅森橋，第 41 次運轉：場穩住了。倒數已設定。成功的話，往後沒有人會離任何地方太遠。",
+    "【筆記】倒數螢幕全都停在零。已經停很久了。我不記得自己關過它們。",
+    "【筆記】橋沒有開在我們瞄準的地方，它開在我們腳下。我看見了站的外面，然後就看不見了。",
+    "【筆記】沒有人回應。走廊現在是黃色的，我一直在走。我只是想坐下來一下。",
+]
 
 
 def main():
@@ -424,6 +611,8 @@ def main():
         L.write_json(L.ASSETS / f"blockstates/{name}.json", blockstates[name])
         L.write_json(L.ASSETS / f"items/{name}.json", {"model": {"type": "minecraft:model", "model": NS + name}})
         L.write_json(L.DATA / f"noclip_backrooms/loot_table/blocks/{name}.json", L.loot_table(name))
+    for name, entries in SALVAGE.items():
+        L.write_json(L.DATA / f"noclip_backrooms/loot_table/blocks/{name}.json", salvage(name, entries))
     # Every model's textures must exist (the rest of the level's models are checked by make_level0p1.py).
     for name in MODELS:
         data = L.json.loads((L.MODELS / f"{name}.json").read_text(encoding="utf8"))
@@ -436,6 +625,12 @@ def main():
         data = L.json.loads(path.read_text(encoding="utf8"))
         for name, text in names.items():
             data[f"block.noclip_backrooms.{name}"] = text
+        path.write_text(L.json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf8")
+    for file, texts in (("en_us.json", MESSAGES_EN), ("zh_tw.json", MESSAGES_ZH)):
+        path = L.ASSETS / "lang" / file
+        data = L.json.loads(path.read_text(encoding="utf8"))
+        for i, text in enumerate(texts):
+            data[f"message.noclip_backrooms.level0p1.rhea.{i}"] = text
         path.write_text(L.json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf8")
     L.update_tags(list(MODELS))
     print(f"{len(TEXTURES)} textures, {len(MODELS)} blocks")

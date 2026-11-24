@@ -18,14 +18,14 @@ import dev.noclip.backrooms.level2.Level2Plan.RoomKind;
  * three is a bank of pipes floor to ceiling, which leaves two to walk in. Turns are cut off at the outer corner.
  */
 public final class Level2Layout {
-	static final int BANK = 203, WALLS = 204, LIGHTS = 205, FLOORS = 206, PALETTE = 207, ROOM_PROPS = 208, BANK_PARTS = 209;
+	static final int BANK = 203, WALLS = 204, LIGHTS = 205, FLOORS = 206, PALETTE = 207, ROOM_PROPS = 208, BANK_PARTS = 209, OFFICE = 210;
 	/** Lights are wired in series in blocks of 3x3 cells; one broken light takes its whole block down. */
 	static final int CIRCUIT = 3;
 	/** Cells around the door to 811 whose pipes carry blue pulsing lights. */
 	static final int BLADE_TRAIL = 6;
 
 	enum Kind {
-		WALL, FLOOR, BANK, MACHINE, DOOR, LOCKED_DOOR, EXIT, WINDOW, ROOM, VOID, VOID_WALL, CRATE, DRUM, SCRAP, CABINET;
+		WALL, FLOOR, BANK, MACHINE, DOOR, LOCKED_DOOR, EXIT, WINDOW, ROOM, VOID, VOID_WALL, CRATE, DRUM, SCRAP, CABINET, TOOLBOX, CABLE_REEL, LUMBER_STACK;
 
 		/** Whether a player can stand here. Doors count: they open. */
 		public boolean walkable() {
@@ -105,6 +105,8 @@ public final class Level2Layout {
 		int bank = bankSide(seed, plan, rx, rz, i, j);
 		if (bank >= 0 && bankColumn(bank, ox, oz)) return new Tile(Kind.BANK, Level2Plan.opposite(bank), null);
 		if (outerCorner(plan.open[cell], ox, oz)) return Tile.WALL;
+		Tile debris = deadEndDebris(seed, plan, i, j, ox, oz, x, z);
+		if (debris != null) return debris;
 		return Tile.FLOOR;
 	}
 
@@ -141,7 +143,7 @@ public final class Level2Layout {
 	static int bankSide(long seed, Level2Plan plan, int rx, int rz, int i, int j) {
 		int cell = Level2Plan.cell(i, j);
 		int axis = plan.straightAxis(cell);
-		if (axis < 0) return -1;
+		if (axis < 0 || isRailCell(plan, i, j) || isOfficePatch(seed, rx * SIZE + i * CELL, rz * SIZE + j * CELL)) return -1;
 		int line = axis == 0 ? rz * N + j : rx * N + i;
 		int a = axis == 0 ? NORTH : WEST, b = Level2Plan.opposite(a);
 		int preferred = (hash(seed, line, axis, BANK) & 1) == 0 ? a : b;
@@ -171,12 +173,43 @@ public final class Level2Layout {
 		int roll = (int) Math.floorMod(hash(seed, x, z, ROOM_PROPS), 100);
 		return switch (room.kind()) {
 			case STORAGE -> !byWall ? Tile.ROOM
-					: roll < 38 ? new Tile(Kind.CRATE, 0, null) : roll < 58 ? new Tile(Kind.DRUM, 0, null)
-					: roll < 72 ? new Tile(Kind.SCRAP, 0, null) : Tile.ROOM;
+					: roll < 26 ? new Tile(Kind.CRATE, 0, null)
+					: roll < 42 ? new Tile(Kind.DRUM, 0, null)
+					: roll < 54 ? new Tile(Kind.SCRAP, 0, null)
+					: roll < 66 ? new Tile(Kind.TOOLBOX, 0, null)
+					: roll < 76 ? new Tile(Kind.CABLE_REEL, 0, null)
+					: roll < 86 ? new Tile(Kind.LUMBER_STACK, 0, null) : Tile.ROOM;
 			case MACHINES -> (lz - room.z0()) % 3 == 2 && lx > room.x0() + 1 && lx < room.x1() - 1
 					? new Tile(Kind.CABINET, (lz - room.z0()) % 6 == 2 ? SOUTH : NORTH, null) : Tile.ROOM;
+			case EL3A -> !byWall ? Tile.ROOM
+					: roll < 20 ? new Tile(Kind.CRATE, 0, null)
+					: roll < 35 ? new Tile(Kind.CABINET, lx == room.x0() + 1 ? EAST : lx == room.x1() - 1 ? WEST : lz == room.z0() + 1 ? SOUTH : NORTH, null)
+					: roll < 45 ? new Tile(Kind.TOOLBOX, 0, null)
+					: roll < 52 ? new Tile(Kind.CABLE_REEL, 0, null)
+					: Tile.ROOM;
+			case MACCHINA -> !byWall ? Tile.ROOM
+					: roll < 28 ? new Tile(Kind.CABINET, lx == room.x0() + 1 ? EAST : lx == room.x1() - 1 ? WEST : lz == room.z0() + 1 ? SOUTH : NORTH, null)
+					: roll < 50 ? new Tile(Kind.SCRAP, 0, null) : Tile.ROOM;
 			default -> Tile.ROOM;
 		};
+	}
+
+	/** Occasional toolbox, cable reel, lumber stack, or scrap tucked into a bare dead-end corner. */
+	private static Tile deadEndDebris(long seed, Level2Plan plan, int i, int j, int ox, int oz, int x, int z) {
+		int cell = Level2Plan.cell(i, j);
+		if (plan.openings(cell) != 1 || isOfficePatch(seed, x, z)) return null;
+		for (int d = 0; d < 4; d++) {
+			if (plan.feature(cell, d) != Feature.NONE) return null;
+		}
+		int openDir = Integer.numberOfTrailingZeros(plan.open[cell] & 0xF);
+		int backX = openDir == WEST ? 3 : 1, backZ = openDir == NORTH ? 3 : 1;
+		if (ox != backX || oz != backZ) return null;
+		int roll = Math.floorMod(hash(seed, x, z, ROOM_PROPS), 100);
+		if (roll < 16) return new Tile(Kind.TOOLBOX, 0, null);
+		if (roll < 28) return new Tile(Kind.CABLE_REEL, 0, null);
+		if (roll < 40) return new Tile(Kind.LUMBER_STACK, 0, null);
+		if (roll < 52) return new Tile(Kind.SCRAP, 0, null);
+		return null;
 	}
 
 	/** Two blocks in from a doorway stay clear, so nothing blocks the way in. */
@@ -189,6 +222,7 @@ public final class Level2Layout {
 
 	/** The finish of the tunnel walls around here, in patches of 4x4 cells. */
 	static Finish finish(long seed, int x, int z) {
+		if (isOfficePatch(seed, x, z)) return Finish.PAINTED;
 		int px = Math.floorDiv(x, CELL * 4), pz = Math.floorDiv(z, CELL * 4);
 		int roll = Math.floorMod(hash(seed, px, pz, WALLS), 100);
 		Finish finish = roll < 52 ? Finish.CONCRETE : roll < 72 ? Finish.MUDDY_BRICK : roll < 84 ? Finish.PAINTED : Finish.BLACK_BRICK;
@@ -241,6 +275,7 @@ public final class Level2Layout {
 	}
 
 	static Ground ground(long seed, int x, int z) {
+		if (isOfficePatch(seed, x, z)) return Ground.PLAIN;
 		int roll = Math.floorMod(hash(seed, x, z, FLOORS), 100);
 		return roll < 14 ? Ground.DEBRIS : roll < 19 ? Ground.DAMP : Ground.PLAIN;
 	}
@@ -257,8 +292,9 @@ public final class Level2Layout {
 		return Math.floorMod(hash(seed, x * 31 + y, z, BANK_PARTS), 100);
 	}
 
-	/** Whether a column is inside a hot zone. */
+	/** Whether a column is inside a hot zone (Office Area EL3A is always climate-controlled). */
 	public static boolean hot(long seed, int x, int z) {
+		if (roomKindAt(seed, x, z) == RoomKind.EL3A) return false;
 		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
 		for (int dx = -1; dx <= 1; dx++) {
 			for (int dz = -1; dz <= 1; dz++) {
@@ -320,11 +356,189 @@ public final class Level2Layout {
 				for (int gj = gj0 - ring; gj <= gj0 + ring; gj++) {
 					if (Math.max(Math.abs(gi - gi0), Math.abs(gj - gj0)) != ring) continue;
 					int cx = gi * CELL + 2, cz = gj * CELL + 2;
-					if (tile(seed, cx, cz).kind() == Kind.FLOOR && !hot(seed, cx, cz)) return new int[] {cx, cz};
+					if (tile(seed, cx, cz).kind() == Kind.FLOOR && !hot(seed, cx, cz) && !cold(seed, cx, cz)
+							&& !gas(seed, cx, cz) && floodedStage(seed, cx, cz) == 0) {
+						return new int[] {cx, cz};
+					}
 				}
 			}
 		}
 		return new int[] {gi0 * CELL + 2, gj0 * CELL + 2};
+	}
+
+	/** Office-style corridors: bare painted walls, plain floors, no industrial pipes or machinery. */
+	static boolean isOfficePatch(long seed, int x, int z) {
+		int px = Math.floorDiv(x, CELL * 4), pz = Math.floorDiv(z, CELL * 4);
+		return Math.floorMod(hash(seed, px, pz, OFFICE), 100) < 14;
+	}
+
+	/** Whether a column is inside an abnormally cold stretch. */
+	public static boolean cold(long seed, int x, int z) {
+		if (isSafeZone(seed, x, z)) return false;
+		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				Level2Plan plan = Level2Plan.of(seed, rx + dx, rz + dz);
+				if (plan.coldX < 0) continue;
+				int cx = (rx + dx) * SIZE + plan.coldX, cz = (rz + dz) * SIZE + plan.coldZ;
+				if (Math.abs(x - cx) + Math.abs(z - cz) <= Level2Plan.COLD_RADIUS) return true;
+			}
+		}
+		return false;
+	}
+
+	/** Whether a column is inside a burst-pipe gas leak zone. */
+	public static boolean gas(long seed, int x, int z) {
+		if (isSafeZone(seed, x, z)) return false;
+		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				Level2Plan plan = Level2Plan.of(seed, rx + dx, rz + dz);
+				if (plan.gasX < 0) continue;
+				int gx = (rx + dx) * SIZE + plan.gasX, gz = (rz + dz) * SIZE + plan.gasZ;
+				if (Math.abs(x - gx) + Math.abs(z - gz) <= Level2Plan.GAS_RADIUS) return true;
+			}
+		}
+		return false;
+	}
+
+	static RoomKind roomKindAt(long seed, int x, int z) {
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		Level2Plan plan = plan(seed, x, z);
+		int room = plan.roomOf[Level2Plan.cell(lx / CELL, lz / CELL)];
+		return room >= 0 ? plan.rooms.get(room).kind() : null;
+	}
+
+	static boolean isSafeZone(long seed, int x, int z) {
+		return roomKindAt(seed, x, z) == RoomKind.EL3A;
+	}
+
+	/** Straight tunnel cells in an EL3A region that form a run of >= 2 straight cells carry B.N.T.G. narrow-gauge rails. */
+	private static boolean isRailCell(Level2Plan plan, int i, int j) {
+		if (!plan.hasEl3a) return false;
+		int axis = plan.straightAxis(Level2Plan.cell(i, j));
+		if (axis < 0) return false;
+		int dx = axis == 0 ? 1 : 0, dz = axis == 1 ? 1 : 0;
+		for (int step : new int[] {-1, 1}) {
+			int ni = i + dx * step, nj = j + dz * step;
+			if (ni >= 0 && nj >= 0 && ni < N && nj < N) {
+				int nc = Level2Plan.cell(ni, nj);
+				if (plan.roomOf[nc] < 0 && plan.straightAxis(nc) == axis) return true;
+			}
+		}
+		return false;
+	}
+
+	/** Returns 0 (east-west) or 1 (north-south) if a rail track sits at (x, z), or -1. */
+	static int railAxis(long seed, int x, int z) {
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		Level2Plan plan = plan(seed, x, z);
+		int i = lx / CELL, j = lz / CELL;
+		int cell = Level2Plan.cell(i, j);
+		if (plan.roomOf[cell] >= 0 || !isRailCell(plan, i, j)) return -1;
+		int axis = plan.straightAxis(cell);
+		int ox = lx % CELL, oz = lz % CELL;
+		if ((axis == 0 && oz == 2) || (axis == 1 && ox == 2)) return axis;
+		return -1;
+	}
+
+	enum WallProp { BREAKER_BOX, PRESSURE_GAUGE, HAZARD_SIGN }
+	record WallDetail(WallProp prop, int dir) {}
+	enum CeilingProp { VENT, SNAPPED_CABLES }
+
+	private static final int[] WALL_DX = {0, 1, 0, -1};
+	private static final int[] WALL_DZ = {-1, 0, 1, 0};
+
+	static WallDetail wallDetail(long seed, int x, int z) {
+		if (roomKindAt(seed, x, z) != null || isOfficePatch(seed, x, z)) return null;
+		int wallDir = -1;
+		for (int d = 0; d < 4; d++) {
+			if (tile(seed, x + WALL_DX[d], z + WALL_DZ[d]).kind() == Kind.WALL) {
+				wallDir = Level2Plan.opposite(d);
+				break;
+			}
+		}
+		if (wallDir < 0) return null;
+		int r = Math.floorMod(hash(seed, x, z, 0x41D1), 100);
+		if (hot(seed, x, z) || cold(seed, x, z) || gas(seed, x, z)) {
+			if (r < 6) return new WallDetail(WallProp.HAZARD_SIGN, wallDir);
+			if (r < 9) return new WallDetail(WallProp.PRESSURE_GAUGE, wallDir);
+			return null;
+		}
+		if (r < 2) return new WallDetail(WallProp.BREAKER_BOX, wallDir);
+		if (r < 4) return new WallDetail(WallProp.PRESSURE_GAUGE, wallDir);
+		if (r < 6) return new WallDetail(WallProp.HAZARD_SIGN, wallDir);
+		return null;
+	}
+
+	static boolean isDrainGrate(long seed, int x, int z) {
+		if (roomKindAt(seed, x, z) != null || isOfficePatch(seed, x, z)) return false;
+		if (ground(seed, x, z) != Ground.DAMP) return false;
+		return Math.floorMod(hash(seed, x, z, 0x41D2), 100) < 10;
+	}
+
+	static int floorCableDuctAxis(long seed, int x, int z) {
+		if (roomKindAt(seed, x, z) != null || isOfficePatch(seed, x, z) || railAxis(seed, x, z) >= 0) return -1;
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		Level2Plan plan = plan(seed, x, z);
+		int i = lx / CELL, j = lz / CELL;
+		int cell = Level2Plan.cell(i, j);
+		int axis = plan.straightAxis(cell);
+		if (axis < 0) return -1;
+		int cellHash = Math.floorMod(hash(seed, Math.floorDiv(x, CELL), Math.floorDiv(z, CELL), 0x41D3), 100);
+		if (cellHash >= 10) return -1;
+		int side = (cellHash & 1) == 0 ? 1 : 3;
+		int across = axis == 0 ? lz % CELL : lx % CELL;
+		return across == side ? axis : -1;
+	}
+
+	static CeilingProp ceilingDetail(long seed, int x, int z) {
+		if (roomKindAt(seed, x, z) != null || isOfficePatch(seed, x, z)) return null;
+		int r = Math.floorMod(hash(seed, x, z, 0x41D4), 100);
+		if (r < 3) return CeilingProp.VENT;
+		int cableCutoff = (ground(seed, x, z) == Ground.DEBRIS || hot(seed, x, z) || gas(seed, x, z)) ? 8 : 6;
+		return r < cableCutoff ? CeilingProp.SNAPPED_CABLES : null;
+	}
+
+	/** 0 = dry, 1 = puddled concrete floor, 2 = shallow ankle-deep water pool. */
+	static int floodedStage(long seed, int x, int z) {
+		if (roomKindAt(seed, x, z) != null || isOfficePatch(seed, x, z)
+				|| hot(seed, x, z) || cold(seed, x, z) || railAxis(seed, x, z) >= 0) {
+			return 0;
+		}
+		int px = Math.floorDiv(x, CELL * 2), pz = Math.floorDiv(z, CELL * 2);
+		if (Math.floorMod(hash(seed, px, pz, 0x41D5), 100) >= 9) return 0;
+		int ox = Math.floorMod(x, CELL), oz = Math.floorMod(z, CELL);
+		boolean inner = ox >= 1 && ox <= 3 && oz >= 1 && oz <= 3;
+		if (inner && (ox == 2 || oz == 2) && !isDrainGrate(seed, x, z)
+				&& Math.floorMod(hash(seed, x, z, 0x41D6), 100) < 55) {
+			return 2;
+		}
+		return 1;
+	}
+
+	/** 0 = none, 1 = bridge X, 2 = bridge Z, 3 = leaking X, 4 = leaking Z. */
+	static int overheadPipe(long seed, int x, int z) {
+		if (roomKindAt(seed, x, z) != null || isOfficePatch(seed, x, z)) return 0;
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		Level2Plan plan = plan(seed, x, z);
+		int cell = Level2Plan.cell(lx / CELL, lz / CELL);
+		int corridorAxis = plan.straightAxis(cell);
+		if (corridorAxis < 0) return 0;
+		int along = corridorAxis == 0 ? lx % CELL : lz % CELL;
+		int across = corridorAxis == 0 ? lz % CELL : lx % CELL;
+		if (floodedStage(seed, x, z) > 0 && (across == 1 || across == 3)) {
+			int side = Math.floorMod(hash(seed, Math.floorDiv(x, CELL), Math.floorDiv(z, CELL), 0x41D8), 2) == 0 ? 1 : 3;
+			if (across == side) return corridorAxis == 0 ? 3 : 4;
+		}
+		int cellRoll = Math.floorMod(hash(seed, Math.floorDiv(x, CELL), Math.floorDiv(z, CELL), 0x41D7), 100);
+		int bridgeRate = gas(seed, x, z) ? 35 : 22;
+		if (cellRoll < bridgeRate && along == 0 && across >= 1 && across <= 3) {
+			int bridgeAxis = 1 - corridorAxis;
+			boolean leaking = (cellRoll & 3) == 0 || floodedStage(seed, x, z) > 0;
+			return (leaking ? 3 : 1) + bridgeAxis;
+		}
+		return 0;
 	}
 
 	static int hash(long seed, int x, int z, int salt) {

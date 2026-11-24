@@ -140,6 +140,22 @@ public final class ZenithBlocks {
 	public static final Block WATER_TANK = register("water_tank", steel(MapColor.COLOR_LIGHT_BLUE, 3.0F).noOcclusion(), p -> new ZenithFacingBlock(p, Block.box(2, 0, 2, 14, 16, 14)));
 	public static final Block HANGING_VINES = register("hanging_vines", Properties.of().mapColor(MapColor.COLOR_GREEN).strength(0.2F).sound(SoundType.VINE)
 			.noOcclusion().noCollision(), p -> new ZenithShapedBlock(p, FULL, false));
+	public static final Block CEILING_SPEAKER = register("ceiling_speaker", steel(MapColor.COLOR_LIGHT_GRAY, 2.0F));
+	public static final Block ICICLES = register("icicles", Properties.of().mapColor(MapColor.ICE).strength(0.2F).sound(SoundType.GLASS)
+			.noOcclusion().noCollision(), p -> new ZenithShapedBlock(p, FULL, false));
+	public static final Block ICE_DRIFT = register("ice_drift", Properties.of().mapColor(MapColor.ICE).strength(0.3F).sound(SoundType.GLASS)
+			.noOcclusion().noCollision(), p -> new ZenithShapedBlock(p, Block.box(1, 0, 1, 15, 5, 15), false));
+	public static final Block SLAG_PILE = register("slag_pile", Properties.of().mapColor(MapColor.COLOR_BLACK).strength(0.5F).sound(SoundType.BASALT)
+			.noOcclusion().noCollision().lightLevel(s -> 5), p -> new ZenithShapedBlock(p, Block.box(2, 0, 2, 14, 4, 14), false));
+	public static final Block HEAT_VENT = register("heat_vent", steel(MapColor.COLOR_BLACK, 2.0F).noOcclusion().noCollision().lightLevel(s -> 8),
+			p -> new ZenithShapedBlock(p, Block.box(1, 0, 1, 15, 2, 15), false));
+	public static final Block COUNTDOWN_SCREEN = register("countdown_screen", steel(MapColor.COLOR_BLACK, 1.0F).noOcclusion().noCollision().lightLevel(s -> 6),
+			p -> new ZenithFacingBlock(p, THIN));
+	public static final Block BRIDGE_COIL = register("bridge_coil", steel(MapColor.COLOR_PURPLE, 3.0F).noOcclusion().lightLevel(s -> 12),
+			p -> new ZenithShapedBlock(p, Block.box(3, 0, 3, 13, 16, 13), true));
+	public static final Block RESEARCH_NOTES = register("research_notes", steel(MapColor.SNOW, 0.2F).sound(SoundType.WOOL).noOcclusion().noCollision(),
+			p -> new ZenithNotesBlock(p, Block.box(2, 0, 2, 14, 2, 14)));
+	public static final Block LAB_COAT = register("lab_coat", steel(MapColor.SNOW, 0.2F).sound(SoundType.WOOL).noOcclusion().noCollision(), p -> new ZenithFacingBlock(p, THIN));
 
 	// Ways out. Neither can be broken or carried off.
 	public static final Block YELLOW_DOORWAY = register("yellow_doorway", Properties.of().mapColor(MapColor.COLOR_YELLOW).strength(-1.0F, 3600000.0F)

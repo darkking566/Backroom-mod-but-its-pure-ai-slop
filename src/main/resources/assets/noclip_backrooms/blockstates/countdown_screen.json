@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "noclip_backrooms:block/level0p1/countdown_screen"
+    },
+    "facing=east": {
+      "model": "noclip_backrooms:block/level0p1/countdown_screen",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "noclip_backrooms:block/level0p1/countdown_screen",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "noclip_backrooms:block/level0p1/countdown_screen",
+      "y": 270
+    }
+  }
+}

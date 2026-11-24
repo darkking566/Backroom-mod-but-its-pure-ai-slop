@@ -186,6 +186,65 @@ class Level2LayoutTest {
 			int[] spot = Level2Layout.landing(SEED, x, -x);
 			assertEquals(Kind.FLOOR, Level2Layout.tile(SEED, spot[0], spot[1]).kind());
 			assertFalse(Level2Layout.hot(SEED, spot[0], spot[1]));
+			assertFalse(Level2Layout.cold(SEED, spot[0], spot[1]));
+			assertFalse(Level2Layout.gas(SEED, spot[0], spot[1]));
 		}
+	}
+
+	/** Cold zones, gas leak zones, and bare office corridors appear; office corridors have no pipes. */
+	@Test
+	void anomaliesAndOfficeCorridorsAppear() {
+		int cold = 0, gas = 0, office = 0;
+		for (int x = -6 * SIZE; x < 6 * SIZE; x += 5) {
+			for (int z = -6 * SIZE; z < 6 * SIZE; z += 5) {
+				if (Level2Layout.cold(SEED, x, z)) cold++;
+				if (Level2Layout.gas(SEED, x, z)) gas++;
+				if (Level2Layout.isOfficePatch(SEED, x, z)) {
+					office++;
+					assertFalse(Level2Layout.tile(SEED, x + 1, z + 1).kind() == Kind.BANK, "office corridor has pipes");
+				}
+			}
+		}
+		assertTrue(cold > 0, "no cold zones appeared");
+		assertTrue(gas > 0, "no gas zones appeared");
+		assertTrue(office > 0, "no office corridors appeared");
+	}
+
+	/** EL3A outposts, Macchina ruins, and narrow-gauge rail lines appear; EL3A is never hot. */
+	@Test
+	void facilitiesAndRailsAppear() {
+		int el3a = 0, macchina = 0, rails = 0;
+		for (int x = -6 * SIZE; x < 6 * SIZE; x += 5) {
+			for (int z = -6 * SIZE; z < 6 * SIZE; z += 5) {
+				Level2Plan.RoomKind kind = Level2Layout.roomKindAt(SEED, x, z);
+				if (kind == Level2Plan.RoomKind.EL3A) {
+					el3a++;
+					assertFalse(Level2Layout.hot(SEED, x, z), "EL3A should not be hot");
+				} else if (kind == Level2Plan.RoomKind.MACCHINA) {
+					macchina++;
+				}
+				if (Level2Layout.railAxis(SEED, x + 2, z + 2) >= 0) rails++;
+			}
+		}
+		assertTrue(el3a > 0, "no EL3A rooms appeared");
+		assertTrue(macchina > 0, "no Macchina rooms appeared");
+		assertTrue(rails > 0, "no railway tracks appeared");
+	}
+
+	/** Toolboxes, cable reels, and lumber stacks appear in storage rooms and dead-end corners. */
+	@Test
+	void debrisPropsAppear() {
+		int toolbox = 0, reel = 0, lumber = 0;
+		for (int x = -4 * SIZE; x < 4 * SIZE; x++) {
+			for (int z = -4 * SIZE; z < 4 * SIZE; z++) {
+				Kind k = Level2Layout.tile(SEED, x, z).kind();
+				if (k == Kind.TOOLBOX) toolbox++;
+				else if (k == Kind.CABLE_REEL) reel++;
+				else if (k == Kind.LUMBER_STACK) lumber++;
+			}
+		}
+		assertTrue(toolbox > 0, "no toolboxes appeared");
+		assertTrue(reel > 0, "no cable reels appeared");
+		assertTrue(lumber > 0, "no lumber stacks appeared");
 	}
 }

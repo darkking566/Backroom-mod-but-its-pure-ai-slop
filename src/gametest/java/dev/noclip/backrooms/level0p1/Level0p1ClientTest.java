@@ -55,7 +55,9 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 			shoot(context, game, mx + 7.5, arrival.getY(), mz + 7.5, -135, 5, "level0p1_airlock");
 			shoot(context, game, mx + 10.5, arrival.getY(), mz + 6.5, 0, 5, "level0p1_airlock_doorway");
 			if (only("rooms")) rooms(context, game, arrival);
+			if (only("variants")) variants(context, game, arrival);
 			if (only("zones")) zones(context, game, arrival);
+			if (only("details")) details(context, game, arrival);
 			if (only("stairs")) stairs(context, game);
 			if (only("atrium")) atrium(context, game);
 			if (only("middle")) middle(context, game);
@@ -97,6 +99,52 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 		if (corridor != null) shoot(context, game, corridor[0] * 16 + 2.5, corridor[2] * 8 + 1, corridor[1] * 16 + 20.5, 270, 0, "level0p1_corridor");
 	}
 
+	/** Merged halls, two-story rooms, sunken pits, raised platforms, cubicles, and narrow halls. */
+	private void variants(ClientGameTestContext context, TestSingleplayerContext game, BlockPos from) {
+		int[] merged = findVariant(from, null, true);
+		if (merged != null) {
+			int[] b = ZenithLayout.roomBounds(seed, merged[0], merged[1], merged[2]);
+			shoot(context, game, b[0] * 16 + 9.5, merged[2] * 8 + 1, b[1] * 16 + 9.5, -45, 5, "level0p1_variant_merged");
+		}
+		int[] twoStory = findVariant(from, ZenithLayout.Shape.DOUBLE_LOWER, false);
+		if (twoStory != null) {
+			shoot(context, game, twoStory[0] * 16 + 10.5, twoStory[2] * 8 + 1.5, twoStory[1] * 16 + 10.5, 135, -20, "level0p1_variant_double_lower");
+			shoot(context, game, twoStory[0] * 16 + 10.5, (twoStory[2] + 1) * 8 + 2.5, twoStory[1] * 16 + 10.5, 135, 25, "level0p1_variant_double_upper");
+		}
+		for (ZenithLayout.Shape s : new ZenithLayout.Shape[] {
+				ZenithLayout.Shape.SUNKEN_PIT, ZenithLayout.Shape.RAISED_DAIS, ZenithLayout.Shape.CUBICLES, ZenithLayout.Shape.NARROW_HALL}) {
+			int[] at = findVariant(from, s, false);
+			if (at == null) continue;
+			shoot(context, game, at[0] * 16 + 10.5, at[2] * 8 + 1.5, at[1] * 16 + 10.5, 135, 14,
+					"level0p1_variant_" + s.name().toLowerCase(Locale.ROOT));
+		}
+	}
+
+	private int[] findVariant(BlockPos from, ZenithLayout.Shape shape, boolean requireMerged) {
+		int mx0 = Math.floorDiv(from.getX(), 16), mz0 = Math.floorDiv(from.getZ(), 16);
+		int deck = Math.floorDiv(from.getY(), 8);
+		for (int ring = 0; ring < 20; ring++) {
+			for (int dk : new int[] {0, -1, 1, -2, 2}) {
+				int k = deck + dk;
+				for (int i = -ring; i <= ring; i++) {
+					for (int j = -ring; j <= ring; j++) {
+						if (Math.max(Math.abs(i), Math.abs(j)) != ring) continue;
+						int mx = mx0 + i, mz = mz0 + j;
+						double cx = mx * 16 + 10, cy = k * 8 + 4, cz = mz * 16 + 10;
+						double distance = Math.sqrt(cx * cx + cy * cy + cz * cz);
+						if (distance < ZenithLayout.RI + 40 || distance > ZenithLayout.RO - 36) continue;
+						if (ZenithLayout.atrium(seed, Math.floorDiv(mx, 3), Math.floorDiv(mz, 3), Math.floorDiv(k, 6))) continue;
+						if (ZenithLayout.room(seed, mx, mz, k) == Room.AIRLOCK) continue;
+						if (requireMerged && !ZenithLayout.isMerged(seed, mx, mz, k)) continue;
+						if (shape != null && ZenithLayout.shape(seed, mx, mz, k) != shape) continue;
+						return new int[] {mx, mz, k};
+					}
+				}
+			}
+		}
+		return null;
+	}
+
 	/** The corridors of a cold, a hot and a dark stretch: damaged zones 1, 2 and 3. */
 	private void zones(ClientGameTestContext context, TestSingleplayerContext game, BlockPos from) {
 		String[] names = {"", "cold", "hot", "dark"};
@@ -107,6 +155,100 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 			shoot(context, game, at[0] * 16 + 10.5, at[2] * 8 + 1, at[1] * 16 + 10.5, 135, 18, "level0p1_zone_" + names[zone] + "_room");
 			shoot(context, game, at[0] * 16 + 10.5, at[2] * 8 + 1, at[1] * 16 + 10.5, 135, -50, "level0p1_zone_" + names[zone] + "_ceiling");
 		}
+	}
+
+	/** Close-ups of the speakers and the cold and hot stretches' props, each from a few blocks away. */
+	private void details(ClientGameTestContext context, TestSingleplayerContext game, BlockPos from) {
+		int[] room = findRoom(from, Room.BEDROOM), cold = findZone(from, 1), hot = findZone(from, 2);
+		if (room != null) closeUp(context, game, room, ZenithLayout.Kind.SPEAKER, "speaker");
+		java.util.List<double[]> done = new java.util.ArrayList<>();
+		for (int n = 0; n < 3; n++) outside(context, game, from, done, n);
+		int[] lab = findRoom(from, Room.LAB), airlock = findRoom(from, Room.AIRLOCK);
+		if (lab != null) {
+			closeUp(context, game, lab, ZenithLayout.Kind.COIL, "coil");
+			closeUp(context, game, lab, ZenithLayout.Kind.SCREEN, "countdown");
+		}
+		if (airlock != null) {
+			closeUp(context, game, airlock, ZenithLayout.Kind.NOTES, "notes");
+			closeUp(context, game, airlock, ZenithLayout.Kind.COAT, "coat");
+		}
+		if (cold != null) {
+			closeUp(context, game, cold, ZenithLayout.Kind.ICICLES, "icicles");
+			closeUp(context, game, cold, ZenithLayout.Kind.DRIFT, "ice_drift");
+		}
+		if (hot != null) {
+			closeUp(context, game, hot, ZenithLayout.Kind.SLAG, "slag");
+			closeUp(context, game, hot, ZenithLayout.Kind.VENT, "vent");
+		}
+	}
+
+	private static double pick0(int cell, double direction, double distance) {
+		return cell + 0.5 + direction * distance;
+	}
+
+	/** Looking out through an outer window at the sea of rooms: the nearest window with floor behind it. */
+	private void outside(ClientGameTestContext context, TestSingleplayerContext game, BlockPos from, java.util.List<double[]> done, int n) {
+		double best = Double.MAX_VALUE;
+		double[] pick = null;
+		for (int i = 0; i < 60000; i++) {
+			double yaw = i * 2.399963, pitch = Math.asin(((i * 0.618034) % 1.0) * 2 - 1);
+			double dx = Math.cos(pitch) * Math.cos(yaw), dy = Math.sin(pitch), dz = Math.cos(pitch) * Math.sin(yaw);
+			int x = (int) (478.5 * dx), y = (int) (478.5 * dy), z = (int) (478.5 * dz);
+			double distance = Math.hypot(Math.hypot(x - from.getX(), y - from.getY()), z - from.getZ());
+			final double px = x, py = y, pz = z;
+			if (distance >= best || done.stream().anyMatch(d -> Math.hypot(Math.hypot(d[0] - px, d[1] - py), d[2] - pz) < 40) || ZenithLayout.kind(ZenithLayout.cell(seed, x, y, z)) != ZenithLayout.Kind.WINDOW) continue;
+			int cx = (int) Math.round(473.5 * dx), cz = (int) Math.round(473.5 * dz), cy = (int) Math.round(473.5 * dy);
+			int fy = cy;
+			while (fy > cy - 6 && ZenithLayout.passable(ZenithLayout.cell(seed, cx, fy - 1, cz))) fy--;
+			if (ZenithLayout.passable(ZenithLayout.cell(seed, cx, fy - 1, cz)) || !ZenithLayout.passable(ZenithLayout.cell(seed, cx, fy, cz))
+					|| !ZenithLayout.passable(ZenithLayout.cell(seed, cx, fy + 1, cz))) continue;
+			// Looking straight out from here, the first thing in the way (at eye height) has to be the window.
+			double hx = dx / Math.hypot(dx, dz), hz = dz / Math.hypot(dx, dz);
+			boolean clear = false;
+			for (double r = 0; r < 14; r += 0.25) {
+				int rx = (int) Math.floor(pick0(cx, hx, r)), rz = (int) Math.floor(pick0(cz, hz, r));
+				ZenithLayout.Kind kind = ZenithLayout.kind(ZenithLayout.cell(seed, rx, fy + 1, rz));
+				if (ZenithLayout.passable(ZenithLayout.cell(seed, rx, fy + 1, rz)) && ZenithLayout.passable(ZenithLayout.cell(seed, rx, fy, rz))) continue;
+				clear = kind == ZenithLayout.Kind.WINDOW && r > 2;
+				break;
+			}
+			if (!clear) continue;
+			best = distance;
+			pick = new double[] {cx + 0.5, fy, cz + 0.5, hx, hz, dy, x, y, z};
+		}
+		if (pick == null) {
+			System.out.println("details: no outer window found");
+			return;
+		}
+		done.add(new double[] {pick[6], pick[7], pick[8]});
+		float yaw = (float) Math.toDegrees(Math.atan2(-pick[3], pick[4]));
+		shoot(context, game, pick[0], pick[1], pick[2], yaw, 0, "level0p1_detail_outside" + n);
+	}
+
+	private void closeUp(ClientGameTestContext context, TestSingleplayerContext game, int[] module, ZenithLayout.Kind kind, String name) {
+		int y0 = module[2] * 8;
+		for (int dx = -48; dx < 64; dx++) {
+			for (int dz = -48; dz < 64; dz++) {
+				int x = module[0] * 16 + dx, z = module[1] * 16 + dz;
+				for (int t = 1; t < 8; t++) {
+					if (ZenithLayout.kind(ZenithLayout.cell(seed, x, y0 + t, z)) != kind) continue;
+					for (int[] step : new int[][] {{-3, 0}, {3, 0}, {0, -3}, {0, 3}, {-2, 0}, {2, 0}, {0, -2}, {0, 2}}) {
+						int cx = x + step[0], cz = z + step[1];
+						boolean clear = true;
+						for (int i = 0; i < 3 && clear; i++) {
+							int mx = cx + Integer.signum(x - cx) * i, mz = cz + Integer.signum(z - cz) * i;
+							clear = ZenithLayout.passable(ZenithLayout.cell(seed, mx, y0 + 1, mz)) && ZenithLayout.passable(ZenithLayout.cell(seed, mx, y0 + 2, mz));
+						}
+						if (!clear) continue;
+						double ox = x + 0.5 - (cx + 0.5), oy = y0 + t + 0.5 - (y0 + 2.6), oz = z + 0.5 - (cz + 0.5);
+						float yaw = (float) Math.toDegrees(Math.atan2(-ox, oz)), pitch = (float) -Math.toDegrees(Math.atan2(oy, Math.hypot(ox, oz)));
+						shoot(context, game, cx + 0.5, y0 + 1, cz + 0.5, yaw, pitch, "level0p1_detail_" + name);
+						return;
+					}
+				}
+			}
+		}
+		System.out.println("details: no " + kind + " found near " + module[0] + "," + module[1]);
 	}
 
 	/** A module (mx, mz, deck) near here in a damaged stretch of this kind, not part of an atrium. */
@@ -264,13 +406,31 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 	/** Doors open on their own when you come near and shut when you leave. */
 	private void doors(ClientGameTestContext context, TestSingleplayerContext game, BlockPos from) {
 		var server = game.getServer();
-		int[] room = findRoom(from, Room.BEDROOM);
-		if (room == null) room = findRoom(from, Room.STORAGE);
-		int doorsMask = ZenithLayout.doors(seed, room[0], room[1], room[2]);
-		int side = Integer.numberOfTrailingZeros(doorsMask);
-		// West wall door at u=4, v=9/10; north wall at v=4, u=9/10; east u=15; south v=15.
-		int x = room[0] * 16 + (side == 0 ? 4 : side == 2 ? 15 : 9), z = room[1] * 16 + (side == 1 ? 4 : side == 3 ? 15 : 9);
-		int y = room[2] * 8 + 1;
+		int mx0 = Math.floorDiv(from.getX(), 16), mz0 = Math.floorDiv(from.getZ(), 16);
+		int deck = Math.floorDiv(from.getY(), 8);
+		int[] room = null;
+		int side = 0, x = 0, y = 0, z = 0;
+		search:
+		for (int ring = 0; ring < 16; ring++) {
+			for (int i = -ring; i <= ring; i++) {
+				for (int j = -ring; j <= ring; j++) {
+					if (Math.max(Math.abs(i), Math.abs(j)) != ring) continue;
+					int mx = mx0 + i, mz = mz0 + j;
+					if (ZenithLayout.isMerged(seed, mx, mz, deck)) continue;
+					if (ZenithLayout.atrium(seed, Math.floorDiv(mx, 3), Math.floorDiv(mz, 3), Math.floorDiv(deck, 6))) continue;
+					int doorsMask = ZenithLayout.doors(seed, mx, mz, deck);
+					int s = Integer.numberOfTrailingZeros(doorsMask);
+					int dx = mx * 16 + (s == 0 ? 4 : s == 2 ? 15 : 9), dz = mz * 16 + (s == 1 ? 4 : s == 3 ? 15 : 9);
+					int dy = deck * 8 + 1;
+					if (ZenithLayout.kind(ZenithLayout.cell(seed, dx, dy, dz)) == Kind.DOOR) {
+						room = new int[] {mx, mz, deck};
+						side = s; x = dx; y = dy; z = dz;
+						break search;
+					}
+				}
+			}
+		}
+		check(room != null, "no flush door found near arrival");
 		BlockPos door = new BlockPos(x, y, z);
 		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_0.1 run tp @s %d %d %d", x + (side == 0 ? -4 : side == 2 ? 4 : 0), y, z + (side == 1 ? -4 : side == 3 ? 4 : 0)));
 		server.runCommand("gamemode survival @a");

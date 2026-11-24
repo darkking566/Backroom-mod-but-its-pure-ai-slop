@@ -1,0 +1,211 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level2/pipe_frosted",
+    "low": "noclip_backrooms:block/level2/pipe_frosted",
+    "high": "noclip_backrooms:block/level2/pipe_frosted",
+    "bracket": "noclip_backrooms:block/level2/bracket"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        1.5,
+        1.5
+      ],
+      "to": [
+        16,
+        6.5,
+        6.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#low",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#low",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#low",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#low",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#low",
+          "uv": [
+            0,
+            0,
+            5.0,
+            5.0
+          ]
+        },
+        "west": {
+          "texture": "#low",
+          "uv": [
+            0,
+            0,
+            5.0,
+            5.0
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        9,
+        2.5
+      ],
+      "to": [
+        16,
+        14,
+        7.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#high",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#high",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#high",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#high",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#high",
+          "uv": [
+            0,
+            0,
+            5.0,
+            5
+          ]
+        },
+        "west": {
+          "texture": "#high",
+          "uv": [
+            0,
+            0,
+            5.0,
+            5
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        7.5,
+        0,
+        0
+      ],
+      "to": [
+        8.5,
+        16,
+        1
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bracket"
+        },
+        "south": {
+          "texture": "#bracket"
+        },
+        "east": {
+          "texture": "#bracket"
+        },
+        "west": {
+          "texture": "#bracket"
+        },
+        "up": {
+          "texture": "#bracket"
+        },
+        "down": {
+          "texture": "#bracket"
+        }
+      }
+    },
+    {
+      "from": [
+        7.5,
+        6.5,
+        1
+      ],
+      "to": [
+        8.5,
+        7.5,
+        4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#bracket"
+        },
+        "south": {
+          "texture": "#bracket"
+        },
+        "east": {
+          "texture": "#bracket"
+        },
+        "west": {
+          "texture": "#bracket"
+        },
+        "up": {
+          "texture": "#bracket"
+        },
+        "down": {
+          "texture": "#bracket"
+        }
+      }
+    }
+  ]
+}
