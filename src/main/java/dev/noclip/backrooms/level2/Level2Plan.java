@@ -29,7 +29,11 @@ final class Level2Plan {
 		/** Rows of machine cabinets. */
 		MACHINES,
 		/** No light, no sound: the doorway is the only light there is. */
-		VOID
+		VOID,
+		/** B.N.T.G. Office Area EL3A outpost: lit, safe, stocked with supplies and terminals. */
+		EL3A,
+		/** Ancient Macchina ruins: brick & copper machinery with blue pulsing lights. */
+		MACCHINA
 	}
 
 	enum Feature {
@@ -70,6 +74,8 @@ final class Level2Plan {
 	int hotX = -1, hotZ = -1;
 	/** The cell whose wall holds the door to 811, or -1. */
 	int bladeCell = -1;
+	/** Whether this region hosts an Office Area EL3A outpost (and thus B.N.T.G. narrow-gauge rails). */
+	boolean hasEl3a;
 	/**
 	 * Earlier wanderers' marks (Wikidot: the standard exits are "often marked by earlier wanderers' signs"): in cells
 	 * near a door marked 1, 3 or 4, the way to go towards it (a direction), or -1; and which door.
@@ -140,8 +146,23 @@ final class Level2Plan {
 			int i = 1 + random.nextInt(N - 1 - w), j = 1 + random.nextInt(N - 1 - h);
 			if (!free(i - 1, j - 1, w + 2, h + 2)) continue;
 			int roll = random.nextInt(100);
-			RoomKind kind = roll < 35 ? RoomKind.EMPTY : roll < 70 ? RoomKind.STORAGE : roll < 90 ? RoomKind.MACHINES : RoomKind.VOID;
-			rooms.add(new Room(i, j, w, h, kind, kind != RoomKind.VOID && random.nextInt(100) < 45));
+			RoomKind kind;
+			if (!hasEl3a && roll < 14) {
+				kind = RoomKind.EL3A;
+				hasEl3a = true;
+			} else if (roll < 22) {
+				kind = RoomKind.MACCHINA;
+			} else if (roll < 48) {
+				kind = RoomKind.EMPTY;
+			} else if (roll < 74) {
+				kind = RoomKind.STORAGE;
+			} else if (roll < 92) {
+				kind = RoomKind.MACHINES;
+			} else {
+				kind = RoomKind.VOID;
+			}
+			boolean lit = kind == RoomKind.EL3A || kind == RoomKind.MACCHINA || (kind != RoomKind.VOID && random.nextInt(100) < 45);
+			rooms.add(new Room(i, j, w, h, kind, lit));
 			for (int a = i; a < i + w; a++) {
 				for (int b = j; b < j + h; b++) roomOf[cell(a, b)] = rooms.size() - 1;
 			}
@@ -250,12 +271,13 @@ final class Level2Plan {
 					}
 				}
 			}
-			int doors = random.nextInt(100) < 30 ? 2 : 1;
+			int doors = room.kind() == RoomKind.EL3A || random.nextInt(100) < 30 ? 2 : 1;
 			for (int n = 0; n < doors && !walls.isEmpty(); n++) {
 				int[] wall = walls.remove(random.nextInt(walls.size()));
 				int c = wall[0], d = wall[1];
 				if (features[c * 4 + d] != Feature.NONE) continue;
-				features[c * 4 + d] = random.nextInt(100) < 55 ? Feature.DOOR : Feature.LOCKED_DOOR;
+				boolean unlocked = room.kind() == RoomKind.EL3A || room.kind() == RoomKind.MACCHINA || random.nextInt(100) < 55;
+				features[c * 4 + d] = unlocked ? Feature.DOOR : Feature.LOCKED_DOOR;
 				int i = c % N, j = c / N;
 				// The middle of the cell's wall on side d, then one step on into the room's own wall.
 				int x = i * CELL + 2 + DX[d] * 3, z = j * CELL + 2 + DZ[d] * 3;

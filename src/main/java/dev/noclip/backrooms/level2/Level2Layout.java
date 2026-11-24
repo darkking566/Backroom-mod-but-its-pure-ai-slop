@@ -141,7 +141,7 @@ public final class Level2Layout {
 	static int bankSide(long seed, Level2Plan plan, int rx, int rz, int i, int j) {
 		int cell = Level2Plan.cell(i, j);
 		int axis = plan.straightAxis(cell);
-		if (axis < 0) return -1;
+		if (axis < 0 || isRailCell(plan, i, j)) return -1;
 		int line = axis == 0 ? rz * N + j : rx * N + i;
 		int a = axis == 0 ? NORTH : WEST, b = Level2Plan.opposite(a);
 		int preferred = (hash(seed, line, axis, BANK) & 1) == 0 ? a : b;
@@ -175,6 +175,13 @@ public final class Level2Layout {
 					: roll < 72 ? new Tile(Kind.SCRAP, 0, null) : Tile.ROOM;
 			case MACHINES -> (lz - room.z0()) % 3 == 2 && lx > room.x0() + 1 && lx < room.x1() - 1
 					? new Tile(Kind.CABINET, (lz - room.z0()) % 6 == 2 ? SOUTH : NORTH, null) : Tile.ROOM;
+			case EL3A -> !byWall ? Tile.ROOM
+					: roll < 25 ? new Tile(Kind.CRATE, 0, null)
+					: roll < 42 ? new Tile(Kind.CABINET, lx == room.x0() + 1 ? EAST : lx == room.x1() - 1 ? WEST : lz == room.z0() + 1 ? SOUTH : NORTH, null)
+					: Tile.ROOM;
+			case MACCHINA -> !byWall ? Tile.ROOM
+					: roll < 28 ? new Tile(Kind.CABINET, lx == room.x0() + 1 ? EAST : lx == room.x1() - 1 ? WEST : lz == room.z0() + 1 ? SOUTH : NORTH, null)
+					: roll < 50 ? new Tile(Kind.SCRAP, 0, null) : Tile.ROOM;
 			default -> Tile.ROOM;
 		};
 	}
@@ -257,8 +264,9 @@ public final class Level2Layout {
 		return Math.floorMod(hash(seed, x * 31 + y, z, BANK_PARTS), 100);
 	}
 
-	/** Whether a column is inside a hot zone. */
+	/** Whether a column is inside a hot zone (Office Area EL3A is always climate-controlled). */
 	public static boolean hot(long seed, int x, int z) {
+		if (roomKindAt(seed, x, z) == RoomKind.EL3A) return false;
 		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
 		for (int dx = -1; dx <= 1; dx++) {
 			for (int dz = -1; dz <= 1; dz++) {
@@ -325,6 +333,46 @@ public final class Level2Layout {
 			}
 		}
 		return new int[] {gi0 * CELL + 2, gj0 * CELL + 2};
+	}
+
+	static RoomKind roomKindAt(long seed, int x, int z) {
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		Level2Plan plan = plan(seed, x, z);
+		int room = plan.roomOf[Level2Plan.cell(lx / CELL, lz / CELL)];
+		return room >= 0 ? plan.rooms.get(room).kind() : null;
+	}
+
+	static boolean isSafeZone(long seed, int x, int z) {
+		return roomKindAt(seed, x, z) == RoomKind.EL3A;
+	}
+
+	/** Straight tunnel cells in an EL3A region that form a run of >= 2 straight cells carry B.N.T.G. narrow-gauge rails. */
+	private static boolean isRailCell(Level2Plan plan, int i, int j) {
+		if (!plan.hasEl3a) return false;
+		int axis = plan.straightAxis(Level2Plan.cell(i, j));
+		if (axis < 0) return false;
+		int dx = axis == 0 ? 1 : 0, dz = axis == 1 ? 1 : 0;
+		for (int step : new int[] {-1, 1}) {
+			int ni = i + dx * step, nj = j + dz * step;
+			if (ni >= 0 && nj >= 0 && ni < N && nj < N) {
+				int nc = Level2Plan.cell(ni, nj);
+				if (plan.roomOf[nc] < 0 && plan.straightAxis(nc) == axis) return true;
+			}
+		}
+		return false;
+	}
+
+	/** Returns 0 (east-west) or 1 (north-south) if a rail track sits at (x, z), or -1. */
+	static int railAxis(long seed, int x, int z) {
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		Level2Plan plan = plan(seed, x, z);
+		int i = lx / CELL, j = lz / CELL;
+		int cell = Level2Plan.cell(i, j);
+		if (plan.roomOf[cell] >= 0 || !isRailCell(plan, i, j)) return -1;
+		int axis = plan.straightAxis(cell);
+		int ox = lx % CELL, oz = lz % CELL;
+		if ((axis == 0 && oz == 2) || (axis == 1 && ox == 2)) return axis;
+		return -1;
 	}
 
 	static int hash(long seed, int x, int z, int salt) {

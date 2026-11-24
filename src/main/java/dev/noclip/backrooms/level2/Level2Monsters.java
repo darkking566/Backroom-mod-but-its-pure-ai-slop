@@ -116,7 +116,7 @@ final class Level2Monsters {
 			int x = (int) Math.floor(player.getX() + Math.cos(angle) * distance);
 			int z = (int) Math.floor(player.getZ() + Math.sin(angle) * distance);
 			Kind kind = Level2Layout.tile(seed, x, z).kind();
-			if (kind != Kind.FLOOR && kind != Kind.ROOM) continue;
+			if ((kind != Kind.FLOOR && kind != Kind.ROOM) || Level2Layout.isSafeZone(seed, x, z)) continue;
 			BlockPos spot = new BlockPos(x, Level2ChunkGenerator.FLOOR_Y + 1, z);
 			if (!level.isLoaded(spot) || !level.getBlockState(spot).isAir() || !level.getBlockState(spot.above()).isAir()) continue;
 			mob.snapTo(spot.getX() + 0.5, spot.getY(), spot.getZ() + 0.5, random.nextFloat() * 360, 0);

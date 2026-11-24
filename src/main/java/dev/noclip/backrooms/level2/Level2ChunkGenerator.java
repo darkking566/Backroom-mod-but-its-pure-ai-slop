@@ -3,6 +3,8 @@ package dev.noclip.backrooms.level2;
 import com.mojang.serialization.MapCodec;
 import dev.noclip.backrooms.level2.Level2Layout.Kind;
 import dev.noclip.backrooms.level2.Level2Layout.Tile;
+import dev.noclip.backrooms.level2.Level2Plan.Room;
+import dev.noclip.backrooms.level2.Level2Plan.RoomKind;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.BlockPos;
@@ -16,9 +18,12 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.PoweredRailBlock;
+import net.minecraft.world.level.block.RailBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -64,12 +69,19 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 		boolean dark = tile.kind() == Kind.VOID || tile.kind() == Kind.VOID_WALL;
 		if (y < FLOOR_Y) return Blocks.CONCRETE.gray().defaultBlockState();
 		if (y == CEILING_Y) return state(dark ? Level2Blocks.VOID_CONCRETE : Level2Blocks.UTILITY_CEILING);
-		if (y == FLOOR_Y) return dark ? state(Level2Blocks.VOID_CONCRETE) : floor(seed, tile, x, z);
+		if (y == FLOOR_Y) {
+			if (dark) return state(Level2Blocks.VOID_CONCRETE);
+			if (Level2Layout.railAxis(seed, x, z) >= 0 && Math.floorMod(x + z, 8) == 0) {
+				return Blocks.REDSTONE_BLOCK.defaultBlockState();
+			}
+			return floor(seed, tile, x, z);
+		}
 		int h = y - FLOOR_Y; // 1..4
 		return switch (tile.kind()) {
 			case WALL -> wall(seed, x, z);
 			case VOID_WALL -> state(Level2Blocks.VOID_CONCRETE);
-			case FLOOR, ROOM -> h == 4 ? light(seed, x, z) : h == 2 ? mark(seed, x, z) : air();
+			case FLOOR -> floorBlock(seed, x, z, h);
+			case ROOM -> roomBlock(seed, x, z, h);
 			case VOID -> air();
 			case BANK -> bank(seed, x, y, z, tile.dir());
 			case MACHINE -> machine(seed, tile, x, y, z, h);
@@ -94,12 +106,50 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 				.setValue(Level2MarkBlock.LEVEL, Level2MarkBlock.level(mark.exit())).setValue(Level2MarkBlock.RIGHT, mark.right());
 	}
 
+	private static BlockState floorBlock(long seed, int x, int z, int h) {
+		if (h == 4) return light(seed, x, z);
+		if (h == 2) return mark(seed, x, z);
+		if (h == 1) {
+			int rail = Level2Layout.railAxis(seed, x, z);
+			if (rail >= 0) {
+				RailShape shape = rail == 0 ? RailShape.EAST_WEST : RailShape.NORTH_SOUTH;
+				if (Math.floorMod(x + z, 8) == 0) {
+					return Blocks.POWERED_RAIL.defaultBlockState().setValue(PoweredRailBlock.SHAPE, shape).setValue(PoweredRailBlock.POWERED, true);
+				}
+				return Blocks.RAIL.defaultBlockState().setValue(RailBlock.SHAPE, shape);
+			}
+		}
+		return air();
+	}
+
+	private static BlockState roomBlock(long seed, int x, int z, int h) {
+		if (h == 4) return light(seed, x, z);
+		int lx = Math.floorMod(x, Level2Plan.SIZE), lz = Math.floorMod(z, Level2Plan.SIZE);
+		Level2Plan plan = Level2Layout.plan(seed, x, z);
+		int r = plan.roomOf[Level2Plan.cell(lx / Level2Plan.CELL, lz / Level2Plan.CELL)];
+		if (r >= 0) {
+			Room room = plan.rooms.get(r);
+			int cx = (room.x0() + room.x1()) / 2, cz = (room.z0() + room.z1()) / 2;
+			if (room.kind() == RoomKind.EL3A) {
+				if (lx == cx && lz == cz) return h == 1 ? Blocks.CRAFTING_TABLE.defaultBlockState() : h == 2 ? Blocks.LANTERN.defaultBlockState() : air();
+				if (lx == cx + 1 && lz == cz && h == 1) return Blocks.CHEST.defaultBlockState();
+			} else if (room.kind() == RoomKind.MACCHINA) {
+				if (lx == cx && lz == cz) return h == 1 ? state(Level2Blocks.MACHINE_CABINET) : h == 2 ? Blocks.SOUL_LANTERN.defaultBlockState() : air();
+				if (lx == cx + 1 && lz == cz && h == 1) return Blocks.LECTERN.defaultBlockState();
+			}
+		}
+		return air();
+	}
+
 	private static BlockState roomAir(long seed, int x, int z, int h) {
 		return h == 4 ? light(seed, x, z) : air();
 	}
 
 	private static BlockState floor(long seed, Tile tile, int x, int z) {
 		if (tile.kind() != Kind.FLOOR && tile.kind() != Kind.ROOM) return state(Level2Blocks.UTILITY_FLOOR);
+		RoomKind kind = Level2Layout.roomKindAt(seed, x, z);
+		if (kind == RoomKind.EL3A) return state(Level2Blocks.UTILITY_FLOOR);
+		if (kind == RoomKind.MACCHINA) return state(Level2Blocks.BLACK_BRICK_WALL);
 		return switch (Level2Layout.ground(seed, x, z)) {
 			case DEBRIS -> state(Level2Blocks.DEBRIS_UTILITY_FLOOR);
 			case DAMP -> state(Level2Blocks.DAMP_UTILITY_FLOOR);

@@ -61,6 +61,7 @@ public final class Level2ClientTest implements FabricClientGameTest {
 			window(context, game, seed, arrival);
 			hounds(context, game, seed, arrival);
 			monsters(context, game, seed, arrival);
+			facilities(context, game, seed, arrival);
 			checkBlocks(game);
 		}
 	}
@@ -234,6 +235,32 @@ public final class Level2ClientTest implements FabricClientGameTest {
 		});
 		check(spawned == Level2Monsters.POOL.size(), "only " + spawned + "/" + Level2Monsters.POOL.size() + " Level 2 monsters spawned");
 		server.runCommand("kill @e[tag=" + Level2Monsters.TAG + "]");
+		server.runCommand("gamemode spectator @a");
+	}
+
+	private static void facilities(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
+		var server = game.getServer();
+		int[] el3a = nearest(seed, from, tile -> tile.kind() == Kind.ROOM, 0,
+				(x, z) -> Level2Layout.roomKindAt(seed, x, z) == Level2Plan.RoomKind.EL3A);
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_2 run tp @s %.1f %d %.1f", el3a[0] + 0.5, STAND, el3a[1] + 0.5));
+		server.runCommand("gamemode survival @a");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(20);
+		int staff = server.computeOnServer(s -> Level2Bases.populateNearEl3a(level2(s), seed, player(s)));
+		check(staff > 0, "no B.N.T.G. staff spawned at EL3A");
+		context.takeScreenshot("level2_el3a");
+
+		int[] rail = nearest(seed, from, tile -> tile.kind() == Kind.FLOOR, 0,
+				(x, z) -> Level2Layout.railAxis(seed, x, z) >= 0);
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_2 run tp @s %.1f %d %.1f", rail[0] + 0.5, STAND, rail[1] + 0.5));
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(20);
+		int carts = server.computeOnServer(s -> Level2Bases.populateNearRail(level2(s), seed, player(s)));
+		check(carts > 0, "no cargo minecart spawned on Level 2 rail");
+		context.takeScreenshot("level2_rail");
+
+		server.runCommand("kill @e[tag=" + Level2Bases.STAFF_TAG + "]");
+		server.runCommand("kill @e[tag=" + Level2Bases.CART_TAG + "]");
 		server.runCommand("gamemode spectator @a");
 	}
 
