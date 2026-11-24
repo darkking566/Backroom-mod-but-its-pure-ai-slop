@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "noclip_backrooms:block/level2/machine_side",
+    "south": "noclip_backrooms:block/level2/machine_gauges",
+    "north": "noclip_backrooms:block/level2/machine_side",
+    "east": "noclip_backrooms:block/level2/machine_side",
+    "west": "noclip_backrooms:block/level2/machine_side",
+    "up": "noclip_backrooms:block/level2/machine_top",
+    "down": "noclip_backrooms:block/level2/machine_side"
+  }
+}

@@ -233,5 +233,109 @@
         "pitch": 0.5
       }
     ]
+  },
+  "level2.machine": {
+    "subtitle": "subtitles.noclip_backrooms.level2.machine",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.ambient",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "level2.steam": {
+    "subtitle": "subtitles.noclip_backrooms.level2.steam",
+    "sounds": [
+      {
+        "name": "minecraft:block.fire.extinguish",
+        "type": "event",
+        "volume": 0.5,
+        "pitch": 0.7
+      }
+    ]
+  },
+  "level2.drip": {
+    "subtitle": "subtitles.noclip_backrooms.level2.drip",
+    "sounds": [
+      {
+        "name": "minecraft:block.pointed_dripstone.drip_water",
+        "type": "event"
+      }
+    ]
+  },
+  "level2.pipe_knock": {
+    "subtitle": "subtitles.noclip_backrooms.level2.pipe_knock",
+    "sounds": [
+      {
+        "name": "minecraft:block.anvil.land",
+        "type": "event",
+        "volume": 0.3,
+        "pitch": 0.5
+      },
+      {
+        "name": "minecraft:block.chain.hit",
+        "type": "event",
+        "pitch": 0.5
+      },
+      {
+        "name": "minecraft:block.iron_door.close",
+        "type": "event",
+        "volume": 0.6,
+        "pitch": 0.6
+      }
+    ]
+  },
+  "level2.circuit_down": {
+    "subtitle": "subtitles.noclip_backrooms.level2.circuit_down",
+    "sounds": [
+      {
+        "name": "minecraft:block.glass.break",
+        "type": "event",
+        "volume": 0.7,
+        "pitch": 1.3
+      },
+      {
+        "name": "minecraft:block.redstone_torch.burnout",
+        "type": "event",
+        "pitch": 0.6
+      }
+    ]
+  },
+  "level2.locked": {
+    "subtitle": "subtitles.noclip_backrooms.level2.locked",
+    "sounds": [
+      {
+        "name": "minecraft:block.iron_door.close",
+        "type": "event",
+        "volume": 0.7,
+        "pitch": 1.4
+      },
+      {
+        "name": "minecraft:block.chain.hit",
+        "type": "event",
+        "pitch": 1.2
+      }
+    ]
+  },
+  "level2.window": {
+    "subtitle": "subtitles.noclip_backrooms.level2.window",
+    "sounds": [
+      {
+        "name": "minecraft:block.glass.hit",
+        "type": "event",
+        "pitch": 0.6
+      }
+    ]
+  },
+  "level2.hum": {
+    "subtitle": "subtitles.noclip_backrooms.level2.hum",
+    "sounds": [
+      {
+        "name": "noclip_backrooms:ambient.fluorescent_hum",
+        "type": "event"
+      }
+    ]
   }
 }

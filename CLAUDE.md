@@ -82,6 +82,26 @@
 - 隔間加小東西：桌上依位置隨機放電腦（62%）、枯萎盆栽（14%）、蕨類盆栽（10%）或空桌（14%）；隔間角落 40% 放垃圾桶（原版鍋釜，新增 `Tile.BIN`）；垃圾桶後來換成自製模型（見下一條）；Antigravity 當時未提交的 Duller 改動曾讓客戶端崩潰，之後已恢復
 - 自製垃圾桶方塊 `wastebasket`（穿孔鋼桶往上外擴、桶口鋁邊、裡面一堆紙團）：`tools/make_wastebasket.py` 寫方塊模型（箱子清單是唯一來源）、三張貼圖、blockstate、物品、戰利品表與語言條目；`tools/blender_wastebasket.py` 讀同一份規格在 Blender 5.3 組出 `art/props/wastebasket.blend` 與預覽圖；`Level1Blocks.WASTEBASKET` 取代原版鍋釜；`Level1ClientTest` 的 `rooms` 段加垃圾桶近照，`gradlew build` 與 `NOCLIP_ONLY=rooms` 客戶端測試通過
 - 桌上盆栽也換成自製（`desk_plant_dead` 枯枝、`desk_plant_leafy` 綠葉；陶盆＋兩片交叉透明貼圖）：`tools/make_desk_plants.py`、`tools/blender_desk_plants.py`（`art/props/desk_plants.blend` 與預覽）；`Level1ChunkGenerator.deskTop` 改用這兩個方塊。`gradlew build` 通過；遊戲畫面還沒確認（客戶端測試跟別的同時跑的測試撞到同一個 build 資料夾）。注意：多個人同時跑 gradle 會互相弄壞 `build/`，單元測試曾因此出現 EOFException，單獨重跑就過
+### 2026-11-24
+- 改在單一資料夾 `Desktop\Backroom`（`main`）工作；先把朋友在 GitHub 新推的 3 個提交（Level 0 馬尼拉房間、多層樓梯間、斷路器與筆記）快轉合併進來，沒有衝突
+- 使用者要求在 Gemini（Antigravity）規劃的 60 層之外，再找其他來源、把樓層企劃擴充到 200～300 層：
+  - 查證來源：Backrooms Wikidot 樓層總表（0～199 主樓層、0～99 子樓層、無編號樓層）、後室中文維基原創層級、B 站後室 Wiki、Escape the Backrooms 攻略；Fandom 擋自動讀取，沒辦法查證
+  - `docs/levels/README.md` 加「第二批擴充」：新增 227 層（Wikidot 0～99 主樓層 75、子樓層 39、100～199 主樓層 91、中文原創 22），合計 287 層；另列 52 個候補、名稱對照表（第一批和 Wikidot 名稱不同的 13 處）、Escape the Backrooms 關卡玩法參考
+  - 第二批只列在索引，不預先建立各層資料夾與 Java 套件（開工時再建）
+- 使用者提到看過「1980 阿帕拉契的荒涼」：查到是 Fandom 的 Level 161（Appalachian Desolation）與 161.1（Appalachian Lodge），Wikidot 的 161 是另一層；`docs/levels/README.md` 加「Fandom 版本」29 層（從搜尋結果確認得到標題的，和 Wikidot 同號的資料夾加 `_fd`），合計 316 層
+- 使用者定下分工：Claude 先把主樓層做好，Gemini（Antigravity）做合成表；讀了 Antigravity 的 `docs/PROJECT_PLAN_FOR_CLAUDE.md`，回覆寫在 `docs/PROJECT_PLAN_REPLY_FROM_CLAUDE.md`（五個問題的答覆、建議都在 `main` 小步提交、配方只在伺服器端等技術提醒）；`AGENTS.md` 加一行分工
+- 使用者同意後，把兩邊未提交的企劃（Antigravity 的 60 層骨架、合成表企劃、協作企劃書；Claude 擴充的樓層索引與回覆）一起提交（`cd71cdb`）
+- 使用者要求開始做 Level 2，並要求每一層都參考網路上的圖：
+  - 讀 Wikidot Level 2（Abandoned Utility Halls）全文，下載頁面上的實景照片照著做
+  - 新增 `level2/`：地圖規劃（`Level2Plan`、`Level2Layout`：5 格單元迷宮、寬 3 高 4 的走道、一側整排管線、轉角切斜、房間與門、悶熱區、窗戶）、地形生成、47 個方塊、14 種出口（`Level2Exit`，越低樓層越難找）、串聯電路（打破一盞燈整組熄）、悶熱區（飢餓、虛弱）、窗戶（靠近會受傷）、暗處的獵犬、環境音
+  - 新增 Level 2 的維度、維度類型、生態域、掉落物表、語言檔、音效、挖掘標籤；`BackroomsMod` 加一行註冊；Level 1 往下的樓梯從此接到 Level 2
+  - 新增 `tools/make_level2.py`（貼圖、模型、blockstates、物品模型、掉落物表）、`docs/levels/level2/README.md`（取代企劃稿）與貼圖預覽
+  - 新增單元測試 `Level2LayoutTest`、`MapDump`，實機測試 `Level2ClientTest`
+  - 順手修正朋友的馬尼拉房間踢腳板模型：還指向資料夾整理前的舊路徑（`block/baseboard_wall` → `block/level0/baseboard_wall`，`tools/make_manila.py` 一併改）
+  - 修正 `core/LevelExits` 的錯誤：「尚未開放」的提示用伺服器 tick 計時防止洗版，但換世界後 tick 從 0 重算、記錄卻沒清，會讓提示很久都不出現；改成 tick 倒退時不擋
+  - 管線依照片改成連續長管（拿掉一節一節的箍環、紅管只留閥門），截圖確認
+  - 驗證：`gradlew build`（34 個單元測試）與 `runClientGameTest`（Level 0、1、2）全部通過；中途朋友的 Level 0 Edge Shift 測試偶爾逾時一次（看隨機），重跑通過
+- 使用者同意後，把 `main`（企劃書 `cd71cdb`、Level 2 `83e2946`）推送到 GitHub；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
@@ -93,3 +113,23 @@
   - `exports/hound/hound.glb`（僅含獵犬本體與動畫之 glTF 2.0 檔）
   - `exports/hound/hound_preview.png`、`exports/hound/hound_anim_sheet.png`、`exports/hound/README.md`
   - （Claude 註：這些檔案已搬進 `Backroom - Claude` 的 `art/monsters/hound/` 與 `assets/noclip_backrooms/`）
+
+### 2026-11-24
+- 確認 `main`、`claude`、`origin/main`、`origin/claude` 已由 Claude 同步合併於 `cdd4d1c`
+- 經使用者確認同意後：
+  - 移除舊的 git worktree 資料夾 `Desktop\Backroom - Claude`（含其內測試存檔）
+  - 刪除主資料夾重複的暫存目錄 `exports/`（正式檔案均已在 `art/monsters/hound/` 與 `assets/noclip_backrooms/`）
+  - 更新 `AGENTS.md`，改為 Claude 與 Antigravity 統一在 `Desktop\Backroom` 單一資料夾輪流工作
+- 依使用者選定規格預先建立 60 個後室樓層資料夾骨架（整合 Level 1 出口表與收費亭已點名的 13 層，以及 Wikidot / Fandom / 衍生社群經典主樓層、子樓層、負樓層與隱秘樓層）：
+  - 命名規則：一般層 `level<編號>`、子樓層小數點用 `p`（`level1p01`、`level4p3`）、負樓層用 `neg`（`level_neg1`）、隱秘層用英文小寫底線（`the_hub`、`level_run`、`level_fun`、`level_lx`）
+  - 新增總覽索引 `docs/levels/README.md` 與 59 份各樓層企劃 `docs/levels/<層>/README.md`（保留既有的 `docs/levels/level1/README.md` 與 `level0/` 截圖不動）
+  - 新增 58 個尚未開發樓層的 Java 套件資料夾 `src/main/java/dev/noclip/backrooms/<層>/.gitkeep`（既有 `level0/`、`level1/` 不動）
+- 規劃完整大型合成、拆解、怪物掉落與全風格武器系統藍圖，新增 `docs/crafting/` 共 7 份規格文件：
+  - `docs/crafting/README.md`（Tier 0–4 進度科技樹、五大工作站、雙軌破壞規則、遊戲內獨立《後室合成圖鑑》UI 與相容 JEI 規格）
+  - `docs/crafting/01_materials_and_props.md`（既有 Level 0/1 共 42 種方塊拆解規則、24 種異常穿模家具、76 種基礎與加工素材）
+  - `docs/crafting/02_monsters_bosses_loot.md`（26 種原生後室實體統一 `BoxRig` 規劃與掉落、10 隻樓層 Boss、5 種樓層寶箱池）
+  - `docs/crafting/03_tools_and_stations.md`（5 座工作站、Tier 1–4 階梯式特殊破壞工具 11 種、4 套功能防具與探險消耗品配方）
+  - `docs/crafting/04_weapons_melee.md`（冷兵器鍛造零件系統，含中世紀鈍器 12 把、西式冷兵器 14 把、中式冷兵器 16 把）
+  - `docs/crafting/05_weapons_firearms.md`（槍械精密組裝零件樹、18 種土製／正規／異常實驗槍械、10 種細緻彈藥與 6 種戰術配件）
+  - `docs/crafting/06_weapons_magic_and_chests.md`（19 件魔法與異常超自然武器、寶箱與 Boss 取得管道對照總表）
+- 建立給 Claude 閱讀與技術對齊的總體企劃與協作交接書 `docs/PROJECT_PLAN_FOR_CLAUDE.md`（整合核心玩法願景、Antigravity 與 Claude 分工邊界、合成表 v1 資料驅動套件分流提案、多樓層網狀出口擴充建議、單一資料夾短期分支策略與 5 項待對齊問題）

@@ -1,0 +1,237 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level2/bulb_off",
+    "glass": "noclip_backrooms:block/level2/bulb_off",
+    "socket": "noclip_backrooms:block/level2/bulb_socket",
+    "cage": "noclip_backrooms:block/level2/bulb_cage"
+  },
+  "elements": [
+    {
+      "from": [
+        7.7,
+        10,
+        7.7
+      ],
+      "to": [
+        8.3,
+        16,
+        8.3
+      ],
+      "faces": {
+        "north": {
+          "texture": "#socket"
+        },
+        "south": {
+          "texture": "#socket"
+        },
+        "east": {
+          "texture": "#socket"
+        },
+        "west": {
+          "texture": "#socket"
+        }
+      }
+    },
+    {
+      "from": [
+        6.8,
+        7.6,
+        6.8
+      ],
+      "to": [
+        9.2,
+        10,
+        9.2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#socket"
+        },
+        "south": {
+          "texture": "#socket"
+        },
+        "east": {
+          "texture": "#socket"
+        },
+        "west": {
+          "texture": "#socket"
+        },
+        "up": {
+          "texture": "#socket"
+        },
+        "down": {
+          "texture": "#socket"
+        }
+      }
+    },
+    {
+      "from": [
+        6.2,
+        3.6,
+        6.2
+      ],
+      "to": [
+        9.8,
+        7.6,
+        9.8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#glass"
+        },
+        "south": {
+          "texture": "#glass"
+        },
+        "east": {
+          "texture": "#glass"
+        },
+        "west": {
+          "texture": "#glass"
+        },
+        "up": {
+          "texture": "#glass"
+        },
+        "down": {
+          "texture": "#glass"
+        }
+      }
+    },
+    {
+      "from": [
+        5.6,
+        3,
+        5.6
+      ],
+      "to": [
+        6.0,
+        8,
+        6.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cage"
+        },
+        "south": {
+          "texture": "#cage"
+        },
+        "east": {
+          "texture": "#cage"
+        },
+        "west": {
+          "texture": "#cage"
+        }
+      }
+    },
+    {
+      "from": [
+        10,
+        3,
+        5.6
+      ],
+      "to": [
+        10.4,
+        8,
+        6.0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cage"
+        },
+        "south": {
+          "texture": "#cage"
+        },
+        "east": {
+          "texture": "#cage"
+        },
+        "west": {
+          "texture": "#cage"
+        }
+      }
+    },
+    {
+      "from": [
+        5.6,
+        3,
+        10
+      ],
+      "to": [
+        6.0,
+        8,
+        10.4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cage"
+        },
+        "south": {
+          "texture": "#cage"
+        },
+        "east": {
+          "texture": "#cage"
+        },
+        "west": {
+          "texture": "#cage"
+        }
+      }
+    },
+    {
+      "from": [
+        10,
+        3,
+        10
+      ],
+      "to": [
+        10.4,
+        8,
+        10.4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cage"
+        },
+        "south": {
+          "texture": "#cage"
+        },
+        "east": {
+          "texture": "#cage"
+        },
+        "west": {
+          "texture": "#cage"
+        }
+      }
+    },
+    {
+      "from": [
+        5.6,
+        3,
+        5.6
+      ],
+      "to": [
+        10.4,
+        3.4,
+        10.4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cage"
+        },
+        "south": {
+          "texture": "#cage"
+        },
+        "east": {
+          "texture": "#cage"
+        },
+        "west": {
+          "texture": "#cage"
+        },
+        "up": {
+          "texture": "#cage"
+        },
+        "down": {
+          "texture": "#cage"
+        }
+      }
+    }
+  ]
+}

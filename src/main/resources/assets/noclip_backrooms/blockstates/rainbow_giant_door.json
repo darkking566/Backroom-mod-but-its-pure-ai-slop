@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "part=0": {
+      "model": "noclip_backrooms:block/level2/rainbow_giant_door_0"
+    },
+    "part=1": {
+      "model": "noclip_backrooms:block/level2/rainbow_giant_door_1"
+    },
+    "part=2": {
+      "model": "noclip_backrooms:block/level2/rainbow_giant_door_2"
+    },
+    "part=3": {
+      "model": "noclip_backrooms:block/level2/rainbow_giant_door_3"
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level2/tunnel_window",
+    "pane": "noclip_backrooms:block/level2/tunnel_window"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#pane"
+        },
+        "south": {
+          "texture": "#pane"
+        },
+        "east": {
+          "texture": "#pane"
+        },
+        "west": {
+          "texture": "#pane"
+        },
+        "up": {
+          "texture": "#pane"
+        },
+        "down": {
+          "texture": "#pane"
+        }
+      },
+      "shade": false,
+      "light_emission": 15
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "part=0": {
+      "model": "noclip_backrooms:block/level2/marked_door_3_0"
+    },
+    "part=1": {
+      "model": "noclip_backrooms:block/level2/marked_door_3_1"
+    },
+    "part=2": {
+      "model": "noclip_backrooms:block/level2/marked_door_3_1"
+    },
+    "part=3": {
+      "model": "noclip_backrooms:block/level2/marked_door_3_1"
+    }
+  }
+}
