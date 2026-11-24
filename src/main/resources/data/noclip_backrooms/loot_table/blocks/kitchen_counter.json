@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:kitchen_counter"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "noclip_backrooms:blocks/kitchen_counter"
+}

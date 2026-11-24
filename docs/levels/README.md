@@ -252,7 +252,7 @@ Wikidot 和 Fandom 是兩套不同的設定，同一個編號的名稱和內容�
 
 | 資料夾 / 套件 | 樓層名稱 | 出口鍵 | 來源 | 狀態 |
 |---|---|---|---|---|
-| `level0p1` | Level 0.1：天頂站（Zenith Station） | `0.1` | Wikidot | 未開放 |
+| `level0p1` | Level 0.1：天頂站（Zenith Station） | `0.1` | Wikidot | 已開放 |
 | `level0p3` | Level 0.3：冰凍房間（The Icy Rooms） | `0.3` | Wikidot | 未開放 |
 | `level0p5` | Level 0.5：水域幽閉醫務室（Aquaclaustrophobic Infirmary） | `0.5` | Wikidot | 未開放 |
 | `level0p7` | Level 0.7：追憶街區（The Reminiscence District） | `0.7` | Wikidot | 未開放 |

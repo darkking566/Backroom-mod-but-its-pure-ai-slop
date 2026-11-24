@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "noclip_backrooms:block/level0p1/weight_rack"
+    },
+    "facing=east": {
+      "model": "noclip_backrooms:block/level0p1/weight_rack",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "noclip_backrooms:block/level0p1/weight_rack",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "noclip_backrooms:block/level0p1/weight_rack",
+      "y": 270
+    }
+  }
+}

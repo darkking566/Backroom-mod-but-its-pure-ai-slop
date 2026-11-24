@@ -3,6 +3,10 @@ package dev.noclip.backrooms;
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.people.PersonModel;
 import dev.noclip.backrooms.core.people.PersonRenderer;
+import dev.noclip.backrooms.level0p1.robots.Robot;
+import dev.noclip.backrooms.level0p1.robots.RobotModel;
+import dev.noclip.backrooms.level0p1.robots.RobotRenderer;
+import dev.noclip.backrooms.level0p1.robots.Robots;
 import dev.noclip.backrooms.monsters.Monsters;
 import dev.noclip.backrooms.monsters.arms.ArmsModel;
 import dev.noclip.backrooms.monsters.arms.ArmsRenderer;
@@ -59,6 +63,8 @@ public final class BackroomsClient implements ClientModInitializer {
 		EntityRendererRegistry.register(Monsters.SHEPHERD_SNAKE, ShepherdSnakeRenderer::new);
 		ModelLayerRegistry.registerModelLayer(NguithrxurhModel.LAYER, NguithrxurhModel.RIG::layer);
 		EntityRendererRegistry.register(Monsters.NGUITHRXURH, NguithrxurhRenderer::new);
+		ModelLayerRegistry.registerModelLayer(RobotModel.LAYER, RobotModel.RIG::layer);
+		for (Robot.Kind kind : Robot.Kind.values()) EntityRendererRegistry.register(Robots.type(kind), context -> new RobotRenderer(context, kind));
 		ModelLayerRegistry.registerModelLayer(PersonModel.LAYER, PersonModel.RIG::layer);
 		for (String look : People.LOOKS) EntityRendererRegistry.register(People.type(look), context -> new PersonRenderer(context, look));
 	}

@@ -337,5 +337,71 @@
         "type": "event"
       }
     ]
+  },
+  "level0p1.hum": {
+    "subtitle": "subtitles.noclip_backrooms.level0p1.hum",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.ambient",
+        "type": "event",
+        "volume": 0.7,
+        "pitch": 0.5
+      }
+    ]
+  },
+  "level0p1.alarm": {
+    "subtitle": "subtitles.noclip_backrooms.level0p1.alarm",
+    "sounds": [
+      {
+        "name": "minecraft:block.note_block.bit",
+        "type": "event",
+        "volume": 0.9,
+        "pitch": 0.5
+      }
+    ]
+  },
+  "level0p1.chime": {
+    "subtitle": "subtitles.noclip_backrooms.level0p1.chime",
+    "sounds": [
+      {
+        "name": "minecraft:block.note_block.chime",
+        "type": "event",
+        "volume": 0.9,
+        "pitch": 0.8
+      }
+    ]
+  },
+  "level0p1.creak": {
+    "subtitle": "subtitles.noclip_backrooms.level0p1.creak",
+    "sounds": [
+      {
+        "name": "minecraft:block.chain.break",
+        "type": "event",
+        "volume": 0.6,
+        "pitch": 0.5
+      }
+    ]
+  },
+  "level0p1.spark": {
+    "subtitle": "subtitles.noclip_backrooms.level0p1.spark",
+    "sounds": [
+      {
+        "name": "minecraft:block.fire.extinguish",
+        "type": "event",
+        "volume": 0.5,
+        "pitch": 1.4
+      }
+    ]
+  },
+  "level0p1.door": {
+    "subtitle": "subtitles.noclip_backrooms.level0p1.door",
+    "sounds": [
+      {
+        "name": "minecraft:block.piston.extend",
+        "type": "event",
+        "volume": 0.5,
+        "pitch": 1.6
+      }
+    ]
   }
 }
