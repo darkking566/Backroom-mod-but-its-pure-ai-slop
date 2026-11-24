@@ -291,5 +291,6 @@
   "block.noclip_backrooms.book_shelf": "書架",
   "block.noclip_backrooms.cubicle_panel": "隔間板",
   "entity.noclip_backrooms.wretch": "悲屍",
-  "item.noclip_backrooms.wretch_spawn_egg": "悲屍生怪蛋"
+  "item.noclip_backrooms.wretch_spawn_egg": "悲屍生怪蛋",
+  "block.noclip_backrooms.wastebasket": "辦公室垃圾桶"
 }

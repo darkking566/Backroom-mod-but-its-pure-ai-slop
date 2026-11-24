@@ -906,6 +906,8 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			}
 			shoot(context, game, at[0] + 0.5, STAND, at[1] + 0.5, -45, 12, "level1_room_" + type.name().toLowerCase());
 		}
+		BlockPos bin = findNear(seed, Tile.BIN);
+		shoot(context, game, bin.getX() + 0.5, STAND - 0.3, bin.getZ() + 2.0, 180, 40, "level1_wastebasket");
 	}
 
 	private static void hounds(ClientGameTestContext context, TestSingleplayerContext game, long seed) {

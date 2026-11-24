@@ -283,6 +283,10 @@ public final class Level1Blocks {
 	public static final Block FLOOR_PAINTING = register("floor_painting", Properties.of()
 			.mapColor(MapColor.COLOR_BROWN).instabreak().sound(SoundType.WOOD).noOcclusion().noCollision().noLootTable(),
 			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 0.5, 14)));
+	/** The office wastebasket, a perforated steel bin with scrunched paper in it (modelled in Blender, see tools/make_wastebasket.py). */
+	public static final Block WASTEBASKET = register("wastebasket", Properties.of()
+			.mapColor(MapColor.METAL).strength(0.5F).sound(SoundType.METAL).noOcclusion(),
+			p -> new ShapedBlock(p, Block.box(4, 0, 4, 12, 11.5, 12)));
 	public static final Block HOSPITAL_BED = register("hospital_bed", Properties.of()
 			.mapColor(MapColor.METAL).strength(0.8F).sound(SoundType.METAL).noOcclusion(),
 			p -> new ShapedBlock(p, Block.box(0, 0, 1, 16, 11, 15)));

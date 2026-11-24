@@ -291,5 +291,6 @@
   "block.noclip_backrooms.book_shelf": "Bookcase",
   "block.noclip_backrooms.cubicle_panel": "Cubicle Panel",
   "entity.noclip_backrooms.wretch": "Wretch",
-  "item.noclip_backrooms.wretch_spawn_egg": "Wretch Spawn Egg"
+  "item.noclip_backrooms.wretch_spawn_egg": "Wretch Spawn Egg",
+  "block.noclip_backrooms.wastebasket": "Office Wastebasket"
 }
