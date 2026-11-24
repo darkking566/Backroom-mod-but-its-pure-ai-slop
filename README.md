@@ -4,7 +4,7 @@ Fabric 模組，Minecraft 26.2、Java 25，模組代號 `noclip_backrooms`。在
 
 - 開遊戲試玩：雙擊 `play.bat`
 - 編譯並跑單元測試：`.\gradlew.bat build`
-- 真實遊戲自動測試：`.\gradlew.bat runClientGameTest`
+- 真實遊戲自動測試：`.\gradlew.bat runClientGameTest`；只跑某幾層加 `-Plevels=1,3`（Level 0.1 寫 `0.1`，畫面風格測試寫 `look`），Level 1 只跑某幾段再加 `-Psections=people,secrets`
 - 進度與試玩方法：[NEXT.md](NEXT.md)；協作規則：[AGENTS.md](AGENTS.md)；素材授權：[CREDITS.md](CREDITS.md)
 
 ## 資料夾怎麼分：一層一個資料夾，跨樓層的放 core
@@ -14,6 +14,7 @@ src/main/java/dev/noclip/backrooms/
 ├─ BackroomsMod.java        模組入口：依序呼叫每一層的 register()；也放共用的 MOD_ID、id()
 ├─ core/                    好幾層都會用到的機制
 │  └─ LevelExits.java       出口登記處：每個出口寫著通往哪一層，這裡決定通不通
+│     （客戶端的 src/client/.../core/look/ 是畫面風格：寫實材質包與攝影機濾鏡，見 docs/look/README.md）
 ├─ level0/                  Level 0「大廳」（入口檔 Level0.java）
 ├─ level1/                  Level 1「停車場」（入口檔 Level1.java）
 ├─ core/people/             人物（居民、巡邏隊、施工影子）：Person、People 登記八種造型；模型 `monsters/people.json`、貼圖 `textures/entity/people/`、Blender 原檔 `art/people/`，由 `tools/make_people.py` 與 `tools/blender_people.py` 產生
@@ -45,6 +46,7 @@ src/test/java/dev/noclip/backrooms/level0/  level1/        單元測試（迷宮
 src/gametest/java/dev/noclip/backrooms/level0/  level1/    真實遊戲測試；新增的要登記在 src/gametest/resources/fabric.mod.json
 
 tools/make_textures.py      畫 Level 0 的貼圖，也是共用的繪圖工具
+tools/make_level0_realistic.py  寫實材質包（`resourcepacks/realistic/`）的 Level 0 照片材質；見 docs/look/README.md
 tools/make_level1.py        畫 Level 1 的貼圖，並寫出 Level 1 的模型、blockstates、物品模型
 tools/make_level2.py        畫 Level 2 的貼圖，並寫出 Level 2 的模型、blockstates、物品模型、掉落物表
 tools/make_level3.py        Level 3 的同上

@@ -44,3 +44,7 @@ hs_err_*.log
 replay_*.log
 *.hprof
 *.jfr
+
+# downloaded photo materials (tools/make_level0_realistic.py fetches them again when missing)
+
+tools/.cache/
