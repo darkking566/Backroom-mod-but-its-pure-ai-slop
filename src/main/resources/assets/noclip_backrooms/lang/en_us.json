@@ -292,5 +292,9 @@
   "block.noclip_backrooms.cubicle_panel": "Cubicle Panel",
   "entity.noclip_backrooms.wretch": "Wretch",
   "item.noclip_backrooms.wretch_spawn_egg": "Wretch Spawn Egg",
-  "block.noclip_backrooms.wastebasket": "Office Wastebasket"
+  "entity.noclip_backrooms.shriek": "Shriek",
+  "item.noclip_backrooms.shriek_spawn_egg": "Shriek Spawn Egg",
+  "block.noclip_backrooms.wastebasket": "Office Wastebasket",
+  "block.noclip_backrooms.desk_plant_dead": "Withered Desk Plant",
+  "block.noclip_backrooms.desk_plant_leafy": "Desk Plant"
 }
