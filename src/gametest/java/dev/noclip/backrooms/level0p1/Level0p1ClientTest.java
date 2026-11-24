@@ -25,8 +25,13 @@ import net.minecraft.world.level.block.state.BlockState;
 public final class Level0p1ClientTest implements FabricClientGameTest {
 	private long seed;
 
+	private static boolean only(String section) {
+		return dev.noclip.backrooms.TestFilter.section(section);
+	}
+
 	@Override
 	public void runTest(ClientGameTestContext context) {
+		if (!dev.noclip.backrooms.TestFilter.level("level0p1")) return;
 		try (TestSingleplayerContext game = context.worldBuilder().create()) {
 			var server = game.getServer();
 			game.getConnection().waitForChunksRender();
@@ -35,6 +40,7 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 			server.runCommand("gamemode survival @a");
 
 			enterWithBeacon(context, game);
+			ZenithBlackouts.holdOff(20 * 60 * 10);
 			seed = server.computeOnServer(s -> ZenithChunkGenerator.planSeed(station(s).getChunkSource().randomState()));
 			BlockPos arrival = server.computeOnServer(s -> player(s).blockPosition());
 			server.runOnServer(s -> {
@@ -48,15 +54,17 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 			int mx = Math.floorDiv(arrival.getX(), 16) * 16, mz = Math.floorDiv(arrival.getZ(), 16) * 16;
 			shoot(context, game, mx + 7.5, arrival.getY(), mz + 7.5, -135, 5, "level0p1_airlock");
 			shoot(context, game, mx + 10.5, arrival.getY(), mz + 6.5, 0, 5, "level0p1_airlock_doorway");
-			rooms(context, game, arrival);
-			stairs(context, game);
-			atrium(context, game);
-			middle(context, game);
-			robots(context, game, arrival);
-			doors(context, game, arrival);
-			ways(context, game, arrival);
-			hatch(context, game);
-			blocks(game);
+			if (only("rooms")) rooms(context, game, arrival);
+			if (only("zones")) zones(context, game, arrival);
+			if (only("stairs")) stairs(context, game);
+			if (only("atrium")) atrium(context, game);
+			if (only("middle")) middle(context, game);
+			if (only("robots")) robots(context, game, arrival);
+			if (only("blackout")) blackout(context, game, arrival);
+			if (only("doors")) doors(context, game, arrival);
+			if (only("ways")) ways(context, game, arrival);
+			if (only("hatch")) hatch(context, game);
+			if (only("blocks")) blocks(game);
 		}
 	}
 
@@ -87,6 +95,39 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 		}
 		int[] corridor = findRoom(from, Room.BEDROOM);
 		if (corridor != null) shoot(context, game, corridor[0] * 16 + 2.5, corridor[2] * 8 + 1, corridor[1] * 16 + 20.5, 270, 0, "level0p1_corridor");
+	}
+
+	/** The corridors of a cold, a hot and a dark stretch: damaged zones 1, 2 and 3. */
+	private void zones(ClientGameTestContext context, TestSingleplayerContext game, BlockPos from) {
+		String[] names = {"", "cold", "hot", "dark"};
+		for (int zone = 1; zone <= 3; zone++) {
+			int[] at = findZone(from, zone);
+			if (at == null) continue;
+			shoot(context, game, at[0] * 16 + 2.5, at[2] * 8 + 1, at[1] * 16 + 20.5, 270, 0, "level0p1_zone_" + names[zone] + "_corridor");
+			shoot(context, game, at[0] * 16 + 10.5, at[2] * 8 + 1, at[1] * 16 + 10.5, 135, 18, "level0p1_zone_" + names[zone] + "_room");
+			shoot(context, game, at[0] * 16 + 10.5, at[2] * 8 + 1, at[1] * 16 + 10.5, 135, -50, "level0p1_zone_" + names[zone] + "_ceiling");
+		}
+	}
+
+	/** A module (mx, mz, deck) near here in a damaged stretch of this kind, not part of an atrium. */
+	private int[] findZone(BlockPos from, int zone) {
+		int mx0 = Math.floorDiv(from.getX(), 16), mz0 = Math.floorDiv(from.getZ(), 16);
+		int deck = Math.floorDiv(from.getY(), 8);
+		for (int ring = 0; ring < 40; ring++) {
+			for (int i = -ring; i <= ring; i++) {
+				for (int j = -ring; j <= ring; j++) {
+					if (Math.max(Math.abs(i), Math.abs(j)) != ring) continue;
+					int mx = mx0 + i, mz = mz0 + j;
+					if (ZenithLayout.zone(seed, mx, mz, deck) != zone) continue;
+					double cx = mx * 16 + 10, cy = deck * 8 + 4, cz = mz * 16 + 10;
+					double distance = Math.sqrt(cx * cx + cy * cy + cz * cz);
+					if (distance < ZenithLayout.RI + 40 || distance > ZenithLayout.RO - 26) continue;
+					if (ZenithLayout.atrium(seed, Math.floorDiv(mx, 3), Math.floorDiv(mz, 3), Math.floorDiv(deck, 6))) continue;
+					return new int[] {mx, mz, deck};
+				}
+			}
+		}
+		return null;
 	}
 
 	/** A module (mx, mz, deck) near here whose room is of this kind and not part of an atrium. */
@@ -180,6 +221,44 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 				check(ZenithRobots.kindAt(seed, kitchen[0] * 16 + 10, kitchen[2] * 8 + 1, kitchen[1] * 16 + 10) == dev.noclip.backrooms.level0p1.robots.Robot.Kind.CHEF, "no chef in the galley");
 			}
 		});
+	}
+
+	/** A power failure: the ceiling lights go out where you stand and come back, and none that were dead come to life. */
+	private void blackout(ClientGameTestContext context, TestSingleplayerContext game, BlockPos arrival) {
+		var server = game.getServer();
+		int mx = Math.floorDiv(arrival.getX(), 16) * 16, mz = Math.floorDiv(arrival.getZ(), 16) * 16;
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_0.1 run tp @s %.2f %d %.2f 0 10", mx + 8.5, arrival.getY(), mz + 8.5));
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(10);
+		int lit = server.computeOnServer(s -> countLights(s, ZenithBlocks.CEILING_LIGHT));
+		int dead = server.computeOnServer(s -> countLights(s, ZenithBlocks.DEAD_CEILING_LIGHT));
+		check(lit > 0, "no ceiling lights near the airlock to black out");
+		server.runOnServer(s -> ZenithBlackouts.startNow());
+		server.waitFor(s -> ZenithBlackouts.phase() == ZenithBlackouts.Phase.DARK, 400);
+		context.waitTicks(30);
+		server.runOnServer(s -> {
+			check(countLights(s, ZenithBlocks.CEILING_LIGHT) == 0, "lights stayed on in the blackout");
+			check(countLights(s, ZenithBlocks.DEAD_CEILING_LIGHT) == lit + dead, "lights went missing in the blackout");
+		});
+		context.takeScreenshot("level0p1_blackout");
+		server.runOnServer(s -> ZenithBlackouts.endNow());
+		server.waitFor(s -> ZenithBlackouts.phase() == ZenithBlackouts.Phase.NORMAL, 200);
+		context.waitTicks(10);
+		server.runOnServer(s -> {
+			check(countLights(s, ZenithBlocks.CEILING_LIGHT) == lit, "lights did not come back");
+			check(countLights(s, ZenithBlocks.DEAD_CEILING_LIGHT) == dead, "dead lights came back to life");
+			ZenithBlackouts.holdOff(20 * 60 * 10);
+		});
+	}
+
+	private static int countLights(MinecraftServer server, Block kind) {
+		ServerLevel level = station(server);
+		BlockPos centre = player(server).blockPosition();
+		int count = 0;
+		for (BlockPos pos : BlockPos.betweenClosed(centre.offset(-16, -4, -16), centre.offset(16, 8, 16))) {
+			if (level.getBlockState(pos).is(kind)) count++;
+		}
+		return count;
 	}
 
 	/** Doors open on their own when you come near and shut when you leave. */

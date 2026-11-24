@@ -28,6 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public final class Level0ClientTest implements FabricClientGameTest {
 	@Override
 	public void runTest(ClientGameTestContext context) {
+		if (!dev.noclip.backrooms.TestFilter.level("level0")) return;
 		TestWorldSave save;
 		try (TestSingleplayerContext game = context.worldBuilder().create()) {
 			save = game.getWorldSave();

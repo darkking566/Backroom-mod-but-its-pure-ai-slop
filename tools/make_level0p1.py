@@ -19,6 +19,19 @@ sys.dont_write_bytecode = True  # no __pycache__ next to the scripts
 import make_textures as mt  # noqa: E402
 from make_textures import SIZE, X, Y, box, clouds, flat, noise, paint, step, tint  # noqa: E402
 
+# The same drawing functions make every variant of a surface: SHIFT moves all their noise seeds, so each variant has its own grime.
+SHIFT = 0
+_noise, _clouds = noise, clouds
+
+
+def noise(seed, *args, **kwargs):  # noqa: F811
+    return _noise(seed + SHIFT, *args, **kwargs)
+
+
+def clouds(seed, cells=4):  # noqa: F811
+    return _clouds(seed + SHIFT, cells)
+
+
 ASSETS = mt.ASSETS
 TEXTURES = ASSETS / "textures/block/level0p1"
 MODELS = ASSETS / "models/block/level0p1"
@@ -167,12 +180,12 @@ def corridor_floor_stripe():
 
 
 def quarters_carpet():
-    m = flat((58, 70, 98), 0.1, 6, 120)
+    m = flat((108, 86, 74), 0.1, 6, 120)
     fibre = noise(61, 128) * 0.5 + noise(62, 64) * 0.5
     m.color *= (1 + fibre * 0.07)[..., None]
     m.height += fibre * 0.3
-    paint(m, lines(64, 2.4) * 0.5, (84, 96, 126), height=0.4)
-    weather(m, 63, 0.25, (0.82, 0.82, 0.85))
+    paint(m, lines(64, 2.4) * 0.5, (132, 108, 92), height=0.4)
+    weather(m, 63, 0.25, (0.82, 0.8, 0.78))
     return m
 
 
@@ -264,10 +277,10 @@ def wall_panel():
 
 
 def quarters_wall():
-    m = flat((172, 190, 206), 0.4, 20, 40)
+    m = flat((208, 196, 178), 0.4, 20, 40)
     grain(m, 151, 0.025)
-    paint(m, lines(64, 1.0, axes="x"), (140, 158, 176), height=-1.8)
-    paint(m, box(-2, 60, 130, 64), (224, 196, 150), height=0.6)  # a warm trim, to make it a home
+    paint(m, lines(64, 1.0, axes="x"), (164, 150, 132), height=-1.8)
+    paint(m, box(-2, 60, 130, 64), (176, 128, 84), height=0.6)  # a warm trim, to make it a home
     paint(m, box(-2, 108, 130, 130), (118, 98, 80), height=0.6)
     weather(m, 152, 0.4)
     return m
@@ -295,19 +308,101 @@ def gym_wall():
 
 
 def damaged_wall():
-    m = flat((60, 62, 66), 0.4, 30)
+    """A scorched panel wall. The base has the big hole with cables; the variants put it elsewhere, smaller, or leave the wall whole."""
+    m = flat((84, 87, 94), 0.4, 30)
     grain(m, 181, 0.05)
     paint(m, lines(64, 1.1), (24, 26, 28), height=-2.2)
-    hole = step(0.1, 0.5, 1 - np.hypot((X - 70) / 38, (Y - 62) / 30))
+    rng = np.random.default_rng(SHIFT + 181)
+    hx, hy, hw, hh = (70, 62, 38, 30) if SHIFT == 0 else (rng.uniform(30, 98), rng.uniform(30, 98), rng.uniform(14, 30), rng.uniform(12, 26))
+    hole = step(0.1, 0.5, 1 - np.hypot((X - hx) / hw, (Y - hy) / hh))
+    if SHIFT == 2 * 1009:
+        hole = hole * 0  # this one stays whole, just scorched and scratched
     paint(m, hole, (14, 14, 16), height=-4)
-    wires = np.zeros((SIZE, SIZE))
     palette = [(200, 50, 40), (220, 190, 60), (60, 130, 200), (70, 180, 90)]
     for i, colour in enumerate(palette):
-        curve = 1 - step(0.8, 2.2, np.abs(Y - (56 + i * 5 + 6 * np.sin(X / 9.0 + i))))
-        paint(m, curve * hole * 0.9, colour, height=1.4, smooth=0.5)
-    spark = dots(128, 3, 0) * 0
+        curve = 1 - step(0.8, 2.2, np.abs(Y - (hy - 6 + i * 5 + 6 * np.sin(X / 9.0 + i))))
+        paint(m, curve * hole * 0.9, colour, height=1.4, smooth=0.5, glow=0.5)
     scorch(m, 182, 1.3)
     paint(m, step(0.62, 0.74, clouds(183, 5)) * 0.4, (110, 70, 44), height=-0.5)
+    # Lighter dents and scratches so the dark wall still shows its shape by a little light.
+    paint(m, (1 - step(0.0, 0.1, np.abs(noise(185, 5, 9) + noise(186, 30, 4) * 0.3))) * 0.5, (110, 112, 118), height=-0.8)
+    return m
+
+
+def frost_wall():
+    """A panel wall under frost: white-blue rime in drifts, ice crystals, icicle streaks, the seams still dark under it."""
+    m = flat((120, 138, 158), 0.7, 40)
+    grain(m, 191, 0.04)
+    paint(m, lines(64, 1.1), (30, 38, 48), height=-2.2)
+    rime = step(-0.5, 0.25, clouds(192, 4) + (1 - Y / SIZE) * 0.1)
+    paint(m, rime * 0.92, (214, 230, 244), height=1.2, smooth=0.85)
+    paint(m, step(0.55, 0.8, noise(193, 40, 40)) * rime, (248, 252, 255), height=1.8)
+    icicles = step(0.45, 0.8, noise(194, 28, 2)) * step(0.0, 0.7, Y / SIZE)
+    paint(m, icicles * 0.7, (232, 244, 255), height=1.5, smooth=0.95)
+    paint(m, (1 - step(0.0, 0.06, np.abs(noise(195, 8, 14)))) * 0.5, (150, 176, 204), height=-0.6)
+    return m
+
+
+def scorched_wall():
+    """A panel wall cooked black, with cracks still glowing orange and soot over everything."""
+    m = flat((46, 38, 34), 0.35, 30)
+    grain(m, 201, 0.06)
+    paint(m, lines(64, 1.1), (16, 14, 14), height=-2.2)
+    soot = step(-0.2, 0.6, clouds(202, 3))
+    tint(m, soot * 0.55, (0.55, 0.52, 0.5))
+    veins = 1 - step(0.0, 0.1, np.abs(noise(203, 7, 11) + noise(204, 19, 9) * 0.35))
+    paint(m, veins * 0.95, (255, 120, 36), height=-1.2, glow=1.0)
+    paint(m, veins * step(0.25, 0.7, noise(205, 20)) * 0.8, (255, 214, 120), glow=1.0)
+    paint(m, step(0.5, 0.85, noise(206, 14, 14)) * 0.5, (88, 66, 52), height=0.8)
+    return m
+
+
+def frost_floor():
+    """Deck plating under ice: a sheet of pale ice with cracks, white rime in the corners of each plate, seams dark underneath."""
+    m = flat((96, 110, 126), 0.75, 40)
+    grain(m, 211, 0.04)
+    paint(m, lines(64, 1.1), (30, 38, 48), height=-2.2)
+    rime = step(-0.4, 0.3, clouds(212, 4))
+    paint(m, rime * 0.9, (206, 224, 242), height=1.0, smooth=0.9)
+    paint(m, step(0.55, 0.8, noise(213, 36, 36)) * rime, (248, 252, 255), height=1.5)
+    paint(m, (1 - step(0.0, 0.05, np.abs(noise(214, 9, 9) + noise(215, 21, 21) * 0.3))) * 0.6, (150, 178, 208), height=-0.8)
+    return m
+
+
+def scorched_floor():
+    """Deck plating burnt black, ash drifted in the seams, cracks still glowing."""
+    m = flat((40, 34, 32), 0.35, 30)
+    grain(m, 221, 0.06)
+    paint(m, lines(64, 1.1), (14, 12, 12), height=-2.2)
+    ash = step(0.0, 0.7, clouds(222, 4))
+    tint(m, ash * 0.5, (1.5, 1.45, 1.4))
+    veins = 1 - step(0.0, 0.09, np.abs(noise(223, 8, 8) + noise(224, 18, 18) * 0.35))
+    paint(m, veins * 0.9, (255, 112, 32), height=-1.0, glow=1.0)
+    paint(m, veins * step(0.3, 0.7, noise(225, 18)) * 0.7, (255, 210, 110), glow=1.0)
+    return m
+
+
+def frost_ceiling():
+    """Ceiling plates furred with rime, with icicle points in clusters."""
+    m = flat((150, 164, 178), 0.5, 20, 40)
+    m.color *= (1 + noise(231, 128, 128) * 0.03)[..., None]
+    paint(m, lines(64, 1.3), (60, 72, 86), height=-2.2)
+    rime = step(-0.55, 0.2, clouds(232, 4))
+    paint(m, rime * 0.92, (222, 236, 248), height=1.2, smooth=0.85)
+    points = step(0.5, 0.8, noise(233, 30, 30)) * rime
+    paint(m, points, (252, 254, 255), height=2.2, smooth=0.95)
+    return m
+
+
+def scorched_ceiling():
+    """Ceiling plates blackened by smoke, a few cracks still dull red."""
+    m = flat((54, 48, 46), 0.25, 8, 40)
+    m.color *= (1 + noise(241, 128, 128) * 0.05)[..., None]
+    paint(m, lines(64, 1.3), (16, 14, 14), height=-2.2)
+    soot = step(-0.3, 0.6, clouds(242, 3))
+    tint(m, soot * 0.6, (0.5, 0.48, 0.47))
+    veins = 1 - step(0.0, 0.07, np.abs(noise(243, 6, 9) + noise(244, 16, 12) * 0.35))
+    paint(m, veins * 0.7, (200, 70, 28), height=-1.0, glow=0.6)
     return m
 
 
@@ -684,28 +779,68 @@ def singularity_core():
 
 
 def singularity_shell():
+    """Near black with a violet cast and thin bright veins: the dark ball in the middle, lit only by the ring round it."""
     f = clouds(451, 3)
-    m = flat((160, 90, 255), 0.9, 20)
-    m.glow += 1.0
-    tint(m, step(-0.1, 0.5, f) * 0.6, (0.7, 0.55, 1.15))
-    paint(m, step(0.2, 0.7, noise(452, 12)) * 0.7, (240, 200, 255))
+    m = flat((26, 12, 52), 0.9, 20)
+    m.glow += 0.55
+    tint(m, step(-0.2, 0.6, f) * 0.8, (1.5, 1.2, 2.0))
+    veins = 1 - step(0.0, 0.12, np.abs(noise(452, 10) + noise(453, 22) * 0.4))
+    paint(m, veins * 0.9, (170, 140, 255), glow=1.0)
     return m
 
 
-PLASMA_COLOURS = [(255, 246, 214), (255, 208, 96), (255, 122, 48), (214, 56, 90)]
+PLASMA_COLOURS = [(255, 250, 232), (255, 214, 118), (255, 148, 58), (196, 66, 38)]
 
 
 def plasma(heat):
+    """Hot gas: bright filaments and dark gaps, whiter inside and a deep ember red at the rim."""
     base = np.array(PLASMA_COLOURS[heat], float)
     m = flat(tuple(base), 0.9, 20)
-    m.glow += 1.0
-    swirl = clouds(461 + heat, 4)
-    tint(m, step(-0.2, 0.6, swirl) * 0.5, (1.0, 0.82, 0.7))
-    paint(m, step(0.3, 0.7, noise(465 + heat, 16)) * 0.35, tuple(np.minimum(base * 1.2 + 30, 255)))
+    m.glow += 0.9 if heat < 3 else 0.7
+    swirl = clouds(461 + heat, 4) + noise(470 + heat, 24, 6) * 0.5
+    tint(m, step(-0.3, 0.7, swirl) * 0.55, (1.0, 0.72, 0.5))
+    paint(m, step(0.35, 0.75, noise(465 + heat, 16)) * 0.4, tuple(np.minimum(base * 1.25 + 30, 255)))
+    tint(m, step(0.55, 0.95, -swirl) * 0.6, (0.55, 0.38, 0.32))
     return m
 
 
 # Texture tables
+
+def wear(m, seed):
+    """Stains, scuffs and the odd dent: what keeps a big wall of one tile from looking like a stamp."""
+    blot = step(0.35, 0.75, clouds(seed + 7, 3))
+    tint(m, blot * 0.5, (0.62, 0.6, 0.56))
+    streak = step(0.55, 0.9, noise(seed + 9, 48, 3))
+    tint(m, streak * 0.45, (0.55, 0.54, 0.52))
+    dent = step(0.6, 0.85, noise(seed + 11, 12, 12))
+    m.height -= dent * 1.2
+    m.color *= (1 - dent * 0.12)[..., None]
+    return m
+
+
+# Surfaces drawn in several variants that the blockstate picks between at random (and turns 4 ways), so no tile repeats in a row.
+VARIANTED = {"wall_panel": wall_panel, "deck_floor": deck_floor, "station_corridor_floor": corridor_floor,
+             "deck_ceiling": deck_ceiling, "quarters_wall": quarters_wall, "kitchen_wall": kitchen_wall, "damaged_wall": damaged_wall,
+             "frost_wall": frost_wall, "scorched_wall": scorched_wall,
+             "frost_floor": frost_floor, "scorched_floor": scorched_floor,
+             "frost_ceiling": frost_ceiling, "scorched_ceiling": scorched_ceiling}
+VARIANTS = 3
+
+
+def variants():
+    global SHIFT
+    out = {}
+    try:
+        for name, draw in VARIANTED.items():
+            SHIFT = 0
+            out[name] = wear(draw(), 0)
+            for n in range(1, VARIANTS + 1):
+                SHIFT = n * 1009
+                out[f"{name}_v{n}"] = wear(draw(), n * 1009)
+    finally:
+        SHIFT = 0
+    return out
+
 
 def all_textures():
     t = {
@@ -717,6 +852,9 @@ def all_textures():
         "ceiling_light": ceiling_light(), "dead_ceiling_light": dead_ceiling_light(),
         "wall_panel": wall_panel(), "quarters_wall": quarters_wall(), "kitchen_wall": kitchen_wall(), "gym_wall": gym_wall(),
         "damaged_wall": damaged_wall(),
+        "frost_wall": frost_wall(), "scorched_wall": scorched_wall(),
+        "frost_floor": frost_floor(), "scorched_floor": scorched_floor(),
+        "frost_ceiling": frost_ceiling(), "scorched_ceiling": scorched_ceiling(),
         "station_door_bottom": door_leaf(False), "station_door_top": door_leaf(True),
         "station_hatch_0": hatch(0), "station_hatch_1": hatch(1),
         "stair_steps": stair_steps(), "stair_core": stair_core(True), "dead_stair_core": stair_core(False),
@@ -734,6 +872,7 @@ def all_textures():
     }
     for heat in range(4):
         t[f"plasma_{heat}"] = plasma(heat)
+    t.update(variants())
     return t
 
 
@@ -889,7 +1028,7 @@ DOOR_MODELS = ("bottom_left", "bottom_left_open", "bottom_right", "bottom_right_
 CUBES = ["hull_plate", "hull_seam", "inner_hull_plate", "observation_glass", "bulkhead", "deck_floor", "station_corridor_floor",
          "station_corridor_floor_stripe", "quarters_carpet", "kitchen_tile", "gym_mat", "garden_floor", "worn_floor", "hazard_floor",
          "deck_ceiling", "ceiling_light", "dead_ceiling_light", "wall_panel", "quarters_wall", "kitchen_wall", "gym_wall",
-         "damaged_wall", "stair_core", "dead_stair_core", "station_crate", "doorway_frame", "static_tear", "truss", "girder",
+         "damaged_wall", "frost_wall", "scorched_wall", "frost_floor", "scorched_floor", "frost_ceiling", "scorched_ceiling", "stair_core", "dead_stair_core", "station_crate", "doorway_frame", "static_tear", "truss", "girder",
          "girder_lamp"]
 CUBE_TEXTURE = {"station_crate": "crate", "static_tear": "static_tear", "truss": "truss", "girder": "girder", "girder_lamp": "girder_lamp"}
 EMISSIVE = {"ceiling_light": 15, "static_tear": 10, "girder_lamp": 15, "stair_core": 8}
@@ -901,6 +1040,9 @@ def all_models():
     for name in CUBES:
         texture = CUBE_TEXTURE.get(name, name)
         m[name] = glowing_cube(texture, EMISSIVE[name]) if name in EMISSIVE else cube(texture)
+    for name in VARIANTED:
+        for n in range(1, VARIANTS + 1):
+            m[f"{name}_v{n}"] = cube(f"{name}_v{n}")
     m["singularity_core"] = glowing_cube("singularity_core")
     m["singularity_shell"] = glowing_cube("singularity_shell")
     for heat in range(4):
@@ -1014,6 +1156,9 @@ def all_blockstates():
     for name, count in PARTS.items():
         b[name] = {"variants": {f"part={p}": {"model": NS + f"{name}_{p}"} for p in range(count)}}
     b["plasma"] = {"variants": {f"heat={h}": {"model": NS + f"plasma_{h}"} for h in range(4)}}
+    for name in VARIANTED:
+        models = [name] + [f"{name}_v{n}" for n in range(1, VARIANTS + 1)]
+        b[name] = {"variants": {"": [{"model": NS + model, "y": y} for model in models for y in (0, 90, 180, 270)]}}
     return b
 
 
@@ -1065,7 +1210,8 @@ def check(blockstates):
                     assert (TEXTURES / f"{value[len(NS):]}{suffix}.png").is_file(), (path.name, value, suffix)
     for name, state in blockstates.items():
         entries = state["variants"].values() if "variants" in state else [part["apply"] for part in state["multipart"]]
-        for variant in entries:
+        flat_entries = [v for entry in entries for v in (entry if isinstance(entry, list) else [entry])]
+        for variant in flat_entries:
             if variant["model"].startswith(prefix):
                 assert (ASSETS / f"models/block/{variant['model'][len(prefix):]}.json").is_file(), (name, variant["model"])
         item = json.loads((ASSETS / f"items/{name}.json").read_text(encoding="utf8"))
@@ -1080,7 +1226,7 @@ LANG_EN = {
     "quarters_carpet": "Quarters Carpet", "kitchen_tile": "Galley Tile", "gym_mat": "Gym Mat", "garden_floor": "Hydroponic Moss",
     "worn_floor": "Worn Deck Floor", "hazard_floor": "Hazard Floor", "deck_ceiling": "Deck Ceiling", "ceiling_light": "Ceiling Light",
     "dead_ceiling_light": "Dead Ceiling Light", "wall_panel": "Wall Panel", "quarters_wall": "Quarters Wall", "kitchen_wall": "Galley Wall",
-    "gym_wall": "Padded Wall", "damaged_wall": "Damaged Wall", "station_door": "Station Door", "station_stairs": "Station Stairs",
+    "gym_wall": "Padded Wall", "damaged_wall": "Damaged Wall", "frost_wall": "Frosted Wall", "scorched_wall": "Scorched Wall", "frost_floor": "Frosted Floor", "scorched_floor": "Scorched Floor", "frost_ceiling": "Frosted Ceiling", "scorched_ceiling": "Scorched Ceiling", "station_door": "Station Door", "station_stairs": "Station Stairs",
     "stair_core": "Stair Core", "dead_stair_core": "Dead Stair Core", "safety_rail": "Safety Rail", "rail_lamp": "Rail Lamp",
     "glow_orb": "Glow Orb", "crew_bed": "Crew Bunk", "crew_locker": "Crew Locker", "kitchen_counter": "Galley Counter",
     "stove": "Galley Stove", "treadmill": "Treadmill", "weight_rack": "Weight Rack", "hydroponic_planter": "Hydroponic Planter",
@@ -1096,7 +1242,7 @@ LANG_ZH = {
     "quarters_carpet": "寢室地毯", "kitchen_tile": "廚房地磚", "gym_mat": "健身墊", "garden_floor": "水培苔蘚",
     "worn_floor": "磨損甲板", "hazard_floor": "警示地板", "deck_ceiling": "甲板天花板", "ceiling_light": "天花板燈",
     "dead_ceiling_light": "壞掉的天花板燈", "wall_panel": "牆板", "quarters_wall": "寢室牆", "kitchen_wall": "廚房牆",
-    "gym_wall": "軟墊牆", "damaged_wall": "損壞的牆", "station_door": "站內自動門", "station_stairs": "站內樓梯",
+    "gym_wall": "軟墊牆", "damaged_wall": "損壞的牆", "frost_wall": "結霜的牆", "scorched_wall": "焦黑的牆", "frost_floor": "結冰的地板", "scorched_floor": "焦黑的地板", "frost_ceiling": "結霜的天花板", "scorched_ceiling": "焦黑的天花板", "station_door": "站內自動門", "station_stairs": "站內樓梯",
     "stair_core": "樓梯中柱", "dead_stair_core": "熄滅的樓梯中柱", "safety_rail": "安全欄杆", "rail_lamp": "欄杆燈",
     "glow_orb": "發光球", "crew_bed": "船員床鋪", "crew_locker": "船員置物櫃", "kitchen_counter": "廚房檯面",
     "stove": "廚房爐具", "treadmill": "跑步機", "weight_rack": "重訓架", "hydroponic_planter": "水培種植槽",

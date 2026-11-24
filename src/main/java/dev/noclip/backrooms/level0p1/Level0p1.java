@@ -38,6 +38,7 @@ public final class Level0p1 {
 		ZenithDoors.register();
 		ZenithClimate.register();
 		ZenithAmbience.register();
+		ZenithBlackouts.register();
 		ZenithEntrance.register();
 		ZenithRobots.register();
 	}

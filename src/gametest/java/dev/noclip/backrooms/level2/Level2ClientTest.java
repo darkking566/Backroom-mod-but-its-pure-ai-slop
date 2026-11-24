@@ -27,6 +27,7 @@ public final class Level2ClientTest implements FabricClientGameTest {
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
+		if (!dev.noclip.backrooms.TestFilter.level("level2")) return;
 		try (TestSingleplayerContext game = context.worldBuilder().create()) {
 			var server = game.getServer();
 			game.getConnection().waitForChunksRender();

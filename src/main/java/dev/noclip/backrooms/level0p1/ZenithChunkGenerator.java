@@ -80,6 +80,12 @@ final class ZenithChunkGenerator extends ChunkGenerator {
 			case WALL_KITCHEN -> ZenithBlocks.KITCHEN_WALL.defaultBlockState();
 			case WALL_GYM -> ZenithBlocks.GYM_WALL.defaultBlockState();
 			case WALL_DAMAGED -> ZenithBlocks.DAMAGED_WALL.defaultBlockState();
+			case CEILING_FROST -> ZenithBlocks.FROST_CEILING.defaultBlockState();
+			case CEILING_SCORCH -> ZenithBlocks.SCORCHED_CEILING.defaultBlockState();
+			case FLOOR_FROST -> ZenithBlocks.FROST_FLOOR.defaultBlockState();
+			case FLOOR_SCORCH -> ZenithBlocks.SCORCHED_FLOOR.defaultBlockState();
+			case WALL_FROST -> ZenithBlocks.FROST_WALL.defaultBlockState();
+			case WALL_SCORCH -> ZenithBlocks.SCORCHED_WALL.defaultBlockState();
 			case DOOR -> door(dir, extra);
 			case STAIR -> ZenithBlocks.STATION_STAIRS.defaultBlockState().setValue(StairBlock.FACING, direction(dir));
 			case STAIR_CORE -> (extra == 1 ? ZenithBlocks.DEAD_STAIR_CORE : ZenithBlocks.STAIR_CORE).defaultBlockState();

@@ -131,6 +131,12 @@
     "noclip_backrooms:station_door",
     "noclip_backrooms:station_stairs",
     "noclip_backrooms:safety_rail",
-    "noclip_backrooms:rail_lamp"
+    "noclip_backrooms:rail_lamp",
+    "noclip_backrooms:frost_wall",
+    "noclip_backrooms:scorched_wall",
+    "noclip_backrooms:frost_floor",
+    "noclip_backrooms:scorched_floor",
+    "noclip_backrooms:frost_ceiling",
+    "noclip_backrooms:scorched_ceiling"
   ]
 }

@@ -26,15 +26,14 @@ import net.minecraft.world.phys.Vec3;
 /** Plays Level 1 in a real client: through a flickering wall, around the halls and corridors, a blackout, a crate, and out. */
 public final class Level1ClientTest implements FabricClientGameTest {
 	private static final int STAND = Level1ChunkGenerator.FLOOR_Y + 1;
-	/** Set NOCLIP_ONLY=people,secrets to run just those sections (the full run takes a quarter of an hour); unset runs everything. */
-	private static final String ONLY = System.getenv("NOCLIP_ONLY");
-
+	/** NOCLIP_ONLY=people,secrets runs just those sections (the full run takes a quarter of an hour); see TestFilter. */
 	private static boolean only(String section) {
-		return ONLY == null || ONLY.isBlank() || java.util.Arrays.asList(ONLY.split(",")).contains(section);
+		return dev.noclip.backrooms.TestFilter.section(section);
 	}
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
+		if (!dev.noclip.backrooms.TestFilter.level("level1")) return;
 		try (TestSingleplayerContext game = context.worldBuilder().create()) {
 			var server = game.getServer();
 			game.getConnection().waitForChunksRender();

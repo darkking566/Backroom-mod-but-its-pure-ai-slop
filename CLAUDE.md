@@ -199,6 +199,19 @@
   - 將主工作目錄切回 `main`，在 `.gitignore` 加入 `logs/`、`__pycache__/`、`*.blend1`
   - 提交工作區既有的 Level 1 薄型相連辦公隔間板改動（`CubiclePanelBlock`、`make_cubicle_models.py`、模型與 blockstate，`b9121b0`）
   - 將 `claude` 分支尚未進主線的提交 `bdad687`（Level 0 巨構房間新增柱廊、分隔房間群與階梯下沉劇場三種版型及測試）合併進 `main`，通過 `gradlew build` 後將 `main` 與 `claude` 推送至 GitHub（無強制推送、無改寫歷史）
+- Level 0.1 打磨：新增三種機器人生怪蛋（`Robots.register`、`tools/make_robot_eggs.py`、語言檔）；`gradlew build` 通過（要用 Java 25：`JAVA_HOME=C:/Program Files/Java/jdk-25.0.5.0.3`），遊戲畫面尚未確認
+- Level 0.1 站內停電事件（`ZenithBlackouts`：警報＋三次閃爍→熄燈 20～50 秒→恢復；樓梯芯、欄杆燈、光球等自帶電的不熄；原本就壞的燈不會被修好；廣播三句；語言檔）；`Level0p1ClientTest` 新增 `blackout` 段，通過
+- 客戶端測試現在可以只跑一部分：新增 `TestFilter`，`NOCLIP_TEST=level0p1`（逗號分隔 level0、level1、level2、level0p1）選樓層，`NOCLIP_ONLY=blackout` 選樓層內的段落（Level 1、Level 0.1 有分段；Level 0、Level 2 目前只能整層跑或不跑）；都不設就跟以前一樣全跑。只跑停電段約 40 秒
+- Level 0.1 停電再打磨：停電時生出的一律是壞掉的服務機器人（`ZenithRobots.spawn`），停電時身邊偶爾有電線噴火花的聲音（`ZenithAmbience`）；`robots,blackout` 兩段通過
+- Level 0.1 畫面質感：六種牆／地板／天花板各 3 個隨機變體加污漬擦痕、寢室改暖色、環境光色由深藍改成中性灰藍、天花板燈 14→13（細節見 `docs/levels/level0p1/README.md` 的「畫面質感」）；`rooms` 段實機截圖確認。重跑 `make_level0p1.py` 會重畫全部貼圖而非只有這幾張，我跑完用 git 還原了其他的
+- Level 0.1 重拍水培大廳、天橋、輻條門洞、奇點的截圖（新環境光色下），換掉 `docs/levels/level0p1/screens/` 裡對應四張
+- Level 0.1 奇點與電漿盤重調：球改近黑深紫帶亮脈、赤道一圈白熱邊、圓盤環距 5→6 格、紋理加亮絲暗隙；`gradlew build` 與 `middle` 段實機截圖確認
+- Level 0.1 暗房與損壞區：損壞牆 3 變體（洞位置不同、一個無洞）、提亮加刮痕、垂下的電纜發光 6；`gradlew build` 與 `rooms` 段實機截圖確認
+- `Level0p1ClientTest` 新增 `zones` 段（冷、熱、暗區各拍走廊與房間，`NOCLIP_ONLY=zones`）；看過截圖：冷區、熱區、暗區的牆面長得一樣（都是損壞牆），只有行為不同，看不出冷或熱，尚未處理（截圖在 `docs/levels/level0p1/screens/zone_*.png`）
+- Level 0.1 冷區與熱區各有自己的牆：新增方塊 `frost_wall`、`scorched_wall`（含貼圖 3 變體、語言、掉落物），`ZenithLayout.wallKind` 改傳區域編號，冷區 2/3 結霜牆、熱區 2/3 焦黑牆、1/3 仍是損壞牆；`gradlew build` 與 `zones` 段實機截圖確認。注意：加了兩個 `Kind`，舊存檔裡已生成的區塊不變，新生成的才會有
+- Level 0.1 冷區、熱區加地板外觀：新增方塊 `frost_floor`、`scorched_floor`（`ZenithLayout.floor` 改傳區域編號：1/4 磨損、3/4 之中的 2/3 結冰或焦黑）；`gradlew build` 與 `zones` 段截圖確認。`make_level0p1.py` 在 Windows 上偶爾寫檔報 Errno 22，重跑一次就好
+- Level 0.1 冷區、熱區加天花板外觀：新增方塊 `frost_ceiling`、`scorched_ceiling`（`ZenithLayout.ceiling` 改傳區域編號，3/4 的板換成結霜或焦黑，燈位置不變）；`zones` 段多拍天花板，`gradlew build` 通過
+- Level 0.1 完整客戶端測試（`NOCLIP_TEST=level0p1`，全部段落）在牆／地板／天花板／環境光／奇點改動後通過，約 2 分 23 秒、40 張截圖
 - 依使用者要求合併遠端最新進度與雙方製作的怪物（重疊怪物一律以朋友版本為準）：
   - 先抓下並合併 `origin/main`（Level 0.1 天頂站與子樓層支援、牧蛇動態低頭系統，`2b4ec32`），解決 `fabric.mod.json`、`Level1ClientTest.java`、`sounds.json`、`mineable/pickaxe.json`、`en_us.json`、`zh_tw.json` 合併衝突並完整保留兩邊內容與 Claude 工作區既有修正
   - 比對怪物清單：重疊的 3 隻怪物（`smiler` 微笑者、`skin_stealer` 竊皮者、`clump` 肢叢）以及朋友獨有的怪物（`duller`、`arms`、`wretch`、`shriek`、`crawler`、`shepherd_snake`、`nguithrxurh`）與共用的 `hound` 全數保留朋友既有程式碼、模型規格與貼圖，未做任何覆蓋；另補齊朋友前 5 隻怪物遺漏的 `en_us.json`／`zh_tw.json` 實體與生怪蛋翻譯條目
