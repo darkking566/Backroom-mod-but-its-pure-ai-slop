@@ -141,7 +141,7 @@
   - 中立機器人（`level0p1/robots/`、`src/client/.../level0p1/robots/`）：七足清洗機器人、廚房機器人、壞掉的服務機器人；`tools/make_robots.py` 產生 BoxRig 規格檔 `monsters/robots.json`、貼圖與三段動畫，`tools/blender_robots.py` 用 Blender 5.3 的 bpy 組出 `art/robots/robots.blend` 與三張預覽（容器裡用 `pip install bpy` 在虛擬環境跑，沒有 GUI）；機器人不攻擊、會閒逛、遠離玩家會消失，`ZenithRobots` 依房間在玩家附近生出（廚房→廚師、毀損／暗區→服務機器人、其他→清洗機器人）
   - 測試：`ZenithLayoutTest`（上樓、走廊到中央平台、降落點、氣閘出口、外殼封閉、區塊生成速度）；`Level0p1ClientTest`（用 Xvfb 虛擬螢幕真的跑遊戲客戶端：用信標進站、每種房間、樓梯、中庭、環廊窗、輻條與奇點、機器人、自動門、回 Level 0、切出、艙門）；這次在雲端容器裡裝了 Java 25（`/tmp/jdk25`）才能編譯與測試
   - 還沒做：站內材料的合成（Antigravity）、視聽幻覺與導航失效、機器人生怪蛋、站內更多事件
-- 使用者同意後，把 `main` 推送到 GitHub（Level 3、路標與 Level 0 等待縮短、合併朋友的停車場大改版與 Level 0.1、停車場測試與微笑者等修正、Gemini 的 7 隻新怪物）；推送前 `gradlew build`（57 個單元測試）通過；本地 `claude` 分支快轉到 GitHub 上的 `origin/claude`；沒有強制推送、沒有改寫歷史
+- 使用者同意後，把 `main` 推送到 GitHub（Level 3、路標與 Level 0 等待縮短、合併朋友的停車場大改版與 Level 0.1、停車場測試與微笑者等修正、Gemini 的 7 隻新怪物）；推送前 `gradlew build`（57 個單元測試）通過；GitHub 上的 `claude` 分支已被刪除，本地的 `claude` 內容確認全部已在 `main` 裡，所以也刪掉本地這個分支（GitHub 上另外兩個分支 `claude-level0p1`、`level1-depth-polish` 也都已在 `main` 裡）；沒有強制推送、沒有改寫歷史
   - 還沒跑實機測試的部分：Level 0.1、Gemini 的 7 隻新怪物、牧羊蛇低頭、停車場微笑者「黑暗中繞圈」的測試改動
 
 ## 動作記錄（Antigravity）
