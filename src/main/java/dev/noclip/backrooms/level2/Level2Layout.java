@@ -541,6 +541,21 @@ public final class Level2Layout {
 		return 0;
 	}
 
+	/** Rare anomalous wall section that lets players walk/noclip into it toward Level 2.1, backed by solid wall. */
+	static boolean isNoclipWall(long seed, int x, int z) {
+		if (roomKindAt(seed, x, z) != null || isOfficePatch(seed, x, z)) return false;
+		if (tile(seed, x, z).kind() != Kind.WALL) return false;
+		boolean backed = false;
+		for (int d = 0; d < 4; d++) {
+			if (tile(seed, x + WALL_DX[d], z + WALL_DZ[d]).kind() == Kind.FLOOR
+					&& tile(seed, x - WALL_DX[d], z - WALL_DZ[d]).kind() == Kind.WALL) {
+				backed = true;
+				break;
+			}
+		}
+		return backed && Math.floorMod(hash(seed, x, z, 0x41D9), 260) == 0;
+	}
+
 	static int hash(long seed, int x, int z, int salt) {
 		long h = mix(seed + salt);
 		h = mix(h ^ x);

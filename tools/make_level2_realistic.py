@@ -235,6 +235,14 @@ def build_authored_textures(WATER, MOULD):
     ice = load_pbr_substrate("Ice003", rgb(206, 228, 246), contrast=0.9, normal_strength=1.1, default_smooth=0.82, f0=16, porosity=0.05)
     tex["frosted_utility_wall"] = apply_frost(wall_base.copy(), ice, seed=501, cover=0.58)
 
+    noclip_w = wall_base.copy()
+    glitch = (np.sin(Y * 0.45) * 0.5 + 0.5) * smoothstep(0.55, 0.85, fbm(99, base=16, octaves=3))
+    crack = smoothstep(5.0, 0.0, np.abs(X - S / 2 - np.sin(Y / 30.0) * 6)) * smoothstep(48.0, 96.0, Y) * smoothstep(S - 48.0, S - 96.0, Y)
+    noclip_w.color = mix(noclip_w.color, noclip_w.color * rgb(196, 200, 226) * 0.85, glitch * 0.45)
+    noclip_w.color = mix(noclip_w.color, rgb(28, 28, 36), crack * 0.75)
+    noclip_w.height = np.clip(noclip_w.height - crack * 0.25, 0, 1)
+    tex["noclip_wall"] = noclip_w
+
     floor_base = load_pbr_substrate("Concrete019", rgb(118, 120, 114), contrast=0.95, normal_strength=0.9, default_smooth=0.18, porosity=0.45)
     joint = np.maximum(smoothstep(2.0, 0.0, np.abs(X - S / 2)), smoothstep(2.0, 0.0, np.abs(Y - S / 2))) * 0.25
     floor_base.color *= (1 - joint[..., None] * 0.25)
