@@ -152,13 +152,16 @@ final class FlickeringWalls {
 		}));
 	}
 
+	/** Two blocks of open floor in front, so the wall is in a room or corridor and not at the back of a niche. */
 	private static boolean facesOpenFloor(ServerLevel level, BlockPos bottom) {
 		for (Direction side : Direction.Plane.HORIZONTAL) {
-			BlockPos front = bottom.relative(side);
-			if (level.getBlockState(front).isAir() && level.getBlockState(front.above()).isAir()
-					&& !level.getBlockState(front.below()).getCollisionShape(level, front.below()).isEmpty()) {
-				return true;
+			boolean clear = true;
+			for (int step = 1; step <= 2 && clear; step++) {
+				BlockPos front = bottom.relative(side, step);
+				clear = level.getBlockState(front).isAir() && level.getBlockState(front.above()).isAir()
+						&& !level.getBlockState(front.below()).getCollisionShape(level, front.below()).isEmpty();
 			}
+			if (clear) return true;
 		}
 		return false;
 	}

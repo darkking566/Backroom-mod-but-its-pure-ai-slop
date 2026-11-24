@@ -300,6 +300,25 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		server.runCommand("gamemode spectator @a");
 	}
 
+	private static boolean nearSettlementAround(long seed, int[] spot) {
+		for (int dx = -28; dx <= 28; dx += 4) {
+			for (int dz = -28; dz <= 28; dz += 4) {
+				if (Marauders.nearSettlement(seed, spot[0] + dx, spot[1] + dz)) return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean nearThreshold(long seed, int[] spot) {
+		for (int dx = -6; dx <= 6; dx += 3) {
+			for (int dz = -6; dz <= 6; dz += 3) {
+				double pipes = Level1Layout.pipeZone(seed, spot[0] + dx, spot[1] + dz), glitch = Level1Layout.glitchZone(seed, spot[0] + dx, spot[1] + dz);
+				if (pipes >= 0 && pipes <= 0.2 || glitch >= 0 && glitch <= 0.3) return true;
+			}
+		}
+		return false;
+	}
+
 	/** The patrol, the workers, the lock, the smoke, the secret route to the Hub and the glitch trail. */
 	private static void secrets(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
 		var server = game.getServer();
@@ -314,13 +333,15 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			shoot(context, game, at[0] * 64 + 31.5, STAND, at[1] * 64 + 40.5, 180, 10, "level1_tour_" + base.name().toLowerCase());
 		}
 
-		// Newcomers are found and led toward the outpost.
+		// Newcomers are found and led toward the outpost. Somewhere clear of the thresholds to Level 2 and Level 38,
+		// which would carry the player off before the patrol got there.
 		int[] spot = Level1Layout.landing(seed, 0, 0);
+		for (int k = 1; k < 20 && nearThreshold(seed, spot); k++) spot = Level1Layout.landing(seed, k * 300, k * 170);
 		shoot(context, game, spot[0] + 0.5, STAND, spot[1] + 0.5, 0, 0, "level1_patrol_start");
 		server.runCommand("gamemode survival @a");
 		check(server.computeOnServer(s -> Patrols.dispatch(level1(s), player(s))), "no patrol set out");
 		for (int i = 0; i < 80 && Patrols.leading() == 0; i++) context.waitTicks(10);
-		check(Patrols.leading() > 0, "the patrol never reached the player");
+		check(Patrols.leading() > 0, "the patrol never reached the player (who is in " + server.computeOnServer(s -> player(s).level().dimension().identifier()) + ")");
 		double start = server.computeOnServer(s -> Patrols.memberPosition().distanceTo(Patrols.destination()));
 		for (int i = 0; i < 60; i++) {
 			context.waitTicks(10);
@@ -762,7 +783,11 @@ public final class Level1ClientTest implements FabricClientGameTest {
 	/** A band of marauders behind the player, who drop alloy; and in a blackout, a smiler drawn in by a torch. */
 	private static void monsters(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
 		var server = game.getServer();
+		// Out in the halls, well away from any settlement (raiders and smilers keep clear of them) and the thresholds.
 		int[] spot = Level1Layout.landing(seed, 0, 0);
+		for (int k = 1; k < 30 && (nearSettlementAround(seed, spot) || nearThreshold(seed, spot)); k++) {
+			spot = Level1Layout.landing(seed, k * 300, -k * 230);
+		}
 		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f 180 0",
 				spot[0] + 0.5, STAND, spot[1] + 0.5));
 		server.runCommand("gamemode survival @a");
@@ -816,9 +841,9 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		double drawn = server.computeOnServer(Level1ClientTest::nearestSmiler);
 		check(still - drawn > 2.5, "a torch did not draw the smiler (" + still + " -> " + drawn + ")");
 		float[] view = server.computeOnServer(s -> {
-			var face = level1(s).getEntitiesOfClass(net.minecraft.world.entity.Display.ItemDisplay.class,
+			var face = level1(s).getEntitiesOfClass(dev.noclip.backrooms.monsters.smiler.Smiler.class,
 					new AABB(player(s).blockPosition()).inflate(32), d -> d.entityTags().contains(Smilers.TAG)).getFirst();
-			Vec3 look = face.position().subtract(player(s).getEyePosition());
+			Vec3 look = face.getEyePosition().subtract(player(s).getEyePosition());
 			return new float[] {(float) Math.toDegrees(Math.atan2(-look.x, look.z)),
 					(float) -Math.toDegrees(Math.atan2(look.y, look.horizontalDistance()))};
 		});
@@ -830,9 +855,9 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		context.getInput().lookAt(180, 0);
 		context.waitTicks(3);
 		server.runOnServer(s -> {
-			var face = level1(s).getEntitiesOfClass(net.minecraft.world.entity.Display.ItemDisplay.class,
+			var face = level1(s).getEntitiesOfClass(dev.noclip.backrooms.monsters.smiler.Smiler.class,
 					new AABB(player(s).blockPosition()).inflate(40), d -> d.entityTags().contains(Smilers.TAG)).getFirst();
-			face.setPos(player(s).getX(), player(s).getEyeY(), player(s).getZ() - 3);
+			face.snapTo(player(s).getX(), player(s).getY(), player(s).getZ() - 3, 0, 0);
 		});
 		context.waitTicks(5);
 		context.takeScreenshot("level1_smiler_close");
@@ -936,6 +961,8 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		float yaw = (float) Math.toDegrees(Math.atan2(-way[0], way[1]));
 		double hx = spot[0] + 0.5 + way[0] * 4, hz = spot[1] + 0.5 + way[1] * 4;
 		server.runCommand("gamemode spectator @a");
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f %.1f 0", spot[0] + 0.5, STAND, spot[1] + 0.5, yaw));
+		game.getConnection().waitForChunksDownload();
 		server.runCommand(String.format(Locale.ROOT,
 				"execute in noclip_backrooms:level_1 run summon noclip_backrooms:hound %.1f %d %.1f {NoAI:1b,Tags:[\"test_hound\"]}", hx, STAND, hz));
 		server.runOnServer(s -> {
@@ -1082,9 +1109,10 @@ public final class Level1ClientTest implements FabricClientGameTest {
 	private static double nearestSmiler(MinecraftServer server) {
 		ServerPlayer player = player(server);
 		double best = Double.MAX_VALUE;
-		for (var face : level1(server).getEntitiesOfClass(net.minecraft.world.entity.Display.ItemDisplay.class,
+		// Smilers are creatures now (monsters/smiler), no longer floating faces.
+		for (var face : level1(server).getEntitiesOfClass(dev.noclip.backrooms.monsters.smiler.Smiler.class,
 				new AABB(player.blockPosition()).inflate(40), d -> d.entityTags().contains(Smilers.TAG))) {
-			best = Math.min(best, face.position().distanceTo(player.getEyePosition()));
+			best = Math.min(best, face.getEyePosition().distanceTo(player.getEyePosition()));
 		}
 		return best;
 	}
