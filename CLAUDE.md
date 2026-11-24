@@ -78,6 +78,7 @@
 
 - 走廊區新增 7 種房間變體（`CorridorPlan.Room`）：教室、圖書室、宿舍、食堂、隔間辦公室、柱廳、候診室；新增方塊書架（`book_shelf`）與隔間板（`cubicle_panel`）（128 像素貼圖、`Tile.BOOKSHELF`／`PARTITION`）；房間擺設用獨立的亂數串，迷宮和房間位置不變；`Level1ClientTest` 新增 `rooms` 段（每種房間一張照片）
   - 注意：`tools/make_level1.py` 已跟 Antigravity 手工放進去的素材脫節，整支重跑會覆蓋他的貼圖與模型（我跑完後用 git 還原了），而且會在他的 `vending_machine` 模型驗證失敗；之後新增素材請只跑新函式或先對齊
+- 隔間板改成 1 格高、頂面加鋁邊、側面 4 種圖案隨機（便條紙、日曆與相框、長條圖、磨損）；新增 `tools/make_room_props.py`，只重畫書架與隔間板，不會動到其他素材
 
 ## 動作記錄（Antigravity）
 

@@ -328,18 +328,62 @@ def book_shelf():
     return m
 
 
-def cubicle_panel():
-    """A grey-blue fabric partition with dark trim and a few pinned notes."""
-    m = flat((112, 132, 142), 0.15, 6, 60)
-    m.color *= (1 + np.sin(X * 2.0) * np.sin(Y * 2.0) * 0.035 + noise(1810, 8) * 0.04)[..., None]
-    rng = np.random.default_rng(1811)
-    for _ in range(5):
-        x, y = int(rng.integers(12, 100)), int(rng.integers(16, 96))
-        w, h = int(rng.integers(12, 22)), int(rng.integers(14, 26))
-        paint(m, box(x, y, x + w, y + h), (226, 222, 202), height=1)
-        paint(m, box(x + w // 2 - 1, y + 1, x + w // 2 + 1, y + 3), (170, 40, 40), height=2)
+def cubicle_panel(kind=0):
+    """A fabric office partition with dark trim and something pinned to it: notes, a calendar and photos, a chart, or nothing but wear."""
+    base = [(112, 132, 142), (132, 120, 108), (118, 138, 124), (128, 128, 120)][kind]
+    m = flat(base, 0.15, 6, 60)
+    m.color *= (1 + np.sin(X * 2.0) * np.sin(Y * 2.0) * 0.035 + noise(1810 + kind, 8) * 0.04)[..., None]
+    rng = np.random.default_rng(1811 + kind)
+    paper = (226, 222, 202)
+    if kind == 0:
+        for _ in range(5):
+            x, y = int(rng.integers(12, 100)), int(rng.integers(16, 96))
+            w, h = int(rng.integers(12, 22)), int(rng.integers(14, 26))
+            paint(m, box(x, y, x + w, y + h), paper, height=1)
+            paint(m, box(x + w // 2 - 1, y + 1, x + w // 2 + 1, y + 3), (170, 40, 40), height=2)
+    elif kind == 1:
+        # A wall calendar and two framed photos.
+        paint(m, box(18, 16, 78, 88), paper, height=1)
+        paint(m, box(18, 16, 78, 32), (176, 52, 48), height=1)
+        for gx in range(24, 78, 9):
+            paint(m, box(gx, 38, gx + 1, 84), (170, 166, 150))
+        for gy in range(44, 88, 9):
+            paint(m, box(20, gy, 76, gy + 1), (170, 166, 150))
+        for x0, y0, tone in ((88, 20, (96, 128, 160)), (90, 62, (150, 120, 90))):
+            paint(m, box(x0, y0, x0 + 26, y0 + 30), (58, 44, 34), height=2)
+            paint(m, box(x0 + 3, y0 + 3, x0 + 23, y0 + 27), tone, height=1)
+    elif kind == 2:
+        # A bar chart on a sheet of paper, a sticky note on the corner.
+        paint(m, box(14, 18, 112, 96), paper, height=1)
+        for i, bar in enumerate((30, 52, 40, 64, 48)):
+            x = 24 + i * 17
+            paint(m, box(x, 90 - bar, x + 11, 90), (60, 96, 150))
+        paint(m, box(20, 24, 22, 90), (60, 60, 60))
+        paint(m, box(20, 89, 106, 91), (60, 60, 60))
+        paint(m, box(96, 86, 120, 110), (226, 206, 90), height=2)
+    else:
+        # Worn through: stains, a torn corner, a taped-up scrawl.
+        from make_textures import clouds
+        tint(m, step(0.15, 0.5, clouds(1830, 3)), (0.74, 0.7, 0.62))
+        for _ in range(3):
+            y = int(rng.integers(20, 100))
+            paint(m, box(int(rng.integers(8, 40)), y, int(rng.integers(70, 118)), y + 1), (60, 56, 52))
+        paint(m, box(86, 96, 124, 124), (88, 86, 80), height=-2)
+        paint(m, box(30, 40, 58, 70), paper, height=1)
+        paint(m, box(28, 38, 60, 41), (190, 180, 120), height=2)
     for edge in (box(0, 0, 127, 7), box(0, 120, 127, 127), box(0, 0, 4, 127), box(123, 0, 127, 127)):
         paint(m, edge, (50, 52, 56), height=2, smooth=0.5)
+    return m
+
+
+def cubicle_trim():
+    """The capped top of a partition: dark fabric inside an aluminium edge."""
+    m = flat((46, 48, 52), 0.2, 6, 40)
+    m.color *= (1 + noise(1840, 8) * 0.05)[..., None]
+    paint(m, box(0, 0, 127, 5), (170, 172, 176), height=2, smooth=0.7, f0=200)
+    paint(m, box(0, 122, 127, 127), (170, 172, 176), height=2, smooth=0.7, f0=200)
+    paint(m, box(0, 0, 5, 127), (170, 172, 176), height=2, smooth=0.7, f0=200)
+    paint(m, box(122, 0, 127, 127), (170, 172, 176), height=2, smooth=0.7, f0=200)
     return m
 
 
@@ -1820,7 +1864,10 @@ def all_textures():
     t["padded_wall"] = padded(620)
     t["padded_wall_1"] = padded(630, True)
     t["book_shelf"] = book_shelf()
-    t["cubicle_panel"] = cubicle_panel()
+    t["cubicle_panel"] = cubicle_panel(0)
+    for variant in (1, 2, 3):
+        t[f"cubicle_panel_{variant}"] = cubicle_panel(variant)
+    t["cubicle_trim"] = cubicle_trim()
     t["desk_top"] = laminate()
     t["desk_leg"] = metal((86, 86, 88), 0.5)
     t["computer_case"] = plastic((198, 188, 160), 640)
@@ -2133,8 +2180,10 @@ def all_models():
         m[name] = bottom_top(name, "garage_floor")
     for name in ("garage_wall", "garage_wall_1", "garage_wall_2", "garage_wall_3", "garage_pillar", "garage_pillar_base",
                  "garage_pillar_marked", "garage_ceiling", "garage_ceiling_1", "painted_wall", "painted_wall_1", "painted_wall_2",
-                 "painted_wall_3", "old_brick", "old_brick_1", "padded_wall", "padded_wall_1", "book_shelf", "cubicle_panel"):
+                 "painted_wall_3", "old_brick", "old_brick_1", "padded_wall", "padded_wall_1", "book_shelf"):
         m[name] = cube_all(name)
+    for variant in ("cubicle_panel", "cubicle_panel_1", "cubicle_panel_2", "cubicle_panel_3"):
+        m[variant] = {"parent": "minecraft:block/cube_column", "textures": {"end": NS + "cubicle_trim", "side": NS + variant}}
     for name in ("corridor_floor", "corridor_floor_1", "corridor_floor_2"):
         m[name] = bottom_top(name, "corridor_floor")
     m["garage_light"] = lamp_model(True)
@@ -2281,7 +2330,8 @@ def all_blockstates():
     b["old_brick"] = {"variants": {"": [{"model": NS + "old_brick", "weight": 3}, {"model": NS + "old_brick_1"}]}}
     b["padded_wall"] = {"variants": {"": [{"model": NS + "padded_wall", "weight": 5}, {"model": NS + "padded_wall_1"}]}}
     b["book_shelf"] = single("book_shelf")
-    b["cubicle_panel"] = single("cubicle_panel")
+    b["cubicle_panel"] = {"variants": {"": [{"model": NS + "cubicle_panel", "weight": 4}, {"model": NS + "cubicle_panel_1", "weight": 2},
+                                            {"model": NS + "cubicle_panel_2", "weight": 2}, {"model": NS + "cubicle_panel_3", "weight": 3}]}}
     b["old_computer"] = {"variants": {f"facing={f}": ({"model": NS + "old_computer", "y": y} if y else {"model": NS + "old_computer"})
                                       for f, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}}
     for door in ("white_door", "reinforced_door", "pickaxe_door", "automatic_door", *NEW_DOORS, "white_wood_door"):

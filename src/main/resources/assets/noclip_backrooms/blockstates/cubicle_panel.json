@@ -1,7 +1,22 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level1/cubicle_panel"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/cubicle_panel",
+        "weight": 4
+      },
+      {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_1",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_2",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_3",
+        "weight": 3
+      }
+    ]
   }
 }
