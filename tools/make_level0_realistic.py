@@ -509,18 +509,30 @@ def ceiling_base(seed):
 
     pits = supersample(fissures, scale=2)
     color = rgb(218, 212, 194) * ((0.965 + 0.06 * fbm(seed + 5, base=4)) * (1 - 0.32 * pits))[..., None]
-    d = edge_distance()
-    bevel = smoothstep(0, 16, d)
-    color *= ((0.76 + 0.24 * bevel) * np.where(d < 2, 0.82, 1))[..., None]
-    dust = (1 - smoothstep(0, 70, d)) * fbm(seed + 6, base=8)
-    color = mix(color, color * rgb(205, 200, 186), dust * 0.6)
-    return Material(color, 0.55 + 0.45 * bevel - pits * 0.25, smooth=0.06, porosity=0.8, bump=30)
+    # Four tiles a block, about the size of real 60 cm tiles, so the ceiling stops following the block grid. The bars
+    # between them are painted; the model's own grid strips (0.75/16 of a block, 24 px) run along two block edges.
+    bar = (np.abs(X - (S - 1) / 2) < 12) | (np.abs(Y - (S - 1) / 2) < 12)
+    across = np.minimum(np.minimum(X, S - 1 - X), np.abs(X - (S - 1) / 2) - 12)
+    down = np.minimum(np.minimum(Y, S - 1 - Y), np.abs(Y - (S - 1) / 2) - 12)
+    d = np.maximum(np.minimum(across, down), 0)
+    bevel = smoothstep(0, 10, d)
+    color *= ((0.78 + 0.22 * bevel) * np.where(d < 2, 0.84, 1))[..., None]
+    dust = (1 - smoothstep(0, 40, d)) * fbm(seed + 6, base=8)
+    color = mix(color, color * rgb(205, 200, 186), dust * 0.5)
+    metal = painted_metal(rgb(196, 194, 184), seed + 7).color
+    color = np.where(bar[..., None], metal * (0.92 + 0.08 * smoothstep(0, 10, 12 - np.minimum(np.abs(X - (S - 1) / 2), np.abs(Y - (S - 1) / 2))))[..., None], color)
+    height = np.where(bar, 0.75, 0.55 + 0.45 * bevel - pits * 0.25)
+    m = Material(color, height, smooth=np.where(bar, 0.55, 0.06), porosity=0.8, bump=30)
+    m.bar = bar
+    return m
 
 
 def ceiling_variant(i):
     m = ceiling_base(seed=600)
     if i:
+        before = m.color.copy()
         tide_rings(m, big_stain(600 + i, 0.32))
+        m.color = np.where(m.bar[..., None], mix(before, m.color, 0.35), m.color)  # the metal bars barely take the stain
     return m
 
 
@@ -580,6 +592,55 @@ def light_panel(broken):
     return m
 
 
+# ------------------------------------------------------------------------------------------ models
+
+def troffer(panel, glow):
+    """A light as a 60x120 cm fitting recessed into half of the block, the other half ordinary ceiling tiles, instead
+    of a whole glowing block. Same textures as before, plus the ceiling's; the grid strips match ceiling_tile_base."""
+    level0 = "noclip_backrooms:block/level0/"
+
+    def face(texture, uv=None, cull=None):
+        f = {"texture": texture}
+        if uv:
+            f["uv"] = uv
+        if cull:
+            f["cullface"] = cull
+        return f
+
+    diffuser = {"from": [0.5, 1.5, 0.5], "to": [15.5, 1.5, 8], "faces": {"down": face("#panel", [0, 0, 16, 16])}}
+    if glow:
+        diffuser.update({"shade": False, "light_emission": 15})
+    grid = [0, 7, 16, 8]
+    return {
+        "parent": "minecraft:block/block",
+        "textures": {"particle": level0 + panel, "panel": level0 + panel, "housing": level0 + "light_housing",
+                     "tile": level0 + "ceiling_tile", "grid": level0 + "ceiling_grid"},
+        "elements": [
+            # Above the ceiling line it is a ceiling block like its neighbours.
+            {"from": [0, 0, 0], "to": [16, 16, 16],
+             "faces": {side: face("#tile", cull=side) for side in ("north", "south", "west", "east", "up")}},
+            # Two ordinary tiles beside the fitting.
+            {"from": [0, 0, 8], "to": [16, 1.5, 16], "faces": {"down": face("#tile", [0, 0, 16, 8]), "north": face("#housing", [0, 0, 16, 1.5])}},
+            # The fitting's frame round the opening, and its inside walls.
+            {"from": [0, 0, 0], "to": [16, 1.5, 0.5], "faces": {"down": face("#housing", [0, 0, 16, 0.5]), "south": face("#housing", [0, 0, 16, 1.5])}},
+            {"from": [0, 0, 0.5], "to": [0.5, 1.5, 8], "faces": {"down": face("#housing", [0, 0, 0.5, 7.5]), "east": face("#housing", [0, 0, 7.5, 1.5])}},
+            {"from": [15.5, 0, 0.5], "to": [16, 1.5, 8], "faces": {"down": face("#housing", [0, 0, 0.5, 7.5]), "west": face("#housing", [0, 0, 7.5, 1.5])}},
+            diffuser,
+            # The ceiling grid, as on every ceiling tile.
+            {"from": [0, -0.3, 0], "to": [16, 0, 0.75], "faces": {s: face("#grid", grid) for s in ("down", "north", "south")}},
+            {"from": [0, -0.3, 0.75], "to": [0.75, 0, 16], "faces": {s: face("#grid", grid) for s in ("down", "west", "east")}},
+        ],
+    }
+
+
+def models():
+    folder = PACK / "assets/noclip_backrooms/models/block/level0"
+    folder.mkdir(parents=True, exist_ok=True)
+    for name, panel, glow in (("fluorescent_light", "fluorescent_light", True), ("broken_fluorescent_light", "broken_fluorescent_light", False),
+                              ("red_fluorescent_light", "red_fluorescent_light", True)):
+        (folder / f"{name}.json").write_text(json.dumps(troffer(panel, glow), indent=2) + "\n", encoding="utf8")
+
+
 # ------------------------------------------------------------------------------------------ pack and preview
 
 def pack_meta():
@@ -627,6 +688,7 @@ def main():
     textures["broken_fluorescent_light"] = light_panel(broken=True)
     for name, m in textures.items():
         save(name, m)
+    models()
     pack_meta()
     preview(["wallpaper", "wallpaper_1", "wallpaper_6", "wallpaper_baseboard", "board", "carpet", "carpet_2", "carpet_4",
              "ceiling_tile", "ceiling_tile_1", "fluorescent_light", "broken_fluorescent_light"])

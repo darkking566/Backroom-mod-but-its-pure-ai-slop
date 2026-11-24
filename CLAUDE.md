@@ -151,6 +151,13 @@
   - 依使用者要求做「測試只跑更新的部分」：`build.gradle` 加 `-Plevels=1,3`（依套件名挑測試類別，0.1 寫 `0.1`，風格測試寫 `look`）與 `-Psections=`（Level 1 分段），不用再手改測試清單
   - 驗證：`gradlew build`（57 個單元測試）通過；`runClientGameTest -Plevels=look` 通過；其他層的測試沒有讀畫面像素，濾鏡不影響它們的判斷（這次沒重跑其他層）
   - 寫這筆紀錄時一個 shell 指令的反引號被當成指令執行（把幾個檔名當腳本跑了一下），檢查過沒有新增或改到任何檔案，只把這段紀錄重寫
+- 使用者看過第一版後說「不夠陰森冷寂、亮的燈太多、建模感覺跟以前一樣」，並問有沒有參考他們的遊戲：
+  - 這次用 Modrinth API 找到核心模組 Minecraft Backrooms Found Footage（SpacePotato）的遊戲截圖來看：它的方塊模型一樣是方塊，差別在光（燈少、只照到燈附近、背光面與遠處全黑、天花板磚比方塊小、強烈魚眼）
+  - 天花板改成一格方塊四片磚（`tools/make_level0_realistic.py`，中間畫金屬龍骨）；資源包覆蓋三種日光燈的模型，改成嵌在半格裡的燈具、另一半是普通磚，燈面用 `light_emission` 發亮
+  - 「暗」：新增 client mixin `FogRendererDarkness`（濾鏡開著時把後室的霧改成近乎全黑、從幾格外開始）與 `LightmapFalloff`（光照表的亮度設定改成負的，燈附近亮、燈之間暗）；每層強弱在 `Look.Mood`（Level 0 最暗，其他層輕一點）；濾鏡加強魚眼與色差、減少柔焦、補曝光、色調改偏黃褪色
+  - 試過在濾鏡裡用深度做遠處變黑，不行：遊戲畫手之前會清掉深度（濾鏡讀到的全是空的），而且 26.2 的深度是反的；改用霧
+  - 沒動朋友的 Level 0 程式與資料（燈的數量、亮度、霧的設定都還是朋友的，只在濾鏡開著時從客戶端改看起來的樣子）
+  - `runClientGameTest -Plevels=look` 與 `gradlew build`（57 個單元測試）通過；更新 `docs/look/README.md`、`docs/look/level0_ingame.jpg`
 
 ## 動作記錄（Antigravity）
 
