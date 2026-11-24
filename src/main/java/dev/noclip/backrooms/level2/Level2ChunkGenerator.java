@@ -69,7 +69,7 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 		return switch (tile.kind()) {
 			case WALL -> wall(seed, x, z);
 			case VOID_WALL -> state(Level2Blocks.VOID_CONCRETE);
-			case FLOOR, ROOM -> h == 4 ? light(seed, x, z) : air();
+			case FLOOR, ROOM -> h == 4 ? light(seed, x, z) : h == 2 ? mark(seed, x, z) : air();
 			case VOID -> air();
 			case BANK -> bank(seed, x, y, z, tile.dir());
 			case MACHINE -> machine(seed, tile, x, y, z, h);
@@ -83,6 +83,15 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 					? Level2Blocks.EXITS.get(tile.exit()).defaultBlockState().setValue(Level2ExitBlock.PART, h - 1) : wall(seed, x, z);
 			case WINDOW -> h == 2 ? state(Level2Blocks.TUNNEL_WINDOW) : wall(seed, x, z);
 		};
+	}
+
+	/** An earlier wanderer's spray-painted mark on the wall beside this column, if there is one here. */
+	private static BlockState mark(long seed, int x, int z) {
+		Level2Layout.Mark mark = Level2Layout.mark(seed, x, z);
+		if (mark == null) return air();
+		return Level2Blocks.WANDERER_MARK.defaultBlockState()
+				.setValue(Level2MarkBlock.FACING, Direction.from2DDataValue(horizontal(mark.facing())))
+				.setValue(Level2MarkBlock.LEVEL, Level2MarkBlock.level(mark.exit())).setValue(Level2MarkBlock.RIGHT, mark.right());
 	}
 
 	private static BlockState roomAir(long seed, int x, int z, int h) {

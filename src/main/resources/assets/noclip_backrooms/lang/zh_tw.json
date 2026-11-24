@@ -276,5 +276,8 @@
   "subtitles.noclip_backrooms.level3.shatter": "燈管爆裂",
   "subtitles.noclip_backrooms.level3.paranoia": "背後有聲音",
   "subtitles.noclip_backrooms.level3.elevator": "電梯叮咚",
-  "subtitles.noclip_backrooms.level3.crackle": "電流劈啪"
+  "subtitles.noclip_backrooms.level3.crackle": "電流劈啪",
+  "block.noclip_backrooms.wanderer_mark": "前人留下的噴漆記號",
+  "block.noclip_backrooms.meg_arrow_sign": "往 Base Gamma 的 M.E.G. 路標",
+  "block.noclip_backrooms.meg_warning_sign": "M.E.G. 熱點警告標誌"
 }

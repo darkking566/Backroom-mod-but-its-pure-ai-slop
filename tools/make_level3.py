@@ -459,6 +459,26 @@ def parts_crate(top):
     return m
 
 
+def meg_arrow(right):
+    m = metal((40, 70, 130), 0.5)
+    paint(m, box(4, 4, 124, 124, 1), (30, 58, 110), height=1)
+    paint(m, text_mask("M.E.G.", 12, (64, 24), "arialbd.ttf"), (232, 214, 120))
+    paint(m, text_mask("BASE GAMMA", 13, (64, 52), "arialbd.ttf"), (240, 238, 230))
+    paint(m, text_mask("\u2192" if right else "\u2190", 56, (64, 92), "arialbd.ttf"), (240, 238, 230))
+    return m
+
+
+def meg_warning():
+    m = metal((222, 186, 40), 0.4)
+    stripes = ((X + Y) // 10 % 2).astype(float) * np.maximum(1 - box(8, 8, 120, 120), 0)
+    paint(m, stripes, (30, 28, 26))
+    paint(m, text_mask("CAUTION", 18, (64, 30), "impact.ttf"), (30, 28, 26))
+    paint(m, text_mask("SCOPOPHOBIA", 11, (64, 58), "arialbd.ttf"), (30, 28, 26))
+    paint(m, text_mask("HOTSPOT AHEAD", 11, (64, 76), "arialbd.ttf"), (30, 28, 26))
+    paint(m, text_mask("- M.E.G. -", 10, (64, 100), "arialbd.ttf"), (120, 30, 24))
+    return m
+
+
 def all_textures():
     t = {}
     t["red_brick"] = brick(1000, (1.25, 0.66, 0.4), 1.55)
@@ -525,6 +545,9 @@ def all_textures():
     t["meg_crate_side"] = meg_crate(False)
     t["meg_crate_top"] = meg_crate(True)
     t["table_top"] = metal((130, 132, 130), 0.5)
+    t["meg_arrow_r"] = meg_arrow(True)
+    t["meg_arrow_l"] = meg_arrow(False)
+    t["meg_warning"] = meg_warning()
     return t
 
 
@@ -725,6 +748,9 @@ def all_models():
     m["meg_table"] = custom({"top": "table_top"}, [
         el((0, 13, 0), (16, 15, 16), sides("#top")), *[el((x, 0, z), (x + 1.5, 13, z + 1.5), sides("#top")) for x, z in ((1, 1), (13.5, 1), (1, 13.5), (13.5, 13.5))]])
     m.update(car_models())
+    for name, texture in (("meg_arrow_sign_r", "meg_arrow_r"), ("meg_arrow_sign_l", "meg_arrow_l"), ("meg_warning_sign", "meg_warning")):
+        m[name] = custom({"plate": texture, "rim": "lock"}, [
+            el((2, 3, 0), (14, 13, 1), {**sides("#rim", ("north", "east", "west", "up", "down")), "south": face("#plate")})], particle=texture)
     return m
 
 
@@ -812,6 +838,10 @@ def all_blockstates():
     b.update({name: facing_state(name) for name in FACING})
     b.update({name: part_state(name, parts) for name, parts in PARTS.items()})
     b["cage_gate"] = gate_state()
+    b["meg_arrow_sign"] = {"variants": {f"facing={f},right={str(r).lower()}": variant(f"meg_arrow_sign_{'r' if r else 'l'}", y)
+                                        for f, y in FACING_Y.items() for r in (False, True)}}
+    b["meg_warning_sign"] = {"variants": {f"facing={f},right={str(r).lower()}": variant("meg_warning_sign", y)
+                                          for f, y in FACING_Y.items() for r in (False, True)}}
     b["meg_table"] = simple("meg_table")
     return b
 
@@ -821,6 +851,8 @@ def item_model(name):
         return NS + f"{name}_0"
     if name == "cage_gate":
         return NS + "cage_gate_lower"
+    if name == "meg_arrow_sign":
+        return NS + "meg_arrow_sign_r"
     return NS + name
 
 

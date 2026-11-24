@@ -34,7 +34,7 @@ final class FlickeringWalls {
 	private static final TagKey<Block> LEVEL_0_WALLS = TagKey.create(Registries.BLOCK, Level1.id("level_0_walls"));
 	private static final TagKey<Block> MANILA_ROOM_BLOCKS = TagKey.create(Registries.BLOCK, Level1.id("manila_room_blocks"));
 	// The way into the parking structure is meant to be one of the hardest to find: a long wait, and it opens well away.
-	private static final int FIRST_DELAY = 4 * 60 * 20, DELAY_SPREAD = 3 * 60 * 20;
+	private static final int FIRST_DELAY = 90 * 20, DELAY_SPREAD = 90 * 20;
 	private static final int NEAREST = 16, FARTHEST = 40;
 	private static final int RETRY_DELAY = 10 * 20, REOPEN_DELAY = 60 * 20, MOVED_DELAY = 20 * 20;
 	private static final int GIVE_UP_DISTANCE = 80;

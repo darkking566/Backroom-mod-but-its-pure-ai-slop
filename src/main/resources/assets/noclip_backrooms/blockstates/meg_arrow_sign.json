@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=south,right=false": {
+      "model": "noclip_backrooms:block/level3/meg_arrow_sign_l"
+    },
+    "facing=south,right=true": {
+      "model": "noclip_backrooms:block/level3/meg_arrow_sign_r"
+    },
+    "facing=west,right=false": {
+      "model": "noclip_backrooms:block/level3/meg_arrow_sign_l",
+      "y": 90
+    },
+    "facing=west,right=true": {
+      "model": "noclip_backrooms:block/level3/meg_arrow_sign_r",
+      "y": 90
+    },
+    "facing=north,right=false": {
+      "model": "noclip_backrooms:block/level3/meg_arrow_sign_l",
+      "y": 180
+    },
+    "facing=north,right=true": {
+      "model": "noclip_backrooms:block/level3/meg_arrow_sign_r",
+      "y": 180
+    },
+    "facing=east,right=false": {
+      "model": "noclip_backrooms:block/level3/meg_arrow_sign_l",
+      "y": 270
+    },
+    "facing=east,right=true": {
+      "model": "noclip_backrooms:block/level3/meg_arrow_sign_r",
+      "y": 270
+    }
+  }
+}

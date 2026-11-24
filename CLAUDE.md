@@ -73,6 +73,12 @@
   - 新增 Level 3 的維度、維度類型、生態域、掉落物表、語言檔、音效、挖掘標籤；`BackroomsMod` 加一行註冊；Level 2 噴了「3」的門從此接到 Level 3
   - 新增 `tools/make_level3.py`、`docs/levels/level3/README.md`（取代企劃稿）與貼圖預覽；更新樓層索引、`README.md`、`NEXT.md`
   - 新增單元測試 `Level3LayoutTest`、`MapDump`，實機測試 `Level3ClientTest`；看截圖後把紅磚調亮、鐵柵的斑點減少
+- 使用者問各層之間好不好走：用暫時的量測程式實測（量完已刪除），Level 1→2 最短路線中位數約 143 格、Level 2→3 約 196 格
+- 使用者要求縮短 Level 0 的等待、照 Wiki 加路標（回頭路先不做，使用者要和朋友討論）：
+  - 閃爍牆出現的時間從 4～7 分鐘改成 1.5～3 分鐘（`FlickeringWalls`）
+  - Level 2：依 Wiki「一般出口常有前人留下的記號」，在噴了 1／3／4 的門附近 7 格內的直走道牆上，加紅色噴漆的樓層號與箭頭（`Level2Plan.markTo`、`Level2Layout.mark`、新方塊 `wanderer_mark`）
+  - Level 3：依 Wiki「M.E.G. 在 Base Gamma 周圍立了許多路標」與「所有已知熱點都有警告標誌」，加藍色 Base Gamma 路標（14 格內）與黃黑熱點警告牌（`Level3Plan.baseTo`、`Level3Layout.sign`、新方塊 `meg_arrow_sign`、`meg_warning_sign`）
+  - 單元測試確認順著箭頭一定走得到它指的門或據點、記號和路標背後一定是牆；實機測試加截圖；更新各層說明與 `NEXT.md`
 
 ## 動作記錄（Antigravity）
 

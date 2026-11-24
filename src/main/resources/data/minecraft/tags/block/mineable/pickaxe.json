@@ -85,6 +85,8 @@
     "noclip_backrooms:sanctum_pillar",
     "noclip_backrooms:sanctum_pillar_top",
     "noclip_backrooms:angel_pedestal",
-    "noclip_backrooms:meg_table"
+    "noclip_backrooms:meg_table",
+    "noclip_backrooms:meg_arrow_sign",
+    "noclip_backrooms:meg_warning_sign"
   ]
 }

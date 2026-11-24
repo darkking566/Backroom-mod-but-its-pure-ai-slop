@@ -276,5 +276,8 @@
   "subtitles.noclip_backrooms.level3.shatter": "Light shatters",
   "subtitles.noclip_backrooms.level3.paranoia": "Something behind you",
   "subtitles.noclip_backrooms.level3.elevator": "Elevator chimes",
-  "subtitles.noclip_backrooms.level3.crackle": "Electricity crackles"
+  "subtitles.noclip_backrooms.level3.crackle": "Electricity crackles",
+  "block.noclip_backrooms.wanderer_mark": "Wanderer's Mark",
+  "block.noclip_backrooms.meg_arrow_sign": "M.E.G. Sign to Base Gamma",
+  "block.noclip_backrooms.meg_warning_sign": "M.E.G. Hotspot Warning"
 }

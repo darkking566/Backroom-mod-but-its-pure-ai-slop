@@ -100,6 +100,9 @@ public final class Level3Blocks {
 	public static final Block TABLE = register("meg_table", Properties.of().mapColor(MapColor.METAL).strength(2.0F).sound(SoundType.METAL).noOcclusion(),
 			p -> new Level3FacingBlock(p, Level3Shapes.full(), Level3FacingBlock.Effect.NONE));
 	public static final Block MEG_SIGN = register("meg_sign", brick(MapColor.COLOR_LIGHT_GRAY));
+	/** The M.E.G. signs on passage walls: an arrow towards Base Gamma, and warnings at the paranoia hotspots. */
+	public static final Block MEG_ARROW_SIGN = register("meg_arrow_sign", sign(), Level3SignBlock::new);
+	public static final Block MEG_WARNING_SIGN = register("meg_warning_sign", sign(), Level3SignBlock::new);
 
 	// Ways out, which nothing breaks either
 	public static final Block ELEVATOR = register("station_elevator", unbreakable(MapColor.GOLD).lightLevel(state -> 3),
@@ -129,6 +132,10 @@ public final class Level3Blocks {
 
 	private static Properties fixture(int light) {
 		return Properties.of().mapColor(MapColor.METAL).strength(0.5F).sound(SoundType.GLASS).noOcclusion().noCollision().lightLevel(state -> light);
+	}
+
+	private static Properties sign() {
+		return Properties.of().mapColor(MapColor.COLOR_BLUE).strength(1.0F).sound(SoundType.METAL).noCollision().noOcclusion();
 	}
 
 	private static Properties unbreakable(MapColor color) {

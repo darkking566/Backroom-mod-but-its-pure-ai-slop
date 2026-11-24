@@ -100,6 +100,39 @@ class Level3LayoutTest {
 		assertTrue(gates > 2, "hardly any gates: " + gates);
 	}
 
+	/** The M.E.G.'s arrows lead to a way into Base Gamma; its signs hang on walls; warnings stand before hotspots. */
+	@Test
+	void signsLeadToBaseGamma() {
+		for (int rx = -3; rx <= 3; rx++) {
+			for (int rz = -3; rz <= 3; rz++) {
+				Level3Plan plan = Level3Plan.of(SEED, rx, rz);
+				for (int c = 0; c < Level3Plan.N * Level3Plan.N; c++) {
+					if (plan.baseTo[c] < 0) continue;
+					int at = c, steps = 0;
+					while (true) {
+						int d = plan.baseTo[at];
+						assertTrue(d >= 0 && steps++ <= Level3Plan.SIGN_DEPTH, "signs lose the way in region " + rx + ", " + rz);
+						if (plan.edge(at, d) == Level3Plan.Edge.HALL) break;
+						at = Level3Plan.cell(at % Level3Plan.N + Level3Plan.DX[d], at / Level3Plan.N + Level3Plan.DZ[d]);
+					}
+				}
+			}
+		}
+		int arrows = 0, warnings = 0;
+		for (int x = -3 * SIZE; x < 3 * SIZE; x++) {
+			for (int z = -3 * SIZE; z < 3 * SIZE; z++) {
+				Level3Layout.Sign sign = Level3Layout.sign(SEED, x, z);
+				if (sign == null) continue;
+				if (sign.warning()) warnings++;
+				else arrows++;
+				assertEquals(Kind.FLOOR, Level3Layout.tile(SEED, x, z).kind(), "a sign off the floor at " + x + ", " + z);
+				Kind behind = Level3Layout.tile(SEED, x - Level3Plan.DX[sign.facing()], z - Level3Plan.DZ[sign.facing()]).kind();
+				assertTrue(behind == Kind.WALL || behind == Kind.EXIT, "a sign with no wall behind it at " + x + ", " + z + ": " + behind);
+			}
+		}
+		assertTrue(arrows > 5 && warnings > 5, "arrows " + arrows + ", warnings " + warnings);
+	}
+
 	/** The paranoia hotspots are a minority of the level, and arriving never puts you in one. */
 	@Test
 	void hotspotsArePatchy() {

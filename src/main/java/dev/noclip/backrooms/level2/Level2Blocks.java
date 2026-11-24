@@ -80,6 +80,10 @@ public final class Level2Blocks {
 	public static final Block SCRAP_HEAP = register("scrap_heap", Properties.of().mapColor(MapColor.METAL).strength(1.0F)
 			.sound(SoundType.CHAIN).noOcclusion(), p -> new Level2ShapedBlock(p, SCRAP));
 
+	/** Spray-painted marks earlier wanderers left near the standard exits. */
+	public static final Block WANDERER_MARK = register("wanderer_mark", Properties.of().mapColor(MapColor.COLOR_RED).strength(0.2F)
+			.noLootTable().sound(SoundType.WOOL).noCollision().noOcclusion(), Level2MarkBlock::new);
+
 	/** Windows at the ends of dead-end tunnels, bright as day. Do not go near them (see Level2Windows). */
 	public static final Block TUNNEL_WINDOW = register("tunnel_window", Properties.of().mapColor(MapColor.SNOW)
 			.strength(-1.0F, 3600000.0F).noLootTable().sound(SoundType.GLASS).lightLevel(state -> 9));

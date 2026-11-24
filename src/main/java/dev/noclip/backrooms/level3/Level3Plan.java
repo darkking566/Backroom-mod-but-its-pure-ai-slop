@@ -75,6 +75,12 @@ final class Level3Plan {
 	final List<Hall> halls = new ArrayList<>();
 	/** Elevators set into a cell's wall on one side: index cell * 4 + direction. */
 	final Level3Exit[] exits = new Level3Exit[N * N * 4];
+	/**
+	 * The M.E.G. signs towards Base Gamma (Wikidot: "numerous signs ... with the hopes of helping wanderers find
+	 * their way to the base"): in cells within reach of a Base Gamma outpost, the way to go, or -1.
+	 */
+	final byte[] baseTo = new byte[N * N];
+	static final int SIGN_DEPTH = 14;
 	private final long seed;
 	private final int rx, rz;
 
@@ -97,6 +103,7 @@ final class Level3Plan {
 		openEdges();
 		openHalls(random);
 		placeElevators(random);
+		placeBaseSigns();
 	}
 
 	static int cell(int i, int j) {
@@ -288,6 +295,41 @@ final class Level3Plan {
 			for (int n = 0; n < openings && !sides.isEmpty(); n++) {
 				int[] side = sides.remove(random.nextInt(sides.size()));
 				edges[side[0] * 4 + side[1]] = Edge.HALL;
+			}
+		}
+	}
+
+	/** From the ways into each Base Gamma outpost, a walk back along passable passages, marking which way it lies. */
+	private void placeBaseSigns() {
+		Arrays.fill(baseTo, (byte) -1);
+		int[] seen = new int[N * N];
+		Arrays.fill(seen, -1);
+		int[] queue = new int[N * N];
+		int head = 0, tail = 0;
+		for (int c = 0; c < N * N; c++) {
+			if (hallOf[c] >= 0) continue;
+			for (int d = 0; d < 4; d++) {
+				if (edges[c * 4 + d] != Edge.HALL) continue;
+				int i = c % N + DX[d], j = c / N + DZ[d];
+				if (!inside(i, j) || halls.get(hallOf[cell(i, j)]).kind() != HallKind.BASE || seen[c] >= 0) continue;
+				seen[c] = 0;
+				baseTo[c] = (byte) d;
+				queue[tail++] = c;
+			}
+		}
+		while (head < tail) {
+			int at = queue[head++];
+			if (seen[at] >= SIGN_DEPTH) continue;
+			int i = at % N, j = at / N;
+			for (int way = 0; way < 4; way++) {
+				Edge edge = edges[at * 4 + way];
+				int a = i + DX[way], b = j + DZ[way];
+				if (edge != Edge.OPEN && edge != Edge.GATE || !mazeCell(a, b)) continue;
+				int next = cell(a, b);
+				if (seen[next] >= 0) continue;
+				seen[next] = seen[at] + 1;
+				baseTo[next] = (byte) opposite(way);
+				queue[tail++] = next;
 			}
 		}
 	}

@@ -94,6 +94,15 @@ public final class Level3ClientTest implements FabricClientGameTest {
 			double eye = profile == Profile.LOW ? STAND - 0.4 : STAND;
 			shoot(context, game, at[0] + 0.5, eye, at[1] + 0.5, yaw, 5, "level3_passage_" + profile.name().toLowerCase(Locale.ROOT));
 		}
+		for (boolean warning : new boolean[] {false, true}) {
+			int[] signed = nearest(seed, from, t -> t.kind() == Kind.FLOOR, (x, z) -> {
+				Level3Layout.Sign sign = Level3Layout.sign(seed, x, z);
+				return sign != null && sign.warning() == warning;
+			});
+			int facing = Level3Layout.sign(seed, signed[0], signed[1]).facing();
+			shoot(context, game, signed[0] + 0.5 + Level3Plan.DX[facing] * 1.0, STAND, signed[1] + 0.5 + Level3Plan.DZ[facing] * 1.0,
+					yaw(Level3Plan.opposite(facing)), 10, warning ? "level3_hotspot_warning" : "level3_base_gamma_sign");
+		}
 		int[] bars = nearest(seed, from, t -> t.kind() == Kind.BARS && t.clearance() >= 3, (x, z) -> true);
 		Tile tile = Level3Layout.tile(seed, bars[0], bars[1]);
 		int back = Level3Plan.opposite(tile.dir());

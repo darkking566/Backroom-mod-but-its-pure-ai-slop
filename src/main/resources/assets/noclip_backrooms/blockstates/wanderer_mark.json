@@ -1,0 +1,94 @@
+{
+  "variants": {
+    "facing=south,level=0,right=false": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_0_l"
+    },
+    "facing=south,level=0,right=true": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_0_r"
+    },
+    "facing=south,level=1,right=false": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_1_l"
+    },
+    "facing=south,level=1,right=true": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_1_r"
+    },
+    "facing=south,level=2,right=false": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_2_l"
+    },
+    "facing=south,level=2,right=true": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_2_r"
+    },
+    "facing=west,level=0,right=false": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_0_l",
+      "y": 90
+    },
+    "facing=west,level=0,right=true": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_0_r",
+      "y": 90
+    },
+    "facing=west,level=1,right=false": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_1_l",
+      "y": 90
+    },
+    "facing=west,level=1,right=true": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_1_r",
+      "y": 90
+    },
+    "facing=west,level=2,right=false": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_2_l",
+      "y": 90
+    },
+    "facing=west,level=2,right=true": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_2_r",
+      "y": 90
+    },
+    "facing=north,level=0,right=false": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_0_l",
+      "y": 180
+    },
+    "facing=north,level=0,right=true": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_0_r",
+      "y": 180
+    },
+    "facing=north,level=1,right=false": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_1_l",
+      "y": 180
+    },
+    "facing=north,level=1,right=true": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_1_r",
+      "y": 180
+    },
+    "facing=north,level=2,right=false": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_2_l",
+      "y": 180
+    },
+    "facing=north,level=2,right=true": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_2_r",
+      "y": 180
+    },
+    "facing=east,level=0,right=false": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_0_l",
+      "y": 270
+    },
+    "facing=east,level=0,right=true": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_0_r",
+      "y": 270
+    },
+    "facing=east,level=1,right=false": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_1_l",
+      "y": 270
+    },
+    "facing=east,level=1,right=true": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_1_r",
+      "y": 270
+    },
+    "facing=east,level=2,right=false": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_2_l",
+      "y": 270
+    },
+    "facing=east,level=2,right=true": {
+      "model": "noclip_backrooms:block/level2/wanderer_mark_2_r",
+      "y": 270
+    }
+  }
+}

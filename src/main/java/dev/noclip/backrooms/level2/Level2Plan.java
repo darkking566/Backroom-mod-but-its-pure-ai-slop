@@ -70,6 +70,13 @@ final class Level2Plan {
 	int hotX = -1, hotZ = -1;
 	/** The cell whose wall holds the door to 811, or -1. */
 	int bladeCell = -1;
+	/**
+	 * Earlier wanderers' marks (Wikidot: the standard exits are "often marked by earlier wanderers' signs"): in cells
+	 * near a door marked 1, 3 or 4, the way to go towards it (a direction), or -1; and which door.
+	 */
+	final byte[] markTo = new byte[N * N];
+	final Level2Exit[] markFor = new Level2Exit[N * N];
+	static final int MARK_DEPTH = 7;
 
 	static Level2Plan of(long seed, int rx, int rz) {
 		// Chunks are generated on several threads; plans are cheap, so a full cache is simply dropped.
@@ -89,6 +96,7 @@ final class Level2Plan {
 		placeHotZone(random);
 		placeExits(random);
 		placeWindows(random);
+		placeMarks();
 	}
 
 	static int cell(int i, int j) {
@@ -285,6 +293,44 @@ final class Level2Plan {
 				exits[c * 4 + d] = exit;
 				if (exit == Level2Exit.BLADE) bladeCell = c;
 				break;
+			}
+		}
+	}
+
+	/** From each standard exit, a short walk back along the tunnels, marking which way it lies. */
+	private void placeMarks() {
+		Arrays.fill(markTo, (byte) -1);
+		int[] depth = new int[N * N];
+		Arrays.fill(depth, Integer.MAX_VALUE);
+		int[] queue = new int[N * N];
+		for (int c = 0; c < N * N; c++) {
+			for (int d = 0; d < 4; d++) {
+				Level2Exit exit = exits[c * 4 + d];
+				if (exit != Level2Exit.MARKED_1 && exit != Level2Exit.MARKED_3 && exit != Level2Exit.MARKED_4) continue;
+				int head = 0, tail = 0;
+				queue[tail++] = c;
+				int[] seen = new int[N * N];
+				Arrays.fill(seen, -1);
+				seen[c] = 0;
+				while (head < tail) {
+					int at = queue[head++];
+					if (seen[at] >= MARK_DEPTH) continue;
+					int i = at % N, j = at / N;
+					for (int way = 0; way < 4; way++) {
+						int a = i + DX[way], b = j + DZ[way];
+						if (!isOpen(at, way) || !mazeCell(a, b)) continue;
+						int next = cell(a, b);
+						if (seen[next] >= 0) continue;
+						seen[next] = seen[at] + 1;
+						queue[tail++] = next;
+						// Nearer exits win where their marks would meet.
+						if (seen[next] < depth[next]) {
+							depth[next] = seen[next];
+							markTo[next] = (byte) opposite(way);
+							markFor[next] = exit;
+						}
+					}
+				}
 			}
 		}
 	}

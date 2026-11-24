@@ -155,6 +155,14 @@ final class Level3ChunkGenerator extends ChunkGenerator {
 					if (roll < 40) return mounted(roll < 6 ? Level3Blocks.LEAKING_SLUDGE_PIPE : roll < 16 ? Level3Blocks.SLUDGE_PIPE : Level3Blocks.WALL_CONDUIT);
 				}
 			}
+			if (h == 2) {
+				Level3Layout.Sign sign = Level3Layout.sign(seed, x, z);
+				if (sign != null) {
+					return (sign.warning() ? Level3Blocks.MEG_WARNING_SIGN : Level3Blocks.MEG_ARROW_SIGN).defaultBlockState()
+							.setValue(Level3SignBlock.FACING, Direction.from2DDataValue(horizontal(sign.facing())))
+							.setValue(Level3SignBlock.RIGHT, sign.right());
+				}
+			}
 			if (h == 2 && against >= 0 && clearance >= 3 && Level3Layout.roll(seed, x, 2, z) < 5) return mounted(Level3Blocks.ELECTRICAL_BOX);
 			return air();
 		}

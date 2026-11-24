@@ -566,6 +566,41 @@ def scrap(seed):
     return m
 
 
+def mark(level, right):
+    """An earlier wanderer's spray paint: the level's number and an arrow, on nothing (the wall shows through)."""
+    m = flat((176, 34, 28), 0.35, 10, 10)
+    number = text_mask(level, 64, (34 if right else 94, 56), rotate=-5)
+    arrow = arrow_mask(right)
+    paint_mask = np.clip(number + arrow, 0, 1)
+    rng = np.random.default_rng(int(level) * 2 + right)
+    for _ in range(3):
+        x0, y0, length = rng.uniform(30, 100), rng.uniform(60, 78), rng.uniform(10, 30)
+        drip = (1 - step(0.5, 1.4, np.abs(X - x0))) * step(y0, y0 + 2, Y) * (1 - step(y0 + length * 0.6, y0 + length, Y))
+        paint_mask = np.maximum(paint_mask, drip * (paint_mask[int(y0), int(x0)] > 0.3))
+    speckle = 0.7 + 0.3 * noise(int(level) + 40, 128)
+    return m, paint_mask * speckle
+
+
+def arrow_mask(right):
+    """A thick sprayed arrow, a shaft and a head, on the other half of the mark from the number."""
+    big = Image.new("L", (SIZE * 4, SIZE * 4))
+    draw = ImageDraw.Draw(big)
+    if right:
+        draw.polygon([(250, 225), (390, 225), (390, 290), (250, 290)], fill=255)
+        draw.polygon([(370, 165), (490, 257), (370, 350)], fill=255)
+    else:
+        draw.polygon([(122, 225), (262, 225), (262, 290), (122, 290)], fill=255)
+        draw.polygon([(142, 165), (22, 257), (142, 350)], fill=255)
+    return np.asarray(big.resize((SIZE, SIZE), Image.Resampling.LANCZOS), float) / 255
+
+
+def save_cutout(name, m, alpha):
+    mt.save(name, m)
+    rgb = np.clip(np.rint(m.color), 0, 255).astype("uint8")
+    a = (alpha > 0.45).astype("uint8") * 255
+    Image.fromarray(np.dstack([rgb, a]), "RGBA").save(TEXTURES / f"{name}.png", optimize=True)
+
+
 def all_textures():
     t = {}
     t["utility_wall"] = chalky(500)
@@ -808,6 +843,11 @@ def all_models():
             texture = f"{name}_{part}" if height == 4 else f"{name}_{'bottom' if part == 0 else 'top'}"
             m[f"{name}_{part}"] = cube(texture)
     m["tunnel_window"] = window_model()
+    for level in range(3):
+        for right in (False, True):
+            name = f"wanderer_mark_{level}_{'r' if right else 'l'}"
+            m[name] = {"parent": "minecraft:block/block", "textures": {"particle": NS + name, "paint": NS + name},
+                       "elements": [el((0, 0, 0.02), (16, 16, 0.12), {"south": face("#paint")})]}
     m["wooden_crate"] = {"parent": "minecraft:block/cube_bottom_top",
                          "textures": {"side": NS + "crate_side", "top": NS + "crate_top", "bottom": NS + "crate_top"}}
     m["oil_drum"] = drum_model()
@@ -859,6 +899,9 @@ def all_blockstates():
         b[name] = exit_state(name, height)
     for name in ("tunnel_window", "wooden_crate", "oil_drum", "scrap_heap"):
         b[name] = {"variants": {"": {"model": NS + name}}}
+    b["wanderer_mark"] = {"variants": {
+        f"facing={f},level={level},right={str(right).lower()}": {"model": NS + f"wanderer_mark_{level}_{'r' if right else 'l'}", **({"y": y} if y else {})}
+        for f, y in FACING_Y.items() for level in range(3) for right in (False, True)}}
     return b
 
 
@@ -867,6 +910,8 @@ def item_model(name):
         return NS + f"{name}_bottom_left"
     if name in EXITS:
         return NS + f"{name}_0"
+    if name == "wanderer_mark":
+        return NS + "wanderer_mark_1_r"
     return NS + name
 
 
@@ -925,7 +970,7 @@ def loot_table(name, door=False):
 
 
 # Ways to other levels and the windows cannot be broken, so they have no loot table.
-NO_LOOT = set(EXITS) | {"tunnel_window"}
+NO_LOOT = set(EXITS) | {"tunnel_window", "wanderer_mark"}
 
 
 def main():
@@ -934,6 +979,9 @@ def main():
     textures = all_textures()
     for name, material in textures.items():
         mt.save(name, material)
+    for level, number in enumerate(("1", "3", "4")):
+        for right in (False, True):
+            save_cutout(f"wanderer_mark_{level}_{'r' if right else 'l'}", *mark(number, right))
     preview(textures)
     models = all_models()
     for name, model in models.items():

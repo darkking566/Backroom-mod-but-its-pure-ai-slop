@@ -87,6 +87,10 @@ public final class Level2ClientTest implements FabricClientGameTest {
 		Tile m = Level2Layout.tile(seed, machine[0], machine[1]);
 		shoot(context, game, machine[0] + 0.5 + Level2Plan.DX[m.dir()] * 2.2, STAND, machine[1] + 0.5 + Level2Plan.DZ[m.dir()] * 2.2,
 				yaw(Level2Plan.opposite(m.dir())), 15, "level2_machine");
+		int[] marked = nearest(seed, from, t -> t.kind() == Kind.FLOOR, 0, (x2, z2) -> Level2Layout.mark(seed, x2, z2) != null);
+		int markFacing = Level2Layout.mark(seed, marked[0], marked[1]).facing();
+		shoot(context, game, marked[0] + 0.5 + Level2Plan.DX[markFacing] * 1.2, STAND, marked[1] + 0.5 + Level2Plan.DZ[markFacing] * 1.2,
+				yaw(Level2Plan.opposite(markFacing)), 10, "level2_wanderer_mark");
 		int[] dark = nearest(seed, from, t -> t.kind() == Kind.FLOOR, 0, (x2, z2) -> Level2Layout.light(seed, x2, z2) == Level2Layout.Light.VIOLET);
 		shoot(context, game, dark[0] + 2.5, STAND, dark[1] + 0.5, 90, -10, "level2_emergency_light");
 	}

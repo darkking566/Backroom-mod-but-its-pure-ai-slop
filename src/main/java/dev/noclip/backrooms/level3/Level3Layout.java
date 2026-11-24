@@ -253,6 +253,35 @@ public final class Level3Layout {
 		return roll < 25 ? Hazard.WIRE : roll < 45 ? Hazard.SLUDGE : Hazard.NONE;
 	}
 
+	/** An M.E.G. sign on a passage wall: an arrow towards Base Gamma, or a warning that a paranoia hotspot lies ahead. */
+	record Sign(boolean warning, int facing, boolean right) {
+	}
+
+	/**
+	 * The M.E.G. sign on the wall beside this column, at eye height, or null. Signs hang in roomy straight passages,
+	 * on their north or west wall: arrows towards Base Gamma one block in from the cell's end, and warnings at the
+	 * end that opens into a dark, narrow stretch (Wikidot: "M.E.G. has installed warning signage at all known hotspots").
+	 */
+	static Sign sign(long seed, int x, int z) {
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		Level3Plan plan = plan(seed, x, z);
+		int i = lx / CELL, j = lz / CELL, ox = lx % CELL, oz = lz % CELL;
+		int cell = Level3Plan.cell(i, j);
+		if (plan.hallOf[cell] >= 0) return null;
+		int axis = plan.straightAxis(cell);
+		Profile p = plan.profile(i, j);
+		if (axis < 0 || p.clearance < 3) return null;
+		int wall = axis == 0 ? NORTH : WEST;
+		int along = axis == 0 ? ox : oz, across = axis == 0 ? oz : ox;
+		if (across != low(p.width)) return null;
+		if (along == 1 && plan.baseTo[cell] >= 0) return new Sign(false, Level3Plan.opposite(wall), plan.baseTo[cell] == ((wall + 1) & 3));
+		int ahead = along == CELL - 2 ? (axis == 0 ? EAST : SOUTH) : along == 1 ? (axis == 0 ? WEST : NORTH) : -1;
+		if (ahead < 0) return null;
+		int gx = Math.floorDiv(x, CELL) + Level3Plan.DX[ahead], gz = Math.floorDiv(z, CELL) + Level3Plan.DZ[ahead];
+		if (hotspot(seed, gx * CELL + 2, gz * CELL + 2)) return new Sign(true, Level3Plan.opposite(wall), false);
+		return null;
+	}
+
 	/** 0..99, for decorations that are a matter of chance. */
 	static int roll(long seed, int x, int y, int z) {
 		return Math.floorMod(hash(seed, x * 31 + y, z, DECOR), 100);
