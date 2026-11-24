@@ -233,3 +233,5 @@
     6. `partypooper`（Entity 68 派對掃興客）：友善流浪者盟友，向玩家招手示警、收受合金或繃帶回贈杏仁水與再生效果，並主動獵殺派對客與周遭敵對怪物
     7. `beast_level5`（Entity 18 第五層野獸紳士，Boss）：雙階段 Boss（紫色 Boss 血條），半血以下觸發 `phase2_unfurl` 展開隱藏深淵雙翼與背部觸手並釋放黑暗脈衝
   - 新增對應之 `src/main/java/.../monsters/<套件>/`、`src/client/java/.../monsters/<套件>/`、`Monsters.java` 與 `BackroomsClient.java` 註冊、`assets/noclip_backrooms/monsters/*.json`、`textures/entity/*.png`（含 `*_eyes.png`）、16×16 生怪蛋貼圖與模型、以及 `art/monsters/<id>/`（`.blend` 與 `.glb` 原檔）
+
+- Level 0.1 四種原文房間加擺設（18 個新方塊：上下舖、相框、開門衣櫃、辦公桌、私人物品、水槽、冰箱、吊掛鍋具、疊盤、臥推架、沙包、牆鏡、飲水機、墊子堆、栽培架、植物燈、水箱、垂藤）：`tools/make_level0p1_props.py` 產生貼圖／模型／blockstates；`ZenithLayout` 的四個房間函式改寫、`ZenithBlocks`／`ZenithChunkGenerator` 登記；`gradlew build` 與 `rooms` 段實機測試通過，截圖看過，各件近照與朝向還沒逐一確認；尚未提交
