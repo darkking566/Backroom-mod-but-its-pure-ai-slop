@@ -4,6 +4,8 @@
 	"package": "dev.noclip.backrooms.mixin.client",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
+		"AbstractContainerScreenAccess",
+		"EntityRenderDispatcherHallucination",
 		"FogRendererDarkness",
 		"GameRendererAccess",
 		"LightmapFalloff"

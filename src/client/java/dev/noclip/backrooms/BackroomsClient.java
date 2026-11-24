@@ -4,6 +4,7 @@ import dev.noclip.backrooms.core.look.Look;
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.people.PersonModel;
 import dev.noclip.backrooms.core.people.PersonRenderer;
+import dev.noclip.backrooms.core.rpg.RpgClient;
 import dev.noclip.backrooms.level0p1.robots.Robot;
 import dev.noclip.backrooms.level0p1.robots.RobotModel;
 import dev.noclip.backrooms.level0p1.robots.RobotRenderer;
@@ -57,6 +58,7 @@ public final class BackroomsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		Look.register();
+		RpgClient.register();
 		ModelLayerRegistry.registerModelLayer(HoundModel.LAYER, HoundModel.RIG::layer);
 		EntityRendererRegistry.register(Monsters.HOUND, HoundRenderer::new);
 		ModelLayerRegistry.registerModelLayer(SmilerModel.LAYER, SmilerModel.RIG::layer);

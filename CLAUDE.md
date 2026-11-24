@@ -235,3 +235,14 @@
   - 新增對應之 `src/main/java/.../monsters/<套件>/`、`src/client/java/.../monsters/<套件>/`、`Monsters.java` 與 `BackroomsClient.java` 註冊、`assets/noclip_backrooms/monsters/*.json`、`textures/entity/*.png`（含 `*_eyes.png`）、16×16 生怪蛋貼圖與模型、以及 `art/monsters/<id>/`（`.blend` 與 `.glb` 原檔）
 
 - Level 0.1 四種原文房間加擺設（18 個新方塊：上下舖、相框、開門衣櫃、辦公桌、私人物品、水槽、冰箱、吊掛鍋具、疊盤、臥推架、沙包、牆鏡、飲水機、墊子堆、栽培架、植物燈、水箱、垂藤）：`tools/make_level0p1_props.py` 產生貼圖／模型／blockstates；`ZenithLayout` 的四個房間函式改寫、`ZenithBlocks`／`ZenithChunkGenerator` 登記；`gradlew build` 與 `rooms` 段實機測試通過，截圖看過，各件近照與朝向還沒逐一確認；尚未提交
+- 依使用者要求撰寫完整總體玩法專案企劃並先實作 RPG 能力值、個人介面 UI 與純客戶端理智幻覺地基：
+  - 新增總體玩法企劃文件 `docs/GAMEPLAY_SYSTEM_PLAN.md`：涵蓋主世界安全據點 × 雙格沙子穿模入口 × 後室撤離尋寶循環（死亡噴裝、出口／安頓點帶回主世界、方塊拆解與合成閉環）、戰前準備系統（Pre-Game Loadout）、多樓層條件解鎖（Boss／鑰匙卡／修發電機／NPC 任務）、經濟金錢與商人收購高價合成物／主世界武器兌換／送信與受困小女孩任務、無限地圖由中心往外之距離難度與稀有掉落曲線、RPG 角色能力值與後續職業系統（含法師吸收大氣粒子快回理智、施法耗理智、多 Boss 掉落合成／主世界兌換專屬法杖）、以及純客戶端理智幻覺系統
+  - 新增伺服器與共用 RPG 系統 `src/main/java/dev/noclip/backrooms/core/rpg/`（`PlayerStats`、`AllocateStatPayload`、`PlayerRpg`），透過 Fabric Data Attachment API 持久化於玩家 NBT、死亡保留、僅同步給本人客戶端（`AttachmentSyncPredicate.targetOnly()`）：
+    - 支援力量（`STR`，加近戰攻擊）、敏捷（`AGI`，加移速與攻速）、體質（`VIT`，加最大生命與韌性）、理智（`SAN`，加理智上限、抗流失與回穩倍率），以 `AttributeModifier` 實際生效
+    - 擊殺怪物與 Boss 累積 RPG 經驗值並升級獲得自由屬性點（初期 3 點，每級 +3 點）；主世界自動回復理智，後室暗處與怪物附近流失理智，飲用杏仁水（`Level1Items.ALMOND_WATER`）額外回復 35 理智
+    - 新增測試指令：`/backrooms sanity set|get`、`/backrooms stats addxp|addpoints|reset`
+  - 新增個人介面 UI 與純客戶端理智幻覺 `src/client/java/dev/noclip/backrooms/core/rpg/`（`RpgClient`、`SanityBarHud`、`InventoryStatsPanel`、`SanityHallucinations`）與客戶端 Mixin（`AbstractContainerScreenAccess`、`EntityRenderDispatcherHallucination`）：
+    - 下方 HUD 新增理智值計量條（對齊飽食度條上方並自動閃避水下氣泡與坐騎血條），低於 30% 時抖動變紅並浮現畫面四周暗角脈衝
+    - 打開原版背包（`InventoryScreen`）時於側邊展開角色狀態與升級加點面板（開合成書時自動移至右側避免重疊），顯示等級、經驗條、理智、四項屬性與 `+` 即時加點按鈕及懸停說明
+    - 理智低於 30% 之幻覺 100% 於該玩家客戶端執行與渲染（伺服器零實體同步）：本機 `ClientLevel` 生成負 ID 幻覺後室怪物追殺玩家，玩家揮刀砍向幻影時本地尖嘯煙散（隊友只見其對空氣瘋狂揮刀）；同時透過 `EntityRenderDispatcherHallucination` 在低理智玩家畫面將視野內隊友（`RemotePlayer`）即時替換渲染為後室 3D 怪物模型並隱藏名牌
+  - 新增單元測試 `src/test/java/dev/noclip/backrooms/core/rpg/PlayerStatsTest.java`，於 `BackroomsMod`、`BackroomsClient`、`noclip_backrooms.client.mixins.json`、`en_us.json`、`zh_tw.json` 完成註冊與雙語翻譯；`gradlew build`（含全部單元測試）與 `runClientGameTest -Plevels=look`（實機驗證 Mixin、HUD 與客戶端系統）皆通過
