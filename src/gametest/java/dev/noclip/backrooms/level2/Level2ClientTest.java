@@ -35,7 +35,10 @@ public final class Level2ClientTest implements FabricClientGameTest {
 			server.runCommand("gamerule noclip_backrooms:edge_shift false");
 			server.runCommand("gamemode survival @a");
 			// Packs are tested on their own below; until then none turn up by chance.
-			server.runOnServer(s -> Level2Hounds.holdOff(s, 20 * 60 * 20));
+			server.runOnServer(s -> {
+				Level2Hounds.holdOff(s, 20 * 60 * 20);
+				Level2Monsters.holdOff(s, 20 * 60 * 20);
+			});
 
 			enterFromLevel1(context, game);
 			long seed = server.computeOnServer(s -> Level2ChunkGenerator.planSeed(level2(s).getChunkSource().randomState()));
@@ -57,6 +60,7 @@ public final class Level2ClientTest implements FabricClientGameTest {
 			heat(context, game, seed, arrival);
 			window(context, game, seed, arrival);
 			hounds(context, game, seed, arrival);
+			monsters(context, game, seed, arrival);
 			checkBlocks(game);
 		}
 	}
@@ -211,6 +215,25 @@ public final class Level2ClientTest implements FabricClientGameTest {
 		int came = server.computeOnServer(s -> Level2Hounds.spawnPack(player(s)));
 		check(came == 2, "a pack of " + came + " hounds");
 		server.runCommand("kill @e[tag=" + Level2Hounds.TAG + "]");
+		server.runCommand("gamemode spectator @a");
+	}
+
+	private static void monsters(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
+		var server = game.getServer();
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_2 run tp @s %.1f %d %.1f", from.getX() + 0.5, STAND, from.getZ() + 0.5));
+		server.runCommand("gamemode survival @a");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(20);
+		int spawned = server.computeOnServer(s -> {
+			ServerPlayer p = player(s);
+			int count = 0;
+			for (Level2Monsters.Entry entry : Level2Monsters.POOL) {
+				if (Level2Monsters.spawnOne(p, entry.type()) != null) count++;
+			}
+			return count;
+		});
+		check(spawned == Level2Monsters.POOL.size(), "only " + spawned + "/" + Level2Monsters.POOL.size() + " Level 2 monsters spawned");
+		server.runCommand("kill @e[tag=" + Level2Monsters.TAG + "]");
 		server.runCommand("gamemode spectator @a");
 	}
 
