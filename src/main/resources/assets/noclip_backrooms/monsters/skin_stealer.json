@@ -71,11 +71,11 @@
             3.6,
             3.6
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -88,11 +88,11 @@
             1.8,
             3.2
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -105,11 +105,11 @@
             1.0,
             2.6
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -122,11 +122,11 @@
             2.6,
             2.4
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -139,11 +139,11 @@
             2.6,
             2.4
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -156,11 +156,11 @@
             1.8,
             0.4
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -173,11 +173,11 @@
             2.6,
             0.5
           ],
-          "uv": [
+          "region": "bruise",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "bruise"
+          ]
         }
       ]
     },
@@ -186,7 +186,7 @@
       "parent": "Pelvis",
       "pivot_mc": [
         0.0,
-        1.2,
+        -0.6,
         0.0
       ],
       "rest_rot_rad_mc": [
@@ -206,11 +206,11 @@
             8.4,
             3.4
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -223,11 +223,11 @@
             1.4,
             0.45
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -240,11 +240,11 @@
             1.5,
             0.5
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -257,11 +257,11 @@
             1.6,
             0.55
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -274,11 +274,11 @@
             1.2,
             0.45
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -291,11 +291,11 @@
             6.4,
             2.2
           ],
-          "uv": [
+          "region": "bruise",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "bruise"
+          ]
         },
         {
           "origin_mc": [
@@ -308,11 +308,11 @@
             6.4,
             2.2
           ],
-          "uv": [
+          "region": "bruise",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "bruise"
+          ]
         },
         {
           "origin_mc": [
@@ -325,11 +325,11 @@
             7.2,
             0.5
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -342,11 +342,11 @@
             7.0,
             0.4
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         }
       ]
     },
@@ -355,7 +355,7 @@
       "parent": "Spine",
       "pivot_mc": [
         0.0,
-        -6.8,
+        -8.0,
         0.0
       ],
       "rest_rot_rad_mc": [
@@ -375,11 +375,11 @@
             8.0,
             4.2
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -392,11 +392,11 @@
             4.2,
             3.4
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -409,11 +409,11 @@
             2.6,
             0.65
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -426,11 +426,11 @@
             2.6,
             0.65
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -443,11 +443,11 @@
             1.6,
             0.5
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -460,11 +460,11 @@
             1.4,
             0.45
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -477,11 +477,11 @@
             0.7,
             0.55
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -494,11 +494,11 @@
             0.7,
             0.55
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -511,11 +511,11 @@
             6.0,
             0.55
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -528,11 +528,11 @@
             3.6,
             0.45
           ],
-          "uv": [
+          "region": "bruise",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "bruise"
+          ]
         },
         {
           "origin_mc": [
@@ -545,11 +545,11 @@
             3.6,
             0.45
           ],
-          "uv": [
+          "region": "bruise",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "bruise"
+          ]
         },
         {
           "origin_mc": [
@@ -562,11 +562,11 @@
             1.0,
             3.2
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         }
       ]
     },
@@ -575,7 +575,7 @@
       "parent": "Chest",
       "pivot_mc": [
         0.0,
-        -14.2,
+        -7.4,
         -0.3
       ],
       "rest_rot_rad_mc": [
@@ -595,11 +595,11 @@
             4.6,
             3.6
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -612,11 +612,11 @@
             3.6,
             3.0
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -629,11 +629,11 @@
             3.8,
             0.5
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -646,11 +646,11 @@
             3.0,
             0.35
           ],
-          "uv": [
+          "region": "blood",
+          "uv_region": [
             188,
             188
-          ],
-          "region": "blood"
+          ]
         },
         {
           "origin_mc": [
@@ -663,11 +663,11 @@
             3.4,
             0.5
           ],
-          "uv": [
+          "region": "bruise",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "bruise"
+          ]
         },
         {
           "origin_mc": [
@@ -680,11 +680,11 @@
             2.4,
             2.0
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -697,11 +697,11 @@
             2.4,
             2.0
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         }
       ]
     },
@@ -710,8 +710,8 @@
       "parent": "Neck",
       "pivot_mc": [
         0.0,
-        -17.8,
-        -0.5
+        -3.6,
+        -0.2
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -730,11 +730,11 @@
             4.4,
             4.4
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -747,11 +747,11 @@
             0.8,
             3.6
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -764,11 +764,11 @@
             2.8,
             3.4
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -781,11 +781,11 @@
             1.4,
             0.9
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -798,11 +798,11 @@
             1.4,
             0.9
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -815,11 +815,11 @@
             0.65,
             0.35
           ],
-          "uv": [
+          "region": "maw",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "maw"
+          ]
         },
         {
           "origin_mc": [
@@ -832,11 +832,11 @@
             0.65,
             0.35
           ],
-          "uv": [
+          "region": "maw",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "maw"
+          ]
         },
         {
           "origin_mc": [
@@ -849,11 +849,11 @@
             1.2,
             0.45
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -866,11 +866,11 @@
             2.2,
             1.8
           ],
-          "uv": [
+          "region": "maw",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "maw"
+          ]
         },
         {
           "origin_mc": [
@@ -883,11 +883,11 @@
             0.45,
             1.4
           ],
-          "uv": [
+          "region": "blood",
+          "uv_region": [
             188,
             188
-          ],
-          "region": "blood"
+          ]
         },
         {
           "origin_mc": [
@@ -900,11 +900,11 @@
             0.48,
             0.25
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             360,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -917,11 +917,11 @@
             0.48,
             0.25
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             360,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -934,11 +934,11 @@
             0.48,
             0.25
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             360,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -951,11 +951,11 @@
             0.48,
             0.25
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             360,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -968,11 +968,11 @@
             3.2,
             0.5
           ],
-          "uv": [
+          "region": "bruise",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "bruise"
+          ]
         }
       ]
     },
@@ -981,8 +981,8 @@
       "parent": "Head",
       "pivot_mc": [
         0.0,
-        -17.4,
-        -1.6
+        0.4,
+        -1.1
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -1001,11 +1001,11 @@
             2.6,
             1.8
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -1018,11 +1018,11 @@
             2.2,
             0.9
           ],
-          "uv": [
+          "region": "maw",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "maw"
+          ]
         },
         {
           "origin_mc": [
@@ -1035,11 +1035,11 @@
             0.7,
             1.4
           ],
-          "uv": [
+          "region": "blood",
+          "uv_region": [
             188,
             188
-          ],
-          "region": "blood"
+          ]
         },
         {
           "origin_mc": [
@@ -1052,11 +1052,11 @@
             0.48,
             0.25
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             360,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -1069,11 +1069,11 @@
             0.48,
             0.25
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             360,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -1086,11 +1086,11 @@
             0.48,
             0.25
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             360,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -1103,11 +1103,11 @@
             0.48,
             0.25
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             360,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -1120,11 +1120,11 @@
             2.2,
             1.2
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         }
       ]
     },
@@ -1133,7 +1133,7 @@
       "parent": "Chest",
       "pivot_mc": [
         -3.8,
-        -13.4,
+        -6.6,
         0.0
       ],
       "rest_rot_rad_mc": [
@@ -1153,11 +1153,11 @@
             2.2,
             2.4
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1170,11 +1170,11 @@
             1.4,
             2.0
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         }
       ]
     },
@@ -1182,8 +1182,8 @@
       "name": "UpperArm_L",
       "parent": "Shoulder_L",
       "pivot_mc": [
-        -4.4,
-        -12.8,
+        -0.6,
+        0.6,
         0.0
       ],
       "rest_rot_rad_mc": [
@@ -1203,11 +1203,11 @@
             10.4,
             2.0
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1220,11 +1220,11 @@
             6.4,
             1.7
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -1237,11 +1237,11 @@
             1.8,
             1.9
           ],
-          "uv": [
+          "region": "bruise",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "bruise"
+          ]
         }
       ]
     },
@@ -1249,8 +1249,8 @@
       "name": "Forearm_L",
       "parent": "UpperArm_L",
       "pivot_mc": [
-        -4.5,
-        -2.6,
+        -0.1,
+        10.2,
         -0.2
       ],
       "rest_rot_rad_mc": [
@@ -1270,11 +1270,11 @@
             10.2,
             1.7
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1287,11 +1287,11 @@
             5.5,
             1.4
           ],
-          "uv": [
+          "region": "bruise",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "bruise"
+          ]
         },
         {
           "origin_mc": [
@@ -1304,11 +1304,11 @@
             1.4,
             1.6
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         }
       ]
     },
@@ -1316,9 +1316,9 @@
       "name": "Hand_L",
       "parent": "Forearm_L",
       "pivot_mc": [
-        -4.5,
-        7.4,
-        -0.4
+        0.0,
+        10.0,
+        -0.2
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -1337,11 +1337,11 @@
             2.2,
             1.3
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1354,11 +1354,11 @@
             1.9,
             0.4
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1371,11 +1371,11 @@
             2.3,
             0.4
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1388,11 +1388,11 @@
             2.3,
             0.4
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1405,11 +1405,11 @@
             1.9,
             0.4
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1422,11 +1422,11 @@
             1.7,
             0.4
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         }
       ]
     },
@@ -1435,7 +1435,7 @@
       "parent": "Pelvis",
       "pivot_mc": [
         -2.0,
-        2.4,
+        0.6,
         0.0
       ],
       "rest_rot_rad_mc": [
@@ -1455,11 +1455,11 @@
             10.4,
             2.6
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1472,11 +1472,11 @@
             4.4,
             2.2
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -1489,11 +1489,11 @@
             1.8,
             2.4
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         }
       ]
     },
@@ -1501,8 +1501,8 @@
       "name": "Shin_L",
       "parent": "Thigh_L",
       "pivot_mc": [
-        -2.0,
-        12.6,
+        0.0,
+        10.2,
         -0.1
       ],
       "rest_rot_rad_mc": [
@@ -1522,11 +1522,11 @@
             5.4,
             2.1
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1539,11 +1539,11 @@
             5.6,
             1.64
           ],
-          "uv": [
+          "region": "bruise",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "bruise"
+          ]
         },
         {
           "origin_mc": [
@@ -1556,11 +1556,11 @@
             3.8,
             1.6
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         }
       ]
     },
@@ -1568,9 +1568,9 @@
       "name": "Foot_L",
       "parent": "Shin_L",
       "pivot_mc": [
-        -2.0,
-        23.2,
-        0.2
+        0.0,
+        10.6,
+        0.3
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -1589,11 +1589,11 @@
             1.0,
             3.8
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1606,11 +1606,11 @@
             0.7,
             0.8
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -1623,11 +1623,11 @@
             0.8,
             2.6
           ],
-          "uv": [
+          "region": "bruise",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "bruise"
+          ]
         }
       ]
     },
@@ -1636,7 +1636,7 @@
       "parent": "Chest",
       "pivot_mc": [
         3.8,
-        -13.4,
+        -6.6,
         0.0
       ],
       "rest_rot_rad_mc": [
@@ -1656,11 +1656,11 @@
             2.2,
             2.4
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1673,11 +1673,11 @@
             1.4,
             2.0
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         }
       ]
     },
@@ -1685,8 +1685,8 @@
       "name": "UpperArm_R",
       "parent": "Shoulder_R",
       "pivot_mc": [
-        4.4,
-        -12.8,
+        0.6,
+        0.6,
         0.0
       ],
       "rest_rot_rad_mc": [
@@ -1706,11 +1706,11 @@
             10.4,
             2.0
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1723,11 +1723,11 @@
             6.4,
             1.7
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -1740,11 +1740,11 @@
             1.8,
             1.9
           ],
-          "uv": [
+          "region": "bruise",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "bruise"
+          ]
         }
       ]
     },
@@ -1752,8 +1752,8 @@
       "name": "Forearm_R",
       "parent": "UpperArm_R",
       "pivot_mc": [
-        4.5,
-        -2.6,
+        0.1,
+        10.2,
         -0.2
       ],
       "rest_rot_rad_mc": [
@@ -1773,11 +1773,11 @@
             10.2,
             1.7
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1790,11 +1790,11 @@
             5.5,
             1.4
           ],
-          "uv": [
+          "region": "bruise",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "bruise"
+          ]
         },
         {
           "origin_mc": [
@@ -1807,11 +1807,11 @@
             1.4,
             1.6
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         }
       ]
     },
@@ -1819,9 +1819,9 @@
       "name": "Hand_R",
       "parent": "Forearm_R",
       "pivot_mc": [
-        4.5,
-        7.4,
-        -0.4
+        0.0,
+        10.0,
+        -0.2
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -1840,11 +1840,11 @@
             2.2,
             1.3
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1857,11 +1857,11 @@
             1.9,
             0.4
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1874,11 +1874,11 @@
             2.3,
             0.4
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1891,11 +1891,11 @@
             2.3,
             0.4
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1908,11 +1908,11 @@
             1.9,
             0.4
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1925,11 +1925,11 @@
             1.7,
             0.4
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         }
       ]
     },
@@ -1938,7 +1938,7 @@
       "parent": "Pelvis",
       "pivot_mc": [
         2.0,
-        2.4,
+        0.6,
         0.0
       ],
       "rest_rot_rad_mc": [
@@ -1958,11 +1958,11 @@
             10.4,
             2.6
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -1975,11 +1975,11 @@
             4.4,
             2.2
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -1992,11 +1992,11 @@
             1.8,
             2.4
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         }
       ]
     },
@@ -2004,8 +2004,8 @@
       "name": "Shin_R",
       "parent": "Thigh_R",
       "pivot_mc": [
-        2.0,
-        12.6,
+        0.0,
+        10.2,
         -0.1
       ],
       "rest_rot_rad_mc": [
@@ -2025,11 +2025,11 @@
             5.4,
             2.1
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -2042,11 +2042,11 @@
             5.6,
             1.64
           ],
-          "uv": [
+          "region": "bruise",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "bruise"
+          ]
         },
         {
           "origin_mc": [
@@ -2059,11 +2059,11 @@
             3.8,
             1.6
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         }
       ]
     },
@@ -2071,9 +2071,9 @@
       "name": "Foot_R",
       "parent": "Shin_R",
       "pivot_mc": [
-        2.0,
-        23.2,
-        0.2
+        0.0,
+        10.6,
+        0.3
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -2092,11 +2092,11 @@
             1.0,
             3.8
           ],
-          "uv": [
+          "region": "pale",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "pale"
+          ]
         },
         {
           "origin_mc": [
@@ -2109,11 +2109,11 @@
             0.7,
             0.8
           ],
-          "uv": [
+          "region": "fold",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "fold"
+          ]
         },
         {
           "origin_mc": [
@@ -2126,11 +2126,11 @@
             0.8,
             2.6
           ],
-          "uv": [
+          "region": "bruise",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "bruise"
+          ]
         }
       ]
     }
@@ -2141,7 +2141,6 @@
       "loop": true,
       "keyframes": [
         {
-          "t": 0.0,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -2283,10 +2282,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0
         },
         {
-          "t": 0.2286,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -2428,10 +2427,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.2286
         },
         {
-          "t": 0.4571,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -2573,10 +2572,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.4571
         },
         {
-          "t": 0.6857,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -2718,10 +2717,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.6857
         },
         {
-          "t": 0.9143,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -2863,10 +2862,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.9143
         },
         {
-          "t": 1.1429,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -3008,10 +3007,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.1429
         },
         {
-          "t": 1.3714,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -3153,10 +3152,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.3714
         },
         {
-          "t": 1.6,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -3298,10 +3297,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.6
         },
         {
-          "t": 1.8286,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -3443,10 +3442,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.8286
         },
         {
-          "t": 2.0571,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -3588,10 +3587,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 2.0571
         },
         {
-          "t": 2.2857,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -3733,10 +3732,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 2.2857
         },
         {
-          "t": 2.5143,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -3878,10 +3877,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 2.5143
         },
         {
-          "t": 2.7429,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -4023,10 +4022,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 2.7429
         },
         {
-          "t": 2.9714,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -4168,10 +4167,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 2.9714
         },
         {
-          "t": 3.2,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -4313,7 +4312,8 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 3.2
         }
       ]
     },
@@ -4322,7 +4322,6 @@
       "loop": true,
       "keyframes": [
         {
-          "t": 0.0,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -4464,10 +4463,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0
         },
         {
-          "t": 0.1143,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -4609,10 +4608,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.1143
         },
         {
-          "t": 0.2286,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -4754,10 +4753,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.2286
         },
         {
-          "t": 0.3429,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -4899,10 +4898,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.3429
         },
         {
-          "t": 0.4571,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -5044,10 +5043,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.4571
         },
         {
-          "t": 0.5714,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -5189,10 +5188,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5714
         },
         {
-          "t": 0.6857,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -5334,10 +5333,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.6857
         },
         {
-          "t": 0.8,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -5479,10 +5478,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.8
         },
         {
-          "t": 0.9143,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -5624,10 +5623,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.9143
         },
         {
-          "t": 1.0286,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -5769,10 +5768,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.0286
         },
         {
-          "t": 1.1429,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -5914,10 +5913,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.1429
         },
         {
-          "t": 1.2571,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -6059,10 +6058,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.2571
         },
         {
-          "t": 1.3714,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -6204,10 +6203,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.3714
         },
         {
-          "t": 1.4857,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -6349,10 +6348,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.4857
         },
         {
-          "t": 1.6,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -6494,7 +6493,8 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.6
         }
       ]
     },
@@ -6503,7 +6503,6 @@
       "loop": false,
       "keyframes": [
         {
-          "t": 0.0,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -6645,10 +6644,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0
         },
         {
-          "t": 0.0929,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -6790,10 +6789,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0929
         },
         {
-          "t": 0.1857,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -6935,10 +6934,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.1857
         },
         {
-          "t": 0.2786,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -7080,10 +7079,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.2786
         },
         {
-          "t": 0.3714,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -7225,10 +7224,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.3714
         },
         {
-          "t": 0.4643,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -7370,10 +7369,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.4643
         },
         {
-          "t": 0.5571,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -7515,10 +7514,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5571
         },
         {
-          "t": 0.65,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -7660,10 +7659,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.65
         },
         {
-          "t": 0.7429,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -7805,10 +7804,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.7429
         },
         {
-          "t": 0.8357,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -7950,10 +7949,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.8357
         },
         {
-          "t": 0.9286,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -8095,10 +8094,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.9286
         },
         {
-          "t": 1.0214,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -8240,10 +8239,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.0214
         },
         {
-          "t": 1.1143,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -8385,10 +8384,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.1143
         },
         {
-          "t": 1.2071,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -8530,10 +8529,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.2071
         },
         {
-          "t": 1.3,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -8675,7 +8674,8 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.3
         }
       ]
     },
@@ -8684,7 +8684,6 @@
       "loop": true,
       "keyframes": [
         {
-          "t": 0.0,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -8826,10 +8825,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0
         },
         {
-          "t": 0.0625,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -8971,10 +8970,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0625
         },
         {
-          "t": 0.125,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -9116,10 +9115,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.125
         },
         {
-          "t": 0.1875,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -9261,10 +9260,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.1875
         },
         {
-          "t": 0.25,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -9406,10 +9405,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.25
         },
         {
-          "t": 0.3125,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -9551,10 +9550,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.3125
         },
         {
-          "t": 0.375,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -9696,10 +9695,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.375
         },
         {
-          "t": 0.4375,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -9841,10 +9840,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.4375
         },
         {
-          "t": 0.5,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -9986,10 +9985,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5
         },
         {
-          "t": 0.5625,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -10131,10 +10130,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5625
         },
         {
-          "t": 0.625,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -10276,10 +10275,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.625
         },
         {
-          "t": 0.6875,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -10421,10 +10420,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.6875
         },
         {
-          "t": 0.75,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -10566,7 +10565,8 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.75
         }
       ]
     },
@@ -10575,7 +10575,6 @@
       "loop": false,
       "keyframes": [
         {
-          "t": 0.0,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -10717,10 +10716,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0
         },
         {
-          "t": 0.0542,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -10862,10 +10861,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0542
         },
         {
-          "t": 0.1083,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -11007,10 +11006,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.1083
         },
         {
-          "t": 0.1625,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -11152,10 +11151,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.1625
         },
         {
-          "t": 0.2167,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -11297,10 +11296,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.2167
         },
         {
-          "t": 0.2708,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -11442,10 +11441,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.2708
         },
         {
-          "t": 0.325,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -11587,10 +11586,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.325
         },
         {
-          "t": 0.3792,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -11732,10 +11731,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.3792
         },
         {
-          "t": 0.4333,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -11877,10 +11876,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.4333
         },
         {
-          "t": 0.4875,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -12022,10 +12021,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.4875
         },
         {
-          "t": 0.5417,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -12167,10 +12166,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5417
         },
         {
-          "t": 0.5958,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -12312,10 +12311,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5958
         },
         {
-          "t": 0.65,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -12457,7 +12456,8 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.65
         }
       ]
     }

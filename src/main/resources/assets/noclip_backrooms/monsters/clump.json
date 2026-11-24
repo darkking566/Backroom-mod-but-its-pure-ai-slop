@@ -65,11 +65,11 @@
             13.0,
             10.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -82,11 +82,11 @@
             11.0,
             8.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -99,11 +99,11 @@
             15.0,
             8.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -116,11 +116,11 @@
             8.4,
             2.4
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             188,
             188
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -133,11 +133,11 @@
             6.4,
             0.8
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             188,
             188
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -150,11 +150,11 @@
             3.0,
             4.2
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -167,11 +167,11 @@
             1.8,
             1.1
           ],
-          "uv": [
+          "region": "blood",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "blood"
+          ]
         },
         {
           "origin_mc": [
@@ -184,11 +184,11 @@
             3.6,
             4.2
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -201,11 +201,11 @@
             3.0,
             4.2
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -218,11 +218,11 @@
             1.8,
             1.1
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -235,11 +235,11 @@
             3.6,
             4.2
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -252,11 +252,11 @@
             3.0,
             4.2
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -269,11 +269,11 @@
             1.8,
             1.1
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -286,11 +286,11 @@
             3.6,
             4.2
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -303,11 +303,11 @@
             3.0,
             4.2
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -320,11 +320,11 @@
             1.8,
             1.1
           ],
-          "uv": [
+          "region": "blood",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "blood"
+          ]
         },
         {
           "origin_mc": [
@@ -337,11 +337,11 @@
             3.6,
             4.2
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -354,11 +354,11 @@
             3.0,
             4.2
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -371,11 +371,11 @@
             1.8,
             1.1
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -388,11 +388,11 @@
             3.6,
             4.2
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -405,11 +405,11 @@
             3.0,
             4.2
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -422,11 +422,11 @@
             1.8,
             1.1
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -439,11 +439,11 @@
             3.6,
             4.2
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -456,11 +456,11 @@
             3.0,
             4.2
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -473,11 +473,11 @@
             1.8,
             1.1
           ],
-          "uv": [
+          "region": "blood",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "blood"
+          ]
         },
         {
           "origin_mc": [
@@ -490,11 +490,11 @@
             3.6,
             4.2
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -507,11 +507,11 @@
             3.0,
             4.2
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -524,11 +524,11 @@
             1.8,
             1.1
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -541,11 +541,11 @@
             3.6,
             4.2
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -558,11 +558,11 @@
             3.0,
             4.2
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -575,11 +575,11 @@
             1.8,
             1.1
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -592,11 +592,11 @@
             3.6,
             4.2
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -609,11 +609,11 @@
             3.0,
             4.2
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -626,11 +626,11 @@
             1.8,
             1.1
           ],
-          "uv": [
+          "region": "blood",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "blood"
+          ]
         },
         {
           "origin_mc": [
@@ -643,11 +643,11 @@
             3.6,
             4.2
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -660,11 +660,11 @@
             3.0,
             4.2
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -677,11 +677,11 @@
             1.8,
             1.1
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -694,11 +694,11 @@
             3.6,
             4.2
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -711,11 +711,11 @@
             3.0,
             4.2
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -728,11 +728,11 @@
             1.8,
             1.1
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -745,11 +745,11 @@
             3.6,
             4.2
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         }
       ]
     },
@@ -758,7 +758,7 @@
       "parent": "Core",
       "pivot_mc": [
         0.0,
-        3.8,
+        -4.2,
         -5.6
       ],
       "rest_rot_rad_mc": [
@@ -778,11 +778,11 @@
             2.3,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -795,11 +795,11 @@
             2.8,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -812,11 +812,11 @@
             2.3,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -829,11 +829,11 @@
             2.8,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -846,11 +846,11 @@
             2.3,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -863,11 +863,11 @@
             1.5,
             1.6
           ],
-          "uv": [
+          "region": "blood",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "blood"
+          ]
         }
       ]
     },
@@ -876,7 +876,7 @@
       "parent": "Core",
       "pivot_mc": [
         0.0,
-        12.2,
+        4.2,
         -5.6
       ],
       "rest_rot_rad_mc": [
@@ -896,11 +896,11 @@
             2.3,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -913,11 +913,11 @@
             2.8,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -930,11 +930,11 @@
             2.3,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -947,11 +947,11 @@
             2.8,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -964,11 +964,11 @@
             2.3,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -981,11 +981,11 @@
             1.5,
             1.6
           ],
-          "uv": [
+          "region": "blood",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "blood"
+          ]
         }
       ]
     },
@@ -994,7 +994,7 @@
       "parent": "Core",
       "pivot_mc": [
         -4.2,
-        8.0,
+        0.0,
         -5.6
       ],
       "rest_rot_rad_mc": [
@@ -1014,11 +1014,11 @@
             0.65,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -1031,11 +1031,11 @@
             0.65,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -1048,11 +1048,11 @@
             0.65,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -1065,11 +1065,11 @@
             0.65,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -1082,11 +1082,11 @@
             0.65,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -1099,11 +1099,11 @@
             7.6,
             1.6
           ],
-          "uv": [
+          "region": "blood",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "blood"
+          ]
         }
       ]
     },
@@ -1112,7 +1112,7 @@
       "parent": "Core",
       "pivot_mc": [
         4.2,
-        8.0,
+        0.0,
         -5.6
       ],
       "rest_rot_rad_mc": [
@@ -1132,11 +1132,11 @@
             0.65,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -1149,11 +1149,11 @@
             0.65,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -1166,11 +1166,11 @@
             0.65,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -1183,11 +1183,11 @@
             0.65,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -1200,11 +1200,11 @@
             0.65,
             0.65
           ],
-          "uv": [
+          "region": "tooth",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "tooth"
+          ]
         },
         {
           "origin_mc": [
@@ -1217,11 +1217,11 @@
             7.6,
             1.6
           ],
-          "uv": [
+          "region": "blood",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "blood"
+          ]
         }
       ]
     },
@@ -1230,7 +1230,7 @@
       "parent": "Core",
       "pivot_mc": [
         -4.8,
-        2.8,
+        -5.2,
         -2.5
       ],
       "rest_rot_rad_mc": [
@@ -1250,11 +1250,11 @@
             9.0,
             2.3
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1267,11 +1267,11 @@
             1.8,
             2.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         }
       ]
     },
@@ -1279,9 +1279,9 @@
       "name": "ArmF_0",
       "parent": "ArmU_0",
       "pivot_mc": [
-        -4.8,
-        11.8,
-        -2.5
+        0.0,
+        9.0,
+        0.0
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -1300,11 +1300,11 @@
             9.0,
             1.9
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1317,11 +1317,11 @@
             1.6,
             2.1
           ],
-          "uv": [
+          "region": "blood",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "blood"
+          ]
         },
         {
           "origin_mc": [
@@ -1334,11 +1334,11 @@
             2.0,
             1.4
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1351,11 +1351,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1368,11 +1368,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -1385,11 +1385,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1402,11 +1402,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -1419,11 +1419,11 @@
             1.8,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         }
       ]
     },
@@ -1432,7 +1432,7 @@
       "parent": "Core",
       "pivot_mc": [
         3.2,
-        2.2,
+        -5.8,
         -2.5
       ],
       "rest_rot_rad_mc": [
@@ -1452,11 +1452,11 @@
             10.5,
             2.3
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -1469,11 +1469,11 @@
             1.8,
             2.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         }
       ]
     },
@@ -1481,9 +1481,9 @@
       "name": "ArmF_1",
       "parent": "ArmU_1",
       "pivot_mc": [
-        3.2,
-        12.7,
-        -2.5
+        0.0,
+        10.5,
+        0.0
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -1502,11 +1502,11 @@
             9.5,
             1.9
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1519,11 +1519,11 @@
             1.6,
             2.1
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -1536,11 +1536,11 @@
             2.0,
             1.4
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1553,11 +1553,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1570,11 +1570,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -1587,11 +1587,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1604,11 +1604,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -1621,11 +1621,11 @@
             1.8,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         }
       ]
     },
@@ -1634,7 +1634,7 @@
       "parent": "Core",
       "pivot_mc": [
         -6.8,
-        5.0,
+        -3.0,
         -2.0
       ],
       "rest_rot_rad_mc": [
@@ -1654,11 +1654,11 @@
             9.5,
             2.3
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1671,11 +1671,11 @@
             1.8,
             2.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         }
       ]
     },
@@ -1683,9 +1683,9 @@
       "name": "ArmF_2",
       "parent": "ArmU_2",
       "pivot_mc": [
-        -6.8,
-        14.5,
-        -2.0
+        0.0,
+        9.5,
+        0.0
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -1704,11 +1704,11 @@
             9.0,
             1.9
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1721,11 +1721,11 @@
             1.6,
             2.1
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -1738,11 +1738,11 @@
             2.0,
             1.4
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1755,11 +1755,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1772,11 +1772,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -1789,11 +1789,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1806,11 +1806,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -1823,11 +1823,11 @@
             1.8,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         }
       ]
     },
@@ -1836,7 +1836,7 @@
       "parent": "Core",
       "pivot_mc": [
         6.8,
-        5.4,
+        -2.6,
         -2.0
       ],
       "rest_rot_rad_mc": [
@@ -1856,11 +1856,11 @@
             10.0,
             2.3
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -1873,11 +1873,11 @@
             1.8,
             2.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         }
       ]
     },
@@ -1885,9 +1885,9 @@
       "name": "ArmF_3",
       "parent": "ArmU_3",
       "pivot_mc": [
-        6.8,
-        15.4,
-        -2.0
+        0.0,
+        10.0,
+        0.0
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -1906,11 +1906,11 @@
             9.0,
             1.9
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1923,11 +1923,11 @@
             1.6,
             2.1
           ],
-          "uv": [
+          "region": "blood",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "blood"
+          ]
         },
         {
           "origin_mc": [
@@ -1940,11 +1940,11 @@
             2.0,
             1.4
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1957,11 +1957,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -1974,11 +1974,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -1991,11 +1991,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2008,11 +2008,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -2025,11 +2025,11 @@
             1.8,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         }
       ]
     },
@@ -2038,7 +2038,7 @@
       "parent": "Core",
       "pivot_mc": [
         -6.8,
-        9.2,
+        1.2,
         -2.2
       ],
       "rest_rot_rad_mc": [
@@ -2058,11 +2058,11 @@
             8.8,
             2.3
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2075,11 +2075,11 @@
             1.8,
             2.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         }
       ]
     },
@@ -2087,9 +2087,9 @@
       "name": "ArmF_4",
       "parent": "ArmU_4",
       "pivot_mc": [
-        -6.8,
-        18.0,
-        -2.2
+        0.0,
+        8.8,
+        0.0
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -2108,11 +2108,11 @@
             8.5,
             1.9
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2125,11 +2125,11 @@
             1.6,
             2.1
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -2142,11 +2142,11 @@
             2.0,
             1.4
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2159,11 +2159,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2176,11 +2176,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -2193,11 +2193,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2210,11 +2210,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -2227,11 +2227,11 @@
             1.8,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         }
       ]
     },
@@ -2240,7 +2240,7 @@
       "parent": "Core",
       "pivot_mc": [
         6.8,
-        9.5,
+        1.5,
         -2.2
       ],
       "rest_rot_rad_mc": [
@@ -2260,11 +2260,11 @@
             8.8,
             2.3
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -2277,11 +2277,11 @@
             1.8,
             2.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         }
       ]
     },
@@ -2289,9 +2289,9 @@
       "name": "ArmF_5",
       "parent": "ArmU_5",
       "pivot_mc": [
-        6.8,
-        18.3,
-        -2.2
+        0.0,
+        8.8,
+        0.0
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -2310,11 +2310,11 @@
             8.5,
             1.9
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2327,11 +2327,11 @@
             1.6,
             2.1
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -2344,11 +2344,11 @@
             2.0,
             1.4
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2361,11 +2361,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2378,11 +2378,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -2395,11 +2395,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2412,11 +2412,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -2429,11 +2429,11 @@
             1.8,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         }
       ]
     },
@@ -2442,7 +2442,7 @@
       "parent": "Core",
       "pivot_mc": [
         -5.2,
-        12.8,
+        4.8,
         -3.5
       ],
       "rest_rot_rad_mc": [
@@ -2462,11 +2462,11 @@
             7.8,
             2.3
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2479,11 +2479,11 @@
             1.8,
             2.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         }
       ]
     },
@@ -2491,9 +2491,9 @@
       "name": "ArmF_6",
       "parent": "ArmU_6",
       "pivot_mc": [
-        -5.2,
-        20.6,
-        -3.5
+        0.0,
+        7.8,
+        0.0
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -2512,11 +2512,11 @@
             7.8,
             1.9
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2529,11 +2529,11 @@
             1.6,
             2.1
           ],
-          "uv": [
+          "region": "blood",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "blood"
+          ]
         },
         {
           "origin_mc": [
@@ -2546,11 +2546,11 @@
             2.0,
             1.4
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2563,11 +2563,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2580,11 +2580,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -2597,11 +2597,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2614,11 +2614,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -2631,11 +2631,11 @@
             1.8,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         }
       ]
     },
@@ -2644,7 +2644,7 @@
       "parent": "Core",
       "pivot_mc": [
         5.2,
-        12.8,
+        4.8,
         -3.5
       ],
       "rest_rot_rad_mc": [
@@ -2664,11 +2664,11 @@
             7.8,
             2.3
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -2681,11 +2681,11 @@
             1.8,
             2.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         }
       ]
     },
@@ -2693,9 +2693,9 @@
       "name": "ArmF_7",
       "parent": "ArmU_7",
       "pivot_mc": [
-        5.2,
-        20.6,
-        -3.5
+        0.0,
+        7.8,
+        0.0
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -2714,11 +2714,11 @@
             7.8,
             1.9
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2731,11 +2731,11 @@
             1.6,
             2.1
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -2748,11 +2748,11 @@
             2.0,
             1.4
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2765,11 +2765,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2782,11 +2782,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -2799,11 +2799,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2816,11 +2816,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -2833,11 +2833,11 @@
             1.8,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         }
       ]
     },
@@ -2846,7 +2846,7 @@
       "parent": "Core",
       "pivot_mc": [
         -5.6,
-        13.0,
+        5.0,
         0.5
       ],
       "rest_rot_rad_mc": [
@@ -2866,11 +2866,11 @@
             7.8,
             2.3
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2883,11 +2883,11 @@
             1.8,
             2.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         }
       ]
     },
@@ -2895,9 +2895,9 @@
       "name": "ArmF_8",
       "parent": "ArmU_8",
       "pivot_mc": [
-        -5.6,
-        20.8,
-        0.5
+        0.0,
+        7.8,
+        0.0
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -2916,11 +2916,11 @@
             7.8,
             1.9
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2933,11 +2933,11 @@
             1.6,
             2.1
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -2950,11 +2950,11 @@
             2.0,
             1.4
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2967,11 +2967,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -2984,11 +2984,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -3001,11 +3001,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -3018,11 +3018,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -3035,11 +3035,11 @@
             1.8,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         }
       ]
     },
@@ -3048,7 +3048,7 @@
       "parent": "Core",
       "pivot_mc": [
         5.6,
-        13.0,
+        5.0,
         0.5
       ],
       "rest_rot_rad_mc": [
@@ -3068,11 +3068,11 @@
             7.8,
             2.3
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -3085,11 +3085,11 @@
             1.8,
             2.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         }
       ]
     },
@@ -3097,9 +3097,9 @@
       "name": "ArmF_9",
       "parent": "ArmU_9",
       "pivot_mc": [
-        5.6,
-        20.8,
-        0.5
+        0.0,
+        7.8,
+        0.0
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -3118,11 +3118,11 @@
             7.8,
             1.9
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -3135,11 +3135,11 @@
             1.6,
             2.1
           ],
-          "uv": [
+          "region": "blood",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "blood"
+          ]
         },
         {
           "origin_mc": [
@@ -3152,11 +3152,11 @@
             2.0,
             1.4
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -3169,11 +3169,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -3186,11 +3186,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -3203,11 +3203,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -3220,11 +3220,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -3237,11 +3237,11 @@
             1.8,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         }
       ]
     },
@@ -3250,7 +3250,7 @@
       "parent": "Core",
       "pivot_mc": [
         -4.4,
-        12.8,
+        4.8,
         4.0
       ],
       "rest_rot_rad_mc": [
@@ -3270,11 +3270,11 @@
             7.8,
             2.3
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -3287,11 +3287,11 @@
             1.8,
             2.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         }
       ]
     },
@@ -3299,9 +3299,9 @@
       "name": "ArmF_10",
       "parent": "ArmU_10",
       "pivot_mc": [
-        -4.4,
-        20.6,
-        4.0
+        0.0,
+        7.8,
+        0.0
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -3320,11 +3320,11 @@
             7.8,
             1.9
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -3337,11 +3337,11 @@
             1.6,
             2.1
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -3354,11 +3354,11 @@
             2.0,
             1.4
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -3371,11 +3371,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -3388,11 +3388,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -3405,11 +3405,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -3422,11 +3422,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -3439,11 +3439,11 @@
             1.8,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         }
       ]
     },
@@ -3452,7 +3452,7 @@
       "parent": "Core",
       "pivot_mc": [
         4.4,
-        12.8,
+        4.8,
         4.0
       ],
       "rest_rot_rad_mc": [
@@ -3472,11 +3472,11 @@
             7.8,
             2.3
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -3489,11 +3489,11 @@
             1.8,
             2.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         }
       ]
     },
@@ -3501,9 +3501,9 @@
       "name": "ArmF_11",
       "parent": "ArmU_11",
       "pivot_mc": [
-        4.4,
-        20.6,
-        4.0
+        0.0,
+        7.8,
+        0.0
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -3522,11 +3522,11 @@
             7.8,
             1.9
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -3539,11 +3539,11 @@
             1.6,
             2.1
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -3556,11 +3556,11 @@
             2.0,
             1.4
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -3573,11 +3573,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -3590,11 +3590,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -3607,11 +3607,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         },
         {
           "origin_mc": [
@@ -3624,11 +3624,11 @@
             2.0,
             0.5
           ],
-          "uv": [
+          "region": "grime",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "grime"
+          ]
         },
         {
           "origin_mc": [
@@ -3641,11 +3641,11 @@
             1.8,
             0.5
           ],
-          "uv": [
+          "region": "skin",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "skin"
+          ]
         }
       ]
     }
@@ -3656,7 +3656,6 @@
       "loop": true,
       "keyframes": [
         {
-          "t": 0.0,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -3861,10 +3860,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0
         },
         {
-          "t": 0.1714,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -4069,10 +4068,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.1714
         },
         {
-          "t": 0.3429,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -4277,10 +4276,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.3429
         },
         {
-          "t": 0.5143,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -4485,10 +4484,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5143
         },
         {
-          "t": 0.6857,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -4693,10 +4692,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.6857
         },
         {
-          "t": 0.8571,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -4901,10 +4900,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.8571
         },
         {
-          "t": 1.0286,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -5109,10 +5108,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.0286
         },
         {
-          "t": 1.2,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -5317,10 +5316,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.2
         },
         {
-          "t": 1.3714,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -5525,10 +5524,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.3714
         },
         {
-          "t": 1.5429,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -5733,10 +5732,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.5429
         },
         {
-          "t": 1.7143,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -5941,10 +5940,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.7143
         },
         {
-          "t": 1.8857,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -6149,10 +6148,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.8857
         },
         {
-          "t": 2.0571,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -6357,10 +6356,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 2.0571
         },
         {
-          "t": 2.2286,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -6565,10 +6564,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 2.2286
         },
         {
-          "t": 2.4,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -6773,7 +6772,8 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 2.4
         }
       ]
     },
@@ -6782,7 +6782,6 @@
       "loop": true,
       "keyframes": [
         {
-          "t": 0.0,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -6987,10 +6986,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0
         },
         {
-          "t": 0.0833,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -7195,10 +7194,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0833
         },
         {
-          "t": 0.1667,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -7403,10 +7402,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.1667
         },
         {
-          "t": 0.25,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -7611,10 +7610,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.25
         },
         {
-          "t": 0.3333,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -7819,10 +7818,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.3333
         },
         {
-          "t": 0.4167,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -8027,10 +8026,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.4167
         },
         {
-          "t": 0.5,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -8235,10 +8234,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5
         },
         {
-          "t": 0.5833,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -8443,10 +8442,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5833
         },
         {
-          "t": 0.6667,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -8651,10 +8650,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.6667
         },
         {
-          "t": 0.75,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -8859,10 +8858,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.75
         },
         {
-          "t": 0.8333,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -9067,10 +9066,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.8333
         },
         {
-          "t": 0.9167,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -9275,10 +9274,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.9167
         },
         {
-          "t": 1.0,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -9483,7 +9482,8 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.0
         }
       ]
     },
@@ -9492,7 +9492,6 @@
       "loop": true,
       "keyframes": [
         {
-          "t": 0.0,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -9697,10 +9696,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0
         },
         {
-          "t": 0.06,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -9905,10 +9904,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.06
         },
         {
-          "t": 0.12,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -10113,10 +10112,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.12
         },
         {
-          "t": 0.18,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -10321,10 +10320,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.18
         },
         {
-          "t": 0.24,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -10529,10 +10528,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.24
         },
         {
-          "t": 0.3,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -10737,10 +10736,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.3
         },
         {
-          "t": 0.36,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -10945,10 +10944,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.36
         },
         {
-          "t": 0.42,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -11153,10 +11152,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.42
         },
         {
-          "t": 0.48,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -11361,10 +11360,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.48
         },
         {
-          "t": 0.54,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -11569,10 +11568,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.54
         },
         {
-          "t": 0.6,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -11777,7 +11776,8 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.6
         }
       ]
     },
@@ -11786,7 +11786,6 @@
       "loop": false,
       "keyframes": [
         {
-          "t": 0.0,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -11991,10 +11990,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0
         },
         {
-          "t": 0.0542,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -12199,10 +12198,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0542
         },
         {
-          "t": 0.1083,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -12407,10 +12406,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.1083
         },
         {
-          "t": 0.1625,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -12615,10 +12614,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.1625
         },
         {
-          "t": 0.2167,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -12823,10 +12822,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.2167
         },
         {
-          "t": 0.2708,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -13031,10 +13030,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.2708
         },
         {
-          "t": 0.325,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -13239,10 +13238,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.325
         },
         {
-          "t": 0.3792,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -13447,10 +13446,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.3792
         },
         {
-          "t": 0.4333,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -13655,10 +13654,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.4333
         },
         {
-          "t": 0.4875,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -13863,10 +13862,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.4875
         },
         {
-          "t": 0.5417,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -14071,10 +14070,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5417
         },
         {
-          "t": 0.5958,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -14279,10 +14278,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5958
         },
         {
-          "t": 0.65,
           "joints": {
             "Core": {
               "rot_rad_mc": [
@@ -14487,7 +14486,8 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.65
         }
       ]
     }

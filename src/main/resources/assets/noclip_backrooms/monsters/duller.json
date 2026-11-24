@@ -59,11 +59,11 @@
             3.6,
             4.0
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -76,11 +76,11 @@
             2.2,
             3.4
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -93,11 +93,11 @@
             1.4,
             3.2
           ],
-          "uv": [
+          "region": "shadow",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "shadow"
+          ]
         },
         {
           "origin_mc": [
@@ -110,11 +110,11 @@
             2.4,
             2.4
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -127,11 +127,11 @@
             2.4,
             2.4
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -144,11 +144,11 @@
             2.6,
             0.5
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         }
       ]
     },
@@ -157,7 +157,7 @@
       "parent": "Pelvis",
       "pivot_mc": [
         0.0,
-        -3.5,
+        -1.0,
         0.0
       ],
       "rest_rot_rad_mc": [
@@ -177,11 +177,11 @@
             9.4,
             3.6
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -194,11 +194,11 @@
             8.6,
             4.0
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -211,11 +211,11 @@
             5.8,
             2.8
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -228,11 +228,11 @@
             5.8,
             2.8
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -245,11 +245,11 @@
             7.8,
             0.5
           ],
-          "uv": [
+          "region": "shadow",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "shadow"
+          ]
         },
         {
           "origin_mc": [
@@ -262,11 +262,11 @@
             2.4,
             0.5
           ],
-          "uv": [
+          "region": "shadow",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "shadow"
+          ]
         },
         {
           "origin_mc": [
@@ -279,11 +279,11 @@
             3.2,
             0.4
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         }
       ]
     },
@@ -292,7 +292,7 @@
       "parent": "Spine",
       "pivot_mc": [
         0.0,
-        -12.5,
+        -9.0,
         -0.3
       ],
       "rest_rot_rad_mc": [
@@ -312,11 +312,11 @@
             9.6,
             4.8
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -329,11 +329,11 @@
             5.2,
             4.0
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -346,11 +346,11 @@
             1.4,
             3.6
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -363,11 +363,11 @@
             6.4,
             0.6
           ],
-          "uv": [
+          "region": "shadow",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "shadow"
+          ]
         },
         {
           "origin_mc": [
@@ -380,11 +380,11 @@
             6.8,
             0.6
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -397,11 +397,11 @@
             4.4,
             2.8
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -414,11 +414,11 @@
             4.4,
             2.8
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -431,11 +431,11 @@
             3.6,
             1.2
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -448,11 +448,11 @@
             3.6,
             0.5
           ],
-          "uv": [
+          "region": "shadow",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "shadow"
+          ]
         },
         {
           "origin_mc": [
@@ -465,11 +465,11 @@
             1.0,
             4.2
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         }
       ]
     },
@@ -478,8 +478,8 @@
       "parent": "Chest",
       "pivot_mc": [
         0.0,
-        -21.5,
-        -0.8
+        -9.0,
+        -0.5
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -498,11 +498,11 @@
             8.6,
             4.0
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -515,11 +515,11 @@
             7.4,
             3.4
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -532,11 +532,11 @@
             7.6,
             4.4
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -549,11 +549,11 @@
             6.0,
             2.4
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -566,11 +566,11 @@
             6.0,
             2.4
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -583,11 +583,11 @@
             6.8,
             0.45
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -600,11 +600,11 @@
             5.4,
             0.4
           ],
-          "uv": [
+          "region": "shadow",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "shadow"
+          ]
         }
       ]
     },
@@ -613,8 +613,8 @@
       "parent": "Neck",
       "pivot_mc": [
         0.0,
-        -29.2,
-        -1.0
+        -7.7,
+        -0.2
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -633,11 +633,11 @@
             8.4,
             4.2
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -650,11 +650,11 @@
             1.2,
             3.6
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -667,11 +667,11 @@
             0.6,
             2.6
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -684,11 +684,11 @@
             6.8,
             3.4
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -701,11 +701,11 @@
             6.8,
             4.5
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -718,11 +718,11 @@
             5.8,
             2.6
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -735,11 +735,11 @@
             5.8,
             2.6
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -752,11 +752,11 @@
             6.0,
             0.35
           ],
-          "uv": [
+          "region": "shadow",
+          "uv_region": [
             16,
             188
-          ],
-          "region": "shadow"
+          ]
         }
       ]
     },
@@ -765,8 +765,8 @@
       "parent": "Chest",
       "pivot_mc": [
         -4.4,
-        -20.5,
-        -0.2
+        -8.0,
+        0.1
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -785,11 +785,11 @@
             3.4,
             3.2
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -802,11 +802,11 @@
             2.4,
             2.6
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         }
       ]
     },
@@ -814,9 +814,9 @@
       "name": "UpperArm_L",
       "parent": "Shoulder_L",
       "pivot_mc": [
-        -5.2,
-        -19.8,
-        -0.2
+        -0.8,
+        0.7,
+        0.0
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -835,11 +835,11 @@
             15.2,
             2.5
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -852,11 +852,11 @@
             12.6,
             2.0
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -869,11 +869,11 @@
             12.6,
             2.8
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -886,11 +886,11 @@
             9.5,
             1.6
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -903,11 +903,11 @@
             9.5,
             1.6
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         }
       ]
     },
@@ -915,9 +915,9 @@
       "name": "Forearm_L",
       "parent": "UpperArm_L",
       "pivot_mc": [
-        -5.4,
-        -4.8,
-        -0.5
+        -0.2,
+        15.0,
+        -0.3
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -936,11 +936,11 @@
             15.8,
             2.1
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -953,11 +953,11 @@
             13.0,
             1.7
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -970,11 +970,11 @@
             13.0,
             2.4
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -987,11 +987,11 @@
             9.8,
             1.4
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -1004,11 +1004,11 @@
             9.8,
             1.4
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         }
       ]
     },
@@ -1016,9 +1016,9 @@
       "name": "Hand_L",
       "parent": "Forearm_L",
       "pivot_mc": [
-        -5.4,
-        10.8,
-        -0.9
+        0.0,
+        15.6,
+        -0.4
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -1037,11 +1037,11 @@
             2.6,
             1.8
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1054,11 +1054,11 @@
             1.8,
             1.4
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -1071,11 +1071,11 @@
             2.2,
             0.45
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1088,11 +1088,11 @@
             2.6,
             0.45
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1105,11 +1105,11 @@
             2.6,
             0.45
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1122,11 +1122,11 @@
             2.2,
             0.45
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1139,11 +1139,11 @@
             1.9,
             0.45
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         }
       ]
     },
@@ -1152,7 +1152,7 @@
       "parent": "Pelvis",
       "pivot_mc": [
         -2.4,
-        -1.8,
+        0.7,
         0.0
       ],
       "rest_rot_rad_mc": [
@@ -1172,11 +1172,11 @@
             13.4,
             2.9
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1189,11 +1189,11 @@
             10.8,
             2.3
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -1206,11 +1206,11 @@
             10.8,
             3.2
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -1223,11 +1223,11 @@
             8.0,
             1.8
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -1240,11 +1240,11 @@
             8.0,
             1.8
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         }
       ]
     },
@@ -1252,8 +1252,8 @@
       "name": "Shin_L",
       "parent": "Thigh_L",
       "pivot_mc": [
-        -2.5,
-        11.4,
+        -0.1,
+        13.2,
         -0.4
       ],
       "rest_rot_rad_mc": [
@@ -1273,11 +1273,11 @@
             12.0,
             2.4
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1290,11 +1290,11 @@
             9.8,
             1.9
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -1307,11 +1307,11 @@
             9.8,
             2.7
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -1324,11 +1324,11 @@
             7.6,
             1.5
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -1341,11 +1341,11 @@
             7.6,
             1.5
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         }
       ]
     },
@@ -1353,9 +1353,9 @@
       "name": "Foot_L",
       "parent": "Shin_L",
       "pivot_mc": [
-        -2.5,
-        23.0,
-        0.4
+        0.0,
+        11.6,
+        0.8
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -1374,11 +1374,11 @@
             1.2,
             4.4
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1391,11 +1391,11 @@
             0.9,
             1.2
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -1408,11 +1408,11 @@
             0.9,
             3.2
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         }
       ]
     },
@@ -1421,8 +1421,8 @@
       "parent": "Chest",
       "pivot_mc": [
         4.4,
-        -20.5,
-        -0.2
+        -8.0,
+        0.1
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -1441,11 +1441,11 @@
             3.4,
             3.2
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1458,11 +1458,11 @@
             2.4,
             2.6
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         }
       ]
     },
@@ -1470,9 +1470,9 @@
       "name": "UpperArm_R",
       "parent": "Shoulder_R",
       "pivot_mc": [
-        5.2,
-        -19.8,
-        -0.2
+        0.8,
+        0.7,
+        0.0
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -1491,11 +1491,11 @@
             15.2,
             2.5
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1508,11 +1508,11 @@
             12.6,
             2.0
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -1525,11 +1525,11 @@
             12.6,
             2.8
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -1542,11 +1542,11 @@
             9.5,
             1.6
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -1559,11 +1559,11 @@
             9.5,
             1.6
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         }
       ]
     },
@@ -1571,9 +1571,9 @@
       "name": "Forearm_R",
       "parent": "UpperArm_R",
       "pivot_mc": [
-        5.4,
-        -4.8,
-        -0.5
+        0.2,
+        15.0,
+        -0.3
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -1592,11 +1592,11 @@
             15.8,
             2.1
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1609,11 +1609,11 @@
             13.0,
             1.7
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -1626,11 +1626,11 @@
             13.0,
             2.4
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -1643,11 +1643,11 @@
             9.8,
             1.4
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -1660,11 +1660,11 @@
             9.8,
             1.4
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         }
       ]
     },
@@ -1672,9 +1672,9 @@
       "name": "Hand_R",
       "parent": "Forearm_R",
       "pivot_mc": [
-        5.4,
-        10.8,
-        -0.9
+        0.0,
+        15.6,
+        -0.4
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -1693,11 +1693,11 @@
             2.6,
             1.8
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1710,11 +1710,11 @@
             1.8,
             1.4
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -1727,11 +1727,11 @@
             2.2,
             0.45
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1744,11 +1744,11 @@
             2.6,
             0.45
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1761,11 +1761,11 @@
             2.6,
             0.45
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1778,11 +1778,11 @@
             2.2,
             0.45
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1795,11 +1795,11 @@
             1.9,
             0.45
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         }
       ]
     },
@@ -1808,7 +1808,7 @@
       "parent": "Pelvis",
       "pivot_mc": [
         2.4,
-        -1.8,
+        0.7,
         0.0
       ],
       "rest_rot_rad_mc": [
@@ -1828,11 +1828,11 @@
             13.4,
             2.9
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1845,11 +1845,11 @@
             10.8,
             2.3
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -1862,11 +1862,11 @@
             10.8,
             3.2
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -1879,11 +1879,11 @@
             8.0,
             1.8
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -1896,11 +1896,11 @@
             8.0,
             1.8
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         }
       ]
     },
@@ -1908,8 +1908,8 @@
       "name": "Shin_R",
       "parent": "Thigh_R",
       "pivot_mc": [
-        2.5,
-        11.4,
+        0.1,
+        13.2,
         -0.4
       ],
       "rest_rot_rad_mc": [
@@ -1929,11 +1929,11 @@
             12.0,
             2.4
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -1946,11 +1946,11 @@
             9.8,
             1.9
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -1963,11 +1963,11 @@
             9.8,
             2.7
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -1980,11 +1980,11 @@
             7.6,
             1.5
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         },
         {
           "origin_mc": [
@@ -1997,11 +1997,11 @@
             7.6,
             1.5
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         }
       ]
     },
@@ -2009,9 +2009,9 @@
       "name": "Foot_R",
       "parent": "Shin_R",
       "pivot_mc": [
-        2.5,
-        23.0,
-        0.4
+        0.0,
+        11.6,
+        0.8
       ],
       "rest_rot_rad_mc": [
         0.0,
@@ -2030,11 +2030,11 @@
             1.2,
             4.4
           ],
-          "uv": [
+          "region": "void",
+          "uv_region": [
             16,
             16
-          ],
-          "region": "void"
+          ]
         },
         {
           "origin_mc": [
@@ -2047,11 +2047,11 @@
             0.9,
             1.2
           ],
-          "uv": [
+          "region": "soot",
+          "uv_region": [
             188,
             16
-          ],
-          "region": "soot"
+          ]
         },
         {
           "origin_mc": [
@@ -2064,11 +2064,11 @@
             0.9,
             3.2
           ],
-          "uv": [
+          "region": "haze",
+          "uv_region": [
             360,
             16
-          ],
-          "region": "haze"
+          ]
         }
       ]
     }
@@ -2079,7 +2079,6 @@
       "loop": true,
       "keyframes": [
         {
-          "t": 0.0,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -2214,10 +2213,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0
         },
         {
-          "t": 0.2143,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -2352,10 +2351,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.2143
         },
         {
-          "t": 0.4286,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -2490,10 +2489,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.4286
         },
         {
-          "t": 0.6429,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -2628,10 +2627,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.6429
         },
         {
-          "t": 0.8571,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -2766,10 +2765,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.8571
         },
         {
-          "t": 1.0714,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -2904,10 +2903,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.0714
         },
         {
-          "t": 1.2857,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -3042,10 +3041,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.2857
         },
         {
-          "t": 1.5,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -3180,10 +3179,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.5
         },
         {
-          "t": 1.7143,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -3318,10 +3317,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.7143
         },
         {
-          "t": 1.9286,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -3456,10 +3455,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.9286
         },
         {
-          "t": 2.1429,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -3594,10 +3593,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 2.1429
         },
         {
-          "t": 2.3571,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -3732,10 +3731,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 2.3571
         },
         {
-          "t": 2.5714,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -3870,10 +3869,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 2.5714
         },
         {
-          "t": 2.7857,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -4008,10 +4007,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 2.7857
         },
         {
-          "t": 3.0,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -4146,7 +4145,8 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 3.0
         }
       ]
     },
@@ -4155,7 +4155,6 @@
       "loop": true,
       "keyframes": [
         {
-          "t": 0.0,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -4290,10 +4289,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0
         },
         {
-          "t": 0.1143,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -4428,10 +4427,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.1143
         },
         {
-          "t": 0.2286,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -4566,10 +4565,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.2286
         },
         {
-          "t": 0.3429,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -4704,10 +4703,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.3429
         },
         {
-          "t": 0.4571,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -4842,10 +4841,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.4571
         },
         {
-          "t": 0.5714,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -4980,10 +4979,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5714
         },
         {
-          "t": 0.6857,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -5118,10 +5117,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.6857
         },
         {
-          "t": 0.8,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -5256,10 +5255,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.8
         },
         {
-          "t": 0.9143,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -5394,10 +5393,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.9143
         },
         {
-          "t": 1.0286,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -5532,10 +5531,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.0286
         },
         {
-          "t": 1.1429,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -5670,10 +5669,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.1429
         },
         {
-          "t": 1.2571,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -5808,10 +5807,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.2571
         },
         {
-          "t": 1.3714,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -5946,10 +5945,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.3714
         },
         {
-          "t": 1.4857,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -6084,10 +6083,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.4857
         },
         {
-          "t": 1.6,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -6222,7 +6221,8 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.6
         }
       ]
     },
@@ -6231,7 +6231,6 @@
       "loop": true,
       "keyframes": [
         {
-          "t": 0.0,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -6366,10 +6365,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0
         },
         {
-          "t": 0.1071,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -6504,10 +6503,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.1071
         },
         {
-          "t": 0.2143,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -6642,10 +6641,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.2143
         },
         {
-          "t": 0.3214,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -6780,10 +6779,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.3214
         },
         {
-          "t": 0.4286,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -6918,10 +6917,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.4286
         },
         {
-          "t": 0.5357,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -7056,10 +7055,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5357
         },
         {
-          "t": 0.6429,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -7194,10 +7193,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.6429
         },
         {
-          "t": 0.75,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -7332,10 +7331,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.75
         },
         {
-          "t": 0.8571,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -7470,10 +7469,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.8571
         },
         {
-          "t": 0.9643,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -7608,10 +7607,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.9643
         },
         {
-          "t": 1.0714,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -7746,10 +7745,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.0714
         },
         {
-          "t": 1.1786,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -7884,10 +7883,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.1786
         },
         {
-          "t": 1.2857,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -8022,10 +8021,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.2857
         },
         {
-          "t": 1.3929,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -8160,10 +8159,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.3929
         },
         {
-          "t": 1.5,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -8298,7 +8297,8 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 1.5
         }
       ]
     },
@@ -8307,7 +8307,6 @@
       "loop": false,
       "keyframes": [
         {
-          "t": 0.0,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -8442,10 +8441,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0
         },
         {
-          "t": 0.0625,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -8580,10 +8579,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0625
         },
         {
-          "t": 0.125,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -8718,10 +8717,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.125
         },
         {
-          "t": 0.1875,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -8856,10 +8855,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.1875
         },
         {
-          "t": 0.25,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -8994,10 +8993,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.25
         },
         {
-          "t": 0.3125,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -9132,10 +9131,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.3125
         },
         {
-          "t": 0.375,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -9270,10 +9269,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.375
         },
         {
-          "t": 0.4375,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -9408,10 +9407,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.4375
         },
         {
-          "t": 0.5,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -9546,10 +9545,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5
         },
         {
-          "t": 0.5625,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -9684,10 +9683,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5625
         },
         {
-          "t": 0.625,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -9822,10 +9821,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.625
         },
         {
-          "t": 0.6875,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -9960,10 +9959,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.6875
         },
         {
-          "t": 0.75,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -10098,7 +10097,8 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.75
         }
       ]
     },
@@ -10107,7 +10107,6 @@
       "loop": false,
       "keyframes": [
         {
-          "t": 0.0,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -10242,10 +10241,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0
         },
         {
-          "t": 0.0625,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -10380,10 +10379,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.0625
         },
         {
-          "t": 0.125,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -10518,10 +10517,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.125
         },
         {
-          "t": 0.1875,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -10656,10 +10655,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.1875
         },
         {
-          "t": 0.25,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -10794,10 +10793,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.25
         },
         {
-          "t": 0.3125,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -10932,10 +10931,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.3125
         },
         {
-          "t": 0.375,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -11070,10 +11069,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.375
         },
         {
-          "t": 0.4375,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -11208,10 +11207,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.4375
         },
         {
-          "t": 0.5,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -11346,10 +11345,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5
         },
         {
-          "t": 0.5625,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -11484,10 +11483,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.5625
         },
         {
-          "t": 0.625,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -11622,10 +11621,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.625
         },
         {
-          "t": 0.6875,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -11760,10 +11759,10 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.6875
         },
         {
-          "t": 0.75,
           "joints": {
             "Pelvis": {
               "rot_rad_mc": [
@@ -11898,7 +11897,8 @@
                 0.0
               ]
             }
-          }
+          },
+          "time_sec": 0.75
         }
       ]
     }
