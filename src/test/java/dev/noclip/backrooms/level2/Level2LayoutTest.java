@@ -230,4 +230,21 @@ class Level2LayoutTest {
 		assertTrue(macchina > 0, "no Macchina rooms appeared");
 		assertTrue(rails > 0, "no railway tracks appeared");
 	}
+
+	/** Toolboxes, cable reels, and lumber stacks appear in storage rooms and dead-end corners. */
+	@Test
+	void debrisPropsAppear() {
+		int toolbox = 0, reel = 0, lumber = 0;
+		for (int x = -4 * SIZE; x < 4 * SIZE; x++) {
+			for (int z = -4 * SIZE; z < 4 * SIZE; z++) {
+				Kind k = Level2Layout.tile(SEED, x, z).kind();
+				if (k == Kind.TOOLBOX) toolbox++;
+				else if (k == Kind.CABLE_REEL) reel++;
+				else if (k == Kind.LUMBER_STACK) lumber++;
+			}
+		}
+		assertTrue(toolbox > 0, "no toolboxes appeared");
+		assertTrue(reel > 0, "no cable reels appeared");
+		assertTrue(lumber > 0, "no lumber stacks appeared");
+	}
 }

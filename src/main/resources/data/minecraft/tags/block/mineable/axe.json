@@ -26,6 +26,8 @@
     "noclip_backrooms:blink_sign",
     "noclip_backrooms:wooden_crate",
     "noclip_backrooms:meg_supply_crate",
-    "noclip_backrooms:parts_crate"
+    "noclip_backrooms:parts_crate",
+    "noclip_backrooms:cable_reel",
+    "noclip_backrooms:lumber_stack"
   ]
 }

@@ -40,6 +40,16 @@
 | `floodlight` | Tier 1 | `optical_lens`（光學透鏡 ×1）、`copper_wire`（×2）、`ballast_coil`（×1）、`alloy`（×1） |
 | `tarp` / `cot` / `bedroll` | Tier 0 | `synthetic_fabric`（×2–3）、`iron_pipe`（行軍床掉 ×1） |
 
+### Level 2 管道區與倉庫雜物拆解（`level2`）
+| 方塊 ID | 所需工具 | 拆解掉落材料 |
+|---|---|---|
+| `toolbox`（工具箱） | Tier 0 | `sheet_metal`（×1）、`rusty_screws`（×2–3）、低機率 `alloy`（×1） |
+| `cable_reel`（伸縮電線盤） | Tier 0 | `copper_wire`（×3–4）、`plastic_casing`（×1）、`rotten_wood_strip`（×2） |
+| `lumber_stack`（木材垛） | Tier 0 | `rotten_wood_strip`（×3–4）、`rusty_nail`（×2） |
+| `scrap_heap`（廢料堆） | Tier 0 | `scrap_metal`（×2）、`rusty_screws`（×2）、`iron_pipe`（×1） |
+| `oil_drum`（油桶） | Tier 1 | `sheet_metal`（×2）、`crude_fuel_can`（×1） |
+| `machine_cabinet` / `machine_panel` | Tier 1–2 | `old_circuit_board`（×1）、`capacitor`（×2）、`copper_wire`（×2）、`steel_gear`（×1） |
+
 ---
 
 ## 二、新增「異常穿模家具與環境物件」（No-Clipped Props，共 24 種）

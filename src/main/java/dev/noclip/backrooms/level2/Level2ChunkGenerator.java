@@ -90,6 +90,9 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 			case CRATE -> h == 1 || h == 2 && Level2Layout.bankRoll(seed, x, y, z) < 45 ? state(Level2Blocks.WOODEN_CRATE) : roomAir(seed, x, z, h);
 			case DRUM -> h == 1 ? state(Level2Blocks.OIL_DRUM) : roomAir(seed, x, z, h);
 			case SCRAP -> h == 1 ? state(Level2Blocks.SCRAP_HEAP) : roomAir(seed, x, z, h);
+			case TOOLBOX -> h == 1 ? state(Level2Blocks.TOOLBOX) : roomAir(seed, x, z, h);
+			case CABLE_REEL -> h == 1 ? state(Level2Blocks.CABLE_REEL) : roomAir(seed, x, z, h);
+			case LUMBER_STACK -> h == 1 ? state(Level2Blocks.LUMBER_STACK) : roomAir(seed, x, z, h);
 			case DOOR, LOCKED_DOOR -> h <= 2 ? door(tile, h) : wall(seed, x, z);
 			case EXIT -> h <= tile.exit().height
 					? Level2Blocks.EXITS.get(tile.exit()).defaultBlockState().setValue(Level2ExitBlock.PART, h - 1) : wall(seed, x, z);

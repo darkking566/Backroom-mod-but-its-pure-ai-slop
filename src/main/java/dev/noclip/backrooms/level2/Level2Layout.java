@@ -25,7 +25,7 @@ public final class Level2Layout {
 	static final int BLADE_TRAIL = 6;
 
 	enum Kind {
-		WALL, FLOOR, BANK, MACHINE, DOOR, LOCKED_DOOR, EXIT, WINDOW, ROOM, VOID, VOID_WALL, CRATE, DRUM, SCRAP, CABINET;
+		WALL, FLOOR, BANK, MACHINE, DOOR, LOCKED_DOOR, EXIT, WINDOW, ROOM, VOID, VOID_WALL, CRATE, DRUM, SCRAP, CABINET, TOOLBOX, CABLE_REEL, LUMBER_STACK;
 
 		/** Whether a player can stand here. Doors count: they open. */
 		public boolean walkable() {
@@ -105,6 +105,8 @@ public final class Level2Layout {
 		int bank = bankSide(seed, plan, rx, rz, i, j);
 		if (bank >= 0 && bankColumn(bank, ox, oz)) return new Tile(Kind.BANK, Level2Plan.opposite(bank), null);
 		if (outerCorner(plan.open[cell], ox, oz)) return Tile.WALL;
+		Tile debris = deadEndDebris(seed, plan, i, j, ox, oz, x, z);
+		if (debris != null) return debris;
 		return Tile.FLOOR;
 	}
 
@@ -171,19 +173,43 @@ public final class Level2Layout {
 		int roll = (int) Math.floorMod(hash(seed, x, z, ROOM_PROPS), 100);
 		return switch (room.kind()) {
 			case STORAGE -> !byWall ? Tile.ROOM
-					: roll < 38 ? new Tile(Kind.CRATE, 0, null) : roll < 58 ? new Tile(Kind.DRUM, 0, null)
-					: roll < 72 ? new Tile(Kind.SCRAP, 0, null) : Tile.ROOM;
+					: roll < 26 ? new Tile(Kind.CRATE, 0, null)
+					: roll < 42 ? new Tile(Kind.DRUM, 0, null)
+					: roll < 54 ? new Tile(Kind.SCRAP, 0, null)
+					: roll < 66 ? new Tile(Kind.TOOLBOX, 0, null)
+					: roll < 76 ? new Tile(Kind.CABLE_REEL, 0, null)
+					: roll < 86 ? new Tile(Kind.LUMBER_STACK, 0, null) : Tile.ROOM;
 			case MACHINES -> (lz - room.z0()) % 3 == 2 && lx > room.x0() + 1 && lx < room.x1() - 1
 					? new Tile(Kind.CABINET, (lz - room.z0()) % 6 == 2 ? SOUTH : NORTH, null) : Tile.ROOM;
 			case EL3A -> !byWall ? Tile.ROOM
-					: roll < 25 ? new Tile(Kind.CRATE, 0, null)
-					: roll < 42 ? new Tile(Kind.CABINET, lx == room.x0() + 1 ? EAST : lx == room.x1() - 1 ? WEST : lz == room.z0() + 1 ? SOUTH : NORTH, null)
+					: roll < 20 ? new Tile(Kind.CRATE, 0, null)
+					: roll < 35 ? new Tile(Kind.CABINET, lx == room.x0() + 1 ? EAST : lx == room.x1() - 1 ? WEST : lz == room.z0() + 1 ? SOUTH : NORTH, null)
+					: roll < 45 ? new Tile(Kind.TOOLBOX, 0, null)
+					: roll < 52 ? new Tile(Kind.CABLE_REEL, 0, null)
 					: Tile.ROOM;
 			case MACCHINA -> !byWall ? Tile.ROOM
 					: roll < 28 ? new Tile(Kind.CABINET, lx == room.x0() + 1 ? EAST : lx == room.x1() - 1 ? WEST : lz == room.z0() + 1 ? SOUTH : NORTH, null)
 					: roll < 50 ? new Tile(Kind.SCRAP, 0, null) : Tile.ROOM;
 			default -> Tile.ROOM;
 		};
+	}
+
+	/** Occasional toolbox, cable reel, lumber stack, or scrap tucked into a bare dead-end corner. */
+	private static Tile deadEndDebris(long seed, Level2Plan plan, int i, int j, int ox, int oz, int x, int z) {
+		int cell = Level2Plan.cell(i, j);
+		if (plan.openings(cell) != 1 || isOfficePatch(seed, x, z)) return null;
+		for (int d = 0; d < 4; d++) {
+			if (plan.feature(cell, d) != Feature.NONE) return null;
+		}
+		int openDir = Integer.numberOfTrailingZeros(plan.open[cell] & 0xF);
+		int backX = openDir == WEST ? 3 : 1, backZ = openDir == NORTH ? 3 : 1;
+		if (ox != backX || oz != backZ) return null;
+		int roll = Math.floorMod(hash(seed, x, z, ROOM_PROPS), 100);
+		if (roll < 16) return new Tile(Kind.TOOLBOX, 0, null);
+		if (roll < 28) return new Tile(Kind.CABLE_REEL, 0, null);
+		if (roll < 40) return new Tile(Kind.LUMBER_STACK, 0, null);
+		if (roll < 52) return new Tile(Kind.SCRAP, 0, null);
+		return null;
 	}
 
 	/** Two blocks in from a doorway stay clear, so nothing blocks the way in. */

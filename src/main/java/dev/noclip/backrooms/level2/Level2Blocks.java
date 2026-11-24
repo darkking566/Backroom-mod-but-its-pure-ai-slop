@@ -31,6 +31,9 @@ public final class Level2Blocks {
 	private static final VoxelShape[] BULB = Level2AxisBlock.turned(5, 4, 5, 11, 16, 11);
 	private static final VoxelShape DRUM = Block.box(2.5, 0, 2.5, 13.5, 15, 13.5);
 	private static final VoxelShape SCRAP = Block.box(1, 0, 1, 15, 6, 15);
+	private static final VoxelShape TOOLBOX_SHAPE = Block.box(2, 0, 4, 14, 7.5, 12);
+	private static final VoxelShape REEL_SHAPE = Block.box(2, 0, 2, 14, 12, 14);
+	private static final VoxelShape LUMBER_SHAPE = Block.box(1, 0, 1, 15, 8.5, 15);
 
 	private static final BlockSetType STEEL = BlockSetTypeBuilder.copyOf(BlockSetType.IRON).openableByHand(true).register(Level2.id("steel"));
 	private static final BlockSetType STEEL_LOCKED = BlockSetTypeBuilder.copyOf(BlockSetType.IRON).register(Level2.id("steel_locked"));
@@ -79,6 +82,12 @@ public final class Level2Blocks {
 			.sound(SoundType.METAL).noOcclusion(), p -> new Level2ShapedBlock(p, DRUM));
 	public static final Block SCRAP_HEAP = register("scrap_heap", Properties.of().mapColor(MapColor.METAL).strength(1.0F)
 			.sound(SoundType.CHAIN).noOcclusion(), p -> new Level2ShapedBlock(p, SCRAP));
+	public static final Block TOOLBOX = register("toolbox", Properties.of().mapColor(MapColor.COLOR_RED).strength(1.5F)
+			.sound(SoundType.METAL).noOcclusion(), p -> new Level2ShapedBlock(p, TOOLBOX_SHAPE));
+	public static final Block CABLE_REEL = register("cable_reel", Properties.of().mapColor(MapColor.WOOD).strength(1.8F)
+			.sound(SoundType.WOOD).noOcclusion(), p -> new Level2ShapedBlock(p, REEL_SHAPE));
+	public static final Block LUMBER_STACK = register("lumber_stack", Properties.of().mapColor(MapColor.WOOD).strength(1.6F)
+			.sound(SoundType.WOOD).noOcclusion(), p -> new Level2ShapedBlock(p, LUMBER_SHAPE));
 
 	/** Spray-painted marks earlier wanderers left near the standard exits. */
 	public static final Block WANDERER_MARK = register("wanderer_mark", Properties.of().mapColor(MapColor.COLOR_RED).strength(0.2F)

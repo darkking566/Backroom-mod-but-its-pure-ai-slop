@@ -37,6 +37,8 @@ class MapDump {
 					case DRUM -> 0x5a6a5a;
 					case SCRAP -> 0x707070;
 					case CABINET -> 0x3060a0;
+					case TOOLBOX -> 0xb03028;
+					case CABLE_REEL, LUMBER_STACK -> 0x8a643c;
 				};
 				if (tile.kind() == Level2Layout.Kind.FLOOR && Level2Layout.hot(12345, x, z)) rgb = 0xc07050;
 				switch (Level2Layout.light(12345, x, z)) {
