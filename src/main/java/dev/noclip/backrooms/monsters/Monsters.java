@@ -6,6 +6,7 @@ import dev.noclip.backrooms.monsters.clump.Clump;
 import dev.noclip.backrooms.monsters.crawler.Crawler;
 import dev.noclip.backrooms.monsters.duller.Duller;
 import dev.noclip.backrooms.monsters.hound.Hound;
+import dev.noclip.backrooms.monsters.nguithrxurh.Nguithrxurh;
 import dev.noclip.backrooms.monsters.shepherdsnake.ShepherdSnake;
 import dev.noclip.backrooms.monsters.shriek.Shriek;
 import dev.noclip.backrooms.monsters.skinstealer.SkinStealer;
@@ -61,6 +62,9 @@ public final class Monsters {
 	public static final EntityType<ShepherdSnake> SHEPHERD_SNAKE = register("shepherd_snake",
 			EntityType.Builder.of(ShepherdSnake::new, MobCategory.MONSTER).sized(2.4F, 3.8F).eyeHeight(3.4F).clientTrackingRange(16));
 	public static final Item SHEPHERD_SNAKE_SPAWN_EGG = registerEgg("shepherd_snake_spawn_egg", SHEPHERD_SNAKE);
+	public static final EntityType<Nguithrxurh> NGUITHRXURH = register("nguithrxurh",
+			EntityType.Builder.of(Nguithrxurh::new, MobCategory.MONSTER).sized(1.65F, 1.05F).eyeHeight(0.62F).clientTrackingRange(12));
+	public static final Item NGUITHRXURH_SPAWN_EGG = registerEgg("nguithrxurh_spawn_egg", NGUITHRXURH);
 
 	public static final SoundEvent HOUND_GROWL = sound("hound.growl");
 	public static final SoundEvent HOUND_ROAR = sound("hound.roar");
@@ -81,6 +85,7 @@ public final class Monsters {
 		FabricDefaultAttributeRegistry.register(SHRIEK, Shriek.createAttributes());
 		FabricDefaultAttributeRegistry.register(CRAWLER, Crawler.createAttributes());
 		FabricDefaultAttributeRegistry.register(SHEPHERD_SNAKE, ShepherdSnake.createAttributes());
+		FabricDefaultAttributeRegistry.register(NGUITHRXURH, Nguithrxurh.createAttributes());
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.SPAWN_EGGS).register(output -> {
 			output.accept(HOUND_SPAWN_EGG);
 			output.accept(SMILER_SPAWN_EGG);
@@ -92,6 +97,7 @@ public final class Monsters {
 			output.accept(SHRIEK_SPAWN_EGG);
 			output.accept(CRAWLER_SPAWN_EGG);
 			output.accept(SHEPHERD_SNAKE_SPAWN_EGG);
+			output.accept(NGUITHRXURH_SPAWN_EGG);
 		});
 	}
 
