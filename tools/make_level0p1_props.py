@@ -246,6 +246,58 @@ def vines():
     return m
 
 
+# Second batch: ceiling speakers, cold and hot stretch details, salvage
+
+def speaker_bottom():
+    m = metal((176, 180, 188), 501)
+    paint(m, box(16, 16, 112, 112), (40, 42, 46), height=-3)
+    paint(m, lines(8, 1.0, axes="x") * box(16, 16, 112, 112), (92, 96, 104), height=1)
+    paint(m, box(58, 58, 70, 70), (60, 160, 230), glow=0.3, height=2)
+    return m
+
+
+def speaker_side():
+    return metal((150, 156, 166), 502, 64)
+
+
+def speaker_top():
+    return metal((120, 126, 136), 503)
+
+
+def icicles():
+    m = flat((200, 230, 246), 0.9, 90)
+    alpha = np.zeros((SIZE, SIZE))
+    rng = np.random.default_rng(511)
+    for i in range(9):
+        cx, length, width = rng.uniform(8, 120), rng.uniform(40, 100), rng.uniform(5, 9)
+        alpha = np.maximum(alpha, step(0.0, 1.0, 1 - np.abs(X - cx) / (width * (1 - Y / length)).clip(0.5)) * (Y < length))
+    tint(m, 0.25 * noise(512, 10), (0.8, 1.0, 1.1))
+    L.ALPHA["icicles"] = np.where(alpha > 0.5, 255.0, 0.0)
+    return m
+
+
+def ice_drift():
+    m = base((214, 232, 244), 521, 0.85, 80, 0.05)
+    paint(m, step(0.2, 0.7, noise(522, 14)) * 0.5, (160, 200, 232))
+    return m
+
+
+def slag_pile():
+    m = base((42, 36, 34), 531, 0.3, 10, 0.08)
+    paint(m, step(0.55, 0.8, noise(532, 12)), (255, 120, 30), glow=0.9)
+    return m
+
+
+def vent_top():
+    m = metal((70, 68, 70), 541, 32)
+    paint(m, lines(16, 3.0, axes="x") * box(8, 8, 120, 120), (255, 130, 40), glow=1.0)
+    return m
+
+
+def vent_side():
+    return metal((70, 68, 70), 542, 64)
+
+
 TEXTURES = {
     "desk_top": desk_top, "desk_side": desk_side, "desk_lamp": desk_lamp, "wardrobe_front": wardrobe_front,
     "frame_art": frame_art, "frame_wood": frame_wood,
@@ -257,6 +309,8 @@ TEXTURES = {
     "dispenser": dispenser, "jug": jug, "mat_side": mat_side,
     "rack_frame": rack_frame, "rack_tray": rack_tray, "grow_light": grow_light, "tank_side": tank_side, "tank_front": tank_front,
     "hanging_vines": vines,
+    "speaker_bottom": speaker_bottom, "speaker_side": speaker_side, "speaker_top": speaker_top, "icicles": icicles, "ice_drift": ice_drift,
+    "slag_pile": slag_pile, "vent_top": vent_top, "vent_side": vent_side,
 }
 
 
@@ -390,11 +444,35 @@ def model_vines():
         el((8, 0, 0), (8, 16, 16), {"east": "#v", "west": "#v"}, shade=False)])
 
 
+def model_speaker():
+    return {"parent": "minecraft:block/cube_bottom_top", "textures": {"bottom": NS + "speaker_bottom", "side": NS + "speaker_side", "top": NS + "speaker_top"}}
+
+
+def model_icicles():
+    return model({"v": "icicles"}, [
+        el((0, 0, 8), (16, 16, 8), {"north": "#v", "south": "#v"}, shade=False),
+        el((8, 0, 0), (8, 16, 16), {"east": "#v", "west": "#v"}, shade=False)])
+
+
+def model_drift():
+    return model({"t": "ice_drift"}, [el((1, 0, 1), (15, 5, 15), {**sides("#t", uv=FULLUV)})])
+
+
+def model_slag():
+    return model({"t": "slag_pile"}, [el((2, 0, 2), (14, 4, 14), {**sides("#t", uv=FULLUV)})])
+
+
+def model_vent():
+    return model({"top": "vent_top", "side": "vent_side"}, [
+        el((1, 0, 1), (15, 2, 15), {"up": {"texture": "#top", "uv": FULLUV}, **sides("#side", ("north", "south", "east", "west", "down"), uv=FULLUV)})])
+
+
 MODELS = {
     "crew_desk": model_desk, "open_wardrobe": model_wardrobe, "bunk_bed": model_bunk, "wall_frame": model_frame, "personal_items": model_items,
     "kitchen_sink": model_sink, "fridge": model_fridge, "hanging_pots": model_pots, "dish_stack": model_plates,
     "bench_press": model_bench_press, "punching_bag": model_bag, "wall_mirror": model_mirror, "water_dispenser": model_dispenser, "mat_stack": model_mats,
     "hydroponic_rack": model_rack, "grow_light": model_grow_light, "water_tank": model_tank, "hanging_vines": model_vines,
+    "ceiling_speaker": model_speaker, "icicles": model_icicles, "ice_drift": model_drift, "slag_pile": model_slag, "heat_vent": model_vent,
 }
 FACING = {"open_wardrobe", "bunk_bed", "wall_frame", "kitchen_sink", "fridge", "hanging_pots", "bench_press", "wall_mirror", "water_dispenser", "water_tank"}
 
@@ -403,12 +481,37 @@ NAMES_EN = {
     "kitchen_sink": "Galley Sink", "fridge": "Galley Fridge", "hanging_pots": "Hanging Pots", "dish_stack": "Stacked Dishes",
     "bench_press": "Bench Press", "punching_bag": "Punching Bag", "wall_mirror": "Wall Mirror", "water_dispenser": "Water Dispenser", "mat_stack": "Stacked Mats",
     "hydroponic_rack": "Hydroponic Rack", "grow_light": "Grow Light", "water_tank": "Water Tank", "hanging_vines": "Hanging Vines",
+    "ceiling_speaker": "Ceiling Speaker", "icicles": "Icicles", "ice_drift": "Ice Drift", "slag_pile": "Slag Pile", "heat_vent": "Heat Vent",
 }
 NAMES_ZH = {
     "crew_desk": "船員書桌", "open_wardrobe": "敞開的衣櫃", "bunk_bed": "上下鋪", "wall_frame": "相框", "personal_items": "私人物品",
     "kitchen_sink": "廚房水槽", "fridge": "廚房冰箱", "hanging_pots": "掛著的鍋具", "dish_stack": "一疊餐盤",
     "bench_press": "臥推椅", "punching_bag": "沙包", "wall_mirror": "牆鏡", "water_dispenser": "飲水機", "mat_stack": "一疊墊子",
     "hydroponic_rack": "水培架", "grow_light": "植物生長燈", "water_tank": "水箱", "hanging_vines": "垂掛的藤蔓",
+    "ceiling_speaker": "天花板廣播喇叭", "icicles": "冰柱", "ice_drift": "積冰", "slag_pile": "熔渣堆", "heat_vent": "排熱孔",
+}
+
+
+# What B.N.T.G. comes for: wiring and electronics broken down into raw materials (replaces these blocks' plain "drop itself" tables).
+def salvage(name, entries):
+    pools = []
+    for item, low, high, chance in entries:
+        entry = {"type": "minecraft:item", "name": item, "functions": [
+            {"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": low, "max": high}}]}
+        conditions = [{"condition": "minecraft:survives_explosion"}]
+        if chance < 1:
+            conditions.append({"condition": "minecraft:random_chance", "chance": chance})
+        pools.append({"rolls": 1.0, "conditions": conditions, "entries": [entry]})
+    return {"type": "minecraft:block", "pools": pools, "random_sequence": f"noclip_backrooms:blocks/{name}"}
+
+
+SALVAGE = {
+    "hanging_cables": [("minecraft:copper_ingot", 0, 2, 1), ("minecraft:redstone", 0, 1, 0.5)],
+    "console": [("minecraft:redstone", 1, 2, 1), ("minecraft:iron_nugget", 1, 3, 1)],
+    "broken_console": [("minecraft:redstone", 1, 3, 1), ("minecraft:iron_nugget", 2, 5, 1), ("minecraft:gold_nugget", 0, 2, 1),
+                       ("noclip_backrooms:alloy", 1, 1, 0.1)],
+    "server_rack": [("minecraft:redstone", 2, 4, 1), ("minecraft:gold_nugget", 1, 4, 1), ("minecraft:iron_ingot", 0, 2, 1),
+                    ("minecraft:copper_ingot", 1, 2, 1), ("noclip_backrooms:alloy", 1, 1, 0.15)],
 }
 
 
@@ -424,6 +527,8 @@ def main():
         L.write_json(L.ASSETS / f"blockstates/{name}.json", blockstates[name])
         L.write_json(L.ASSETS / f"items/{name}.json", {"model": {"type": "minecraft:model", "model": NS + name}})
         L.write_json(L.DATA / f"noclip_backrooms/loot_table/blocks/{name}.json", L.loot_table(name))
+    for name, entries in SALVAGE.items():
+        L.write_json(L.DATA / f"noclip_backrooms/loot_table/blocks/{name}.json", salvage(name, entries))
     # Every model's textures must exist (the rest of the level's models are checked by make_level0p1.py).
     for name in MODELS:
         data = L.json.loads((L.MODELS / f"{name}.json").read_text(encoding="utf8"))

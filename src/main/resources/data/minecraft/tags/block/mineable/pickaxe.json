@@ -155,6 +155,11 @@
     "noclip_backrooms:hydroponic_rack",
     "noclip_backrooms:grow_light",
     "noclip_backrooms:water_tank",
-    "noclip_backrooms:hanging_vines"
+    "noclip_backrooms:hanging_vines",
+    "noclip_backrooms:ceiling_speaker",
+    "noclip_backrooms:icicles",
+    "noclip_backrooms:ice_drift",
+    "noclip_backrooms:slag_pile",
+    "noclip_backrooms:heat_vent"
   ]
 }

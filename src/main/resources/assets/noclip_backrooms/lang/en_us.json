@@ -561,5 +561,10 @@
   "block.noclip_backrooms.hydroponic_rack": "Hydroponic Rack",
   "block.noclip_backrooms.grow_light": "Grow Light",
   "block.noclip_backrooms.water_tank": "Water Tank",
-  "block.noclip_backrooms.hanging_vines": "Hanging Vines"
+  "block.noclip_backrooms.hanging_vines": "Hanging Vines",
+  "block.noclip_backrooms.ceiling_speaker": "Ceiling Speaker",
+  "block.noclip_backrooms.icicles": "Icicles",
+  "block.noclip_backrooms.ice_drift": "Ice Drift",
+  "block.noclip_backrooms.slag_pile": "Slag Pile",
+  "block.noclip_backrooms.heat_vent": "Heat Vent"
 }

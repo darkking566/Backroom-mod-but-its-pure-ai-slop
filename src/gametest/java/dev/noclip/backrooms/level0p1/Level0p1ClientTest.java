@@ -56,6 +56,7 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 			shoot(context, game, mx + 10.5, arrival.getY(), mz + 6.5, 0, 5, "level0p1_airlock_doorway");
 			if (only("rooms")) rooms(context, game, arrival);
 			if (only("zones")) zones(context, game, arrival);
+			if (only("details")) details(context, game, arrival);
 			if (only("stairs")) stairs(context, game);
 			if (only("atrium")) atrium(context, game);
 			if (only("middle")) middle(context, game);
@@ -107,6 +108,46 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 			shoot(context, game, at[0] * 16 + 10.5, at[2] * 8 + 1, at[1] * 16 + 10.5, 135, 18, "level0p1_zone_" + names[zone] + "_room");
 			shoot(context, game, at[0] * 16 + 10.5, at[2] * 8 + 1, at[1] * 16 + 10.5, 135, -50, "level0p1_zone_" + names[zone] + "_ceiling");
 		}
+	}
+
+	/** Close-ups of the speakers and the cold and hot stretches' props, each from a few blocks away. */
+	private void details(ClientGameTestContext context, TestSingleplayerContext game, BlockPos from) {
+		int[] room = findRoom(from, Room.BEDROOM), cold = findZone(from, 1), hot = findZone(from, 2);
+		if (room != null) closeUp(context, game, room, ZenithLayout.Kind.SPEAKER, "speaker");
+		if (cold != null) {
+			closeUp(context, game, cold, ZenithLayout.Kind.ICICLES, "icicles");
+			closeUp(context, game, cold, ZenithLayout.Kind.DRIFT, "ice_drift");
+		}
+		if (hot != null) {
+			closeUp(context, game, hot, ZenithLayout.Kind.SLAG, "slag");
+			closeUp(context, game, hot, ZenithLayout.Kind.VENT, "vent");
+		}
+	}
+
+	private void closeUp(ClientGameTestContext context, TestSingleplayerContext game, int[] module, ZenithLayout.Kind kind, String name) {
+		int y0 = module[2] * 8;
+		for (int dx = -48; dx < 64; dx++) {
+			for (int dz = -48; dz < 64; dz++) {
+				int x = module[0] * 16 + dx, z = module[1] * 16 + dz;
+				for (int t = 1; t < 8; t++) {
+					if (ZenithLayout.kind(ZenithLayout.cell(seed, x, y0 + t, z)) != kind) continue;
+					for (int[] step : new int[][] {{-3, 0}, {3, 0}, {0, -3}, {0, 3}, {-2, 0}, {2, 0}, {0, -2}, {0, 2}}) {
+						int cx = x + step[0], cz = z + step[1];
+						boolean clear = true;
+						for (int i = 0; i < 3 && clear; i++) {
+							int mx = cx + Integer.signum(x - cx) * i, mz = cz + Integer.signum(z - cz) * i;
+							clear = ZenithLayout.passable(ZenithLayout.cell(seed, mx, y0 + 1, mz)) && ZenithLayout.passable(ZenithLayout.cell(seed, mx, y0 + 2, mz));
+						}
+						if (!clear) continue;
+						double ox = x + 0.5 - (cx + 0.5), oy = y0 + t + 0.5 - (y0 + 2.6), oz = z + 0.5 - (cz + 0.5);
+						float yaw = (float) Math.toDegrees(Math.atan2(-ox, oz)), pitch = (float) -Math.toDegrees(Math.atan2(oy, Math.hypot(ox, oz)));
+						shoot(context, game, cx + 0.5, y0 + 1, cz + 0.5, yaw, pitch, "level0p1_detail_" + name);
+						return;
+					}
+				}
+			}
+		}
+		System.out.println("details: no " + kind + " found near " + module[0] + "," + module[1]);
 	}
 
 	/** A module (mx, mz, deck) near here in a damaged stretch of this kind, not part of an atrium. */

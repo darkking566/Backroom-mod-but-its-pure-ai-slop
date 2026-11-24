@@ -58,6 +58,20 @@ class ZenithLayoutTest {
 
 	/** The spiral stair in the corner of each 48x48 block takes you up a whole deck, again and again. */
 	@Test
+	void speakersAndZoneDetailsAppear() {
+		java.util.EnumSet<ZenithLayout.Kind> seen = java.util.EnumSet.noneOf(ZenithLayout.Kind.class);
+		for (int x = -400; x < 400; x += 2) {
+			for (int z = -400; z < 400; z += 2) {
+				for (int y : new int[] {33, 38, 39, 41, 65, 70}) seen.add(ZenithLayout.kind(ZenithLayout.cell(SEEDS[0], x, y, z)));
+			}
+		}
+		for (ZenithLayout.Kind kind : new ZenithLayout.Kind[] {ZenithLayout.Kind.SPEAKER, ZenithLayout.Kind.ICICLES, ZenithLayout.Kind.DRIFT,
+				ZenithLayout.Kind.SLAG, ZenithLayout.Kind.VENT}) {
+			assertTrue(seen.contains(kind), kind + " never appears");
+		}
+	}
+
+	@Test
 	void stairsClimbDeckByDeck() {
 		for (long seed : SEEDS) {
 			for (int deck : new int[] {-30, 25, 40, 52}) {

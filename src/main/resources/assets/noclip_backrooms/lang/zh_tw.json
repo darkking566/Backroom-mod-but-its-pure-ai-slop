@@ -561,5 +561,10 @@
   "block.noclip_backrooms.hydroponic_rack": "水培架",
   "block.noclip_backrooms.grow_light": "植物生長燈",
   "block.noclip_backrooms.water_tank": "水箱",
-  "block.noclip_backrooms.hanging_vines": "垂掛的藤蔓"
+  "block.noclip_backrooms.hanging_vines": "垂掛的藤蔓",
+  "block.noclip_backrooms.ceiling_speaker": "天花板廣播喇叭",
+  "block.noclip_backrooms.icicles": "冰柱",
+  "block.noclip_backrooms.ice_drift": "積冰",
+  "block.noclip_backrooms.slag_pile": "熔渣堆",
+  "block.noclip_backrooms.heat_vent": "排熱孔"
 }

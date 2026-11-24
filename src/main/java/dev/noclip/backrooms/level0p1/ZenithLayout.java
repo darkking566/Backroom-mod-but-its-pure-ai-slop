@@ -47,7 +47,8 @@ final class ZenithLayout {
 		PORTAL, PORTAL_FRAME, STATIC_TEAR,
 		LEAVES, LOG, WATER(true), ORB,
 		CATWALK, TRUSS, TETHER, GIRDER, GIRDER_LIGHT, SINGULARITY_CORE, SINGULARITY_SHELL, PLASMA, RAIL_LAMP,
-		DESK, WARDROBE, BUNK_BED, FRAME, ITEMS, SINK, FRIDGE, POTS, DISHES, BENCH_PRESS, BAG, MIRROR, DISPENSER, MATS, RACK, GROW_LIGHT, TANK, VINES;
+		DESK, WARDROBE, BUNK_BED, FRAME, ITEMS, SINK, FRIDGE, POTS, DISHES, BENCH_PRESS, BAG, MIRROR, DISPENSER, MATS, RACK, GROW_LIGHT, TANK, VINES,
+		SPEAKER(false), ICICLES(true), DRIFT(true), SLAG(true), VENT(true);
 
 		/** Whether a player can walk through it (a closed door counts: it opens). */
 		final boolean passable;
@@ -299,6 +300,14 @@ final class ZenithLayout {
 		if (corridor) {
 			// Cables hang from the ceiling in the dark stretches.
 			if (damaged && t >= 5 && hash(seed, x, z, k) % 9 == 0) return of(Kind.CABLES);
+			// Rime hangs from the cold stretches' ceilings and drifts on their floors; the hot ones have slag and venting floor grates.
+			if (zone == 1 && t == 6 && hash(seed, x, z, k + 9) % 7 == 0) return of(Kind.ICICLES);
+			if (zone == 1 && t == 1 && hash(seed, x, z, k + 10) % 9 == 0) return of(Kind.DRIFT);
+			if (zone == 2 && t == 1) {
+				int h = Math.floorMod(hash(seed, x, z, k + 10), 14);
+				if (h == 0) return of(Kind.SLAG);
+				if (h == 1) return of(Kind.VENT);
+			}
 			return of(Kind.AIR);
 		}
 		boolean wallW = u == 4, wallE = u == 15, wallN = v == 4, wallS = v == 15;
@@ -311,6 +320,8 @@ final class ZenithLayout {
 		boolean lamp;
 		if (corridor) lamp = v < 4 ? (x & 7) == 4 && v == 1 : (z & 7) == 4 && u == 1;
 		else lamp = u == 9 && v == 9 || u == 10 && v == 10;
+		// The announcement speakers: one every 16 blocks along a working corridor.
+		if (corridor && zone == 0 && !lamp && (v < 4 ? (x & 15) == 0 && v == 2 : (z & 15) == 0 && u == 2)) return of(Kind.SPEAKER);
 		if (!lamp) {
 			// In the cold and the hot stretches most plates are furred with rime or blackened.
 			if (zone == 1 && hash(seed, x, z, k + 5) % 4 != 0) return of(Kind.CEILING_FROST);

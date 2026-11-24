@@ -211,3 +211,5 @@
   - 新增對應之 `src/main/java/.../monsters/<套件>/`、`src/client/java/.../monsters/<套件>/`、`Monsters.java` 與 `BackroomsClient.java` 註冊、`assets/noclip_backrooms/monsters/*.json`、`textures/entity/*.png`（含 `*_eyes.png`）、16×16 生怪蛋貼圖與模型、以及 `art/monsters/<id>/`（`.blend` 與 `.glb` 原檔）
 
 - Level 0.1 四種原文房間加擺設（18 個新方塊：上下舖、相框、開門衣櫃、辦公桌、私人物品、水槽、冰箱、吊掛鍋具、疊盤、臥推架、沙包、牆鏡、飲水機、墊子堆、栽培架、植物燈、水箱、垂藤）：`tools/make_level0p1_props.py` 產生貼圖／模型／blockstates；`ZenithLayout` 的四個房間函式改寫、`ZenithBlocks`／`ZenithChunkGenerator` 登記；`gradlew build` 與 `rooms` 段實機測試通過，截圖看過，各件近照與朝向還沒逐一確認；尚未提交
+
+- Level 0.1 第二批細節：天花板廣播喇叭（走廊每 16 格、廣播時冒音符）、電纜電火花與排熱孔冒煙（`ZenithAmbience.details` 隨機抽樣）、冷區冰柱／積冰、熱區熔渣堆／排熱孔（5 個新方塊，皆可穿過，`Kind.SPEAKER/ICICLES/DRIFT/SLAG/VENT`）、拆解材料掉落（電纜、控制台、壞控制台、伺服器機櫃改掉銅／紅石／金粒／鐵／機率合金）；新增單元測試 `speakersAndZoneDetailsAppear`；`gradlew build` 與 `rooms,zones` 實機段通過；之後補拍近照（新增 `details` 段，`NOCLIP_ONLY=details`）：喇叭、冰柱、積冰、熔渣、排熱孔外觀都看過；火花、煙與音符粒子沒拍；尚未提交
