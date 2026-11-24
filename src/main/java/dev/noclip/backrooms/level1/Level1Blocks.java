@@ -287,6 +287,11 @@ public final class Level1Blocks {
 	public static final Block WASTEBASKET = register("wastebasket", Properties.of()
 			.mapColor(MapColor.METAL).strength(0.5F).sound(SoundType.METAL).noOcclusion(),
 			p -> new ShapedBlock(p, Block.box(4, 0, 4, 12, 11.5, 12)));
+	/** Potted plants for office desks, one dead and one still green (tools/make_desk_plants.py). */
+	public static final Block DESK_PLANT_DEAD = register("desk_plant_dead", Properties.of()
+			.mapColor(MapColor.TERRACOTTA_ORANGE).instabreak().sound(SoundType.GRASS).noOcclusion(), p -> new ShapedBlock(p, Block.box(4, 0, 4, 12, 6, 12)));
+	public static final Block DESK_PLANT_LEAFY = register("desk_plant_leafy", Properties.of()
+			.mapColor(MapColor.TERRACOTTA_ORANGE).instabreak().sound(SoundType.GRASS).noOcclusion(), p -> new ShapedBlock(p, Block.box(4, 0, 4, 12, 6, 12)));
 	public static final Block HOSPITAL_BED = register("hospital_bed", Properties.of()
 			.mapColor(MapColor.METAL).strength(0.8F).sound(SoundType.METAL).noOcclusion(),
 			p -> new ShapedBlock(p, Block.box(0, 0, 1, 16, 11, 15)));

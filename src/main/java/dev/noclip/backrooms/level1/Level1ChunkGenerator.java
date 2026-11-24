@@ -173,8 +173,8 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 	private static BlockState deskTop(long seed, int x, int z) {
 		int roll = Math.floorMod(Level1Layout.hash(seed, x, z, 13), 100);
 		if (roll < 62) return computer(seed, x, z);
-		if (roll < 76) return Blocks.POTTED_DEAD_BUSH.defaultBlockState();
-		if (roll < 86) return Blocks.POTTED_FERN.defaultBlockState();
+		if (roll < 76) return state(Level1Blocks.DESK_PLANT_DEAD);
+		if (roll < 86) return state(Level1Blocks.DESK_PLANT_LEAFY);
 		return Blocks.AIR.defaultBlockState();
 	}
 
