@@ -110,8 +110,28 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 	}
 
 	private static BlockState floorBlock(long seed, int x, int z, int h) {
-		if (h == 4) return light(seed, x, z);
-		if (h == 2) return mark(seed, x, z);
+		if (h == 4) {
+			BlockState fixture = light(seed, x, z);
+			if (!fixture.isAir()) return fixture;
+			Level2Layout.CeilingProp prop = Level2Layout.ceilingDetail(seed, x, z);
+			if (prop == Level2Layout.CeilingProp.VENT) return state(Level2Blocks.CEILING_VENT);
+			if (prop == Level2Layout.CeilingProp.SNAPPED_CABLES) return state(Level2Blocks.SNAPPED_CABLES);
+			return air();
+		}
+		if (h == 2) {
+			BlockState m = mark(seed, x, z);
+			if (!m.isAir()) return m;
+			Level2Layout.WallDetail detail = Level2Layout.wallDetail(seed, x, z);
+			if (detail != null) {
+				Block block = switch (detail.prop()) {
+					case BREAKER_BOX -> Level2Blocks.BREAKER_BOX;
+					case PRESSURE_GAUGE -> Level2Blocks.PRESSURE_GAUGE;
+					case HAZARD_SIGN -> Level2Blocks.HAZARD_SIGN;
+				};
+				return block.defaultBlockState().setValue(Level2WallDetailBlock.FACING, Direction.from2DDataValue(horizontal(detail.dir())));
+			}
+			return air();
+		}
 		if (h == 1) {
 			int rail = Level2Layout.railAxis(seed, x, z);
 			if (rail >= 0) {
@@ -153,6 +173,12 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 		RoomKind kind = Level2Layout.roomKindAt(seed, x, z);
 		if (kind == RoomKind.EL3A) return state(Level2Blocks.UTILITY_FLOOR);
 		if (kind == RoomKind.MACCHINA) return state(Level2Blocks.BLACK_BRICK_WALL);
+		if (Level2Layout.isDrainGrate(seed, x, z)) return state(Level2Blocks.DRAIN_GRATE);
+		int ductAxis = Level2Layout.floorCableDuctAxis(seed, x, z);
+		if (ductAxis >= 0) {
+			return Level2Blocks.FLOOR_CABLE_DUCT.defaultBlockState()
+					.setValue(Level2AxisBlock.AXIS, ductAxis == 0 ? Direction.Axis.X : Direction.Axis.Z);
+		}
 		return switch (Level2Layout.ground(seed, x, z)) {
 			case DEBRIS -> state(Level2Blocks.DEBRIS_UTILITY_FLOOR);
 			case DAMP -> state(Level2Blocks.DAMP_UTILITY_FLOOR);

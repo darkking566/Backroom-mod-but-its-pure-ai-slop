@@ -441,6 +441,64 @@ public final class Level2Layout {
 		return -1;
 	}
 
+	enum WallProp { BREAKER_BOX, PRESSURE_GAUGE, HAZARD_SIGN }
+	record WallDetail(WallProp prop, int dir) {}
+	enum CeilingProp { VENT, SNAPPED_CABLES }
+
+	private static final int[] WALL_DX = {0, 1, 0, -1};
+	private static final int[] WALL_DZ = {-1, 0, 1, 0};
+
+	static WallDetail wallDetail(long seed, int x, int z) {
+		if (roomKindAt(seed, x, z) != null || isOfficePatch(seed, x, z)) return null;
+		int wallDir = -1;
+		for (int d = 0; d < 4; d++) {
+			if (tile(seed, x + WALL_DX[d], z + WALL_DZ[d]).kind() == Kind.WALL) {
+				wallDir = Level2Plan.opposite(d);
+				break;
+			}
+		}
+		if (wallDir < 0) return null;
+		int r = Math.floorMod(hash(seed, x, z, 0x41D1), 100);
+		if (hot(seed, x, z) || cold(seed, x, z) || gas(seed, x, z)) {
+			if (r < 6) return new WallDetail(WallProp.HAZARD_SIGN, wallDir);
+			if (r < 9) return new WallDetail(WallProp.PRESSURE_GAUGE, wallDir);
+			return null;
+		}
+		if (r < 2) return new WallDetail(WallProp.BREAKER_BOX, wallDir);
+		if (r < 4) return new WallDetail(WallProp.PRESSURE_GAUGE, wallDir);
+		if (r < 6) return new WallDetail(WallProp.HAZARD_SIGN, wallDir);
+		return null;
+	}
+
+	static boolean isDrainGrate(long seed, int x, int z) {
+		if (roomKindAt(seed, x, z) != null || isOfficePatch(seed, x, z)) return false;
+		if (ground(seed, x, z) != Ground.DAMP) return false;
+		return Math.floorMod(hash(seed, x, z, 0x41D2), 100) < 10;
+	}
+
+	static int floorCableDuctAxis(long seed, int x, int z) {
+		if (roomKindAt(seed, x, z) != null || isOfficePatch(seed, x, z) || railAxis(seed, x, z) >= 0) return -1;
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		Level2Plan plan = plan(seed, x, z);
+		int i = lx / CELL, j = lz / CELL;
+		int cell = Level2Plan.cell(i, j);
+		int axis = plan.straightAxis(cell);
+		if (axis < 0) return -1;
+		int cellHash = Math.floorMod(hash(seed, Math.floorDiv(x, CELL), Math.floorDiv(z, CELL), 0x41D3), 100);
+		if (cellHash >= 10) return -1;
+		int side = (cellHash & 1) == 0 ? 1 : 3;
+		int across = axis == 0 ? lz % CELL : lx % CELL;
+		return across == side ? axis : -1;
+	}
+
+	static CeilingProp ceilingDetail(long seed, int x, int z) {
+		if (roomKindAt(seed, x, z) != null || isOfficePatch(seed, x, z)) return null;
+		int r = Math.floorMod(hash(seed, x, z, 0x41D4), 100);
+		if (r < 3) return CeilingProp.VENT;
+		int cableCutoff = (ground(seed, x, z) == Ground.DEBRIS || hot(seed, x, z) || gas(seed, x, z)) ? 8 : 6;
+		return r < cableCutoff ? CeilingProp.SNAPPED_CABLES : null;
+	}
+
 	static int hash(long seed, int x, int z, int salt) {
 		long h = mix(seed + salt);
 		h = mix(h ^ x);

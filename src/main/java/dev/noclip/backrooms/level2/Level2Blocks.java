@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.Function;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.type.BlockSetTypeBuilder;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -15,13 +16,16 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public final class Level2Blocks {
@@ -114,6 +118,22 @@ public final class Level2Blocks {
 	public static final Block PINK_DOOR = exit("pink_door", Level2Exit.PINK, SoundType.WOOD, 0);
 	public static final Block ELEVATOR_DOOR = exit("level2_elevator_door", Level2Exit.ELEVATOR, SoundType.METAL, 2);
 
+	public static final Block BREAKER_BOX = register("breaker_box", wallDetail(),
+			p -> new Level2WallDetailBlock(p, 3, 2, 13, 13, 14, 16));
+	public static final Block PRESSURE_GAUGE = register("pressure_gauge", wallDetail(),
+			p -> new Level2WallDetailBlock(p, 4, 0, 14, 12, 12, 16));
+	public static final Block HAZARD_SIGN = register("hazard_sign", wallDetail(),
+			p -> new Level2WallDetailBlock(p, 2, 3, 15, 14, 13, 16));
+	public static final Block DRAIN_GRATE = register("drain_grate",
+			Properties.of().mapColor(MapColor.METAL).strength(2.0F, 6.0F).sound(SoundType.METAL));
+	public static final Block FLOOR_CABLE_DUCT = register("floor_cable_duct",
+			Properties.of().mapColor(MapColor.METAL).strength(2.0F, 6.0F).sound(SoundType.METAL),
+			Level2AxisBlock::new);
+	public static final Block CEILING_VENT = register("ceiling_vent", ceilingDetail(),
+			p -> shaped(p, Block.box(2, 14.5, 2, 14, 16, 14)));
+	public static final Block SNAPPED_CABLES = register("snapped_cables", ceilingDetail(),
+			p -> shaped(p, Block.box(3, 5, 3, 13, 16, 13)));
+
 	private Level2Blocks() {
 	}
 
@@ -142,6 +162,23 @@ public final class Level2Blocks {
 	private static Properties fixture(int light) {
 		return Properties.of().mapColor(MapColor.METAL).strength(0.5F).sound(SoundType.GLASS).noOcclusion().noCollision()
 				.lightLevel(state -> light);
+	}
+
+	private static Properties wallDetail() {
+		return Properties.of().mapColor(MapColor.METAL).strength(0.8F).sound(SoundType.METAL).noOcclusion().noCollision();
+	}
+
+	private static Properties ceilingDetail() {
+		return Properties.of().mapColor(MapColor.METAL).strength(0.5F).sound(SoundType.METAL).noOcclusion().noCollision();
+	}
+
+	private static Block shaped(Properties properties, VoxelShape shape) {
+		return new Block(properties) {
+			@Override
+			protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+				return shape;
+			}
+		};
 	}
 
 	private static Properties door(float strength) {

@@ -1,0 +1,138 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level2/snapped_cables",
+    "cable": "noclip_backrooms:block/level2/snapped_cables",
+    "plate": "noclip_backrooms:block/level2/toolbox_metal"
+  },
+  "elements": [
+    {
+      "from": [
+        4,
+        5,
+        5
+      ],
+      "to": [
+        5.5,
+        16,
+        6.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cable"
+        },
+        "south": {
+          "texture": "#cable"
+        },
+        "east": {
+          "texture": "#cable"
+        },
+        "west": {
+          "texture": "#cable"
+        },
+        "up": {
+          "texture": "#cable"
+        },
+        "down": {
+          "texture": "#cable"
+        }
+      }
+    },
+    {
+      "from": [
+        7.5,
+        7,
+        9
+      ],
+      "to": [
+        9,
+        16,
+        10.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cable"
+        },
+        "south": {
+          "texture": "#cable"
+        },
+        "east": {
+          "texture": "#cable"
+        },
+        "west": {
+          "texture": "#cable"
+        },
+        "up": {
+          "texture": "#cable"
+        },
+        "down": {
+          "texture": "#cable"
+        }
+      }
+    },
+    {
+      "from": [
+        10.5,
+        9,
+        5.5
+      ],
+      "to": [
+        12,
+        16,
+        7
+      ],
+      "faces": {
+        "north": {
+          "texture": "#cable"
+        },
+        "south": {
+          "texture": "#cable"
+        },
+        "east": {
+          "texture": "#cable"
+        },
+        "west": {
+          "texture": "#cable"
+        },
+        "up": {
+          "texture": "#cable"
+        },
+        "down": {
+          "texture": "#cable"
+        }
+      }
+    },
+    {
+      "from": [
+        3.5,
+        14.5,
+        4.5
+      ],
+      "to": [
+        12.5,
+        16,
+        11.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#plate"
+        },
+        "south": {
+          "texture": "#plate"
+        },
+        "east": {
+          "texture": "#plate"
+        },
+        "west": {
+          "texture": "#plate"
+        },
+        "up": {
+          "texture": "#plate"
+        },
+        "down": {
+          "texture": "#plate"
+        }
+      }
+    }
+  ]
+}
