@@ -10,12 +10,15 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.AnimationState;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -46,6 +49,10 @@ import net.minecraft.world.phys.Vec3;
 public class ShepherdSnake extends Monster {
 	private static final EntityDataAccessor<Boolean> DATA_CHARGING =
 			SynchedEntityData.defineId(ShepherdSnake.class, EntityDataSerializers.BOOLEAN);
+	private static final EntityDataAccessor<Float> DATA_STOOP =
+			SynchedEntityData.defineId(ShepherdSnake.class, EntityDataSerializers.FLOAT);
+	private static final EntityDimensions CROUCH_SIZE =
+			EntityDimensions.scalable(1.9F, 2.35F).withEyeHeight(1.75F);
 	private static final byte EVENT_CRUSH = 4;
 	private static final int CRUSH_HIT_AT = 10, CRUSH_TICKS = 17;
 
@@ -55,6 +62,8 @@ public class ShepherdSnake extends Monster {
 	private LivingEntity crushTarget;
 	private int chargeTicks;
 	private int chargeCooldown;
+	private float targetStoop;
+	private boolean initializedStoop;
 
 	public ShepherdSnake(EntityType<? extends ShepherdSnake> type, Level level) {
 		super(type, level);
@@ -74,10 +83,30 @@ public class ShepherdSnake extends Monster {
 	protected void defineSynchedData(SynchedEntityData.Builder builder) {
 		super.defineSynchedData(builder);
 		builder.define(DATA_CHARGING, false);
+		builder.define(DATA_STOOP, 0.0F);
 	}
 
 	public boolean isCharging() {
 		return entityData.get(DATA_CHARGING);
+	}
+
+	public float stoopAmount() {
+		return entityData.get(DATA_STOOP);
+	}
+
+	@Override
+	public EntityDimensions getDefaultDimensions(Pose pose) {
+		return pose == Pose.CROUCHING ? CROUCH_SIZE : super.getDefaultDimensions(pose);
+	}
+
+	@Override
+	public void tick() {
+		// Snap into crouch before LivingEntity.baseTick() checks isInWall() so spawning in Level 0 never suffocates.
+		if (!initializedStoop && level() instanceof ServerLevel serverLevel) {
+			initializedStoop = true;
+			updateCeilingStoop(serverLevel, true);
+		}
+		super.tick();
 	}
 
 	@Override
@@ -109,6 +138,17 @@ public class ShepherdSnake extends Monster {
 		if (chargeTicks > 0) {
 			chargeTicks--;
 			entityData.set(DATA_CHARGING, chargeTicks > 0);
+		}
+
+		// Dynamically measure ceiling clearance so the colossal serpent stoops smoothly under low ceilings
+		if (tickCount % 4 == 0) {
+			updateCeilingStoop(level, false);
+		}
+		float curStoop = stoopAmount();
+		if (Math.abs(curStoop - targetStoop) > 0.01F) {
+			entityData.set(DATA_STOOP, Mth.lerp(0.22F, curStoop, targetStoop));
+		} else if (curStoop != targetStoop) {
+			entityData.set(DATA_STOOP, targetStoop);
 		}
 
 		// Heavy rumbling slither warning when moving near players
@@ -155,6 +195,12 @@ public class ShepherdSnake extends Monster {
 		int baseY = getBlockY(); // NEVER break y < baseY (protects floors!)
 		int radius = wide ? 2 : 1;
 		int maxDy = wide ? 4 : 3;
+		float stoop = stoopAmount();
+		if (stoop > 0.85F) {
+			maxDy = Math.min(maxDy, 2); // Preserve 3-block Level 0 / corridor ceilings
+		} else if (stoop > 0.35F) {
+			maxDy = Math.min(maxDy, 3); // Preserve 4-block ceilings
+		}
 		int broken = 0;
 
 		for (int dx = -radius; dx <= radius; dx++) {
@@ -192,6 +238,54 @@ public class ShepherdSnake extends Monster {
 			return false;
 		}
 		return true;
+	}
+
+	private void updateCeilingStoop(ServerLevel level, boolean immediate) {
+		targetStoop = computeCeilingStoop(level);
+		Pose desiredPose = targetStoop > 0.35F ? Pose.CROUCHING : Pose.STANDING;
+		if (desiredPose == Pose.STANDING && getPose() == Pose.CROUCHING
+				&& !level.noCollision(this, getDimensions(Pose.STANDING).makeBoundingBox(position()))) {
+			desiredPose = Pose.CROUCHING;
+			targetStoop = Math.max(targetStoop, 0.75F);
+		}
+		if (getPose() != desiredPose) {
+			setPose(desiredPose);
+			refreshDimensions();
+		}
+		if (immediate) {
+			entityData.set(DATA_STOOP, targetStoop);
+		}
+	}
+
+	/** Checks headroom above self, sides, and ahead; returns 1.0 under <=3-block ceilings, 0.75 under 4-block, 0.0 in >=5-block halls. */
+	private float computeCeilingStoop(ServerLevel level) {
+		BlockPos feet = blockPosition();
+		Vec3 fwd = Vec3.directionFromRotation(0, getYRot());
+		Vec3 right = new Vec3(-fwd.z, 0, fwd.x);
+		int minClear = headroom(level, feet, false);
+		minClear = Math.min(minClear, headroom(level, BlockPos.containing(getX() + fwd.x * 1.5, getY(), getZ() + fwd.z * 1.5), true));
+		minClear = Math.min(minClear, headroom(level, BlockPos.containing(getX() + fwd.x * 2.8, getY(), getZ() + fwd.z * 2.8), true));
+		minClear = Math.min(minClear, headroom(level, BlockPos.containing(getX() + fwd.x + right.x * 0.85, getY(), getZ() + fwd.z + right.z * 0.85), true));
+		minClear = Math.min(minClear, headroom(level, BlockPos.containing(getX() + fwd.x - right.x * 0.85, getY(), getZ() + fwd.z - right.z * 0.85), true));
+		if (minClear <= 3) return 1.0F;
+		if (minClear == 4) return 0.75F;
+		return 0.0F;
+	}
+
+	private static int headroom(ServerLevel level, BlockPos feet, boolean ignoreSolidWall) {
+		if (ignoreSolidWall) {
+			BlockPos body = feet.above(1);
+			if (!level.getBlockState(body).getCollisionShape(level, body).isEmpty()) {
+				return 5;
+			}
+		}
+		for (int dy = 2; dy <= 4; dy++) {
+			BlockPos check = feet.above(dy);
+			if (!level.getBlockState(check).getCollisionShape(level, check).isEmpty()) {
+				return dy;
+			}
+		}
+		return 5;
 	}
 
 	@Override

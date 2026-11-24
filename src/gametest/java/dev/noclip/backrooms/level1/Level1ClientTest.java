@@ -81,6 +81,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			if (only("people")) people(context, game, seed);
 			if (only("rooms")) rooms(context, game, seed);
 			if (only("hounds")) hounds(context, game, seed);
+			if (only("shepherdSnake")) shepherdSnake(context, game, seed);
 			if (only("checkBlocks")) checkBlocks(context, game);
 			if (only("leaveThroughDoor")) leaveThroughDoor(context, game, seed);
 		}
@@ -981,6 +982,86 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		int gone = server.computeOnServer(s -> Hounds.slinkOff(level1(s)));
 		check(gone == 1, "a far-off hound did not leave when the lights came back (" + gone + ")");
 		server.runCommand("gamemode spectator @a");
+	}
+
+	/** Verifies the Shepherd Snake stoops cleanly in 3-block Level 0 without suffocating, and stands tall in 5-block Level 1 halls. */
+	private static void shepherdSnake(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		server.runCommand("gamemode spectator @a");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 34.0 1.2 0 10");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(20);
+		game.getConnection().waitForChunksRender();
+
+		server.runOnServer(s -> {
+			ServerLevel level0 = s.getLevel(dev.noclip.backrooms.level0.Level0.LEVEL_0);
+			var snake = dev.noclip.backrooms.monsters.Monsters.SHEPHERD_SNAKE.create(level0, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+			check(snake != null, "could not create shepherd snake");
+			snake.setPos(3.5, 33.0, 4.5);
+			snake.setYRot(180.0F);
+			snake.yBodyRot = 180.0F;
+			snake.yHeadRot = 180.0F;
+			snake.addTag("test_snake");
+			level0.addFreshEntity(snake);
+		});
+		for (int step : new int[] {1, 4, 40}) {
+			context.waitTicks(step);
+			server.runOnServer(s -> {
+				ServerLevel level0 = s.getLevel(dev.noclip.backrooms.level0.Level0.LEVEL_0);
+				var snakes = level0.getEntitiesOfClass(dev.noclip.backrooms.monsters.shepherdsnake.ShepherdSnake.class,
+						new AABB(3, 32, 4, 4, 36, 5).inflate(16), e -> e.entityTags().contains("test_snake"));
+				check(!snakes.isEmpty(), "test shepherd snake missing in level 0");
+				var snake = snakes.getFirst();
+				var src = snake.getLastDamageSource();
+				check(snake.getHealth() == snake.getMaxHealth(),
+						"shepherd snake took damage in level 0 at tick " + snake.tickCount + ": "
+								+ snake.getHealth() + "/" + snake.getMaxHealth()
+								+ " pose=" + snake.getPose() + " stoop=" + snake.stoopAmount()
+								+ " pos=" + snake.position() + " src=" + (src == null ? "none" : src.getMsgId())
+								+ " inWall=" + snake.isInWall() + " eyeY=" + snake.getEyeY());
+			});
+		}
+		context.takeScreenshot("level0_shepherd_snake_stoop");
+		server.runOnServer(s -> {
+			ServerLevel level0 = s.getLevel(dev.noclip.backrooms.level0.Level0.LEVEL_0);
+			var snakes = level0.getEntitiesOfClass(dev.noclip.backrooms.monsters.shepherdsnake.ShepherdSnake.class,
+					new AABB(3, 32, 4, 4, 36, 5).inflate(16), e -> e.entityTags().contains("test_snake"));
+			check(!snakes.isEmpty(), "test shepherd snake missing in level 0");
+			var snake = snakes.getFirst();
+			check(snake.getPose() == net.minecraft.world.entity.Pose.CROUCHING,
+					"shepherd snake did not crouch in level 0: " + snake.getPose());
+			check(snake.stoopAmount() >= 0.99F,
+					"shepherd snake stoop too low in level 0: " + snake.stoopAmount());
+			check(!snake.isInWall(), "shepherd snake stuck in wall in level 0");
+		});
+		server.runCommand("kill @e[tag=test_snake]");
+
+		// Also verify it stands tall in a 5-block Level 1 hall.
+		int[] spot = Level1Layout.landing(seed, 0, 0);
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f 180 0",
+				spot[0] + 0.5, STAND + 1, spot[1] + 0.5));
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		server.runOnServer(s -> {
+			var snake = dev.noclip.backrooms.monsters.Monsters.SHEPHERD_SNAKE.create(level1(s), net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+			check(snake != null, "could not create shepherd snake in level 1");
+			snake.setPos(spot[0] + 0.5, STAND, spot[1] + 0.5);
+			snake.addTag("test_snake");
+			level1(s).addFreshEntity(snake);
+		});
+		context.waitTicks(20);
+		server.runOnServer(s -> {
+			var snakes = level1(s).getEntitiesOfClass(dev.noclip.backrooms.monsters.shepherdsnake.ShepherdSnake.class,
+					new AABB(spot[0], STAND, spot[1], spot[0] + 1, STAND + 4, spot[1] + 1).inflate(16),
+					e -> e.entityTags().contains("test_snake"));
+			check(!snakes.isEmpty(), "test shepherd snake missing in level 1");
+			var snake = snakes.getFirst();
+			check(snake.getPose() == net.minecraft.world.entity.Pose.STANDING,
+					"shepherd snake crouched in tall level 1 hall: " + snake.getPose());
+			check(snake.stoopAmount() < 0.05F,
+					"shepherd snake stooped in tall level 1 hall: " + snake.stoopAmount());
+		});
+		server.runCommand("kill @e[tag=test_snake]");
 	}
 
 	private static dev.noclip.backrooms.monsters.hound.Hound testHound(MinecraftServer server) {

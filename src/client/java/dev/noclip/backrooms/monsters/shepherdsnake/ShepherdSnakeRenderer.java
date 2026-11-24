@@ -34,6 +34,7 @@ public final class ShepherdSnakeRenderer extends MobRenderer<ShepherdSnake, Shep
 	public void extractRenderState(ShepherdSnake mob, State state, float partialTick) {
 		super.extractRenderState(mob, state, partialTick);
 		state.charging = mob.isCharging();
+		state.stoop = mob.stoopAmount();
 		state.crush.copyFrom(mob.crushAnimation);
 	}
 
@@ -44,6 +45,7 @@ public final class ShepherdSnakeRenderer extends MobRenderer<ShepherdSnake, Shep
 
 	public static final class State extends LivingEntityRenderState {
 		boolean charging;
+		float stoop;
 		final AnimationState crush = new AnimationState();
 	}
 }

@@ -133,3 +133,8 @@
   - `docs/crafting/05_weapons_firearms.md`（槍械精密組裝零件樹、18 種土製／正規／異常實驗槍械、10 種細緻彈藥與 6 種戰術配件）
   - `docs/crafting/06_weapons_magic_and_chests.md`（19 件魔法與異常超自然武器、寶箱與 Boss 取得管道對照總表）
 - 建立給 Claude 閱讀與技術對齊的總體企劃與協作交接書 `docs/PROJECT_PLAN_FOR_CLAUDE.md`（整合核心玩法願景、Antigravity 與 Claude 分工邊界、合成表 v1 資料驅動套件分流提案、多樓層網狀出口擴充建議、單一資料夾短期分支策略與 5 項待對齊問題）
+- 為牧蛇（`ShepherdSnake`）新增動態天花板高度適應與低頭動畫系統（修正 Level 0 三格高走廊卡牆窒息受傷）：
+  - `assets/noclip_backrooms/monsters/shepherd_snake.json`：新增 `low_ceiling_stoop` 循環低頭動畫片段（於 Blender `art/monsters/shepherd_snake/shepherd_snake.blend` 測試確認姿勢與總高 `<= 2.61` 格，僅控制 `Neck_1..3` 與 `Head`，保留身體與尾部波浪擺動及下顎咬合動畫）
+  - `monsters/shepherdsnake/ShepherdSnake.java`：新增 `DATA_STOOP` 同步、`CROUCH_SIZE`（`1.9×2.35`，眼高 `1.75`）、生成第一 tick 立即於 `isInWall()` 前切換姿勢避免出生窒息、站起前碰撞檢查、以及依低頭程度限制 `bulldozeObstacles` 高度避免拆毀天花板
+  - `ShepherdSnakeRenderer.java`、`ShepherdSnakeModel.java`：同步 `stoop` 權重並混合 `low_ceiling_stoop`，低頭時限制抬頭仰角
+  - `Level1ClientTest.java`：新增 `shepherdSnake` 實機測試段（驗證 Level 0 滿血不窒息低頭與 Level 1 五格大廳站立），`gradlew build` 與 `NOCLIP_ONLY=shepherdSnake gradlew runClientGameTest`（含 Level 0、Level 1 該段、Level 2）全部通過
