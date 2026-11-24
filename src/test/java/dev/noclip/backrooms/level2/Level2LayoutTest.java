@@ -186,7 +186,28 @@ class Level2LayoutTest {
 			int[] spot = Level2Layout.landing(SEED, x, -x);
 			assertEquals(Kind.FLOOR, Level2Layout.tile(SEED, spot[0], spot[1]).kind());
 			assertFalse(Level2Layout.hot(SEED, spot[0], spot[1]));
+			assertFalse(Level2Layout.cold(SEED, spot[0], spot[1]));
+			assertFalse(Level2Layout.gas(SEED, spot[0], spot[1]));
 		}
+	}
+
+	/** Cold zones, gas leak zones, and bare office corridors appear; office corridors have no pipes. */
+	@Test
+	void anomaliesAndOfficeCorridorsAppear() {
+		int cold = 0, gas = 0, office = 0;
+		for (int x = -6 * SIZE; x < 6 * SIZE; x += 5) {
+			for (int z = -6 * SIZE; z < 6 * SIZE; z += 5) {
+				if (Level2Layout.cold(SEED, x, z)) cold++;
+				if (Level2Layout.gas(SEED, x, z)) gas++;
+				if (Level2Layout.isOfficePatch(SEED, x, z)) {
+					office++;
+					assertFalse(Level2Layout.tile(SEED, x + 1, z + 1).kind() == Kind.BANK, "office corridor has pipes");
+				}
+			}
+		}
+		assertTrue(cold > 0, "no cold zones appeared");
+		assertTrue(gas > 0, "no gas zones appeared");
+		assertTrue(office > 0, "no office corridors appeared");
 	}
 
 	/** EL3A outposts, Macchina ruins, and narrow-gauge rail lines appear; EL3A is never hot. */

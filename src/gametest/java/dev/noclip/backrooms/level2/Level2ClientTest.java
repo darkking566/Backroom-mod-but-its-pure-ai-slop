@@ -58,6 +58,7 @@ public final class Level2ClientTest implements FabricClientGameTest {
 			exits(context, game, seed, arrival);
 			circuit(context, game, seed, arrival);
 			heat(context, game, seed, arrival);
+			anomalies(context, game, seed, arrival);
 			window(context, game, seed, arrival);
 			hounds(context, game, seed, arrival);
 			monsters(context, game, seed, arrival);
@@ -189,6 +190,29 @@ public final class Level2ClientTest implements FabricClientGameTest {
 		context.takeScreenshot("level2_hot");
 		server.runOnServer(s -> check(Level2Heat.feelingIt(player(s)), "standing in a hot stretch did nothing"));
 		server.runCommand("gamemode spectator @a");
+	}
+
+	/** Cold stretches freeze you, burst pipes leak putrid gas, and office corridors are bare. */
+	private static void anomalies(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
+		var server = game.getServer();
+		int[] cold = nearest(seed, from, tile -> tile.kind() == Kind.FLOOR, 0, (x, z) -> Level2Layout.cold(seed, x, z));
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_2 run tp @s %.1f %d %.1f 90 5", cold[0] + 0.5, STAND, cold[1] + 0.5));
+		server.runCommand("gamemode survival @a");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(35);
+		server.runOnServer(s -> check(Level2Heat.feelingCold(player(s)), "standing in a cold stretch did nothing"));
+		server.runCommand("gamemode spectator @a");
+
+		int[] gas = nearest(seed, from, tile -> tile.kind() == Kind.FLOOR, 0, (x, z) -> Level2Layout.gas(seed, x, z));
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_2 run tp @s %.1f %d %.1f 90 5", gas[0] + 0.5, STAND, gas[1] + 0.5));
+		server.runCommand("gamemode survival @a");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(35);
+		server.runOnServer(s -> check(Level2Heat.feelingGas(player(s)), "standing in a gas leak did nothing"));
+		server.runCommand("gamemode spectator @a");
+
+		int[] office = nearest(seed, from, tile -> tile.kind() == Kind.FLOOR, 0, (x, z) -> Level2Layout.isOfficePatch(seed, x, z));
+		shoot(context, game, office[0] + 0.5, STAND, office[1] + 0.5, 0, 5, "level2_office_corridor");
 	}
 
 	/** Do not go near the windows. */

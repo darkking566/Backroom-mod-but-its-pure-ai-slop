@@ -17,6 +17,8 @@ final class Level2Plan {
 	static final int NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3;
 	static final int[] DX = {0, 1, 0, -1}, DZ = {-1, 0, 1, 0};
 	static final int HOT_RADIUS = 14;
+	static final int COLD_RADIUS = 12;
+	static final int GAS_RADIUS = 10;
 	private static final int EDGE_OPENINGS = 3;
 	private static final int PLAN = 201, EDGE = 202;
 	private static final ConcurrentHashMap<Key, Level2Plan> CACHE = new ConcurrentHashMap<>();
@@ -70,8 +72,10 @@ final class Level2Plan {
 	final Level2Exit[] exits = new Level2Exit[N * N * 4];
 	/** Local block positions (z * SIZE + x) of the gaps in room walls behind room doors. */
 	final List<Integer> doorways = new ArrayList<>();
-	/** Local block position of the middle of the hot zone, or -1. */
+	/** Local block position of the middle of the hot, cold, and burst-pipe gas zones, or -1. */
 	int hotX = -1, hotZ = -1;
+	int coldX = -1, coldZ = -1;
+	int gasX = -1, gasZ = -1;
 	/** The cell whose wall holds the door to 811, or -1. */
 	int bladeCell = -1;
 	/** Whether this region hosts an Office Area EL3A outpost (and thus B.N.T.G. narrow-gauge rails). */
@@ -103,6 +107,8 @@ final class Level2Plan {
 		placeExits(random);
 		placeWindows(random);
 		placeMarks();
+		placeColdZone(random);
+		placeGasZone(random);
 	}
 
 	static int cell(int i, int j) {
@@ -294,6 +300,30 @@ final class Level2Plan {
 		} while (roomOf[c] >= 0);
 		hotX = c % N * CELL + 2;
 		hotZ = c / N * CELL + 2;
+	}
+
+	private void placeColdZone(SplittableRandom random) {
+		if (random.nextInt(100) >= 28) return;
+		for (int attempt = 0; attempt < 24; attempt++) {
+			int c = random.nextInt(N * N);
+			if (roomOf[c] >= 0) continue;
+			int x = c % N * CELL + 2, z = c / N * CELL + 2;
+			if (hotX >= 0 && Math.abs(x - hotX) + Math.abs(z - hotZ) <= HOT_RADIUS + COLD_RADIUS) continue;
+			coldX = x;
+			coldZ = z;
+			return;
+		}
+	}
+
+	private void placeGasZone(SplittableRandom random) {
+		if (random.nextInt(100) >= 28) return;
+		for (int attempt = 0; attempt < 24; attempt++) {
+			int c = random.nextInt(N * N);
+			if (roomOf[c] >= 0) continue;
+			gasX = c % N * CELL + 2;
+			gasZ = c / N * CELL + 2;
+			return;
+		}
 	}
 
 	private void placeExits(SplittableRandom random) {

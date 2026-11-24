@@ -18,7 +18,7 @@ import dev.noclip.backrooms.level2.Level2Plan.RoomKind;
  * three is a bank of pipes floor to ceiling, which leaves two to walk in. Turns are cut off at the outer corner.
  */
 public final class Level2Layout {
-	static final int BANK = 203, WALLS = 204, LIGHTS = 205, FLOORS = 206, PALETTE = 207, ROOM_PROPS = 208, BANK_PARTS = 209;
+	static final int BANK = 203, WALLS = 204, LIGHTS = 205, FLOORS = 206, PALETTE = 207, ROOM_PROPS = 208, BANK_PARTS = 209, OFFICE = 210;
 	/** Lights are wired in series in blocks of 3x3 cells; one broken light takes its whole block down. */
 	static final int CIRCUIT = 3;
 	/** Cells around the door to 811 whose pipes carry blue pulsing lights. */
@@ -141,7 +141,7 @@ public final class Level2Layout {
 	static int bankSide(long seed, Level2Plan plan, int rx, int rz, int i, int j) {
 		int cell = Level2Plan.cell(i, j);
 		int axis = plan.straightAxis(cell);
-		if (axis < 0 || isRailCell(plan, i, j)) return -1;
+		if (axis < 0 || isRailCell(plan, i, j) || isOfficePatch(seed, rx * SIZE + i * CELL, rz * SIZE + j * CELL)) return -1;
 		int line = axis == 0 ? rz * N + j : rx * N + i;
 		int a = axis == 0 ? NORTH : WEST, b = Level2Plan.opposite(a);
 		int preferred = (hash(seed, line, axis, BANK) & 1) == 0 ? a : b;
@@ -196,6 +196,7 @@ public final class Level2Layout {
 
 	/** The finish of the tunnel walls around here, in patches of 4x4 cells. */
 	static Finish finish(long seed, int x, int z) {
+		if (isOfficePatch(seed, x, z)) return Finish.PAINTED;
 		int px = Math.floorDiv(x, CELL * 4), pz = Math.floorDiv(z, CELL * 4);
 		int roll = Math.floorMod(hash(seed, px, pz, WALLS), 100);
 		Finish finish = roll < 52 ? Finish.CONCRETE : roll < 72 ? Finish.MUDDY_BRICK : roll < 84 ? Finish.PAINTED : Finish.BLACK_BRICK;
@@ -248,6 +249,7 @@ public final class Level2Layout {
 	}
 
 	static Ground ground(long seed, int x, int z) {
+		if (isOfficePatch(seed, x, z)) return Ground.PLAIN;
 		int roll = Math.floorMod(hash(seed, x, z, FLOORS), 100);
 		return roll < 14 ? Ground.DEBRIS : roll < 19 ? Ground.DAMP : Ground.PLAIN;
 	}
@@ -328,11 +330,49 @@ public final class Level2Layout {
 				for (int gj = gj0 - ring; gj <= gj0 + ring; gj++) {
 					if (Math.max(Math.abs(gi - gi0), Math.abs(gj - gj0)) != ring) continue;
 					int cx = gi * CELL + 2, cz = gj * CELL + 2;
-					if (tile(seed, cx, cz).kind() == Kind.FLOOR && !hot(seed, cx, cz)) return new int[] {cx, cz};
+					if (tile(seed, cx, cz).kind() == Kind.FLOOR && !hot(seed, cx, cz) && !cold(seed, cx, cz) && !gas(seed, cx, cz)) {
+						return new int[] {cx, cz};
+					}
 				}
 			}
 		}
 		return new int[] {gi0 * CELL + 2, gj0 * CELL + 2};
+	}
+
+	/** Office-style corridors: bare painted walls, plain floors, no industrial pipes or machinery. */
+	static boolean isOfficePatch(long seed, int x, int z) {
+		int px = Math.floorDiv(x, CELL * 4), pz = Math.floorDiv(z, CELL * 4);
+		return Math.floorMod(hash(seed, px, pz, OFFICE), 100) < 14;
+	}
+
+	/** Whether a column is inside an abnormally cold stretch. */
+	public static boolean cold(long seed, int x, int z) {
+		if (isSafeZone(seed, x, z)) return false;
+		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				Level2Plan plan = Level2Plan.of(seed, rx + dx, rz + dz);
+				if (plan.coldX < 0) continue;
+				int cx = (rx + dx) * SIZE + plan.coldX, cz = (rz + dz) * SIZE + plan.coldZ;
+				if (Math.abs(x - cx) + Math.abs(z - cz) <= Level2Plan.COLD_RADIUS) return true;
+			}
+		}
+		return false;
+	}
+
+	/** Whether a column is inside a burst-pipe gas leak zone. */
+	public static boolean gas(long seed, int x, int z) {
+		if (isSafeZone(seed, x, z)) return false;
+		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				Level2Plan plan = Level2Plan.of(seed, rx + dx, rz + dz);
+				if (plan.gasX < 0) continue;
+				int gx = (rx + dx) * SIZE + plan.gasX, gz = (rz + dz) * SIZE + plan.gasZ;
+				if (Math.abs(x - gx) + Math.abs(z - gz) <= Level2Plan.GAS_RADIUS) return true;
+			}
+		}
+		return false;
 	}
 
 	static RoomKind roomKindAt(long seed, int x, int z) {
