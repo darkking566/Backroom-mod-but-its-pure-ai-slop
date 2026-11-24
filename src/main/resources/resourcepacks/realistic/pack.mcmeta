@@ -2,7 +2,7 @@
   "pack": {
     "description": {
       "translate": "pack.noclip_backrooms.realistic.description",
-      "fallback": "Photo-based textures (first sample: Level 0)"
+      "fallback": "Photo-based textures (Level 0 & Level 2)"
     },
     "min_format": 88,
     "max_format": 88
