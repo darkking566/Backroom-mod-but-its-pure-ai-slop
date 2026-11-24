@@ -139,6 +139,12 @@ public final class Level2Blocks {
 			p -> new Level2BankBlock(p, Level2BankBlock.Effect.FROST));
 	public static final Block BURST_GAS_PIPES = register("burst_gas_pipes", pipe(MapColor.COLOR_GREEN),
 			p -> new Level2BankBlock(p, Level2BankBlock.Effect.GAS));
+	public static final Block PUDDLED_UTILITY_FLOOR = register("puddled_utility_floor",
+			concrete(MapColor.WATER).sound(SoundType.MUD));
+	public static final Block OVERHEAD_PIPE_BRIDGE = register("overhead_pipe_bridge", pipe(MapColor.COLOR_GRAY),
+			p -> new Level2OverheadPipeBlock(p, false));
+	public static final Block LEAKING_OVERHEAD_PIPE = register("leaking_overhead_pipe", pipe(MapColor.COLOR_GRAY),
+			p -> new Level2OverheadPipeBlock(p, true));
 
 	private Level2Blocks() {
 	}

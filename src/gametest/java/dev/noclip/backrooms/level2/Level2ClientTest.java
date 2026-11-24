@@ -1,6 +1,7 @@
 package dev.noclip.backrooms.level2;
 
 import dev.noclip.backrooms.core.LevelExits;
+import dev.noclip.backrooms.core.people.Person;
 import dev.noclip.backrooms.level1.Level1;
 import dev.noclip.backrooms.level2.Level2Layout.Kind;
 import dev.noclip.backrooms.level2.Level2Layout.Tile;
@@ -14,9 +15,11 @@ import net.minecraft.locale.Language;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.vehicle.minecart.MinecartChest;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 
 /**
  * Plays Level 2 in a real client: down Level 1's stairs into the tunnels, a look around, a room door and a locked
@@ -270,7 +273,12 @@ public final class Level2ClientTest implements FabricClientGameTest {
 		server.runCommand("gamemode survival @a");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(20);
-		int staff = server.computeOnServer(s -> Level2Bases.populateNearEl3a(level2(s), seed, player(s)));
+		int staff = server.computeOnServer(s -> {
+			ServerLevel l2 = level2(s);
+			ServerPlayer p = player(s);
+			Level2Bases.populateNearEl3a(l2, seed, p);
+			return l2.getEntitiesOfClass(Person.class, new AABB(p.blockPosition()).inflate(48)).size();
+		});
 		check(staff > 0, "no B.N.T.G. staff spawned at EL3A");
 		context.takeScreenshot("level2_el3a");
 
@@ -279,7 +287,12 @@ public final class Level2ClientTest implements FabricClientGameTest {
 		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_2 run tp @s %.1f %d %.1f", rail[0] + 0.5, STAND, rail[1] + 0.5));
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(20);
-		int carts = server.computeOnServer(s -> Level2Bases.populateNearRail(level2(s), seed, player(s)));
+		int carts = server.computeOnServer(s -> {
+			ServerLevel l2 = level2(s);
+			ServerPlayer p = player(s);
+			Level2Bases.populateNearRail(l2, seed, p);
+			return l2.getEntitiesOfClass(MinecartChest.class, new AABB(p.blockPosition()).inflate(36)).size();
+		});
 		check(carts > 0, "no cargo minecart spawned on Level 2 rail");
 		context.takeScreenshot("level2_rail");
 

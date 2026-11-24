@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "noclip_backrooms:block/level2/overhead_pipe_bridge"
+    },
+    "axis=z": {
+      "model": "noclip_backrooms:block/level2/overhead_pipe_bridge",
+      "y": 90
+    }
+  }
+}

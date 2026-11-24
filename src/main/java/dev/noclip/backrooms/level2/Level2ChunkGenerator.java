@@ -113,6 +113,12 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 		if (h == 4) {
 			BlockState fixture = light(seed, x, z);
 			if (!fixture.isAir()) return fixture;
+			int overhead = Level2Layout.overheadPipe(seed, x, z);
+			if (overhead > 0) {
+				Block pipe = overhead >= 3 ? Level2Blocks.LEAKING_OVERHEAD_PIPE : Level2Blocks.OVERHEAD_PIPE_BRIDGE;
+				Direction.Axis axis = (overhead == 1 || overhead == 3) ? Direction.Axis.X : Direction.Axis.Z;
+				return pipe.defaultBlockState().setValue(Level2AxisBlock.AXIS, axis);
+			}
 			Level2Layout.CeilingProp prop = Level2Layout.ceilingDetail(seed, x, z);
 			if (prop == Level2Layout.CeilingProp.VENT) return state(Level2Blocks.CEILING_VENT);
 			if (prop == Level2Layout.CeilingProp.SNAPPED_CABLES) return state(Level2Blocks.SNAPPED_CABLES);
@@ -173,7 +179,10 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 		RoomKind kind = Level2Layout.roomKindAt(seed, x, z);
 		if (kind == RoomKind.EL3A) return state(Level2Blocks.UTILITY_FLOOR);
 		if (kind == RoomKind.MACCHINA) return state(Level2Blocks.BLACK_BRICK_WALL);
+		int flooded = Level2Layout.floodedStage(seed, x, z);
+		if (flooded == 2) return Blocks.WATER.defaultBlockState();
 		if (Level2Layout.isDrainGrate(seed, x, z)) return state(Level2Blocks.DRAIN_GRATE);
+		if (flooded == 1) return state(Level2Blocks.PUDDLED_UTILITY_FLOOR);
 		int ductAxis = Level2Layout.floorCableDuctAxis(seed, x, z);
 		if (ductAxis >= 0) {
 			return Level2Blocks.FLOOR_CABLE_DUCT.defaultBlockState()

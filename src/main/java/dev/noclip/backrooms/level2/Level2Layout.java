@@ -356,7 +356,8 @@ public final class Level2Layout {
 				for (int gj = gj0 - ring; gj <= gj0 + ring; gj++) {
 					if (Math.max(Math.abs(gi - gi0), Math.abs(gj - gj0)) != ring) continue;
 					int cx = gi * CELL + 2, cz = gj * CELL + 2;
-					if (tile(seed, cx, cz).kind() == Kind.FLOOR && !hot(seed, cx, cz) && !cold(seed, cx, cz) && !gas(seed, cx, cz)) {
+					if (tile(seed, cx, cz).kind() == Kind.FLOOR && !hot(seed, cx, cz) && !cold(seed, cx, cz)
+							&& !gas(seed, cx, cz) && floodedStage(seed, cx, cz) == 0) {
 						return new int[] {cx, cz};
 					}
 				}
@@ -497,6 +498,47 @@ public final class Level2Layout {
 		if (r < 3) return CeilingProp.VENT;
 		int cableCutoff = (ground(seed, x, z) == Ground.DEBRIS || hot(seed, x, z) || gas(seed, x, z)) ? 8 : 6;
 		return r < cableCutoff ? CeilingProp.SNAPPED_CABLES : null;
+	}
+
+	/** 0 = dry, 1 = puddled concrete floor, 2 = shallow ankle-deep water pool. */
+	static int floodedStage(long seed, int x, int z) {
+		if (roomKindAt(seed, x, z) != null || isOfficePatch(seed, x, z)
+				|| hot(seed, x, z) || cold(seed, x, z) || railAxis(seed, x, z) >= 0) {
+			return 0;
+		}
+		int px = Math.floorDiv(x, CELL * 2), pz = Math.floorDiv(z, CELL * 2);
+		if (Math.floorMod(hash(seed, px, pz, 0x41D5), 100) >= 9) return 0;
+		int ox = Math.floorMod(x, CELL), oz = Math.floorMod(z, CELL);
+		boolean inner = ox >= 1 && ox <= 3 && oz >= 1 && oz <= 3;
+		if (inner && (ox == 2 || oz == 2) && !isDrainGrate(seed, x, z)
+				&& Math.floorMod(hash(seed, x, z, 0x41D6), 100) < 55) {
+			return 2;
+		}
+		return 1;
+	}
+
+	/** 0 = none, 1 = bridge X, 2 = bridge Z, 3 = leaking X, 4 = leaking Z. */
+	static int overheadPipe(long seed, int x, int z) {
+		if (roomKindAt(seed, x, z) != null || isOfficePatch(seed, x, z)) return 0;
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		Level2Plan plan = plan(seed, x, z);
+		int cell = Level2Plan.cell(lx / CELL, lz / CELL);
+		int corridorAxis = plan.straightAxis(cell);
+		if (corridorAxis < 0) return 0;
+		int along = corridorAxis == 0 ? lx % CELL : lz % CELL;
+		int across = corridorAxis == 0 ? lz % CELL : lx % CELL;
+		if (floodedStage(seed, x, z) > 0 && (across == 1 || across == 3)) {
+			int side = Math.floorMod(hash(seed, Math.floorDiv(x, CELL), Math.floorDiv(z, CELL), 0x41D8), 2) == 0 ? 1 : 3;
+			if (across == side) return corridorAxis == 0 ? 3 : 4;
+		}
+		int cellRoll = Math.floorMod(hash(seed, Math.floorDiv(x, CELL), Math.floorDiv(z, CELL), 0x41D7), 100);
+		int bridgeRate = gas(seed, x, z) ? 35 : 22;
+		if (cellRoll < bridgeRate && along == 0 && across >= 1 && across <= 3) {
+			int bridgeAxis = 1 - corridorAxis;
+			boolean leaking = (cellRoll & 3) == 0 || floodedStage(seed, x, z) > 0;
+			return (leaking ? 3 : 1) + bridgeAxis;
+		}
+		return 0;
 	}
 
 	static int hash(long seed, int x, int z, int salt) {
