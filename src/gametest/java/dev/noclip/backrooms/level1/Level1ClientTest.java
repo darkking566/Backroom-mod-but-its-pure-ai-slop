@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level1;
 
+import dev.noclip.backrooms.core.LevelExits;
 import dev.noclip.backrooms.level0.Level0;
 import dev.noclip.backrooms.level1.Level1Layout.Kind;
 import dev.noclip.backrooms.level1.Level1Layout.Tile;
@@ -25,6 +26,12 @@ import net.minecraft.world.phys.Vec3;
 /** Plays Level 1 in a real client: through a flickering wall, around the halls and corridors, a blackout, a crate, and out. */
 public final class Level1ClientTest implements FabricClientGameTest {
 	private static final int STAND = Level1ChunkGenerator.FLOOR_Y + 1;
+	/** Set NOCLIP_ONLY=people,secrets to run just those sections (the full run takes a quarter of an hour); unset runs everything. */
+	private static final String ONLY = System.getenv("NOCLIP_ONLY");
+
+	private static boolean only(String section) {
+		return ONLY == null || ONLY.isBlank() || java.util.Arrays.asList(ONLY.split(",")).contains(section);
+	}
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
@@ -46,6 +53,11 @@ public final class Level1ClientTest implements FabricClientGameTest {
 				Marauders.holdOff(s, 20 * 60 * 10);
 				// Same for hounds, which come out in blackouts.
 				Hounds.holdOff(s, 20 * 60 * 10);
+				// And nobody moves into the settlements, or is carried off along the halls, until their own tests.
+				Residents.holdOff(s, 20 * 60 * 10);
+				Warps.holdOff(s, 20 * 60 * 10);
+				Patrols.holdOff(s, 20 * 60 * 10);
+				Workers.holdOff(s, 20 * 60 * 10);
 			});
 			server.runCommand("gamemode spectator @a");
 			BlockPos arrival = server.computeOnServer(s -> player(s).blockPosition());
@@ -54,17 +66,23 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			}
 			shoot(context, game, arrival.getX() + 0.5, STAND, arrival.getZ() + 0.5, 90, -50, "level1_ceiling");
 
-			blackout(context, game);
-			crate(context, game);
-			views(context, game, seed);
-			exits(context, game, seed);
-			events(context, game, seed);
-			settlements(context, game, seed);
-			items(context, game, seed);
-			monsters(context, game, seed);
-			hounds(context, game, seed);
-			checkBlocks(context, game);
-			leaveThroughDoor(context, game, seed);
+			if (only("blackout")) blackout(context, game);
+			if (only("crate")) crate(context, game);
+			if (only("marker")) marker(context, game);
+			if (only("views")) views(context, game, seed);
+			if (only("sectors")) sectors(context, game, seed);
+			if (only("exits")) exits(context, game, seed);
+			if (only("events")) events(context, game, seed);
+			if (only("settlements")) settlements(context, game, seed);
+			if (only("wikiSettlements")) wikiSettlements(context, game, seed);
+			if (only("secrets")) secrets(context, game, seed);
+			if (only("items")) items(context, game, seed);
+			if (only("monsters")) monsters(context, game, seed);
+			if (only("people")) people(context, game, seed);
+			if (only("rooms")) rooms(context, game, seed);
+			if (only("hounds")) hounds(context, game, seed);
+			if (only("checkBlocks")) checkBlocks(context, game);
+			if (only("leaveThroughDoor")) leaveThroughDoor(context, game, seed);
 		}
 	}
 
@@ -191,6 +209,284 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		server.runCommand("gamemode spectator @a");
 	}
 
+	/** The Trader's Keep sells for alloy, Hippocrates-1 mends for free; a picture of each other settlement too. */
+	private static void wikiSettlements(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		server.runCommand("gamemode spectator @a");
+		for (Level1Layout.Base base : new Level1Layout.Base[] {Level1Layout.Base.TOMS, Level1Layout.Base.SIGNUP, Level1Layout.Base.CORNUCOPIA}) {
+			int[] at = nearestBase(seed, base);
+			shoot(context, game, at[0] * 64 + 31.5, STAND, at[1] * 64 + 11.5, 0, 0, "level1_" + base.name().toLowerCase());
+		}
+		int[] keep = nearestBase(seed, Level1Layout.Base.TRADERS_KEEP);
+		shoot(context, game, keep[0] * 64 + 31.5, STAND, keep[1] * 64 + 11.5, 0, 0, "level1_traders_keep");
+		server.runOnServer(s -> player(s).getInventory().clearContent());
+		server.runCommand("give @a noclip_backrooms:alloy 1");
+		standAndUse(context, game, keep[0] * 64 + 24.5, keep[1] * 64 + 26.5, 180, 35);
+		server.runOnServer(s -> {
+			check(player(s).getInventory().countItem(Level1Items.ALLOY) == 0, "the counter took no alloy");
+			boolean got = !level1(s).getEntitiesOfClass(ItemEntity.class, new AABB(player(s).blockPosition()).inflate(5)).isEmpty()
+					|| !player(s).getInventory().isEmpty();
+			check(got, "the counter gave nothing");
+		});
+		int[] clinic = nearestBase(seed, Level1Layout.Base.HIPPOCRATES);
+		shoot(context, game, clinic[0] * 64 + 31.5, STAND, clinic[1] * 64 + 11.5, 0, 0, "level1_hippocrates");
+		server.runOnServer(s -> player(s).setHealth(4.0F));
+		standAndUse(context, game, clinic[0] * 64 + 24.5, clinic[1] * 64 + 25.5, 180, 22);
+		server.runOnServer(s -> check(player(s).getHealth() >= player(s).getMaxHealth() - 0.1F, "the clinic bed did not mend the player"));
+
+		// The people move in, once.
+		server.runCommand("gamemode spectator @a");
+		int came = server.computeOnServer(s -> Residents.populate(level1(s), clinic[0], clinic[1]));
+		check(came == 2, "the medics did not move into Hippocrates-1: " + came);
+		check(server.computeOnServer(s -> Residents.populate(level1(s), clinic[0], clinic[1])) == 0, "the medics moved in twice");
+		shoot(context, game, clinic[0] * 64 + 31.5, STAND, clinic[1] * 64 + 11.5, 0, 0, "level1_hippocrates_people");
+		int[] fort = nearestBase(seed, Level1Layout.Base.CORNUCOPIA);
+		// The district has to be loaded for anyone to move in.
+		shoot(context, game, fort[0] * 64 + 31.5, STAND, fort[1] * 64 + 11.5, 0, 0, "level1_cornucopia");
+		check(server.computeOnServer(s -> Residents.populate(level1(s), fort[0], fort[1])) > 0, "no one is at Cornucopia");
+		shoot(context, game, fort[0] * 64 + 31.5, STAND, fort[1] * 64 + 11.5, 0, 0, "level1_cornucopia_people");
+
+		// Where the copper pipes crowd in, the way to Level 2 (open now that Level 2 exists).
+		BlockPos pipes = null;
+		for (int rx = -6; rx <= 6 && pipes == null; rx++) {
+			for (int rz = -6; rz <= 6 && pipes == null; rz++) {
+				int cx = rx * 256 + 128, cz = rz * 256 + 128;
+				for (int dx = -8; dx <= 8 && pipes == null; dx++) {
+					for (int dz = -8; dz <= 8 && pipes == null; dz++) {
+						double zone = Level1Layout.pipeZone(seed, cx + dx, cz + dz);
+						if (zone >= 0 && zone <= 0.06 && Level1Layout.tile(seed, cx + dx, cz + dz) == Tile.FLOOR
+								&& Level1Layout.kindAt(seed, cx + dx, cz + dz) != Kind.CORRIDORS) pipes = new BlockPos(cx + dx, STAND, cz + dz);
+					}
+				}
+			}
+		}
+		check(pipes != null, "no pipe zone near the origin");
+		shoot(context, game, pipes.getX() + 0.5, STAND, pipes.getZ() + 0.5, 90, 5, "level1_pipe_zone");
+		server.runCommand("gamemode survival @a");
+		server.waitFor(s -> player(s).level().dimension() == dev.noclip.backrooms.level2.Level2.LEVEL_2, 80);
+		server.runCommand("gamemode spectator @a");
+		// Gauges on the pillars and thicker pipes overhead, toward the middle of the pipe zone.
+		long pipeSeed = seed;
+		BlockPos gauge = null;
+		for (int dx = -30; dx <= 30 && gauge == null; dx++) {
+			for (int dz = -30; dz <= 30 && gauge == null; dz++) {
+				if (Level1ChunkGenerator.blockAt(pipeSeed, pipes.getX() + dx, Level1ChunkGenerator.FLOOR_Y + 2, pipes.getZ() + dz).is(Level1Blocks.PIPE_GAUGE)) {
+					gauge = new BlockPos(pipes.getX() + dx, Level1ChunkGenerator.FLOOR_Y + 2, pipes.getZ() + dz);
+				}
+			}
+		}
+		check(gauge != null, "no pipe gauge in the pipe zone");
+		Direction away = Level1ChunkGenerator.blockAt(pipeSeed, gauge.getX(), gauge.getY(), gauge.getZ()).getValue(PhosphorMarkBlock.FACING);
+		server.runCommand("gamemode spectator @a");
+		shoot(context, game, gauge.getX() + 0.5 + away.getStepX() * 3, STAND, gauge.getZ() + 0.5 + away.getStepZ() * 3, away.getOpposite().toYRot(), 0, "level1_pipe_gauge");
+		server.runCommand("gamemode spectator @a");
+
+		// The zone is not Euclidean: carried a bay or two along the hall, heading kept.
+		int[] spot = Level1Layout.landing(seed, 0, 0);
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f 0 0", spot[0] + 0.5, STAND, spot[1] + 0.5));
+		server.runCommand("gamemode survival @a");
+		context.waitTicks(20);
+		boolean warped = server.computeOnServer(s -> {
+			for (int jumps = 1; jumps <= 2; jumps++) {
+				for (int sign = 1; sign >= -1; sign -= 2) {
+					if (Warps.warp(level1(s), player(s), new Vec3(1, 0, 0), sign, jumps)) return true;
+				}
+			}
+			return false;
+		});
+		check(warped, "the hall carried no one anywhere");
+		server.runCommand("gamemode spectator @a");
+		server.runCommand("gamemode spectator @a");
+	}
+
+	/** The patrol, the workers, the lock, the smoke, the secret route to the Hub and the glitch trail. */
+	private static void secrets(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		server.runCommand("gamemode spectator @a");
+
+		// Every settlement with its people, seen from inside.
+		for (Level1Layout.Base base : Level1Layout.Base.values()) {
+			if (base == Level1Layout.Base.NONE) continue;
+			int[] at = nearestBase(seed, base);
+			shoot(context, game, at[0] * 64 + 31.5, STAND, at[1] * 64 + 11.5, 0, 0, "level1_tour_" + base.name().toLowerCase() + "_outside");
+			server.runOnServer(s -> Residents.populate(level1(s), at[0], at[1]));
+			shoot(context, game, at[0] * 64 + 31.5, STAND, at[1] * 64 + 40.5, 180, 10, "level1_tour_" + base.name().toLowerCase());
+		}
+
+		// Newcomers are found and led toward the outpost.
+		int[] spot = Level1Layout.landing(seed, 0, 0);
+		shoot(context, game, spot[0] + 0.5, STAND, spot[1] + 0.5, 0, 0, "level1_patrol_start");
+		server.runCommand("gamemode survival @a");
+		check(server.computeOnServer(s -> Patrols.dispatch(level1(s), player(s))), "no patrol set out");
+		for (int i = 0; i < 80 && Patrols.leading() == 0; i++) context.waitTicks(10);
+		check(Patrols.leading() > 0, "the patrol never reached the player");
+		double start = server.computeOnServer(s -> Patrols.memberPosition().distanceTo(Patrols.destination()));
+		for (int i = 0; i < 60; i++) {
+			context.waitTicks(10);
+			Vec3 to = server.computeOnServer(s -> {
+				Vec3 member = Patrols.memberPosition(), base = Patrols.destination();
+				if (member == null || base == null) return null;
+				return member.add(base.subtract(member).multiply(1, 0, 1).normalize().scale(6));
+			});
+			if (to != null) server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.2f %d %.2f", to.x, STAND, to.z));
+		}
+		double end = server.computeOnServer(s -> Patrols.memberPosition() == null ? 0 : Patrols.memberPosition().distanceTo(Patrols.destination()));
+		check(end < start - 15, "the patrol did not lead anywhere: " + start + " -> " + end);
+		server.runCommand("gamemode spectator @a");
+
+		// A natural lock in a doorway shuts the whole room for good.
+		int[] corridor = null;
+		for (int ring = 0; ring < 10 && corridor == null; ring++) {
+			for (int dx = -ring; dx <= ring && corridor == null; dx++) {
+				for (int dz = -ring; dz <= ring && corridor == null; dz++) {
+					if (Math.max(Math.abs(dx), Math.abs(dz)) == ring && !Level1Layout.doorways(seed, dx, dz).isEmpty()) corridor = new int[] {dx, dz};
+				}
+			}
+		}
+		check(corridor != null, "no room with a doorway near the origin");
+		int[] room = corridor;
+		CorridorPlan.Doorway doorway = Level1Layout.doorways(seed, room[0], room[1]).getFirst();
+		BlockPos lock = new BlockPos(room[0] * 64 + doorway.lockX(), Level1ChunkGenerator.LOW_CEILING_Y - 1, room[1] * 64 + doorway.lockZ());
+		shoot(context, game, lock.getX() + 0.5, STAND, lock.getZ() + 0.5, 0, 0, "level1_lock_place");
+		server.runOnServer(s -> level1(s).setBlock(lock, Level1Blocks.NATURAL_LOCK.defaultBlockState(), 3));
+		server.runCommand("gamemode survival @a");
+		context.waitTicks(10);
+		shoot(context, game, lock.getX() + 0.5, STAND, lock.getZ() + 0.5, 0, 0, "level1_lock");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			level.getBlockState(lock).useWithoutItem(level, player(s), new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(lock), Direction.NORTH, lock, false));
+			for (int[] tile : doorway.tiles()) {
+				BlockPos at = new BlockPos(room[0] * 64 + tile[0], STAND, room[1] * 64 + tile[1]);
+				check(level.getBlockState(at).is(Level1Blocks.SEALED_DOOR), "a doorway of the room was not sealed at " + at);
+			}
+		});
+		context.waitTicks(10);
+		server.runCommand("gamemode spectator @a");
+		// The sealed doorway, seen from either side along the passage.
+		boolean throughX = doorway.tiles()[0][0] == doorway.tiles()[1][0];
+		for (int side = -3; side <= 3; side += 6) {
+			int cx = lock.getX() + (throughX ? side : 0), cz = lock.getZ() + (throughX ? 0 : side);
+			if (!Level1Layout.tile(seed, cx, cz).walkable()) continue;
+			float yaw = throughX ? (side < 0 ? -90 : 90) : (side < 0 ? 0 : 180);
+			shoot(context, game, cx + 0.5, STAND, cz + 0.5, yaw, 0, "level1_sealed_door");
+			break;
+		}
+
+		// Smoke chokes a camp in the corridors.
+		BlockPos camp = find(seed, room[0] * 64 + 22, room[1] * 64 + 22, Tile.CORRIDOR);
+		shoot(context, game, camp.getX() + 0.5, STAND, camp.getZ() + 0.5, 0, 0, "level1_smoke_place");
+		server.runOnServer(s -> {
+			level1(s).setBlock(camp.east(), net.minecraft.world.level.block.Blocks.CAMPFIRE.defaultBlockState(), 3);
+			player(s).setHealth(player(s).getMaxHealth());
+		});
+		server.runCommand("gamemode survival @a");
+		context.waitTicks(70);
+		server.runOnServer(s -> check(player(s).getHealth() < player(s).getMaxHealth(), "the campfire smoke did not choke the player"));
+		server.runCommand("gamemode spectator @a");
+
+		// Shadows at work in the Tailchase Sector.
+		BlockPos tail = null;
+		for (int rx = -6; rx <= 6 && tail == null; rx++) {
+			for (int rz = -6; rz <= 6 && tail == null; rz++) {
+				int x = rx * 256 + 128, z = rz * 256 + 128;
+				if (Level1Layout.sector(seed, x, z) != Level1Layout.Sector.TAILCHASE) continue;
+				for (int dx = 0; dx < 128 && tail == null; dx += 9) {
+					if (Level1Layout.tile(seed, x + dx, z) == Tile.FLOOR && Level1Layout.kindAt(seed, x + dx, z) != Kind.CORRIDORS) tail = new BlockPos(x + dx, STAND, z);
+				}
+			}
+		}
+		check(tail != null, "no Tailchase sector near the origin");
+		shoot(context, game, tail.getX() + 0.5, STAND, tail.getZ() + 0.5, 0, 5, "level1_tailchase_place");
+		check(server.computeOnServer(s -> Workers.spawnNear(level1(s), player(s), seed, level1(s).getRandom())), "no worker could be placed");
+		Vec3 worker = server.computeOnServer(s -> level1(s).getEntitiesOfClass(net.minecraft.world.entity.Mob.class, new AABB(player(s).blockPosition()).inflate(40),
+				m -> m.entityTags().contains(Workers.TAG)).getFirst().position());
+		// From five blocks off along a line of clear floor, so no pillar is in the way.
+		for (Direction side : Direction.Plane.HORIZONTAL) {
+			boolean clear = true;
+			for (int i = 1; i <= 5; i++) {
+				Tile along = Level1Layout.tile(seed, (int) Math.floor(worker.x) + side.getStepX() * i, (int) Math.floor(worker.z) + side.getStepZ() * i);
+				clear &= along == Tile.FLOOR || along == Tile.LINE || along == Tile.DAMP;
+			}
+			if (clear) {
+				shoot(context, game, worker.x + side.getStepX() * 5, STAND, worker.z + side.getStepZ() * 5, side.getOpposite().toYRot(), 8, "level1_worker");
+				break;
+			}
+		}
+
+		// The secret order of doors leads to the Hub.
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			LevelExits.use(player(s), "22");
+			LevelExits.use(player(s), "1.2");
+			LevelExits.use(player(s), "19");
+		});
+		check(HubRoute.completions() == 1, "the route to the Hub did not complete");
+		server.runCommand("gamemode spectator @a");
+
+		// The glitch trail grows more broken toward Level 38.
+		BlockPos trail = null;
+		for (int ring = 0; ring < 14 && trail == null; ring++) {
+			for (int dx = -ring; dx <= ring && trail == null; dx++) {
+				for (int dz = -ring; dz <= ring && trail == null; dz++) {
+					if (Math.max(Math.abs(dx), Math.abs(dz)) != ring) continue;
+					for (int ox = -3; ox <= 3 && trail == null; ox++) {
+						for (int oz = -3; oz <= 3 && trail == null; oz++) {
+							int x = dx * 64 + 32 + ox, z = dz * 64 + 32 + oz;
+							double zone = Level1Layout.glitchZone(seed, x, z);
+							if (zone >= 0 && zone <= 0.1 && Level1Layout.tile(seed, x, z) == Tile.CORRIDOR) trail = new BlockPos(x, STAND, z);
+						}
+					}
+				}
+			}
+		}
+		check(trail != null, "no glitch trail near the origin");
+		context.waitTicks(60);
+		int refused = LevelExits.refusals();
+		shoot(context, game, trail.getX() + 0.5, STAND, trail.getZ() + 0.5, 0, 0, "level1_glitch_trail");
+		server.runCommand("gamemode survival @a");
+		context.waitTicks(30);
+		check(LevelExits.refusals() > refused, "the glitch trail led nowhere");
+		server.runCommand("gamemode spectator @a");
+	}
+
+	/** One picture of every sector, found by scanning the regions around the origin for a hall floor in each. */
+	private static void sectors(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		for (Level1Layout.Sector sector : Level1Layout.Sector.values()) {
+			BlockPos spot = null;
+			for (int rx = -4; rx <= 4 && spot == null; rx++) {
+				for (int rz = -4; rz <= 4 && spot == null; rz++) {
+					int x = rx * 256 + 128, z = rz * 256 + 128;
+					if (Level1Layout.sector(seed, x, z) != sector) continue;
+					for (int dx = 0; dx < 128 && spot == null; dx += 9) {
+						Tile tile = Level1Layout.tile(seed, x + dx, z);
+						if (tile == Tile.FLOOR && Level1Layout.kindAt(seed, x + dx, z) != Kind.CORRIDORS) spot = new BlockPos(x + dx, STAND, z);
+					}
+				}
+			}
+			check(spot != null, "no " + sector + " sector near the origin");
+			shoot(context, game, spot.getX() + 0.5, STAND, spot.getZ() + 0.5, 90, 5, "level1_sector_" + sector.name().toLowerCase());
+		}
+	}
+
+	/** A settlement marker is hung on a pillar nearby; right-clicking takes its supplies once and leaves the bare cloth. */
+	private static void marker(ClientGameTestContext context, TestSingleplayerContext game) {
+		var server = game.getServer();
+		BlockPos marker = server.computeOnServer(s -> Markers.hangOnPillar(level1(s), player(s)));
+		check(marker != null, "no marker was hung");
+		Direction out = server.computeOnServer(s -> level1(s).getBlockState(marker).getValue(SettlementMarkerBlock.FACING));
+		BlockPos stand = marker.relative(out, 2);
+		server.runOnServer(s -> check(level1(s).getBlockState(new BlockPos(stand.getX(), STAND, stand.getZ())).isAir(), "nowhere to stand by the marker"));
+		server.runOnServer(s -> player(s).getInventory().clearContent());
+		standAndUse(context, game, stand.getX() + 0.5, stand.getZ() + 0.5, out.getOpposite().toYRot(), 0);
+		context.takeScreenshot("level1_marker");
+		server.runOnServer(s -> {
+			check(level1(s).getBlockState(marker).getValue(SettlementMarkerBlock.TAKEN), "the marker's supplies were not taken");
+			boolean spilled = !level1(s).getEntitiesOfClass(ItemEntity.class, new AABB(marker).inflate(4)).isEmpty();
+			check(spilled || !player(s).getInventory().isEmpty(), "the marker gave nothing");
+		});
+		server.runCommand("gamemode spectator @a");
+	}
+
 	/** Pictures of each part of the level, found from the floor plan. */
 	private static void views(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
 		int[] warehouse = nearestDistrict(seed, Kind.WAREHOUSE);
@@ -211,6 +507,15 @@ public final class Level1ClientTest implements FabricClientGameTest {
 
 		BlockPos desk = findNear(seed, Tile.DESK);
 		shoot(context, game, desk.getX() + 0.5, STAND, desk.getZ() + 2.5, 180, 25, "level1_office");
+		BlockPos bed = findNear(seed, Tile.BED);
+		shoot(context, game, bed.getX() + 0.5, STAND, bed.getZ() + 2.5, 180, 25, "level1_infirmary");
+		BlockPos gallery = findNear(seed, Tile.GALLERY);
+		for (Direction side : Direction.Plane.HORIZONTAL) {
+			if (Level1Layout.tile(seed, gallery.getX() + side.getStepX(), gallery.getZ() + side.getStepZ()).walkable()) {
+				lookBack(context, game, seed, gallery, side, "level1_gallery", 5);
+				break;
+			}
+		}
 		BlockPos brick = findNear(seed, Tile.BRICK);
 		for (Direction side : Direction.Plane.HORIZONTAL) {
 			if (Level1Layout.tile(seed, brick.getX() + side.getStepX(), brick.getZ() + side.getStepZ()).walkable()) {
@@ -534,6 +839,76 @@ public final class Level1ClientTest implements FabricClientGameTest {
 	}
 
 	/** The Hound: how it looks standing and mid-lunge, its eyes in a blackout, a real bite, and leaving when the lights come back. */
+	/** Every look of the people, standing in a row in a hall, from afar and close up. */
+	private static void people(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		int[] spot = Level1Layout.landing(seed, 0, 0);
+		server.runCommand("gamemode spectator @a");
+		var looks = dev.noclip.backrooms.core.people.People.LOOKS;
+		server.runOnServer(s -> {
+			for (int i = 0; i < looks.size(); i++) {
+				var type = dev.noclip.backrooms.core.people.People.type(looks.get(i));
+				var mob = type.create(level1(s), net.minecraft.world.entity.EntitySpawnReason.EVENT);
+				mob.snapTo(spot[0] + 0.5 + (i - 3.5) * 1.1, STAND, spot[1] + 4.5, 180, 0);
+				mob.setYBodyRot(180);
+				mob.setYHeadRot(180);
+				mob.setNoAi(true);
+				mob.setInvulnerable(true);
+				mob.addTag("test_person");
+				level1(s).addFreshEntity(mob);
+			}
+		});
+		shoot(context, game, spot[0] + 0.5, STAND + 0.6, spot[1] - 1.0, 0, 5, "level1_people_row");
+		shoot(context, game, spot[0] + 0.5 - 1.65, STAND + 0.9, spot[1] + 2.4, 0, 5, "level1_people_close_left");
+		shoot(context, game, spot[0] + 0.5 + 1.65, STAND + 0.9, spot[1] + 2.4, 0, 5, "level1_people_close_right");
+		shoot(context, game, spot[0] + 0.5, STAND + 0.9, spot[1] + 8.5, 180, 5, "level1_people_backs");
+		server.runCommand("kill @e[tag=test_person]");
+		// Residents stroll about rather than stand still.
+		int[] home = nearestBase(seed, Level1Layout.Base.TOMS);
+		shoot(context, game, home[0] * 64 + 31.5, STAND, home[1] * 64 + 11.5, 0, 0, "level1_resident_walk_place");
+		server.runOnServer(s -> Residents.populate(level1(s), home[0], home[1]));
+		BlockPos hub = new BlockPos(home[0] * 64 + 32, STAND, home[1] * 64 + 30);
+		Vec3 first = server.computeOnServer(s -> Residents.residentNear(level1(s), hub));
+		check(first != null, "no resident moved in");
+		double farthest = 0;
+		for (int i = 0; i < 30; i++) {
+			context.waitTicks(20);
+			Vec3 now = server.computeOnServer(s -> Residents.residentNear(level1(s), hub));
+			if (now != null) farthest = Math.max(farthest, now.distanceTo(first));
+		}
+		check(farthest > 1.5, "the residents stood still (moved " + farthest + ")");
+	}
+
+	/** One picture of each kind of room in the corridors, from a corner of its free ring. */
+	private static void rooms(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		game.getServer().runCommand("gamemode spectator @a");
+		for (CorridorPlan.Room type : CorridorPlan.Room.values()) {
+			int[] at = null;
+			for (int ring = 0; ring < 20 && at == null; ring++) {
+				for (int dx = -ring; dx <= ring && at == null; dx++) {
+					for (int dz = -ring; dz <= ring && at == null; dz++) {
+						if (Math.max(Math.abs(dx), Math.abs(dz)) != ring || Level1Layout.kindAt(seed, dx * 64 + 32, dz * 64 + 32) != Kind.CORRIDORS) continue;
+						CorridorPlan plan = CorridorPlan.of(seed, dx, dz);
+						for (int ci = 1; ci < Level1Layout.CELLS && at == null; ci++) {
+							for (int cj = 1; cj < Level1Layout.CELLS && at == null; cj++) {
+								int lx = ci * Level1Layout.CELL, lz = cj * Level1Layout.CELL;
+								// The top-left cell of a room, so its free ring starts one block in from the corner.
+								if (plan.roomAt(lx, lz) == type && plan.roomAt(lx - 1, lz) != type && plan.roomAt(lx, lz - 1) != type) at = new int[] {dx * 64 + lx + 1, dz * 64 + lz + 1};
+							}
+						}
+					}
+				}
+			}
+			if (at == null) {
+				System.out.println("no " + type + " room near the origin");
+				continue;
+			}
+			shoot(context, game, at[0] + 0.5, STAND, at[1] + 0.5, -45, 12, "level1_room_" + type.name().toLowerCase());
+		}
+		BlockPos bin = findNear(seed, Tile.BIN);
+		shoot(context, game, bin.getX() + 0.5, STAND - 0.3, bin.getZ() + 2.0, 180, 40, "level1_wastebasket");
+	}
+
 	private static void hounds(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
 		var server = game.getServer();
 		int[] spot = Level1Layout.landing(seed, 0, 0);
@@ -721,8 +1096,8 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		game.getServer().runOnServer(s -> {
 			ServerLevel level = level1(s);
 			for (Block block : Level1Blocks.ALL) {
-				if (block.getLootTable().isEmpty() || block == Level1Blocks.SUPPLY_CRATE || block == Level1Blocks.EYED_CRATE
-						|| block == Level1Blocks.SUPPLY_LOCKER) continue; // these hand out their contents instead
+				if (block.getLootTable().isEmpty() || block == Level1Blocks.SUPPLY_CRATE || block == Level1Blocks.DEBRIS_PILE || block == Level1Blocks.EYED_CRATE
+						|| block == Level1Blocks.SUPPLY_LOCKER || block == Level1Blocks.TRADE_COUNTER || block == Level1Blocks.TOM_COUNTER) continue; // these hand out their contents instead
 				var drops = Block.getDrops(block.defaultBlockState(), level, new BlockPos(3, 3, 3), null);
 				check(drops.size() == 1 && drops.getFirst().is(block.asItem()), "wrong drop for " + block);
 			}

@@ -1,0 +1,30 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level1/pipe_gauge",
+    "dial": "noclip_backrooms:block/level1/pipe_gauge"
+  },
+  "elements": [
+    {
+      "from": [
+        3,
+        0.05,
+        3
+      ],
+      "to": [
+        13,
+        0.4,
+        13
+      ],
+      "faces": {
+        "up": {
+          "texture": "#dial"
+        },
+        "down": {
+          "texture": "#dial"
+        }
+      },
+      "shade": false
+    }
+  ]
+}

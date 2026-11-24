@@ -19,7 +19,7 @@ final class Level1Bases {
 			case BARRIER_X, BARRIER_Z -> y == FLOOR + 1 ? barrier(piece == Piece.BARRIER_X) : null;
 			case SIGN_X, SIGN_Z -> {
 				if (y == FLOOR + 1) yield barrier(piece == Piece.SIGN_X);
-				if (y == FLOOR + 2) yield state(base == Base.FIRST_LIGHT ? Level1Blocks.FIRST_LIGHT_SIGN : Level1Blocks.BLINK_SIGN);
+				if (y == FLOOR + 2) yield state(sign(base));
 				yield null;
 			}
 			case FLOODLIGHT -> y == FLOOR + 1 ? state(Level1Blocks.FLOODLIGHT) : null;
@@ -35,7 +35,24 @@ final class Level1Bases {
 			case BEDROLL -> y == FLOOR + 1 ? state(Level1Blocks.BEDROLL) : null;
 			case TENT_WALL -> y > FLOOR && y <= TENT_ROOF ? state(Level1Blocks.TARP) : null;
 			case TENT_FLOOR -> y == TENT_ROOF ? state(Level1Blocks.TARP) : null;
+			case ALPHA_FRAME -> y == FLOOR + 1 ? state(Level1Blocks.DOOR_FRAME) : y == FLOOR + 2 ? state(Level1Blocks.DOOR_FRAME_TOP) : null;
+			case COUNTER_TRADE -> y == FLOOR + 1 ? state(Level1Blocks.TRADE_COUNTER) : null;
+			case COUNTER_TOM -> y == FLOOR + 1 ? state(Level1Blocks.TOM_COUNTER) : null;
+			case CLINIC_BED -> y == FLOOR + 1 ? state(Level1Blocks.CLINIC_BED) : null;
+			case SIGNUP_BOOTH -> y == FLOOR + 1 ? state(Level1Blocks.SIGNUP_BOOTH) : y == FLOOR + 2 ? state(Level1Blocks.SIGNUP_SIGN) : null;
 			case TENT_BEDROLL -> y == FLOOR + 1 ? state(Level1Blocks.BEDROLL) : y == TENT_ROOF ? state(Level1Blocks.TARP) : null;
+		};
+	}
+
+	private static Block sign(Base base) {
+		return switch (base) {
+			case FIRST_LIGHT -> Level1Blocks.FIRST_LIGHT_SIGN;
+			case TRADERS_KEEP -> Level1Blocks.TRADER_SIGN;
+			case HIPPOCRATES -> Level1Blocks.CLINIC_SIGN;
+			case TOMS -> Level1Blocks.TOM_SIGN;
+			case SIGNUP -> Level1Blocks.SIGNUP_SIGN;
+			case CORNUCOPIA -> Level1Blocks.JUSTICE_SIGN;
+			default -> Level1Blocks.BLINK_SIGN;
 		};
 	}
 

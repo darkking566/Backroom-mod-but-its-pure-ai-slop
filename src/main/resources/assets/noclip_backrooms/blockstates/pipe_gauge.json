@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=up": {
+      "model": "noclip_backrooms:block/level1/pipe_gauge"
+    },
+    "facing=down": {
+      "model": "noclip_backrooms:block/level1/pipe_gauge",
+      "x": 180
+    },
+    "facing=north": {
+      "model": "noclip_backrooms:block/level1/pipe_gauge",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "noclip_backrooms:block/level1/pipe_gauge",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east": {
+      "model": "noclip_backrooms:block/level1/pipe_gauge",
+      "x": 90,
+      "y": 90
+    },
+    "facing=west": {
+      "model": "noclip_backrooms:block/level1/pipe_gauge",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

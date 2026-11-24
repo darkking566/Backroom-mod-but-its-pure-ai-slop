@@ -1,0 +1,56 @@
+{
+  "variants": {
+    "facing=up,taken=false": {
+      "model": "noclip_backrooms:block/level1/settlement_marker"
+    },
+    "facing=down,taken=false": {
+      "model": "noclip_backrooms:block/level1/settlement_marker",
+      "x": 180
+    },
+    "facing=north,taken=false": {
+      "model": "noclip_backrooms:block/level1/settlement_marker",
+      "x": 90
+    },
+    "facing=south,taken=false": {
+      "model": "noclip_backrooms:block/level1/settlement_marker",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east,taken=false": {
+      "model": "noclip_backrooms:block/level1/settlement_marker",
+      "x": 90,
+      "y": 90
+    },
+    "facing=west,taken=false": {
+      "model": "noclip_backrooms:block/level1/settlement_marker",
+      "x": 90,
+      "y": 270
+    },
+    "facing=up,taken=true": {
+      "model": "noclip_backrooms:block/level1/settlement_marker_taken"
+    },
+    "facing=down,taken=true": {
+      "model": "noclip_backrooms:block/level1/settlement_marker_taken",
+      "x": 180
+    },
+    "facing=north,taken=true": {
+      "model": "noclip_backrooms:block/level1/settlement_marker_taken",
+      "x": 90
+    },
+    "facing=south,taken=true": {
+      "model": "noclip_backrooms:block/level1/settlement_marker_taken",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east,taken=true": {
+      "model": "noclip_backrooms:block/level1/settlement_marker_taken",
+      "x": 90,
+      "y": 90
+    },
+    "facing=west,taken=true": {
+      "model": "noclip_backrooms:block/level1/settlement_marker_taken",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

@@ -47,6 +47,41 @@
   - 新增 `tools/make_hound.py`（眼睛發光貼圖、生怪蛋圖示與模型），音效與語言檔加獵犬條目，`Level1ClientTest` 加獵犬測試
 - 使用者同意後，把 `claude` 快轉合併進 `main`，並把 `main` 與 `claude` 推送到 GitHub（停車場事件／據點／道具／怪物、資料夾照樓層整理、獵犬）；合併前主資料夾 `CLAUDE.md` 裡 Antigravity 未提交的紀錄已確認全部在本檔，才還原該檔（備份在暫存區）；主資料夾的 `exports/hound/` 沒有刪；沒有強制推送、沒有改寫歷史
 
+- 照 Backrooms 中文維基 Level 1 原文補板條箱與地標（完整讀過原文，含折疊的實體表與六個區段分頁）：
+  - 板條箱：新增繃帶（`bandage`，吃了回 2 顆心）、皮靴、皮護腿、書與筆、腐肉／玻璃片／鐵粒／火藥等垃圾與化學品；8% 是整箱 4 瓶杏仁水；徒手撬箱 20% 被割傷（拿斧頭或劍不會）
+  - 定居點地標（`SettlementMarkerBlock`、`Markers`）：柱子上掛橘布、瓶子與紙條，右鍵拿一次補給並讀紙條，指出最近據點的方向與距離
+  - 更新 `tools/make_level1.py`（貼圖、模型、blockstate）、語言檔、戰利品表、`docs/levels/level1/README.md`、`Level1ClientTest`；`gradlew build` 與 `runClientGameTest` 通過
+  - 還沒做（wiki 有）：撬棍與殘骸堆、福友玉／滋水槍／遷躍漿果、醫務室與裝飾房、其餘區段、更多實體（手臂、鈍人、窃皮者等）、更多據點、Level 2
+
+- 走廊區新增兩種房間（照 wiki 的小徑房間）：醫務室（`Room.MEDICAL`，中間病床加四角桌子）與掛畫房（`Room.GALLERY`，牆壁是掛畫的方塊）；新增方塊 `hospital_bed`、`gallery_wall`、對應貼圖／模型／戰利品表／語言條目，新增 `Tile.BED`、`TABLE`、`GALLERY`；房間種類機率調整（辦公室 35%、儲藏室 25%、空房 10%、醫務室 15%、掛畫房 15%，只影響 2×2 房，迷宮與房間位置不變）；`gradlew build`（含 160 個種子的連通測試）與 `runClientGameTest` 通過
+  - 還沒做：橡膠房的椅子嵌進地板、地板上的畫、小徑門前會消失的畫
+
+- 使用者下目標「把 Level 1 原文內容除了怪物以外全部做進模組」，照中文維基原文（含折疊內容）分批做完，每批都 `gradlew build` 與 `runClientGameTest` 通過並提交（細節見 `docs/levels/level1/README.md` 的「照中文維基原文補上的內容」）：
+  - 道具：撬棍、殘骸堆、福友玉、滋水槍、遷躍漿果（吃了被甩走，10 分鐘出口打不開，`LevelExits.lock`）、C.L.I.P.P. 卡、杏仁水加夜視；箱子內容更完整
+  - 房間：橡膠房椅子、掛畫房地上的畫、門前會消失的畫、門邊地上的地標
+  - 六個區段（`Level1Layout.sector`、`Level1Sectors`）與花園段變植物（`Gardens`）；躍金段補給箱 3 倍快
+  - 五種新據點（商人之家、希波克拉底-1、Tom 的餐館、速切玩家報名點、丰饒角）與居民（`Residents`）、櫃檯（付合金）與診所病床（免費治療）；出口機率整體減半（0.03＋0.09×log10）
+  - 新出口：1.2、19、22、128、154、159、218、740、800、998、998.2；通往 Level 2 的管線區（`Thresholds`）；非歐幾何傳送（`Warps`）
+  - 用到 Blender 的地方：沒有，方塊模型都是 JSON 方框（Blender 在 Steam 目錄下找得到，之後做怪物可以用）
+  - 停止鉤子指出還有缺口後又補上：M.E.G. 巡邏隊護送新人（`Patrols`、`Walkers`）、銜尾段施工的影子（`Workers`）、營火的煙（`Smoke`）、天然的鎖與鎖死的門（`Locks`、`NaturalLockBlock`）、樞紐順序門（`HubRoute`、`LevelExits.onUse`）、Level 38 故障小徑、Level 1.5「顛倒的牆」與 √2 的門、Alpha 基地南邊通往 1.1 的門框、往 Level 2 的管線區加儀表與粗管；每個據點、居民、鎖、施工影子都有遊戲畫面確認
+  - 修掉自己的兩個 bug：巡邏隊一生出來就被「清掉舊巡邏」的載入事件刪掉（標籤要在加入世界後才加）；巡邏隊從「找人」切到「帶路」那一刻拿玩家位置當終點，立刻判定已抵達
+  - 沒做：怪物（照指示）
+
+- 居民、巡邏隊、施工影子換成自製人形（用 Blender，沿用獵犬的盒子骨架格式）：
+  - 新增 `core/people/`（`Person`、`People`：八種造型各一個實體型別）與客戶端 `PersonModel`、`PersonRenderer`；`BoxRig` 多支援貼圖解析度倍率（4 倍，臉 32 像素）與依造型顯示／隱藏配件
+  - `tools/make_people.py` 產生骨架 `monsters/people.json`（兩段手腳、帽子、背包、外套、圍裙、護目鏡、工具、待機／走路／揮動三段動畫）與八張 512 像素貼圖；`tools/blender_people.py` 在 Blender 5.3 無頭模式組出 `art/people/people.blend` 與八張預覽圖
+  - `Residents`、`Patrols`、`Workers` 改用新實體（敵對的正義使者仍是原版掠奪者）；施工影子不再穿下界合金裝備
+  - `Level1ClientTest` 新增 `people`（八種造型一排、近照、背面）
+
+- 居民會走動（`Residents.walk`）：沒有 AI，沿用施工影子的走路程式（`Walkers`），在據點中間一次走幾格、停 1～3 秒，玩家走近 4 格內就停下轉向；客戶端測試 `people` 段檢查 30 秒內有走動
+- 客戶端測試可只跑指定段落：先設環境變數 `NOCLIP_ONLY`（例如 `people,secrets`），不設就跑全部；段落名見 `Level1ClientTest.runTest`
+
+- 走廊區新增 7 種房間變體（`CorridorPlan.Room`）：教室、圖書室、宿舍、食堂、隔間辦公室、柱廳、候診室；新增方塊書架（`book_shelf`）與隔間板（`cubicle_panel`）（128 像素貼圖、`Tile.BOOKSHELF`／`PARTITION`）；房間擺設用獨立的亂數串，迷宮和房間位置不變；`Level1ClientTest` 新增 `rooms` 段（每種房間一張照片）
+  - 注意：`tools/make_level1.py` 已跟 Antigravity 手工放進去的素材脫節，整支重跑會覆蓋他的貼圖與模型（我跑完後用 git 還原了），而且會在他的 `vending_machine` 模型驗證失敗；之後新增素材請只跑新函式或先對齊
+- 隔間板改成 1 格高、頂面加鋁邊、側面 4 種圖案隨機（便條紙、日曆與相框、長條圖、磨損）；新增 `tools/make_room_props.py`，只重畫書架與隔間板，不會動到其他素材
+- 隔間加小東西：桌上依位置隨機放電腦（62%）、枯萎盆栽（14%）、蕨類盆栽（10%）或空桌（14%）；隔間角落 40% 放垃圾桶（原版鍋釜，新增 `Tile.BIN`）；垃圾桶後來換成自製模型（見下一條）；Antigravity 當時未提交的 Duller 改動曾讓客戶端崩潰，之後已恢復
+- 自製垃圾桶方塊 `wastebasket`（穿孔鋼桶往上外擴、桶口鋁邊、裡面一堆紙團）：`tools/make_wastebasket.py` 寫方塊模型（箱子清單是唯一來源）、三張貼圖、blockstate、物品、戰利品表與語言條目；`tools/blender_wastebasket.py` 讀同一份規格在 Blender 5.3 組出 `art/props/wastebasket.blend` 與預覽圖；`Level1Blocks.WASTEBASKET` 取代原版鍋釜；`Level1ClientTest` 的 `rooms` 段加垃圾桶近照，`gradlew build` 與 `NOCLIP_ONLY=rooms` 客戶端測試通過
+- 桌上盆栽也換成自製（`desk_plant_dead` 枯枝、`desk_plant_leafy` 綠葉；陶盆＋兩片交叉透明貼圖）：`tools/make_desk_plants.py`、`tools/blender_desk_plants.py`（`art/props/desk_plants.blend` 與預覽）；`Level1ChunkGenerator.deskTop` 改用這兩個方塊。`gradlew build` 通過；遊戲畫面還沒確認（客戶端測試跟別的同時跑的測試撞到同一個 build 資料夾）。注意：多個人同時跑 gradle 會互相弄壞 `build/`，單元測試曾因此出現 EOFException，單獨重跑就過
 ### 2026-11-24
 - 改在單一資料夾 `Desktop\Backroom`（`main`）工作；先把朋友在 GitHub 新推的 3 個提交（Level 0 馬尼拉房間、多層樓梯間、斷路器與筆記）快轉合併進來，沒有衝突
 - 使用者要求在 Gemini（Antigravity）規劃的 60 層之外，再找其他來源、把樓層企劃擴充到 200～300 層：
@@ -79,6 +114,11 @@
   - Level 2：依 Wiki「一般出口常有前人留下的記號」，在噴了 1／3／4 的門附近 7 格內的直走道牆上，加紅色噴漆的樓層號與箭頭（`Level2Plan.markTo`、`Level2Layout.mark`、新方塊 `wanderer_mark`）
   - Level 3：依 Wiki「M.E.G. 在 Base Gamma 周圍立了許多路標」與「所有已知熱點都有警告標誌」，加藍色 Base Gamma 路標（14 格內）與黃黑熱點警告牌（`Level3Plan.baseTo`、`Level3Layout.sign`、新方塊 `meg_arrow_sign`、`meg_warning_sign`）
   - 單元測試確認順著箭頭一定走得到它指的門或據點、記號和路標背後一定是牆；實機測試加截圖；更新各層說明與 `NEXT.md`
+- 提交前抓 GitHub，合併朋友新推的 44 個提交（停車場大改版：六大區、更多據點與出口、居民與人物模型、11 種 3D 怪物等）：
+  - 衝突只在兩個語言檔（兩邊的條目全部保留）和 abandoned_car：朋友的 Level 1 也新增了同 ID 的「廢棄的車」，所以把還沒推上去的 Level 3 的車改名為 rusted_car（生鏽的車），保留朋友的
+  - 順手修正朋友的照明燈、販賣機模型：發光貼圖指向不存在的 level1/garage_light，改成 level1/light_lens
+  - 合併後 gradlew build（49 個單元測試）通過
+  - 朋友的 Level 1 測試假設 Level 2 不存在（管線區通往 Level 2 應該拒絕），改成檢查會真的進到 Level 2；之後朋友的「巡邏隊到達玩家」檢查失敗，還沒查原因（用量到上限，留待下次）；Level 0 測試通過
 
 ## 動作記錄（Antigravity）
 

@@ -55,6 +55,21 @@ public final class Level1Blocks {
 	public static final Block SUPPLY_CRATE = register("supply_crate", Properties.of()
 			.mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD), SupplyCrateBlock::new);
 
+	/** A lock hanging in a room's doorway; use it and the room is shut for good. */
+	public static final Block NATURAL_LOCK = register("natural_lock", Properties.of()
+			.mapColor(MapColor.METAL).strength(0.5F).sound(SoundType.CHAIN).noOcclusion().noCollision().noLootTable(),
+			p -> new NaturalLockBlock(p, Block.box(5, 6, 7, 11, 16, 9)));
+	/** What a natural lock leaves in the doorways of its room. */
+	public static final Block SEALED_DOOR = register("sealed_door", Properties.of()
+			.mapColor(MapColor.METAL).strength(25.0F, 3600000.0F).sound(SoundType.METAL).noLootTable());
+	/** A gauge on a pillar where the pipes crowd in toward Level 2; no item of its own. */
+	public static final Block PIPE_GAUGE = registerBlockOnly("pipe_gauge", Properties.of()
+			.mapColor(MapColor.COLOR_ORANGE).instabreak().noCollision().noOcclusion().noLootTable().replaceable()
+			.sound(SoundType.METAL), PhosphorMarkBlock::new);
+	/** Wreckage on the floor: planks, scrap and, now and then, a crowbar. Opens like a crate. */
+	public static final Block DEBRIS_PILE = register("debris_pile", Properties.of()
+			.mapColor(MapColor.WOOD).strength(1.0F).sound(SoundType.WOOD).noOcclusion(), SupplyCrateBlock::new);
+
 	// The corridors
 	public static final Block PAINTED_CONCRETE_WALL = register("painted_concrete_wall", concrete(MapColor.QUARTZ));
 	public static final Block CORRIDOR_FLOOR = register("corridor_floor", concrete(MapColor.COLOR_LIGHT_GRAY));
@@ -69,6 +84,11 @@ public final class Level1Blocks {
 			.mapColor(MapColor.TERRACOTTA_RED).strength(2.0F).sound(SoundType.STONE));
 	public static final Block PADDED_WALL = register("padded_wall", Properties.of()
 			.mapColor(MapColor.WOOL).strength(0.8F).sound(SoundType.WOOL));
+	/** Room furniture: a floor-to-ceiling bookcase, and an office partition. */
+	public static final Block BOOK_SHELF = register("book_shelf", Properties.of()
+			.mapColor(MapColor.WOOD).strength(1.2F).sound(SoundType.WOOD));
+	public static final Block CUBICLE_PANEL = register("cubicle_panel", Properties.of()
+			.mapColor(MapColor.COLOR_GRAY).strength(0.6F).sound(SoundType.WOOL));
 	public static final Block OFFICE_DESK = register("office_desk", Properties.of()
 			.mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD).noOcclusion(), p -> new ShapedBlock(p, DESK_SHAPE));
 	public static final Block OLD_COMPUTER = register("old_computer", Properties.of()
@@ -88,6 +108,32 @@ public final class Level1Blocks {
 	public static final Block AUTOMATIC_DOOR_TOP = door("automatic_door_top", Level1Exit.AUTOMATIC_DOOR, SoundType.GLASS, 12);
 	public static final Block PICKAXE_DOOR = door("pickaxe_door", Level1Exit.PICKAXE_DOOR, SoundType.WOOD, 0);
 	public static final Block PICKAXE_DOOR_TOP = door("pickaxe_door_top", Level1Exit.PICKAXE_DOOR, SoundType.WOOD, 0);
+	public static final Block CONCRETE_DOOR = door("concrete_door", Level1Exit.CONCRETE_DOOR, SoundType.STONE, 0);
+	public static final Block CONCRETE_DOOR_TOP = door("concrete_door_top", Level1Exit.CONCRETE_DOOR, SoundType.STONE, 0);
+	public static final Block GLASS_DOOR = door("glass_door", Level1Exit.GLASS_DOOR, SoundType.GLASS, 0);
+	public static final Block GLASS_DOOR_TOP = door("glass_door_top", Level1Exit.GLASS_DOOR, SoundType.GLASS, 0);
+	public static final Block SYMBOL_DOOR = door("symbol_door", Level1Exit.SYMBOL_DOOR, SoundType.METAL, 8);
+	public static final Block SYMBOL_DOOR_TOP = door("symbol_door_top", Level1Exit.SYMBOL_DOOR, SoundType.METAL, 8);
+	public static final Block FROZEN_DOOR = door("frozen_door", Level1Exit.FROZEN_DOOR, SoundType.METAL, 0);
+	public static final Block FROZEN_DOOR_TOP = door("frozen_door_top", Level1Exit.FROZEN_DOOR, SoundType.METAL, 0);
+	public static final Block BUNKER_DOOR = door("bunker_door", Level1Exit.BUNKER_DOOR, SoundType.METAL, 0);
+	public static final Block BUNKER_DOOR_TOP = door("bunker_door_top", Level1Exit.BUNKER_DOOR, SoundType.METAL, 0);
+	public static final Block COLD_DOOR = door("cold_door", Level1Exit.COLD_DOOR, SoundType.METAL, 3);
+	public static final Block COLD_DOOR_TOP = door("cold_door_top", Level1Exit.COLD_DOOR, SoundType.METAL, 3);
+	public static final Block ELEVATOR_DOOR = door("elevator_door", Level1Exit.ELEVATOR_DOOR, SoundType.METAL, 0);
+	public static final Block ELEVATOR_DOOR_TOP = door("elevator_door_top", Level1Exit.ELEVATOR_DOOR, SoundType.METAL, 0);
+	public static final Block WHITE_WOOD_DOOR = door("white_wood_door", Level1Exit.WHITE_WOOD_DOOR, SoundType.WOOD, 0);
+	public static final Block WHITE_WOOD_DOOR_TOP = door("white_wood_door_top", Level1Exit.WHITE_WOOD_DOOR, SoundType.WOOD, 0);
+	public static final Block ATTIC_HATCH = register("attic_hatch", exitProperties(MapColor.STONE, SoundType.WOOD),
+			p -> new ExitBlock(p, Level1Exit.ATTIC_HATCH.level));
+	public static final Block OUTDOOR_GAP = register("outdoor_gap", exitProperties(MapColor.STONE, SoundType.STONE),
+			p -> new ExitBlock(p, Level1Exit.OUTDOOR_GAP.level));
+	public static final Block WALL_VENT = register("wall_vent", exitProperties(MapColor.STONE, SoundType.METAL),
+			p -> new ExitBlock(p, Level1Exit.WALL_VENT.level));
+	public static final Block ROOT_DOOR = door("root_door", Level1Exit.ROOT_TWO, SoundType.METAL, 4);
+	public static final Block ROOT_DOOR_TOP = door("root_door_top", Level1Exit.ROOT_TWO, SoundType.METAL, 4);
+	public static final Block INVERTED_WALL = register("inverted_wall", exitProperties(MapColor.STONE, SoundType.STONE),
+			p -> new ExitBlock(p, Level1Exit.INVERTED_WALL.level));
 	public static final Block PALACE_PAINTING = register("palace_painting", exitProperties(MapColor.COLOR_PINK, SoundType.WOOD),
 			p -> new ExitBlock(p, Level1Exit.PAINTING.level));
 	public static final Block OUTLET_WALL = register("outlet_wall", exitProperties(MapColor.STONE, SoundType.STONE),
@@ -142,6 +188,113 @@ public final class Level1Blocks {
 	public static final Block FLOODLIGHT = register("floodlight", Properties.of()
 			.mapColor(MapColor.METAL).strength(1.5F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 15),
 			p -> new ShapedBlock(p, Block.box(3, 0, 3, 13, 16, 13)));
+	public static final Block TRADER_SIGN = register("trader_sign", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(2.0F).sound(SoundType.METAL));
+	public static final Block CLINIC_SIGN = register("clinic_sign", Properties.of().mapColor(MapColor.SNOW).strength(2.0F).sound(SoundType.METAL));
+	public static final Block TOM_SIGN = register("tom_sign", Properties.of().mapColor(MapColor.COLOR_RED).strength(2.0F).sound(SoundType.METAL).lightLevel(state -> 6));
+	public static final Block SIGNUP_SIGN = register("signup_sign", Properties.of().mapColor(MapColor.COLOR_YELLOW).strength(2.0F).sound(SoundType.METAL));
+	public static final Block JUSTICE_SIGN = register("justice_sign", Properties.of().mapColor(MapColor.CRIMSON_NYLIUM).strength(2.0F).sound(SoundType.METAL));
+	/** Pay an alloy, get something from the Keep's stock. */
+	public static final Block TRADE_COUNTER = register("trade_counter", Properties.of()
+			.mapColor(MapColor.COLOR_CYAN).strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new CounterBlock(p, Block.box(0, 0, 1, 16, 14, 15), "trade"));
+	/** Pay an alloy, get a hot meal. */
+	public static final Block TOM_COUNTER = register("tom_counter", Properties.of()
+			.mapColor(MapColor.COLOR_RED).strength(-1.0F, 3600000.0F).sound(SoundType.WOOD).noOcclusion(),
+			p -> new CounterBlock(p, Block.box(0, 0, 1, 16, 14, 15), "meal"));
+	/** Free care at Hippocrates-1. */
+	public static final Block CLINIC_BED = register("clinic_bed", Properties.of()
+			.mapColor(MapColor.SNOW).strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new ClinicBedBlock(p, Block.box(0, 0, 1, 16, 11, 15)));
+	public static final Block SIGNUP_BOOTH = register("signup_booth", Properties.of()
+			.mapColor(MapColor.COLOR_YELLOW).strength(-1.0F, 3600000.0F).sound(SoundType.WOOD), SignupBoothBlock::new);
+	public static final Block GALLERY_WALL = register("gallery_wall", Properties.of()
+			.mapColor(MapColor.QUARTZ).strength(2.0F).sound(SoundType.STONE));
+	// What the sectors are dressed in (see Level1Sectors)
+	public static final Block GILD_PILLAR_0 = register("gild_pillar_0", Properties.of().mapColor(MapColor.COLOR_YELLOW).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GILD_PILLAR_1 = register("gild_pillar_1", Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GILD_PILLAR_2 = register("gild_pillar_2", Properties.of().mapColor(MapColor.COLOR_BLUE).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GILD_PILLAR_3 = register("gild_pillar_3", Properties.of().mapColor(MapColor.COLOR_LIGHT_GREEN).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GILD_PILLAR_4 = register("gild_pillar_4", Properties.of().mapColor(MapColor.COLOR_RED).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GILD_PILLAR_5 = register("gild_pillar_5", Properties.of().mapColor(MapColor.COLOR_PURPLE).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GILD_WALL = register("gild_wall", Properties.of().mapColor(MapColor.SNOW).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GILD_FLOOR = register("gild_floor", Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GOTHIC_COLUMN = register("gothic_column", Properties.of().mapColor(MapColor.QUARTZ).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GOTHIC_BASE = register("gothic_base", Properties.of().mapColor(MapColor.QUARTZ).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GOTHIC_BRICK = register("gothic_brick", Properties.of().mapColor(MapColor.STONE).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GOTHIC_FLOOR = register("gothic_floor", Properties.of().mapColor(MapColor.STONE).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GOTHIC_CEILING = register("gothic_ceiling", Properties.of().mapColor(MapColor.DEEPSLATE).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GARDEN_MOSS = register("garden_moss", Properties.of().mapColor(MapColor.COLOR_GREEN).strength(2.0F).sound(SoundType.MOSS));
+	public static final Block GARDEN_GRASS_FLOOR = register("garden_grass_floor", Properties.of().mapColor(MapColor.GRASS).strength(2.0F).sound(SoundType.GRASS));
+	public static final Block GARDEN_WALL = register("garden_wall", Properties.of().mapColor(MapColor.COLOR_LIGHT_GREEN).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GARDEN_PILLAR = register("garden_pillar", Properties.of().mapColor(MapColor.COLOR_GREEN).strength(2.0F).sound(SoundType.STONE));
+	public static final Block GARDEN_CEILING = register("garden_ceiling", Properties.of().mapColor(MapColor.COLOR_GREEN).strength(2.0F).sound(SoundType.MOSS));
+	public static final Block LEGEND_FLOOR = register("legend_floor", Properties.of().mapColor(MapColor.COLOR_BROWN).strength(2.0F).sound(SoundType.WOOD));
+	public static final Block LEGEND_FLOOR_LINE = register("legend_floor_line", Properties.of().mapColor(MapColor.CRIMSON_STEM).strength(2.0F).sound(SoundType.WOOD));
+	public static final Block LEGEND_WALL = register("legend_wall", Properties.of().mapColor(MapColor.COLOR_RED).strength(2.0F).sound(SoundType.WOOD));
+	public static final Block LEGEND_PILLAR = register("legend_pillar", Properties.of().mapColor(MapColor.COLOR_RED).strength(2.0F).sound(SoundType.WOOD));
+	public static final Block LEGEND_BASE = register("legend_base", Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F).sound(SoundType.WOOD));
+	public static final Block LEGEND_CEILING = register("legend_ceiling", Properties.of().mapColor(MapColor.COLOR_BROWN).strength(2.0F).sound(SoundType.WOOD));
+	public static final Block COPPER_PILLAR = register("copper_pillar", Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(2.0F).sound(SoundType.METAL));
+	/** Neon in the Legend Sector: not on the lamps' circuit, so a blackout leaves it burning. */
+	public static final Block NEON_CYAN = register("neon_cyan", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12));
+	/** Neon in the Legend Sector: not on the lamps' circuit, so a blackout leaves it burning. */
+	public static final Block NEON_MAGENTA = register("neon_magenta", Properties.of().mapColor(MapColor.COLOR_MAGENTA).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12));
+	/** Neon in the Legend Sector: not on the lamps' circuit, so a blackout leaves it burning. */
+	public static final Block NEON_AMBER = register("neon_amber", Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12));
+	public static final Block GARDEN_GRASS = register("garden_grass", Properties.of().mapColor(MapColor.PLANT).instabreak().noCollision().noOcclusion().replaceable().sound(SoundType.GRASS),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 12, 14)));
+	public static final Block GARDEN_FERN = register("garden_fern", Properties.of().mapColor(MapColor.PLANT).instabreak().noCollision().noOcclusion().replaceable().sound(SoundType.GRASS),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 12, 14)));
+	public static final Block GARDEN_FLOWER_BLUE = register("garden_flower_blue", Properties.of().mapColor(MapColor.PLANT).instabreak().noCollision().noOcclusion().replaceable().sound(SoundType.GRASS),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 12, 14)));
+	public static final Block GARDEN_FLOWER_RED = register("garden_flower_red", Properties.of().mapColor(MapColor.PLANT).instabreak().noCollision().noOcclusion().replaceable().sound(SoundType.GRASS),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 12, 14)));
+	public static final Block GARDEN_FLOWER_YELLOW = register("garden_flower_yellow", Properties.of().mapColor(MapColor.PLANT).instabreak().noCollision().noOcclusion().replaceable().sound(SoundType.GRASS),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 12, 14)));
+	public static final Block CONSTRUCTION_CONE = register("construction_cone", Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(0.5F).sound(SoundType.WOOL).noOcclusion().noCollision(),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 14, 14)));
+	public static final Block SCAFFOLD_POLE = register("scaffold_pole", Properties.of().mapColor(MapColor.METAL).strength(0.5F).sound(SoundType.METAL).noOcclusion().noCollision(),
+			p -> new ShapedBlock(p, Block.box(7, 0, 7, 9, 16, 9)));
+	public static final Block SITE_MACHINE = register("site_machine", Properties.of().mapColor(MapColor.COLOR_YELLOW).strength(0.5F).sound(SoundType.METAL).noOcclusion(),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 14, 14)));
+	/** A dusty 90s abandoned sedan parked in the garage halls and indoor overpasses. */
+	public static final Block ABANDONED_CAR = register("abandoned_car", Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new OldComputerBlock(p, Block.box(0, 0, 0, 16, 16, 16)));
+	/** A boxy 90s cargo delivery van parked in garage stalls and loading docks. */
+	public static final Block ABANDONED_VAN = register("abandoned_van", Properties.of().mapColor(MapColor.SNOW).strength(3.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new OldComputerBlock(p, Block.box(0, 0, 0, 16, 16, 16)));
+	/** A softly humming retro vending machine with a lit display window. */
+	public static final Block VENDING_MACHINE = register("vending_machine", Properties.of().mapColor(MapColor.COLOR_RED).strength(2.5F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 7),
+			p -> new OldComputerBlock(p, Block.box(1, 0, 2, 15, 16, 14)));
+	/** A wooden shipping pallet stacked with boxes and a red hand-truck. */
+	public static final Block PALLET_STACK = register("pallet_stack", Properties.of().mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD).noOcclusion(),
+			p -> new OldComputerBlock(p, Block.box(0, 0, 0, 16, 15, 16)));
+	/** A tall industrial electrical switchgear cabinet with conduits and indicator lights. */
+	public static final Block ELECTRICAL_CABINET = register("electrical_cabinet", Properties.of().mapColor(MapColor.COLOR_GRAY).strength(3.0F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 4),
+			p -> new OldComputerBlock(p, Block.box(1, 0, 2, 15, 16, 14)));
+	public static final Block GLITCH_BLACK = register("glitch_black", Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 0));
+	public static final Block GLITCH_MAGENTA = register("glitch_magenta", Properties.of().mapColor(MapColor.COLOR_MAGENTA).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 6));
+	public static final Block GLITCH_CYAN = register("glitch_cyan", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 6));
+	/** The chair in the rubber room, sunk into the floor. */
+	public static final Block SUNKEN_CHAIR = register("sunken_chair", Properties.of()
+			.mapColor(MapColor.COLOR_GRAY).strength(0.8F).sound(SoundType.WOOL).noOcclusion(),
+			p -> new ShapedBlock(p, Block.box(4, 0, 4, 12, 13, 12)));
+	/** A painting lying on the floor, where no one would put one. */
+	public static final Block FLOOR_PAINTING = register("floor_painting", Properties.of()
+			.mapColor(MapColor.COLOR_BROWN).instabreak().sound(SoundType.WOOD).noOcclusion().noCollision().noLootTable(),
+			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 0.5, 14)));
+	/** The office wastebasket, a perforated steel bin with scrunched paper in it (modelled in Blender, see tools/make_wastebasket.py). */
+	public static final Block WASTEBASKET = register("wastebasket", Properties.of()
+			.mapColor(MapColor.METAL).strength(0.5F).sound(SoundType.METAL).noOcclusion(),
+			p -> new ShapedBlock(p, Block.box(4, 0, 4, 12, 11.5, 12)));
+	/** Potted plants for office desks, one dead and one still green (tools/make_desk_plants.py). */
+	public static final Block DESK_PLANT_DEAD = register("desk_plant_dead", Properties.of()
+			.mapColor(MapColor.TERRACOTTA_ORANGE).instabreak().sound(SoundType.GRASS).noOcclusion(), p -> new ShapedBlock(p, Block.box(4, 0, 4, 12, 6, 12)));
+	public static final Block DESK_PLANT_LEAFY = register("desk_plant_leafy", Properties.of()
+			.mapColor(MapColor.TERRACOTTA_ORANGE).instabreak().sound(SoundType.GRASS).noOcclusion(), p -> new ShapedBlock(p, Block.box(4, 0, 4, 12, 6, 12)));
+	public static final Block HOSPITAL_BED = register("hospital_bed", Properties.of()
+			.mapColor(MapColor.METAL).strength(0.8F).sound(SoundType.METAL).noOcclusion(),
+			p -> new ShapedBlock(p, Block.box(0, 0, 1, 16, 11, 15)));
 	public static final Block COT = register("cot", Properties.of()
 			.mapColor(MapColor.COLOR_GREEN).strength(0.8F).sound(SoundType.WOOL).noOcclusion(),
 			p -> new RestBlock(p, Block.box(0, 0, 1, 16, 8, 15), "first_light"));
@@ -156,6 +309,10 @@ public final class Level1Blocks {
 			p -> new BarrelFireBlock(p, Block.box(2.5, 0, 2.5, 13.5, 15, 13.5)));
 	public static final Block TARP = register("tarp", Properties.of()
 			.mapColor(MapColor.COLOR_BLUE).strength(0.8F).sound(SoundType.WOOL));
+
+	/** Hung on pillars by the settlement teams; no item of its own, gives its supplies once. */
+	public static final Block SETTLEMENT_MARKER = registerBlockOnly("settlement_marker", Properties.of()
+			.mapColor(MapColor.COLOR_ORANGE).strength(0.2F).noCollision().noOcclusion().sound(SoundType.WOOL), SettlementMarkerBlock::new);
 
 	/** Left by phosphor powder; no item of its own. */
 	public static final Block PHOSPHOR_MARK = registerBlockOnly("phosphor_mark", Properties.of()

@@ -1,123 +1,18 @@
 {
   "variants": {
-    "facing=south,part=0": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_0"
+    "facing=north": {
+      "model": "noclip_backrooms:block/level1/abandoned_car"
     },
-    "facing=south,part=1": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_1"
-    },
-    "facing=south,part=2": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_2"
-    },
-    "facing=south,part=3": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_3"
-    },
-    "facing=south,part=4": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_4"
-    },
-    "facing=south,part=5": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_5"
-    },
-    "facing=south,part=6": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_6"
-    },
-    "facing=south,part=7": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_7"
-    },
-    "facing=west,part=0": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_0",
+    "facing=east": {
+      "model": "noclip_backrooms:block/level1/abandoned_car",
       "y": 90
     },
-    "facing=west,part=1": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_1",
-      "y": 90
-    },
-    "facing=west,part=2": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_2",
-      "y": 90
-    },
-    "facing=west,part=3": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_3",
-      "y": 90
-    },
-    "facing=west,part=4": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_4",
-      "y": 90
-    },
-    "facing=west,part=5": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_5",
-      "y": 90
-    },
-    "facing=west,part=6": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_6",
-      "y": 90
-    },
-    "facing=west,part=7": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_7",
-      "y": 90
-    },
-    "facing=north,part=0": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_0",
+    "facing=south": {
+      "model": "noclip_backrooms:block/level1/abandoned_car",
       "y": 180
     },
-    "facing=north,part=1": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_1",
-      "y": 180
-    },
-    "facing=north,part=2": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_2",
-      "y": 180
-    },
-    "facing=north,part=3": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_3",
-      "y": 180
-    },
-    "facing=north,part=4": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_4",
-      "y": 180
-    },
-    "facing=north,part=5": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_5",
-      "y": 180
-    },
-    "facing=north,part=6": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_6",
-      "y": 180
-    },
-    "facing=north,part=7": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_7",
-      "y": 180
-    },
-    "facing=east,part=0": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_0",
-      "y": 270
-    },
-    "facing=east,part=1": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_1",
-      "y": 270
-    },
-    "facing=east,part=2": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_2",
-      "y": 270
-    },
-    "facing=east,part=3": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_3",
-      "y": 270
-    },
-    "facing=east,part=4": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_4",
-      "y": 270
-    },
-    "facing=east,part=5": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_5",
-      "y": 270
-    },
-    "facing=east,part=6": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_6",
-      "y": 270
-    },
-    "facing=east,part=7": {
-      "model": "noclip_backrooms:block/level3/abandoned_car_7",
+    "facing=west": {
+      "model": "noclip_backrooms:block/level1/abandoned_car",
       "y": 270
     }
   }

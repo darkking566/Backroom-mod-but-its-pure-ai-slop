@@ -780,7 +780,7 @@ def car_models():
                 wx0, wx1 = (11, 14.5) if left else (1.5, 5)
                 elements.append(el((wx0, 0, 3), (wx1, 6, 13), {**sides("#tyre", ("north", "south", "up", "down")), outer: face("#tyre"),
                                                                ("west" if left else "east"): face("#tyre")}))
-        models[f"abandoned_car_{part}"] = custom({"paint": "car_paint", "glass": "car_glass", "front": "car_front", "rear": "car_rear",
+        models[f"rusted_car_{part}"] = custom({"paint": "car_paint", "glass": "car_glass", "front": "car_front", "rear": "car_rear",
                                                  "tyre": "tyre"}, elements, particle="car_paint")
     return models
 
@@ -826,10 +826,10 @@ CUBES = ["red_brick_wall", "brown_brick_wall", "glazed_tile_wall", "glazed_tile_
 AXIS = ["low_ceiling", "white_bars", "black_bars", "station_light", "flickering_station_light", "broken_station_light", "cage_bulb",
         "dead_cage_bulb", "station_floodlight", "hanging_cable_tray", "ceiling_sludge_pipe", "hoist_chain", "hoist_hook"]
 FACING = ["wall_conduit", "sludge_pipe", "leaking_sludge_pipe", "electrical_box", "boiler_valve", "conveyor_belt", "meg_cot", "meg_table"]
-PARTS = {"station_generator": 2, "switchgear": 2, "brass_boiler": 2, "assembly_press": 2, "angel_statue": 2, "abandoned_car": 8,
+PARTS = {"station_generator": 2, "switchgear": 2, "brass_boiler": 2, "assembly_press": 2, "angel_statue": 2, "rusted_car": 8,
          "station_elevator": 2, "base_gamma_door": 2}
 # Nothing breaks these, so they have no loot table.
-NO_LOOT = {"white_bars", "black_bars", "cage_gate", "angel_statue", "sanctum_stained_glass", "station_elevator", "base_gamma_door", "abandoned_car"}
+NO_LOOT = {"white_bars", "black_bars", "cage_gate", "angel_statue", "sanctum_stained_glass", "station_elevator", "base_gamma_door", "rusted_car"}
 
 
 def all_blockstates():

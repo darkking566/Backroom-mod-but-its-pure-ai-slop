@@ -36,7 +36,7 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 	static final int LOW_CEILING_Y = 36;
 	static final int CEILING_Y = 38;
 	// Must match dimension_type/level_1.json
-	static final int HEIGHT = 48;
+	static final int HEIGHT = 96;
 	private static final int HALL_TOP = CEILING_Y - 1, LOW_TOP = LOW_CEILING_Y - 1;
 
 	private Level1ChunkGenerator(BiomeSource biomeSource) {
@@ -60,6 +60,13 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 
 	private static BlockState block(long seed, Tile tile, Ceiling ceiling, HallPlan.Cell exit, HallPlan.PropCell prop,
 			BasePlan.Piece piece, int x, int y, int z) {
+		BlockState state = plainBlock(seed, tile, ceiling, exit, prop, piece, x, y, z);
+		BlockState dressed = Level1Sectors.dress(Level1Layout.sector(seed, x, z), tile, state, seed, x, y, z);
+		return Level1SectorArchitecture.apply(seed, tile, dressed, x, y, z);
+	}
+
+	private static BlockState plainBlock(long seed, Tile tile, Ceiling ceiling, HallPlan.Cell exit, HallPlan.PropCell prop,
+			BasePlan.Piece piece, int x, int y, int z) {
 		if (piece != null && tile != Tile.PILLAR) {
 			Level1Layout.Base base = Level1Layout.base(seed, Math.floorDiv(x, Level1Layout.DISTRICT), Math.floorDiv(z, Level1Layout.DISTRICT));
 			BlockState state = Level1Bases.block(base, piece, y);
@@ -74,7 +81,12 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 			if (state != null) return state;
 		}
 		// Bedrock under the floor and over the roof, so nothing gets out underneath or lands on top.
-		if (y == 0 || y > CEILING_Y) return Blocks.BEDROCK.defaultBlockState();
+		if (y == 0 || y >= HEIGHT - 1) return Blocks.BEDROCK.defaultBlockState();
+		BlockState landmark = Level1Landmarks.block(seed, tile, ceiling, x, y, z);
+		if (landmark != null) return landmark;
+		BlockState elevated = Level1Elevation.block(seed, tile, ceiling, x, y, z);
+		if (elevated != null) return elevated;
+		if (y > CEILING_Y) return Blocks.CONCRETE.gray().defaultBlockState();
 		if (y < FLOOR_Y) return Blocks.CONCRETE.gray().defaultBlockState();
 		if (y == CEILING_Y) return state(Level1Blocks.GARAGE_CEILING);
 		if (y == FLOOR_Y) return floor(tile);
@@ -89,7 +101,15 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 			case OPENING -> y <= LOW_TOP ? air() : state(Level1Blocks.PAINTED_CONCRETE_WALL);
 			case OPENING_SIGN -> y <= LOW_TOP ? air() : y == LOW_CEILING_Y ? sign(x) : state(Level1Blocks.PAINTED_CONCRETE_WALL);
 			case CORRIDOR -> corridor(ceiling, y);
-			case DESK -> y == FLOOR_Y + 1 ? state(Level1Blocks.OFFICE_DESK) : y == FLOOR_Y + 2 ? computer(seed, x, z) : corridor(ceiling, y);
+			case DESK -> y == FLOOR_Y + 1 ? state(Level1Blocks.OFFICE_DESK) : y == FLOOR_Y + 2 ? deskTop(seed, x, z) : corridor(ceiling, y);
+			case BIN -> y == FLOOR_Y + 1 ? state(Level1Blocks.WASTEBASKET) : corridor(ceiling, y);
+			case CHAIR -> y == FLOOR_Y + 1 ? state(Level1Blocks.SUNKEN_CHAIR) : corridor(ceiling, y);
+			case FLOOR_PAINTING -> y == FLOOR_Y + 1 ? state(Level1Blocks.FLOOR_PAINTING) : corridor(ceiling, y);
+			case BED -> y == FLOOR_Y + 1 ? state(Level1Blocks.HOSPITAL_BED) : corridor(ceiling, y);
+			case TABLE -> y == FLOOR_Y + 1 ? state(Level1Blocks.OFFICE_DESK) : corridor(ceiling, y);
+			case GALLERY -> y <= LOW_CEILING_Y ? state(Level1Blocks.GALLERY_WALL) : state(Level1Blocks.GARAGE_WALL);
+			case BOOKSHELF -> y <= FLOOR_Y + 2 ? state(Level1Blocks.BOOK_SHELF) : corridor(ceiling, y);
+			case PARTITION -> y <= FLOOR_Y + 1 ? state(Level1Blocks.CUBICLE_PANEL) : corridor(ceiling, y);
 			case ROOM_SHELF -> y <= FLOOR_Y + 2 ? state(Level1Blocks.METAL_SHELF) : corridor(ceiling, y);
 			case WALL -> y <= LOW_CEILING_Y ? state(Level1Blocks.PAINTED_CONCRETE_WALL) : state(Level1Blocks.GARAGE_WALL);
 			case BRICK -> y <= LOW_CEILING_Y ? state(Level1Blocks.OLD_BRICK) : state(Level1Blocks.GARAGE_WALL);
@@ -147,6 +167,15 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 	private static BlockState sign(int x) {
 		boolean alongZ = Math.floorMod(x, Level1Layout.DISTRICT) == 0;
 		return state(Level1Blocks.EMERGENCY_SIGN).setValue(AxisSignBlock.AXIS, alongZ ? Direction.Axis.Z : Direction.Axis.X);
+	}
+
+	/** What sits on an office desk: mostly a computer, otherwise a dead plant, a fern in a pot, or nothing. */
+	private static BlockState deskTop(long seed, int x, int z) {
+		int roll = Math.floorMod(Level1Layout.hash(seed, x, z, 13), 100);
+		if (roll < 62) return computer(seed, x, z);
+		if (roll < 76) return state(Level1Blocks.DESK_PLANT_DEAD);
+		if (roll < 86) return state(Level1Blocks.DESK_PLANT_LEAFY);
+		return Blocks.AIR.defaultBlockState();
 	}
 
 	private static BlockState computer(long seed, int x, int z) {

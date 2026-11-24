@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/legend_floor_line"
+      },
+      {
+        "model": "noclip_backrooms:block/level1/legend_floor_line",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level1/legend_floor_line",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level1/legend_floor_line",
+        "y": 270
+      }
+    ]
+  }
+}

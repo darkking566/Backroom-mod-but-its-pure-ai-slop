@@ -103,7 +103,7 @@ public final class Level2Blocks {
 	public static final Block BLADE_DOOR = exit("blade_door", Level2Exit.BLADE, SoundType.METAL, 0);
 	public static final Block BROKEN_KNOB_DOOR = exit("broken_knob_door", Level2Exit.BROKEN_KNOB, SoundType.WOOD, 0);
 	public static final Block PINK_DOOR = exit("pink_door", Level2Exit.PINK, SoundType.WOOD, 0);
-	public static final Block ELEVATOR_DOOR = exit("elevator_door", Level2Exit.ELEVATOR, SoundType.METAL, 2);
+	public static final Block ELEVATOR_DOOR = exit("level2_elevator_door", Level2Exit.ELEVATOR, SoundType.METAL, 2);
 
 	private Level2Blocks() {
 	}

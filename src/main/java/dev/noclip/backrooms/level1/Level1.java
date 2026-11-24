@@ -35,9 +35,28 @@ public final class Level1 {
 		FlickeringWalls.register();
 		Blackouts.register();
 		Crates.register();
+		Markers.register();
+		Gardens.register();
+		Residents.register();
+		Warps.register();
+		Thresholds.register();
+		Patrols.register();
+		Workers.register();
+		Smoke.register();
+		Locks.register();
+		HubRoute.register();
 		Strays.register();
 		Marauders.register();
 		Smilers.register();
+		SkinStealers.register();
+		Clumps.register();
+		Dullers.register();
+		Level1Arms.register();
+		Wretches.register();
+		Shrieks.register();
+		Crawlers.register();
+		ShepherdSnakes.register();
+		Nguithrxurhs.register();
 		Hounds.register();
 		Level1Ambience.register();
 	}

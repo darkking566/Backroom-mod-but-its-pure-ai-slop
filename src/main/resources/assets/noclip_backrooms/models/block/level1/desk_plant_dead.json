@@ -1,0 +1,231 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level1/desk_pot",
+    "desk_pot": "noclip_backrooms:block/level1/desk_pot",
+    "desk_soil": "noclip_backrooms:block/level1/desk_soil",
+    "plant": "noclip_backrooms:block/level1/dead_twigs"
+  },
+  "elements": [
+    {
+      "name": "pot_base",
+      "from": [
+        5,
+        0,
+        5
+      ],
+      "to": [
+        11,
+        1.5,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#desk_pot"
+        },
+        "south": {
+          "texture": "#desk_pot"
+        },
+        "east": {
+          "texture": "#desk_pot"
+        },
+        "west": {
+          "texture": "#desk_pot"
+        },
+        "up": {
+          "texture": "#desk_pot"
+        },
+        "down": {
+          "texture": "#desk_pot"
+        }
+      }
+    },
+    {
+      "name": "pot_body",
+      "from": [
+        4.5,
+        1.5,
+        4.5
+      ],
+      "to": [
+        11.5,
+        5,
+        11.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#desk_pot"
+        },
+        "south": {
+          "texture": "#desk_pot"
+        },
+        "east": {
+          "texture": "#desk_pot"
+        },
+        "west": {
+          "texture": "#desk_pot"
+        },
+        "up": {
+          "texture": "#desk_pot"
+        },
+        "down": {
+          "texture": "#desk_pot"
+        }
+      }
+    },
+    {
+      "name": "pot_rim",
+      "from": [
+        4,
+        5,
+        4
+      ],
+      "to": [
+        12,
+        6,
+        12
+      ],
+      "faces": {
+        "north": {
+          "texture": "#desk_pot"
+        },
+        "south": {
+          "texture": "#desk_pot"
+        },
+        "east": {
+          "texture": "#desk_pot"
+        },
+        "west": {
+          "texture": "#desk_pot"
+        },
+        "up": {
+          "texture": "#desk_pot"
+        },
+        "down": {
+          "texture": "#desk_pot"
+        }
+      }
+    },
+    {
+      "name": "soil",
+      "from": [
+        4.6,
+        5.9,
+        4.6
+      ],
+      "to": [
+        11.4,
+        6,
+        11.4
+      ],
+      "faces": {
+        "north": {
+          "texture": "#desk_soil"
+        },
+        "south": {
+          "texture": "#desk_soil"
+        },
+        "east": {
+          "texture": "#desk_soil"
+        },
+        "west": {
+          "texture": "#desk_soil"
+        },
+        "up": {
+          "texture": "#desk_soil"
+        },
+        "down": {
+          "texture": "#desk_soil"
+        }
+      }
+    },
+    {
+      "name": "plant_45",
+      "from": [
+        0.8,
+        6.0,
+        8
+      ],
+      "to": [
+        15.2,
+        15.0,
+        8
+      ],
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": 45,
+        "rescale": true
+      },
+      "shade": false,
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#plant"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#plant"
+        }
+      }
+    },
+    {
+      "name": "plant_-45",
+      "from": [
+        0.8,
+        6.0,
+        8
+      ],
+      "to": [
+        15.2,
+        15.0,
+        8
+      ],
+      "rotation": {
+        "origin": [
+          8,
+          8,
+          8
+        ],
+        "axis": "y",
+        "angle": -45,
+        "rescale": true
+      },
+      "shade": false,
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#plant"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#plant"
+        }
+      }
+    }
+  ]
+}

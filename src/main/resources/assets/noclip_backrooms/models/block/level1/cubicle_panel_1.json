@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "noclip_backrooms:block/level1/cubicle_trim",
+    "side": "noclip_backrooms:block/level1/cubicle_panel_1"
+  }
+}

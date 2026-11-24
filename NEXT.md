@@ -115,6 +115,6 @@ Fabric・Minecraft 26.2・Java 25・模組代號 `noclip_backrooms`
 ## Level 3：發電站（等使用者試玩）
 
 - 說明：[docs/levels/level3/README.md](docs/levels/level3/README.md)（照 Wikidot Level 3 的文字和照片做）
-- 進入：Level 2 噴了紅色「3」的門；出口：電梯（Level 4／5）、Base Gamma 的門（Level 11）、廢棄的車（Level 69），都還沒開放
+- 進入：Level 2 噴了紅色「3」的門；出口：電梯（Level 4／5）、Base Gamma 的門（Level 11）、生鏽的車（Level 69），都還沒開放
 - 特色：寬窄高矮都不一樣的磚造走道（矮的要蹲）、打不壞的鐵柵與可以撬開的柵門、電箱與黑泥管、斷線觸電、黑泥燙傷、燈管爆裂、發電機過載爆炸、被窺視感熱點、發電機房／鍋爐房／組裝線／聖所（天使會嚇走獵犬）／Base Gamma 據點
 - 改貼圖或模型：`py tools/make_level3.py`

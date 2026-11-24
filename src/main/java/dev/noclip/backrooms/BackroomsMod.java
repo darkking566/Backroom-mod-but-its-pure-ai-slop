@@ -1,5 +1,6 @@
 package dev.noclip.backrooms;
 
+import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.level0.Level0;
 import dev.noclip.backrooms.level1.Level1;
 import dev.noclip.backrooms.level2.Level2;
@@ -23,6 +24,7 @@ public final class BackroomsMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		Monsters.register();
+		People.register();
 		Level0.register();
 		Level1.register();
 		Level2.register();

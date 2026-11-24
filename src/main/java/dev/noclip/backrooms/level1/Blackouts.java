@@ -134,12 +134,11 @@ final class Blackouts {
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		for (ServerPlayer player : players) {
 			int px = player.getBlockX(), pz = player.getBlockZ();
-			// Hall lights: x = 5 (mod 9), z = 4 or 12 (mod 16), just under the ceiling.
-			int hallY = Level1ChunkGenerator.CEILING_Y - 1;
+			// Hall lights: x = 5 (mod 9), z = 4 or 12 (mod 16), across all vertical deck and vaulted ceiling heights.
 			for (int x = px - REACH - Math.floorMod(px - REACH - 5, Level1Layout.BAY_X); x <= px + REACH; x += Level1Layout.BAY_X) {
 				for (int z = pz - REACH - Math.floorMod(pz - REACH - 4, 8); z <= pz + REACH; z += 8) {
 					if (Math.floorMod(z, Level1Layout.BAY_Z) == 4 || Math.floorMod(z, Level1Layout.BAY_Z) == 12) {
-						apply(level, pos.set(x, hallY, z));
+						for (int hallY : Level1Elevation.LAMP_YS) apply(level, pos.set(x, hallY, z));
 					}
 				}
 			}

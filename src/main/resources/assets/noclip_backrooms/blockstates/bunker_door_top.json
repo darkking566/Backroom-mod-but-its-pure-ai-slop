@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=z": {
+      "model": "noclip_backrooms:block/level1/bunker_door_top"
+    },
+    "axis=x": {
+      "model": "noclip_backrooms:block/level1/bunker_door_top",
+      "y": 90
+    }
+  }
+}

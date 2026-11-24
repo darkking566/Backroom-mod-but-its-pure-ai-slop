@@ -109,7 +109,7 @@ public final class Level3Blocks {
 			p -> new Level3PartBlock(p, Level3Exit.ELEVATOR));
 	public static final Block BASE_GAMMA_DOOR = register("base_gamma_door", unbreakable(MapColor.COLOR_LIGHT_GRAY),
 			p -> new Level3PartBlock(p, Level3Exit.BASE_GAMMA_DOOR));
-	public static final Block CAR = register("abandoned_car", unbreakable(MapColor.COLOR_RED).noOcclusion(), p -> new Level3PartBlock(p, Level3Exit.CAR));
+	public static final Block CAR = register("rusted_car", unbreakable(MapColor.COLOR_RED).noOcclusion(), p -> new Level3PartBlock(p, Level3Exit.CAR));
 
 	private Level3Blocks() {
 	}

@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=z": {
+      "model": "noclip_backrooms:block/level1/cold_door"
+    },
+    "axis=x": {
+      "model": "noclip_backrooms:block/level1/cold_door",
+      "y": 90
+    }
+  }
+}

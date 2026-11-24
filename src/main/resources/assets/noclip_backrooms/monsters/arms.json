@@ -1,0 +1,7143 @@
+{
+  "entity_id": "noclip_backrooms:arms",
+  "display_name_zh_tw": "\u624b\u81c2",
+  "display_name_en_us": "Arms",
+  "texture_atlas": {
+    "file": "arms.png",
+    "width": 512,
+    "height": 512,
+    "regions": {
+      "rift": {
+        "u": 8,
+        "v": 8,
+        "w": 152,
+        "h": 152
+      },
+      "skin": {
+        "u": 180,
+        "v": 8,
+        "w": 152,
+        "h": 152
+      },
+      "bruise": {
+        "u": 352,
+        "v": 8,
+        "w": 152,
+        "h": 152
+      },
+      "tendon": {
+        "u": 8,
+        "v": 180,
+        "w": 152,
+        "h": 152
+      },
+      "nail": {
+        "u": 180,
+        "v": 180,
+        "w": 152,
+        "h": 152
+      }
+    }
+  },
+  "parts": [
+    {
+      "name": "Rift_Core",
+      "parent": "root",
+      "pivot_mc": [
+        0,
+        -4.0,
+        0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -7.5,
+            -1.5,
+            -6.5
+          ],
+          "size_mc": [
+            15.0,
+            2.2,
+            13.0
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -9.0,
+            -0.8,
+            -3.5
+          ],
+          "size_mc": [
+            18.0,
+            1.6,
+            7.0
+          ],
+          "uv_region": [
+            8,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            -0.2,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0,
+            0.25,
+            0
+          ]
+        },
+        {
+          "origin_mc": [
+            -4.5,
+            -0.9,
+            -8.5
+          ],
+          "size_mc": [
+            9.0,
+            1.8,
+            17.0
+          ],
+          "uv_region": [
+            8,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            -0.3,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0,
+            -0.18,
+            0
+          ]
+        },
+        {
+          "origin_mc": [
+            -5.5,
+            0.5,
+            -5.0
+          ],
+          "size_mc": [
+            11.0,
+            1.8,
+            10.0
+          ],
+          "uv_region": [
+            8,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -2.0,
+            -1.1,
+            -2.5
+          ],
+          "size_mc": [
+            4.0,
+            2.2,
+            5.0
+          ],
+          "uv_region": [
+            352,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -4.0,
+            2.3,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.12,
+            0.2,
+            0.15
+          ]
+        },
+        {
+          "origin_mc": [
+            -2.0,
+            -1.2,
+            -2.5
+          ],
+          "size_mc": [
+            4.0,
+            2.4,
+            5.0
+          ],
+          "uv_region": [
+            352,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            4.0,
+            2.2,
+            -0.5
+          ],
+          "subpart_rot_rad_mc": [
+            -0.1,
+            -0.2,
+            -0.12
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_1",
+      "parent": "Rift_Core",
+      "pivot_mc": [
+        0.0,
+        1.5,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.05,
+        0.0,
+        -0.05
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.25,
+            0.0,
+            -1.25
+          ],
+          "size_mc": [
+            2.5,
+            5.9,
+            2.5
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.0,
+            5.44,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            6.12,
+            2.0
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.4,
+            -1.1,
+            -1.1
+          ],
+          "size_mc": [
+            2.8,
+            2.2,
+            2.2
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            3.59,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.08,
+            0.15,
+            0.08
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.2,
+            -1.0,
+            -1.2
+          ],
+          "size_mc": [
+            2.4,
+            2.0,
+            2.4
+          ],
+          "uv_region": [
+            352,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            10.64,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            -0.1,
+            0,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fore_1",
+      "parent": "Arm_1",
+      "pivot_mc": [
+        0.0,
+        11.34,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        -0.03,
+        0.0,
+        0.03
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            5.9,
+            2.0
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.82,
+            5.44,
+            -0.82
+          ],
+          "size_mc": [
+            1.64,
+            6.12,
+            1.64
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.15,
+            -1.2,
+            -0.95
+          ],
+          "size_mc": [
+            2.3,
+            2.4,
+            1.9
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            4.6,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.1,
+            -0.12,
+            0
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.05,
+            9.3,
+            -1.05
+          ],
+          "size_mc": [
+            2.1,
+            1.8,
+            2.1
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hand_1",
+      "parent": "Fore_1",
+      "pivot_mc": [
+        0.0,
+        11.34,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.3,
+            0.0,
+            -0.9
+          ],
+          "size_mc": [
+            2.6,
+            2.4,
+            1.8
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.45,
+            0.6,
+            -1.0
+          ],
+          "size_mc": [
+            2.9,
+            1.2,
+            2.0
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -1.01,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            2.02,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.07,
+            3.11,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            -0.18
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -1.01,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            2.02,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.12,
+            4.95,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            -0.21
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -1.22,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            2.44,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.27,
+            3.32,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            -0.06
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -1.22,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            2.44,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.32,
+            5.53,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            -0.07
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -1.22,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            2.44,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.53,
+            3.32,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            0.06
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -1.22,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            2.44,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.48,
+            5.53,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            0.07
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -1.01,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            2.02,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.28,
+            3.11,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            0.18
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -1.01,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            2.02,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.23,
+            4.95,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            0.21
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_2",
+      "parent": "Rift_Core",
+      "pivot_mc": [
+        -4.2,
+        1.5,
+        -3.2
+      ],
+      "rest_rot_rad_mc": [
+        -0.22,
+        0.4,
+        0.18
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.25,
+            0.0,
+            -1.25
+          ],
+          "size_mc": [
+            2.5,
+            5.24,
+            2.5
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.0,
+            4.84,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            5.44,
+            2.0
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.4,
+            -1.1,
+            -1.1
+          ],
+          "size_mc": [
+            2.8,
+            2.2,
+            2.2
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            3.32,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.08,
+            0.15,
+            0.08
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.2,
+            -1.0,
+            -1.2
+          ],
+          "size_mc": [
+            2.4,
+            2.0,
+            2.4
+          ],
+          "uv_region": [
+            352,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            9.57,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            -0.1,
+            0,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fore_2",
+      "parent": "Arm_2",
+      "pivot_mc": [
+        0.0,
+        10.08,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.132,
+        0.0,
+        -0.108
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            5.24,
+            2.0
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.82,
+            4.84,
+            -0.82
+          ],
+          "size_mc": [
+            1.64,
+            5.44,
+            1.64
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.15,
+            -1.2,
+            -0.95
+          ],
+          "size_mc": [
+            2.3,
+            2.4,
+            1.9
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            4.22,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.1,
+            -0.12,
+            0
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.05,
+            8.27,
+            -1.05
+          ],
+          "size_mc": [
+            2.1,
+            1.8,
+            2.1
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hand_2",
+      "parent": "Fore_2",
+      "pivot_mc": [
+        0.0,
+        10.08,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.3,
+            0.0,
+            -0.9
+          ],
+          "size_mc": [
+            2.6,
+            2.4,
+            1.8
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.45,
+            0.6,
+            -1.0
+          ],
+          "size_mc": [
+            2.9,
+            1.2,
+            2.0
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -0.9,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            1.8,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.07,
+            3.0,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            -0.18
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -0.9,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            1.8,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.12,
+            4.63,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            -0.21
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -1.08,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            2.16,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.27,
+            3.18,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            -0.06
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -1.08,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            2.16,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.32,
+            5.15,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            -0.07
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -1.08,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            2.16,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.53,
+            3.18,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            0.06
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -1.08,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            2.16,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.48,
+            5.15,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            0.07
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -0.9,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            1.8,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.28,
+            3.0,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            0.18
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -0.9,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            1.8,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.23,
+            4.63,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            0.21
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_3",
+      "parent": "Rift_Core",
+      "pivot_mc": [
+        4.2,
+        1.5,
+        -3.2
+      ],
+      "rest_rot_rad_mc": [
+        -0.22,
+        -0.4,
+        -0.18
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.25,
+            0.0,
+            -1.25
+          ],
+          "size_mc": [
+            2.5,
+            5.35,
+            2.5
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.0,
+            4.94,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            5.56,
+            2.0
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.4,
+            -1.1,
+            -1.1
+          ],
+          "size_mc": [
+            2.8,
+            2.2,
+            2.2
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            3.36,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.08,
+            0.15,
+            0.08
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.2,
+            -1.0,
+            -1.2
+          ],
+          "size_mc": [
+            2.4,
+            2.0,
+            2.4
+          ],
+          "uv_region": [
+            352,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            9.75,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            -0.1,
+            0,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fore_3",
+      "parent": "Arm_3",
+      "pivot_mc": [
+        0.0,
+        10.29,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.132,
+        0.0,
+        0.108
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            5.35,
+            2.0
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.82,
+            4.94,
+            -0.82
+          ],
+          "size_mc": [
+            1.64,
+            5.56,
+            1.64
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.15,
+            -1.2,
+            -0.95
+          ],
+          "size_mc": [
+            2.3,
+            2.4,
+            1.9
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            4.29,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.1,
+            -0.12,
+            0
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.05,
+            8.44,
+            -1.05
+          ],
+          "size_mc": [
+            2.1,
+            1.8,
+            2.1
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hand_3",
+      "parent": "Fore_3",
+      "pivot_mc": [
+        0.0,
+        10.29,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.3,
+            0.0,
+            -0.9
+          ],
+          "size_mc": [
+            2.6,
+            2.4,
+            1.8
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.45,
+            0.6,
+            -1.0
+          ],
+          "size_mc": [
+            2.9,
+            1.2,
+            2.0
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -0.92,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            1.83,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.07,
+            3.02,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            -0.18
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -0.92,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            1.83,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.12,
+            4.68,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            -0.21
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -1.1,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            2.21,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.27,
+            3.2,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            -0.06
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -1.1,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            2.21,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.32,
+            5.21,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            -0.07
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -1.1,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            2.21,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.53,
+            3.2,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            0.06
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -1.1,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            2.21,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.48,
+            5.21,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            0.07
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -0.92,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            1.83,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.28,
+            3.02,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            0.18
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -0.92,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            1.83,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.23,
+            4.68,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            0.21
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_4",
+      "parent": "Rift_Core",
+      "pivot_mc": [
+        -4.0,
+        1.5,
+        3.4
+      ],
+      "rest_rot_rad_mc": [
+        0.22,
+        -0.5,
+        0.2
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.25,
+            0.0,
+            -1.25
+          ],
+          "size_mc": [
+            2.5,
+            5.02,
+            2.5
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.0,
+            4.64,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            5.22,
+            2.0
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.4,
+            -1.1,
+            -1.1
+          ],
+          "size_mc": [
+            2.8,
+            2.2,
+            2.2
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            3.23,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.08,
+            0.15,
+            0.08
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.2,
+            -1.0,
+            -1.2
+          ],
+          "size_mc": [
+            2.4,
+            2.0,
+            2.4
+          ],
+          "uv_region": [
+            352,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            9.21,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            -0.1,
+            0,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fore_4",
+      "parent": "Arm_4",
+      "pivot_mc": [
+        0.0,
+        9.66,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        -0.132,
+        0.0,
+        -0.12
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            5.02,
+            2.0
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.82,
+            4.64,
+            -0.82
+          ],
+          "size_mc": [
+            1.64,
+            5.22,
+            1.64
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.15,
+            -1.2,
+            -0.95
+          ],
+          "size_mc": [
+            2.3,
+            2.4,
+            1.9
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            4.1,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.1,
+            -0.12,
+            0
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.05,
+            7.92,
+            -1.05
+          ],
+          "size_mc": [
+            2.1,
+            1.8,
+            2.1
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hand_4",
+      "parent": "Fore_4",
+      "pivot_mc": [
+        0.0,
+        9.66,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.3,
+            0.0,
+            -0.9
+          ],
+          "size_mc": [
+            2.6,
+            2.4,
+            1.8
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.45,
+            0.6,
+            -1.0
+          ],
+          "size_mc": [
+            2.9,
+            1.2,
+            2.0
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -0.86,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            1.72,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.07,
+            2.96,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            -0.18
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -0.86,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            1.72,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.12,
+            4.52,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            -0.21
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -1.04,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            2.07,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.27,
+            3.14,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            -0.06
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -1.04,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            2.07,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.32,
+            5.02,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            -0.07
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -1.04,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            2.07,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.53,
+            3.14,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            0.06
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -1.04,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            2.07,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.48,
+            5.02,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            0.07
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -0.86,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            1.72,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.28,
+            2.96,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            0.18
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -0.86,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            1.72,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.23,
+            4.52,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            0.21
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_5",
+      "parent": "Rift_Core",
+      "pivot_mc": [
+        4.0,
+        1.5,
+        3.4
+      ],
+      "rest_rot_rad_mc": [
+        0.22,
+        0.5,
+        -0.2
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.25,
+            0.0,
+            -1.25
+          ],
+          "size_mc": [
+            2.5,
+            5.13,
+            2.5
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.0,
+            4.74,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            5.33,
+            2.0
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.4,
+            -1.1,
+            -1.1
+          ],
+          "size_mc": [
+            2.8,
+            2.2,
+            2.2
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            3.27,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.08,
+            0.15,
+            0.08
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.2,
+            -1.0,
+            -1.2
+          ],
+          "size_mc": [
+            2.4,
+            2.0,
+            2.4
+          ],
+          "uv_region": [
+            352,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            9.39,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            -0.1,
+            0,
+            0.1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fore_5",
+      "parent": "Arm_5",
+      "pivot_mc": [
+        0.0,
+        9.87,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        -0.132,
+        0.0,
+        0.12
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.0,
+            0.0,
+            -1.0
+          ],
+          "size_mc": [
+            2.0,
+            5.13,
+            2.0
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.82,
+            4.74,
+            -0.82
+          ],
+          "size_mc": [
+            1.64,
+            5.33,
+            1.64
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.15,
+            -1.2,
+            -0.95
+          ],
+          "size_mc": [
+            2.3,
+            2.4,
+            1.9
+          ],
+          "uv_region": [
+            8,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            4.16,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.1,
+            -0.12,
+            0
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.05,
+            8.09,
+            -1.05
+          ],
+          "size_mc": [
+            2.1,
+            1.8,
+            2.1
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hand_5",
+      "parent": "Fore_5",
+      "pivot_mc": [
+        0.0,
+        9.87,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "origin_mc": [
+            -1.3,
+            0.0,
+            -0.9
+          ],
+          "size_mc": [
+            2.6,
+            2.4,
+            1.8
+          ],
+          "uv_region": [
+            180,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -1.45,
+            0.6,
+            -1.0
+          ],
+          "size_mc": [
+            2.9,
+            1.2,
+            2.0
+          ],
+          "uv_region": [
+            352,
+            8
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -0.88,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            1.76,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.07,
+            2.98,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            -0.18
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -0.88,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            1.76,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.12,
+            4.58,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            -0.21
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -1.06,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            2.12,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.27,
+            3.16,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            -0.06
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -1.06,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            2.12,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.32,
+            5.09,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            -0.07
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -1.06,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            2.12,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.53,
+            3.16,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            0.06
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -1.06,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            2.12,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.48,
+            5.09,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            0.07
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.23,
+            -0.88,
+            -0.23
+          ],
+          "size_mc": [
+            0.46,
+            1.76,
+            0.46
+          ],
+          "uv_region": [
+            180,
+            8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.28,
+            2.98,
+            -0.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.24,
+            0,
+            0.18
+          ]
+        },
+        {
+          "origin_mc": [
+            -0.18,
+            -0.88,
+            -0.18
+          ],
+          "size_mc": [
+            0.36,
+            1.76,
+            0.36
+          ],
+          "uv_region": [
+            180,
+            180
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.23,
+            4.58,
+            -0.17
+          ],
+          "subpart_rot_rad_mc": [
+            0.62,
+            0,
+            0.21
+          ]
+        }
+      ]
+    }
+  ],
+  "animations": {
+    "idle_dangle": {
+      "loop": true,
+      "keyframes": [
+        {
+          "time_sec": 0.0,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0.0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -4.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.2208,
+                0.0378,
+                0.0068
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.0488,
+                0.0,
+                0.2388
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.4295,
+                0.0,
+                0.0568
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.1123,
+                0.3039,
+                0.0358
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.0683,
+                0.0,
+                0.0237
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                -0.0377,
+                0.0,
+                -0.1442
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.3229,
+                -0.4985,
+                -0.3277
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.0731,
+                0.0,
+                -0.0177
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.5314,
+                0.0,
+                -0.1477
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.0474,
+                -0.466,
+                0.2511
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.0611,
+                0.0,
+                -0.331
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.0868,
+                0.0,
+                0.0511
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.214,
+                0.6199,
+                -0.0201
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                0.1179,
+                0.0,
+                0.1127
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.2301,
+                0.0,
+                0.1799
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.275,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0.0354,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -4.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.2109,
+                -0.0538,
+                -0.1307
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.142,
+                0.0,
+                0.2267
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.0097,
+                0.0,
+                -0.0807
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.2458,
+                0.2812,
+                0.0019
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.1154,
+                0.0,
+                -0.1395
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.3351,
+                0.0,
+                -0.1781
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.3972,
+                -0.4211,
+                -0.2117
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                0.088,
+                0.0,
+                -0.1086
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.354,
+                0.0,
+                -0.0317
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.1341,
+                -0.3946,
+                0.3582
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                0.0877,
+                0.0,
+                -0.225
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                -0.0017,
+                0.0,
+                0.1582
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.343,
+                0.5876,
+                -0.0686
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                0.0505,
+                0.0,
+                0.2703
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.5493,
+                0.0,
+                0.1314
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.55,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0.05,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -4.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.1068,
+                -0.1139,
+                -0.2208
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.2672,
+                0.0,
+                0.0994
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.0705,
+                0.0,
+                -0.1708
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.3642,
+                0.3282,
+                0.0723
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.0176,
+                0.0,
+                -0.2843
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.5377,
+                0.0,
+                -0.1077
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.3677,
+                -0.3314,
+                -0.0771
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                0.2749,
+                0.0,
+                -0.0725
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                -0.0314,
+                0.0,
+                0.1029
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.2711,
+                -0.3849,
+                0.3726
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                0.1077,
+                0.0,
+                -0.0576
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.4132,
+                0.0,
+                0.1726
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.3999,
+                0.504,
+                -0.194
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.1237,
+                0.0,
+                0.3399
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.2699,
+                0.0,
+                0.006
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.825,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0.0354,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -4.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                -0.0307,
+                -0.1073,
+                -0.2109
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.2535,
+                0.0,
+                -0.0686
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.4903,
+                0.0,
+                -0.1609
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.3981,
+                0.4172,
+                0.2058
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                0.1678,
+                0.0,
+                -0.3257
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.1649,
+                0.0,
+                0.0258
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.2517,
+                -0.2819,
+                -0.0028
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                0.3781,
+                0.0,
+                0.0693
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.146,
+                0.0,
+                0.1772
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.3782,
+                -0.4427,
+                0.2859
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.0126,
+                0.0,
+                0.0733
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.5017,
+                0.0,
+                0.0859
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.3514,
+                0.418,
+                -0.323
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.3028,
+                0.0,
+                0.2806
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                -0.0493,
+                0.0,
+                -0.123
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 1.1,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0.0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -4.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                -0.1208,
+                -0.0378,
+                -0.1068
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.1088,
+                0.0,
+                -0.1788
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.4295,
+                0.0,
+                -0.0568
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.3277,
+                0.4961,
+                0.3242
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                0.3323,
+                0.0,
+                -0.2397
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                -0.0377,
+                0.0,
+                0.1442
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.1171,
+                -0.3015,
+                -0.0323
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                0.3371,
+                0.0,
+                0.2337
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.5314,
+                0.0,
+                0.1477
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.3926,
+                -0.534,
+                0.1489
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.2029,
+                0.0,
+                0.091
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.0868,
+                0.0,
+                -0.0511
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.226,
+                0.3801,
+                -0.3799
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.3819,
+                0.0,
+                0.1273
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.2301,
+                0.0,
+                -0.1799
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 1.375,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                -0.0354,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -4.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                -0.1109,
+                0.0538,
+                0.0307
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.082,
+                0.0,
+                -0.1667
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.0097,
+                0.0,
+                0.0807
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.1942,
+                0.5188,
+                0.3581
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                0.3794,
+                0.0,
+                -0.0765
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.3351,
+                0.0,
+                0.1781
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.0428,
+                -0.3789,
+                -0.1483
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                0.176,
+                0.0,
+                0.3246
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.354,
+                0.0,
+                0.0317
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.3059,
+                -0.6054,
+                0.0418
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.3517,
+                0.0,
+                -0.015
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                -0.0017,
+                0.0,
+                -0.1582
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.097,
+                0.4124,
+                -0.3314
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.3145,
+                0.0,
+                -0.0303
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.5493,
+                0.0,
+                -0.1314
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 1.65,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                -0.05,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -4.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                -0.0068,
+                0.1139,
+                0.1208
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.2072,
+                0.0,
+                -0.0394
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.0705,
+                0.0,
+                0.1708
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.0758,
+                0.4718,
+                0.2877
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                0.2816,
+                0.0,
+                0.0683
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.5377,
+                0.0,
+                0.1077
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.0723,
+                -0.4686,
+                -0.2829
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.0109,
+                0.0,
+                0.2885
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                -0.0314,
+                0.0,
+                -0.1029
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.1689,
+                -0.6151,
+                0.0274
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.3717,
+                0.0,
+                -0.1824
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.4132,
+                0.0,
+                -0.1726
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.0401,
+                0.496,
+                -0.206
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.1403,
+                0.0,
+                -0.0999
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.2699,
+                0.0,
+                -0.006
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 1.925,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                -0.0354,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -4.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.1307,
+                0.1073,
+                0.1109
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.1935,
+                0.0,
+                0.1286
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.4903,
+                0.0,
+                0.1609
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.0419,
+                0.3828,
+                0.1542
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                0.0962,
+                0.0,
+                0.1097
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.1649,
+                0.0,
+                -0.0258
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.1883,
+                -0.5181,
+                -0.3572
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.1141,
+                0.0,
+                0.1467
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.146,
+                0.0,
+                -0.1772
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.0618,
+                -0.5573,
+                0.1141
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.2514,
+                0.0,
+                -0.3133
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.5017,
+                0.0,
+                -0.0859
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.0886,
+                0.582,
+                -0.077
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                0.0388,
+                0.0,
+                -0.0406
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                -0.0493,
+                0.0,
+                0.123
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 2.2,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                -0.0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -4.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.2208,
+                0.0378,
+                0.0068
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.0488,
+                0.0,
+                0.2388
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.4295,
+                0.0,
+                0.0568
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.1123,
+                0.3039,
+                0.0358
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.0683,
+                0.0,
+                0.0237
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                -0.0377,
+                0.0,
+                -0.1442
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.3229,
+                -0.4985,
+                -0.3277
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.0731,
+                0.0,
+                -0.0177
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.5314,
+                0.0,
+                -0.1477
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.0474,
+                -0.466,
+                0.2511
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.0611,
+                0.0,
+                -0.331
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.0868,
+                0.0,
+                0.0511
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.214,
+                0.6199,
+                -0.0201
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                0.1179,
+                0.0,
+                0.1127
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.2301,
+                0.0,
+                0.1799
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "reach_grab": {
+      "loop": true,
+      "keyframes": [
+        {
+          "time_sec": 0.0,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -2.2,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.2339,
+                0.0,
+                0.0889
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.127,
+                0.0,
+                0.2495
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.7734,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                0.106,
+                0.4,
+                -0.0692
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.1648,
+                0.0,
+                0.2264
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.0694,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.1259,
+                -0.4,
+                -0.309
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.2765,
+                0.0,
+                -0.0442
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.5746,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                -0.1404,
+                -0.5,
+                0.0062
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.0861,
+                0.0,
+                -0.2664
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.684,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                -0.0813,
+                0.5,
+                0.0901
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                0.1984,
+                0.0,
+                -0.1976
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.05,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.1125,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -1.776,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.2482,
+                0.0,
+                -0.0943
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.0866,
+                0.0,
+                0.2663
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.2146,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.0507,
+                0.4,
+                -0.1651
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.2766,
+                0.0,
+                0.0436
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.3271,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.2824,
+                -0.4,
+                -0.2128
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.1643,
+                0.0,
+                -0.2267
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.8301,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                -0.1256,
+                -0.5,
+                0.1893
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                0.1276,
+                0.0,
+                -0.2493
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.1256,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.0885,
+                0.5,
+                0.16
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                0.28,
+                0.0,
+                0.0006
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.4518,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.225,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -1.6,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.1289,
+                0.0,
+                -0.2339
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.2495,
+                0.0,
+                0.127
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.1266,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.2292,
+                0.4,
+                -0.122
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.2264,
+                0.0,
+                -0.1648
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.8306,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.325,
+                -0.4,
+                -0.0341
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                0.0442,
+                0.0,
+                -0.2765
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.3254,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.0142,
+                -0.5,
+                0.3084
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                0.2664,
+                0.0,
+                -0.0861
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.216,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.2581,
+                0.5,
+                0.0893
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                0.1976,
+                0.0,
+                0.1984
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.85,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.3375,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -1.776,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                -0.0543,
+                0.0,
+                -0.2482
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.2663,
+                0.0,
+                -0.0866
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.6854,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.3251,
+                0.4,
+                0.0347
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.0436,
+                0.0,
+                -0.2766
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.5729,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.2288,
+                -0.4,
+                0.1224
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                0.2267,
+                0.0,
+                -0.1643
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.0699,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.1973,
+                -0.5,
+                0.2936
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                0.2493,
+                0.0,
+                0.1276
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.7744,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.328,
+                0.5,
+                -0.0805
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.0006,
+                0.0,
+                0.28
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.4482,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.45,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -2.2,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                -0.1939,
+                0.0,
+                -0.1289
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.127,
+                0.0,
+                -0.2495
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.7734,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.282,
+                0.4,
+                0.2132
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                0.1648,
+                0.0,
+                -0.2264
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.0694,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.0501,
+                -0.4,
+                0.165
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                0.2765,
+                0.0,
+                0.0442
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.5746,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.3164,
+                -0.5,
+                0.1538
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                0.0861,
+                0.0,
+                0.2664
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.684,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.2573,
+                0.5,
+                -0.2501
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.1984,
+                0.0,
+                0.1976
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.05,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.5625,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -2.624,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                -0.2082,
+                0.0,
+                0.0543
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.0866,
+                0.0,
+                -0.2663
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.2146,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.1253,
+                0.4,
+                0.3091
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                0.2766,
+                0.0,
+                -0.0436
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.3271,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                0.1064,
+                -0.4,
+                0.0688
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                0.1643,
+                0.0,
+                0.2267
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.8301,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.3016,
+                -0.5,
+                -0.0293
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.1276,
+                0.0,
+                0.2493
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.1256,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.0875,
+                0.5,
+                -0.32
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.28,
+                0.0,
+                -0.0006
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.4518,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.675,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -2.8,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                -0.0889,
+                0.0,
+                0.1939
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.2495,
+                0.0,
+                -0.127
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.1266,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                0.0532,
+                0.4,
+                0.266
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                0.2264,
+                0.0,
+                0.1648
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.8306,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                0.149,
+                -0.4,
+                -0.1099
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.0442,
+                0.0,
+                0.2765
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.3254,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.1618,
+                -0.5,
+                -0.1484
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.2664,
+                0.0,
+                0.0861
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.216,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                -0.0821,
+                0.5,
+                -0.2493
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.1976,
+                0.0,
+                -0.1984
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.85,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.7875,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -2.624,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.0943,
+                0.0,
+                0.2082
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.2663,
+                0.0,
+                0.0866
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.6854,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                0.1491,
+                0.4,
+                0.1093
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                0.0436,
+                0.0,
+                0.2766
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.5729,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                0.0528,
+                -0.4,
+                -0.2664
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.2267,
+                0.0,
+                0.1643
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.0699,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                -0.0213,
+                -0.5,
+                -0.1336
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.2493,
+                0.0,
+                -0.1276
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.7744,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                -0.152,
+                0.5,
+                -0.0795
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                0.0006,
+                0.0,
+                -0.28
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.4482,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.9,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -2.2,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.2339,
+                0.0,
+                0.0889
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.127,
+                0.0,
+                0.2495
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.7734,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                0.106,
+                0.4,
+                -0.0692
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.1648,
+                0.0,
+                0.2264
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.0694,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.1259,
+                -0.4,
+                -0.309
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.2765,
+                0.0,
+                -0.0442
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.5746,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                -0.1404,
+                -0.5,
+                0.0062
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.0861,
+                0.0,
+                -0.2664
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.684,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                -0.0813,
+                0.5,
+                0.0901
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                0.1984,
+                0.0,
+                -0.1976
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.05,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "attack_snatch": {
+      "loop": false,
+      "keyframes": [
+        {
+          "time_sec": 0.0,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -4.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.05,
+                0.0,
+                -0.05
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.025,
+                0,
+                0.025
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.22,
+                0.4,
+                0.18
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                0.11,
+                0,
+                -0.09
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.22,
+                -0.4,
+                -0.18
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                0.11,
+                0,
+                0.09
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.22,
+                -0.5,
+                0.2
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.11,
+                0,
+                -0.1
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.22,
+                0.5,
+                -0.2
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.11,
+                0,
+                0.1
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.0944,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -4.635,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.0754,
+                0.0,
+                -0.0754
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.025,
+                0,
+                0.025
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                -0.0952,
+                0,
+                0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.3317,
+                0.4,
+                0.2714
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                0.11,
+                0,
+                -0.09
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                -0.0952,
+                0,
+                0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.3317,
+                -0.4,
+                -0.2714
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                0.11,
+                0,
+                0.09
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                -0.0952,
+                0,
+                0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.3317,
+                -0.5,
+                0.3016
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.11,
+                0,
+                -0.1
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                -0.0952,
+                0,
+                0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.3317,
+                0.5,
+                -0.3016
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.11,
+                0,
+                0.1
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                -0.0952,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.1889,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -5.27,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.1008,
+                0.0,
+                -0.1008
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.025,
+                0,
+                0.025
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                -0.1905,
+                0,
+                0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.4435,
+                0.4,
+                0.3629
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                0.11,
+                0,
+                -0.09
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                -0.1905,
+                0,
+                0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.4435,
+                -0.4,
+                -0.3629
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                0.11,
+                0,
+                0.09
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                -0.1905,
+                0,
+                0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.4435,
+                -0.5,
+                0.4032
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.11,
+                0,
+                -0.1
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                -0.1905,
+                0,
+                0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.4435,
+                0.5,
+                -0.4032
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.11,
+                0,
+                0.1
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                -0.1905,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.2833,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -5.905,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.1262,
+                0.0,
+                -0.1262
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.025,
+                0,
+                0.025
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                -0.2857,
+                0,
+                0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.5552,
+                0.4,
+                0.4543
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                0.11,
+                0,
+                -0.09
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                -0.2857,
+                0,
+                0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.5552,
+                -0.4,
+                -0.4543
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                0.11,
+                0,
+                0.09
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                -0.2857,
+                0,
+                0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.5552,
+                -0.5,
+                0.5048
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.11,
+                0,
+                -0.1
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                -0.2857,
+                0,
+                0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.5552,
+                0.5,
+                -0.5048
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.11,
+                0,
+                0.1
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                -0.2857,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.3778,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -3.639,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.0828,
+                0.0,
+                -0.0828
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.0094,
+                0,
+                -0.0094
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.062,
+                0,
+                0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.3642,
+                0.4,
+                0.298
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.0416,
+                0,
+                0.034
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.062,
+                0,
+                0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.3642,
+                -0.4,
+                -0.298
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.0416,
+                0,
+                -0.034
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.062,
+                0,
+                0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.3642,
+                -0.5,
+                0.3311
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                0.0416,
+                0,
+                0.0378
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.062,
+                0,
+                0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.3642,
+                0.5,
+                -0.3311
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                0.0416,
+                0,
+                -0.0378
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.062,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.4722,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.861,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.0272,
+                0.0,
+                -0.0272
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.0206,
+                0,
+                -0.0206
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.488,
+                0,
+                0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.1198,
+                0.4,
+                0.098
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.0904,
+                0,
+                0.074
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.488,
+                0,
+                0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.1198,
+                -0.4,
+                -0.098
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.0904,
+                0,
+                -0.074
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.488,
+                0,
+                0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.1198,
+                -0.5,
+                0.1089
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                0.0904,
+                0,
+                0.0822
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.488,
+                0,
+                0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.1198,
+                0.5,
+                -0.1089
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                0.0904,
+                0,
+                -0.0822
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.488,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.5667,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                1.238,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                -0.0167,
+                0.0,
+                0.0167
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.0286,
+                0,
+                -0.0286
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.8214,
+                0,
+                0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                0.0733,
+                0.4,
+                -0.06
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.1257,
+                0,
+                0.1029
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.8214,
+                0,
+                0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                0.0733,
+                -0.4,
+                0.06
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.1257,
+                0,
+                -0.1029
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.8214,
+                0,
+                0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                -0.0733,
+                -0.5,
+                -0.0667
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                0.1257,
+                0,
+                0.1143
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.8214,
+                0,
+                0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                -0.0733,
+                0.5,
+                0.0667
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                0.1257,
+                0,
+                -0.1143
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.8214,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.6611,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.508,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.0056,
+                0.0,
+                -0.0056
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.019,
+                0,
+                -0.019
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.631,
+                0,
+                0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.0244,
+                0.4,
+                0.02
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.0838,
+                0,
+                0.0686
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.631,
+                0,
+                0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.0244,
+                -0.4,
+                -0.02
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.0838,
+                0,
+                -0.0686
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.631,
+                0,
+                0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.0244,
+                -0.5,
+                0.0222
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                0.0838,
+                0,
+                0.0762
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.631,
+                0,
+                0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.0244,
+                0.5,
+                -0.0222
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                0.0838,
+                0,
+                -0.0762
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.631,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.7556,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -2.254,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.0278,
+                0.0,
+                -0.0278
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.0095,
+                0,
+                -0.0095
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.4405,
+                0,
+                0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.1222,
+                0.4,
+                0.1
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.0419,
+                0,
+                0.0343
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.4405,
+                0,
+                0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.1222,
+                -0.4,
+                -0.1
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.0419,
+                0,
+                -0.0343
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.4405,
+                0,
+                0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.1222,
+                -0.5,
+                0.1111
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                0.0419,
+                0,
+                0.0381
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.4405,
+                0,
+                0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.1222,
+                0.5,
+                -0.1111
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                0.0419,
+                0,
+                -0.0381
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.4405,
+                0,
+                0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.85,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -4.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.05,
+                0.0,
+                -0.05
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                -0.0
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.25,
+                0,
+                0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.22,
+                0.4,
+                0.18
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                0.0
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.25,
+                0,
+                0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.22,
+                -0.4,
+                -0.18
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.0,
+                0,
+                -0.0
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.25,
+                0,
+                0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.22,
+                -0.5,
+                0.2
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                0.0
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.25,
+                0,
+                0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.22,
+                0.5,
+                -0.2
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                0.0,
+                0,
+                -0.0
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.25,
+                0,
+                0
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "light_recoil": {
+      "loop": false,
+      "keyframes": [
+        {
+          "time_sec": 0.0,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0.0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -4.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.05,
+                0.0,
+                -0.05
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                -0.22,
+                0.4,
+                0.18
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                -0.22,
+                -0.4,
+                -0.18
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.22,
+                -0.5,
+                0.2
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.22,
+                0.5,
+                -0.2
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.0,
+                0.0,
+                0.0
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.0833,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0.0808,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -5.5,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.3333,
+                0.0,
+                -0.185
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.2475,
+                0.0,
+                0.0808
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.18,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                0.0633,
+                0.4,
+                0.315
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.2475,
+                0.0,
+                0.0808
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.18,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                0.0633,
+                -0.4,
+                -0.315
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.2475,
+                0.0,
+                0.0808
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.18,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.5033,
+                -0.5,
+                0.335
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.2475,
+                0.0,
+                0.0808
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.18,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.5033,
+                0.5,
+                -0.335
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.2475,
+                0.0,
+                0.0808
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.18,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.1667,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                -0.1428,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -7.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.3122,
+                0.0,
+                -0.32
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.495,
+                0.0,
+                -0.1428
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.36,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                0.0422,
+                0.4,
+                0.45
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.495,
+                0.0,
+                -0.1428
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.36,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                0.0422,
+                -0.4,
+                -0.45
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.495,
+                0.0,
+                -0.1428
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.36,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.4822,
+                -0.5,
+                0.47
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.495,
+                0.0,
+                -0.1428
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.36,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.4822,
+                0.5,
+                -0.47
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.495,
+                0.0,
+                -0.1428
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.36,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.25,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0.1804,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -8.5,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.8379,
+                0.0,
+                -0.455
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.7425,
+                0.0,
+                0.1804
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.54,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                0.5679,
+                0.4,
+                0.585
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.7425,
+                0.0,
+                0.1804
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.54,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                0.5679,
+                -0.4,
+                -0.585
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.7425,
+                0.0,
+                0.1804
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.54,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                1.0079,
+                -0.5,
+                0.605
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.7425,
+                0.0,
+                0.1804
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.54,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                1.0079,
+                0.5,
+                -0.605
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.7425,
+                0.0,
+                0.1804
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.54,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.3333,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                -0.1915,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -10.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                0.6685,
+                0.0,
+                -0.59
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -0.99,
+                0.0,
+                -0.1915
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.72,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                0.3985,
+                0.4,
+                0.72
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -0.99,
+                0.0,
+                -0.1915
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.72,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                0.3985,
+                -0.4,
+                -0.72
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -0.99,
+                0.0,
+                -0.1915
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.72,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                0.8385,
+                -0.5,
+                0.74
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -0.99,
+                0.0,
+                -0.1915
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.72,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                0.8385,
+                0.5,
+                -0.74
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -0.99,
+                0.0,
+                -0.1915
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.72,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.4167,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0.1778,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -11.5,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                1.2403,
+                0.0,
+                -0.725
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -1.2375,
+                0.0,
+                0.1778
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                0.9,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                0.9703,
+                0.4,
+                0.855
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -1.2375,
+                0.0,
+                0.1778
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                0.9,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                0.9703,
+                -0.4,
+                -0.855
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -1.2375,
+                0.0,
+                0.1778
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                0.9,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                1.4103,
+                -0.5,
+                0.875
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -1.2375,
+                0.0,
+                0.1778
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                0.9,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                1.4103,
+                0.5,
+                -0.875
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -1.2375,
+                0.0,
+                0.1778
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                0.9,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.5,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                -0.1443,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -13.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                1.1207,
+                0.0,
+                -0.86
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -1.485,
+                0.0,
+                -0.1443
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                1.08,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                0.8507,
+                0.4,
+                0.99
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -1.485,
+                0.0,
+                -0.1443
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                1.08,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                0.8507,
+                -0.4,
+                -0.99
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -1.485,
+                0.0,
+                -0.1443
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                1.08,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                1.2907,
+                -0.5,
+                1.01
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -1.485,
+                0.0,
+                -0.1443
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                1.08,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                1.2907,
+                0.5,
+                -1.01
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -1.485,
+                0.0,
+                -0.1443
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                1.08,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.5833,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                0.0982,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -14.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                1.4982,
+                0.0,
+                -0.95
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -1.65,
+                0.0,
+                0.0982
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                1.2,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                1.2282,
+                0.4,
+                1.08
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -1.65,
+                0.0,
+                0.0982
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                1.2,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                1.2282,
+                -0.4,
+                -1.08
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -1.65,
+                0.0,
+                0.0982
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                1.2,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                1.6682,
+                -0.5,
+                1.1
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -1.65,
+                0.0,
+                0.0982
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                1.2,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                1.6682,
+                0.5,
+                -1.1
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -1.65,
+                0.0,
+                0.0982
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                1.2,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.6667,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                -0.0475,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -14.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                1.3525,
+                0.0,
+                -0.95
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -1.65,
+                0.0,
+                -0.0475
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                1.2,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                1.0825,
+                0.4,
+                1.08
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -1.65,
+                0.0,
+                -0.0475
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                1.2,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                1.0825,
+                -0.4,
+                -1.08
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -1.65,
+                0.0,
+                -0.0475
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                1.2,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                1.5225,
+                -0.5,
+                1.1
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -1.65,
+                0.0,
+                -0.0475
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                1.2,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                1.5225,
+                0.5,
+                -1.1
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -1.65,
+                0.0,
+                -0.0475
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                1.2,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        },
+        {
+          "time_sec": 0.75,
+          "joints": {
+            "Rift_Core": {
+              "rot_rad_mc": [
+                0,
+                -0.0,
+                0
+              ],
+              "pos_mc": [
+                0.0,
+                -14.0,
+                0.0
+              ]
+            },
+            "Arm_1": {
+              "rot_rad_mc": [
+                1.4,
+                0.0,
+                -0.95
+              ]
+            },
+            "Fore_1": {
+              "rot_rad_mc": [
+                -1.65,
+                0.0,
+                -0.0
+              ]
+            },
+            "Hand_1": {
+              "rot_rad_mc": [
+                1.2,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_2": {
+              "rot_rad_mc": [
+                1.13,
+                0.4,
+                1.08
+              ]
+            },
+            "Fore_2": {
+              "rot_rad_mc": [
+                -1.65,
+                0.0,
+                -0.0
+              ]
+            },
+            "Hand_2": {
+              "rot_rad_mc": [
+                1.2,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_3": {
+              "rot_rad_mc": [
+                1.13,
+                -0.4,
+                -1.08
+              ]
+            },
+            "Fore_3": {
+              "rot_rad_mc": [
+                -1.65,
+                0.0,
+                -0.0
+              ]
+            },
+            "Hand_3": {
+              "rot_rad_mc": [
+                1.2,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_4": {
+              "rot_rad_mc": [
+                1.57,
+                -0.5,
+                1.1
+              ]
+            },
+            "Fore_4": {
+              "rot_rad_mc": [
+                -1.65,
+                0.0,
+                -0.0
+              ]
+            },
+            "Hand_4": {
+              "rot_rad_mc": [
+                1.2,
+                0.0,
+                0.0
+              ]
+            },
+            "Arm_5": {
+              "rot_rad_mc": [
+                1.57,
+                0.5,
+                -1.1
+              ]
+            },
+            "Fore_5": {
+              "rot_rad_mc": [
+                -1.65,
+                0.0,
+                -0.0
+              ]
+            },
+            "Hand_5": {
+              "rot_rad_mc": [
+                1.2,
+                0.0,
+                0.0
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

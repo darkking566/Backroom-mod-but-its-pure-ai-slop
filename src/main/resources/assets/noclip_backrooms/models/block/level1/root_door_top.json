@@ -1,0 +1,107 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level1/root_door_top",
+    "leaf": "noclip_backrooms:block/level1/root_door_top",
+    "jamb": "noclip_backrooms:block/level1/door_jamb",
+    "knob": "noclip_backrooms:block/level1/door_knob"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        1.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#jamb",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#jamb"
+        },
+        "east": {
+          "texture": "#jamb"
+        },
+        "west": {
+          "texture": "#jamb"
+        },
+        "up": {
+          "texture": "#jamb"
+        },
+        "down": {
+          "texture": "#jamb"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        14.5
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#jamb"
+        },
+        "south": {
+          "texture": "#jamb",
+          "cullface": "south"
+        },
+        "east": {
+          "texture": "#jamb"
+        },
+        "west": {
+          "texture": "#jamb"
+        },
+        "up": {
+          "texture": "#jamb"
+        },
+        "down": {
+          "texture": "#jamb"
+        }
+      }
+    },
+    {
+      "from": [
+        1,
+        0,
+        1.5
+      ],
+      "to": [
+        15,
+        16,
+        14.5
+      ],
+      "faces": {
+        "east": {
+          "texture": "#leaf"
+        },
+        "west": {
+          "texture": "#leaf"
+        },
+        "up": {
+          "texture": "#jamb",
+          "cullface": "up"
+        },
+        "down": {
+          "texture": "#jamb",
+          "cullface": "down"
+        }
+      },
+      "shade": false,
+      "light_emission": 12
+    }
+  ]
+}

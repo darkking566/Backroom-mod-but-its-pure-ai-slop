@@ -1,7 +1,17 @@
 package dev.noclip.backrooms.monsters;
 
 import dev.noclip.backrooms.BackroomsMod;
+import dev.noclip.backrooms.monsters.arms.Arms;
+import dev.noclip.backrooms.monsters.clump.Clump;
+import dev.noclip.backrooms.monsters.crawler.Crawler;
+import dev.noclip.backrooms.monsters.duller.Duller;
 import dev.noclip.backrooms.monsters.hound.Hound;
+import dev.noclip.backrooms.monsters.nguithrxurh.Nguithrxurh;
+import dev.noclip.backrooms.monsters.shepherdsnake.ShepherdSnake;
+import dev.noclip.backrooms.monsters.shriek.Shriek;
+import dev.noclip.backrooms.monsters.skinstealer.SkinStealer;
+import dev.noclip.backrooms.monsters.smiler.Smiler;
+import dev.noclip.backrooms.monsters.wretch.Wretch;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.core.Registry;
@@ -25,6 +35,36 @@ public final class Monsters {
 	public static final EntityType<Hound> HOUND = register("hound",
 			EntityType.Builder.of(Hound::new, MobCategory.MONSTER).sized(0.95F, 1.05F).eyeHeight(0.8F).clientTrackingRange(10));
 	public static final Item HOUND_SPAWN_EGG = registerEgg("hound_spawn_egg", HOUND);
+	public static final EntityType<Smiler> SMILER = register("smiler",
+			EntityType.Builder.of(Smiler::new, MobCategory.MONSTER).sized(0.75F, 2.05F).eyeHeight(1.72F).clientTrackingRange(10));
+	public static final Item SMILER_SPAWN_EGG = registerEgg("smiler_spawn_egg", SMILER);
+	public static final EntityType<SkinStealer> SKIN_STEALER = register("skin_stealer",
+			EntityType.Builder.of(SkinStealer::new, MobCategory.MONSTER).sized(0.68F, 2.75F).eyeHeight(2.5F).clientTrackingRange(10));
+	public static final Item SKIN_STEALER_SPAWN_EGG = registerEgg("skin_stealer_spawn_egg", SKIN_STEALER);
+	public static final EntityType<Clump> CLUMP = register("clump",
+			EntityType.Builder.of(Clump::new, MobCategory.MONSTER).sized(1.05F, 0.95F).eyeHeight(0.55F).clientTrackingRange(10));
+	public static final Item CLUMP_SPAWN_EGG = registerEgg("clump_spawn_egg", CLUMP);
+	public static final EntityType<Duller> DULLER = register("duller",
+			EntityType.Builder.of(Duller::new, MobCategory.MONSTER).sized(0.7F, 3.65F).eyeHeight(3.3F).clientTrackingRange(10));
+	public static final Item DULLER_SPAWN_EGG = registerEgg("duller_spawn_egg", DULLER);
+	public static final EntityType<Arms> ARMS = register("arms",
+			EntityType.Builder.of(Arms::new, MobCategory.MONSTER).sized(1.15F, 1.85F).eyeHeight(1.2F).clientTrackingRange(10));
+	public static final Item ARMS_SPAWN_EGG = registerEgg("arms_spawn_egg", ARMS);
+	public static final EntityType<Wretch> WRETCH = register("wretch",
+			EntityType.Builder.of(Wretch::new, MobCategory.MONSTER).sized(0.65F, 1.95F).eyeHeight(1.68F).clientTrackingRange(10));
+	public static final Item WRETCH_SPAWN_EGG = registerEgg("wretch_spawn_egg", WRETCH);
+	public static final EntityType<Shriek> SHRIEK = register("shriek",
+			EntityType.Builder.of(Shriek::new, MobCategory.MONSTER).sized(1.45F, 1.85F).eyeHeight(1.3F).clientTrackingRange(10));
+	public static final Item SHRIEK_SPAWN_EGG = registerEgg("shriek_spawn_egg", SHRIEK);
+	public static final EntityType<Crawler> CRAWLER = register("crawler",
+			EntityType.Builder.of(Crawler::new, MobCategory.MONSTER).sized(1.25F, 0.9F).eyeHeight(0.55F).clientTrackingRange(10));
+	public static final Item CRAWLER_SPAWN_EGG = registerEgg("crawler_spawn_egg", CRAWLER);
+	public static final EntityType<ShepherdSnake> SHEPHERD_SNAKE = register("shepherd_snake",
+			EntityType.Builder.of(ShepherdSnake::new, MobCategory.MONSTER).sized(2.4F, 3.8F).eyeHeight(3.4F).clientTrackingRange(16));
+	public static final Item SHEPHERD_SNAKE_SPAWN_EGG = registerEgg("shepherd_snake_spawn_egg", SHEPHERD_SNAKE);
+	public static final EntityType<Nguithrxurh> NGUITHRXURH = register("nguithrxurh",
+			EntityType.Builder.of(Nguithrxurh::new, MobCategory.MONSTER).sized(1.65F, 1.05F).eyeHeight(0.62F).clientTrackingRange(12));
+	public static final Item NGUITHRXURH_SPAWN_EGG = registerEgg("nguithrxurh_spawn_egg", NGUITHRXURH);
 
 	public static final SoundEvent HOUND_GROWL = sound("hound.growl");
 	public static final SoundEvent HOUND_ROAR = sound("hound.roar");
@@ -36,7 +76,29 @@ public final class Monsters {
 
 	public static void register() {
 		FabricDefaultAttributeRegistry.register(HOUND, Hound.createAttributes());
-		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.SPAWN_EGGS).register(output -> output.accept(HOUND_SPAWN_EGG));
+		FabricDefaultAttributeRegistry.register(SMILER, Smiler.createAttributes());
+		FabricDefaultAttributeRegistry.register(SKIN_STEALER, SkinStealer.createAttributes());
+		FabricDefaultAttributeRegistry.register(CLUMP, Clump.createAttributes());
+		FabricDefaultAttributeRegistry.register(DULLER, Duller.createAttributes());
+		FabricDefaultAttributeRegistry.register(ARMS, Arms.createAttributes());
+		FabricDefaultAttributeRegistry.register(WRETCH, Wretch.createAttributes());
+		FabricDefaultAttributeRegistry.register(SHRIEK, Shriek.createAttributes());
+		FabricDefaultAttributeRegistry.register(CRAWLER, Crawler.createAttributes());
+		FabricDefaultAttributeRegistry.register(SHEPHERD_SNAKE, ShepherdSnake.createAttributes());
+		FabricDefaultAttributeRegistry.register(NGUITHRXURH, Nguithrxurh.createAttributes());
+		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.SPAWN_EGGS).register(output -> {
+			output.accept(HOUND_SPAWN_EGG);
+			output.accept(SMILER_SPAWN_EGG);
+			output.accept(SKIN_STEALER_SPAWN_EGG);
+			output.accept(CLUMP_SPAWN_EGG);
+			output.accept(DULLER_SPAWN_EGG);
+			output.accept(ARMS_SPAWN_EGG);
+			output.accept(WRETCH_SPAWN_EGG);
+			output.accept(SHRIEK_SPAWN_EGG);
+			output.accept(CRAWLER_SPAWN_EGG);
+			output.accept(SHEPHERD_SNAKE_SPAWN_EGG);
+			output.accept(NGUITHRXURH_SPAWN_EGG);
+		});
 	}
 
 	private static <T extends net.minecraft.world.entity.Entity> EntityType<T> register(String name, EntityType.Builder<T> builder) {

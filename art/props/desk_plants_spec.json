@@ -1,0 +1,72 @@
+{
+  "pot": [
+    {
+      "name": "pot_base",
+      "from": [
+        5,
+        0,
+        5
+      ],
+      "to": [
+        11,
+        1.5,
+        11
+      ],
+      "texture": "desk_pot"
+    },
+    {
+      "name": "pot_body",
+      "from": [
+        4.5,
+        1.5,
+        4.5
+      ],
+      "to": [
+        11.5,
+        5,
+        11.5
+      ],
+      "texture": "desk_pot"
+    },
+    {
+      "name": "pot_rim",
+      "from": [
+        4,
+        5,
+        4
+      ],
+      "to": [
+        12,
+        6,
+        12
+      ],
+      "texture": "desk_pot"
+    },
+    {
+      "name": "soil",
+      "from": [
+        4.6,
+        5.9,
+        4.6
+      ],
+      "to": [
+        11.4,
+        6,
+        11.4
+      ],
+      "texture": "desk_soil"
+    }
+  ],
+  "plants": {
+    "desk_plant_dead": {
+      "texture": "dead_twigs",
+      "y0": 6.0,
+      "y1": 15.0
+    },
+    "desk_plant_leafy": {
+      "texture": "leafy_plant",
+      "y0": 6.0,
+      "y1": 16.0
+    }
+  }
+}

@@ -136,7 +136,7 @@ class Level1LayoutTest {
 	void lowerLevelsAreHarderToFind() {
 		Level1Exit[] exits = Level1Exit.values();
 		for (int i = 1; i < exits.length; i++) {
-			assertTrue(Double.parseDouble(exits[i].level) > Double.parseDouble(exits[i - 1].level), "exits must be listed by level");
+			assertTrue(Level1Exit.number(exits[i].level) > Level1Exit.number(exits[i - 1].level), "exits must be listed by level");
 			assertTrue(exits[i].chance > exits[i - 1].chance, exits[i] + " should be easier to find than " + exits[i - 1]);
 		}
 
@@ -146,6 +146,8 @@ class Level1LayoutTest {
 		for (long seed = 0; seed < 6; seed++) {
 			for (int dx = -20; dx < 20; dx++) {
 				for (int dz = -20; dz < 20; dz++) {
+					// Settlements take most of a district's bays, so they are left out of the count.
+					if (Level1Layout.base(seed, dx, dz) != Level1Layout.Base.NONE) continue;
 					Kind kind = Level1Layout.kind(seed, dx, dz);
 					if (kind == Kind.PARKING) parking++;
 					if (kind == Kind.WAREHOUSE) warehouse++;
@@ -252,7 +254,8 @@ class Level1LayoutTest {
 					Level1Layout.Base base = Level1Layout.base(seed, dx, dz);
 					if (base == Level1Layout.Base.NONE) continue;
 					Kind kind = Level1Layout.kind(seed, dx, dz);
-					assertEquals(base == Level1Layout.Base.FIRST_LIGHT ? Kind.PARKING : Kind.WAREHOUSE, kind);
+					if (base == Level1Layout.Base.FIRST_LIGHT) assertEquals(Kind.PARKING, kind);
+					if (base == Level1Layout.Base.BLINK) assertEquals(Kind.WAREHOUSE, kind);
 					if (base == Level1Layout.Base.FIRST_LIGHT) outposts++;
 					else camps++;
 					// No exit or prop inside or right around the ring.
