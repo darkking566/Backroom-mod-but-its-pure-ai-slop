@@ -148,6 +148,7 @@ final class CorridorPlan {
 		if (item == 7) return Tile.BOOKSHELF;
 		if (item == 8) return Tile.PARTITION;
 		if (item == 9) return Tile.WALL;
+		if (item == 10) return Tile.BIN;
 
 		int ci = lx / CELL, cj = lz / CELL, px = lx % CELL, pz = lz % CELL;
 		if (px != 0 && pz != 0) return Tile.CORRIDOR;
@@ -342,6 +343,7 @@ final class CorridorPlan {
 						}
 						furniture[x + 1 + (z + 1) * SIZE] = 1;
 						furniture[x + 2 + (z + 2) * SIZE] = 5;
+						if (variety.nextInt(100) < 40) furniture[x + 1 + (z + 2) * SIZE] = 10;
 					}
 				}
 			}

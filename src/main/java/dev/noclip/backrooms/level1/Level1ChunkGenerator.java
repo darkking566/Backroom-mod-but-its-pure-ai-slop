@@ -101,7 +101,8 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 			case OPENING -> y <= LOW_TOP ? air() : state(Level1Blocks.PAINTED_CONCRETE_WALL);
 			case OPENING_SIGN -> y <= LOW_TOP ? air() : y == LOW_CEILING_Y ? sign(x) : state(Level1Blocks.PAINTED_CONCRETE_WALL);
 			case CORRIDOR -> corridor(ceiling, y);
-			case DESK -> y == FLOOR_Y + 1 ? state(Level1Blocks.OFFICE_DESK) : y == FLOOR_Y + 2 ? computer(seed, x, z) : corridor(ceiling, y);
+			case DESK -> y == FLOOR_Y + 1 ? state(Level1Blocks.OFFICE_DESK) : y == FLOOR_Y + 2 ? deskTop(seed, x, z) : corridor(ceiling, y);
+			case BIN -> y == FLOOR_Y + 1 ? Blocks.CAULDRON.defaultBlockState() : corridor(ceiling, y);
 			case CHAIR -> y == FLOOR_Y + 1 ? state(Level1Blocks.SUNKEN_CHAIR) : corridor(ceiling, y);
 			case FLOOR_PAINTING -> y == FLOOR_Y + 1 ? state(Level1Blocks.FLOOR_PAINTING) : corridor(ceiling, y);
 			case BED -> y == FLOOR_Y + 1 ? state(Level1Blocks.HOSPITAL_BED) : corridor(ceiling, y);
@@ -166,6 +167,15 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 	private static BlockState sign(int x) {
 		boolean alongZ = Math.floorMod(x, Level1Layout.DISTRICT) == 0;
 		return state(Level1Blocks.EMERGENCY_SIGN).setValue(AxisSignBlock.AXIS, alongZ ? Direction.Axis.Z : Direction.Axis.X);
+	}
+
+	/** What sits on an office desk: mostly a computer, otherwise a dead plant, a fern in a pot, or nothing. */
+	private static BlockState deskTop(long seed, int x, int z) {
+		int roll = Math.floorMod(Level1Layout.hash(seed, x, z, 13), 100);
+		if (roll < 62) return computer(seed, x, z);
+		if (roll < 76) return Blocks.POTTED_DEAD_BUSH.defaultBlockState();
+		if (roll < 86) return Blocks.POTTED_FERN.defaultBlockState();
+		return Blocks.AIR.defaultBlockState();
 	}
 
 	private static BlockState computer(long seed, int x, int z) {
