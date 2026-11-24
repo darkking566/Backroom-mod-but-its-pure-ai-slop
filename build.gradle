@@ -43,6 +43,31 @@ test {
 	useJUnitPlatform()
 }
 
+// Run only some of the real-client tests: gradlew runClientGameTest -Plevels=1,3 picks test classes by their package
+// (a number n means level<n>, with "." written as "p": 0.1 -> level0p1; other names as they are, e.g. look).
+// -Psections=people,secrets runs only those sections of the Level 1 test. Leaving them out runs everything.
+def testLevels = providers.gradleProperty("levels").getOrElse("")
+def testSections = providers.gradleProperty("sections").getOrElse("")
+
+tasks.named("processGametestResources") {
+	inputs.property "levels", testLevels
+	def metadata = new File(destinationDir, "fabric.mod.json")
+	doLast {
+		if (testLevels.isBlank()) return
+		def wanted = testLevels.split(",").collect { it.trim() }.collect { it ==~ /[0-9].*/ ? "level" + it.replace(".", "p") : it } as Set
+		def json = new groovy.json.JsonSlurper().parse(metadata)
+		def all = json.entrypoints["fabric-client-gametest"]
+		def kept = all.findAll { wanted.contains(it.tokenize(".")[-2]) }
+		if (kept.isEmpty()) throw new GradleException("no client tests for -Plevels=" + testLevels + "; there are " + all.collect { it.tokenize(".")[-2] })
+		json.entrypoints["fabric-client-gametest"] = kept
+		metadata.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(json))
+	}
+}
+
+tasks.named("runClientGameTest") {
+	if (!testSections.isBlank()) environment "NOCLIP_ONLY", testSections
+}
+
 processResources {
 	def version = project.version
 	inputs.property "version", version

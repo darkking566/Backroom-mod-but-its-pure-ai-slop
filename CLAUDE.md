@@ -143,6 +143,14 @@
   - 還沒做：站內材料的合成（Antigravity）、視聽幻覺與導航失效、機器人生怪蛋、站內更多事件
 - 使用者同意後，把 `main` 推送到 GitHub（Level 3、路標與 Level 0 等待縮短、合併朋友的停車場大改版與 Level 0.1、停車場測試與微笑者等修正、Gemini 的 7 隻新怪物）；推送前 `gradlew build`（57 個單元測試）通過；GitHub 上的 `claude` 分支已被刪除，本地的 `claude` 內容確認全部已在 `main` 裡，所以也刪掉本地這個分支（GitHub 上另外兩個分支 `claude-level0p1`、`level1-depth-polish` 也都已在 `main` 裡）；沒有強制推送、沒有改寫歷史
   - 還沒跑實機測試的部分：Level 0.1、Gemini 的 7 隻新怪物、牧羊蛇低頭、停車場微笑者「黑暗中繞圈」的測試改動
+- 使用者要求先不做新樓層、改做材質建模，參考 CurseForge 模組包「Into The Backrooms - Found Footage」：
+  - 查了使用者本機的模組包：畫面主要來自 SP-Backrooms Revamped（GPL-3.0，靠 Veil 自製渲染，只有 1.20.1），不能直接搬，改成自己做同類風格；使用者選先試做 Level 0（Level 0 是朋友負責的，只用資源包同名覆蓋，沒動朋友的貼圖與工具）
+  - 新增內建資源包「後室：寫實材質」（`src/main/resources/resourcepacks/realistic/`，預設開啟，可在資源包畫面關掉）：Level 0 的 31 張 512 像素貼圖與 labPBR `_n`、`_s`（壁紙與 9 種變體、踢腳板、地毯與 9 種變體、地毯側面、天花板與 2 種水漬、格柵、燈座、燈板、壞燈板），由新工具 `tools/make_level0_realistic.py` 產生；照片材質來自 ambientCG（CC0：Carpet016、Fabric028、Wallpaper001A、Wallpaper002A/B/C），自動下載到 `tools/.cache/`（加進 `.gitignore`）；壁紙印花照 Wikidot Level 0 原始照片畫；資源包約 20 MB
+  - 新增攝影機濾鏡（`core/look/Look`、`CamcorderOverlay`、`post_effect/camcorder.json`、`shaders/post/camcorder.fsh`）：鏡頭變形、色差、柔焦、泛光、暖色調、暗角、雜訊、掃描線、訊號線，加 REC、電池、計時、日期時間；只在後室各層開，F7 切換；用 1×1 動態貼圖把時間傳給濾鏡；新增 client mixin `GameRendererAccess` 與 `noclip_backrooms.client.mixins.json`（`fabric.mod.json` 加 mixins），`BackroomsClient` 加一行 `Look.register()`；語言檔加資源包、按鍵、訊息條目
+  - 新增實機測試 `look/LookClientTest`（同角度拍原本／寫實／寫實＋濾鏡三組，檢查資源包預設開啟、濾鏡在 Level 0 開、回主世界關）；新增 `docs/look/README.md`、`docs/look/level0_realistic.png`（貼圖新舊對照）、`docs/look/level0_ingame.jpg`（遊戲畫面三欄對照）；`CREDITS.md`、`README.md` 更新
+  - 依使用者要求做「測試只跑更新的部分」：`build.gradle` 加 `-Plevels=1,3`（依套件名挑測試類別，0.1 寫 `0.1`，風格測試寫 `look`）與 `-Psections=`（Level 1 分段），不用再手改測試清單
+  - 驗證：`gradlew build`（57 個單元測試）通過；`runClientGameTest -Plevels=look` 通過；其他層的測試沒有讀畫面像素，濾鏡不影響它們的判斷（這次沒重跑其他層）
+  - 寫這筆紀錄時一個 shell 指令的反引號被當成指令執行（把幾個檔名當腳本跑了一下），檢查過沒有新增或改到任何檔案，只把這段紀錄重寫
 
 ## 動作記錄（Antigravity）
 

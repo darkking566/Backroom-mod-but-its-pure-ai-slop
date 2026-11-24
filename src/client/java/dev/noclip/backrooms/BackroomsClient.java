@@ -1,5 +1,6 @@
 package dev.noclip.backrooms;
 
+import dev.noclip.backrooms.core.look.Look;
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.people.PersonModel;
 import dev.noclip.backrooms.core.people.PersonRenderer;
@@ -55,6 +56,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
 public final class BackroomsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
+		Look.register();
 		ModelLayerRegistry.registerModelLayer(HoundModel.LAYER, HoundModel.RIG::layer);
 		EntityRendererRegistry.register(Monsters.HOUND, HoundRenderer::new);
 		ModelLayerRegistry.registerModelLayer(SmilerModel.LAYER, SmilerModel.RIG::layer);

@@ -531,5 +531,11 @@
   "entity.noclip_backrooms.partypooper": "派對掃興客",
   "item.noclip_backrooms.partypooper_spawn_egg": "派對掃興客生怪蛋",
   "entity.noclip_backrooms.beast_level5": "第五層野獸紳士",
-  "item.noclip_backrooms.beast_level5_spawn_egg": "第五層野獸紳士生怪蛋"
+  "item.noclip_backrooms.beast_level5_spawn_egg": "第五層野獸紳士生怪蛋",
+  "pack.noclip_backrooms.realistic": "後室：寫實材質",
+  "pack.noclip_backrooms.realistic.description": "照片材質（試做：Level 0）",
+  "key.category.noclip_backrooms.backrooms": "後室",
+  "key.noclip_backrooms.camcorder": "攝影機濾鏡",
+  "message.noclip_backrooms.camcorder_on": "攝影機濾鏡：開",
+  "message.noclip_backrooms.camcorder_off": "攝影機濾鏡：關"
 }
