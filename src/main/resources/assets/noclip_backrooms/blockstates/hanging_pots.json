@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "noclip_backrooms:block/level0p1/hanging_pots"
+    },
+    "facing=east": {
+      "model": "noclip_backrooms:block/level0p1/hanging_pots",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "noclip_backrooms:block/level0p1/hanging_pots",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "noclip_backrooms:block/level0p1/hanging_pots",
+      "y": 270
+    }
+  }
+}

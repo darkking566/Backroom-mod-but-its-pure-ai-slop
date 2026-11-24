@@ -137,6 +137,24 @@
     "noclip_backrooms:frost_floor",
     "noclip_backrooms:scorched_floor",
     "noclip_backrooms:frost_ceiling",
-    "noclip_backrooms:scorched_ceiling"
+    "noclip_backrooms:scorched_ceiling",
+    "noclip_backrooms:crew_desk",
+    "noclip_backrooms:open_wardrobe",
+    "noclip_backrooms:bunk_bed",
+    "noclip_backrooms:wall_frame",
+    "noclip_backrooms:personal_items",
+    "noclip_backrooms:kitchen_sink",
+    "noclip_backrooms:fridge",
+    "noclip_backrooms:hanging_pots",
+    "noclip_backrooms:dish_stack",
+    "noclip_backrooms:bench_press",
+    "noclip_backrooms:punching_bag",
+    "noclip_backrooms:wall_mirror",
+    "noclip_backrooms:water_dispenser",
+    "noclip_backrooms:mat_stack",
+    "noclip_backrooms:hydroponic_rack",
+    "noclip_backrooms:grow_light",
+    "noclip_backrooms:water_tank",
+    "noclip_backrooms:hanging_vines"
   ]
 }

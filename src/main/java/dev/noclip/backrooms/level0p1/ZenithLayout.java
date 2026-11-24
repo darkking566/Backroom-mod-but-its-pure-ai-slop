@@ -46,7 +46,8 @@ final class ZenithLayout {
 		BED, LOCKER, COUNTER, STOVE, TREADMILL, WEIGHTS, PLANTER, CONSOLE, BROKEN_CONSOLE, SERVER, CRATE, CABLES(true), TABLE, BENCH,
 		PORTAL, PORTAL_FRAME, STATIC_TEAR,
 		LEAVES, LOG, WATER(true), ORB,
-		CATWALK, TRUSS, TETHER, GIRDER, GIRDER_LIGHT, SINGULARITY_CORE, SINGULARITY_SHELL, PLASMA, RAIL_LAMP;
+		CATWALK, TRUSS, TETHER, GIRDER, GIRDER_LIGHT, SINGULARITY_CORE, SINGULARITY_SHELL, PLASMA, RAIL_LAMP,
+		DESK, WARDROBE, BUNK_BED, FRAME, ITEMS, SINK, FRIDGE, POTS, DISHES, BENCH_PRESS, BAG, MIRROR, DISPENSER, MATS, RACK, GROW_LIGHT, TANK, VINES;
 
 		/** Whether a player can walk through it (a closed door counts: it opens). */
 		final boolean passable;
@@ -410,10 +411,10 @@ final class ZenithLayout {
 		int faceV = north ? 2 : 0, faceU = west ? 1 : 3;
 		int roll = hash(seed, u + mx * 16, v + mz * 16, k);
 		return switch (room) {
-			case BEDROOM -> bedroom(a, b, t, faceV, roll);
-			case KITCHEN -> kitchen(a, b, t, faceV);
+			case BEDROOM -> bedroom(a, b, t, faceV, roll, hash(seed, mx, mz, k + 31));
+			case KITCHEN -> kitchen(a, b, t, faceV, roll);
 			case GYM -> gym(a, b, t, faceV, roll);
-			case GREENHOUSE -> greenhouse(a, b, t, roll);
+			case GREENHOUSE -> greenhouse(a, b, t, faceV, roll);
 			case CONSOLES -> consoles(a, b, t, faceV);
 			case MACHINES -> machines(a, b, t, faceU);
 			case STORAGE -> storage(a, b, t, faceV, roll);
@@ -423,36 +424,56 @@ final class ZenithLayout {
 		};
 	}
 
-	private static int bedroom(int a, int b, int t, int face, int roll) {
-		if (t == 1 && b == 0 && a <= 2) return of(Kind.BED, face);
-		if (t == 1 && b == 0 && a == 3) return of(Kind.LOCKER, face);
-		if (t == 2 && b == 0 && a == 3) return of(Kind.LOCKER, face, 1);
-		if (t == 1 && a == 2 && b == 3 && roll % 2 == 0) return of(Kind.TABLE);
+	private static int bedroom(int a, int b, int t, int face, int roll, int room) {
+		// The beds: plain ones, or bunks in a third of the rooms.
+		if (t == 1 && b == 0 && a <= 2) return of(room % 3 == 0 ? Kind.BUNK_BED : Kind.BED, face);
+		// A picture over the middle bed.
+		if (t == 2 && b == 0 && a == 1 && room % 4 != 3) return of(Kind.FRAME, face);
+		// A wardrobe standing open, or the plain locker.
+		if (b == 0 && a == 3 && t <= 2) return room % 2 == 0 ? of(Kind.WARDROBE, face) : of(Kind.LOCKER, face, t - 1);
+		// A desk with a lamp, or the plain table with someone's things on it.
+		if (a == 2 && b == 3 && roll % 2 == 0) {
+			if (t == 1) return of(room % 2 == 0 ? Kind.DESK : Kind.TABLE);
+			if (t == 2 && room % 2 != 0) return of(Kind.ITEMS);
+		}
 		return of(Kind.AIR);
 	}
 
-	private static int kitchen(int a, int b, int t, int face) {
-		if (t == 1 && b == 0 && a <= 2) return of(Kind.COUNTER, face);
+	private static int kitchen(int a, int b, int t, int face, int roll) {
+		if (t == 1 && b == 0 && a <= 2) return a == 1 ? of(Kind.SINK, face) : of(Kind.COUNTER, face);
 		if (t == 1 && b == 0 && a == 3) return of(Kind.STOVE, face);
-		if (t == 1 && a == 1 && b == 2) return of(Kind.TABLE);
-		if (t == 1 && a == 3 && b == 3) return of(Kind.LOCKER, face);
-		if (t == 2 && a == 3 && b == 3) return of(Kind.LOCKER, face, 1);
+		if (t == 2 && b == 0 && (a == 0 || a == 2)) return of(Kind.POTS, face);
+		if (a == 1 && b == 2) {
+			if (t == 1) return of(Kind.TABLE);
+			if (t == 2) return of(Kind.DISHES);
+		}
+		if (a == 3 && b == 3 && t <= 2) return roll % 2 == 0 ? of(Kind.FRIDGE, face) : of(Kind.LOCKER, face, t - 1);
 		return of(Kind.AIR);
 	}
 
 	private static int gym(int a, int b, int t, int face, int roll) {
 		if (t == 1 && b == 0 && a <= 2) return of(Kind.TREADMILL, face);
-		if (t == 1 && b == 3 && a <= 1) return of(Kind.WEIGHTS, face);
+		if (t == 2 && b == 0 && a == 1) return of(Kind.MIRROR, face);
+		if (t == 1 && b == 3 && a == 0) return of(Kind.WEIGHTS, face);
+		if (t == 1 && b == 3 && a == 1) return of(Kind.BENCH_PRESS, face);
+		if (t == 1 && a == 3 && b == 0) return of(Kind.BAG);
+		if (t == 1 && a == 3 && b == 1) return of(Kind.DISPENSER, face);
+		if (t == 1 && a == 2 && b == 3 && roll % 2 == 0) return of(Kind.MATS);
 		if (t == 1 && a == 3 && b == 3 && roll % 2 == 0) return of(Kind.BENCH);
 		return of(Kind.AIR);
 	}
 
-	private static int greenhouse(int a, int b, int t, int roll) {
+	private static int greenhouse(int a, int b, int t, int face, int roll) {
+		// Tiered racks along the wall in every other row, the single planters and bushes in the rest.
+		if (a == 0 && b % 2 == 0 && t <= 2) return of(Kind.RACK);
 		if (a <= 1) {
 			if (t == 1) return of(Kind.PLANTER);
 			if (t == 2 && roll % 3 != 0) return of(Kind.LEAVES);
 		}
+		if (a == 3 && b == 0 && t <= 2) return of(Kind.TANK, face);
 		if (t == 6 && a == 3 && b == 3) return of(Kind.ORB);
+		if (t == 6 && a == 1 && (b == 1 || b == 3)) return of(Kind.GROW_LIGHT);
+		if (t == 5 && a == 1 && (b == 1 || b == 3) && roll % 2 == 0) return of(Kind.VINES);
 		return of(Kind.AIR);
 	}
 
