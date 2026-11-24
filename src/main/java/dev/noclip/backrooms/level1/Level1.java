@@ -55,6 +55,7 @@ public final class Level1 {
 		Wretches.register();
 		Shrieks.register();
 		Crawlers.register();
+		ShepherdSnakes.register();
 		Hounds.register();
 		Level1Ambience.register();
 	}
