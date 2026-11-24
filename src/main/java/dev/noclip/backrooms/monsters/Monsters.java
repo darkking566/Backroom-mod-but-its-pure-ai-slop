@@ -7,6 +7,7 @@ import dev.noclip.backrooms.monsters.duller.Duller;
 import dev.noclip.backrooms.monsters.hound.Hound;
 import dev.noclip.backrooms.monsters.skinstealer.SkinStealer;
 import dev.noclip.backrooms.monsters.smiler.Smiler;
+import dev.noclip.backrooms.monsters.wretch.Wretch;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.core.Registry;
@@ -45,6 +46,9 @@ public final class Monsters {
 	public static final EntityType<Arms> ARMS = register("arms",
 			EntityType.Builder.of(Arms::new, MobCategory.MONSTER).sized(1.15F, 1.85F).eyeHeight(1.2F).clientTrackingRange(10));
 	public static final Item ARMS_SPAWN_EGG = registerEgg("arms_spawn_egg", ARMS);
+	public static final EntityType<Wretch> WRETCH = register("wretch",
+			EntityType.Builder.of(Wretch::new, MobCategory.MONSTER).sized(0.65F, 1.95F).eyeHeight(1.68F).clientTrackingRange(10));
+	public static final Item WRETCH_SPAWN_EGG = registerEgg("wretch_spawn_egg", WRETCH);
 
 	public static final SoundEvent HOUND_GROWL = sound("hound.growl");
 	public static final SoundEvent HOUND_ROAR = sound("hound.roar");
@@ -61,6 +65,7 @@ public final class Monsters {
 		FabricDefaultAttributeRegistry.register(CLUMP, Clump.createAttributes());
 		FabricDefaultAttributeRegistry.register(DULLER, Duller.createAttributes());
 		FabricDefaultAttributeRegistry.register(ARMS, Arms.createAttributes());
+		FabricDefaultAttributeRegistry.register(WRETCH, Wretch.createAttributes());
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.SPAWN_EGGS).register(output -> {
 			output.accept(HOUND_SPAWN_EGG);
 			output.accept(SMILER_SPAWN_EGG);
@@ -68,6 +73,7 @@ public final class Monsters {
 			output.accept(CLUMP_SPAWN_EGG);
 			output.accept(DULLER_SPAWN_EGG);
 			output.accept(ARMS_SPAWN_EGG);
+			output.accept(WRETCH_SPAWN_EGG);
 		});
 	}
 

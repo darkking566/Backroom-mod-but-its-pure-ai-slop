@@ -52,6 +52,7 @@ public final class Level1 {
 		Clumps.register();
 		Dullers.register();
 		Level1Arms.register();
+		Wretches.register();
 		Hounds.register();
 		Level1Ambience.register();
 	}

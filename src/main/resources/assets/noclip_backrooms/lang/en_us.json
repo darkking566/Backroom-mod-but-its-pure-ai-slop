@@ -289,5 +289,7 @@
   "block.noclip_backrooms.glitch_magenta": "Glitch Magenta",
   "block.noclip_backrooms.glitch_cyan": "Glitch Cyan",
   "block.noclip_backrooms.book_shelf": "Bookcase",
-  "block.noclip_backrooms.cubicle_panel": "Cubicle Panel"
+  "block.noclip_backrooms.cubicle_panel": "Cubicle Panel",
+  "entity.noclip_backrooms.wretch": "Wretch",
+  "item.noclip_backrooms.wretch_spawn_egg": "Wretch Spawn Egg"
 }

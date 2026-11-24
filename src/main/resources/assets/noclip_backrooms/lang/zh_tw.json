@@ -289,5 +289,7 @@
   "block.noclip_backrooms.glitch_magenta": "故障的洋紅",
   "block.noclip_backrooms.glitch_cyan": "故障的青",
   "block.noclip_backrooms.book_shelf": "書架",
-  "block.noclip_backrooms.cubicle_panel": "隔間板"
+  "block.noclip_backrooms.cubicle_panel": "隔間板",
+  "entity.noclip_backrooms.wretch": "悲屍",
+  "item.noclip_backrooms.wretch_spawn_egg": "悲屍生怪蛋"
 }
