@@ -97,7 +97,7 @@ public final class PlayerRpg {
 			grantXp(killer, reward);
 		});
 
-		ServerTickEvents.END_SERVER_TICK.register(PlayerRpg::tickSanity);
+		ServerTickEvents.END_SERVER_TICK.register(PlayerRpg::tickVitalityAndSanity);
 		registerCommands();
 	}
 
@@ -162,17 +162,24 @@ public final class PlayerRpg {
 		}
 	}
 
-	private static void tickSanity(MinecraftServer server) {
+	private static void tickVitalityAndSanity(MinecraftServer server) {
 		if (server.getTickCount() % SANITY_TICK_INTERVAL != 0) return;
 		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 			if (!player.isAlive() || player.isCreative() || player.isSpectator()) continue;
 			ServerLevel level = player.level();
 			PlayerStats stats = get(player);
+
+			// Vitality passive health regeneration (0.5s tick step; requires non-starving food >= 6).
+			if (stats.vitality() > 0 && player.getHealth() < player.getMaxHealth() && player.getFoodData().getFoodLevel() >= 6) {
+				player.heal(stats.healthRegenPerSec() * 0.5F);
+			}
+
 			boolean inBackrooms = level.dimension().identifier().getNamespace().equals(BackroomsMod.MOD_ID);
 			float delta;
 			if (!inBackrooms) {
-				// Overworld safe base steadily restores sanity.
-				delta = level.dimension() == Level.OVERWORLD ? 0.85F * stats.sanityRegenMultiplier() : 0.2F;
+				// Overworld safe base steadily restores sanity, accelerated by SAN stat.
+				float baseRec = level.dimension() == Level.OVERWORLD ? 0.85F : 0.25F;
+				delta = (baseRec + stats.passiveSanityRegenPerSec() * 0.5F) * stats.sanityRegenMultiplier();
 			} else {
 				BlockPos eyePos = BlockPos.containing(player.getX(), player.getEyeY(), player.getZ());
 				int blockLight = level.getBrightness(LightLayer.BLOCK, eyePos);
@@ -182,14 +189,16 @@ public final class PlayerRpg {
 				} else if (blockLight <= 8) {
 					envDelta = -0.14F;
 				} else if (blockLight >= 11) {
-					envDelta = 0.22F;
+					envDelta = 0.24F;
 				} else {
 					envDelta = 0.0F;
 				}
 
 				List<Monster> nearby = level.getEntitiesOfClass(Monster.class, new AABB(eyePos).inflate(12.0));
 				float monsterDrain = Math.min(1.05F, nearby.size() * 0.30F);
-				float raw = envDelta - monsterDrain;
+				// SAN passive composure helps stabilize sanity whenever not in pitch darkness next to monsters.
+				float passiveCalm = (blockLight > 4 && nearby.isEmpty()) ? stats.passiveSanityRegenPerSec() * 0.5F : 0.0F;
+				float raw = envDelta - monsterDrain + passiveCalm;
 				delta = raw < 0.0F
 						? raw * (1.0F - stats.sanityDrainResistance())
 						: raw * stats.sanityRegenMultiplier();

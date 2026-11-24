@@ -45,6 +45,9 @@ final class PlayerStatsTest {
 		assertEquals(110.0F, stats.maxSanity(), 1.0E-4F);
 		assertEquals(110.0F, stats.sanity(), 1.0E-4F);
 		assertEquals(2.0, stats.maxHealthBonus(), 1.0E-4);
+		assertEquals(0.12F, stats.healthRegenPerSec(), 1.0E-4F);
+		assertEquals(1.10F, stats.sanityRegenMultiplier(), 1.0E-4F);
+		assertEquals(0.05F, stats.passiveSanityRegenPerSec(), 1.0E-4F);
 
 		// Spending with 0 points left is a safe no-op.
 		assertEquals(stats, stats.allocate(PlayerStats.StatKind.AGILITY));

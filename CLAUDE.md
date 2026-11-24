@@ -246,3 +246,7 @@
     - 打開原版背包（`InventoryScreen`）時於側邊展開角色狀態與升級加點面板（開合成書時自動移至右側避免重疊），顯示等級、經驗條、理智、四項屬性與 `+` 即時加點按鈕及懸停說明
     - 理智低於 30% 之幻覺 100% 於該玩家客戶端執行與渲染（伺服器零實體同步）：本機 `ClientLevel` 生成負 ID 幻覺後室怪物追殺玩家，玩家揮刀砍向幻影時本地尖嘯煙散（隊友只見其對空氣瘋狂揮刀）；同時透過 `EntityRenderDispatcherHallucination` 在低理智玩家畫面將視野內隊友（`RemotePlayer`）即時替換渲染為後室 3D 怪物模型並隱藏名牌
   - 新增單元測試 `src/test/java/dev/noclip/backrooms/core/rpg/PlayerStatsTest.java`，於 `BackroomsMod`、`BackroomsClient`、`noclip_backrooms.client.mixins.json`、`en_us.json`、`zh_tw.json` 完成註冊與雙語翻譯；`gradlew build`（含全部單元測試）與 `runClientGameTest -Plevels=look`（實機驗證 Mixin、HUD 與客戶端系統）皆通過
+- 依使用者檢視實機截圖後的回饋調整個人介面 UI 與體質／理智加點效果：
+  - 背包角色狀態面板（`InventoryStatsPanel.java`）改為原版 Minecraft 容器材質風格（`#C6C6C6` 灰石斜面視窗、圓角黑邊、白／深灰立體倒角、`#8B8B8B` 凹槽欄位、`#404040` 字色與自製原版斜面 `+` 按鈕，移除不搭的紫框）
+  - 體質（`VIT`）新增自然回生命速度（每點 `+0.12 HP/秒`，飽食度 `>= 6` 時於伺服器端持續生效）；理智（`SAN`）強化回理智速度（每點回復倍率 `+10%` 並附 `+0.05/秒` 被動回穩），兩者皆即時顯示於面板與懸停說明
+  - 下方 HUD 理智條（`SanityBarHud.java`）改為 Minecraft 風格 9×9 像素小圖示（新增 `assets/noclip_backrooms/textures/gui/sanity_icons.png`：空框／滿／半格 × 冷靜青／不安紫／低於 30% 紅眼抖動），每 100 理智為一排（10 顆圖示），自飽食度上方（`sh - 49`，並自動避讓水下氣泡與坐騎多排血條）**嚴格向上疊排**並採原版多排血量壓縮間距公式，確保無論理智加點擴充幾排都不會與飽食度重疊

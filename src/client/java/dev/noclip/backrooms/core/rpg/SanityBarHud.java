@@ -1,20 +1,34 @@
 package dev.noclip.backrooms.core.rpg;
 
+import dev.noclip.backrooms.BackroomsMod;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.chat.Component;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 
 /**
- * Renders the player's Sanity bar directly in the bottom survival HUD (paired with health and hunger),
- * plus a pulsing crimson-violet edge vignette whenever sanity drops below 30% (hallucination threshold).
+ * Renders the player's Sanity as Minecraft-style 9x9 pixel-art Mind-Eye icons directly above the hunger bar.
+ * <p>
+ * Multi-row safety:
+ * <ul>
+ *   <li>1 icon = 10 Sanity (half icon = 5 Sanity), 10 icons per row = 100 Sanity per row.</li>
+ *   <li>Row 0 anchors cleanly above the Food bar ({@code sh - 49}), shifting further upward whenever underwater
+ *       Air bubbles or Mount Health rows are visible.</li>
+ *   <li>Additional rows from higher SAN stats strictly stack <b>UPWARD</b> ({@code baseY - row * rowStep}),
+ *       matching vanilla Minecraft's multi-row Health compression so Sanity NEVER overlaps Food, Air, or Mount bars.</li>
+ * </ul>
  */
 public final class SanityBarHud {
-	private static final int BAR_WIDTH = 81;
-	private static final int BAR_HEIGHT = 9;
+	static final Identifier ICONS_TEXTURE = BackroomsMod.id("textures/gui/sanity_icons.png");
+	static final int TEX_W = 64;
+	static final int TEX_H = 16;
+	private static final int ICON_SIZE = 9;
+	private static final int ICON_STEP = 8;
+	private static final int ICONS_PER_ROW = 10;
 
 	private SanityBarHud() {
 	}
@@ -34,66 +48,68 @@ public final class SanityBarHud {
 			extractLowSanityVignette(graphics, ratio, player.tickCount);
 		}
 
-		// In Creative, hide the sanity bar unless sanity is below max (so /backrooms sanity set works smoothly).
+		// In Creative, hide the sanity icons unless sanity is below max (so /backrooms sanity set shows immediately).
 		if (creative && ratio >= 0.999F) return;
 
 		int sw = graphics.guiWidth();
 		int sh = graphics.guiHeight();
-		int x = sw / 2 + 10;
-		int y;
+		int rightEdge = sw / 2 + 91;
+
+		int baseY;
 		if (creative) {
-			y = sh - 34;
+			baseY = sh - 34;
 		} else {
+			int occupiedRightRows = 1; // Row 0 (sh - 39) is Food bar (or row 0 of Mount Health).
+			if (player.getVehicle() instanceof LivingEntity mount && mount.showVehicleHealth()) {
+				int mountRows = Mth.clamp(Mth.ceil(mount.getMaxHealth() / 20.0F), 1, 3);
+				occupiedRightRows = Math.max(occupiedRightRows, mountRows);
+			}
 			boolean airVisible = player.getAirSupply() < player.getMaxAirSupply() || player.isUnderWater();
-			boolean mountHealth = player.getVehicle() instanceof net.minecraft.world.entity.LivingEntity;
-			y = sh - 50 - (airVisible ? 10 : 0) - (mountHealth ? 10 : 0);
+			if (airVisible) {
+				occupiedRightRows += 1;
+			}
+			// Anchor Row 0 cleanly above every occupied right-side vanilla row (Food / Mount / Air).
+			baseY = sh - 39 - occupiedRightRows * 10;
 		}
 
-		// Subtle horizontal tremor when sanity drops below 30%.
-		if (critical) {
-			long jitterSeed = (System.currentTimeMillis() / 90L) ^ player.tickCount;
-			x += (int) ((jitterSeed % 3L) - 1L);
+		int totalIcons = Math.max(ICONS_PER_ROW, Mth.ceil(stats.maxSanity() / 10.0F));
+		int totalRows = Mth.ceil(totalIcons / (float) ICONS_PER_ROW);
+		// Compress multi-row vertical spacing upward just like vanilla Minecraft's multi-row hearts.
+		int rowStep = totalRows <= 1 ? 10 : Math.max(3, 10 - (totalRows - 2));
+
+		int halfUnits = Mth.ceil(stats.sanity() / 5.0F);
+		int fullSpriteU = critical ? 45 : (ratio < 0.60F ? 27 : 9);
+		int halfSpriteU = fullSpriteU + 9;
+
+		// Draw from top row down to row 0 so lower rows cleanly overlap upper rows when compressed (>2 rows).
+		for (int i = totalIcons - 1; i >= 0; i--) {
+			int row = i / ICONS_PER_ROW;
+			int col = i % ICONS_PER_ROW;
+
+			// Right-to-left placement mirrors vanilla Food & Air bars symmetrically against left-side Hearts.
+			int x = rightEdge - col * ICON_STEP - ICON_SIZE;
+			int y = baseY - row * rowStep;
+
+			// Subtle vertical jitter per icon when sanity drops below 30% (like vanilla low-HP shaking hearts).
+			if (critical) {
+				long hash = ((player.tickCount / 2L) * 31L + i * 17L) & 0x7FFFFFFFL;
+				if ((hash % 3L) == 0L) {
+					y += (int) ((hash % 2L) * 2L - 1L);
+				}
+			}
+
+			int iconHalfThreshold = i * 2;
+			int u;
+			if (halfUnits >= iconHalfThreshold + 2) {
+				u = fullSpriteU;
+			} else if (halfUnits == iconHalfThreshold + 1) {
+				u = halfSpriteU;
+			} else {
+				u = 0; // Empty container
+			}
+
+			graphics.blit(RenderPipelines.GUI_TEXTURED, ICONS_TEXTURE, x, y, u, 0, ICON_SIZE, ICON_SIZE, TEX_W, TEX_H);
 		}
-
-		int borderColor = critical
-				? ((System.currentTimeMillis() / 220L) % 2L == 0L ? 0xFFE63964 : 0xFF7A1E3D)
-				: 0xFF2B3548;
-		int fillColor = critical
-				? 0xFFD9325C
-				: (ratio < 0.60F ? 0xFF9664F2 : 0xFF42CFF2);
-		int highlightColor = critical
-				? 0xFFFF7A9E
-				: (ratio < 0.60F ? 0xFFC8A6FF : 0xFF9BEFFF);
-
-		// Frame + dark backdrop
-		graphics.fill(x, y, x + BAR_WIDTH, y + BAR_HEIGHT, 0xCC0D1018);
-		graphics.outline(x, y, BAR_WIDTH, BAR_HEIGHT, borderColor);
-
-		// Segmented inner bar
-		int innerW = BAR_WIDTH - 2;
-		int filledW = Mth.clamp(Math.round(innerW * ratio), 0, innerW);
-		if (filledW > 0) {
-			graphics.fill(x + 1, y + 1, x + 1 + filledW, y + BAR_HEIGHT - 1, fillColor);
-			graphics.fill(x + 1, y + 1, x + 1 + filledW, y + 3, highlightColor);
-		}
-		// Subtle 10-segment tick marks
-		for (int seg = 1; seg < 10; seg++) {
-			int sx = x + 1 + (innerW * seg) / 10;
-			graphics.fill(sx, y + 1, sx + 1, y + BAR_HEIGHT - 1, 0x55080A10);
-		}
-
-		// Compact centered label inside/above bar
-		Font font = client.font;
-		String label = Component.translatable("hud.noclip_backrooms.sanity",
-				Math.round(stats.sanity()), Math.round(stats.maxSanity())).getString();
-		int textColor = critical ? 0xFFFFB5C5 : 0xFFEBF5FF;
-		graphics.pose().pushMatrix();
-		float scale = 0.72F;
-		graphics.pose().scale(scale, scale);
-		int tx = Math.round((x + BAR_WIDTH / 2.0F) / scale) - font.width(label) / 2;
-		int ty = Math.round((y + 1.8F) / scale);
-		graphics.text(font, label, tx, ty, textColor, true);
-		graphics.pose().popMatrix();
 	}
 
 	private static void extractLowSanityVignette(GuiGraphicsExtractor graphics, float ratio, int tickCount) {
@@ -111,10 +127,8 @@ public final class SanityBarHud {
 		int bandH = Math.max(24, (int) (h * (0.14F + severity * 0.10F + scare * 0.08F)));
 		int bandW = Math.max(20, (int) (w * (0.08F + severity * 0.06F)));
 
-		// Top and bottom gradient bands
 		graphics.fillGradient(0, 0, w, bandH, edgeColor, transparent);
 		graphics.fillGradient(0, h - bandH, w, h, transparent, edgeColor);
-		// Left and right subtle panic borders
 		int sideAlpha = (int) (alpha * 0.65F);
 		int sideColor = (sideAlpha << 24) | (scare > 0.1F ? 0x5A0A1E : 0x2B0928);
 		graphics.fill(0, 0, bandW / 2, h, sideColor);

@@ -114,14 +114,24 @@ public record PlayerStats(
 		return vitality * 0.25;
 	}
 
+	/** Passive health regenerated per second from Vitality (while not starving). */
+	public float healthRegenPerSec() {
+		return vitality * 0.12F;
+	}
+
 	/** Fraction of sanity drain negated (capped at 65%). */
 	public float sanityDrainResistance() {
 		return Math.min(0.65F, sanityStat * 0.06F);
 	}
 
-	/** Multiplier for natural sanity recovery (will synergize with the future Mage class). */
+	/** Multiplier for natural sanity recovery (+10% per SAN point; synergizes with future Mage class). */
 	public float sanityRegenMultiplier() {
-		return 1.0F + sanityStat * 0.08F;
+		return 1.0F + sanityStat * 0.10F;
+	}
+
+	/** Extra passive sanity recovery per second from high SAN when not surrounded in pitch darkness. */
+	public float passiveSanityRegenPerSec() {
+		return sanityStat * 0.05F;
 	}
 
 	public PlayerStats withSanity(float value) {
