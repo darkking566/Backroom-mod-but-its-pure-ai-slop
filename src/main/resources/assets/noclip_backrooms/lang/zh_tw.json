@@ -434,5 +434,17 @@
   "subtitles.noclip_backrooms.level0p1.door": "門滑開",
   "entity.noclip_backrooms.robot_cleaner": "七足清洗機器人",
   "entity.noclip_backrooms.robot_chef": "廚房機器人",
-  "entity.noclip_backrooms.robot_servant": "壞掉的服務機器人"
+  "entity.noclip_backrooms.robot_servant": "壞掉的服務機器人",
+  "item.noclip_backrooms.robot_cleaner_spawn_egg": "七足清洗機器人生怪蛋",
+  "item.noclip_backrooms.robot_chef_spawn_egg": "廚房機器人生怪蛋",
+  "item.noclip_backrooms.robot_servant_spawn_egg": "壞掉的服務機器人生怪蛋",
+  "message.noclip_backrooms.level0p1.blackout.warning": "[站內廣播] 偵測到主電力波動，請保持冷靜。",
+  "message.noclip_backrooms.level0p1.blackout.dark": "[站內廣播] 主電力中斷，僅剩緊急照明。",
+  "message.noclip_backrooms.level0p1.blackout.restored": "[站內廣播] 主電力已恢復，感謝您的耐心等候。",
+  "block.noclip_backrooms.frost_wall": "結霜的牆",
+  "block.noclip_backrooms.scorched_wall": "焦黑的牆",
+  "block.noclip_backrooms.frost_floor": "結冰的地板",
+  "block.noclip_backrooms.scorched_floor": "焦黑的地板",
+  "block.noclip_backrooms.frost_ceiling": "結霜的天花板",
+  "block.noclip_backrooms.scorched_ceiling": "焦黑的天花板"
 }

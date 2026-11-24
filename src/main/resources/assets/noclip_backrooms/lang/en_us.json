@@ -434,5 +434,17 @@
   "subtitles.noclip_backrooms.level0p1.door": "Door slides",
   "entity.noclip_backrooms.robot_cleaner": "Seven-Legged Cleaning Robot",
   "entity.noclip_backrooms.robot_chef": "Galley Robot",
-  "entity.noclip_backrooms.robot_servant": "Broken Servant Robot"
+  "entity.noclip_backrooms.robot_servant": "Broken Servant Robot",
+  "item.noclip_backrooms.robot_cleaner_spawn_egg": "Seven-Legged Cleaning Robot Spawn Egg",
+  "item.noclip_backrooms.robot_chef_spawn_egg": "Galley Robot Spawn Egg",
+  "item.noclip_backrooms.robot_servant_spawn_egg": "Broken Servant Robot Spawn Egg",
+  "message.noclip_backrooms.level0p1.blackout.warning": "[Station] Main power fluctuation detected. Please remain calm.",
+  "message.noclip_backrooms.level0p1.blackout.dark": "[Station] Main power lost. Emergency lighting only.",
+  "message.noclip_backrooms.level0p1.blackout.restored": "[Station] Main power restored. Thank you for your patience.",
+  "block.noclip_backrooms.frost_wall": "Frosted Wall",
+  "block.noclip_backrooms.scorched_wall": "Scorched Wall",
+  "block.noclip_backrooms.frost_floor": "Frosted Floor",
+  "block.noclip_backrooms.scorched_floor": "Scorched Floor",
+  "block.noclip_backrooms.frost_ceiling": "Frosted Ceiling",
+  "block.noclip_backrooms.scorched_ceiling": "Scorched Ceiling"
 }

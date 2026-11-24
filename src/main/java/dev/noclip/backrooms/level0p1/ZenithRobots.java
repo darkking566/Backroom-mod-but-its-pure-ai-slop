@@ -74,7 +74,8 @@ public final class ZenithRobots {
 
 	/** Places a robot of the kind that belongs here; returns whether there was room. For tests too. */
 	public static Robot spawn(ServerLevel level, long seed, BlockPos at, RandomSource random) {
-		Robot.Kind kind = kindAt(seed, at.getX(), at.getY(), at.getZ());
+		// In a blackout the broken servants wander out of the dark, wherever you are.
+		Robot.Kind kind = ZenithBlackouts.phase() == ZenithBlackouts.Phase.DARK ? Robot.Kind.SERVANT : kindAt(seed, at.getX(), at.getY(), at.getZ());
 		Robot robot = Robots.type(kind).create(level, EntitySpawnReason.EVENT);
 		if (robot == null) return null;
 		robot.snapTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5, random.nextFloat() * 360, 0);

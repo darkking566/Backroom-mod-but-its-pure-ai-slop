@@ -39,9 +39,9 @@ final class ZenithLayout {
 
 	enum Kind {
 		AIR(true), HULL, HULL_SEAM, SKIN_PLATE, WINDOW, BULKHEAD,
-		FLOOR, FLOOR_CORRIDOR, FLOOR_STRIPE, FLOOR_QUARTERS, FLOOR_KITCHEN, FLOOR_GYM, FLOOR_GARDEN, FLOOR_WORN, FLOOR_HAZARD,
-		CEILING, LIGHT, DEAD_LIGHT,
-		WALL, WALL_QUARTERS, WALL_KITCHEN, WALL_GYM, WALL_DAMAGED,
+		FLOOR, FLOOR_CORRIDOR, FLOOR_STRIPE, FLOOR_QUARTERS, FLOOR_KITCHEN, FLOOR_GYM, FLOOR_GARDEN, FLOOR_WORN, FLOOR_HAZARD, FLOOR_FROST, FLOOR_SCORCH,
+		CEILING, LIGHT, DEAD_LIGHT, CEILING_FROST, CEILING_SCORCH,
+		WALL, WALL_QUARTERS, WALL_KITCHEN, WALL_GYM, WALL_DAMAGED, WALL_FROST, WALL_SCORCH,
 		DOOR(true), STAIR, STAIR_CORE, RAIL,
 		BED, LOCKER, COUNTER, STOVE, TREADMILL, WEIGHTS, PLANTER, CONSOLE, BROKEN_CONSOLE, SERVER, CRATE, CABLES(true), TABLE, BENCH,
 		PORTAL, PORTAL_FRAME, STATIC_TEAR,
@@ -293,30 +293,42 @@ final class ZenithLayout {
 		boolean damaged = zone != 0;
 		boolean corridor = u < 4 || v < 4;
 		Room room = corridor ? null : room(seed, mx, mz, k);
-		if (t == 7) return ceiling(seed, x, z, u, v, corridor, damaged, mx, mz, k);
-		if (t == 0) return floor(seed, x, z, u, v, corridor, damaged, room);
+		if (t == 7) return ceiling(seed, x, z, u, v, corridor, zone, mx, mz, k);
+		if (t == 0) return floor(seed, x, z, u, v, corridor, zone, room);
 		if (corridor) {
 			// Cables hang from the ceiling in the dark stretches.
 			if (damaged && t >= 5 && hash(seed, x, z, k) % 9 == 0) return of(Kind.CABLES);
 			return of(Kind.AIR);
 		}
 		boolean wallW = u == 4, wallE = u == 15, wallN = v == 4, wallS = v == 15;
-		if (wallW || wallE || wallN || wallS) return wall(seed, mx, mz, k, u, v, t, wallW, wallE, wallN, wallS, room, damaged);
+		if (wallW || wallE || wallN || wallS) return wall(seed, mx, mz, k, u, v, t, wallW, wallE, wallN, wallS, room, zone);
 		return furnish(seed, room, mx, mz, k, u, v, t, damaged);
 	}
 
-	private static int ceiling(long seed, int x, int z, int u, int v, boolean corridor, boolean damaged, int mx, int mz, int k) {
+	private static int ceiling(long seed, int x, int z, int u, int v, boolean corridor, int zone, int mx, int mz, int k) {
+		boolean damaged = zone != 0;
 		boolean lamp;
 		if (corridor) lamp = v < 4 ? (x & 7) == 4 && v == 1 : (z & 7) == 4 && u == 1;
 		else lamp = u == 9 && v == 9 || u == 10 && v == 10;
-		if (!lamp) return of(Kind.CEILING);
+		if (!lamp) {
+			// In the cold and the hot stretches most plates are furred with rime or blackened.
+			if (zone == 1 && hash(seed, x, z, k + 5) % 4 != 0) return of(Kind.CEILING_FROST);
+			if (zone == 2 && hash(seed, x, z, k + 5) % 4 != 0) return of(Kind.CEILING_SCORCH);
+			return of(Kind.CEILING);
+		}
 		// A few lamps still work in the dark stretches.
 		boolean alive = !damaged || hash(seed, x, z, k) % 12 == 0;
 		return of(alive ? Kind.LIGHT : Kind.DEAD_LIGHT);
 	}
 
-	private static int floor(long seed, int x, int z, int u, int v, boolean corridor, boolean damaged, Room room) {
-		if (damaged && hash(seed, x, z, 3) % 4 == 0) return of(Kind.FLOOR_WORN);
+	private static int floor(long seed, int x, int z, int u, int v, boolean corridor, int zone, Room room) {
+		if (zone != 0) {
+			// A damaged stretch: worn plates, and in the cold and the hot ones plates under ice or burnt, over half the floor.
+			int h = hash(seed, x, z, 3) % 4;
+			if (h == 0) return of(Kind.FLOOR_WORN);
+			if (h <= 2 && zone == 1) return of(Kind.FLOOR_FROST);
+			if (h <= 2 && zone == 2) return of(Kind.FLOOR_SCORCH);
+		}
 		if (corridor) {
 			boolean stripe = u < 4 && v >= 4 ? u == 1 || u == 2 : v < 4 && u >= 4 && (v == 1 || v == 2);
 			return of(stripe ? Kind.FLOOR_STRIPE : Kind.FLOOR_CORRIDOR);
@@ -347,7 +359,7 @@ final class ZenithLayout {
 	}
 
 	private static int wall(long seed, int mx, int mz, int k, int u, int v, int t, boolean w, boolean e, boolean n, boolean s,
-			Room room, boolean damaged) {
+			Room room, int zone) {
 		int mask = doors(seed, mx, mz, k);
 		boolean alongZ = w || e; // the wall runs along z, so the door is at v 9 and 10
 		int along = alongZ ? v : u;
@@ -356,14 +368,20 @@ final class ZenithLayout {
 			int side = w ? 0 : n ? 1 : e ? 2 : 3;
 			if ((mask >> side & 1) != 0) {
 				if (t <= 2) return of(Kind.DOOR, alongZ ? 1 : 0, (along == 9 ? 0 : 1) | (t == 1 ? 0 : 2));
-				return of(wallKind(room, damaged, seed, u, v, k));
+				return of(wallKind(room, zone, seed, u, v, k));
 			}
 		}
-		return of(wallKind(room, damaged, seed, u, v, k));
+		return of(wallKind(room, zone, seed, u, v, k));
 	}
 
-	private static Kind wallKind(Room room, boolean damaged, long seed, int u, int v, int k) {
-		if (damaged && hash(seed, u, v, k) % 3 == 0) return Kind.WALL_DAMAGED;
+	private static Kind wallKind(Room room, int zone, long seed, int u, int v, int k) {
+		if (zone != 0) {
+			// Every wall in a damaged stretch shows what is wrong with it: some torn open, the rest frosted (zone 1) or scorched (2).
+			int h = hash(seed, u, v, k) % 3;
+			if (h == 0) return Kind.WALL_DAMAGED;
+			if (zone == 1) return Kind.WALL_FROST;
+			if (zone == 2) return Kind.WALL_SCORCH;
+		}
 		return switch (room) {
 			case BEDROOM -> Kind.WALL_QUARTERS;
 			case KITCHEN -> Kind.WALL_KITCHEN;
@@ -507,10 +525,12 @@ final class ZenithLayout {
 	private static int cavity(long seed, int x, int y, int z, long d2) {
 		if (d2 < 49) return of(Kind.SINGULARITY_CORE);
 		if (d2 < 144) return of(Kind.SINGULARITY_SHELL);
+		// A one-block skin round the dark ball, white-hot along the equator where the disc touches it, so the ball has a bright edge.
+		if (d2 < 169) return Math.abs(y) <= 2 ? of(Kind.PLASMA, 0, 0) : of(Kind.SINGULARITY_SHELL);
 		long rho2 = (long) x * x + (long) z * z;
 		if (y >= -1 && y <= 2 && rho2 >= 256 && rho2 <= 1296) {
 			// The plasma disc: hotter and whiter towards the inside, in rings.
-			int ring = (int) ((Math.sqrt(rho2) - 16) / 5);
+			int ring = (int) ((Math.sqrt(rho2) - 16) / 6);
 			return of(Kind.PLASMA, 0, Math.min(ring, 3));
 		}
 		// The ring walkway round the singularity, and the four spokes out to the skin.

@@ -1,9 +1,15 @@
 package dev.noclip.backrooms.level0p1.robots;
 
 import dev.noclip.backrooms.BackroomsMod;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
+import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -34,6 +40,12 @@ public final class Robots {
 		for (Map.Entry<Robot.Kind, EntityType<Robot>> entry : TYPES.entrySet()) {
 			FabricDefaultAttributeRegistry.register(entry.getValue(), Robot.createAttributes(entry.getKey()));
 		}
+		List<Item> eggs = new ArrayList<>();
+		for (Map.Entry<Robot.Kind, EntityType<Robot>> entry : TYPES.entrySet()) {
+			ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, BackroomsMod.id("robot_" + entry.getKey().id + "_spawn_egg"));
+			eggs.add(Registry.register(BuiltInRegistries.ITEM, key, new SpawnEggItem(new Item.Properties().spawnEgg(entry.getValue()).setId(key))));
+		}
+		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.SPAWN_EGGS).register(output -> eggs.forEach(output::accept));
 	}
 
 	public static EntityType<Robot> type(Robot.Kind kind) {

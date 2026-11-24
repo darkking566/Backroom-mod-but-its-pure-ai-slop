@@ -63,7 +63,7 @@ public final class ZenithBlocks {
 	public static final Block WORN_FLOOR = register("worn_floor", steel(MapColor.COLOR_GRAY, 3.0F));
 	public static final Block HAZARD_FLOOR = register("hazard_floor", steel(MapColor.COLOR_YELLOW, 3.0F));
 	public static final Block DECK_CEILING = register("deck_ceiling", steel(MapColor.SNOW, 3.0F));
-	public static final Block CEILING_LIGHT = register("ceiling_light", steel(MapColor.SNOW, 1.0F).sound(SoundType.GLASS).lightLevel(s -> 14));
+	public static final Block CEILING_LIGHT = register("ceiling_light", steel(MapColor.SNOW, 1.0F).sound(SoundType.GLASS).lightLevel(s -> 13));
 	public static final Block DEAD_CEILING_LIGHT = register("dead_ceiling_light", steel(MapColor.COLOR_GRAY, 1.0F).sound(SoundType.GLASS));
 
 	// Walls and doors
@@ -72,6 +72,12 @@ public final class ZenithBlocks {
 	public static final Block KITCHEN_WALL = register("kitchen_wall", steel(MapColor.SNOW, 4.0F).sound(SoundType.STONE));
 	public static final Block GYM_WALL = register("gym_wall", steel(MapColor.COLOR_BLUE, 3.0F).sound(SoundType.WOOL));
 	public static final Block DAMAGED_WALL = register("damaged_wall", steel(MapColor.COLOR_BLACK, 4.0F));
+	public static final Block FROST_WALL = register("frost_wall", steel(MapColor.ICE, 4.0F).sound(SoundType.GLASS));
+	public static final Block FROST_FLOOR = register("frost_floor", steel(MapColor.ICE, 3.0F).sound(SoundType.GLASS));
+	public static final Block SCORCHED_FLOOR = register("scorched_floor", steel(MapColor.COLOR_BLACK, 3.0F).lightLevel(s -> 2));
+	public static final Block FROST_CEILING = register("frost_ceiling", steel(MapColor.ICE, 2.0F).sound(SoundType.GLASS));
+	public static final Block SCORCHED_CEILING = register("scorched_ceiling", steel(MapColor.COLOR_BLACK, 2.0F));
+	public static final Block SCORCHED_WALL = register("scorched_wall", steel(MapColor.COLOR_BLACK, 4.0F).lightLevel(s -> 3));
 	public static final Block STATION_DOOR_BLOCK = register("station_door", steel(MapColor.SNOW, 5.0F).noOcclusion()
 			.pushReaction(PushReaction.DESTROY), p -> new ZenithDoorBlock(STATION_DOOR, p));
 
@@ -98,7 +104,7 @@ public final class ZenithBlocks {
 	public static final Block SERVER_RACK = register("server_rack", steel(MapColor.COLOR_BLACK, 4.0F).lightLevel(s -> 4), p -> new ZenithFacingBlock(p, FULL));
 	public static final Block SUPPLY_CRATE = register("station_crate", steel(MapColor.COLOR_GRAY, 2.0F));
 	public static final Block HANGING_CABLES = register("hanging_cables", Properties.of().mapColor(MapColor.COLOR_BLACK).strength(0.3F).sound(SoundType.CHAIN)
-			.noOcclusion().noCollision(), p -> new ZenithShapedBlock(p, FULL, false));
+			.noOcclusion().noCollision().lightLevel(s -> 6), p -> new ZenithShapedBlock(p, FULL, false)); // live wires spark: the only light in a wreck
 	public static final Block CREW_TABLE = register("crew_table", steel(MapColor.COLOR_LIGHT_GRAY, 2.0F).noOcclusion(), p -> new ZenithShapedBlock(p, TABLE, true));
 	public static final Block STATION_BENCH = register("station_bench", steel(MapColor.COLOR_LIGHT_GRAY, 2.0F).noOcclusion(), p -> new ZenithShapedBlock(p, BENCH, true));
 
