@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:ender_pearl",
+    "noclip_backrooms:alloy",
+    "noclip_backrooms:alloy",
+    "minecraft:redstone"
+  ],
+  "result": {
+    "id": "noclip_backrooms:bntg_beacon"
+  }
+}

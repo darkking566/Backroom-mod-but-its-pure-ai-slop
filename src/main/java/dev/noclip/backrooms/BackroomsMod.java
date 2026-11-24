@@ -2,6 +2,7 @@ package dev.noclip.backrooms;
 
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.level0.Level0;
+import dev.noclip.backrooms.level0p1.Level0p1;
 import dev.noclip.backrooms.level1.Level1;
 import dev.noclip.backrooms.level2.Level2;
 import dev.noclip.backrooms.level3.Level3;
@@ -26,6 +27,7 @@ public final class BackroomsMod implements ModInitializer {
 		Monsters.register();
 		People.register();
 		Level0.register();
+		Level0p1.register();
 		Level1.register();
 		Level2.register();
 		Level3.register();

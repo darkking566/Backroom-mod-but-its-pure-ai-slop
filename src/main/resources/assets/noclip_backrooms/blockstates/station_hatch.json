@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "part=0": {
+      "model": "noclip_backrooms:block/level0p1/station_hatch_0"
+    },
+    "part=1": {
+      "model": "noclip_backrooms:block/level0p1/station_hatch_1"
+    }
+  }
+}

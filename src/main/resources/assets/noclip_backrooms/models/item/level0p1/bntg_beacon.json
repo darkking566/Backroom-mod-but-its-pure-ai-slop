@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "noclip_backrooms:item/level0p1/bntg_beacon"
+  }
+}

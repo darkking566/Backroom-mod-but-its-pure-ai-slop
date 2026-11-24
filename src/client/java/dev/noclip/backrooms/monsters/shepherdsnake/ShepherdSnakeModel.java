@@ -22,6 +22,7 @@ public final class ShepherdSnakeModel extends EntityModel<ShepherdSnakeRenderer.
 	private final BoxRig.Clip slither = RIG.clip("slither_glide");
 	private final BoxRig.Clip charge = RIG.clip("ram_charge");
 	private final BoxRig.Clip crush = RIG.clip("attack_crush");
+	private final BoxRig.Clip stoopClip = RIG.clip("low_ceiling_stoop");
 
 	public ShepherdSnakeModel(ModelPart root) {
 		super(root);
@@ -33,6 +34,7 @@ public final class ShepherdSnakeModel extends EntityModel<ShepherdSnakeRenderer.
 		super.setupAnim(state);
 		float timeSec = state.ageInTicks / 20.0F;
 		float moveWeight = Mth.clamp(state.walkAnimationSpeed * 2.2F, 0.0F, 1.0F);
+		float stoop = Mth.clamp(state.stoop, 0.0F, 1.0F);
 
 		idle.apply(joints, timeSec, 1.0F);
 		if (state.charging) {
@@ -50,8 +52,14 @@ public final class ShepherdSnakeModel extends EntityModel<ShepherdSnakeRenderer.
 			}
 		}
 
+		if (stoop > 0.01F) {
+			float stoopTime = moveWeight > 0.05F ? state.walkAnimationPos / 10.0F : timeSec * 0.45F;
+			stoopClip.apply(joints, stoopTime, stoop);
+		}
+
 		float yaw = Mth.clamp(state.yRot, -50, 50) * Mth.DEG_TO_RAD;
-		float pitch = Mth.clamp(state.xRot, -30, 30) * Mth.DEG_TO_RAD;
+		float minPitch = stoop > 0.5F ? -12.0F : -30.0F;
+		float pitch = Mth.clamp(state.xRot, minPitch, 30.0F) * Mth.DEG_TO_RAD;
 		ModelPart neck = joints.get("Neck_3"), head = joints.get("Head");
 		if (neck != null) neck.yRot += yaw * 0.35F;
 		if (head != null) {

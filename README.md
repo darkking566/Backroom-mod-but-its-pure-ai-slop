@@ -87,6 +87,18 @@ git 分支不是用來分樓層的：大家都在 `Desktop\Backroom - Claude`（
 5. 貼圖、模型放 `textures/block/level2/`、`models/block/level2/`。
 6. 測試放 `src/test/.../level2/`、`src/gametest/.../level2/`，並把遊戲測試登記到 `src/gametest/resources/fabric.mod.json`。
 
+## 子樓層（Level 0.1、1.1、4.3……）
+
+子樓層就是「屬於某一層、但有自己維度」的樓層。做法跟主樓層一樣（見上一節），多的只有三件事，共用的部分放在 `core/`：
+
+- **登記用 `Sublevels.register(...)`**，不要直接用 `LevelExits.open`。它會同時記下「父層是誰」（離開時回哪裡）和「隨機切出（cut-out）」的去處與權重，例如 Level 0.1：`Sublevels.register("0.1", "0", LEVEL_0_1, Map.of("1", 85, "0", 15), ZenithTravel::enter)`。
+- **出口方塊用 `core/LevelExitBlock`**：右鍵就走，行為由 `LevelExitBlock.to("層號")`（固定去某層）、`leave("0.1")`（回父層）、`cutOut("0.1")`（隨機切出）決定，不用每個子樓層自己寫方塊類別。
+- **落點用 `core/Landing`**：`Landing.tryLand(player, level, 腳的位置)` 會檢查地板是實心、頭上沒東西才傳送。
+
+**入口歸被進入的那層**（跟主樓層一樣）：子樓層自己負責在父層放入口（例如 Level 0.1 在 Level 0 載入區塊時放艙門，見 `level0p1/ZenithEntrance`），父層的程式不用改。
+
+維度 ID 用句點：Level 0.1 是 `noclip_backrooms:level_0.1`（見下面的 ID 規則）。Java 套件和資料夾用 `p`：`level0p1`。
+
 ## 新增怪物
 
 1. 在 Blender 照獵犬的標準做（純長方體骨骼、3×3 貼圖分區），匯出成跟 `monsters/hound.json` 一樣格式的規格檔，放到 `assets/noclip_backrooms/monsters/`，貼圖放 `textures/entity/`，原始檔放 `art/monsters/<名字>/`。

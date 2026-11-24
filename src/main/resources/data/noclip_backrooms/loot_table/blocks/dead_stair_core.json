@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:dead_stair_core"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "noclip_backrooms:blocks/dead_stair_core"
+}
