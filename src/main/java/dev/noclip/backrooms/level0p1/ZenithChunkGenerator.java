@@ -126,6 +126,10 @@ final class ZenithChunkGenerator extends ChunkGenerator {
 			case DRIFT -> ZenithBlocks.ICE_DRIFT.defaultBlockState();
 			case SLAG -> ZenithBlocks.SLAG_PILE.defaultBlockState();
 			case VENT -> ZenithBlocks.HEAT_VENT.defaultBlockState();
+			case SCREEN -> facing(ZenithBlocks.COUNTDOWN_SCREEN, dir);
+			case COIL -> ZenithBlocks.BRIDGE_COIL.defaultBlockState();
+			case NOTES -> ZenithBlocks.RESEARCH_NOTES.defaultBlockState();
+			case COAT -> facing(ZenithBlocks.LAB_COAT, dir);
 			case VINES -> ZenithBlocks.HANGING_VINES.defaultBlockState();
 			case BENCH -> ZenithBlocks.STATION_BENCH.defaultBlockState();
 			case PORTAL -> ZenithBlocks.YELLOW_DOORWAY.defaultBlockState().setValue(ZenithPortalBlock.PART, extra);

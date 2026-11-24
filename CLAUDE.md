@@ -237,3 +237,5 @@
 - Level 0.1 四種原文房間加擺設（18 個新方塊：上下舖、相框、開門衣櫃、辦公桌、私人物品、水槽、冰箱、吊掛鍋具、疊盤、臥推架、沙包、牆鏡、飲水機、墊子堆、栽培架、植物燈、水箱、垂藤）：`tools/make_level0p1_props.py` 產生貼圖／模型／blockstates；`ZenithLayout` 的四個房間函式改寫、`ZenithBlocks`／`ZenithChunkGenerator` 登記；`gradlew build` 與 `rooms` 段實機測試通過，截圖看過，各件近照與朝向還沒逐一確認；尚未提交
 
 - Level 0.1 第二批細節：天花板廣播喇叭（走廊每 16 格、廣播時冒音符）、電纜電火花與排熱孔冒煙（`ZenithAmbience.details` 隨機抽樣）、冷區冰柱／積冰、熱區熔渣堆／排熱孔（5 個新方塊，皆可穿過，`Kind.SPEAKER/ICICLES/DRIFT/SLAG/VENT`）、拆解材料掉落（電纜、控制台、壞控制台、伺服器機櫃改掉銅／紅石／金粒／鐵／機率合金）；新增單元測試 `speakersAndZoneDetailsAppear`；`gradlew build` 與 `rooms,zones` 實機段通過；之後補拍近照（新增 `details` 段，`NOCLIP_ONLY=details`）：喇叭、冰柱、積冰、熔渣、排熱孔外觀都看過；火花、煙與音符粒子沒拍；尚未提交
+
+- Level 0.1 第三批（原文背景故事延伸）：新房間「實驗室」`Room.LAB`（橋接發射線圈、伺服器機櫃、桌子、控制台）、倒數螢幕 `countdown_screen`（實驗室與控制室牆上，停在 00:00）、Rhea 的研究筆記 `research_notes`（右鍵讀 4 頁之一，`ZenithNotesBlock`）與實驗袍 `lab_coat`（每個氣閘室一角）；4 個新方塊由 `make_level0p1_props.py` 產生；`ZenithShapedBlock` 拿掉 final 讓筆記繼承；單元測試加四種新 Kind；`gradlew build` 與 `details,rooms` 實機段通過，截圖看過；實驗袍在近照裡是側視、看不清，筆記右鍵文字沒實機點過；尚未提交

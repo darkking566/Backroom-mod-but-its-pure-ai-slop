@@ -62,11 +62,11 @@ class ZenithLayoutTest {
 		java.util.EnumSet<ZenithLayout.Kind> seen = java.util.EnumSet.noneOf(ZenithLayout.Kind.class);
 		for (int x = -400; x < 400; x += 2) {
 			for (int z = -400; z < 400; z += 2) {
-				for (int y : new int[] {33, 38, 39, 41, 65, 70}) seen.add(ZenithLayout.kind(ZenithLayout.cell(SEEDS[0], x, y, z)));
+				for (int y : new int[] {33, 34, 38, 39, 41, 42, 65, 70}) seen.add(ZenithLayout.kind(ZenithLayout.cell(SEEDS[0], x, y, z)));
 			}
 		}
 		for (ZenithLayout.Kind kind : new ZenithLayout.Kind[] {ZenithLayout.Kind.SPEAKER, ZenithLayout.Kind.ICICLES, ZenithLayout.Kind.DRIFT,
-				ZenithLayout.Kind.SLAG, ZenithLayout.Kind.VENT}) {
+				ZenithLayout.Kind.SLAG, ZenithLayout.Kind.VENT, ZenithLayout.Kind.SCREEN, ZenithLayout.Kind.COIL, ZenithLayout.Kind.NOTES}) {
 			assertTrue(seen.contains(kind), kind + " never appears");
 		}
 	}

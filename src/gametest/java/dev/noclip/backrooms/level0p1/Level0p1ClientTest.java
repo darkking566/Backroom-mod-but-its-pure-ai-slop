@@ -114,6 +114,15 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 	private void details(ClientGameTestContext context, TestSingleplayerContext game, BlockPos from) {
 		int[] room = findRoom(from, Room.BEDROOM), cold = findZone(from, 1), hot = findZone(from, 2);
 		if (room != null) closeUp(context, game, room, ZenithLayout.Kind.SPEAKER, "speaker");
+		int[] lab = findRoom(from, Room.LAB), airlock = findRoom(from, Room.AIRLOCK);
+		if (lab != null) {
+			closeUp(context, game, lab, ZenithLayout.Kind.COIL, "coil");
+			closeUp(context, game, lab, ZenithLayout.Kind.SCREEN, "countdown");
+		}
+		if (airlock != null) {
+			closeUp(context, game, airlock, ZenithLayout.Kind.NOTES, "notes");
+			closeUp(context, game, airlock, ZenithLayout.Kind.COAT, "coat");
+		}
 		if (cold != null) {
 			closeUp(context, game, cold, ZenithLayout.Kind.ICICLES, "icicles");
 			closeUp(context, game, cold, ZenithLayout.Kind.DRIFT, "ice_drift");

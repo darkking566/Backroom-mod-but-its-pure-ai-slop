@@ -149,6 +149,13 @@ public final class ZenithBlocks {
 			.noOcclusion().noCollision().lightLevel(s -> 5), p -> new ZenithShapedBlock(p, Block.box(2, 0, 2, 14, 4, 14), false));
 	public static final Block HEAT_VENT = register("heat_vent", steel(MapColor.COLOR_BLACK, 2.0F).noOcclusion().noCollision().lightLevel(s -> 8),
 			p -> new ZenithShapedBlock(p, Block.box(1, 0, 1, 15, 2, 15), false));
+	public static final Block COUNTDOWN_SCREEN = register("countdown_screen", steel(MapColor.COLOR_BLACK, 1.0F).noOcclusion().noCollision().lightLevel(s -> 6),
+			p -> new ZenithFacingBlock(p, THIN));
+	public static final Block BRIDGE_COIL = register("bridge_coil", steel(MapColor.COLOR_PURPLE, 3.0F).noOcclusion().lightLevel(s -> 12),
+			p -> new ZenithShapedBlock(p, Block.box(3, 0, 3, 13, 16, 13), true));
+	public static final Block RESEARCH_NOTES = register("research_notes", steel(MapColor.SNOW, 0.2F).sound(SoundType.WOOL).noOcclusion().noCollision(),
+			p -> new ZenithNotesBlock(p, Block.box(2, 0, 2, 14, 2, 14)));
+	public static final Block LAB_COAT = register("lab_coat", steel(MapColor.SNOW, 0.2F).sound(SoundType.WOOL).noOcclusion().noCollision(), p -> new ZenithFacingBlock(p, THIN));
 
 	// Ways out. Neither can be broken or carried off.
 	public static final Block YELLOW_DOORWAY = register("yellow_doorway", Properties.of().mapColor(MapColor.COLOR_YELLOW).strength(-1.0F, 3600000.0F)

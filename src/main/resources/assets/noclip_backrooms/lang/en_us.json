@@ -572,5 +572,13 @@
   "block.noclip_backrooms.icicles": "Icicles",
   "block.noclip_backrooms.ice_drift": "Ice Drift",
   "block.noclip_backrooms.slag_pile": "Slag Pile",
-  "block.noclip_backrooms.heat_vent": "Heat Vent"
+  "block.noclip_backrooms.heat_vent": "Heat Vent",
+  "block.noclip_backrooms.countdown_screen": "Countdown Screen",
+  "block.noclip_backrooms.bridge_coil": "Bridge Emitter Coil",
+  "block.noclip_backrooms.research_notes": "Research Notes",
+  "block.noclip_backrooms.lab_coat": "Lab Coat",
+  "message.noclip_backrooms.level0p1.rhea.0": "[Notes] Einstein-Rosen bridge, run 41: the field holds. Countdown set. If this works, nobody will ever be far from anywhere again.",
+  "message.noclip_backrooms.level0p1.rhea.1": "[Notes] The countdown screens all read zero. They have read zero for a very long time. I do not remember turning them off.",
+  "message.noclip_backrooms.level0p1.rhea.2": "[Notes] The bridge did not open where we aimed it. It opened under us. I could see the station from outside, and then I could not.",
+  "message.noclip_backrooms.level0p1.rhea.3": "[Notes] Nobody answers. The corridors are yellow now, and I keep walking them. I am only going to sit down for a moment."
 }

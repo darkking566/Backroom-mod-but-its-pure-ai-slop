@@ -160,6 +160,10 @@
     "noclip_backrooms:icicles",
     "noclip_backrooms:ice_drift",
     "noclip_backrooms:slag_pile",
-    "noclip_backrooms:heat_vent"
+    "noclip_backrooms:heat_vent",
+    "noclip_backrooms:countdown_screen",
+    "noclip_backrooms:bridge_coil",
+    "noclip_backrooms:research_notes",
+    "noclip_backrooms:lab_coat"
   ]
 }

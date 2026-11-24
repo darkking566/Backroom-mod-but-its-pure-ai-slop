@@ -572,5 +572,13 @@
   "block.noclip_backrooms.icicles": "冰柱",
   "block.noclip_backrooms.ice_drift": "積冰",
   "block.noclip_backrooms.slag_pile": "熔渣堆",
-  "block.noclip_backrooms.heat_vent": "排熱孔"
+  "block.noclip_backrooms.heat_vent": "排熱孔",
+  "block.noclip_backrooms.countdown_screen": "倒數螢幕",
+  "block.noclip_backrooms.bridge_coil": "橋接發射線圈",
+  "block.noclip_backrooms.research_notes": "研究筆記",
+  "block.noclip_backrooms.lab_coat": "實驗袍",
+  "message.noclip_backrooms.level0p1.rhea.0": "【筆記】愛因斯坦－羅森橋，第 41 次運轉：場穩住了。倒數已設定。成功的話，往後沒有人會離任何地方太遠。",
+  "message.noclip_backrooms.level0p1.rhea.1": "【筆記】倒數螢幕全都停在零。已經停很久了。我不記得自己關過它們。",
+  "message.noclip_backrooms.level0p1.rhea.2": "【筆記】橋沒有開在我們瞄準的地方，它開在我們腳下。我看見了站的外面，然後就看不見了。",
+  "message.noclip_backrooms.level0p1.rhea.3": "【筆記】沒有人回應。走廊現在是黃色的，我一直在走。我只是想坐下來一下。"
 }

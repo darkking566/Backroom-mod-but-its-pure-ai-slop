@@ -48,7 +48,8 @@ final class ZenithLayout {
 		LEAVES, LOG, WATER(true), ORB,
 		CATWALK, TRUSS, TETHER, GIRDER, GIRDER_LIGHT, SINGULARITY_CORE, SINGULARITY_SHELL, PLASMA, RAIL_LAMP,
 		DESK, WARDROBE, BUNK_BED, FRAME, ITEMS, SINK, FRIDGE, POTS, DISHES, BENCH_PRESS, BAG, MIRROR, DISPENSER, MATS, RACK, GROW_LIGHT, TANK, VINES,
-		SPEAKER(false), ICICLES(true), DRIFT(true), SLAG(true), VENT(true);
+		SPEAKER(false), ICICLES(true), DRIFT(true), SLAG(true), VENT(true),
+		SCREEN, COIL, NOTES(true), COAT;
 
 		/** Whether a player can walk through it (a closed door counts: it opens). */
 		final boolean passable;
@@ -62,7 +63,7 @@ final class ZenithLayout {
 		}
 	}
 
-	enum Room { BEDROOM, KITCHEN, GYM, GREENHOUSE, CONSOLES, MACHINES, STORAGE, EMPTY, WRECK, AIRLOCK }
+	enum Room { BEDROOM, KITCHEN, GYM, GREENHOUSE, CONSOLES, MACHINES, STORAGE, EMPTY, WRECK, AIRLOCK, LAB }
 
 	// Directions: 0 north (-z), 1 east (+x), 2 south (+z), 3 west (-x)
 	private static final int[][] RING = {{0, 0}, {1, 0}, {2, 0}, {3, 0}, {3, 1}, {3, 2}, {3, 3}, {2, 3}, {1, 3}, {0, 3}, {0, 2}, {0, 1}};
@@ -427,11 +428,12 @@ final class ZenithLayout {
 			case GYM -> gym(a, b, t, faceV, roll);
 			case GREENHOUSE -> greenhouse(a, b, t, faceV, roll);
 			case CONSOLES -> consoles(a, b, t, faceV);
+			case LAB -> lab(a, b, t, faceV, faceU, roll);
 			case MACHINES -> machines(a, b, t, faceU);
 			case STORAGE -> storage(a, b, t, faceV, roll);
 			case EMPTY -> t == 1 && a == 0 && b == 0 && roll % 3 == 0 ? of(Kind.CRATE) : of(Kind.AIR);
 			case WRECK -> wreck(a, b, t, faceV, roll);
-			case AIRLOCK -> t == 1 && a == 0 && b == 0 ? of(Kind.CRATE) : of(Kind.AIR);
+			case AIRLOCK -> airlock(a, b, t, faceV, faceU);
 		};
 	}
 
@@ -491,6 +493,34 @@ final class ZenithLayout {
 	private static int consoles(int a, int b, int t, int face) {
 		if (t == 1 && b == 0) return of(Kind.CONSOLE, face);
 		if (t == 1 && a == 0 && b == 1) return of(Kind.CONSOLE, face);
+		// A wall screen above the consoles, stopped at zero.
+		if (t == 2 && b == 0 && a == 2) return of(Kind.SCREEN, face);
+		return of(Kind.AIR);
+	}
+
+	/** The wormhole lab: an emitter coil in one corner, benches along the walls with a stopped countdown over them, server racks in another. */
+	private static int lab(int a, int b, int t, int face, int faceU, int roll) {
+		boolean coilCorner = face == 2 && faceU == 1, serverCorner = face == 2 && faceU == 3;
+		if (coilCorner) {
+			if (a == 1 && b == 1 && t <= 3) return of(Kind.COIL);
+			if (t == 1 && a == 1 && b == 2 && roll % 2 == 0) return of(Kind.NOTES);
+			return of(Kind.AIR);
+		}
+		if (serverCorner) return t <= 3 && b == 0 && a <= 2 ? of(Kind.SERVER, face) : of(Kind.AIR);
+		if (t == 1 && b == 0 && a >= 2) return of(Kind.TABLE);
+		if (t == 2 && b == 0 && a == 3) return of(Kind.ITEMS);
+		if (t == 2 && b == 0 && a == 1) return of(Kind.SCREEN, face);
+		if (t == 1 && b == 0 && a == 0) return of(Kind.CONSOLE, face);
+		return of(Kind.AIR);
+	}
+
+	/** Beside the yellow doorway, in one corner of each airlock: Rhea's notes and her lab coat, as if she had stood here. */
+	private static int airlock(int a, int b, int t, int face, int faceU) {
+		if (t == 1 && a == 0 && b == 0) return of(Kind.CRATE);
+		if (face == 2 && faceU == 1) {
+			if (t == 1 && a == 1 && b == 1) return of(Kind.NOTES);
+			if (t == 2 && a == 3 && b == 0) return of(Kind.COAT, face);
+		}
 		return of(Kind.AIR);
 	}
 
@@ -533,6 +563,7 @@ final class ZenithLayout {
 		if (roll < 64) return Room.CONSOLES;
 		if (roll < 76) return Room.MACHINES;
 		if (roll < 88) return Room.STORAGE;
+		if (roll < 92) return Room.LAB;
 		return roll < 96 ? Room.EMPTY : Room.WRECK;
 	}
 
