@@ -83,6 +83,9 @@
 - 自製垃圾桶方塊 `wastebasket`（穿孔鋼桶往上外擴、桶口鋁邊、裡面一堆紙團）：`tools/make_wastebasket.py` 寫方塊模型（箱子清單是唯一來源）、三張貼圖、blockstate、物品、戰利品表與語言條目；`tools/blender_wastebasket.py` 讀同一份規格在 Blender 5.3 組出 `art/props/wastebasket.blend` 與預覽圖；`Level1Blocks.WASTEBASKET` 取代原版鍋釜；`Level1ClientTest` 的 `rooms` 段加垃圾桶近照，`gradlew build` 與 `NOCLIP_ONLY=rooms` 客戶端測試通過
 - 桌上盆栽也換成自製（`desk_plant_dead` 枯枝、`desk_plant_leafy` 綠葉；陶盆＋兩片交叉透明貼圖）：`tools/make_desk_plants.py`、`tools/blender_desk_plants.py`（`art/props/desk_plants.blend` 與預覽）；`Level1ChunkGenerator.deskTop` 改用這兩個方塊。`gradlew build` 通過；遊戲畫面還沒確認（客戶端測試跟別的同時跑的測試撞到同一個 build 資料夾）。注意：多個人同時跑 gradle 會互相弄壞 `build/`，單元測試曾因此出現 EOFException，單獨重跑就過
 ### 2026-11-24
+- Level 0 巨構房間新增三種版型（每個 16×16 格的巨構區隨機選一種，`MegahallPlan.Style`）：柱廊大廳（`COLONNADE`，整片密集的 2×2 柱子、無隔牆）、分隔房間群（`ROOM_GRID`，每條大廳邊界都是牆，只在中間開 3 格寬的門）、階梯下沉劇場（`TERRACED`，越往中間越低，每圈降 1 格，最低低 3 格，沒有樓梯方塊）；原本的大廳分區維持 40%
+- 新增測試 `megahallStylesAllAppearAndInteriorStaysWalkable`（四種版型都出現；內部每個可走方塊都走得到）
+- `gradlew build` 通過；`runClientGameTest` 失敗在 Level 1 的「橡膠房椅子 `sunken_chair` 掉落物不對」（`b623c12` 沒有附戰利品表，與本次改動無關，尚未修）
 - 改在單一資料夾 `Desktop\Backroom`（`main`）工作；先把朋友在 GitHub 新推的 3 個提交（Level 0 馬尼拉房間、多層樓梯間、斷路器與筆記）快轉合併進來，沒有衝突
 - 使用者要求在 Gemini（Antigravity）規劃的 60 層之外，再找其他來源、把樓層企劃擴充到 200～300 層：
   - 查證來源：Backrooms Wikidot 樓層總表（0～199 主樓層、0～99 子樓層、無編號樓層）、後室中文維基原創層級、B 站後室 Wiki、Escape the Backrooms 攻略；Fandom 擋自動讀取，沒辦法查證
@@ -102,6 +105,16 @@
   - 管線依照片改成連續長管（拿掉一節一節的箍環、紅管只留閥門），截圖確認
   - 驗證：`gradlew build`（34 個單元測試）與 `runClientGameTest`（Level 0、1、2）全部通過；中途朋友的 Level 0 Edge Shift 測試偶爾逾時一次（看隨機），重跑通過
 - 使用者同意後，把 `main`（企劃書 `cd71cdb`、Level 2 `83e2946`）推送到 GitHub；沒有強制推送、沒有改寫歷史
+
+- 使用者要求加入子樓層，讀 Backrooms 中文維基 Level 0.1 原文後規劃；使用者決定：先把子樓層共用做法做好、機器人全部當中立環境角色（建模要在 Blender）、入口兩種都做、球殼要又大又深又壯觀（高度與深度要夠）：
+  - 共用做法（`core/`）：`Sublevels`（登記子層級：父層、隨機切出權重）、`LevelExitBlock`（右鍵出口方塊：`to`／`leave`／`cutOut`）、`Landing`（落點檢查）；根目錄 `README.md` 加「子樓層」一節；維度 ID 照規則用句點 `level_0.1`，套件 `level0p1`
+  - Level 0.1 天頂站（`level0p1/`，細節見 `docs/levels/level0p1/README.md`）：維度高度 1024（`min_y=-512`），真的做成半徑 480 的球殼——外殼、約 290 格厚的甲板殼體（每 8 格一層、約 120 層）、隔艙壁、環廊、玻璃內殼、半徑 176 的中央空洞（奇點、電漿圓盤、四條輻條、大樑環、冷卻水湖）；`ZenithLayout` 是純函式，`ZenithChunkGenerator` 只負責轉成方塊
+  - 殼體內容：16×16 模組（四格寬走廊＋10×10 房間）、10 種房間（臥室、廚房、健身室、水培溫室、控制室、機房、儲藏室、空房、毀損房、氣閘室）、每 48×48 角落一座螺旋梯（每圈上一層）、約十分之一的 48×48×48 水培大廳（苔蘚、池塘、杜鵑樹、天橋、光球）、冷／熱／暗的損壞區、自動門（靠近開、離開關）、站內廣播與音效
+  - 出入口：Level 0 每 1 公里見方有一半會藏一扇白色艙門（區塊載入時放進去，不改變能走的路）；B.N.T.G. 信標（末影珍珠＋2 合金＋紅石）在 Level 0 直接進站；氣閘室的黃色門框回 Level 0；毀損房的雜訊裂縫隨機切出（85% Level 1、15% Level 0）
+  - 55 個新方塊與貼圖、模型、blockstates、物品、掉落物表、語言、音效、挖掘標籤，全由 `tools/make_level0p1.py` 產生，預覽 `docs/levels/level0p1/textures.png`；注意：方塊 ID 全站共用，`corridor_floor`、`supply_crate` 已被 Level 1 用掉，天頂站的改叫 `station_corridor_floor`、`station_crate`（第一次跑腳本時蓋掉過 Level 1 的檔案，已用 git 還原並刪掉多餘檔案）
+  - 中立機器人（`level0p1/robots/`、`src/client/.../level0p1/robots/`）：七足清洗機器人、廚房機器人、壞掉的服務機器人；`tools/make_robots.py` 產生 BoxRig 規格檔 `monsters/robots.json`、貼圖與三段動畫，`tools/blender_robots.py` 用 Blender 5.3 的 bpy 組出 `art/robots/robots.blend` 與三張預覽（容器裡用 `pip install bpy` 在虛擬環境跑，沒有 GUI）；機器人不攻擊、會閒逛、遠離玩家會消失，`ZenithRobots` 依房間在玩家附近生出（廚房→廚師、毀損／暗區→服務機器人、其他→清洗機器人）
+  - 測試：`ZenithLayoutTest`（上樓、走廊到中央平台、降落點、氣閘出口、外殼封閉、區塊生成速度）；`Level0p1ClientTest`（用 Xvfb 虛擬螢幕真的跑遊戲客戶端：用信標進站、每種房間、樓梯、中庭、環廊窗、輻條與奇點、機器人、自動門、回 Level 0、切出、艙門）；這次在雲端容器裡裝了 Java 25（`/tmp/jdk25`）才能編譯與測試
+  - 還沒做：站內材料的合成（Antigravity）、視聽幻覺與導航失效、機器人生怪蛋、站內更多事件
 
 ## 動作記錄（Antigravity）
 
@@ -138,3 +151,8 @@
   - `monsters/shepherdsnake/ShepherdSnake.java`：新增 `DATA_STOOP` 同步、`CROUCH_SIZE`（`1.9×2.35`，眼高 `1.75`）、生成第一 tick 立即於 `isInWall()` 前切換姿勢避免出生窒息、站起前碰撞檢查、以及依低頭程度限制 `bulldozeObstacles` 高度避免拆毀天花板
   - `ShepherdSnakeRenderer.java`、`ShepherdSnakeModel.java`：同步 `stoop` 權重並混合 `low_ceiling_stoop`，低頭時限制抬頭仰角
   - `Level1ClientTest.java`：新增 `shepherdSnake` 實機測試段（驗證 Level 0 滿血不窒息低頭與 Level 1 五格大廳站立），`gradlew build` 與 `NOCLIP_ONLY=shepherdSnake gradlew runClientGameTest`（含 Level 0、Level 1 該段、Level 2）全部通過
+
+- 依使用者要求同步本機與 GitHub 進度：
+  - 將主工作目錄切回 `main`，在 `.gitignore` 加入 `logs/`、`__pycache__/`、`*.blend1`
+  - 提交工作區既有的 Level 1 薄型相連辦公隔間板改動（`CubiclePanelBlock`、`make_cubicle_models.py`、模型與 blockstate，`b9121b0`）
+  - 將 `claude` 分支尚未進主線的提交 `bdad687`（Level 0 巨構房間新增柱廊、分隔房間群與階梯下沉劇場三種版型及測試）合併進 `main`，通過 `gradlew build` 後將 `main` 與 `claude` 推送至 GitHub（無強制推送、無改寫歷史）

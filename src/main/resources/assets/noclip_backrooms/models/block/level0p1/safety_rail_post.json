@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/fence_post",
+  "textures": {
+    "texture": "noclip_backrooms:block/level0p1/safety_rail"
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level1/cubicle_trim",
+    "trim": "noclip_backrooms:block/level1/cubicle_trim",
+    "side": "noclip_backrooms:block/level1/cubicle_panel_2"
+  },
+  "elements": [
+    {
+      "from": [
+        7,
+        0,
+        0
+      ],
+      "to": [
+        9,
+        16,
+        7
+      ],
+      "faces": {
+        "north": {
+          "texture": "#trim"
+        },
+        "up": {
+          "texture": "#trim"
+        },
+        "down": {
+          "texture": "#trim"
+        },
+        "east": {
+          "texture": "#side",
+          "uv": [
+            9,
+            0,
+            16,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#side",
+          "uv": [
+            0,
+            0,
+            7,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

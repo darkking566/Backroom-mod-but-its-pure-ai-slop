@@ -266,7 +266,15 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		shoot(context, game, pipes.getX() + 0.5, STAND, pipes.getZ() + 0.5, 90, 5, "level1_pipe_zone");
 		server.runCommand("gamemode survival @a");
 		context.waitTicks(30);
-		check(LevelExits.refusals() > refusedBefore, "the threshold to Level 2 did nothing");
+		// Level 2 is open now, so the threshold carries you down; before it opened, it refused. Either way it does something.
+		boolean carried = server.computeOnServer(s -> s.getPlayerList().getPlayers().getFirst().level().dimension() != Level1.LEVEL_1);
+		check(LevelExits.refusals() > refusedBefore || carried, "the threshold to Level 2 did nothing");
+		if (carried) {
+			server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run tp @a %.1f %d %.1f", pipes.getX() + 0.5, STAND, pipes.getZ() + 0.5));
+			server.waitFor(s -> s.getPlayerList().getPlayers().getFirst().level().dimension() == Level1.LEVEL_1, 100);
+			game.getConnection().waitForChunksDownload();
+			context.waitTicks(20);
+		}
 		// Gauges on the pillars and thicker pipes overhead, toward the middle of the pipe zone.
 		long pipeSeed = seed;
 		BlockPos gauge = null;

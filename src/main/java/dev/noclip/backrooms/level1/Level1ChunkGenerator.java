@@ -109,7 +109,7 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 			case TABLE -> y == FLOOR_Y + 1 ? state(Level1Blocks.OFFICE_DESK) : corridor(ceiling, y);
 			case GALLERY -> y <= LOW_CEILING_Y ? state(Level1Blocks.GALLERY_WALL) : state(Level1Blocks.GARAGE_WALL);
 			case BOOKSHELF -> y <= FLOOR_Y + 2 ? state(Level1Blocks.BOOK_SHELF) : corridor(ceiling, y);
-			case PARTITION -> y <= FLOOR_Y + 1 ? state(Level1Blocks.CUBICLE_PANEL) : corridor(ceiling, y);
+			case PARTITION -> y <= FLOOR_Y + 1 ? panel(seed, x, z) : corridor(ceiling, y);
 			case ROOM_SHELF -> y <= FLOOR_Y + 2 ? state(Level1Blocks.METAL_SHELF) : corridor(ceiling, y);
 			case WALL -> y <= LOW_CEILING_Y ? state(Level1Blocks.PAINTED_CONCRETE_WALL) : state(Level1Blocks.GARAGE_WALL);
 			case BRICK -> y <= LOW_CEILING_Y ? state(Level1Blocks.OLD_BRICK) : state(Level1Blocks.GARAGE_WALL);
@@ -167,6 +167,17 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 	private static BlockState sign(int x) {
 		boolean alongZ = Math.floorMod(x, Level1Layout.DISTRICT) == 0;
 		return state(Level1Blocks.EMERGENCY_SIGN).setValue(AxisSignBlock.AXIS, alongZ ? Direction.Axis.Z : Direction.Axis.X);
+	}
+
+	/** A cubicle panel with arms toward the panels next to it and a look picked from where it stands. */
+	private static BlockState panel(long seed, int x, int z) {
+		int[] weights = {0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 3};
+		int style = weights[Math.floorMod(Level1Layout.hash(seed, x, z, 17), weights.length)];
+		return CubiclePanelBlock.with(isPanel(seed, x, z - 1), isPanel(seed, x + 1, z), isPanel(seed, x, z + 1), isPanel(seed, x - 1, z), style);
+	}
+
+	private static boolean isPanel(long seed, int x, int z) {
+		return Level1Layout.tile(seed, x, z) == Tile.PARTITION;
 	}
 
 	/** What sits on an office desk: mostly a computer, otherwise a dead plant, a fern in a pot, or nothing. */

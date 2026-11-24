@@ -31,6 +31,12 @@ bin/
 # fabric
 
 run/
+logs/
+
+# tools & art backups
+
+__pycache__/
+*.blend1
 
 # java
 

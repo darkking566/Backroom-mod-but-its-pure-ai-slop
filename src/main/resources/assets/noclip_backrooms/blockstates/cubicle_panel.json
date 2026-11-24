@@ -1,22 +1,261 @@
 {
-  "variants": {
-    "": [
-      {
-        "model": "noclip_backrooms:block/level1/cubicle_panel",
-        "weight": 4
-      },
-      {
-        "model": "noclip_backrooms:block/level1/cubicle_panel_1",
-        "weight": 2
-      },
-      {
-        "model": "noclip_backrooms:block/level1/cubicle_panel_2",
-        "weight": 2
-      },
-      {
-        "model": "noclip_backrooms:block/level1/cubicle_panel_3",
-        "weight": 3
+  "multipart": [
+    {
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_post"
       }
-    ]
-  }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "style": "0"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_0"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "style": "0"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_0",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "style": "0"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_0",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "style": "0"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_0",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "style": "1"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_1"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "style": "1"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_1",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "style": "1"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_1",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "style": "1"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_1",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "style": "2"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_2"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "style": "2"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_2",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "style": "2"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_2",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "style": "2"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_2",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "style": "3"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_3"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "style": "3"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_3",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "style": "3"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_3",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "style": "3"
+          }
+        ]
+      },
+      "apply": {
+        "model": "noclip_backrooms:block/level1/cubicle_panel_arm_3",
+        "y": 270
+      }
+    }
+  ]
 }

@@ -452,6 +452,56 @@ class MazeTest {
 	}
 
 	@Test
+	void megahallStylesAllAppearAndInteriorStaysWalkable() {
+		int cell = Maze.CELL, span = MegahallPlan.MACRO_CELLS;
+		EnumSet<MegahallPlan.Style> seen = EnumSet.noneOf(MegahallPlan.Style.class);
+
+		for (long seed = 1; seed <= 6; seed++) {
+			for (int mx = -3; mx <= 3; mx++) {
+				for (int mz = -3; mz <= 3; mz++) {
+					int baseCx = mx * span, baseCz = mz * span;
+					MegahallPlan.Style style = MegahallPlan.styleAt(seed, baseCx, baseCz);
+					seen.add(style);
+					if (style == MegahallPlan.Style.BAYS) continue;
+
+					// Walk the interior (cells 1..14) from its centre; every open block must be reachable.
+					int ox = (baseCx + 1) * cell, oz = (baseCz + 1) * cell, n = (span - 2) * cell;
+					boolean[] visited = new boolean[n * n];
+					ArrayDeque<int[]> queue = new ArrayDeque<>();
+					int startX = (baseCx + 2) * cell + 3, startZ = (baseCz + 2) * cell + 3;
+					assertFalse(MegahallPlan.isWallAt(seed, startX, startZ, false), style + " start is a wall");
+					visited[(startX - ox) * n + (startZ - oz)] = true;
+					queue.add(new int[] {startX, startZ});
+					int reached = 1, open = 0;
+					int[][] steps = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+					for (int i = 0; i < n; i++) {
+						for (int j = 0; j < n; j++) {
+							if (!MegahallPlan.isWallAt(seed, ox + i, oz + j, false)) open++;
+						}
+					}
+					while (!queue.isEmpty()) {
+						int[] p = queue.poll();
+						int fy = MegahallPlan.walkableFloorY(seed, p[0], p[1]);
+						for (int[] s : steps) {
+							int nx = p[0] + s[0], nz = p[1] + s[1];
+							if (nx < ox || nz < oz || nx >= ox + n || nz >= oz + n) continue;
+							if (MegahallPlan.isWallAt(seed, nx, nz, false)) continue;
+							if (Math.abs(MegahallPlan.walkableFloorY(seed, nx, nz) - fy) > 1) continue;
+							int k = (nx - ox) * n + (nz - oz);
+							if (visited[k]) continue;
+							visited[k] = true;
+							reached++;
+							queue.add(new int[] {nx, nz});
+						}
+					}
+					assertEquals(open, reached, style + " interior split at macro " + mx + "," + mz + " seed " + seed);
+				}
+			}
+		}
+		assertEquals(EnumSet.allOf(MegahallPlan.Style.class), seen, "not every megahall style was generated");
+	}
+
+	@Test
 	void manilaRoomGeneratesRarelyAndIsFullyConnected() {
 		long seed = 12345L;
 		int found = 0;
