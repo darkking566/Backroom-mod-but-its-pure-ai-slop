@@ -2,11 +2,18 @@ package dev.noclip.backrooms.monsters;
 
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.monsters.arms.Arms;
+import dev.noclip.backrooms.monsters.bacteria.Bacteria;
+import dev.noclip.backrooms.monsters.beastlevel5.BeastOfLevel5;
+import dev.noclip.backrooms.monsters.bonethief.BoneThief;
 import dev.noclip.backrooms.monsters.clump.Clump;
 import dev.noclip.backrooms.monsters.crawler.Crawler;
+import dev.noclip.backrooms.monsters.deathmoth.Deathmoth;
 import dev.noclip.backrooms.monsters.duller.Duller;
+import dev.noclip.backrooms.monsters.faceling.Faceling;
 import dev.noclip.backrooms.monsters.hound.Hound;
 import dev.noclip.backrooms.monsters.nguithrxurh.Nguithrxurh;
+import dev.noclip.backrooms.monsters.partygoer.Partygoer;
+import dev.noclip.backrooms.monsters.partypooper.Partypooper;
 import dev.noclip.backrooms.monsters.shepherdsnake.ShepherdSnake;
 import dev.noclip.backrooms.monsters.shriek.Shriek;
 import dev.noclip.backrooms.monsters.skinstealer.SkinStealer;
@@ -65,6 +72,27 @@ public final class Monsters {
 	public static final EntityType<Nguithrxurh> NGUITHRXURH = register("nguithrxurh",
 			EntityType.Builder.of(Nguithrxurh::new, MobCategory.MONSTER).sized(1.65F, 1.05F).eyeHeight(0.62F).clientTrackingRange(12));
 	public static final Item NGUITHRXURH_SPAWN_EGG = registerEgg("nguithrxurh_spawn_egg", NGUITHRXURH);
+	public static final EntityType<Deathmoth> DEATHMOTH = register("deathmoth",
+			EntityType.Builder.of(Deathmoth::new, MobCategory.MONSTER).sized(1.25F, 1.45F).eyeHeight(0.95F).clientTrackingRange(12));
+	public static final Item DEATHMOTH_SPAWN_EGG = registerEgg("deathmoth_spawn_egg", DEATHMOTH);
+	public static final EntityType<Faceling> FACELING = register("faceling",
+			EntityType.Builder.of(Faceling::new, MobCategory.CREATURE).sized(0.65F, 2.1F).eyeHeight(1.85F).clientTrackingRange(10));
+	public static final Item FACELING_SPAWN_EGG = registerEgg("faceling_spawn_egg", FACELING);
+	public static final EntityType<Partygoer> PARTYGOER = register("partygoer",
+			EntityType.Builder.of(Partygoer::new, MobCategory.MONSTER).sized(0.75F, 2.35F).eyeHeight(2.05F).clientTrackingRange(12));
+	public static final Item PARTYGOER_SPAWN_EGG = registerEgg("partygoer_spawn_egg", PARTYGOER);
+	public static final EntityType<Bacteria> BACTERIA = register("bacteria",
+			EntityType.Builder.of(Bacteria::new, MobCategory.MONSTER).sized(0.8F, 2.68F).eyeHeight(2.38F).clientTrackingRange(14));
+	public static final Item BACTERIA_SPAWN_EGG = registerEgg("bacteria_spawn_egg", BACTERIA);
+	public static final EntityType<BoneThief> BONE_THIEF = register("bone_thief",
+			EntityType.Builder.of(BoneThief::new, MobCategory.MONSTER).sized(1.6F, 1.4F).eyeHeight(0.85F).clientTrackingRange(12));
+	public static final Item BONE_THIEF_SPAWN_EGG = registerEgg("bone_thief_spawn_egg", BONE_THIEF);
+	public static final EntityType<Partypooper> PARTYPOOPER = register("partypooper",
+			EntityType.Builder.of(Partypooper::new, MobCategory.CREATURE).sized(0.68F, 2.04F).eyeHeight(1.78F).clientTrackingRange(10));
+	public static final Item PARTYPOOPER_SPAWN_EGG = registerEgg("partypooper_spawn_egg", PARTYPOOPER);
+	public static final EntityType<BeastOfLevel5> BEAST_LEVEL5 = register("beast_level5",
+			EntityType.Builder.of(BeastOfLevel5::new, MobCategory.MONSTER).sized(0.95F, 2.65F).eyeHeight(2.38F).clientTrackingRange(16));
+	public static final Item BEAST_LEVEL5_SPAWN_EGG = registerEgg("beast_level5_spawn_egg", BEAST_LEVEL5);
 
 	public static final SoundEvent HOUND_GROWL = sound("hound.growl");
 	public static final SoundEvent HOUND_ROAR = sound("hound.roar");
@@ -86,6 +114,13 @@ public final class Monsters {
 		FabricDefaultAttributeRegistry.register(CRAWLER, Crawler.createAttributes());
 		FabricDefaultAttributeRegistry.register(SHEPHERD_SNAKE, ShepherdSnake.createAttributes());
 		FabricDefaultAttributeRegistry.register(NGUITHRXURH, Nguithrxurh.createAttributes());
+		FabricDefaultAttributeRegistry.register(DEATHMOTH, Deathmoth.createAttributes());
+		FabricDefaultAttributeRegistry.register(FACELING, Faceling.createAttributes());
+		FabricDefaultAttributeRegistry.register(PARTYGOER, Partygoer.createAttributes());
+		FabricDefaultAttributeRegistry.register(BACTERIA, Bacteria.createAttributes());
+		FabricDefaultAttributeRegistry.register(BONE_THIEF, BoneThief.createAttributes());
+		FabricDefaultAttributeRegistry.register(PARTYPOOPER, Partypooper.createAttributes());
+		FabricDefaultAttributeRegistry.register(BEAST_LEVEL5, BeastOfLevel5.createAttributes());
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.SPAWN_EGGS).register(output -> {
 			output.accept(HOUND_SPAWN_EGG);
 			output.accept(SMILER_SPAWN_EGG);
@@ -98,6 +133,13 @@ public final class Monsters {
 			output.accept(CRAWLER_SPAWN_EGG);
 			output.accept(SHEPHERD_SNAKE_SPAWN_EGG);
 			output.accept(NGUITHRXURH_SPAWN_EGG);
+			output.accept(DEATHMOTH_SPAWN_EGG);
+			output.accept(FACELING_SPAWN_EGG);
+			output.accept(PARTYGOER_SPAWN_EGG);
+			output.accept(BACTERIA_SPAWN_EGG);
+			output.accept(BONE_THIEF_SPAWN_EGG);
+			output.accept(PARTYPOOPER_SPAWN_EGG);
+			output.accept(BEAST_LEVEL5_SPAWN_EGG);
 		});
 	}
 

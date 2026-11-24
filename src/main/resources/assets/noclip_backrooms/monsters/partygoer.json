@@ -1,0 +1,8617 @@
+{
+  "schema_version": 2,
+  "entity_id": "noclip_backrooms:partygoer",
+  "display_name_zh_tw": "派對客",
+  "display_name_en_us": "Partygoer",
+  "backrooms_entity_number": 67,
+  "style_standard": {
+    "route": "Route A: High-detail distorted pure-box EntityModel (native Minecraft 26.2, zero external animation libraries)",
+    "texture_style": "High-res grimy realistic (weathered Level Fun mustard leather + dried blood)",
+    "units": "16 MC model pixels = 1.0 block/meter; Y-down with ground at y=24.0; entity faces -Z",
+    "recommended_hitbox": {
+      "width": 0.75,
+      "height": 2.35
+    },
+    "measured_bind_size_blocks": {
+      "width": 0.74,
+      "length": 1.043,
+      "height": 2.595
+    },
+    "doorway_clearance_note": "Fits through 2x3 doorways; toggleable party_hat & balloon."
+  },
+  "texture_atlas": {
+    "file": "partygoer_texture.png",
+    "width": 512,
+    "height": 512,
+    "regions": {
+      "skin_yellow": {
+        "u": 8,
+        "v": 8,
+        "w": 152,
+        "h": 152
+      },
+      "skin_fold": {
+        "u": 180,
+        "v": 8,
+        "w": 152,
+        "h": 152
+      },
+      "blood_smile": {
+        "u": 352,
+        "v": 8,
+        "w": 152,
+        "h": 152
+      },
+      "flesh_maw": {
+        "u": 8,
+        "v": 180,
+        "w": 152,
+        "h": 152
+      },
+      "void": {
+        "u": 180,
+        "v": 180,
+        "w": 152,
+        "h": 152
+      },
+      "teeth": {
+        "u": 352,
+        "v": 180,
+        "w": 152,
+        "h": 152
+      },
+      "balloon_red": {
+        "u": 8,
+        "v": 352,
+        "w": 152,
+        "h": 152
+      },
+      "hat_blue": {
+        "u": 180,
+        "v": 352,
+        "w": 152,
+        "h": 152
+      },
+      "string_white": {
+        "u": 352,
+        "v": 352,
+        "w": 152,
+        "h": 152
+      }
+    },
+    "note": "Max cube UV footprint is 22x11px, safely inside 152x152 atlas regions."
+  },
+  "coordinate_conversion": {
+    "matrix_bl_to_mc": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        -1
+      ],
+      [
+        0,
+        1,
+        0
+      ]
+    ],
+    "determinant": 1,
+    "rotation_order": "Minecraft ModelPart default (XYZ Euler radians)",
+    "note": "Anatomical convention: +X = Left (_L), -X = Right (_R), entity faces -Z. Already converted; do not mirror X."
+  },
+  "mechanics_ext": {
+    "sockets": {
+      "Socket_Mouth": {
+        "parent": "Head",
+        "offset_mc": [
+          0.0,
+          -1.28,
+          -2.56
+        ]
+      },
+      "Socket_Hand_L": {
+        "parent": "Arm_L_Wrist",
+        "offset_mc": [
+          -0.32,
+          1.6,
+          -0.8
+        ]
+      },
+      "Socket_Hand_R": {
+        "parent": "Arm_R_Wrist",
+        "offset_mc": [
+          0.32,
+          1.6,
+          -0.8
+        ]
+      }
+    },
+    "emissive_parts": [],
+    "toggle_groups": {
+      "balloon": [
+        "Balloon_BaseTaper",
+        "Balloon_BulgeX",
+        "Balloon_BulgeY",
+        "Balloon_Core",
+        "Balloon_Crown",
+        "Balloon_Knot",
+        "Balloon_String1",
+        "Balloon_String2"
+      ],
+      "party_hat": [
+        "PartyHat_Brim",
+        "PartyHat_Pom",
+        "PartyHat_Tier1",
+        "PartyHat_Tier2",
+        "PartyHat_Tier3",
+        "PartyHat_Tip"
+      ]
+    },
+    "supported_traits": [
+      "statue_lure_ambush (clip: statue_idle -> ambush_reveal)",
+      "grab_and_convert (clip: convert_grab, sockets: Socket_Hand_R/L)",
+      "pop_balloon_enrage (toggle_groups: balloon)",
+      "block_breaker (clip: break_block)",
+      "cake_bait_feed (clip: eat_feed, socket: Socket_Mouth)",
+      "light_sensitive (clip: flinch_light)"
+    ]
+  },
+  "parts": [
+    {
+      "name": "Pelvis",
+      "parent": "root",
+      "pivot_mc": [
+        0.0,
+        6.669,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        -0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "name": "Pelvis_BloodSmear",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            1.6,
+            1.6,
+            0.32
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.28,
+            -0.32,
+            -1.76
+          ],
+          "subpart_rot_rad_mc": [
+            0.0,
+            -0.0,
+            0.20944
+          ],
+          "origin_mc": [
+            -0.8,
+            -0.8,
+            -0.16
+          ]
+        },
+        {
+          "name": "Pelvis_Fold_L",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            2.24,
+            1.76,
+            3.36
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.92,
+            0.32,
+            -0.32
+          ],
+          "subpart_rot_rad_mc": [
+            0.13232,
+            0.06943,
+            -0.10497
+          ],
+          "origin_mc": [
+            -1.12,
+            -0.88,
+            -1.68
+          ]
+        },
+        {
+          "name": "Pelvis_Fold_R",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            2.24,
+            1.76,
+            3.36
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.92,
+            0.16,
+            -0.32
+          ],
+          "subpart_rot_rad_mc": [
+            0.09741,
+            -0.06943,
+            0.10497
+          ],
+          "origin_mc": [
+            -1.12,
+            -0.88,
+            -1.68
+          ]
+        },
+        {
+          "name": "Pelvis_Sack",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            5.44,
+            2.56,
+            3.52
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -2.72,
+            -1.6,
+            -1.76
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spine_Lower",
+      "parent": "Pelvis",
+      "pivot_mc": [
+        0.0,
+        -1.6,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.08727,
+        -0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "name": "Back_FoldLow",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            4.16,
+            3.2,
+            0.8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            -2.24,
+            1.76
+          ],
+          "subpart_rot_rad_mc": [
+            -0.10472,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -2.08,
+            -1.6,
+            -0.4
+          ]
+        },
+        {
+          "name": "Belly_BloodDrip1",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.72,
+            2.56,
+            0.32
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.8,
+            -3.2,
+            -2.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.0,
+            -0.0,
+            -0.06981
+          ],
+          "origin_mc": [
+            -0.36,
+            -1.28,
+            -0.16
+          ]
+        },
+        {
+          "name": "Belly_BloodDrip2",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.48,
+            1.92,
+            0.32
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.64,
+            -2.56,
+            -2.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.0,
+            -0.0,
+            0.10472
+          ],
+          "origin_mc": [
+            -0.24,
+            -0.96,
+            -0.16
+          ]
+        },
+        {
+          "name": "Belly_Sack",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            5.28,
+            4.8,
+            3.68
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -2.64,
+            -4.64,
+            -2.0
+          ]
+        },
+        {
+          "name": "Belly_SagFold1",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            4.8,
+            0.88,
+            0.64
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            -1.28,
+            -1.92
+          ],
+          "subpart_rot_rad_mc": [
+            0.17453,
+            -0.0,
+            0.06981
+          ],
+          "origin_mc": [
+            -2.4,
+            -0.44,
+            -0.32
+          ]
+        },
+        {
+          "name": "Belly_SagFold2",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            4.48,
+            0.768,
+            0.64
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.16,
+            -2.88,
+            -1.92
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            -0.08727
+          ],
+          "origin_mc": [
+            -2.24,
+            -0.384,
+            -0.32
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Spine_Upper",
+      "parent": "Spine_Lower",
+      "pivot_mc": [
+        0.0,
+        -4.48,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.13963,
+        -0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "name": "Torso_ChestBlood1",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            1.04,
+            2.88,
+            0.288
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.32,
+            -4.8,
+            -1.984
+          ],
+          "subpart_rot_rad_mc": [
+            0.0,
+            -0.0,
+            -0.10472
+          ],
+          "origin_mc": [
+            -0.52,
+            -1.44,
+            -0.144
+          ]
+        },
+        {
+          "name": "Torso_ChestBlood2",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.672,
+            3.84,
+            0.288
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.96,
+            -3.84,
+            -1.984
+          ],
+          "subpart_rot_rad_mc": [
+            0.0,
+            -0.0,
+            0.13963
+          ],
+          "origin_mc": [
+            -0.336,
+            -1.92,
+            -0.144
+          ]
+        },
+        {
+          "name": "Torso_ChestBlood3",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.512,
+            2.24,
+            0.288
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.44,
+            -3.2,
+            -1.984
+          ],
+          "subpart_rot_rad_mc": [
+            0.0,
+            -0.0,
+            -0.06981
+          ],
+          "origin_mc": [
+            -0.256,
+            -1.12,
+            -0.144
+          ]
+        },
+        {
+          "name": "Torso_ChestFoldL",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            2.56,
+            0.72,
+            0.48
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.28,
+            -4.48,
+            -1.952
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            -0.17453
+          ],
+          "origin_mc": [
+            -1.28,
+            -0.36,
+            -0.24
+          ]
+        },
+        {
+          "name": "Torso_ChestFoldR",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            2.56,
+            0.72,
+            0.48
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.28,
+            -4.16,
+            -1.952
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            0.17453
+          ],
+          "origin_mc": [
+            -1.28,
+            -0.36,
+            -0.24
+          ]
+        },
+        {
+          "name": "Torso_HunchBack",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            5.12,
+            4.48,
+            1.76
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            -3.84,
+            1.92
+          ],
+          "subpart_rot_rad_mc": [
+            -0.20944,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -2.56,
+            -2.24,
+            -0.88
+          ]
+        },
+        {
+          "name": "Torso_Shoulder_L",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            2.24,
+            1.44,
+            3.2
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            2.72,
+            -6.08,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.0,
+            -0.0,
+            -0.24435
+          ],
+          "origin_mc": [
+            -1.12,
+            -0.72,
+            -1.6
+          ]
+        },
+        {
+          "name": "Torso_Shoulder_R",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            2.24,
+            1.44,
+            3.2
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -2.72,
+            -6.08,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.0,
+            -0.0,
+            0.24435
+          ],
+          "origin_mc": [
+            -1.12,
+            -0.72,
+            -1.6
+          ]
+        },
+        {
+          "name": "Torso_UpperSack",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            6.24,
+            6.4,
+            3.84
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -3.12,
+            -6.4,
+            -1.92
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Neck",
+      "parent": "Spine_Upper",
+      "pivot_mc": [
+        0.0,
+        -6.4,
+        -0.16
+      ],
+      "rest_rot_rad_mc": [
+        0.13963,
+        -0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "name": "Neck_BloodDrip",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.8,
+            2.08,
+            0.352
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.24,
+            -2.0,
+            -1.456
+          ]
+        },
+        {
+          "name": "Neck_Sack",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            2.48,
+            2.24,
+            2.48
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.24,
+            -2.08,
+            -1.24
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Head",
+      "parent": "Neck",
+      "pivot_mc": [
+        0.0,
+        -1.76,
+        -0.16
+      ],
+      "rest_rot_rad_mc": [
+        -0.20213,
+        0.06943,
+        0.10497
+      ],
+      "cubes": [
+        {
+          "name": "Head_BackSack",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            3.92,
+            3.52,
+            1.2
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            -2.96,
+            2.32
+          ],
+          "subpart_rot_rad_mc": [
+            -0.10472,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -1.96,
+            -1.76,
+            -0.6
+          ]
+        },
+        {
+          "name": "Head_CheekLump_L",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            0.88,
+            2.24,
+            2.96
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            2.32,
+            -2.64,
+            -0.16
+          ],
+          "subpart_rot_rad_mc": [
+            -0.00731,
+            0.06943,
+            -0.10497
+          ],
+          "origin_mc": [
+            -0.44,
+            -1.12,
+            -1.48
+          ]
+        },
+        {
+          "name": "Head_CheekLump_R",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            0.88,
+            2.24,
+            2.96
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -2.32,
+            -2.64,
+            -0.16
+          ],
+          "subpart_rot_rad_mc": [
+            -0.00731,
+            -0.06943,
+            0.10497
+          ],
+          "origin_mc": [
+            -0.44,
+            -1.12,
+            -1.48
+          ]
+        },
+        {
+          "name": "Head_CrownDomed",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            3.84,
+            0.88,
+            3.76
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.92,
+            -5.88,
+            -1.8
+          ]
+        },
+        {
+          "name": "Head_InnerGumUp",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            3.04,
+            0.4,
+            0.8
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.52,
+            -1.928,
+            -2.08
+          ]
+        },
+        {
+          "name": "Head_InnerVoid",
+          "material": "void",
+          "uv_region": [
+            180,
+            180
+          ],
+          "size_mc": [
+            3.28,
+            1.84,
+            2.88
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.64,
+            -2.44,
+            -2.0
+          ]
+        },
+        {
+          "name": "Head_UpperCore",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            4.48,
+            3.68,
+            4.4
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -2.24,
+            -5.12,
+            -2.2
+          ]
+        },
+        {
+          "name": "PartyHat_Brim",
+          "material": "string_white",
+          "uv_region": [
+            352,
+            352
+          ],
+          "size_mc": [
+            2.88,
+            0.512,
+            2.88
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.56,
+            -6.0,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.14812,
+            0.13275,
+            0.31704
+          ],
+          "origin_mc": [
+            -1.44,
+            -0.256,
+            -1.44
+          ]
+        },
+        {
+          "name": "PartyHat_Pom",
+          "material": "string_white",
+          "uv_region": [
+            352,
+            352
+          ],
+          "size_mc": [
+            0.896,
+            0.896,
+            0.896
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.888,
+            -10.0,
+            0.48
+          ],
+          "subpart_rot_rad_mc": [
+            0.14812,
+            0.13275,
+            0.31704
+          ],
+          "origin_mc": [
+            -0.448,
+            -0.448,
+            -0.448
+          ]
+        },
+        {
+          "name": "PartyHat_Tier1",
+          "material": "hat_blue",
+          "uv_region": [
+            180,
+            352
+          ],
+          "size_mc": [
+            2.48,
+            1.088,
+            2.48
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.768,
+            -6.72,
+            0.0
+          ],
+          "subpart_rot_rad_mc": [
+            0.14812,
+            0.13275,
+            0.31704
+          ],
+          "origin_mc": [
+            -1.24,
+            -0.544,
+            -1.24
+          ]
+        },
+        {
+          "name": "PartyHat_Tier2",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            1.792,
+            1.088,
+            1.792
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.088,
+            -7.712,
+            0.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.14812,
+            0.13275,
+            0.31704
+          ],
+          "origin_mc": [
+            -0.896,
+            -0.544,
+            -0.896
+          ]
+        },
+        {
+          "name": "PartyHat_Tier3",
+          "material": "hat_blue",
+          "uv_region": [
+            180,
+            352
+          ],
+          "size_mc": [
+            1.088,
+            1.04,
+            1.088
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.408,
+            -8.64,
+            0.32
+          ],
+          "subpart_rot_rad_mc": [
+            0.14812,
+            0.13275,
+            0.31704
+          ],
+          "origin_mc": [
+            -0.544,
+            -0.52,
+            -0.544
+          ]
+        },
+        {
+          "name": "PartyHat_Tip",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.544,
+            0.768,
+            0.544
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.664,
+            -9.408,
+            0.48
+          ],
+          "subpart_rot_rad_mc": [
+            0.14812,
+            0.13275,
+            0.31704
+          ],
+          "origin_mc": [
+            -0.272,
+            -0.384,
+            -0.272
+          ]
+        },
+        {
+          "name": "Smile_Corner_L",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.768,
+            0.48,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.824,
+            -2.336,
+            -2.24
+          ],
+          "subpart_rot_rad_mc": [
+            0.0,
+            -0.0,
+            -0.83776
+          ],
+          "origin_mc": [
+            -0.384,
+            -0.24,
+            -0.112
+          ]
+        },
+        {
+          "name": "Smile_Corner_R",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.768,
+            0.48,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.824,
+            -2.336,
+            -2.24
+          ],
+          "subpart_rot_rad_mc": [
+            0.0,
+            -0.0,
+            0.83776
+          ],
+          "origin_mc": [
+            -0.384,
+            -0.24,
+            -0.112
+          ]
+        },
+        {
+          "name": "Smile_EyeDrip_L",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.256,
+            0.928,
+            0.192
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            1.024,
+            -3.568,
+            -2.336
+          ]
+        },
+        {
+          "name": "Smile_EyeDrip_R",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.24,
+            0.736,
+            0.192
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.24,
+            -3.536,
+            -2.336
+          ]
+        },
+        {
+          "name": "Smile_Eye_L",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.608,
+            1.184,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.088,
+            -3.968,
+            -2.24
+          ],
+          "subpart_rot_rad_mc": [
+            0.0,
+            -0.0,
+            -0.10472
+          ],
+          "origin_mc": [
+            -0.304,
+            -0.592,
+            -0.112
+          ]
+        },
+        {
+          "name": "Smile_Eye_R",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.672,
+            1.312,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.024,
+            -4.032,
+            -2.24
+          ],
+          "subpart_rot_rad_mc": [
+            0.0,
+            -0.0,
+            0.13963
+          ],
+          "origin_mc": [
+            -0.336,
+            -0.656,
+            -0.112
+          ]
+        },
+        {
+          "name": "Smile_UpperRim",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            2.96,
+            0.384,
+            0.224
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.48,
+            -1.856,
+            -2.064
+          ]
+        },
+        {
+          "name": "Tooth_Up_1",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.544,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.312,
+            -1.3504,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            -0.17453
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.272,
+            -0.112
+          ]
+        },
+        {
+          "name": "Tooth_Up_2",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.384,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.984,
+            -1.4144,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            -0.1309
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.192,
+            -0.112
+          ]
+        },
+        {
+          "name": "Tooth_Up_3",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.544,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.656,
+            -1.3504,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            -0.08727
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.272,
+            -0.112
+          ]
+        },
+        {
+          "name": "Tooth_Up_4",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.384,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.328,
+            -1.4144,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            -0.04363
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.192,
+            -0.112
+          ]
+        },
+        {
+          "name": "Tooth_Up_5",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.544,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            -1.3504,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.272,
+            -0.112
+          ]
+        },
+        {
+          "name": "Tooth_Up_6",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.384,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.328,
+            -1.4144,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            0.04363
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.192,
+            -0.112
+          ]
+        },
+        {
+          "name": "Tooth_Up_7",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.544,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.656,
+            -1.3504,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            0.08727
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.272,
+            -0.112
+          ]
+        },
+        {
+          "name": "Tooth_Up_8",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.384,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.984,
+            -1.4144,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            0.1309
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.192,
+            -0.112
+          ]
+        },
+        {
+          "name": "Tooth_Up_9",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.544,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.312,
+            -1.3504,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            0.17453
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.272,
+            -0.112
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Jaw_Split",
+      "parent": "Head",
+      "pivot_mc": [
+        0.0,
+        -1.28,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        -0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "name": "Jaw_InnerFlesh",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            3.12,
+            0.512,
+            2.64
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.56,
+            -0.48,
+            -1.928
+          ]
+        },
+        {
+          "name": "Jaw_Tongue",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            1.52,
+            0.416,
+            2.16
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            -0.352,
+            -1.088
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -0.76,
+            -0.208,
+            -1.08
+          ]
+        },
+        {
+          "name": "Jaw_YellowBottom",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            3.44,
+            0.56,
+            3.12
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.72,
+            1.288,
+            -1.752
+          ]
+        },
+        {
+          "name": "Jaw_YellowChin",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            4.352,
+            1.68,
+            4.08
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -2.176,
+            -0.264,
+            -2.168
+          ]
+        },
+        {
+          "name": "Smile_ChinDrip1",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.32,
+            1.04,
+            0.224
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            0.256,
+            0.248,
+            -2.32
+          ]
+        },
+        {
+          "name": "Smile_ChinDrip2",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.256,
+            0.832,
+            0.224
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.896,
+            0.224,
+            -2.32
+          ]
+        },
+        {
+          "name": "Smile_LowArc_C",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            2.0,
+            0.512,
+            0.256
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.0,
+            -0.128,
+            -2.336
+          ]
+        },
+        {
+          "name": "Smile_LowArc_L",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            1.152,
+            0.48,
+            0.256
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.216,
+            -0.256,
+            -2.208
+          ],
+          "subpart_rot_rad_mc": [
+            0.0,
+            -0.0,
+            -0.48869
+          ],
+          "origin_mc": [
+            -0.576,
+            -0.24,
+            -0.128
+          ]
+        },
+        {
+          "name": "Smile_LowArc_R",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            1.152,
+            0.48,
+            0.256
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.216,
+            -0.256,
+            -2.208
+          ],
+          "subpart_rot_rad_mc": [
+            0.0,
+            -0.0,
+            0.48869
+          ],
+          "origin_mc": [
+            -0.576,
+            -0.24,
+            -0.128
+          ]
+        },
+        {
+          "name": "Tooth_Low_1",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.352,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.152,
+            -0.4288,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            -0.13963,
+            -0.0,
+            0.17453
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.176,
+            -0.112
+          ]
+        },
+        {
+          "name": "Tooth_Low_2",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.512,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.768,
+            -0.4928,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            -0.13963,
+            -0.0,
+            0.11636
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.256,
+            -0.112
+          ]
+        },
+        {
+          "name": "Tooth_Low_3",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.352,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.384,
+            -0.4288,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            -0.13963,
+            -0.0,
+            0.05818
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.176,
+            -0.112
+          ]
+        },
+        {
+          "name": "Tooth_Low_4",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.512,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            -0.4928,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            -0.13963,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.256,
+            -0.112
+          ]
+        },
+        {
+          "name": "Tooth_Low_5",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.352,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.384,
+            -0.4288,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            -0.13963,
+            -0.0,
+            -0.05818
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.176,
+            -0.112
+          ]
+        },
+        {
+          "name": "Tooth_Low_6",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.512,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.768,
+            -0.4928,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            -0.13963,
+            -0.0,
+            -0.11636
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.256,
+            -0.112
+          ]
+        },
+        {
+          "name": "Tooth_Low_7",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.224,
+            0.352,
+            0.224
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.152,
+            -0.4288,
+            -1.792
+          ],
+          "subpart_rot_rad_mc": [
+            -0.13963,
+            -0.0,
+            -0.17453
+          ],
+          "origin_mc": [
+            -0.112,
+            -0.176,
+            -0.112
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_L_Shoulder",
+      "parent": "Spine_Upper",
+      "pivot_mc": [
+        3.92,
+        -5.6,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        -0.30683,
+        -0.15671,
+        -0.45985
+      ],
+      "cubes": [
+        {
+          "name": "Arm_UpFold_L",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            0.72,
+            3.52,
+            1.2
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            0.248,
+            1.12,
+            -0.44
+          ]
+        },
+        {
+          "name": "Arm_Up_L",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            1.52,
+            6.8,
+            1.6
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.76,
+            -0.12,
+            -0.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_L_Elbow",
+      "parent": "Arm_L_Shoulder",
+      "pivot_mc": [
+        0.0,
+        6.72,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        -0.74035,
+        -0.06943,
+        0.10497
+      ],
+      "cubes": [
+        {
+          "name": "Arm_Elbow_L",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            1.472,
+            1.408,
+            1.536
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.736,
+            -0.704,
+            -0.768
+          ]
+        },
+        {
+          "name": "Arm_ForeBlood_L",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            1.344,
+            2.64,
+            1.408
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.672,
+            4.12,
+            -0.704
+          ]
+        },
+        {
+          "name": "Arm_ForeUp_L",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            1.312,
+            4.24,
+            1.376
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.656,
+            0.04,
+            -0.688
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_L_Wrist",
+      "parent": "Arm_L_Elbow",
+      "pivot_mc": [
+        0.0,
+        6.72,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.31904,
+        0.06964,
+        0.06998
+      ],
+      "cubes": [
+        {
+          "name": "Hand_Claw_L_1",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.24,
+            0.7728,
+            0.256
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.32,
+            3.2896,
+            -0.928
+          ],
+          "subpart_rot_rad_mc": [
+            -0.59917,
+            -0.12446,
+            0.31669
+          ],
+          "origin_mc": [
+            -0.12,
+            -0.3864,
+            -0.128
+          ]
+        },
+        {
+          "name": "Hand_Claw_L_2",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.24,
+            0.8979,
+            0.256
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.32,
+            3.4854,
+            -0.464
+          ],
+          "subpart_rot_rad_mc": [
+            -0.50218,
+            -0.0415,
+            0.31444
+          ],
+          "origin_mc": [
+            -0.12,
+            -0.449,
+            -0.128
+          ]
+        },
+        {
+          "name": "Hand_Claw_L_3",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.24,
+            0.8243,
+            0.256
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.32,
+            3.3702,
+            0.016
+          ],
+          "subpart_rot_rad_mc": [
+            -0.57992,
+            0.0415,
+            0.31444
+          ],
+          "origin_mc": [
+            -0.12,
+            -0.4122,
+            -0.128
+          ]
+        },
+        {
+          "name": "Hand_Claw_L_4",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.24,
+            0.6992,
+            0.256
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.32,
+            3.1744,
+            0.48
+          ],
+          "subpart_rot_rad_mc": [
+            -0.65747,
+            0.12446,
+            0.31669
+          ],
+          "origin_mc": [
+            -0.12,
+            -0.3496,
+            -0.128
+          ]
+        },
+        {
+          "name": "Hand_Fing_L_1",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.352,
+            1.0416,
+            0.352
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.128,
+            2.5168,
+            -0.704
+          ],
+          "subpart_rot_rad_mc": [
+            -0.2672,
+            -0.1289,
+            0.17601
+          ],
+          "origin_mc": [
+            -0.176,
+            -0.5208,
+            -0.176
+          ]
+        },
+        {
+          "name": "Hand_Fing_L_2",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.352,
+            1.2102,
+            0.352
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.128,
+            2.5875,
+            -0.24
+          ],
+          "subpart_rot_rad_mc": [
+            -0.18211,
+            -0.04297,
+            0.1747
+          ],
+          "origin_mc": [
+            -0.176,
+            -0.6051,
+            -0.176
+          ]
+        },
+        {
+          "name": "Hand_Fing_L_3",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.352,
+            1.111,
+            0.352
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.128,
+            2.5459,
+            0.24
+          ],
+          "subpart_rot_rad_mc": [
+            -0.27167,
+            0.04297,
+            0.1747
+          ],
+          "origin_mc": [
+            -0.176,
+            -0.5555,
+            -0.176
+          ]
+        },
+        {
+          "name": "Hand_Fing_L_4",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.352,
+            0.9424,
+            0.352
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.128,
+            2.4752,
+            0.704
+          ],
+          "subpart_rot_rad_mc": [
+            -0.36112,
+            0.1289,
+            0.17601
+          ],
+          "origin_mc": [
+            -0.176,
+            -0.4712,
+            -0.176
+          ]
+        },
+        {
+          "name": "Hand_Palm_L",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.896,
+            2.0,
+            1.792
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.448,
+            0.12,
+            -1.056
+          ]
+        },
+        {
+          "name": "Hand_Slit_L",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            0.352,
+            1.2,
+            0.992
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.592,
+            0.552,
+            -0.688
+          ]
+        },
+        {
+          "name": "Hand_Thumb_L",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.384,
+            1.312,
+            0.416
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -0.352,
+            1.408,
+            -1.088
+          ],
+          "subpart_rot_rad_mc": [
+            -0.5236,
+            -0.0,
+            0.38397
+          ],
+          "origin_mc": [
+            -0.192,
+            -0.656,
+            -0.208
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Balloon_Joint",
+      "parent": "Arm_L_Wrist",
+      "pivot_mc": [
+        -0.16,
+        1.6,
+        -0.64
+      ],
+      "rest_rot_rad_mc": [
+        0.87711,
+        0.09707,
+        0.38588
+      ],
+      "cubes": [
+        {
+          "name": "Balloon_BaseTaper",
+          "material": "balloon_red",
+          "uv_region": [
+            8,
+            352
+          ],
+          "size_mc": [
+            2.8,
+            1.04,
+            2.8
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.08,
+            -11.56,
+            -1.72
+          ]
+        },
+        {
+          "name": "Balloon_BulgeX",
+          "material": "balloon_red",
+          "uv_region": [
+            8,
+            352
+          ],
+          "size_mc": [
+            4.64,
+            3.52,
+            3.2
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -2.0,
+            -15.52,
+            -1.92
+          ]
+        },
+        {
+          "name": "Balloon_BulgeY",
+          "material": "balloon_red",
+          "uv_region": [
+            8,
+            352
+          ],
+          "size_mc": [
+            3.2,
+            3.52,
+            4.64
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.28,
+            -15.52,
+            -2.64
+          ]
+        },
+        {
+          "name": "Balloon_Core",
+          "material": "balloon_red",
+          "uv_region": [
+            8,
+            352
+          ],
+          "size_mc": [
+            4.0,
+            4.64,
+            4.0
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.68,
+            -15.92,
+            -2.32
+          ]
+        },
+        {
+          "name": "Balloon_Crown",
+          "material": "balloon_red",
+          "uv_region": [
+            8,
+            352
+          ],
+          "size_mc": [
+            3.12,
+            0.96,
+            3.12
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.24,
+            -16.64,
+            -1.88
+          ]
+        },
+        {
+          "name": "Balloon_Knot",
+          "material": "balloon_red",
+          "uv_region": [
+            8,
+            352
+          ],
+          "size_mc": [
+            0.576,
+            0.544,
+            0.576
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            0.032,
+            -10.672,
+            -0.608
+          ]
+        },
+        {
+          "name": "Balloon_String1",
+          "material": "string_white",
+          "uv_region": [
+            352,
+            352
+          ],
+          "size_mc": [
+            0.16,
+            5.44,
+            0.16
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.08,
+            -5.44,
+            -0.08
+          ]
+        },
+        {
+          "name": "Balloon_String2",
+          "material": "string_white",
+          "uv_region": [
+            352,
+            352
+          ],
+          "size_mc": [
+            0.16,
+            5.12,
+            0.16
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.16,
+            -7.68,
+            -0.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.06981,
+            -0.0,
+            -0.05236
+          ],
+          "origin_mc": [
+            -0.08,
+            -2.56,
+            -0.08
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_R_Shoulder",
+      "parent": "Spine_Upper",
+      "pivot_mc": [
+        -3.92,
+        -5.6,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        -0.20944,
+        -0.0,
+        0.13963
+      ],
+      "cubes": [
+        {
+          "name": "Arm_UpFold_R",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            0.72,
+            3.52,
+            1.2
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.968,
+            1.12,
+            -0.44
+          ]
+        },
+        {
+          "name": "Arm_Up_R",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            1.52,
+            6.8,
+            1.6
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.76,
+            -0.12,
+            -0.8
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_R_Elbow",
+      "parent": "Arm_R_Shoulder",
+      "pivot_mc": [
+        0.0,
+        6.72,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        -0.27925,
+        0.06981,
+        0.0
+      ],
+      "cubes": [
+        {
+          "name": "Arm_Elbow_R",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            1.472,
+            1.408,
+            1.536
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.736,
+            -0.704,
+            -0.768
+          ]
+        },
+        {
+          "name": "Arm_ForeBlood_R",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            1.344,
+            2.64,
+            1.408
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.672,
+            4.12,
+            -0.704
+          ]
+        },
+        {
+          "name": "Arm_ForeUp_R",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            1.312,
+            4.24,
+            1.376
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.656,
+            0.04,
+            -0.688
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arm_R_Wrist",
+      "parent": "Arm_R_Elbow",
+      "pivot_mc": [
+        0.0,
+        6.72,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.14696,
+        -0.10446,
+        -0.0702
+      ],
+      "cubes": [
+        {
+          "name": "Hand_Claw_R_1",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.24,
+            0.7728,
+            0.256
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.32,
+            3.2896,
+            -0.928
+          ],
+          "subpart_rot_rad_mc": [
+            -0.51784,
+            -0.12446,
+            -0.31669
+          ],
+          "origin_mc": [
+            -0.12,
+            -0.3864,
+            -0.128
+          ]
+        },
+        {
+          "name": "Hand_Claw_R_2",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.24,
+            0.8979,
+            0.256
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.32,
+            3.4854,
+            -0.464
+          ],
+          "subpart_rot_rad_mc": [
+            -0.4752,
+            -0.0415,
+            -0.31444
+          ],
+          "origin_mc": [
+            -0.12,
+            -0.449,
+            -0.128
+          ]
+        },
+        {
+          "name": "Hand_Claw_R_3",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.24,
+            0.8243,
+            0.256
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.32,
+            3.3702,
+            0.016
+          ],
+          "subpart_rot_rad_mc": [
+            -0.6069,
+            0.0415,
+            -0.31444
+          ],
+          "origin_mc": [
+            -0.12,
+            -0.4122,
+            -0.128
+          ]
+        },
+        {
+          "name": "Hand_Claw_R_4",
+          "material": "teeth",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.24,
+            0.6992,
+            0.256
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.32,
+            3.1744,
+            0.48
+          ],
+          "subpart_rot_rad_mc": [
+            -0.73879,
+            0.12446,
+            -0.31669
+          ],
+          "origin_mc": [
+            -0.12,
+            -0.3496,
+            -0.128
+          ]
+        },
+        {
+          "name": "Hand_Fing_R_1",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.352,
+            1.0416,
+            0.352
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.128,
+            2.5168,
+            -0.704
+          ],
+          "subpart_rot_rad_mc": [
+            -0.22149,
+            -0.1289,
+            -0.17601
+          ],
+          "origin_mc": [
+            -0.176,
+            -0.5208,
+            -0.176
+          ]
+        },
+        {
+          "name": "Hand_Fing_R_2",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.352,
+            1.2102,
+            0.352
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.128,
+            2.5875,
+            -0.24
+          ],
+          "subpart_rot_rad_mc": [
+            -0.16695,
+            -0.04297,
+            -0.1747
+          ],
+          "origin_mc": [
+            -0.176,
+            -0.6051,
+            -0.176
+          ]
+        },
+        {
+          "name": "Hand_Fing_R_3",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.352,
+            1.111,
+            0.352
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.128,
+            2.5459,
+            0.24
+          ],
+          "subpart_rot_rad_mc": [
+            -0.28683,
+            0.04297,
+            -0.1747
+          ],
+          "origin_mc": [
+            -0.176,
+            -0.5555,
+            -0.176
+          ]
+        },
+        {
+          "name": "Hand_Fing_R_4",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.352,
+            0.9424,
+            0.352
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.128,
+            2.4752,
+            0.704
+          ],
+          "subpart_rot_rad_mc": [
+            -0.40683,
+            0.1289,
+            -0.17601
+          ],
+          "origin_mc": [
+            -0.176,
+            -0.4712,
+            -0.176
+          ]
+        },
+        {
+          "name": "Hand_Palm_R",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.896,
+            2.0,
+            1.792
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.448,
+            0.12,
+            -1.056
+          ]
+        },
+        {
+          "name": "Hand_Slit_R",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            0.352,
+            1.2,
+            0.992
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            0.24,
+            0.552,
+            -0.688
+          ]
+        },
+        {
+          "name": "Hand_Thumb_R",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            0.384,
+            1.312,
+            0.416
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.352,
+            1.408,
+            -1.088
+          ],
+          "subpart_rot_rad_mc": [
+            -0.5236,
+            -0.0,
+            -0.38397
+          ],
+          "origin_mc": [
+            -0.192,
+            -0.656,
+            -0.208
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leg_L_Hip",
+      "parent": "Pelvis",
+      "pivot_mc": [
+        1.76,
+        0.64,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        -0.13963,
+        -0.0,
+        -0.03491
+      ],
+      "cubes": [
+        {
+          "name": "Leg_ThighFold_L",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            0.88,
+            3.84,
+            1.6
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            0.328,
+            1.28,
+            -0.64
+          ]
+        },
+        {
+          "name": "Leg_Thigh_L",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            2.048,
+            7.68,
+            2.16
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.024,
+            -0.08,
+            -1.08
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leg_L_Knee",
+      "parent": "Leg_L_Hip",
+      "pivot_mc": [
+        0.0,
+        7.68,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.2618,
+        -0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "name": "Leg_AnkleBlood_L",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            1.632,
+            2.32,
+            1.728
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.816,
+            5.4,
+            -0.864
+          ]
+        },
+        {
+          "name": "Leg_Knee_L",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            1.824,
+            1.52,
+            1.92
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.912,
+            -0.76,
+            -1.12
+          ]
+        },
+        {
+          "name": "Leg_Shin_L",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            1.664,
+            5.44,
+            1.76
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.832,
+            0.16,
+            -0.88
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leg_L_Ankle",
+      "parent": "Leg_L_Knee",
+      "pivot_mc": [
+        0.0,
+        7.68,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        -0.12217,
+        -0.0,
+        0.03491
+      ],
+      "cubes": [
+        {
+          "name": "Foot_Base_L",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            1.792,
+            1.088,
+            3.76
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.896,
+            0.384,
+            -2.84
+          ]
+        },
+        {
+          "name": "Foot_Toe_L_1",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            0.288,
+            0.416,
+            0.8
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.72,
+            1.04,
+            -3.472
+          ]
+        },
+        {
+          "name": "Foot_Toe_L_2",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            0.288,
+            0.416,
+            0.8
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.336,
+            1.04,
+            -3.472
+          ]
+        },
+        {
+          "name": "Foot_Toe_L_3",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            0.288,
+            0.416,
+            0.8
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            0.048,
+            1.04,
+            -3.472
+          ]
+        },
+        {
+          "name": "Foot_Toe_L_4",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            0.288,
+            0.416,
+            0.8
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            0.432,
+            1.04,
+            -3.472
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leg_R_Hip",
+      "parent": "Pelvis",
+      "pivot_mc": [
+        -1.76,
+        0.64,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.06981,
+        -0.0,
+        0.03491
+      ],
+      "cubes": [
+        {
+          "name": "Leg_ThighFold_R",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            0.88,
+            3.84,
+            1.6
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.208,
+            1.28,
+            -0.64
+          ]
+        },
+        {
+          "name": "Leg_Thigh_R",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            2.048,
+            7.68,
+            2.16
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.024,
+            -0.08,
+            -1.08
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leg_R_Knee",
+      "parent": "Leg_R_Hip",
+      "pivot_mc": [
+        0.0,
+        7.68,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.17453,
+        -0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "name": "Leg_AnkleBlood_R",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            1.632,
+            2.32,
+            1.728
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.816,
+            5.4,
+            -0.864
+          ]
+        },
+        {
+          "name": "Leg_Knee_R",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            1.824,
+            1.52,
+            1.92
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.912,
+            -0.76,
+            -1.12
+          ]
+        },
+        {
+          "name": "Leg_Shin_R",
+          "material": "skin_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            1.664,
+            5.44,
+            1.76
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.832,
+            0.16,
+            -0.88
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leg_R_Ankle",
+      "parent": "Leg_R_Knee",
+      "pivot_mc": [
+        0.0,
+        7.68,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        -0.24435,
+        -0.0,
+        -0.03491
+      ],
+      "cubes": [
+        {
+          "name": "Foot_Base_R",
+          "material": "blood_smile",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            1.792,
+            1.088,
+            3.76
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.896,
+            0.384,
+            -2.84
+          ]
+        },
+        {
+          "name": "Foot_Toe_R_1",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            0.288,
+            0.416,
+            0.8
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.72,
+            1.04,
+            -3.472
+          ]
+        },
+        {
+          "name": "Foot_Toe_R_2",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            0.288,
+            0.416,
+            0.8
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.336,
+            1.04,
+            -3.472
+          ]
+        },
+        {
+          "name": "Foot_Toe_R_3",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            0.288,
+            0.416,
+            0.8
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            0.048,
+            1.04,
+            -3.472
+          ]
+        },
+        {
+          "name": "Foot_Toe_R_4",
+          "material": "skin_fold",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            0.288,
+            0.416,
+            0.8
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            0.432,
+            1.04,
+            -3.472
+          ]
+        }
+      ]
+    }
+  ],
+  "animations": {
+    "statue_idle": {
+      "loop": true,
+      "fps": 24,
+      "keyframes": [
+        {
+          "frame": 1,
+          "time_sec": 0.0,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                6.669,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.08727,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.20213,
+                0.06943,
+                0.10497
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.30683,
+                -0.15671,
+                -0.45985
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.74035,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.87711,
+                0.09707,
+                0.38588
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.13963
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.27925,
+                0.06981,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                -0.03491
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.2618,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.12217,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                -0.03491
+              ]
+            }
+          }
+        },
+        {
+          "frame": 12,
+          "time_sec": 0.4583,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                6.669,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.08727,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.13581,
+                0.13418,
+                0.28185
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.26647,
+                -0.15393,
+                -0.49507
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.74035,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.80076,
+                0.06163,
+                0.4897
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -0.17453,
+                -0.0,
+                0.15708
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.27925,
+                0.06981,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                -0.03491
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.2618,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.12217,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                -0.03491
+              ]
+            }
+          }
+        },
+        {
+          "frame": 22,
+          "time_sec": 0.875,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                6.669,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.08727,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.18991,
+                -0.16591,
+                -0.31869
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.34728,
+                -0.15931,
+                -0.4246
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.74035,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.94629,
+                0.13418,
+                0.28185
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                0.12217
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.27925,
+                0.06981,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                -0.03491
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.2618,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.12217,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                -0.03491
+              ]
+            }
+          }
+        },
+        {
+          "frame": 36,
+          "time_sec": 1.4583,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                6.669,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.08727,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.20213,
+                0.06943,
+                0.10497
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.30683,
+                -0.15671,
+                -0.45985
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.74035,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.87711,
+                0.09707,
+                0.38588
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.13963
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.27925,
+                0.06981,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                -0.03491
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.2618,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.12217,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                -0.03491
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "skip_stalk": {
+      "loop": true,
+      "fps": 24,
+      "keyframes": [
+        {
+          "frame": 37,
+          "time_sec": 0.0,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                6.5746,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.12217,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.23947,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.56824,
+                0.06913,
+                -0.13996
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.81016,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.90757,
+                -0.0,
+                0.10472
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.13963
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.27925,
+                0.06981,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                -0.03491
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                -0.03491
+              ]
+            }
+          }
+        },
+        {
+          "frame": 46,
+          "time_sec": 0.375,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.04224,
+                0.10446,
+                0.0702
+              ],
+              "pos_mc": [
+                0.48,
+                7.1126,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.16074,
+                -0.06972,
+                -0.05249
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.21311,
+                -0.10466,
+                -0.0351
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.25004,
+                0.13656,
+                0.21144
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.36121,
+                0.06875,
+                -0.17495
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.77525,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.66323,
+                -0.0,
+                0.20944
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -0.59341,
+                -0.0,
+                0.20944
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.38397,
+                0.06981,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.48869,
+                -0.0,
+                -0.03491
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.31416,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.20944,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.41888,
+                -0.0,
+                -0.03491
+              ]
+            }
+          }
+        },
+        {
+          "frame": 55,
+          "time_sec": 0.75,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                6.5746,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.12217,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.23947,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.56824,
+                0.06913,
+                -0.13996
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.81016,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.94248,
+                -0.0,
+                -0.06981
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.13963
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.27925,
+                0.06981,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                -0.03491
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                -0.38397,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.76794,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.31416,
+                -0.0,
+                -0.03491
+              ]
+            }
+          }
+        },
+        {
+          "frame": 64,
+          "time_sec": 1.125,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.04224,
+                -0.10446,
+                -0.0702
+              ],
+              "pos_mc": [
+                -0.48,
+                7.1126,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.16074,
+                0.06972,
+                0.05249
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.21311,
+                0.10466,
+                0.0351
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.25004,
+                -0.13656,
+                -0.21144
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.74277,
+                0.06913,
+                -0.13996
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.84507,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                1.11701,
+                -0.0,
+                -0.13963
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                0.31416,
+                -0.0,
+                0.17453
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.24435,
+                0.06981,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                -0.03491
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.20944,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.41888,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                -0.48869,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.31416,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                -0.03491
+              ]
+            }
+          }
+        },
+        {
+          "frame": 72,
+          "time_sec": 1.4583,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                6.5746,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.12217,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.23947,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.56824,
+                0.06913,
+                -0.13996
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.81016,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.90757,
+                -0.0,
+                0.10472
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.13963
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.27925,
+                0.06981,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                -0.03491
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                -0.03491
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "ambush_reveal": {
+      "loop": false,
+      "fps": 24,
+      "keyframes": [
+        {
+          "frame": 73,
+          "time_sec": 0.0,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                6.669,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.08727,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.20213,
+                0.06943,
+                0.10497
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.30683,
+                -0.15671,
+                -0.45985
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.74035,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.87711,
+                0.09707,
+                0.38588
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.13963
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.27925,
+                0.06981,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                -0.03491
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.2618,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.12217,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                -0.03491
+              ]
+            }
+          }
+        },
+        {
+          "frame": 81,
+          "time_sec": 0.3333,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                6.669,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.08727,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.11571,
+                -0.10414,
+                -0.10529
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.08519,
+                0.16591,
+                0.31869
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.24961,
+                -0.18462,
+                -0.49791
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.70544,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.81399,
+                0.09409,
+                0.45595
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.9769,
+                0.15393,
+                0.49507
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.73304,
+                0.41888,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.10701,
+                -0.25843,
+                -0.39789
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                -0.03491
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.2618,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.12217,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                -0.03491
+              ]
+            }
+          }
+        },
+        {
+          "frame": 86,
+          "time_sec": 0.5417,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                6.669,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.08727,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.1096,
+                -0.06964,
+                -0.06998
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.06706,
+                0.19664,
+                0.35623
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.29106,
+                -0.18797,
+                -0.46255
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.70544,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.9086,
+                0.09838,
+                0.35084
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.92096,
+                0.20193,
+                0.60747
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.48869,
+                -0.27925,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.06559,
+                0.19905,
+                0.32071
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                -0.03491
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.2618,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.12217,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                -0.03491
+              ]
+            }
+          }
+        },
+        {
+          "frame": 94,
+          "time_sec": 0.875,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                -0.10472,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                6.8747,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                -0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                -0.10472,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.45379,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.87266,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                0.29284,
+                -0.17323,
+                -0.6037
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.5236,
+                -0.13963,
+                0.0
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.41888,
+                -0.0,
+                0.48869
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                0.51159,
+                0.24598,
+                0.68771
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.55851,
+                0.20944,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.27925,
+                -0.0,
+                -0.08727
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.48869,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.27925,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.41888,
+                -0.0,
+                -0.08727
+              ]
+            }
+          }
+        },
+        {
+          "frame": 101,
+          "time_sec": 1.1667,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                6.5943,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.08727,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                -0.10472,
+                -0.06981,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.37424,
+                0.06913,
+                0.13996
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.80285,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.13181,
+                -0.09564,
+                -0.42092
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.81016,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.62832,
+                -0.0,
+                0.31416
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                0.28041,
+                0.18104,
+                0.53322
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.27925,
+                0.06981,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                -0.03491
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.2618,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.12217,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                -0.03491
+              ]
+            }
+          }
+        },
+        {
+          "frame": 108,
+          "time_sec": 1.4583,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                6.669,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.08727,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.20213,
+                0.06943,
+                0.10497
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.30683,
+                -0.15671,
+                -0.45985
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.74035,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.87711,
+                0.09707,
+                0.38588
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.13963
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.27925,
+                0.06981,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                -0.03491
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.2618,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.12217,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                -0.03491
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "convert_grab": {
+      "loop": true,
+      "fps": 24,
+      "keyframes": [
+        {
+          "frame": 109,
+          "time_sec": 0.0,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                7.1986,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.45379,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.73304,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -1.16041,
+                0.13275,
+                -0.31704
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.5236,
+                -0.13963,
+                0.0
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                1.32645,
+                -0.0,
+                0.24435
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.16041,
+                -0.13275,
+                0.31704
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.5236,
+                0.13963,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.45379,
+                -0.0,
+                -0.06981
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.66323,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.59341,
+                -0.0,
+                -0.06981
+              ]
+            }
+          }
+        },
+        {
+          "frame": 118,
+          "time_sec": 0.375,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                7.1986,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.31416,
+                0.24435,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.38931,
+                -0.20737,
+                -0.1427
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.83776,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.97353,
+                0.16171,
+                -0.38932
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.5236,
+                -0.13963,
+                0.0
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                1.11701,
+                -0.0,
+                0.31416
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -2.0132,
+                0.25455,
+                0.43375
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.62832,
+                0.17453,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.45379,
+                -0.0,
+                -0.06981
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.66323,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.59341,
+                -0.0,
+                -0.06981
+              ]
+            }
+          }
+        },
+        {
+          "frame": 126,
+          "time_sec": 0.7083,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                7.1986,
+                -1.28
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.48869,
+                -0.20944,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.54008,
+                0.17357,
+                0.10632
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.90757,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -1.63965,
+                0.31238,
+                -0.11007
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.42269,
+                -0.13418,
+                0.28185
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                1.50098,
+                -0.0,
+                0.10472
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.63965,
+                -0.31238,
+                0.11007
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.42269,
+                0.13418,
+                -0.28185
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.45379,
+                -0.0,
+                -0.06981
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.66323,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.59341,
+                -0.0,
+                -0.06981
+              ]
+            }
+          }
+        },
+        {
+          "frame": 135,
+          "time_sec": 1.0833,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                7.1986,
+                -0.64
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.41888,
+                0.10472,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.45379,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.41888,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -1.07051,
+                0.41644,
+                0.11455
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -1.02872,
+                -0.1911,
+                0.42715
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                1.67552,
+                -0.0,
+                -0.13963
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.07051,
+                -0.41644,
+                -0.11455
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -1.02872,
+                0.1911,
+                -0.42715
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.45379,
+                -0.0,
+                -0.06981
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.66323,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.59341,
+                -0.0,
+                -0.06981
+              ]
+            }
+          }
+        },
+        {
+          "frame": 144,
+          "time_sec": 1.4583,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                7.1986,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.45379,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.73304,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -1.16041,
+                0.13275,
+                -0.31704
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.5236,
+                -0.13963,
+                0.0
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                1.32645,
+                -0.0,
+                0.24435
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.16041,
+                -0.13275,
+                0.31704
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.5236,
+                0.13963,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.45379,
+                -0.0,
+                -0.06981
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.66323,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.59341,
+                -0.0,
+                -0.06981
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "break_block": {
+      "loop": true,
+      "fps": 24,
+      "keyframes": [
+        {
+          "frame": 145,
+          "time_sec": 0.0,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                7.1986,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.45379,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.73304,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -1.16041,
+                0.13275,
+                -0.31704
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.5236,
+                -0.13963,
+                0.0
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                1.32645,
+                -0.0,
+                0.24435
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.16041,
+                -0.13275,
+                0.31704
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.5236,
+                0.13963,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.45379,
+                -0.0,
+                -0.06981
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.66323,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.59341,
+                -0.0,
+                -0.06981
+              ]
+            }
+          }
+        },
+        {
+          "frame": 154,
+          "time_sec": 0.375,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                -0.06981,
+                0.31416,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                7.2214,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                -0.03491,
+                0.24435,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                -0.10472,
+                0.27925,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.25271,
+                -0.24056,
+                0.17976
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.76794,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.8073,
+                0.09707,
+                -0.38588
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.74035,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                1.25664,
+                -0.0,
+                0.38397
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -2.42014,
+                0.22623,
+                0.39456
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.62832,
+                0.13963,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.38397,
+                -0.0,
+                -0.08727
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.55851,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.17453,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.31416,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.48869,
+                -0.0,
+                -0.08727
+              ]
+            }
+          }
+        },
+        {
+          "frame": 162,
+          "time_sec": 0.7083,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.31416,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                7.1565,
+                -1.28
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.24435,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.5236,
+                -0.31416,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.55828,
+                0.24192,
+                -0.14384
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.83776,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.68632,
+                0.18797,
+                -0.46255
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.67785,
+                -0.1037,
+                0.14039
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.83776,
+                -0.0,
+                0.48869
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.24934,
+                -0.38176,
+                -0.11288
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.18426,
+                0.06913,
+                -0.13996
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.38397,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.48869,
+                -0.0,
+                -0.08727
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.73304,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.27925,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.62832,
+                -0.0,
+                -0.08727
+              ]
+            }
+          }
+        },
+        {
+          "frame": 171,
+          "time_sec": 1.0833,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.06981,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                6.4758,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.20944,
+                -0.06981,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.31416,
+                -0.06981,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.20213,
+                0.06943,
+                0.10497
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.48869,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.56824,
+                0.06913,
+                -0.13996
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.81016,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                1.01229,
+                -0.0,
+                0.17453
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.60744,
+                -0.17068,
+                0.21257
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.48869,
+                0.10472,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                -0.03491
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.2618,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.12217,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.03491
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                -0.03491
+              ]
+            }
+          }
+        },
+        {
+          "frame": 180,
+          "time_sec": 1.4583,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                7.1986,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.45379,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.73304,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -1.16041,
+                0.13275,
+                -0.31704
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.5236,
+                -0.13963,
+                0.0
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                1.32645,
+                -0.0,
+                0.24435
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.16041,
+                -0.13275,
+                0.31704
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -0.5236,
+                0.13963,
+                0.0
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.45379,
+                -0.0,
+                -0.06981
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.66323,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.59341,
+                -0.0,
+                -0.06981
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "eat_feed": {
+      "loop": true,
+      "fps": 24,
+      "keyframes": [
+        {
+          "frame": 181,
+          "time_sec": 0.0,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                7.3023,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.38397,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.13232,
+                0.06943,
+                0.10497
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.20944,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.29485,
+                -0.21107,
+                -0.53675
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.77525,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.86438,
+                0.12542,
+                0.45765
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.17318,
+                -0.38004,
+                0.15043
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -1.62906,
+                0.1478,
+                -0.56541
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                -0.24864,
+                -0.17185,
+                -0.17717
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.48869,
+                -0.0,
+                -0.06981
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.83776,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.34907,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                -0.34907,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.69813,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.34907,
+                -0.0,
+                -0.06981
+              ]
+            }
+          }
+        },
+        {
+          "frame": 186,
+          "time_sec": 0.2083,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                7.3023,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.38397,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.2261,
+                0.10312,
+                0.17547
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.76794,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.28752,
+                -0.20663,
+                -0.57214
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.77525,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.80738,
+                0.1183,
+                0.56291
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.31852,
+                -0.41455,
+                0.15264
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -1.7738,
+                0.14446,
+                -0.60053
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                -0.24864,
+                -0.17185,
+                -0.17717
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.48869,
+                -0.0,
+                -0.06981
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.83776,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.34907,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                -0.34907,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.69813,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.34907,
+                -0.0,
+                -0.06981
+              ]
+            }
+          }
+        },
+        {
+          "frame": 190,
+          "time_sec": 0.375,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                6.8354,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.38397,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.06738,
+                -0.03482,
+                -0.06986
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.26745,
+                -0.21526,
+                -0.5013
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.77525,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.92526,
+                0.1294,
+                0.38738
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.17318,
+                -0.38004,
+                0.15043
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -1.62906,
+                0.1478,
+                -0.56541
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                -0.24864,
+                -0.17185,
+                -0.17717
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.31416,
+                -0.0,
+                -0.06981
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.55851,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.48869,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                -0.06981
+              ]
+            }
+          }
+        },
+        {
+          "frame": 194,
+          "time_sec": 0.5417,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                7.3023,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.38397,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.19119,
+                -0.10312,
+                -0.17547
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.69813,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.28752,
+                -0.20663,
+                -0.57214
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.77525,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.83383,
+                0.12319,
+                0.49276
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.28362,
+                -0.41455,
+                0.15264
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -1.73889,
+                0.14446,
+                -0.60053
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                -0.24864,
+                -0.17185,
+                -0.17717
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.48869,
+                -0.0,
+                -0.06981
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.83776,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.34907,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                -0.34907,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.69813,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.34907,
+                -0.0,
+                -0.06981
+              ]
+            }
+          }
+        },
+        {
+          "frame": 198,
+          "time_sec": 0.7083,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                7.3023,
+                0.0
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.38397,
+                -0.0,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.13232,
+                0.06943,
+                0.10497
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.20944,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.29485,
+                -0.21107,
+                -0.53675
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -0.77525,
+                -0.06943,
+                0.10497
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                0.86438,
+                0.12542,
+                0.45765
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.17318,
+                -0.38004,
+                0.15043
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -1.62906,
+                0.1478,
+                -0.56541
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                -0.24864,
+                -0.17185,
+                -0.17717
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.48869,
+                -0.0,
+                -0.06981
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.83776,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.34907,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                -0.34907,
+                -0.0,
+                0.06981
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.69813,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.34907,
+                -0.0,
+                -0.06981
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "flinch_light": {
+      "loop": true,
+      "fps": 24,
+      "keyframes": [
+        {
+          "frame": 199,
+          "time_sec": 0.0,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                -0.06981,
+                0.10472,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                7.588,
+                0.96
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.06981,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.10472,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.18072,
+                -0.36837,
+                0.29993
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.38397,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.96609,
+                0.20121,
+                -0.28516
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -1.38798,
+                -0.12542,
+                0.45765
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                1.91986,
+                -0.0,
+                0.24435
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.36393,
+                -0.40569,
+                0.26643
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -1.78365,
+                0.13727,
+                -0.67067
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.41888,
+                -0.0,
+                -0.08727
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.69813,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.27925,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.59341,
+                -0.0,
+                -0.08727
+              ]
+            }
+          }
+        },
+        {
+          "frame": 204,
+          "time_sec": 0.2083,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                -0.10472,
+                -0.10472,
+                0.0
+              ],
+              "pos_mc": [
+                0.48,
+                7.459,
+                1.92
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.06981,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.10472,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.17989,
+                -0.45689,
+                0.391
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.59341,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.96609,
+                0.20121,
+                -0.28516
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -1.38798,
+                -0.12542,
+                0.45765
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                1.81514,
+                -0.0,
+                0.41888
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.50688,
+                -0.4682,
+                0.31401
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -1.92152,
+                0.15513,
+                -0.74404
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.41888,
+                -0.0,
+                -0.08727
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.69813,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.27925,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.59341,
+                -0.0,
+                -0.08727
+              ]
+            }
+          }
+        },
+        {
+          "frame": 208,
+          "time_sec": 0.375,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                -0.08727,
+                0.13963,
+                0.0
+              ],
+              "pos_mc": [
+                -0.48,
+                7.5545,
+                1.76
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.06981,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.10472,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.15702,
+                0.4017,
+                -0.30414
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.48869,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.96609,
+                0.20121,
+                -0.28516
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -1.38798,
+                -0.12542,
+                0.45765
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                2.02458,
+                -0.0,
+                -0.10472
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.36393,
+                -0.40569,
+                0.26643
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -1.78365,
+                0.13727,
+                -0.67067
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.41888,
+                -0.0,
+                -0.08727
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.69813,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.27925,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.59341,
+                -0.0,
+                -0.08727
+              ]
+            }
+          }
+        },
+        {
+          "frame": 212,
+          "time_sec": 0.5417,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                -0.08727,
+                -0.05236,
+                0.0
+              ],
+              "pos_mc": [
+                0.16,
+                7.5545,
+                1.28
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.06981,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.10472,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.12273,
+                -0.33828,
+                0.25935
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.38397,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.96609,
+                0.20121,
+                -0.28516
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -1.38798,
+                -0.12542,
+                0.45765
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                1.91986,
+                -0.0,
+                0.24435
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.36393,
+                -0.40569,
+                0.26643
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -1.78365,
+                0.13727,
+                -0.67067
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.41888,
+                -0.0,
+                -0.08727
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.69813,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.27925,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.59341,
+                -0.0,
+                -0.08727
+              ]
+            }
+          }
+        },
+        {
+          "frame": 216,
+          "time_sec": 0.7083,
+          "joints": {
+            "Pelvis": {
+              "rot_rad_mc": [
+                -0.06981,
+                0.10472,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                7.588,
+                0.96
+              ]
+            },
+            "Spine_Lower": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.06981,
+                0.0
+              ]
+            },
+            "Spine_Upper": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.10472,
+                0.0
+              ]
+            },
+            "Neck": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Head": {
+              "rot_rad_mc": [
+                -0.18072,
+                -0.36837,
+                0.29993
+              ]
+            },
+            "Jaw_Split": {
+              "rot_rad_mc": [
+                0.38397,
+                -0.0,
+                0.0
+              ]
+            },
+            "Arm_L_Shoulder": {
+              "rot_rad_mc": [
+                -0.96609,
+                0.20121,
+                -0.28516
+              ]
+            },
+            "Arm_L_Elbow": {
+              "rot_rad_mc": [
+                -1.38798,
+                -0.12542,
+                0.45765
+              ]
+            },
+            "Arm_L_Wrist": {
+              "rot_rad_mc": [
+                0.31904,
+                0.06964,
+                0.06998
+              ]
+            },
+            "Balloon_Joint": {
+              "rot_rad_mc": [
+                1.91986,
+                -0.0,
+                0.24435
+              ]
+            },
+            "Arm_R_Shoulder": {
+              "rot_rad_mc": [
+                -1.36393,
+                -0.40569,
+                0.26643
+              ]
+            },
+            "Arm_R_Elbow": {
+              "rot_rad_mc": [
+                -1.78365,
+                0.13727,
+                -0.67067
+              ]
+            },
+            "Arm_R_Wrist": {
+              "rot_rad_mc": [
+                0.14696,
+                -0.10446,
+                -0.0702
+              ]
+            },
+            "Leg_L_Hip": {
+              "rot_rad_mc": [
+                -0.41888,
+                -0.0,
+                -0.08727
+              ]
+            },
+            "Leg_L_Knee": {
+              "rot_rad_mc": [
+                0.69813,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_L_Ankle": {
+              "rot_rad_mc": [
+                -0.27925,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Hip": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.08727
+              ]
+            },
+            "Leg_R_Knee": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_R_Ankle": {
+              "rot_rad_mc": [
+                -0.59341,
+                -0.0,
+                -0.08727
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

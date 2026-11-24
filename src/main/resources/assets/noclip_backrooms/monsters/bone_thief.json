@@ -1,0 +1,6542 @@
+{
+  "schema_version": 2,
+  "entity_id": "noclip_backrooms:bone_thief",
+  "display_name_zh_tw": "竊骨者",
+  "display_name_en_us": "Bone Thief",
+  "backrooms_entity_number": 121,
+  "style_standard": {
+    "route": "Route A: High-detail distorted pure-box EntityModel (native Minecraft 26.2, zero external animation libraries)",
+    "texture_style": "High-res grimy bumpy armored yellow hide + glowing cyan-violet throat eyes",
+    "units": "16 MC model pixels = 1.0 block/meter; Y-down with ground at y=24.0; entity faces -Z",
+    "recommended_hitbox": {
+      "width": 1.6,
+      "height": 1.4
+    },
+    "measured_bind_size_blocks": {
+      "width": 1.713,
+      "length": 1.973,
+      "height": 1.394
+    }
+  },
+  "texture_atlas": {
+    "file": "bone_thief_texture.png",
+    "width": 512,
+    "height": 512,
+    "regions": {
+      "hide_yellow": {
+        "u": 8,
+        "v": 8,
+        "w": 152,
+        "h": 152
+      },
+      "hide_wart": {
+        "u": 180,
+        "v": 8,
+        "w": 152,
+        "h": 152
+      },
+      "belly_pale": {
+        "u": 352,
+        "v": 8,
+        "w": 152,
+        "h": 152
+      },
+      "flesh_maw": {
+        "u": 8,
+        "v": 180,
+        "w": 152,
+        "h": 152
+      },
+      "void_throat": {
+        "u": 180,
+        "v": 180,
+        "w": 152,
+        "h": 152
+      },
+      "bone_stolen": {
+        "u": 352,
+        "v": 180,
+        "w": 152,
+        "h": 152
+      },
+      "slime_ooze": {
+        "u": 8,
+        "v": 352,
+        "w": 152,
+        "h": 152
+      },
+      "gaze_eye": {
+        "u": 180,
+        "v": 352,
+        "w": 152,
+        "h": 152
+      },
+      "gaze_pupil": {
+        "u": 352,
+        "v": 352,
+        "w": 152,
+        "h": 152
+      }
+    },
+    "note": "Max cube UV footprint is 66x27px."
+  },
+  "coordinate_conversion": {
+    "matrix_bl_to_mc": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        -1
+      ],
+      [
+        0,
+        1,
+        0
+      ]
+    ],
+    "determinant": 1,
+    "rotation_order": "Minecraft ModelPart default (XYZ Euler radians)"
+  },
+  "mechanics_ext": {
+    "sockets": {
+      "Socket_Mouth": {
+        "parent": "Body_Root",
+        "offset_mc": [
+          0.0,
+          -0.64,
+          -10.88
+        ]
+      }
+    },
+    "emissive_parts": [
+      "ThroatEye_Orb_Center",
+      "ThroatEye_Orb_Left1",
+      "ThroatEye_Orb_Left2",
+      "ThroatEye_Orb_Right1",
+      "ThroatEye_Orb_Right2",
+      "ThroatEye_Pupil_Center",
+      "ThroatEye_Pupil_Left1",
+      "ThroatEye_Pupil_Left2",
+      "ThroatEye_Pupil_Right1",
+      "ThroatEye_Pupil_Right2"
+    ],
+    "toggle_groups": {
+      "throat_eyes": [
+        "ThroatEye_Orb_Center",
+        "ThroatEye_Orb_Left1",
+        "ThroatEye_Orb_Left2",
+        "ThroatEye_Orb_Right1",
+        "ThroatEye_Orb_Right2",
+        "ThroatEye_Pupil_Center",
+        "ThroatEye_Pupil_Left1",
+        "ThroatEye_Pupil_Left2",
+        "ThroatEye_Pupil_Right1",
+        "ThroatEye_Pupil_Right2"
+      ]
+    },
+    "supported_traits": [
+      "gaze_curse_dont_look (gaze_open)",
+      "closed_mouth_heavy_armor (waddle_idle)",
+      "armored_ram_breaker (break_block)",
+      "bone_offering_feed (eat_feed)",
+      "flashlight_throat_blind (flinch_light)"
+    ]
+  },
+  "parts": [
+    {
+      "name": "Body_Root",
+      "parent": "root",
+      "pivot_mc": [
+        0.0,
+        13.0454,
+        0.8
+      ],
+      "rest_rot_rad_mc": [
+        0.06981,
+        -0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "name": "Body_BellyLow",
+          "material": "belly_pale",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            13.76,
+            3.2,
+            13.44
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -6.88,
+            3.52,
+            -3.52
+          ]
+        },
+        {
+          "name": "Body_DorsalDome",
+          "material": "hide_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            15.04,
+            4.48,
+            14.08
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -7.52,
+            -9.28,
+            -3.2
+          ]
+        },
+        {
+          "name": "Body_MainHulk",
+          "material": "hide_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            16.96,
+            10.88,
+            15.36
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -8.48,
+            -6.4,
+            -4.16
+          ]
+        },
+        {
+          "name": "Body_RumpBulb",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            14.08,
+            8.96,
+            6.72
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            -0.32,
+            11.84
+          ],
+          "subpart_rot_rad_mc": [
+            -0.17453,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -7.04,
+            -4.48,
+            -3.36
+          ]
+        },
+        {
+          "name": "Body_SideBulgeL",
+          "material": "hide_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            3.84,
+            8.32,
+            13.44
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            8.96,
+            -0.32,
+            3.2
+          ],
+          "subpart_rot_rad_mc": [
+            -0.01214,
+            0.06875,
+            -0.17495
+          ],
+          "origin_mc": [
+            -1.92,
+            -4.16,
+            -6.72
+          ]
+        },
+        {
+          "name": "Body_SideBulgeR",
+          "material": "hide_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            3.84,
+            8.32,
+            13.44
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -8.96,
+            -0.32,
+            3.2
+          ],
+          "subpart_rot_rad_mc": [
+            -0.01214,
+            -0.06875,
+            0.17495
+          ],
+          "origin_mc": [
+            -1.92,
+            -4.16,
+            -6.72
+          ]
+        },
+        {
+          "name": "Maw_AbyssCore",
+          "material": "void_throat",
+          "uv_region": [
+            180,
+            180
+          ],
+          "size_mc": [
+            12.16,
+            6.4,
+            6.4
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -6.08,
+            -3.84,
+            -6.08
+          ]
+        },
+        {
+          "name": "Maw_CheekFleshL",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            2.24,
+            6.72,
+            6.72
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            5.6,
+            -4.0,
+            -6.88
+          ]
+        },
+        {
+          "name": "Maw_CheekFleshR",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            2.24,
+            6.72,
+            6.72
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -7.84,
+            -4.0,
+            -6.88
+          ]
+        },
+        {
+          "name": "StolenBone_Rib1",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.972,
+            5.104,
+            0.972
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            4.16,
+            -9.92,
+            4.48
+          ],
+          "subpart_rot_rad_mc": [
+            -0.35292,
+            -0.16171,
+            -0.38932
+          ],
+          "origin_mc": [
+            -0.486,
+            -2.552,
+            -0.486
+          ]
+        },
+        {
+          "name": "StolenBone_Rib2",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.9072,
+            4.176,
+            0.9072
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -3.52,
+            -9.6,
+            6.08
+          ],
+          "subpart_rot_rad_mc": [
+            -0.41612,
+            0.19664,
+            0.35623
+          ],
+          "origin_mc": [
+            -0.4536,
+            -2.088,
+            -0.4536
+          ]
+        },
+        {
+          "name": "StolenBone_Spur3",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            1.0368,
+            4.64,
+            1.0368
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.96,
+            -8.32,
+            10.24
+          ],
+          "subpart_rot_rad_mc": [
+            -0.6486,
+            -0.1037,
+            -0.14039
+          ],
+          "origin_mc": [
+            -0.5184,
+            -2.32,
+            -0.5184
+          ]
+        },
+        {
+          "name": "Wart_FlankL",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            2.56,
+            4.16,
+            5.44
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            10.88,
+            -2.24,
+            3.52
+          ],
+          "subpart_rot_rad_mc": [
+            0.09902,
+            -0.13656,
+            -0.21144
+          ],
+          "origin_mc": [
+            -1.28,
+            -2.08,
+            -2.72
+          ]
+        },
+        {
+          "name": "Wart_FlankR",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            2.56,
+            4.16,
+            5.44
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -10.88,
+            -1.92,
+            4.48
+          ],
+          "subpart_rot_rad_mc": [
+            -0.0406,
+            0.13656,
+            0.21144
+          ],
+          "origin_mc": [
+            -1.28,
+            -2.08,
+            -2.72
+          ]
+        },
+        {
+          "name": "Wart_Rump1",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            5.12,
+            4.16,
+            3.2
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            2.24,
+            -2.56,
+            14.4
+          ],
+          "subpart_rot_rad_mc": [
+            -0.35944,
+            -0.17282,
+            -0.14175
+          ],
+          "origin_mc": [
+            -2.56,
+            -2.08,
+            -1.6
+          ]
+        },
+        {
+          "name": "Wart_Rump2",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            4.48,
+            3.84,
+            2.88
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -3.52,
+            -0.96,
+            14.08
+          ],
+          "subpart_rot_rad_mc": [
+            -0.24261,
+            0.17068,
+            0.21257
+          ],
+          "origin_mc": [
+            -2.24,
+            -1.92,
+            -1.44
+          ]
+        },
+        {
+          "name": "Wart_TopC",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            5.76,
+            2.24,
+            5.44
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.32,
+            -9.44,
+            3.2
+          ],
+          "subpart_rot_rad_mc": [
+            -0.12494,
+            0.13886,
+            0.10574
+          ],
+          "origin_mc": [
+            -2.88,
+            -1.12,
+            -2.72
+          ]
+        },
+        {
+          "name": "Wart_TopL1",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            4.48,
+            2.24,
+            4.8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            5.44,
+            -8.0,
+            0.96
+          ],
+          "subpart_rot_rad_mc": [
+            0.07225,
+            0.09958,
+            -0.31578
+          ],
+          "origin_mc": [
+            -2.24,
+            -1.12,
+            -2.4
+          ]
+        },
+        {
+          "name": "Wart_TopL2",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            4.16,
+            2.4,
+            5.12
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            4.48,
+            -7.36,
+            7.68
+          ],
+          "subpart_rot_rad_mc": [
+            -0.25383,
+            -0.1016,
+            -0.24564
+          ],
+          "origin_mc": [
+            -2.08,
+            -1.2,
+            -2.56
+          ]
+        },
+        {
+          "name": "Wart_TopR1",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            4.8,
+            2.24,
+            4.48
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -5.12,
+            -8.32,
+            2.24
+          ],
+          "subpart_rot_rad_mc": [
+            -0.14344,
+            -0.13418,
+            0.28185
+          ],
+          "origin_mc": [
+            -2.4,
+            -1.12,
+            -2.24
+          ]
+        },
+        {
+          "name": "Wart_TopR2",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            4.48,
+            2.4,
+            4.8
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -4.8,
+            -7.04,
+            8.32
+          ],
+          "subpart_rot_rad_mc": [
+            -0.28874,
+            0.1016,
+            0.24564
+          ],
+          "origin_mc": [
+            -2.24,
+            -1.2,
+            -2.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Jaw_Upper",
+      "parent": "Body_Root",
+      "pivot_mc": [
+        0.0,
+        -2.56,
+        -2.56
+      ],
+      "rest_rot_rad_mc": [
+        0.06981,
+        -0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "name": "JawUp_CrownWartL",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            5.44,
+            1.92,
+            6.08
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            3.84,
+            -4.8,
+            -4.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.12138,
+            0.10312,
+            -0.17547
+          ],
+          "origin_mc": [
+            -2.72,
+            -0.96,
+            -3.04
+          ]
+        },
+        {
+          "name": "JawUp_CrownWartR",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            5.44,
+            1.92,
+            6.08
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -3.84,
+            -4.8,
+            -4.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.12138,
+            -0.10312,
+            0.17547
+          ],
+          "origin_mc": [
+            -2.72,
+            -0.96,
+            -3.04
+          ]
+        },
+        {
+          "name": "JawUp_FrontLip",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            15.04,
+            2.88,
+            3.84
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            -0.16,
+            -9.92
+          ],
+          "subpart_rot_rad_mc": [
+            0.20944,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -7.52,
+            -1.44,
+            -1.92
+          ]
+        },
+        {
+          "name": "JawUp_HoodMain",
+          "material": "hide_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            15.68,
+            4.8,
+            10.88
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -7.84,
+            -4.64,
+            -10.88
+          ]
+        },
+        {
+          "name": "JawUp_NoseLump",
+          "material": "hide_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            5.12,
+            2.24,
+            3.84
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            -2.88,
+            -9.28
+          ],
+          "subpart_rot_rad_mc": [
+            0.31416,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -2.56,
+            -1.12,
+            -1.92
+          ]
+        },
+        {
+          "name": "JawUp_Palate",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            12.8,
+            0.96,
+            8.96
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -6.4,
+            -0.16,
+            -9.6
+          ]
+        },
+        {
+          "name": "JawUp_Slime1",
+          "material": "slime_ooze",
+          "uv_region": [
+            8,
+            352
+          ],
+          "size_mc": [
+            0.64,
+            2.24,
+            0.64
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            3.84,
+            -0.16,
+            -10.56
+          ]
+        },
+        {
+          "name": "JawUp_Slime2",
+          "material": "slime_ooze",
+          "uv_region": [
+            8,
+            352
+          ],
+          "size_mc": [
+            0.48,
+            1.92,
+            0.48
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -3.44,
+            -0.16,
+            -10.64
+          ]
+        },
+        {
+          "name": "JawUp_SnoutWartL",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            3.84,
+            2.56,
+            3.52
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            5.76,
+            -2.24,
+            -8.32
+          ],
+          "subpart_rot_rad_mc": [
+            0.15092,
+            0.20121,
+            -0.28516
+          ],
+          "origin_mc": [
+            -1.92,
+            -1.28,
+            -1.76
+          ]
+        },
+        {
+          "name": "JawUp_SnoutWartR",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            4.16,
+            2.4,
+            3.2
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -5.44,
+            -1.6,
+            -8.64
+          ],
+          "subpart_rot_rad_mc": [
+            0.07938,
+            -0.23695,
+            0.25152
+          ],
+          "origin_mc": [
+            -2.08,
+            -1.2,
+            -1.6
+          ]
+        },
+        {
+          "name": "Tooth_Up_1",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.736,
+            1.408,
+            0.672
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -5.76,
+            1.1328,
+            -7.04
+          ],
+          "subpart_rot_rad_mc": [
+            0.17453,
+            -0.0,
+            -0.24435
+          ],
+          "origin_mc": [
+            -0.368,
+            -0.704,
+            -0.336
+          ]
+        },
+        {
+          "name": "Tooth_Up_2",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.736,
+            1.024,
+            0.672
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -4.32,
+            0.9984,
+            -8.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.17453,
+            -0.0,
+            -0.18326
+          ],
+          "origin_mc": [
+            -0.368,
+            -0.512,
+            -0.336
+          ]
+        },
+        {
+          "name": "Tooth_Up_3",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.736,
+            1.408,
+            0.672
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -2.88,
+            1.1328,
+            -8.96
+          ],
+          "subpart_rot_rad_mc": [
+            0.17453,
+            -0.0,
+            -0.12217
+          ],
+          "origin_mc": [
+            -0.368,
+            -0.704,
+            -0.336
+          ]
+        },
+        {
+          "name": "Tooth_Up_4",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.736,
+            1.024,
+            0.672
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.44,
+            0.9984,
+            -9.44
+          ],
+          "subpart_rot_rad_mc": [
+            0.17453,
+            -0.0,
+            -0.06109
+          ],
+          "origin_mc": [
+            -0.368,
+            -0.512,
+            -0.336
+          ]
+        },
+        {
+          "name": "Tooth_Up_5",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.736,
+            1.408,
+            0.672
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            1.1328,
+            -9.6
+          ],
+          "subpart_rot_rad_mc": [
+            0.17453,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -0.368,
+            -0.704,
+            -0.336
+          ]
+        },
+        {
+          "name": "Tooth_Up_6",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.736,
+            1.024,
+            0.672
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.44,
+            0.9984,
+            -9.44
+          ],
+          "subpart_rot_rad_mc": [
+            0.17453,
+            -0.0,
+            0.06109
+          ],
+          "origin_mc": [
+            -0.368,
+            -0.512,
+            -0.336
+          ]
+        },
+        {
+          "name": "Tooth_Up_7",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.736,
+            1.408,
+            0.672
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            2.88,
+            1.1328,
+            -8.96
+          ],
+          "subpart_rot_rad_mc": [
+            0.17453,
+            -0.0,
+            0.12217
+          ],
+          "origin_mc": [
+            -0.368,
+            -0.704,
+            -0.336
+          ]
+        },
+        {
+          "name": "Tooth_Up_8",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.736,
+            1.024,
+            0.672
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            4.32,
+            0.9984,
+            -8.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.17453,
+            -0.0,
+            0.18326
+          ],
+          "origin_mc": [
+            -0.368,
+            -0.512,
+            -0.336
+          ]
+        },
+        {
+          "name": "Tooth_Up_9",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.736,
+            1.408,
+            0.672
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            5.76,
+            1.1328,
+            -7.04
+          ],
+          "subpart_rot_rad_mc": [
+            0.17453,
+            -0.0,
+            0.24435
+          ],
+          "origin_mc": [
+            -0.368,
+            -0.704,
+            -0.336
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Jaw_Lower",
+      "parent": "Body_Root",
+      "pivot_mc": [
+        0.0,
+        1.28,
+        -2.56
+      ],
+      "rest_rot_rad_mc": [
+        -0.06981,
+        -0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "name": "JawLow_ChinMain",
+          "material": "hide_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            15.04,
+            3.84,
+            10.56
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -7.52,
+            -0.32,
+            -10.56
+          ]
+        },
+        {
+          "name": "JawLow_Floor",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            12.48,
+            1.12,
+            8.96
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -6.24,
+            -0.88,
+            -9.6
+          ]
+        },
+        {
+          "name": "JawLow_FrontLip",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            14.4,
+            2.56,
+            3.52
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            0.32,
+            -9.6
+          ],
+          "subpart_rot_rad_mc": [
+            -0.17453,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -7.2,
+            -1.28,
+            -1.76
+          ]
+        },
+        {
+          "name": "JawLow_JowlWartL",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            3.52,
+            2.56,
+            3.84
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            6.4,
+            1.6,
+            -7.04
+          ],
+          "subpart_rot_rad_mc": [
+            -0.09699,
+            -0.1693,
+            -0.24796
+          ],
+          "origin_mc": [
+            -1.76,
+            -1.28,
+            -1.92
+          ]
+        },
+        {
+          "name": "JawLow_JowlWartR",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            3.52,
+            2.56,
+            3.84
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -6.4,
+            1.6,
+            -7.04
+          ],
+          "subpart_rot_rad_mc": [
+            -0.09699,
+            0.1693,
+            0.24796
+          ],
+          "origin_mc": [
+            -1.76,
+            -1.28,
+            -1.92
+          ]
+        },
+        {
+          "name": "JawLow_SlimePool",
+          "material": "slime_ooze",
+          "uv_region": [
+            8,
+            352
+          ],
+          "size_mc": [
+            8.32,
+            0.48,
+            5.44
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -4.16,
+            -0.88,
+            -9.76
+          ]
+        },
+        {
+          "name": "JawLow_Tongue",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            7.04,
+            1.44,
+            7.68
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            -0.96,
+            -5.44
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -3.52,
+            -0.72,
+            -3.84
+          ]
+        },
+        {
+          "name": "Tooth_Low_1",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.704,
+            0.928,
+            0.64
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -5.44,
+            -0.8048,
+            -6.88
+          ],
+          "subpart_rot_rad_mc": [
+            -0.17453,
+            -0.0,
+            0.20944
+          ],
+          "origin_mc": [
+            -0.352,
+            -0.464,
+            -0.32
+          ]
+        },
+        {
+          "name": "Tooth_Low_2",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.704,
+            1.28,
+            0.64
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -4.08,
+            -0.928,
+            -7.93
+          ],
+          "subpart_rot_rad_mc": [
+            -0.17453,
+            -0.0,
+            0.15708
+          ],
+          "origin_mc": [
+            -0.352,
+            -0.64,
+            -0.32
+          ]
+        },
+        {
+          "name": "Tooth_Low_3",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.704,
+            0.928,
+            0.64
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -2.72,
+            -0.8048,
+            -8.68
+          ],
+          "subpart_rot_rad_mc": [
+            -0.17453,
+            -0.0,
+            0.10472
+          ],
+          "origin_mc": [
+            -0.352,
+            -0.464,
+            -0.32
+          ]
+        },
+        {
+          "name": "Tooth_Low_4",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.704,
+            1.28,
+            0.64
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.36,
+            -0.928,
+            -9.13
+          ],
+          "subpart_rot_rad_mc": [
+            -0.17453,
+            -0.0,
+            0.05236
+          ],
+          "origin_mc": [
+            -0.352,
+            -0.64,
+            -0.32
+          ]
+        },
+        {
+          "name": "Tooth_Low_5",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.704,
+            0.928,
+            0.64
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            -0.8048,
+            -9.28
+          ],
+          "subpart_rot_rad_mc": [
+            -0.17453,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -0.352,
+            -0.464,
+            -0.32
+          ]
+        },
+        {
+          "name": "Tooth_Low_6",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.704,
+            1.28,
+            0.64
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.36,
+            -0.928,
+            -9.13
+          ],
+          "subpart_rot_rad_mc": [
+            -0.17453,
+            -0.0,
+            -0.05236
+          ],
+          "origin_mc": [
+            -0.352,
+            -0.64,
+            -0.32
+          ]
+        },
+        {
+          "name": "Tooth_Low_7",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.704,
+            0.928,
+            0.64
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            2.72,
+            -0.8048,
+            -8.68
+          ],
+          "subpart_rot_rad_mc": [
+            -0.17453,
+            -0.0,
+            -0.10472
+          ],
+          "origin_mc": [
+            -0.352,
+            -0.464,
+            -0.32
+          ]
+        },
+        {
+          "name": "Tooth_Low_8",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.704,
+            1.28,
+            0.64
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            4.08,
+            -0.928,
+            -7.93
+          ],
+          "subpart_rot_rad_mc": [
+            -0.17453,
+            -0.0,
+            -0.15708
+          ],
+          "origin_mc": [
+            -0.352,
+            -0.64,
+            -0.32
+          ]
+        },
+        {
+          "name": "Tooth_Low_9",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.704,
+            0.928,
+            0.64
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            5.44,
+            -0.8048,
+            -6.88
+          ],
+          "subpart_rot_rad_mc": [
+            -0.17453,
+            -0.0,
+            -0.20944
+          ],
+          "origin_mc": [
+            -0.352,
+            -0.464,
+            -0.32
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Throat_Eyes",
+      "parent": "Body_Root",
+      "pivot_mc": [
+        0.0,
+        -0.8,
+        -2.24
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        -0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "name": "ThroatEye_Lid_Center",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            3.3,
+            3.1152,
+            1.848
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.65,
+            -1.8776,
+            -3.084
+          ]
+        },
+        {
+          "name": "ThroatEye_Lid_Left1",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            2.5,
+            2.36,
+            1.4
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            3.36,
+            -0.96,
+            -1.68
+          ],
+          "subpart_rot_rad_mc": [
+            -0.03469,
+            0.24192,
+            -0.14384
+          ],
+          "origin_mc": [
+            -1.25,
+            -1.18,
+            -0.7
+          ]
+        },
+        {
+          "name": "ThroatEye_Lid_Left2",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            1.9,
+            1.7936,
+            1.064
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            2.24,
+            1.44,
+            -1.84
+          ],
+          "subpart_rot_rad_mc": [
+            0.1212,
+            0.17357,
+            -0.10632
+          ],
+          "origin_mc": [
+            -0.95,
+            -0.8968,
+            -0.532
+          ]
+        },
+        {
+          "name": "ThroatEye_Lid_Right1",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            2.5,
+            2.36,
+            1.4
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -3.36,
+            -0.96,
+            -1.68
+          ],
+          "subpart_rot_rad_mc": [
+            -0.03469,
+            -0.24192,
+            0.14384
+          ],
+          "origin_mc": [
+            -1.25,
+            -1.18,
+            -0.7
+          ]
+        },
+        {
+          "name": "ThroatEye_Lid_Right2",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            1.9,
+            1.7936,
+            1.064
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -2.24,
+            1.44,
+            -1.84
+          ],
+          "subpart_rot_rad_mc": [
+            0.1212,
+            -0.17357,
+            0.10632
+          ],
+          "origin_mc": [
+            -0.95,
+            -0.8968,
+            -0.532
+          ]
+        },
+        {
+          "name": "ThroatEye_Orb_Center",
+          "material": "gaze_eye",
+          "uv_region": [
+            180,
+            352
+          ],
+          "size_mc": [
+            2.64,
+            2.508,
+            1.716
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.32,
+            -1.574,
+            -3.418
+          ]
+        },
+        {
+          "name": "ThroatEye_Orb_Left1",
+          "material": "gaze_eye",
+          "uv_region": [
+            180,
+            352
+          ],
+          "size_mc": [
+            2.0,
+            1.9,
+            1.3
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            3.36,
+            -0.96,
+            -2.08
+          ],
+          "subpart_rot_rad_mc": [
+            -0.03469,
+            0.24192,
+            -0.14384
+          ],
+          "origin_mc": [
+            -1.0,
+            -0.95,
+            -0.65
+          ]
+        },
+        {
+          "name": "ThroatEye_Orb_Left2",
+          "material": "gaze_eye",
+          "uv_region": [
+            180,
+            352
+          ],
+          "size_mc": [
+            1.52,
+            1.444,
+            0.988
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            2.24,
+            1.44,
+            -2.24
+          ],
+          "subpart_rot_rad_mc": [
+            0.1212,
+            0.17357,
+            -0.10632
+          ],
+          "origin_mc": [
+            -0.76,
+            -0.722,
+            -0.494
+          ]
+        },
+        {
+          "name": "ThroatEye_Orb_Right1",
+          "material": "gaze_eye",
+          "uv_region": [
+            180,
+            352
+          ],
+          "size_mc": [
+            2.0,
+            1.9,
+            1.3
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -3.36,
+            -0.96,
+            -2.08
+          ],
+          "subpart_rot_rad_mc": [
+            -0.03469,
+            -0.24192,
+            0.14384
+          ],
+          "origin_mc": [
+            -1.0,
+            -0.95,
+            -0.65
+          ]
+        },
+        {
+          "name": "ThroatEye_Orb_Right2",
+          "material": "gaze_eye",
+          "uv_region": [
+            180,
+            352
+          ],
+          "size_mc": [
+            1.52,
+            1.444,
+            0.988
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -2.24,
+            1.44,
+            -2.24
+          ],
+          "subpart_rot_rad_mc": [
+            0.1212,
+            -0.17357,
+            0.10632
+          ],
+          "origin_mc": [
+            -0.76,
+            -0.722,
+            -0.494
+          ]
+        },
+        {
+          "name": "ThroatEye_Pupil_Center",
+          "material": "gaze_pupil",
+          "uv_region": [
+            352,
+            352
+          ],
+          "size_mc": [
+            0.6864,
+            1.9008,
+            0.5808
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -0.3432,
+            -1.2704,
+            -3.6424
+          ]
+        },
+        {
+          "name": "ThroatEye_Pupil_Left1",
+          "material": "gaze_pupil",
+          "uv_region": [
+            352,
+            352
+          ],
+          "size_mc": [
+            0.52,
+            1.44,
+            0.44
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            3.36,
+            -0.96,
+            -2.68
+          ],
+          "subpart_rot_rad_mc": [
+            -0.03469,
+            0.24192,
+            -0.14384
+          ],
+          "origin_mc": [
+            -0.26,
+            -0.72,
+            -0.22
+          ]
+        },
+        {
+          "name": "ThroatEye_Pupil_Left2",
+          "material": "gaze_pupil",
+          "uv_region": [
+            352,
+            352
+          ],
+          "size_mc": [
+            0.3952,
+            1.0944,
+            0.3344
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            2.24,
+            1.44,
+            -2.696
+          ],
+          "subpart_rot_rad_mc": [
+            0.1212,
+            0.17357,
+            -0.10632
+          ],
+          "origin_mc": [
+            -0.1976,
+            -0.5472,
+            -0.1672
+          ]
+        },
+        {
+          "name": "ThroatEye_Pupil_Right1",
+          "material": "gaze_pupil",
+          "uv_region": [
+            352,
+            352
+          ],
+          "size_mc": [
+            0.52,
+            1.44,
+            0.44
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -3.36,
+            -0.96,
+            -2.68
+          ],
+          "subpart_rot_rad_mc": [
+            -0.03469,
+            -0.24192,
+            0.14384
+          ],
+          "origin_mc": [
+            -0.26,
+            -0.72,
+            -0.22
+          ]
+        },
+        {
+          "name": "ThroatEye_Pupil_Right2",
+          "material": "gaze_pupil",
+          "uv_region": [
+            352,
+            352
+          ],
+          "size_mc": [
+            0.3952,
+            1.0944,
+            0.3344
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -2.24,
+            1.44,
+            -2.696
+          ],
+          "subpart_rot_rad_mc": [
+            0.1212,
+            -0.17357,
+            0.10632
+          ],
+          "origin_mc": [
+            -0.1976,
+            -0.5472,
+            -0.1672
+          ]
+        },
+        {
+          "name": "ThroatEye_StalkBase",
+          "material": "flesh_maw",
+          "uv_region": [
+            8,
+            180
+          ],
+          "size_mc": [
+            8.96,
+            4.16,
+            3.2
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -4.48,
+            -2.08,
+            -1.92
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Throat_Sac",
+      "parent": "Jaw_Lower",
+      "pivot_mc": [
+        0.0,
+        2.56,
+        -4.16
+      ],
+      "rest_rot_rad_mc": [
+        0.0,
+        -0.0,
+        0.0
+      ],
+      "cubes": [
+        {
+          "name": "ThroatSac_Main",
+          "material": "belly_pale",
+          "uv_region": [
+            352,
+            8
+          ],
+          "size_mc": [
+            10.88,
+            3.52,
+            7.04
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -5.44,
+            -1.12,
+            -3.52
+          ]
+        },
+        {
+          "name": "ThroatSac_Wrinkle",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            9.28,
+            1.6,
+            5.44
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -4.64,
+            1.6,
+            -3.36
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leg_FL_Hip",
+      "parent": "Body_Root",
+      "pivot_mc": [
+        8.32,
+        1.6,
+        -4.16
+      ],
+      "rest_rot_rad_mc": [
+        -0.35085,
+        0.15931,
+        -0.4246
+      ],
+      "cubes": [
+        {
+          "name": "Leg_FL_Upper",
+          "material": "hide_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            3.84,
+            5.12,
+            4.16
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.92,
+            -0.16,
+            -2.08
+          ]
+        },
+        {
+          "name": "Leg_FL_Wart",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            2.24,
+            2.88,
+            3.2
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            0.8,
+            0.16,
+            -1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leg_FL_Foot",
+      "parent": "Leg_FL_Hip",
+      "pivot_mc": [
+        0.0,
+        4.48,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.16672,
+        -0.09564,
+        0.42092
+      ],
+      "cubes": [
+        {
+          "name": "Leg_FL_Ankle",
+          "material": "hide_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            3.2,
+            4.16,
+            3.52
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.6,
+            -0.16,
+            -1.76
+          ]
+        },
+        {
+          "name": "Leg_FL_Claw1",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.832,
+            0.928,
+            2.08
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.44,
+            4.48,
+            -4.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.20944,
+            0.0
+          ],
+          "origin_mc": [
+            -0.416,
+            -0.464,
+            -1.04
+          ]
+        },
+        {
+          "name": "Leg_FL_Claw2",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.832,
+            0.928,
+            2.08
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            4.48,
+            -4.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -0.416,
+            -0.464,
+            -1.04
+          ]
+        },
+        {
+          "name": "Leg_FL_Claw3",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.832,
+            0.928,
+            2.08
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.44,
+            4.48,
+            -4.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            0.20944,
+            0.0
+          ],
+          "origin_mc": [
+            -0.416,
+            -0.464,
+            -1.04
+          ]
+        },
+        {
+          "name": "Leg_FL_Pad",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            4.16,
+            1.6,
+            5.44
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -2.08,
+            3.36,
+            -4.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leg_FR_Hip",
+      "parent": "Body_Root",
+      "pivot_mc": [
+        -8.32,
+        1.6,
+        -4.16
+      ],
+      "rest_rot_rad_mc": [
+        -0.35085,
+        -0.15931,
+        0.4246
+      ],
+      "cubes": [
+        {
+          "name": "Leg_FR_Upper",
+          "material": "hide_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            3.84,
+            5.12,
+            4.16
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.92,
+            -0.16,
+            -2.08
+          ]
+        },
+        {
+          "name": "Leg_FR_Wart",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            2.24,
+            2.88,
+            3.2
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -3.04,
+            0.16,
+            -1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leg_FR_Foot",
+      "parent": "Leg_FR_Hip",
+      "pivot_mc": [
+        0.0,
+        4.48,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        0.16672,
+        0.09564,
+        -0.42092
+      ],
+      "cubes": [
+        {
+          "name": "Leg_FR_Ankle",
+          "material": "hide_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            3.2,
+            4.16,
+            3.52
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.6,
+            -0.16,
+            -1.76
+          ]
+        },
+        {
+          "name": "Leg_FR_Claw1",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.832,
+            0.928,
+            2.08
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.44,
+            4.48,
+            -4.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.20944,
+            0.0
+          ],
+          "origin_mc": [
+            -0.416,
+            -0.464,
+            -1.04
+          ]
+        },
+        {
+          "name": "Leg_FR_Claw2",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.832,
+            0.928,
+            2.08
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            4.48,
+            -4.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -0.416,
+            -0.464,
+            -1.04
+          ]
+        },
+        {
+          "name": "Leg_FR_Claw3",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.832,
+            0.928,
+            2.08
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.44,
+            4.48,
+            -4.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            0.20944,
+            0.0
+          ],
+          "origin_mc": [
+            -0.416,
+            -0.464,
+            -1.04
+          ]
+        },
+        {
+          "name": "Leg_FR_Pad",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            4.16,
+            1.6,
+            5.44
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -2.08,
+            3.36,
+            -4.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leg_BL_Hip",
+      "parent": "Body_Root",
+      "pivot_mc": [
+        8.96,
+        1.28,
+        5.44
+      ],
+      "rest_rot_rad_mc": [
+        0.49284,
+        -0.21919,
+        -0.46578
+      ],
+      "cubes": [
+        {
+          "name": "Leg_BL_Upper",
+          "material": "hide_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            4.416,
+            5.12,
+            4.784
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -2.208,
+            -0.16,
+            -2.392
+          ]
+        },
+        {
+          "name": "Leg_BL_Wart",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            2.24,
+            2.88,
+            3.2
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            0.8,
+            0.16,
+            -1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leg_BL_Foot",
+      "parent": "Leg_BL_Hip",
+      "pivot_mc": [
+        0.0,
+        4.8,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        -0.37664,
+        0.15671,
+        0.45985
+      ],
+      "cubes": [
+        {
+          "name": "Leg_BL_Ankle",
+          "material": "hide_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            3.68,
+            4.16,
+            4.048
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.84,
+            -0.16,
+            -2.024
+          ]
+        },
+        {
+          "name": "Leg_BL_Claw1",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.832,
+            0.928,
+            2.08
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.44,
+            4.48,
+            -4.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.20944,
+            0.0
+          ],
+          "origin_mc": [
+            -0.416,
+            -0.464,
+            -1.04
+          ]
+        },
+        {
+          "name": "Leg_BL_Claw2",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.832,
+            0.928,
+            2.08
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            4.48,
+            -4.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -0.416,
+            -0.464,
+            -1.04
+          ]
+        },
+        {
+          "name": "Leg_BL_Claw3",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.832,
+            0.928,
+            2.08
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.44,
+            4.48,
+            -4.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            0.20944,
+            0.0
+          ],
+          "origin_mc": [
+            -0.416,
+            -0.464,
+            -1.04
+          ]
+        },
+        {
+          "name": "Leg_BL_Pad",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            4.784,
+            1.6,
+            5.44
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -2.392,
+            3.36,
+            -4.0
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leg_BR_Hip",
+      "parent": "Body_Root",
+      "pivot_mc": [
+        -8.96,
+        1.28,
+        5.44
+      ],
+      "rest_rot_rad_mc": [
+        0.49284,
+        0.21919,
+        0.46578
+      ],
+      "cubes": [
+        {
+          "name": "Leg_BR_Upper",
+          "material": "hide_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            4.416,
+            5.12,
+            4.784
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -2.208,
+            -0.16,
+            -2.392
+          ]
+        },
+        {
+          "name": "Leg_BR_Wart",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            2.24,
+            2.88,
+            3.2
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -3.04,
+            0.16,
+            -1.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Leg_BR_Foot",
+      "parent": "Leg_BR_Hip",
+      "pivot_mc": [
+        0.0,
+        4.8,
+        0.0
+      ],
+      "rest_rot_rad_mc": [
+        -0.37664,
+        -0.15671,
+        -0.45985
+      ],
+      "cubes": [
+        {
+          "name": "Leg_BR_Ankle",
+          "material": "hide_yellow",
+          "uv_region": [
+            8,
+            8
+          ],
+          "size_mc": [
+            3.68,
+            4.16,
+            4.048
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -1.84,
+            -0.16,
+            -2.024
+          ]
+        },
+        {
+          "name": "Leg_BR_Claw1",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.832,
+            0.928,
+            2.08
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            -1.44,
+            4.48,
+            -4.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.20944,
+            0.0
+          ],
+          "origin_mc": [
+            -0.416,
+            -0.464,
+            -1.04
+          ]
+        },
+        {
+          "name": "Leg_BR_Claw2",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.832,
+            0.928,
+            2.08
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            0.0,
+            4.48,
+            -4.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            -0.0,
+            0.0
+          ],
+          "origin_mc": [
+            -0.416,
+            -0.464,
+            -1.04
+          ]
+        },
+        {
+          "name": "Leg_BR_Claw3",
+          "material": "bone_stolen",
+          "uv_region": [
+            352,
+            180
+          ],
+          "size_mc": [
+            0.832,
+            0.928,
+            2.08
+          ],
+          "needs_subpart": true,
+          "subpart_offset_mc": [
+            1.44,
+            4.48,
+            -4.16
+          ],
+          "subpart_rot_rad_mc": [
+            0.13963,
+            0.20944,
+            0.0
+          ],
+          "origin_mc": [
+            -0.416,
+            -0.464,
+            -1.04
+          ]
+        },
+        {
+          "name": "Leg_BR_Pad",
+          "material": "hide_wart",
+          "uv_region": [
+            180,
+            8
+          ],
+          "size_mc": [
+            4.784,
+            1.6,
+            5.44
+          ],
+          "needs_subpart": false,
+          "origin_mc": [
+            -2.392,
+            3.36,
+            -4.0
+          ]
+        }
+      ]
+    }
+  ],
+  "animations": {
+    "waddle_idle": {
+      "loop": true,
+      "fps": 24,
+      "keyframes": [
+        {
+          "frame": 1,
+          "time_sec": 0.0,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                13.0454,
+                0.8
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -2.24
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 12,
+          "time_sec": 0.4583,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.03491,
+                -0.0,
+                0.03491
+              ],
+              "pos_mc": [
+                0.0,
+                12.791,
+                0.8
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.01745,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.01745,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -2.24
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 24,
+          "time_sec": 0.9583,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.10472,
+                -0.0,
+                -0.03491
+              ],
+              "pos_mc": [
+                0.0,
+                12.3389,
+                0.8
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.08727,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.08727,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -2.24
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 36,
+          "time_sec": 1.4583,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                13.0454,
+                0.8
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -2.24
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "walk_waddle": {
+      "loop": true,
+      "fps": 24,
+      "keyframes": [
+        {
+          "frame": 37,
+          "time_sec": 0.0,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                13.0454,
+                0.8
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -2.24
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 46,
+          "time_sec": 0.375,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.12912,
+                0.13749,
+                0.17621
+              ],
+              "pos_mc": [
+                0.96,
+                11.6249,
+                0.64
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -2.24
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.20944,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.77975,
+                0.21526,
+                -0.5013
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.30302,
+                -0.09409,
+                0.45595
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                0.10027,
+                -0.09707,
+                0.38588
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.03046,
+                0.09707,
+                -0.38588
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.79462,
+                -0.28619,
+                -0.43784
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.55672,
+                0.15931,
+                0.4246
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.05303,
+                0.15096,
+                0.53025
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.09194,
+                -0.15393,
+                -0.49507
+              ]
+            }
+          }
+        },
+        {
+          "frame": 55,
+          "time_sec": 0.75,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                13.0454,
+                0.8
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -2.24
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                -0.10472,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 64,
+          "time_sec": 1.125,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.12912,
+                -0.13749,
+                -0.17621
+              ],
+              "pos_mc": [
+                -0.96,
+                11.6249,
+                0.64
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -2.24
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.20944,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                0.10027,
+                0.09707,
+                -0.38588
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.03046,
+                -0.09707,
+                0.38588
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.77975,
+                -0.21526,
+                0.5013
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.30302,
+                0.09409,
+                -0.45595
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.05303,
+                -0.15096,
+                -0.53025
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.09194,
+                0.15393,
+                0.49507
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.79462,
+                0.28619,
+                0.43784
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.55672,
+                -0.15931,
+                -0.4246
+              ]
+            }
+          }
+        },
+        {
+          "frame": 72,
+          "time_sec": 1.4583,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                13.0454,
+                0.8
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -2.24
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "gaze_open": {
+      "loop": true,
+      "fps": 24,
+      "keyframes": [
+        {
+          "frame": 73,
+          "time_sec": 0.0,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                13.0454,
+                0.8
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -2.24
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 82,
+          "time_sec": 0.375,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                12.9334,
+                0.32
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                -0.80285,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                0.76794,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -6.08
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.41888,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.65567,
+                0.22489,
+                -0.64722
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.34045,
+                -0.11564,
+                0.59795
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.65567,
+                -0.22489,
+                0.64722
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.34045,
+                0.11564,
+                -0.59795
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.63949,
+                -0.23594,
+                -0.57641
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.29604,
+                0.15096,
+                0.53025
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.63949,
+                0.23594,
+                0.57641
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.29604,
+                -0.15096,
+                -0.53025
+              ]
+            }
+          }
+        },
+        {
+          "frame": 90,
+          "time_sec": 0.7083,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                -0.17088,
+                0.05223,
+                0.06991
+              ],
+              "pos_mc": [
+                0.16,
+                11.8377,
+                0.16
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                -0.87266,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                0.76794,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.07954,
+                0.06913,
+                0.13996
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -6.72
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.41888,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.65567,
+                0.22489,
+                -0.64722
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.34045,
+                -0.11564,
+                0.59795
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.65567,
+                -0.22489,
+                0.64722
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.34045,
+                0.11564,
+                -0.59795
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.63949,
+                -0.23594,
+                -0.57641
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.29604,
+                0.15096,
+                0.53025
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.63949,
+                0.23594,
+                0.57641
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.29604,
+                -0.15096,
+                -0.53025
+              ]
+            }
+          }
+        },
+        {
+          "frame": 98,
+          "time_sec": 1.0417,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                -0.13597,
+                -0.05223,
+                -0.06991
+              ],
+              "pos_mc": [
+                -0.16,
+                11.9972,
+                0.16
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                -0.80285,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                0.83776,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                -0.06008,
+                -0.06913,
+                -0.13996
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -6.4
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.41888,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.65567,
+                0.22489,
+                -0.64722
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.34045,
+                -0.11564,
+                0.59795
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.65567,
+                -0.22489,
+                0.64722
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.34045,
+                0.11564,
+                -0.59795
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.63949,
+                -0.23594,
+                -0.57641
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.29604,
+                0.15096,
+                0.53025
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.63949,
+                0.23594,
+                0.57641
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.29604,
+                -0.15096,
+                -0.53025
+              ]
+            }
+          }
+        },
+        {
+          "frame": 108,
+          "time_sec": 1.4583,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                12.9334,
+                0.32
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                -0.80285,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                0.76794,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -6.08
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.41888,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.65567,
+                0.22489,
+                -0.64722
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.34045,
+                -0.11564,
+                0.59795
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.65567,
+                -0.22489,
+                0.64722
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.34045,
+                0.11564,
+                -0.59795
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.63949,
+                -0.23594,
+                -0.57641
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.29604,
+                0.15096,
+                0.53025
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.63949,
+                0.23594,
+                0.57641
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.29604,
+                -0.15096,
+                -0.53025
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "chomp_lunge": {
+      "loop": false,
+      "fps": 24,
+      "keyframes": [
+        {
+          "frame": 109,
+          "time_sec": 0.0,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                13.0454,
+                0.8
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -2.24
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 116,
+          "time_sec": 0.2917,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                -0.24435,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                12.0718,
+                2.88
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                -0.62832,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                0.55851,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -4.16
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.86685,
+                -0.24584,
+                -0.50525
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.86685,
+                0.24584,
+                0.50525
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 124,
+          "time_sec": 0.625,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.20944,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                11.3105,
+                -3.52
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                -0.83776,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                0.83776,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -5.44
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -1.04836,
+                0.18104,
+                -0.53322
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -1.04836,
+                -0.18104,
+                0.53322
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                1.04334,
+                -0.16171,
+                -0.38932
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                1.04334,
+                0.16171,
+                0.38932
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 131,
+          "time_sec": 0.9167,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                12.4696,
+                -2.88
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.10472,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.10472,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -1.92
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.48869,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.66213,
+                0.20193,
+                -0.60747
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.66213,
+                -0.20193,
+                0.60747
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 144,
+          "time_sec": 1.4583,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                13.0454,
+                0.8
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -2.24
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "break_block": {
+      "loop": true,
+      "fps": 24,
+      "keyframes": [
+        {
+          "frame": 145,
+          "time_sec": 0.0,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                13.0454,
+                0.8
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -2.24
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 154,
+          "time_sec": 0.375,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                -0.27925,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                11.4361,
+                3.84
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -1.92
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.74048,
+                0.17725,
+                -0.56848
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.74048,
+                -0.17725,
+                0.56848
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 162,
+          "time_sec": 0.7083,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.45379,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                10.0368,
+                -3.84
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -1.92
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                0.00644,
+                0.14446,
+                -0.60053
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                0.00644,
+                -0.14446,
+                0.60053
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                1.01644,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                1.01644,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 170,
+          "time_sec": 1.0417,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.17941,
+                0.06964,
+                0.06998
+              ],
+              "pos_mc": [
+                0.0,
+                11.3059,
+                -0.96
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.10472,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.10472,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -2.24
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 180,
+          "time_sec": 1.4583,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                13.0454,
+                0.8
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -2.24
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "eat_feed": {
+      "loop": true,
+      "fps": 24,
+      "keyframes": [
+        {
+          "frame": 181,
+          "time_sec": 0.0,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                11.9955,
+                0.64
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                -0.31416,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -0.96
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 186,
+          "time_sec": 0.2083,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                11.3579,
+                0.32
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                -0.45379,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                0.5236,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -0.96
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.45379,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 190,
+          "time_sec": 0.375,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.03491,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                13.2034,
+                0.8
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.06981,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -0.96
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                -0.17453,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 194,
+          "time_sec": 0.5417,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.20944,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                11.6692,
+                0.48
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                -0.38397,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                0.45379,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -0.96
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.41888,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 198,
+          "time_sec": 0.7083,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                0.17453,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                11.9955,
+                0.64
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                -0.31416,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -0.96
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.24435,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "flinch_light": {
+      "loop": true,
+      "fps": 24,
+      "keyframes": [
+        {
+          "frame": 199,
+          "time_sec": 0.0,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                -0.15991,
+                0.1037,
+                0.14039
+              ],
+              "pos_mc": [
+                0.48,
+                10.5684,
+                1.92
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                -0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                0.27925,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -3.2
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 204,
+          "time_sec": 0.2083,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                -0.20249,
+                -0.13749,
+                -0.17621
+              ],
+              "pos_mc": [
+                -0.8,
+                9.8388,
+                2.88
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -1.28
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                -0.20944,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 209,
+          "time_sec": 0.4167,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                -0.18504,
+                0.13749,
+                0.17621
+              ],
+              "pos_mc": [
+                0.8,
+                9.9591,
+                2.72
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                -0.13963,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -1.28
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        },
+        {
+          "frame": 216,
+          "time_sec": 0.7083,
+          "joints": {
+            "Body_Root": {
+              "rot_rad_mc": [
+                -0.15991,
+                0.1037,
+                0.14039
+              ],
+              "pos_mc": [
+                0.48,
+                10.5684,
+                1.92
+              ]
+            },
+            "Jaw_Upper": {
+              "rot_rad_mc": [
+                -0.34907,
+                -0.0,
+                0.0
+              ]
+            },
+            "Jaw_Lower": {
+              "rot_rad_mc": [
+                0.27925,
+                -0.0,
+                0.0
+              ]
+            },
+            "Throat_Eyes": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ],
+              "pos_mc": [
+                0.0,
+                -0.8,
+                -3.2
+              ]
+            },
+            "Throat_Sac": {
+              "rot_rad_mc": [
+                0.0,
+                -0.0,
+                0.0
+              ]
+            },
+            "Leg_FL_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                0.15931,
+                -0.4246
+              ]
+            },
+            "Leg_FL_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                -0.09564,
+                0.42092
+              ]
+            },
+            "Leg_FR_Hip": {
+              "rot_rad_mc": [
+                -0.35085,
+                -0.15931,
+                0.4246
+              ]
+            },
+            "Leg_FR_Foot": {
+              "rot_rad_mc": [
+                0.16672,
+                0.09564,
+                -0.42092
+              ]
+            },
+            "Leg_BL_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                -0.21919,
+                -0.46578
+              ]
+            },
+            "Leg_BL_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                0.15671,
+                0.45985
+              ]
+            },
+            "Leg_BR_Hip": {
+              "rot_rad_mc": [
+                0.49284,
+                0.21919,
+                0.46578
+              ]
+            },
+            "Leg_BR_Foot": {
+              "rot_rad_mc": [
+                -0.37664,
+                -0.15671,
+                -0.45985
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

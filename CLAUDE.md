@@ -182,3 +182,15 @@
   - 將主工作目錄切回 `main`，在 `.gitignore` 加入 `logs/`、`__pycache__/`、`*.blend1`
   - 提交工作區既有的 Level 1 薄型相連辦公隔間板改動（`CubiclePanelBlock`、`make_cubicle_models.py`、模型與 blockstate，`b9121b0`）
   - 將 `claude` 分支尚未進主線的提交 `bdad687`（Level 0 巨構房間新增柱廊、分隔房間群與階梯下沉劇場三種版型及測試）合併進 `main`，通過 `gradlew build` 後將 `main` 與 `claude` 推送至 GitHub（無強制推送、無改寫歷史）
+- 依使用者要求合併遠端最新進度與雙方製作的怪物（重疊怪物一律以朋友版本為準）：
+  - 先抓下並合併 `origin/main`（Level 0.1 天頂站與子樓層支援、牧蛇動態低頭系統，`2b4ec32`），解決 `fabric.mod.json`、`Level1ClientTest.java`、`sounds.json`、`mineable/pickaxe.json`、`en_us.json`、`zh_tw.json` 合併衝突並完整保留兩邊內容與 Claude 工作區既有修正
+  - 比對怪物清單：重疊的 3 隻怪物（`smiler` 微笑者、`skin_stealer` 竊皮者、`clump` 肢叢）以及朋友獨有的怪物（`duller`、`arms`、`wretch`、`shriek`、`crawler`、`shepherd_snake`、`nguithrxurh`）與共用的 `hound` 全數保留朋友既有程式碼、模型規格與貼圖，未做任何覆蓋；另補齊朋友前 5 隻怪物遺漏的 `en_us.json`／`zh_tw.json` 實體與生怪蛋翻譯條目
+  - 整合 Antigravity 於 Blender 5.3 完成且不重疊的 7 隻路線 A `BoxRig` 新怪物進遊戲（合計全模組共 18 種可召喚怪物）：
+    1. `deathmoth`（Entity 4 雌性死亡飛蛾）：懸浮飛行、趨光狂暴、中距離噴吐腐蝕酸液、可用杏仁水短暫安撫，含複眼與酸液囊全亮發光層
+    2. `faceling`（Entity 9 無面靈）：預設溫和中立並會好奇打量玩家、可用合金交換繃帶或杏仁水，受攻擊時群體反擊
+    3. `partygoer`（Entity 67 派對客）：遠處持紅氣球靜止偽裝雕像，獵物或掃興客靠近時裂顎突襲並跳躍追擊（附加反胃與凋零）
+    4. `bacteria`（無盡之菌）：黑菌絲與鏽蝕銅線高大掠食者，發現目標後尖嘯高速衝刺撲擊，受強光照射攻擊時短暫畏縮，含核心微光層
+    5. `bone_thief`（Entity 121 竊骨者）：高護甲四足怪物，張開巨顎露出催眠喉眼，玩家直視時施加緩速與挖掘疲勞後撲咬，含青紫喉眼發光層
+    6. `partypooper`（Entity 68 派對掃興客）：友善流浪者盟友，向玩家招手示警、收受合金或繃帶回贈杏仁水與再生效果，並主動獵殺派對客與周遭敵對怪物
+    7. `beast_level5`（Entity 18 第五層野獸紳士，Boss）：雙階段 Boss（紫色 Boss 血條），半血以下觸發 `phase2_unfurl` 展開隱藏深淵雙翼與背部觸手並釋放黑暗脈衝
+  - 新增對應之 `src/main/java/.../monsters/<套件>/`、`src/client/java/.../monsters/<套件>/`、`Monsters.java` 與 `BackroomsClient.java` 註冊、`assets/noclip_backrooms/monsters/*.json`、`textures/entity/*.png`（含 `*_eyes.png`）、16×16 生怪蛋貼圖與模型、以及 `art/monsters/<id>/`（`.blend` 與 `.glb` 原檔）
