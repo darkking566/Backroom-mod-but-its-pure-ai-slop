@@ -36,7 +36,9 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 	private static final int MC_SLOT_FILL = 0xFF8B8B8B;
 	private static final int MC_TEXT = 0xFF404040;
 
-	private static final int BOOK_W = 144;
+	private static final int BOOK_W = 136;
+	private static final int BOOK_GAP = 3;
+	private static final int JEI_RESERVE_W = 104;
 	private static final int BOOK_ROW_H = 19;
 	private static final String[] ALL_CATS = {"all", "parts", "melee", "firearms", "magic", "armor", "gear"};
 
@@ -46,6 +48,7 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 	private String activeCategory = "all";
 	private List<StationRecipe> filteredRecipes = List.of();
 
+	private boolean initializedOnce = false;
 	private boolean bookOpen = true;
 	private int scrollOffset = 0;
 	private StationRecipe ghostRecipe = null;
@@ -58,9 +61,11 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 		this.availableCats = computeAvailableCategories(allStationRecipes);
 		rebuildFiltered();
 		this.titleLabelX = 8;
-		this.titleLabelY = 5;
-		this.inventoryLabelX = station.invOriginX();
-		this.inventoryLabelY = station.invOriginY() - 10;
+		this.titleLabelY = station == StationType.ULTIMATE_SPIDERWEB ? 4 : 5;
+		this.inventoryLabelX = station == StationType.ULTIMATE_SPIDERWEB ? 164 : station.invOriginX();
+		this.inventoryLabelY = station == StationType.ULTIMATE_SPIDERWEB
+				? (station.invOriginY() - 12)
+				: (station.invOriginY() - 10);
 	}
 
 	private static List<String> computeAvailableCategories(List<StationRecipe> list) {
@@ -89,16 +94,47 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 		scrollOffset = 0;
 	}
 
+	private boolean canDockBookBeside() {
+		return this.width >= BOOK_W + BOOK_GAP + this.imageWidth + 6;
+	}
+
+	private boolean isOverlayBook() {
+		return bookOpen && !canDockBookBeside();
+	}
+
+	private void updateLayout() {
+		this.topPos = Math.max(2, (this.height - this.imageHeight) / 2);
+		if (bookOpen && canDockBookBeside()) {
+			int combinedW = BOOK_W + BOOK_GAP + this.imageWidth;
+			int centeredGroupLeft = (this.width - combinedW) / 2;
+			int jeiFriendlyLeft = this.width - combinedW - JEI_RESERVE_W;
+			int groupLeft = Math.max(4, Math.min(centeredGroupLeft, jeiFriendlyLeft));
+			this.leftPos = groupLeft + BOOK_W + BOOK_GAP;
+		} else {
+			this.leftPos = Math.max(2, (this.width - this.imageWidth) / 2);
+		}
+	}
+
+	private int bookW() {
+		return isOverlayBook() ? Math.min(BOOK_W, Math.max(108, this.width - 8)) : BOOK_W;
+	}
+
 	private int bookX() {
-		return leftPos - BOOK_W - 3;
+		if (isOverlayBook()) {
+			return Math.max(2, Math.min(this.leftPos + 4, this.width - bookW() - 2));
+		}
+		return this.leftPos - BOOK_W - BOOK_GAP;
 	}
 
 	private int bookY() {
-		return topPos;
+		return isOverlayBook() ? Math.max(2, this.topPos + 16) : this.topPos;
 	}
 
 	private int bookH() {
-		return imageHeight;
+		if (isOverlayBook()) {
+			return Math.max(96, Math.min(this.imageHeight - 18, this.height - bookY() - 2));
+		}
+		return this.imageHeight;
 	}
 
 	private int bookListY() {
@@ -106,33 +142,37 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 	}
 
 	private int bookListH() {
-		return bookH() - 62;
+		return Math.max(38, bookH() - 62);
 	}
 
 	private int visibleRows() {
-		return Math.max(3, bookListH() / BOOK_ROW_H);
+		return Math.max(2, bookListH() / BOOK_ROW_H);
 	}
 
-	/** Reported to JEI so the left Categorized Recipe Book never overlaps JEI panels. */
+	private boolean isPointInBook(double mx, double my) {
+		return bookOpen && mx >= bookX() && mx < bookX() + bookW()
+				&& my >= bookY() && my < bookY() + bookH();
+	}
+
+	/** Reported to JEI so the docked Left Categorized Recipe Book never overlaps JEI panels. */
 	public List<Rect2i> extraGuiAreas() {
-		if (!bookOpen || bookX() < 2) return List.of();
-		return List.of(new Rect2i(bookX(), bookY(), BOOK_W, bookH()));
+		if (!bookOpen || isOverlayBook()) return List.of();
+		return List.of(new Rect2i(bookX(), bookY(), bookW(), bookH()));
 	}
 
 	@Override
 	protected void init() {
 		super.init();
-		// Auto-close book only if screen is too narrow to fit beside the main crafting table
-		if (leftPos < BOOK_W + 6) {
-			bookOpen = false;
+		if (!initializedOnce) {
+			bookOpen = canDockBookBeside();
+			initializedOnce = true;
 		}
+		updateLayout();
 	}
 
 	@Override
 	protected boolean hasClickedOutside(double mouseX, double mouseY, int left, int top) {
-		if (bookOpen && bookX() >= 2
-				&& mouseX >= bookX() && mouseX < bookX() + BOOK_W
-				&& mouseY >= bookY() && mouseY < bookY() + bookH()) {
+		if (isPointInBook(mouseX, mouseY)) {
 			return false;
 		}
 		return super.hasClickedOutside(mouseX, mouseY, left, top);
@@ -220,8 +260,8 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 		// 6. Ghost Recipe Hints inside empty physical grid slots!
 		drawGhostOverlay(g);
 
-		// 7. Collapsible Left Categorized Recipe Book with Mouse-Draggable Scrollbar
-		if (bookOpen && bookX() >= 2) {
+		// 7. Collapsible Left Categorized Recipe Book (docked beside main window when space allows)
+		if (bookOpen && !isOverlayBook()) {
 			drawRecipeBook(g, mouseX, mouseY);
 		}
 	}
@@ -281,13 +321,17 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 	private void drawRecipeBook(GuiGraphicsExtractor g, int mouseX, int mouseY) {
 		int bx = bookX();
 		int by = bookY();
+		int bw = bookW();
 		int bh = bookH();
-		drawVanillaWindow(g, bx, by, BOOK_W, bh);
+		drawVanillaWindow(g, bx, by, bw, bh);
 		g.text(font, Component.translatable("ui.noclip_backrooms.station.book_title"), bx + 7, by + 6, MC_TEXT, false);
+		if (isOverlayBook()) {
+			drawButton(g, bx + bw - 18, by + 4, 12, 11, "x", true, mouseX, mouseY);
+		}
 
 		// Category Tabs row
 		int tabY = by + 18;
-		int tabW = Math.max(16, (BOOK_W - 14) / Math.max(1, availableCats.size()));
+		int tabW = Math.max(14, (bw - 14) / Math.max(1, availableCats.size()));
 		for (int i = 0; i < availableCats.size(); i++) {
 			String cat = availableCats.get(i);
 			int tx = bx + 7 + i * tabW;
@@ -296,7 +340,7 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 			int bg = active ? 0xFF4A784A : (hovered ? 0xFFA6A6A6 : 0xFF888888);
 			drawVanillaSlot(g, tx, tabY, tabW - 1, 15, bg);
 			String shortLbl = Component.translatable("ui.noclip_backrooms.cat." + cat).getString();
-			String trimmed = font.plainSubstrByWidth(shortLbl, tabW - 4);
+			String trimmed = font.plainSubstrByWidth(shortLbl, tabW - 3);
 			int lx = tx + (tabW - 1 - font.width(trimmed)) / 2;
 			g.text(font, trimmed, lx, tabY + 4, active ? 0xFFFFFF88 : 0xFFFFFFFF, true);
 		}
@@ -304,7 +348,7 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 		// Scrollable Recipe List
 		int listX = bx + 7;
 		int listY = bookListY();
-		int listW = BOOK_W - 14;
+		int listW = bw - 14;
 		int listH = bookListH();
 		int vis = visibleRows();
 		int maxScroll = Math.max(0, filteredRecipes.size() - vis);
@@ -353,18 +397,49 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 			g.fill(sbX + 1, sbY + 1, sbX + 6, sbY + sbH - 1, 0xFF707070);
 		}
 
-		// Bottom Auto-Fill Button for selected ghost recipe
+		// Bottom Auto-Fill Buttons for selected ghost recipe
 		int footY = by + bh - 22;
+		int innerW = bw - 14;
+		int fillW = (innerW - 3) * 60 / 100;
+		int maxW = innerW - 3 - fillW;
 		boolean canFill = ghostRecipe != null && mc.player != null && ghostRecipe.canCraftFromInventory(mc.player);
-		drawButton(g, bx + 7, footY, 76, 15,
+		drawButton(g, bx + 7, footY, fillW, 15,
 				Component.translatable("ui.noclip_backrooms.station.fill_grid").getString(), canFill, mouseX, mouseY);
-		drawButton(g, bx + 86, footY, 51, 15,
+		drawButton(g, bx + 7 + fillW + 3, footY, maxW, 15,
 				Component.translatable("ui.noclip_backrooms.station.fill_max").getString(), canFill, mouseX, mouseY);
 	}
 
 	@Override
 	public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
 		super.extractRenderState(g, mouseX, mouseY, delta);
+
+		// Narrow-screen fallback: draw recipe book as an interactive top drawer above the crafting slots
+		if (isOverlayBook()) {
+			g.fill(leftPos, topPos + 15, leftPos + imageWidth, topPos + imageHeight, 0x77000000);
+			drawRecipeBook(g, mouseX, mouseY);
+		}
+
+		// Hover tooltip on Category Tabs (both docked and overlay drawer modes)
+		if (bookOpen) {
+			int bx = bookX();
+			int bw = bookW();
+			int tabY = bookY() + 18;
+			int tabW = Math.max(14, (bw - 14) / Math.max(1, availableCats.size()));
+			if (mouseY >= tabY && mouseY < tabY + 15) {
+				for (int i = 0; i < availableCats.size(); i++) {
+					int tx = bx + 7 + i * tabW;
+					if (mouseX >= tx && mouseX < tx + tabW - 1) {
+						g.setTooltipForNextFrame(font, Component.translatable("ui.noclip_backrooms.cat_full." + availableCats.get(i)), mouseX, mouseY);
+						return;
+					}
+				}
+			}
+			// Suppress underlying slot tooltips while cursor is over the overlay drawer
+			if (isOverlayBook() && isPointInBook(mouseX, mouseY)) {
+				return;
+			}
+		}
+
 		// Hover tooltip for ghost items in empty grid cells
 		if (ghostRecipe != null && ghostRecipe.station() == station && (hoveredSlot == null || !hoveredSlot.hasItem())) {
 			int ox = ghostRecipe.centeredOffsetX();
@@ -391,30 +466,12 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 			}
 		}
 
-		// Hover tooltip on Category Tabs or Recipe Book rows
-		if (bookOpen && bookX() >= 2) {
-			int bx = bookX();
-			int tabY = bookY() + 18;
-			int tabW = Math.max(16, (BOOK_W - 14) / Math.max(1, availableCats.size()));
-			if (mouseY >= tabY && mouseY < tabY + 15) {
-				for (int i = 0; i < availableCats.size(); i++) {
-					int tx = bx + 7 + i * tabW;
-					if (mouseX >= tx && mouseX < tx + tabW - 1) {
-						g.setTooltipForNextFrame(font, Component.translatable("ui.noclip_backrooms.cat_full." + availableCats.get(i)), mouseX, mouseY);
-						return;
-					}
-				}
-			}
-		}
-
 		extractTooltip(g, mouseX, mouseY);
 	}
 
 	@Override
 	public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-		if (bookOpen && bookX() >= 2
-				&& mouseX >= bookX() && mouseX <= bookX() + BOOK_W
-				&& mouseY >= bookY() && mouseY <= bookY() + bookH()) {
+		if (isPointInBook(mouseX, mouseY)) {
 			int maxScroll = Math.max(0, filteredRecipes.size() - visibleRows());
 			if (maxScroll > 0) {
 				scrollOffset = Mth.clamp(scrollOffset - (int) Math.signum(scrollY), 0, maxScroll);
@@ -431,37 +488,33 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 		int x = leftPos;
 		int y = topPos;
 
-		// 1. Toggle Recipe Book button
+		// 1. Toggle Recipe Book button (shifts main grid right when docked, or opens overlay drawer on narrow screens)
 		int bookBtnX = x + imageWidth - 44;
 		int bookBtnY = y + 3;
 		if (mx >= bookBtnX && mx < bookBtnX + 38 && my >= bookBtnY && my < bookBtnY + 12) {
 			bookOpen = !bookOpen;
+			updateLayout();
 			return true;
 		}
 
-		// 2. Clear Grid button
-		int gx0 = x + station.gridOriginX();
-		int ox = x + station.outputOriginX();
-		int oy = y + station.outputOriginY();
-		int clearBtnX = Math.max(gx0 + station.gridWidth() * station.cellStep() + 4, ox - 6);
-		int clearBtnY = oy + (station.outputSlotCount() == 1 ? 24 : 44);
-		if (clearBtnY + 13 < y + station.invOriginY() - 10
-				&& mx >= clearBtnX && mx < clearBtnX + 30 && my >= clearBtnY && my < clearBtnY + 13) {
-			ClientPlayNetworking.send(new CraftStationPayload(BackroomsCrafting.CLEAR_GRID_ID, false));
-			ghostRecipe = null;
-			return true;
-		}
-
-		// 3. Left Categorized Recipe Book interactions
-		if (bookOpen && bookX() >= 2) {
+		// 2. Categorized Recipe Book interactions (checked BEFORE main window so overlay drawer intercepts cleanly)
+		if (isPointInBook(mx, my)) {
 			int bx = bookX();
 			int by = bookY();
+			int bw = bookW();
 			int bh = bookH();
+
+			// Overlay drawer [x] close button
+			if (isOverlayBook() && mx >= bx + bw - 18 && mx < bx + bw - 6 && my >= by + 4 && my < by + 15) {
+				bookOpen = false;
+				updateLayout();
+				return true;
+			}
 
 			// Category Tabs click
 			int tabY = by + 18;
-			int tabW = Math.max(16, (BOOK_W - 14) / Math.max(1, availableCats.size()));
-			if (my >= tabY && my < tabY + 15 && mx >= bx + 7 && mx < bx + BOOK_W - 7) {
+			int tabW = Math.max(14, (bw - 14) / Math.max(1, availableCats.size()));
+			if (my >= tabY && my < tabY + 15 && mx >= bx + 7 && mx < bx + bw - 7) {
 				int idx = (int) ((mx - (bx + 7)) / tabW);
 				if (idx >= 0 && idx < availableCats.size()) {
 					activeCategory = availableCats.get(idx);
@@ -472,7 +525,7 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 
 			int listX = bx + 7;
 			int listY = bookListY();
-			int listW = BOOK_W - 14;
+			int listW = bw - 14;
 			int listH = bookListH();
 			int sbX = listX + listW - 8;
 
@@ -491,6 +544,10 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 					ghostRecipe = filteredRecipes.get(idx);
 					if (doubleClick || hasShiftDownCompat()) {
 						ClientPlayNetworking.send(new CraftStationPayload(ghostRecipe.id(), hasShiftDownCompat()));
+						if (isOverlayBook()) {
+							bookOpen = false;
+							updateLayout();
+						}
 					}
 					return true;
 				}
@@ -498,16 +555,40 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 
 			// Bottom [自動填入] & [填滿] buttons
 			int footY = by + bh - 22;
+			int innerW = bw - 14;
+			int fillW = (innerW - 3) * 60 / 100;
 			if (ghostRecipe != null && my >= footY && my < footY + 15) {
-				if (mx >= bx + 7 && mx < bx + 83) {
+				if (mx >= bx + 7 && mx < bx + 7 + fillW) {
 					ClientPlayNetworking.send(new CraftStationPayload(ghostRecipe.id(), false));
+					if (isOverlayBook()) {
+						bookOpen = false;
+						updateLayout();
+					}
 					return true;
 				}
-				if (mx >= bx + 86 && mx < bx + 137) {
+				if (mx >= bx + 7 + fillW + 3 && mx < bx + bw - 7) {
 					ClientPlayNetworking.send(new CraftStationPayload(ghostRecipe.id(), true));
+					if (isOverlayBook()) {
+						bookOpen = false;
+						updateLayout();
+					}
 					return true;
 				}
 			}
+			return true;
+		}
+
+		// 3. Clear Grid button
+		int gx0 = x + station.gridOriginX();
+		int ox = x + station.outputOriginX();
+		int oy = y + station.outputOriginY();
+		int clearBtnX = Math.max(gx0 + station.gridWidth() * station.cellStep() + 4, ox - 6);
+		int clearBtnY = oy + (station.outputSlotCount() == 1 ? 24 : 44);
+		if (clearBtnY + 13 < y + station.invOriginY() - 10
+				&& mx >= clearBtnX && mx < clearBtnX + 30 && my >= clearBtnY && my < clearBtnY + 13) {
+			ClientPlayNetworking.send(new CraftStationPayload(BackroomsCrafting.CLEAR_GRID_ID, false));
+			ghostRecipe = null;
+			return true;
 		}
 
 		return super.mouseClicked(event, doubleClick);

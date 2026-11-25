@@ -473,3 +473,10 @@
     - 以 Blender 5.3 製作並匯出 39 款多格／單格家具 `.obj`/`.mtl`（`assets/noclip_backrooms/models/blender_props/`）交由 `BlenderPropRenderer` 於世界內立體渲染；所有 `noclipped_*`／`*_noclipped` 穿模物件皆以 `bmesh.ops.bisect_plane`＋`triangle_fill` 真實斜切並讓埋入地板的半邊物理消失
     - 重建 154 件非武器 3D 物品模型為纖細非方體輪廓（薄弧形彈匣、分顆尖頭子彈／霰彈、超薄電路板與晶片、錐形燒瓶／針筒／酒瓶、細筆／鑰匙／螺絲起子／燈管／齒輪／彈簧／風扇／卡帶／晶核），並修正全部物品與終極蜘蛛網模型貼圖鍵參考（`#0`），同步重新輸出全部 459 張 `docs/items/` 預覽圖（正前 3/4 視角）
   - **驗證**：更新 `BackroomsCraftingTest.java` 強制驗證全 6 座工作站、5×5/7×7/9×9 尺寸門檻、全原版與工作站配方 ID、59 座方塊貼圖與 39 款 Blender 家具 `.obj`/`.mtl`；執行 `gradlew build runClientGameTest -Plevels=look --no-daemon` 全數 78 項單元測試通過、實機測試與 JEI 載入通過且零模型／貼圖／配方警告，並僅於本地 `main` 提交本方改動（未動 `docs/企劃書/`、未推送）
+- 依使用者回饋修正工作站介面預設看不到左側配方書的問題（方案 A＋B）：
+  - **工作站動態推擠與自適應排版**（`src/client/.../crafting/BackroomsStationScreen.java`、`crafting/StationType.java`、`BackroomsCraftingTest.java`）：
+    - 比照原版配方書，展開左側分類配方書（寬 `136px`）時自動把「配方書＋主工作台」整體動態往右推移並替右側 JEI 預留 `104px`（收合時主視窗回到正中）；在 `1080p 4x`（`480×270`）下即使開啟最大的 9×9 終極蜘蛛網合成台（總寬 `363px`），左配方書、中 9×9 格線與右 JEI 皆完整並排顯示不重疊
+    - 將 `ULTIMATE_SPIDERWEB` 高度由 `248px` 壓縮至 `238px` 並將物品欄標籤移至右側空區，連 `854×480`（`2x` 自動縮放、`427×240`）視窗也能並排且不切邊；單元測試同步鎖定 6 座工作站皆滿足 `136 + 3 + guiWidth + 6 <= 427` 與 `guiHeight <= 240`
+    - 極窄螢幕或超大縮放並排塞不下時，不再把配方書隱藏到點不開，改為點擊 `[配方書]` 以覆蓋抽屜模式展開於工作台上方（附 `[×]` 關閉鈕，自動填入後自動收合）
+  - **開發啟動預設 1080p 視窗**（`build.gradle`）：於 `loom.runs.client` 加入 `programArgs "--width", "1920", "--height", "1080"`（僅影響本機 `play.bat`／`runClient` 啟動視窗，不改動玩家正式版 `options.txt`）
+  - **驗證**：執行 `gradlew build runClientGameTest -Plevels=look --no-daemon` 全部 78 項單元測試與客戶端實機測試通過，並僅於本地 `main` 提交本方改動（未推送）

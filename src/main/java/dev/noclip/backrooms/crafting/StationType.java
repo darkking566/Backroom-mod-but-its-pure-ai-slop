@@ -22,7 +22,7 @@ public enum StationType {
 	DISTILLER("almond_distiller", 3, 3, 1, 18, 176, 172),
 	ALTAR("anomaly_altar", 3, 3, 1, 18, 176, 172),
 	SPIDERWEB("spiderweb_crafting_table", 7, 7, 1, 18, 212, 236),
-	ULTIMATE_SPIDERWEB("ultimate_spiderweb_crafting_table", 9, 9, 1, 16, 224, 248);
+	ULTIMATE_SPIDERWEB("ultimate_spiderweb_crafting_table", 9, 9, 1, 16, 224, 238);
 
 	private final String id;
 	private final int gridWidth;
@@ -98,7 +98,7 @@ public enum StationType {
 			case DISTILLER, ALTAR -> 19;
 			case WORKSHOP -> 18;
 			case SPIDERWEB -> 18;
-			case ULTIMATE_SPIDERWEB -> 16;
+			case ULTIMATE_SPIDERWEB -> 14;
 		};
 	}
 
@@ -118,7 +118,7 @@ public enum StationType {
 			case DISTILLER, ALTAR -> 37;
 			case WORKSHOP -> 54;
 			case SPIDERWEB -> 72;
-			case ULTIMATE_SPIDERWEB -> 80;
+			case ULTIMATE_SPIDERWEB -> 72;
 		};
 	}
 
@@ -127,7 +127,7 @@ public enum StationType {
 	}
 
 	public int invOriginY() {
-		return guiHeight - 82;
+		return this == ULTIMATE_SPIDERWEB ? (guiHeight - 78) : (guiHeight - 82);
 	}
 
 	public Identifier blockId() {

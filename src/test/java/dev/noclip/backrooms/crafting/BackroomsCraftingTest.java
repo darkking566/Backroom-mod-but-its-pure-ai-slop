@@ -30,6 +30,11 @@ final class BackroomsCraftingTest {
 		for (StationType station : StationType.values()) {
 			List<StationRecipe> perStation = BackroomsRecipeRegistry.byStation(station);
 			assertFalse(perStation.isEmpty(), "Station " + station.id() + " must have recipes");
+			// Every station + 136px recipe book must fit side-by-side inside 1080p 4x (480x270) AND 854x480 2x (427x240)
+			assertTrue(136 + 3 + station.guiWidth() + 6 <= 427,
+					"Station " + station.id() + " + recipe book exceeds 427px width");
+			assertTrue(station.guiHeight() <= 240,
+					"Station " + station.id() + " height exceeds 240px: " + station.guiHeight());
 		}
 		for (StationRecipe r : all) {
 			assertTrue(seenIds.add(r.id()), "Duplicate station recipe ID: " + r.id());
