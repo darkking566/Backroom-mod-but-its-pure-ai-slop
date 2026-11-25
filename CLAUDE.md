@@ -340,6 +340,7 @@
   - `Level1ClientTest` 的 `sectorFit` 段加 `spanFit`：2 個種子、25×25 個大廳，每座橋、每段樑、每排水管要嘛全有、要嘛全沒有；把整座判斷關掉跑一次會失敗（水管一排 16 格有、17 格缺）
   - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=sectorFit,sectors` 通過
   - 代價：整座放不下就整座不見，燈籠橋約一半（11／22）、天花板水管排約六成（111／178）、未完工樑約一成（32／342）被拿掉；沒在遊戲畫面上看過橋或樑
+- 使用者同意後，把 `main` 推送到 GitHub（`43f74d0` 跨格結構不斷一格與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；Antigravity 未提交的 Level 2 磚牆改動沒有一起推；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
