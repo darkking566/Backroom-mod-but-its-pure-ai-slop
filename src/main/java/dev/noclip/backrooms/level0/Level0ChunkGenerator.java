@@ -307,6 +307,7 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		if (!Maze.isLamp(seed, x, z, epochs)) return ModBlocks.CEILING_TILE.defaultBlockState();
 		if (Exits.lampPointsToExit(seed, x, z)) return ModBlocks.EXIT_LIGHT.defaultBlockState();
 		if (!Maze.lampWorks(seed, x, z, epochs)) return ModBlocks.BROKEN_FLUORESCENT_LIGHT.defaultBlockState();
+		if (ZonePoiPlan.isFunDoorCell(seed, x, z)) return ModBlocks.MANILA_LIGHT.defaultBlockState();
 		return (zone == Maze.Zone.RED_ROOM ? ModBlocks.RED_FLUORESCENT_LIGHT : ModBlocks.FLUORESCENT_LIGHT).defaultBlockState();
 	}
 

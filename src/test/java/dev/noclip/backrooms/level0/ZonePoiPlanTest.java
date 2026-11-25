@@ -156,4 +156,38 @@ class ZonePoiPlanTest {
 
 		assertEquals(EnumSet.allOf(ZonePoiPlan.VignetteType.class), seen, "missing vignette types: " + seen);
 	}
+
+	@Test
+	void mysteryExitsGenerateRarelyForHubAndFunWithoutConflicts() {
+		long seed = 12345L;
+		EnumSet<ZonePoiPlan.MysteryKind> seen = EnumSet.noneOf(ZonePoiPlan.MysteryKind.class);
+
+		for (int rx = -8; rx <= 8; rx++) {
+			for (int rz = -8; rz <= 8; rz++) {
+				ZonePoiPlan.MysteryExit exit = ZonePoiPlan.mysteryExitInRegion(seed, rx, rz);
+				if (rx == 0 && rz == 0) {
+					assertEquals(null, exit);
+					continue;
+				}
+				if (exit == null) continue;
+				seen.add(exit.kind());
+				int cx = exit.cx(), cz = exit.cz();
+				assertTrue(ZonePoiPlan.isProtectedCell(seed, cx, cz));
+				assertFalse(ManilaRoomPlan.isProtectedCell(seed, cx, cz));
+				assertFalse(StaircasePlan.isProtectedCell(seed, cx, cz));
+				assertFalse(Maze.isAtriumCell(seed, cx, cz));
+				assertFalse(Maze.isSunkenCell(seed, cx, cz));
+				assertEquals(null, ZonePoiPlan.vignetteAtCell(seed, cx, cz));
+				assertEquals(Maze.CeilingStyle.FLAT, Maze.ceilingStyle(seed, cx, cz));
+				int ox = cx * Maze.CELL, oz = cz * Maze.CELL;
+				for (int ix = 1; ix < Maze.CELL; ix++) {
+					for (int iz = 1; iz < Maze.CELL; iz++) {
+						assertFalse(Maze.isWall(seed, ox + ix, oz + iz, false));
+					}
+				}
+			}
+		}
+
+		assertEquals(EnumSet.allOf(ZonePoiPlan.MysteryKind.class), seen, "missing mystery exit kind: " + seen);
+	}
 }

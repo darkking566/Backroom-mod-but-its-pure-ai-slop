@@ -6,6 +6,7 @@ import dev.noclip.backrooms.props.BackroomsLootChestBlock;
 import dev.noclip.backrooms.props.BackroomsProps;
 import dev.noclip.backrooms.props.NoClipPropBlock;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -25,6 +26,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 final class ZonePoiPlan {
 	private static final int POI_SALT = 149;
 	private static final int VIGNETTE_SALT = 211;
+	private static final int MYSTERY_SALT = 277;
+	static final int MYSTERY_REGION_SECTORS = 8;
 
 	enum VignetteType {
 		GLASS_OFFICE,
@@ -34,6 +37,11 @@ final class ZonePoiPlan {
 		PEEK_CHAMBER
 	}
 
+	enum MysteryKind {
+		HUB,
+		FUN
+	}
+
 	record ChasmOutpost(int cx, int cz, int tier, int floorY, int ceilY) {
 	}
 
@@ -41,6 +49,9 @@ final class ZonePoiPlan {
 	}
 
 	record Vignette(int cx, int cz, VignetteType type) {
+	}
+
+	record MysteryExit(int cx, int cz, MysteryKind kind) {
 	}
 
 	private ZonePoiPlan() {
@@ -65,6 +76,22 @@ final class ZonePoiPlan {
 		return v != null && v.cx() == cx && v.cz() == cz ? v : null;
 	}
 
+	static MysteryExit mysteryExitInRegion(long seed, int rx, int rz) {
+		return MYSTERY_CACHE.get().getOrCompute(seed, rx, rz);
+	}
+
+	static MysteryExit mysteryExitAtCell(long seed, int cx, int cz) {
+		int rx = Math.floorDiv(Math.floorDiv(cx, Maze.SECTOR), MYSTERY_REGION_SECTORS);
+		int rz = Math.floorDiv(Math.floorDiv(cz, Maze.SECTOR), MYSTERY_REGION_SECTORS);
+		MysteryExit exit = mysteryExitInRegion(seed, rx, rz);
+		return exit != null && exit.cx() == cx && exit.cz() == cz ? exit : null;
+	}
+
+	static boolean isFunDoorCell(long seed, int x, int z) {
+		MysteryExit exit = mysteryExitAtCell(seed, Math.floorDiv(x, Maze.CELL), Math.floorDiv(z, Maze.CELL));
+		return exit != null && exit.kind() == MysteryKind.FUN;
+	}
+
 	static boolean isRedRoomPoiCell(long seed, int cx, int cz) {
 		int sx = Math.floorDiv(cx, Maze.SECTOR);
 		int sz = Math.floorDiv(cz, Maze.SECTOR);
@@ -86,6 +113,7 @@ final class ZonePoiPlan {
 	}
 
 	static boolean isStandardPoiCell(long seed, int cx, int cz) {
+		if (mysteryExitAtCell(seed, cx, cz) != null) return true;
 		if (vignetteAtCell(seed, cx, cz) != null) return true;
 		int sx = Math.floorDiv(cx, Maze.SECTOR);
 		int sz = Math.floorDiv(cz, Maze.SECTOR);
@@ -264,9 +292,40 @@ final class ZonePoiPlan {
 			}
 			return null;
 		}
+		MysteryExit mystery = mysteryExitAtCell(seed, cx, cz);
+		if (mystery != null) {
+			return mysteryBlockAt(mystery.kind(), y, ix, iz);
+		}
 		Vignette v = vignetteAtCell(seed, cx, cz);
 		if (v == null) return null;
 		return vignetteBlockAt(v.type(), y, ix, iz);
+	}
+
+	private static BlockState mysteryBlockAt(MysteryKind kind, int y, int ix, int iz) {
+		if (kind == MysteryKind.FUN && y == Level0ChunkGenerator.FLOOR_Y && ix >= 2 && ix <= 4 && iz >= 2 && iz <= 4) {
+			return ModBlocks.DRY_CARPET.defaultBlockState();
+		}
+		if (iz != 3 || ix < 2 || ix > 4) return null;
+		boolean hub = kind == MysteryKind.HUB;
+		Block wall = hub ? ModBlocks.ROUGH_WALLPAPER : ModBlocks.PALE_WALLPAPER;
+		Block base = hub ? ModBlocks.ROUGH_WALLPAPER_BASEBOARD : ModBlocks.PALE_WALLPAPER_BASEBOARD;
+		if (ix == 2 || ix == 4) {
+			if (y == Level0ChunkGenerator.FLOOR_Y + 1) return base.defaultBlockState();
+			if (y == Level0ChunkGenerator.FLOOR_Y + 2 || y == Level0ChunkGenerator.FLOOR_Y + 3) return wall.defaultBlockState();
+			return null;
+		}
+		if (y == Level0ChunkGenerator.FLOOR_Y + 1) {
+			return (hub ? ModBlocks.HUB_DOOR : ModBlocks.FUN_DOOR).defaultBlockState()
+					.setValue(MysteryExitBlock.AXIS, Direction.Axis.Z);
+		}
+		if (y == Level0ChunkGenerator.FLOOR_Y + 2) {
+			return (hub ? ModBlocks.HUB_DOOR_TOP : ModBlocks.FUN_DOOR_TOP).defaultBlockState()
+					.setValue(MysteryExitBlock.AXIS, Direction.Axis.Z);
+		}
+		if (y == Level0ChunkGenerator.FLOOR_Y + 3) {
+			return wall.defaultBlockState();
+		}
+		return null;
 	}
 
 	private static BlockState vignetteBlockAt(VignetteType type, int y, int ix, int iz) {
@@ -457,6 +516,7 @@ final class ZonePoiPlan {
 			if (ManilaRoomPlan.isProtectedCell(seed, cx, cz)) continue;
 			if (StaircasePlan.isProtectedCell(seed, cx, cz)) continue;
 			if (Maze.isAtriumCell(seed, cx, cz)) continue;
+			if (mysteryExitAtCell(seed, cx, cz) != null) continue;
 
 			int typeRoll = Math.floorMod(hash(seed, cx, cz, VIGNETTE_SALT + 2), 100);
 			VignetteType type = switch (zone) {
@@ -475,6 +535,35 @@ final class ZonePoiPlan {
 				default -> VignetteType.WANDERER_SITE;
 			};
 			return new Vignette(cx, cz, type);
+		}
+		return null;
+	}
+
+	private static MysteryExit computeMysteryExit(long seed, int rx, int rz) {
+		if (rx == 0 && rz == 0) return null;
+		int total = MYSTERY_REGION_SECTORS * MYSTERY_REGION_SECTORS;
+		int start = Math.floorMod(hash(seed, rx, rz, MYSTERY_SALT), total);
+		MysteryKind kind = (hash(seed, rx, rz, MYSTERY_SALT + 1) & 1L) == 0 ? MysteryKind.HUB : MysteryKind.FUN;
+
+		for (int i = 0; i < total; i++) {
+			int pick = (start + i) % total;
+			int sx = rx * MYSTERY_REGION_SECTORS + (pick % MYSTERY_REGION_SECTORS);
+			int sz = rz * MYSTERY_REGION_SECTORS + (pick / MYSTERY_REGION_SECTORS);
+			if (sx == 0 && sz == 0) continue;
+
+			Maze.Zone zone = Maze.baseZoneForSector(seed, sx, sz);
+			if (zone != Maze.Zone.CLASSIC && zone != Maze.Zone.CORRIDORS
+					&& zone != Maze.Zone.ARCHES && zone != Maze.Zone.CUBICLES) {
+				continue;
+			}
+			int lx = 2 + Math.floorMod(hash(seed, sx, sz, MYSTERY_SALT + 2), 4);
+			int lz = 2 + Math.floorMod(hash(seed, sx, sz, MYSTERY_SALT + 3), 4);
+			int cx = sx * Maze.SECTOR + lx;
+			int cz = sz * Maze.SECTOR + lz;
+			if (ManilaRoomPlan.isProtectedCell(seed, cx, cz)) continue;
+			if (StaircasePlan.isProtectedCell(seed, cx, cz)) continue;
+			if (Maze.isAtriumCell(seed, cx, cz)) continue;
+			return new MysteryExit(cx, cz, kind);
 		}
 		return null;
 	}
@@ -498,6 +587,8 @@ final class ZonePoiPlan {
 			ThreadLocal.withInitial(() -> new MacroCache<>(ZonePoiPlan::computeMegahallLounge));
 	private static final ThreadLocal<MacroCache<Vignette>> VIGNETTE_CACHE =
 			ThreadLocal.withInitial(() -> new MacroCache<>(ZonePoiPlan::computeVignette));
+	private static final ThreadLocal<MacroCache<MysteryExit>> MYSTERY_CACHE =
+			ThreadLocal.withInitial(() -> new MacroCache<>(ZonePoiPlan::computeMysteryExit));
 
 	@FunctionalInterface
 	private interface MacroComputer<T> {

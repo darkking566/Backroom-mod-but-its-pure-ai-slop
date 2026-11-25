@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level0;
 
+import dev.noclip.backrooms.core.LevelExits;
 import dev.noclip.backrooms.level1.Level1Blocks;
 import dev.noclip.backrooms.level1.Level1Items;
 import dev.noclip.backrooms.props.BackroomsProps;
@@ -750,6 +751,52 @@ public final class Level0ClientTest implements FabricClientGameTest {
 					"Peek chamber light missing");
 		});
 
+		// 6. Mystery foreshadowing exits (HUB_DOOR -> "hub", FUN_DOOR -> "fun")
+		ZonePoiPlan.MysteryExit hubExit = findMysteryExit(seed, ZonePoiPlan.MysteryKind.HUB);
+		int hx = hubExit.cx() * Maze.CELL, hz = hubExit.cz() * Maze.CELL;
+		server.runCommand("gamemode survival @a");
+		server.runCommand("item replace entity @a hotbar.0 with minecraft:air");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (hx + 3.5) + " " + standY + " " + (hz + 4.8) + " 180 6");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_hub_door");
+		int refusalsBefore = LevelExits.refusals();
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			BlockState door = level.getBlockState(new BlockPos(hx + 3, standY, hz + 3));
+			check(door.is(ModBlocks.HUB_DOOR) && door.getValue(MysteryExitBlock.AXIS) == Direction.Axis.Z,
+					"Hub door missing or wrong axis");
+			check(level.getBlockState(new BlockPos(hx + 3, standY + 1, hz + 3)).is(ModBlocks.HUB_DOOR_TOP),
+					"Hub door top missing");
+		});
+		context.getInput().lookAt(180, 5);
+		context.waitTicks(3);
+		context.getInput().pressMouse(1);
+		server.waitFor(s -> LevelExits.refusals() > refusalsBefore, 40);
+
+		ZonePoiPlan.MysteryExit funExit = findMysteryExit(seed, ZonePoiPlan.MysteryKind.FUN);
+		int fx = funExit.cx() * Maze.CELL, fz = funExit.cz() * Maze.CELL;
+		server.runCommand("gamemode spectator @a");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (fx + 3.5) + " " + standY + " " + (fz + 4.8) + " 180 6");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_fun_door");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(fx + 3, Level0ChunkGenerator.FLOOR_Y, fz + 4)).is(ModBlocks.DRY_CARPET),
+					"Fun door clean carpet missing");
+			check(level.getBlockState(new BlockPos(fx + 3, standY, fz + 3)).is(ModBlocks.FUN_DOOR),
+					"Fun door missing");
+			check(level.getBlockState(new BlockPos(fx + 3, standY + 1, fz + 3)).is(ModBlocks.FUN_DOOR_TOP),
+					"Fun door top missing");
+			check(level.getBlockState(new BlockPos(fx + 3, Level0ChunkGenerator.CEILING_Y, fz + 4)).is(ModBlocks.MANILA_LIGHT),
+					"Fun door warm ceiling light missing");
+		});
+
 		server.runCommand("gamemode survival @a");
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
 		game.getConnection().waitForChunksDownload();
@@ -771,6 +818,19 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			check(map.containsKey(t), "missing vignette type " + t);
 		}
 		return map;
+	}
+
+	private static ZonePoiPlan.MysteryExit findMysteryExit(long seed, ZonePoiPlan.MysteryKind kind) {
+		for (int radius = 0; radius <= 12; radius++) {
+			for (int rx = -radius; rx <= radius; rx++) {
+				for (int rz = -radius; rz <= radius; rz++) {
+					if (Math.max(Math.abs(rx), Math.abs(rz)) != radius) continue;
+					ZonePoiPlan.MysteryExit exit = ZonePoiPlan.mysteryExitInRegion(seed, rx, rz);
+					if (exit != null && exit.kind() == kind) return exit;
+				}
+			}
+		}
+		throw new AssertionError("no mystery exit " + kind + " found within radius 12 regions");
 	}
 
 	private static ZonePoiPlan.ChasmOutpost findChasmOutpost(long seed) {

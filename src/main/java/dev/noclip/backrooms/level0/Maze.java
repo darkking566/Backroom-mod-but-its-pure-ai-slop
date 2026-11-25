@@ -657,6 +657,12 @@ final class Maze {
 		if (ZonePoiPlan.isRedRoomPoiCell(seed, cx, cz)) {
 			return (ix == 3 || ix == 4) && (iz == 3 || iz == 4);
 		}
+		ZonePoiPlan.MysteryExit mystery = ZonePoiPlan.mysteryExitAtCell(seed, cx, cz);
+		if (mystery != null) {
+			return mystery.kind() == ZonePoiPlan.MysteryKind.HUB
+					? ix == 3 && (iz == 2 || iz == 4)
+					: ix == 3 && iz == 4;
+		}
 		ZonePoiPlan.Vignette vignette = ZonePoiPlan.vignetteAtCell(seed, cx, cz);
 		if (vignette != null && vignette.type() != ZonePoiPlan.VignetteType.NOCLIP_ALCOVE) {
 			if (vignette.type() == ZonePoiPlan.VignetteType.PEEK_CHAMBER) {
@@ -708,6 +714,10 @@ final class Maze {
 		if (ManilaRoomPlan.roomAtBlock(seed, x, z) != null) return true;
 		int cx = Math.floorDiv(x, CELL), cz = Math.floorDiv(z, CELL);
 		if (ZonePoiPlan.isRedRoomPoiCell(seed, cx, cz)) return true;
+		ZonePoiPlan.MysteryExit mystery = ZonePoiPlan.mysteryExitAtCell(seed, cx, cz);
+		if (mystery != null) {
+			return mystery.kind() == ZonePoiPlan.MysteryKind.FUN || Math.floorMod(z, CELL) == 4;
+		}
 		ZonePoiPlan.Vignette vignette = ZonePoiPlan.vignetteAtCell(seed, cx, cz);
 		if (vignette != null) {
 			if (vignette.type() == ZonePoiPlan.VignetteType.WANDERER_SITE

@@ -526,3 +526,8 @@
   - `BREAKER_NICHE`（配電壁龕）＋ `FuseBoxEvents`：於走廊擺放粗糙壁紙背柱、`industrial_fuse_box`、補給箱與天花板管線，頭頂燈預設熄滅；右鍵 `industrial_fuse_box`（含深淵前哨平台的電箱）有 70% 機率恢復半徑 20 格內損壞的日光燈與裸燈泡、30% 機率過載跳電使半徑 16 格內熄燈（不動 EXIT 燈與紅燈）並施加短暫黑暗效果且呼叫 `ShadowHallucination.triggerNear` 生出黑影幻覺，觸發後進入 60 秒冷卻（持久化於 `SavedData`）；新增中英文雙語提示條目
   - `PEEK_CHAMBER`（窺視玻璃窗室）：三面淺色壁紙與南面透明玻璃窗圍出冷白日光燈照射的室內隔間，內擺朝向窗戶的 `noclipped_wood_chair`，北側保留後門通道維持迷宮連通性（`Level0ChunkGenerator` 支援一般區 `FLOOR_Y + 3` 窗框門楣）
   - 驗證：`ZonePoiPlanTest` 涵蓋全 5 種微型興趣點，`Level0ClientTest` 新增 `BREAKER_NICHE` 電箱恢復亮燈／冷卻檢查與 `PEEK_CHAMBER` 實機截圖（`level0_breaker_niche`、`level0_peek_chamber`），`.\gradlew build` 與 `.\gradlew runClientGameTest -Plevels=0` 全部通過
+- Level 0 新增跨樓層伏筆彩蛋出口（Antigravity，`MysteryExitBlock`、`ZonePoiPlan.MysteryExit`）：
+  - 新增 4 個不可破壞門方塊並接通 `core/LevelExits`：`hub_door`／`hub_door_top`（`LevelExitBlock.to("hub")`，粗糙壁紙框＋生鏽鋼門噴漆「HUB」）與 `fun_door`／`fun_door_top`（`LevelExitBlock.to("fun")`，淺色壁紙框＋暖光＋「=)」氣球塗鴉派對門），目前皆由 `LevelExits` 顯示「尚未開放」，待目標層登記後自動接通
+  - 新增 `tools/make_level0_mystery_doors.py` 產出 128px 基礎與 512px labPBR（`_n`／`_s`）寫實材質貼圖、方塊模型、blockstates 與物品定義，並補齊中英文語言檔及創造分頁（隱藏上半方塊）
+  - 於每 `8×8` 扇區（448×448 格，避開起始區域 `(0,0)` 與其他 POI／結構）極稀少生成 1 扇，`Exits` 與 `EdgeShift` 皆保護該格不被覆蓋
+  - 驗證：`ZonePoiPlanTest.mysteryExitsGenerateRarelyForHubAndFunWithoutConflicts` 與 `Level0ClientTest`（檢查兩種門方塊、右鍵實測 `LevelExits.refusals()` 增加、拍攝 `level0_hub_door` 與 `level0_fun_door` 實機截圖）皆通過，`.\gradlew build` 與 `.\gradlew runClientGameTest -Plevels=0` 全部通過
