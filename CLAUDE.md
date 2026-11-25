@@ -319,6 +319,7 @@
   - 資源包描述改成「Level 0、0.1、1 與 2」（`pack.mcmeta`、兩個語言檔、`make_level0_realistic.py`／`make_level2_realistic.py` 裡的描述同步）；`docs/look/README.md` 更新；對照圖 `docs/look/level1_realistic.png`
   - 驗證：`gradlew build` 通過；`runClientGameTest -Plevels=1,look -Psections=views,sectors` 通過，log 沒有缺貼圖；看過停車場、走廊、哥德區截圖
   - 注意：資源包變大很多（Level 1 這份約 121 MB），模組 jar 與 git 倉庫會跟著變大
+- 使用者同意後，把 `main` 推送到 GitHub（`a3bb9fa` Level 1 寫實材質包與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
