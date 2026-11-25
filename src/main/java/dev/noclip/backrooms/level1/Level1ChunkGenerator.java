@@ -58,6 +58,12 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 				Level1Layout.propCell(seed, x, z), Level1Layout.basePiece(seed, x, z), x, y, z);
 	}
 
+	/** What a block is before the sectors restyle and build on it: the hall, its profile or landmark, exits, props, settlements. */
+	static BlockState baseAt(long seed, int x, int y, int z) {
+		return plainBlock(seed, Level1Layout.tile(seed, x, z), Level1Layout.ceiling(seed, x, z), Level1Layout.exitCell(seed, x, z),
+				Level1Layout.propCell(seed, x, z), Level1Layout.basePiece(seed, x, z), x, y, z);
+	}
+
 	private static BlockState block(long seed, Tile tile, Ceiling ceiling, HallPlan.Cell exit, HallPlan.PropCell prop,
 			BasePlan.Piece piece, int x, int y, int z) {
 		BlockState state = plainBlock(seed, tile, ceiling, exit, prop, piece, x, y, z);
@@ -103,7 +109,7 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 			case CORRIDOR -> corridor(ceiling, y);
 			case DESK -> y == FLOOR_Y + 1 ? state(Level1Blocks.OFFICE_DESK) : y == FLOOR_Y + 2 ? deskTop(seed, x, z) : corridor(ceiling, y);
 			case BIN -> y == FLOOR_Y + 1 ? state(Level1Blocks.WASTEBASKET) : corridor(ceiling, y);
-			case CHAIR -> y == FLOOR_Y + 1 ? state(Level1Blocks.SUNKEN_CHAIR) : corridor(ceiling, y);
+			case CHAIR -> y == FLOOR_Y + 1 ? state(Level1Blocks.SUNKEN_CHAIR).setValue(OldComputerBlock.FACING, chairFacing(seed, x, z)) : corridor(ceiling, y);
 			case FLOOR_PAINTING -> y == FLOOR_Y + 1 ? state(Level1Blocks.FLOOR_PAINTING) : corridor(ceiling, y);
 			case BED -> y == FLOOR_Y + 1 ? state(Level1Blocks.HOSPITAL_BED) : corridor(ceiling, y);
 			case TABLE -> y == FLOOR_Y + 1 ? state(Level1Blocks.OFFICE_DESK) : corridor(ceiling, y);
@@ -190,8 +196,34 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 	}
 
 	private static BlockState computer(long seed, int x, int z) {
-		Direction facing = Direction.from2DDataValue(Math.floorMod(Level1Layout.hash(seed, x, z, 11), 4));
+		// The screen faces whoever sits at the desk; with no chair, it faces out into the room.
+		Direction facing = toward(seed, x, z, Tile.CHAIR);
+		if (facing == null) facing = awayFromWall(seed, x, z);
+		if (facing == null) facing = Direction.from2DDataValue(Math.floorMod(Level1Layout.hash(seed, x, z, 11), 4));
 		return state(Level1Blocks.OLD_COMPUTER).setValue(OldComputerBlock.FACING, facing);
+	}
+
+	/** A chair faces its desk or table; one set against a wall faces out into the room. */
+	static Direction chairFacing(long seed, int x, int z) {
+		Direction facing = toward(seed, x, z, Tile.DESK);
+		if (facing == null) facing = toward(seed, x, z, Tile.TABLE);
+		if (facing == null) facing = awayFromWall(seed, x, z);
+		return facing == null ? Direction.NORTH : facing;
+	}
+
+	private static Direction toward(long seed, int x, int z, Tile tile) {
+		for (Direction d : Direction.Plane.HORIZONTAL) {
+			if (Level1Layout.tile(seed, x + d.getStepX(), z + d.getStepZ()) == tile) return d;
+		}
+		return null;
+	}
+
+	private static Direction awayFromWall(long seed, int x, int z) {
+		for (Direction d : Direction.Plane.HORIZONTAL) {
+			boolean back = Level1Layout.tile(seed, x - d.getStepX(), z - d.getStepZ()).walkable();
+			if (!back && Level1Layout.tile(seed, x + d.getStepX(), z + d.getStepZ()).walkable()) return d;
+		}
+		return null;
 	}
 
 	private static BlockState door(int y) {

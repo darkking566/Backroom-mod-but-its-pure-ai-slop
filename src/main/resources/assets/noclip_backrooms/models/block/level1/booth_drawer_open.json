@@ -1,6 +1,9 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/orientable",
   "textures": {
-    "all": "noclip_backrooms:block/level1/booth_drawer_open"
+    "particle": "noclip_backrooms:block/level1/booth_drawer_open",
+    "front": "noclip_backrooms:block/level1/booth_drawer_open",
+    "side": "noclip_backrooms:block/level1/booth_wall",
+    "top": "noclip_backrooms:block/level1/booth_wall"
   }
 }

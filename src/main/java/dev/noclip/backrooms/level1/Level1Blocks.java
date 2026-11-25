@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public final class Level1Blocks {
@@ -37,7 +38,7 @@ public final class Level1Blocks {
 
 	// The parking structure
 	public static final Block GARAGE_FLOOR = register("garage_floor", concrete(MapColor.STONE));
-	public static final Block GARAGE_FLOOR_LINE = register("garage_floor_line", concrete(MapColor.STONE));
+	public static final Block GARAGE_FLOOR_LINE = register("garage_floor_line", concrete(MapColor.STONE), LaneLineBlock::new);
 	public static final Block DAMP_GARAGE_FLOOR = register("damp_garage_floor", concrete(MapColor.STONE));
 	public static final Block PUDDLED_GARAGE_FLOOR = register("puddled_garage_floor", concrete(MapColor.WATER));
 	public static final Block GARAGE_WALL = register("garage_wall", concrete(MapColor.STONE));
@@ -46,7 +47,7 @@ public final class Level1Blocks {
 	public static final Block GARAGE_PILLAR_MARKED = register("garage_pillar_marked", concrete(MapColor.STONE));
 	public static final Block GARAGE_CEILING = register("garage_ceiling", concrete(MapColor.STONE));
 	public static final Block GARAGE_LIGHT = register("garage_light", fixture().lightLevel(lit(15)), p -> new Level1LampBlock(p, LIGHT_SHAPE));
-	public static final Block BROKEN_GARAGE_LIGHT = register("broken_garage_light", fixture(), p -> new ShapedBlock(p, LIGHT_SHAPE));
+	public static final Block BROKEN_GARAGE_LIGHT = register("broken_garage_light", fixture(), p -> new AxisPlacedBlock(p, LIGHT_SHAPE, true));
 	public static final Block CEILING_PIPE = register("ceiling_pipe", pipe(), PipeBlock::new);
 	public static final Block LEAKING_CEILING_PIPE = register("leaking_ceiling_pipe", pipe(), LeakingPipeBlock::new);
 	public static final Block METAL_SHELF = register("metal_shelf", Properties.of()
@@ -89,7 +90,7 @@ public final class Level1Blocks {
 	public static final Block CUBICLE_PANEL = register("cubicle_panel", Properties.of()
 			.mapColor(MapColor.COLOR_GRAY).strength(0.6F).sound(SoundType.WOOL).noOcclusion(), CubiclePanelBlock::new);
 	public static final Block OFFICE_DESK = register("office_desk", Properties.of()
-			.mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD).noOcclusion(), p -> new ShapedBlock(p, DESK_SHAPE));
+			.mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD).noOcclusion(), p -> new OldComputerBlock(p, DESK_SHAPE));
 	public static final Block OLD_COMPUTER = register("old_computer", Properties.of()
 			.mapColor(MapColor.SAND).strength(1.0F).sound(SoundType.METAL).noOcclusion(), p -> new OldComputerBlock(p, COMPUTER_SHAPE));
 
@@ -144,7 +145,7 @@ public final class Level1Blocks {
 	public static final Block DOOR_FRAME = register("standalone_door_frame", exitProperties(MapColor.WOOD, SoundType.WOOD).noOcclusion().noCollision(),
 			p -> new DoorFrameBlock(p, FRAME_SHAPE, Level1Exit.DOOR_FRAME.level));
 	public static final Block DOOR_FRAME_TOP = register("standalone_door_frame_top", exitProperties(MapColor.WOOD, SoundType.WOOD).noOcclusion().noCollision(),
-			p -> new ShapedBlock(p, FRAME_SHAPE));
+			p -> new AxisPlacedBlock(p, FRAME_SHAPE, false));
 	public static final Block CONCRETE_STAIRS = register("concrete_stairs", concrete(MapColor.STONE),
 			p -> new ConcreteStairsBlock(GARAGE_FLOOR.defaultBlockState(), p));
 	public static final Block DARKNESS_BELOW = register("darkness_below", darkness(), p -> new DarknessBlock(p, Level1Exit.STAIRS_DOWN.level));
@@ -161,7 +162,7 @@ public final class Level1Blocks {
 			.mapColor(MapColor.COLOR_YELLOW).strength(2.0F).sound(SoundType.METAL));
 	public static final Block BARRIER_ARM = register("barrier_arm", Properties.of()
 			.mapColor(MapColor.COLOR_RED).strength(0.5F).sound(SoundType.METAL).noOcclusion().noCollision(),
-			p -> new ShapedBlock(p, ARM_SHAPE));
+			p -> new AxisPlacedBlock(p, ARM_SHAPE, false));
 	public static final Block GENERATOR = register("generator", Properties.of()
 			.mapColor(MapColor.COLOR_GREEN).strength(3.0F).sound(SoundType.METAL).noOcclusion(),
 			p -> new GeneratorBlock(p, GENERATOR_SHAPE));
@@ -186,7 +187,7 @@ public final class Level1Blocks {
 	/** On the settlement's own power: the Flickering never reaches it. */
 	public static final Block FLOODLIGHT = register("floodlight", Properties.of()
 			.mapColor(MapColor.METAL).strength(1.5F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 15),
-			p -> new ShapedBlock(p, Block.box(3, 0, 3, 13, 16, 13)));
+			p -> new ShapedBlock(p, Block.box(3, 0, 3, 13, 21, 13)));
 	public static final Block TRADER_SIGN = register("trader_sign", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(2.0F).sound(SoundType.METAL));
 	public static final Block CLINIC_SIGN = register("clinic_sign", Properties.of().mapColor(MapColor.SNOW).strength(2.0F).sound(SoundType.METAL));
 	public static final Block TOM_SIGN = register("tom_sign", Properties.of().mapColor(MapColor.COLOR_RED).strength(2.0F).sound(SoundType.METAL).lightLevel(state -> 6));
@@ -235,11 +236,11 @@ public final class Level1Blocks {
 	public static final Block LEGEND_CEILING = register("legend_ceiling", Properties.of().mapColor(MapColor.COLOR_BROWN).strength(2.0F).sound(SoundType.WOOD));
 	public static final Block COPPER_PILLAR = register("copper_pillar", Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(2.0F).sound(SoundType.METAL));
 	/** Neon in the Legend Sector: not on the lamps' circuit, so a blackout leaves it burning. */
-	public static final Block NEON_CYAN = register("neon_cyan", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12));
+	public static final Block NEON_CYAN = register("neon_cyan", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12), NeonBlock::new);
 	/** Neon in the Legend Sector: not on the lamps' circuit, so a blackout leaves it burning. */
-	public static final Block NEON_MAGENTA = register("neon_magenta", Properties.of().mapColor(MapColor.COLOR_MAGENTA).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12));
+	public static final Block NEON_MAGENTA = register("neon_magenta", Properties.of().mapColor(MapColor.COLOR_MAGENTA).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12), NeonBlock::new);
 	/** Neon in the Legend Sector: not on the lamps' circuit, so a blackout leaves it burning. */
-	public static final Block NEON_AMBER = register("neon_amber", Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12));
+	public static final Block NEON_AMBER = register("neon_amber", Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12), NeonBlock::new);
 	public static final Block GARDEN_GRASS = register("garden_grass", Properties.of().mapColor(MapColor.PLANT).instabreak().noCollision().noOcclusion().replaceable().sound(SoundType.GRASS),
 			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 12, 14)));
 	public static final Block GARDEN_FERN = register("garden_fern", Properties.of().mapColor(MapColor.PLANT).instabreak().noCollision().noOcclusion().replaceable().sound(SoundType.GRASS),
@@ -255,29 +256,31 @@ public final class Level1Blocks {
 	public static final Block SCAFFOLD_POLE = register("scaffold_pole", Properties.of().mapColor(MapColor.METAL).strength(0.5F).sound(SoundType.METAL).noOcclusion().noCollision(),
 			p -> new ShapedBlock(p, Block.box(7, 0, 7, 9, 16, 9)));
 	public static final Block SITE_MACHINE = register("site_machine", Properties.of().mapColor(MapColor.COLOR_YELLOW).strength(0.5F).sound(SoundType.METAL).noOcclusion(),
-			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 14, 14)));
+			p -> new ShapedBlock(p, Block.box(0.5, 0, 2, 15.5, 10.5, 19)));
+	// The big props collide as far as their models reach: a block's shape may stick out up to one block past its own
+	// space and the game still checks it (only clicking on the part that sticks out does not pick the block).
 	/** A dusty 90s abandoned sedan parked in the garage halls and indoor overpasses. */
 	public static final Block ABANDONED_CAR = register("abandoned_car", Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F).sound(SoundType.METAL).noOcclusion(),
-			p -> new OldComputerBlock(p, Block.box(0, 0, 0, 16, 16, 16)));
+			p -> new OldComputerBlock(p, Shapes.or(Block.box(0, 0, -8.4, 16, 9.6, 24.4), Block.box(1.2, 9.6, -0.8, 14.8, 16.8, 18.4))));
 	/** A boxy 90s cargo delivery van parked in garage stalls and loading docks. */
 	public static final Block ABANDONED_VAN = register("abandoned_van", Properties.of().mapColor(MapColor.SNOW).strength(3.0F).sound(SoundType.METAL).noOcclusion(),
-			p -> new OldComputerBlock(p, Block.box(0, 0, 0, 16, 16, 16)));
+			p -> new OldComputerBlock(p, Shapes.or(Block.box(0, 0, -9, 16, 11.2, 25), Block.box(0.2, 11.2, -5.8, 15.8, 20.6, 25))));
 	/** A softly humming retro vending machine with a lit display window. */
 	public static final Block VENDING_MACHINE = register("vending_machine", Properties.of().mapColor(MapColor.COLOR_RED).strength(2.5F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 7),
-			p -> new OldComputerBlock(p, Block.box(1, 0, 2, 15, 16, 14)));
+			p -> new OldComputerBlock(p, Block.box(0.8, 0, 2, 15.2, 29.4, 14.2)));
 	/** A wooden shipping pallet stacked with boxes and a red hand-truck. */
 	public static final Block PALLET_STACK = register("pallet_stack", Properties.of().mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD).noOcclusion(),
 			p -> new OldComputerBlock(p, Block.box(0, 0, 0, 16, 15, 16)));
 	/** A tall industrial electrical switchgear cabinet with conduits and indicator lights. */
 	public static final Block ELECTRICAL_CABINET = register("electrical_cabinet", Properties.of().mapColor(MapColor.COLOR_GRAY).strength(3.0F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 4),
-			p -> new OldComputerBlock(p, Block.box(1, 0, 2, 15, 16, 14)));
+			p -> new OldComputerBlock(p, Block.box(1, 0, 2, 15, 27, 14)));
 	public static final Block GLITCH_BLACK = register("glitch_black", Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 0));
 	public static final Block GLITCH_MAGENTA = register("glitch_magenta", Properties.of().mapColor(MapColor.COLOR_MAGENTA).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 6));
 	public static final Block GLITCH_CYAN = register("glitch_cyan", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 6));
 	/** The chair in the rubber room, sunk into the floor. */
 	public static final Block SUNKEN_CHAIR = register("sunken_chair", Properties.of()
 			.mapColor(MapColor.COLOR_GRAY).strength(0.8F).sound(SoundType.WOOL).noOcclusion(),
-			p -> new ShapedBlock(p, Block.box(4, 0, 4, 12, 13, 12)));
+			p -> new OldComputerBlock(p, Block.box(4, 0, 4, 12, 13, 12)));
 	/** A painting lying on the floor, where no one would put one. */
 	public static final Block FLOOR_PAINTING = register("floor_painting", Properties.of()
 			.mapColor(MapColor.COLOR_BROWN).instabreak().sound(SoundType.WOOD).noOcclusion().noCollision().noLootTable(),
@@ -293,13 +296,14 @@ public final class Level1Blocks {
 			.mapColor(MapColor.TERRACOTTA_ORANGE).instabreak().sound(SoundType.GRASS).noOcclusion(), p -> new ShapedBlock(p, Block.box(4, 0, 4, 12, 6, 12)));
 	public static final Block HOSPITAL_BED = register("hospital_bed", Properties.of()
 			.mapColor(MapColor.METAL).strength(0.8F).sound(SoundType.METAL).noOcclusion(),
-			p -> new ShapedBlock(p, Block.box(0, 0, 1, 16, 11, 15)));
+			// Beds run east-west with the pillow west: one turn puts the pillow at the far end of where the player looks.
+			p -> new OldComputerBlock(p, Block.box(0, 0, 1, 16, 11, 15), 1));
 	public static final Block COT = register("cot", Properties.of()
 			.mapColor(MapColor.COLOR_GREEN).strength(0.8F).sound(SoundType.WOOL).noOcclusion(),
-			p -> new RestBlock(p, Block.box(0, 0, 1, 16, 8, 15), "first_light"));
+			p -> new RestBlock(p, Block.box(0, 0, 1, 16, 8, 15), 1, "first_light"));
 	public static final Block BEDROLL = register("bedroll", Properties.of()
 			.mapColor(MapColor.COLOR_BROWN).strength(0.5F).sound(SoundType.WOOL).noOcclusion(),
-			p -> new RestBlock(p, Block.box(1, 0, 1, 15, 3, 15), "blink"));
+			p -> new RestBlock(p, Block.box(1, 0, 1, 15, 3, 15), 0, "blink"));  // pillow north
 	public static final Block SUPPLY_LOCKER = register("supply_locker", Properties.of()
 			.mapColor(MapColor.METAL).strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion(),
 			p -> new LockerBlock(p, Block.box(1, 0, 2, 15, 16, 14)));

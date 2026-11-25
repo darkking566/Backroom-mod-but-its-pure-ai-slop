@@ -37,9 +37,8 @@ class ZenithLayoutTest {
 				for (int dy = 1; dy >= -3; dy--) {
 					int ny = at[1] + dy;
 					if (ny < box[4] || ny > box[5] || !standable(seed, nx, ny, nz)) continue;
-					// Stairs are climbed by walking; anything else by jumping, which needs room above.
-					boolean stair = ZenithLayout.kind(ZenithLayout.cell(seed, nx, ny - 1, nz)) == Kind.STAIR;
-					if (dy == 1 && !stair && !passable(seed, at[0], at[1] + 2, at[2])) continue;
+					// Climbing up 1 block (even on stairs, where feet rise 0.5 while overlapping the previous step) needs headroom at +2.
+					if (dy == 1 && !passable(seed, at[0], at[1] + 2, at[2])) continue;
 					if (dy <= 0 && !(passable(seed, nx, at[1], nz) && passable(seed, nx, at[1] + 1, nz))) continue;
 					boolean clear = true;
 					for (int yy = ny + 2; yy <= at[1] + 1 && clear; yy++) clear = passable(seed, nx, yy, nz);

@@ -86,11 +86,8 @@ final class Smilers {
 			double z = player.getZ() + Math.sin(angle) * distance;
 			int bx = (int) Math.floor(x), bz = (int) Math.floor(z);
 			if (!Level1Layout.tile(seed, bx, bz).walkable() || Marauders.nearSettlement(seed, bx, bz)) continue;
-			BlockPos feet = new BlockPos(bx, baseY, bz);
-			if (!level.isLoaded(feet) || !level.getBlockState(feet).isAir() || !level.getBlockState(feet.above()).isAir()) {
-				feet = new BlockPos(bx, Level1ChunkGenerator.FLOOR_Y + 1, bz);
-				if (!level.isLoaded(feet) || !level.getBlockState(feet).isAir() || !level.getBlockState(feet.above()).isAir()) continue;
-			}
+			BlockPos feet = Spots.feet(level, Monsters.SMILER.getDimensions(), bx, baseY, bz);
+			if (feet == null) continue;
 			Smiler smiler = Monsters.SMILER.create(level, EntitySpawnReason.NATURAL);
 			if (smiler == null) return null;
 			smiler.setPos(bx + 0.5, feet.getY(), bz + 0.5);

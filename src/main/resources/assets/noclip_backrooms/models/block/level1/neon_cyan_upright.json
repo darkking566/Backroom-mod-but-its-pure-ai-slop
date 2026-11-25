@@ -1,0 +1,45 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level1/neon_cyan",
+    "all": "noclip_backrooms:block/level1/neon_cyan"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#all",
+          "rotation": 90
+        },
+        "south": {
+          "texture": "#all",
+          "rotation": 90
+        },
+        "east": {
+          "texture": "#all",
+          "rotation": 90
+        },
+        "west": {
+          "texture": "#all",
+          "rotation": 90
+        },
+        "up": {
+          "texture": "#all"
+        },
+        "down": {
+          "texture": "#all"
+        }
+      }
+    }
+  ]
+}

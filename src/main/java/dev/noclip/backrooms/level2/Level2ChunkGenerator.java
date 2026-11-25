@@ -165,15 +165,15 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 		if (r < 0) return h == 4 ? light(seed, x, z) : air();
 		Room room = plan.rooms.get(r);
 		int cx = (room.x0() + room.x1()) / 2, cz = (room.z0() + room.z1()) / 2;
-		// Each outpost turns its fittings its own way, so no two look stamped from one mould.
-		Direction face = Direction.from2DDataValue(Level2Layout.hash(seed, Math.floorDiv(x, Level2Plan.SIZE) * 64 + room.i(),
-				Math.floorDiv(z, Level2Plan.SIZE) * 64 + room.j(), 0x7A11) & 3);
+		Direction face = Direction.from2DDataValue(Level2Layout.roomTurn(seed, x, z, room));
 		if (room.kind() == RoomKind.EL3A) {
 			// Lanterns near the corners too, so the walls are not left in the dark around one lamp.
 			boolean corner = (lx == room.x0() + 2 || lx == room.x1() - 2) && (lz == room.z0() + 2 || lz == room.z1() - 2);
 			if (h == 4) return corner ? Blocks.LANTERN.defaultBlockState().setValue(LanternBlock.HANGING, true) : light(seed, x, z);
 			if (lx == cx && lz == cz) return h == 1 ? Blocks.CRAFTING_TABLE.defaultBlockState() : h == 2 ? Blocks.LANTERN.defaultBlockState() : air();
-			if (lx == cx + 1 && lz == cz && h == 1) return Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, face);
+			if (lx == cx + 1 && lz == cz && h == 1) {
+				return Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.from2DDataValue(Level2Layout.chestTurn(seed, x, z, room)));
+			}
 		} else if (room.kind() == RoomKind.MACCHINA) {
 			if (h == 4) return light(seed, x, z);
 			if (lx == cx && lz == cz) return h == 1 ? Level2Blocks.MACHINE_CABINET.defaultBlockState().setValue(Level2FacingBlock.FACING, face)

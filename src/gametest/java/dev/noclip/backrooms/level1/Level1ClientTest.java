@@ -70,6 +70,8 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			if (only("marker")) marker(context, game);
 			if (only("views")) views(context, game, seed);
 			if (only("sectors")) sectors(context, game, seed);
+			if (only("sectorFit")) sectorFit();
+			if (only("pipeFit")) pipeFit();
 			if (only("exits")) exits(context, game, seed);
 			if (only("events")) events(context, game, seed);
 			if (only("settlements")) settlements(context, game, seed);
@@ -81,6 +83,9 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			if (only("rooms")) rooms(context, game, seed);
 			if (only("hounds")) hounds(context, game, seed);
 			if (only("shepherdSnake")) shepherdSnake(context, game, seed);
+			if (only("placeFacing")) placeFacing(context, game);
+			if (only("bigProps")) bigProps(context, game);
+			if (only("gardenPlants")) gardenPlants(context, game);
 			if (only("checkBlocks")) checkBlocks(context, game);
 			if (only("leaveThroughDoor")) leaveThroughDoor(context, game, seed);
 		}
@@ -648,6 +653,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		server.runOnServer(s -> {
 			BlockPos drawer = new BlockPos(booth.x0() + 3, STAND, booth.z0() + 7);
 			check(level1(s).getBlockState(drawer).getValue(BoothDrawerBlock.EMPTY), "drawer not emptied");
+			check(level1(s).getBlockState(drawer).getValue(BoothDrawerBlock.FACING) == Direction.SOUTH, "drawer front does not face into the booth");
 			boolean flashlight = false;
 			for (int i = 0; i < 36; i++) {
 				flashlight |= BuiltInRegistries.ITEM.getKey(player(s).getInventory().getItem(i).getItem()).getPath().equals("flashlight");
@@ -655,6 +661,8 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			check(flashlight, "no flashlight from the drawer");
 		});
 		context.takeScreenshot("level1_booth_drawer");
+		// From outside the front window: the drawer's back is the booth's panel, not another drawer.
+		shoot(context, game, booth.x0() + 3.5, STAND + 0.6, booth.z0() + 5.2, 0, 35, "level1_booth_drawer_back");
 
 		HallPlan.PlacedProp room = nearestProp(seed, HallPlan.Prop.GENERATOR_ROOM);
 		int[] door = room.door();
@@ -1211,6 +1219,169 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		throw new AssertionError("no " + tile + " near the origin");
 	}
 
+	/** Racks, arches and pits keep to the main floor of decked, sunken and tunnelled halls; parked props stand on something. */
+	private static void sectorFit() {
+		int D = Level1Layout.DISTRICT, FLOOR = Level1ChunkGenerator.FLOOR_Y;
+		java.util.Set<net.minecraft.world.level.block.Block> props = java.util.Set.of(Level1Blocks.ABANDONED_CAR, Level1Blocks.ABANDONED_VAN,
+				Level1Blocks.VENDING_MACHINE, Level1Blocks.PALLET_STACK);
+		int districts = 0, changed = 0, propsSeen = 0;
+		for (long seed = 0; seed < 2; seed++) {
+			for (int dx = -7; dx <= 7; dx++) {
+				for (int dz = -7; dz <= 7; dz++) {
+					if (Level1SectorArchitecture.variant(seed, dx, dz) == Level1SectorArchitecture.Variant.NONE) continue;
+					Level1Elevation.Profile profile = Level1Elevation.profile(seed, dx, dz);
+					boolean standard = profile == Level1Elevation.Profile.STANDARD;
+					districts++;
+					int top = Level1Elevation.ceilingY(seed, dx, dz);
+					for (int lx = 0; lx < D; lx += standard ? 6 : 2) {
+						for (int lz = 0; lz < D; lz += standard ? 6 : 2) {
+							int x = dx * D + lx, z = dz * D + lz;
+							Level1Layout.Tile tile = Level1Layout.tile(seed, x, z);
+							BlockState floor = Level1ChunkGenerator.baseAt(seed, x, FLOOR, z);
+							boolean deckAbove = false;
+							int blockedAt = Integer.MAX_VALUE;
+							for (int y = FLOOR - 9; y < top; y++) {
+								BlockState base = Level1ChunkGenerator.baseAt(seed, x, y, z);
+								if (y >= FLOOR + 3 && !base.isAir()) deckAbove = true;
+								BlockState out = Level1SectorArchitecture.apply(seed, tile, base, x, y, z);
+								if (props.contains(out.getBlock())) {
+									propsSeen++;
+									if (!solidShape(Level1ChunkGenerator.blockAt(seed, x, y - 1, z))) {
+										throw new AssertionError("prop over nothing at " + x + "," + y + "," + z + " seed " + seed);
+									}
+								}
+								BlockState wanted = Level1SectorArchitecture.apply(seed, tile, base, x, y, z, false);
+								if (y > FLOOR && wanted != base) {
+									// Fitting may only trim a piece from the top, never leave its upper part hanging.
+									if (out == base) blockedAt = Math.min(blockedAt, y);
+									else if (y > blockedAt) throw new AssertionError("piece hangs over a removed block at " + x + "," + blockedAt + ".." + y + "," + z
+											+ " seed " + seed + " " + profile + ": " + out);
+								}
+								if (out == base) continue;
+								changed++;
+								String at = profile + " seed " + seed + " " + x + "," + y + "," + z + " " + base + " -> " + out;
+								if (y <= FLOOR) {
+									if (!standard && profile != Level1Elevation.Profile.VAULTED) throw new AssertionError("carved below a " + at);
+								} else {
+									if (!solidShape(floor)) throw new AssertionError("built over no floor " + at);
+									if (deckAbove && y != top - 1) throw new AssertionError("built through a deck " + at);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		spanFit();
+		if (districts < 10 || changed < 1000) throw new AssertionError("sector fit check barely ran: " + districts + " districts, " + changed + " blocks");
+		System.out.println("[sectorFit] districts " + districts + ", changed blocks " + changed + ", props " + propsSeen);
+	}
+
+	/** Bridges, unfinished beams and ceiling pipe rows go in whole or not at all: no one-block holes. */
+	private static void spanFit() {
+		int D = Level1Layout.DISTRICT, FLOOR = Level1ChunkGenerator.FLOOR_Y;
+		java.util.Map<String, int[]> tally = new java.util.TreeMap<>();
+		for (long seed = 0; seed < 2; seed++) {
+			for (int dx = -12; dx <= 12; dx++) {
+				for (int dz = -12; dz <= 12; dz++) {
+					Level1SectorArchitecture.Variant v = Level1SectorArchitecture.variant(seed, dx, dz);
+					int top = Level1Elevation.ceilingY(seed, dx, dz);
+					java.util.List<int[]> spans = new java.util.ArrayList<>();
+					switch (v) {
+						case LEGEND_LANTERN_BRIDGES -> {
+							if (top >= FLOOR + 9) spans.add(new int[] {5, D - 6, 28, 36, FLOOR + 5, FLOOR + 6});
+						}
+						case TAILCHASE_UNFINISHED_BEAMS -> {
+							for (int lz : new int[] {22, 42}) {
+								for (int a = 0; a < D; a += 9) {
+									if (Math.min(D - 6, a + 5) >= Math.max(5, a)) spans.add(new int[] {Math.max(5, a), Math.min(D - 6, a + 5), lz, lz, FLOOR + 2, FLOOR + 4});
+								}
+							}
+						}
+						case TALON_PIPE_GANTRY -> {
+							for (int lz = 12; lz <= D - 6; lz += 12) spans.add(new int[] {5, D - 6, lz, lz, top - 1, top - 1});
+						}
+						default -> {}
+					}
+					for (int[] sp : spans) {
+						int placed = 0, missing = 0;
+						for (int lx = sp[0]; lx <= sp[1]; lx++) {
+							for (int lz = sp[2]; lz <= sp[3]; lz++) {
+								int x = dx * D + lx, z = dz * D + lz;
+								Level1Layout.Tile tile = Level1Layout.tile(seed, x, z);
+								for (int y = sp[4]; y <= sp[5]; y++) {
+									BlockState base = Level1ChunkGenerator.baseAt(seed, x, y, z);
+									if (!base.isAir()) continue;
+									BlockState wanted = Level1SectorArchitecture.apply(seed, tile, base, x, y, z, false);
+									if (wanted == base || wanted.isAir()) continue;
+									if (Level1SectorArchitecture.apply(seed, tile, base, x, y, z) != base) placed++;
+									else missing++;
+								}
+							}
+						}
+						if (placed > 0 && missing > 0) {
+							throw new AssertionError(v + " seed " + seed + " district " + dx + "," + dz + " span " + java.util.Arrays.toString(sp)
+									+ " has " + missing + " holes among " + placed + " placed blocks");
+						}
+						if (placed + missing > 0) tally.computeIfAbsent(v.name(), k -> new int[2])[placed > 0 ? 0 : 1]++;
+					}
+				}
+			}
+		}
+		System.out.println("[spanFit] whole/dropped " + tally.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()[0] + "/" + e.getValue()[1]).toList());
+		for (var e : tally.entrySet()) {
+			if (e.getValue()[0] == 0) throw new AssertionError(e.getKey() + ": every span was dropped");
+		}
+	}
+
+	/** In the pipe area (the way to Level 2), every ceiling pipe hangs from a real ceiling and every gauge sits on a real pillar. */
+	private static void pipeFit() {
+		int D = Level1Layout.DISTRICT, FLOOR = Level1ChunkGenerator.FLOOR_Y;
+		int size = D * 4;  // Level1Layout's sector region: 4 districts
+		int zones = 0, pipes = 0, gauges = 0;
+		java.util.List<String> bad = new java.util.ArrayList<>();
+		for (long seed = 0; seed < 2; seed++) {
+			for (int rx = -4; rx <= 4; rx++) {
+				for (int rz = -4; rz <= 4; rz++) {
+					int cx = rx * size + size / 2, cz = rz * size + size / 2;
+					if (Level1Layout.pipeZone(seed, cx, cz) < 0) continue;
+					zones++;
+					for (int x = cx - 100; x <= cx + 100; x++) {
+						for (int z = cz - 100; z <= cz + 100; z++) {
+							if (Level1Layout.pipeZone(seed, x, z) < 0) continue;
+							int top = Level1Elevation.ceilingY(seed, Math.floorDiv(x, D), Math.floorDiv(z, D));
+							for (int y = FLOOR + 1; y < top; y++) {
+								if (!Level1ChunkGenerator.blockAt(seed, x, y, z).is(Level1Blocks.CEILING_PIPE)) continue;
+								pipes++;
+								if (!solidShape(Level1ChunkGenerator.blockAt(seed, x, y + 1, z))) {
+									bad.add("pipe " + x + "," + y + "," + z + " s" + seed + " " + Level1Elevation.profile(seed, Math.floorDiv(x, D), Math.floorDiv(z, D))
+											+ " above " + Level1ChunkGenerator.blockAt(seed, x, y + 1, z).getBlock());
+								}
+							}
+							BlockState g = Level1ChunkGenerator.blockAt(seed, x, FLOOR + 2, z);
+							if (g.is(Level1Blocks.PIPE_GAUGE)) {
+								gauges++;
+								net.minecraft.core.Direction back = g.getValue(PhosphorMarkBlock.FACING).getOpposite();
+								BlockState behind = Level1ChunkGenerator.blockAt(seed, x + back.getStepX(), FLOOR + 2, z + back.getStepZ());
+								if (!solidShape(behind)) {
+									bad.add("gauge " + x + "," + (FLOOR + 2) + "," + z + " s" + seed + " " + Level1Elevation.profile(seed, Math.floorDiv(x, D), Math.floorDiv(z, D))
+											+ " behind " + behind.getBlock());
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		System.out.println("[pipeFit] zones " + zones + ", pipes " + pipes + ", gauges " + gauges + ", floating " + bad.size() + " " + bad.subList(0, Math.min(12, bad.size())));
+		if (!bad.isEmpty()) throw new AssertionError(bad.size() + " floating pipes or gauges, first " + bad.get(0));
+		if (zones == 0 || pipes < 100 || gauges < 20) throw new AssertionError("pipe check barely ran: " + zones + " zones, " + pipes + " pipes, " + gauges + " gauges");
+	}
+
+	private static boolean solidShape(BlockState s) {
+		return !s.getCollisionShape(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, net.minecraft.core.BlockPos.ZERO).isEmpty();
+	}
+
 	private static void checkBlocks(ClientGameTestContext context, TestSingleplayerContext game) {
 		game.getServer().runOnServer(s -> {
 			ServerLevel level = level1(s);
@@ -1227,6 +1398,150 @@ public final class Level1ClientTest implements FabricClientGameTest {
 				check(Language.getInstance().has(block.getDescriptionId()), "no name for " + block);
 			}
 		});
+	}
+
+	/**
+	 * A desk a player puts down faces them; a bed runs along the way they look with its pillow at the far end (a bedroll
+	 * the same). Placed with a real right-click from each of the four sides, then the four bed turns photographed.
+	 */
+	private static void placeFacing(ClientGameTestContext context, TestSingleplayerContext game) {
+		var server = game.getServer();
+		BlockPos at = server.computeOnServer(s -> player(s).blockPosition());
+		int x0 = at.getX(), z0 = at.getZ();
+		String clear = String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run fill %d %d %d %d %d %d minecraft:air", x0 - 6, STAND, z0 - 6, x0 + 6, STAND + 3, z0 + 6);
+		server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run fill %d %d %d %d %d %d noclip_backrooms:garage_floor",
+				x0 - 6, STAND - 1, z0 - 6, x0 + 6, STAND - 1, z0 + 6));
+		server.runCommand("gamemode creative @a");
+		Object[][] cases = {{Level1Blocks.OFFICE_DESK, 2}, {Level1Blocks.HOSPITAL_BED, 1}, {Level1Blocks.CLINIC_BED, 1}, {Level1Blocks.COT, 1}, {Level1Blocks.BEDROLL, 0}};
+		for (Object[] c : cases) {
+			Block block = (Block) c[0];
+			int turns = (Integer) c[1];
+			String id = BuiltInRegistries.BLOCK.getKey(block).toString();
+			for (int yaw = 0; yaw < 360; yaw += 90) {
+				server.runCommand(clear);
+				server.runCommand("item replace entity @a weapon.mainhand with " + id);
+				server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f %d 60", x0 + 0.5, STAND, z0 + 0.5, yaw));
+				context.waitTicks(5);
+				context.getInput().lookAt(yaw, 60);
+				context.waitTicks(2);
+				context.getInput().pressMouse(1);
+				context.waitTicks(5);
+				final int look = yaw;
+				server.runOnServer(s -> {
+					ServerLevel level = level1(s);
+					Direction expected = Direction.fromYRot(look);
+					for (int i = 0; i < turns; i++) expected = expected.getClockWise();
+					BlockState placed = null;
+					for (BlockPos pos : BlockPos.betweenClosed(x0 - 4, STAND, z0 - 4, x0 + 4, STAND + 1, z0 + 4)) {
+						if (level.getBlockState(pos).is(block)) placed = level.getBlockState(pos);
+					}
+					check(placed != null, id + " was not placed looking " + Direction.fromYRot(look));
+					check(placed.getValue(OldComputerBlock.FACING) == expected,
+							id + " placed looking " + Direction.fromYRot(look) + " faces " + placed.getValue(OldComputerBlock.FACING) + ", not " + expected);
+				});
+			}
+		}
+		// Long fixtures: across the view like a wall in front of the player, except ceiling lights, which run along it.
+		Object[][] axes = {{Level1Blocks.TRADE_COUNTER, false}, {Level1Blocks.TOM_COUNTER, false}, {Level1Blocks.DOOR_FRAME, false},
+				{Level1Blocks.DOOR_FRAME_TOP, false}, {Level1Blocks.METAL_EXIT_DOOR, false}, {Level1Blocks.METAL_EXIT_DOOR_TOP, false},
+				{Level1Blocks.BARRIER_ARM, false}, {Level1Blocks.GARAGE_LIGHT, true}, {Level1Blocks.BROKEN_GARAGE_LIGHT, true}};
+		for (Object[] c : axes) {
+			Block block = (Block) c[0];
+			boolean along = (Boolean) c[1];
+			String id = BuiltInRegistries.BLOCK.getKey(block).toString();
+			for (int yaw = 0; yaw < 180; yaw += 90) {
+				server.runCommand(clear);
+				server.runCommand("item replace entity @a weapon.mainhand with " + id);
+				server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f %d 60", x0 + 0.5, STAND, z0 + 0.5, yaw));
+				context.waitTicks(5);
+				context.getInput().lookAt(yaw, 60);
+				context.waitTicks(2);
+				context.getInput().pressMouse(1);
+				context.waitTicks(5);
+				final int look = yaw;
+				server.runOnServer(s -> {
+					ServerLevel level = level1(s);
+					Direction.Axis looking = Direction.fromYRot(look).getAxis();
+					Direction.Axis expected = along ? looking : (looking == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X);
+					BlockState placed = null;
+					for (BlockPos pos : BlockPos.betweenClosed(x0 - 4, STAND, z0 - 4, x0 + 4, STAND + 1, z0 + 4)) {
+						if (level.getBlockState(pos).is(block)) placed = level.getBlockState(pos);
+					}
+					check(placed != null, id + " was not placed looking " + Direction.fromYRot(look));
+					check(placed.getValue(AxisPlacedBlock.AXIS) == expected,
+							id + " placed looking " + Direction.fromYRot(look) + " lies along " + placed.getValue(AxisPlacedBlock.AXIS) + ", not " + expected);
+				});
+			}
+		}
+		server.runCommand(clear);
+		server.runCommand("gamemode spectator @a");
+		// Four hospital beds and four bedrolls, as placed looking north, east, south and west.
+		String[] facings = {"east", "south", "west", "north"};
+		for (int i = 0; i < 4; i++) {
+			server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run setblock %d %d %d noclip_backrooms:hospital_bed[facing=%s]", x0 - 3 + 2 * i, STAND, z0, facings[i]));
+			server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run setblock %d %d %d noclip_backrooms:bedroll[facing=%s]", x0 - 3 + 2 * i, STAND, z0 + 2,
+					new String[] {"north", "east", "south", "west"}[i]));
+		}
+		server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run setblock %d %d %d minecraft:sea_lantern", x0, STAND + 3, z0 + 1));
+		shoot(context, game, x0 + 0.5, STAND + 2.6, z0 - 2.5, 0, 55, "level1_place_facing");
+		server.runCommand(clear);
+	}
+
+	/** Cars, vans and the other big props collide as far as their models reach, also in the neighbouring blocks and above. */
+	private static void bigProps(ClientGameTestContext context, TestSingleplayerContext game) {
+		var server = game.getServer();
+		BlockPos at = server.computeOnServer(s -> player(s).blockPosition());
+		int x0 = at.getX(), z0 = at.getZ();
+		server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run fill %d %d %d %d %d %d minecraft:air", x0 - 4, STAND, z0 - 4, x0 + 4, STAND + 3, z0 + 4));
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			BlockPos pos = new BlockPos(x0, STAND, z0);
+			Block[] props = {Level1Blocks.ABANDONED_CAR, Level1Blocks.ABANDONED_VAN, Level1Blocks.VENDING_MACHINE, Level1Blocks.ELECTRICAL_CABINET,
+					Level1Blocks.FLOODLIGHT, Level1Blocks.SITE_MACHINE};
+			int probes = 0;
+			for (Block block : props) {
+				for (Direction facing : Direction.Plane.HORIZONTAL) {
+					BlockState state = block.defaultBlockState();
+					if (state.hasProperty(OldComputerBlock.FACING)) state = state.setValue(OldComputerBlock.FACING, facing);
+					level.setBlock(pos, state, Block.UPDATE_CLIENTS);
+					net.minecraft.world.phys.AABB b = state.getCollisionShape(level, pos).bounds();
+					// Probe just inside each side of the outline that sticks out of the block, low down where every prop is solid.
+					java.util.List<net.minecraft.world.phys.AABB> inside = new java.util.ArrayList<>();
+					double cx = (b.minX + b.maxX) / 2, cz = (b.minZ + b.maxZ) / 2, low = Math.min(0.4, b.maxY / 2);
+					if (b.maxZ > 1.05) inside.add(new net.minecraft.world.phys.AABB(cx - 0.05, low, b.maxZ - 0.1, cx + 0.05, low + 0.1, b.maxZ - 0.05));
+					if (b.minZ < -0.05) inside.add(new net.minecraft.world.phys.AABB(cx - 0.05, low, b.minZ + 0.05, cx + 0.05, low + 0.1, b.minZ + 0.1));
+					if (b.maxX > 1.05) inside.add(new net.minecraft.world.phys.AABB(b.maxX - 0.1, low, cz - 0.05, b.maxX - 0.05, low + 0.1, cz + 0.05));
+					if (b.minX < -0.05) inside.add(new net.minecraft.world.phys.AABB(b.minX + 0.05, low, cz - 0.05, b.minX + 0.1, low + 0.1, cz + 0.05));
+					if (b.maxY > 1.05) inside.add(new net.minecraft.world.phys.AABB(cx - 0.05, b.maxY - 0.1, cz - 0.05, cx + 0.05, b.maxY - 0.05, cz + 0.05));
+					check(!inside.isEmpty(), block + " facing " + facing + " does not reach past its block: " + b);
+					for (net.minecraft.world.phys.AABB probe : inside) {
+						net.minecraft.world.phys.AABB world = probe.move(pos);
+						probes++;
+						check(level.getBlockCollisions(null, world).iterator().hasNext(),
+								block + " facing " + facing + " lets you through at " + world + " (outline " + b + ")");
+					}
+				}
+			}
+			level.setBlock(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+			System.out.println("[bigProps] probes " + probes);
+		});
+	}
+
+	/** The Garden's grass, fern and three flowers in a row on moss under a lamp, close up. */
+	private static void gardenPlants(ClientGameTestContext context, TestSingleplayerContext game) {
+		var server = game.getServer();
+		server.runCommand("gamemode spectator @a");
+		BlockPos at = server.computeOnServer(s -> player(s).blockPosition());
+		int x0 = at.getX(), z0 = at.getZ();
+		String in = "execute in noclip_backrooms:level_1 run ";
+		server.runCommand(in + String.format(Locale.ROOT, "fill %d %d %d %d %d %d minecraft:air", x0 - 4, STAND, z0 - 4, x0 + 4, STAND + 3, z0 + 4));
+		server.runCommand(in + String.format(Locale.ROOT, "fill %d %d %d %d %d %d noclip_backrooms:garden_moss", x0 - 4, STAND - 1, z0 - 1, x0 + 4, STAND - 1, z0 + 3));
+		String[] plants = {"garden_grass", "garden_fern", "garden_flower_blue", "garden_flower_red", "garden_flower_yellow"};
+		for (int i = 0; i < plants.length; i++) {
+			server.runCommand(in + String.format(Locale.ROOT, "setblock %d %d %d noclip_backrooms:%s", x0 - 2 + i, STAND, z0 + 1, plants[i]));
+		}
+		server.runCommand(in + String.format(Locale.ROOT, "setblock %d %d %d minecraft:sea_lantern", x0, STAND + 3, z0 - 1));
+		shoot(context, game, x0 + 0.5, STAND + 0.3, z0 - 2.2, 0, 12, "level1_garden_plants");
 	}
 
 	/** The nearest exit door, from both of its sides, then out with a right-click. */

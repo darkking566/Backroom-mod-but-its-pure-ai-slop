@@ -130,6 +130,11 @@ public final class Level1SectorArchitecture {
 	 * Never touches district borders, settlements, exits, props, or bedrock.
 	 */
 	static BlockState apply(long seed, Tile tile, BlockState current, int x, int y, int z) {
+		return apply(seed, tile, current, x, y, z, true);
+	}
+
+	/** {@code fit = false} is what the sector would build ignoring the hall's profile (for tests). */
+	static BlockState apply(long seed, Tile tile, BlockState current, int x, int y, int z, boolean fit) {
 		if (y <= 1 || y >= Level1ChunkGenerator.HEIGHT - 2) return current;
 		int dx = Math.floorDiv(x, D), dz = Math.floorDiv(z, D);
 		Variant v = variant(seed, dx, dz);
@@ -152,6 +157,84 @@ public final class Level1SectorArchitecture {
 		boolean hasMainFloor = profile != Level1Elevation.Profile.SUNKEN_BASIN
 				|| (lx < 11 || lx > 52 || lz < 11 || lz > 52);
 
+		BlockState prop = prop(seed, tile, current, x, y, z, hasMainFloor);
+		if (prop != null) {
+			// Only on the main floor where it really is, and not where this sector builds something of its own.
+			boolean clear = structure(v, seed, tile, current, x, FLOOR, z, lx, lz, topCeil, hasMainFloor, profile) == null
+					&& structure(v, seed, tile, current, x, FLOOR + 1, z, lx, lz, topCeil, hasMainFloor, profile) == null;
+			if (!fit || clear && allowed(seed, profile, topCeil, x, y, z)) return prop;
+		}
+		BlockState override = structure(v, seed, tile, current, x, y, z, lx, lz, topCeil, hasMainFloor, profile);
+		if (override == null || override == current) return current;
+		if (!fit) return override;
+		int[] span = span(v, lx, lz, y, topCeil);
+		if (span != null) return whole(seed, dx, dz, span) ? override : current;
+		return allowed(seed, profile, topCeil, x, y, z) ? override : current;
+	}
+
+	/**
+	 * {lx0, lx1, lz0, lz1, y0, y1} of the bridge, beam or pipe run this piece belongs to, or null. Such a run goes in whole
+	 * or not at all: one cell left out of a walkway is a hole to fall through.
+	 */
+	static int[] span(Variant v, int lx, int lz, int y, int topCeil) {
+		return switch (v) {
+			case LEGEND_LANTERN_BRIDGES -> topCeil >= FLOOR + 9 && lz >= 28 && lz <= 36 && (y == FLOOR + 5 || y == FLOOR + 6)
+					? new int[] {5, D - 6, 28, 36, FLOOR + 5, FLOOR + 6} : null;
+			case TAILCHASE_UNFINISHED_BEAMS -> (lz == 22 || lz == 42) && y >= FLOOR + 2 && y <= FLOOR + 4 && lx % 9 < 6
+					? new int[] {Math.max(5, lx - lx % 9), Math.min(D - 6, lx - lx % 9 + 5), lz, lz, FLOOR + 2, FLOOR + 4} : null;
+			case TALON_PIPE_GANTRY -> y == topCeil - 1 && lz % 12 == 0 ? new int[] {5, D - 6, lz, lz, y, y} : null;
+			default -> null;
+		};
+	}
+
+	private static final ThreadLocal<java.util.Map<String, Boolean>> SPANS = ThreadLocal.withInitial(java.util.HashMap::new);
+
+	/** Whether every cell of the run that would be solid over open air really gets placed. */
+	private static boolean whole(long seed, int dx, int dz, int[] span) {
+		java.util.Map<String, Boolean> cache = SPANS.get();
+		if (cache.size() > 4096) cache.clear();
+		String key = seed + ":" + dx + ":" + dz + ":" + span[0] + ":" + span[2] + ":" + span[4];
+		Boolean known = cache.get(key);
+		if (known != null) return known;
+		boolean ok = true;
+		for (int lx = span[0]; lx <= span[1] && ok; lx++) {
+			for (int lz = span[2]; lz <= span[3] && ok; lz++) {
+				int x = dx * D + lx, z = dz * D + lz;
+				Tile tile = Level1Layout.tile(seed, x, z);
+				for (int y = span[4]; y <= span[5] && ok; y++) {
+					BlockState base = Level1ChunkGenerator.baseAt(seed, x, y, z);
+					if (!base.isAir()) continue;  // a wall or pillar already fills it
+					BlockState wanted = apply(seed, tile, base, x, y, z, false);
+					if (wanted == base || wanted.isAir()) continue;
+					ok = cell(seed, tile, base, x, y, z) != base;
+				}
+			}
+		}
+		cache.put(key, ok);
+		return ok;
+	}
+
+	/** One cell judged on its own (the per-column checks of {@link #apply}, without the run check). */
+	private static BlockState cell(long seed, Tile tile, BlockState current, int x, int y, int z) {
+		int dx = Math.floorDiv(x, D), dz = Math.floorDiv(z, D);
+		int lx = Math.floorMod(x, D), lz = Math.floorMod(z, D);
+		if (tile == Tile.HALL_WALL || tile == Tile.PERIMETER || tile == Tile.EXIT_CORE
+				|| tile == Tile.STAIRWELL || tile == Tile.HATCH || tile == Tile.FRAME
+				|| tile == Tile.BOOTH || tile == Tile.MACHINE || tile == Tile.CRATE) {
+			return current;
+		}
+		if (Level1Elevation.isNearExitOrProp(seed, dx, dz, x, z)) return current;
+		Variant v = variant(seed, dx, dz);
+		int topCeil = Level1Elevation.ceilingY(seed, dx, dz);
+		Level1Elevation.Profile profile = Level1Elevation.profile(seed, dx, dz);
+		boolean hasMainFloor = profile != Level1Elevation.Profile.SUNKEN_BASIN || (lx < 11 || lx > 52 || lz < 11 || lz > 52);
+		BlockState override = structure(v, seed, tile, current, x, y, z, lx, lz, topCeil, hasMainFloor, profile);
+		if (override == null || override == current) return current;
+		return allowed(seed, profile, topCeil, x, y, z) ? override : current;
+	}
+
+	/** The cars, vending machines and pallet stacks a sector leaves about its main floor, or null. */
+	private static BlockState prop(long seed, Tile tile, BlockState current, int x, int y, int z, boolean hasMainFloor) {
 		// Occasional abandoned 90s sedan or cargo van parked neatly inside parking stalls (never blocking aisles)
 		if (hasMainFloor && y == FLOOR + 1 && current.isAir() && tile == Tile.FLOOR
 				&& Level1Layout.kindAt(seed, x, z) == Kind.PARKING) {
@@ -177,7 +260,12 @@ public final class Level1SectorArchitecture {
 				return Level1Blocks.PALLET_STACK.defaultBlockState().setValue(OldComputerBlock.FACING, dir);
 			}
 		}
-		BlockState override = switch (v) {
+		return null;
+	}
+
+	private static BlockState structure(Variant v, long seed, Tile tile, BlockState current, int x, int y, int z, int lx, int lz,
+			int topCeil, boolean hasMainFloor, Level1Elevation.Profile profile) {
+		return switch (v) {
 			case TALON_SPLIT_RAMPS -> talonSplitRamps(tile, current, lx, lz, y, hasMainFloor);
 			case TALON_PIPE_GANTRY -> talonPipeGantry(seed, tile, current, x, y, z, lx, lz, topCeil);
 			case TALON_FLOODED_TRENCH -> talonFloodedTrench(tile, current, lx, lz, y, hasMainFloor, profile);
@@ -198,7 +286,59 @@ public final class Level1SectorArchitecture {
 			case TAILCHASE_UNFINISHED_BEAMS -> tailchaseUnfinishedBeams(seed, tile, current, x, y, z, lx, lz, topCeil);
 			case NONE -> null;
 		};
-		return override != null ? override : current;
+	}
+
+	// ==================== Fitting in with the hall's profile ====================
+
+	/**
+	 * Whether a sector piece may go here, given what the district's vertical profile or landmark already built:
+	 * above the main floor only where that floor is really there and open, never above an upper deck, a skywalk or a
+	 * beam (so racks, arches and neon stop beneath them); nothing on or beside a staircase or a stairwell opening; and
+	 * pits and trenches only cut where there is plain ground beneath (not into the decks or tunnels below).
+	 */
+	static boolean allowed(long seed, Level1Elevation.Profile profile, int topCeil, int x, int y, int z) {
+		int[] here = column(seed, x, z, topCeil);
+		if (here[1] == 1) return false;
+		// The whole column, not just its foot: a rack or arch cut off at the bottom would hang in the air.
+		for (Direction d : Direction.Plane.HORIZONTAL) {
+			if (column(seed, x + d.getStepX(), z + d.getStepZ(), topCeil)[1] == 1) return false;
+		}
+		if (here[0] == 0) return false;
+		if (y <= FLOOR) {
+			return here[3] == 1 && (profile == Level1Elevation.Profile.STANDARD || profile == Level1Elevation.Profile.VAULTED);
+		}
+		if (y < here[2]) return true;
+		return y == topCeil - 1 && here[2] >= topCeil - 1;
+	}
+
+	private static final ThreadLocal<java.util.Map<Long, int[]>> COLUMNS = ThreadLocal.withInitial(java.util.HashMap::new);
+	private static final ThreadLocal<long[]> COLUMN_SEED = ThreadLocal.withInitial(() -> new long[1]);
+
+	/** {main floor solid, stairs or an opening here, first y from FLOOR + 3 up that is already built, nothing standing on the floor}. */
+	private static int[] column(long seed, int x, int z, int topCeil) {
+		java.util.Map<Long, int[]> cache = COLUMNS.get();
+		long[] cachedSeed = COLUMN_SEED.get();
+		if (cachedSeed[0] != seed || cache.size() > 16_384) {
+			cache.clear();
+			cachedSeed[0] = seed;
+		}
+		return cache.computeIfAbsent(((long) x << 32) ^ (z & 0xffffffffL), key -> {
+			BlockState floor = Level1ChunkGenerator.baseAt(seed, x, FLOOR, z);
+			boolean solid = !floor.getCollisionShape(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, net.minecraft.core.BlockPos.ZERO).isEmpty();
+			boolean stairs = floor.isAir() || floor.getBlock() instanceof StairBlock;
+			for (int y = FLOOR + 1; y <= FLOOR + 2 && !stairs; y++) {
+				stairs = Level1ChunkGenerator.baseAt(seed, x, y, z).getBlock() instanceof StairBlock;
+			}
+			int limit = topCeil;
+			for (int y = FLOOR + 3; y < topCeil; y++) {
+				if (!Level1ChunkGenerator.baseAt(seed, x, y, z).isAir()) {
+					limit = y;
+					break;
+				}
+			}
+			boolean bare = Level1ChunkGenerator.baseAt(seed, x, FLOOR + 1, z).isAir();
+			return new int[] {solid ? 1 : 0, stairs ? 1 : 0, limit, bare ? 1 : 0};
+		});
 	}
 
 	// ==================== TALON (3 variants) ====================
@@ -480,7 +620,7 @@ public final class Level1SectorArchitecture {
 		int color = Math.floorMod(Level1Layout.hash(seed, lx / 12, lz / 12, 113), NEON_COUNT);
 		// Glowing neon drop-columns hanging from the ceiling down to head height
 		if (lx % 12 == 6 && lz % 12 == 6 && y >= FLOOR + 3 && y < topCeil) {
-			return state(neon(color));
+			return state(neon(color)).setValue(NeonBlock.UPRIGHT, true);
 		}
 		// Horizontal neon light-ribbons crisscrossing overhead
 		if ((y == FLOOR + 4 || (topCeil >= 46 && y == FLOOR + 9)) && (lx % 12 == 6 || lz % 12 == 6)) {

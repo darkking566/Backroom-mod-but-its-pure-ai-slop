@@ -572,6 +572,57 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 		shoot(context, game, x0 + 10.0, y + 0.6, z0 - 2.2, 0, 10, "level0p1_props_open_door");
 		game.getServer().runOnServer(s -> check(station(s).getBlockState(new BlockPos(x0 + 11, y, z0)).getValue(DoorBlock.OPEN), "the paired leaf did not open"));
 		game.getServer().runCommand("gamemode spectator @a");
+		outlines(context, game, x0, y, z0);
+		servantEyes(context, game, x0 + 40, y, z0 - 20);
+	}
+
+	/** The selection outline of wall-hung and table-top pieces, aimed at with the crosshair (creative mode shows it). */
+	private void outlines(ClientGameTestContext context, TestSingleplayerContext game, int x0, int y, int z0) {
+		Block[] wall = {ZenithBlocks.WALL_FRAME, ZenithBlocks.WALL_MIRROR, ZenithBlocks.HANGING_POTS, ZenithBlocks.COUNTDOWN_SCREEN, ZenithBlocks.LAB_COAT};
+		game.getServer().runOnServer(s -> {
+			ServerLevel level = station(s);
+			for (int i = 0; i < 13; i++) {
+				for (int dy = 0; dy < 3; dy++) level.setBlock(new BlockPos(x0 + i, y + dy, z0), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
+			}
+			for (int i = 0; i < wall.length; i++) {
+				level.setBlock(new BlockPos(x0 + i * 2, y + 1, z0), wall[i].defaultBlockState().setValue(ZenithFacingBlock.FACING, net.minecraft.core.Direction.NORTH), 2);
+			}
+			level.setBlock(new BlockPos(x0 + 10, y, z0), ZenithBlocks.CREW_TABLE.defaultBlockState(), 2);
+			level.setBlock(new BlockPos(x0 + 10, y + 1, z0), ZenithChunkGenerator.state(ZenithLayout.of(ZenithLayout.Kind.DISHES)), 2);
+			level.setBlock(new BlockPos(x0 + 12, y, z0), ZenithBlocks.PERSONAL_ITEMS.defaultBlockState(), 2);
+		});
+		game.getServer().runCommand("gamemode creative @a");
+		String[] names = {"frame", "mirror", "pots", "screen", "coat"};
+		for (int i = 0; i < wall.length; i++) {
+			shoot(context, game, x0 + i * 2 + 0.5, y, z0 - 1.5, 0, 2, "level0p1_outline_" + names[i]);
+		}
+		shoot(context, game, x0 + 10.5, y, z0 - 1.5, 0, 20, "level0p1_outline_on_table");
+		shoot(context, game, x0 + 12.5, y, z0 - 1.5, 0, 36, "level0p1_outline_on_floor");
+		game.getServer().runCommand("gamemode spectator @a");
+	}
+
+	/** A broken servant robot standing still in the dark, close up, so its red eyes are seen glowing (RobotRenderer's eye layer). */
+	private void servantEyes(ClientGameTestContext context, TestSingleplayerContext game, int x, int y, int z) {
+		java.util.List<java.util.UUID> ids = new java.util.ArrayList<>();
+		game.getServer().runOnServer(s -> {
+			ServerLevel level = station(s);
+			for (int dx = -3; dx <= 3; dx++) {
+				for (int dz = -3; dz <= 4; dz++) level.setBlock(new BlockPos(x + dx, y - 1, z + dz), ZenithBlocks.DECK_CEILING.defaultBlockState(), 2);
+			}
+			var robot = dev.noclip.backrooms.level0p1.robots.Robots.type(dev.noclip.backrooms.level0p1.robots.Robot.Kind.SERVANT).create(level, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
+			robot.snapTo(x + 0.5, y, z + 2.5, 180, 0);
+			robot.setYHeadRot(180);
+			robot.setNoAi(true);
+			level.addFreshEntity(robot);
+			ids.add(robot.getUUID());
+		});
+		shoot(context, game, x + 0.5, y, z + 0.2, 0, 0, "level0p1_servant_eyes");
+		game.getServer().runOnServer(s -> {
+			for (java.util.UUID id : ids) {
+				var robot = station(s).getEntity(id);
+				if (robot != null) robot.discard();
+			}
+		});
 	}
 
 	private static final java.util.Set<Block> SALVAGED = java.util.Set.of(ZenithBlocks.HANGING_CABLES, ZenithBlocks.CONSOLE,

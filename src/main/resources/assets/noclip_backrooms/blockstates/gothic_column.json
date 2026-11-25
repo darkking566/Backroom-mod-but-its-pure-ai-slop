@@ -1,7 +1,18 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level1/gothic_column"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/gothic_column",
+        "weight": 4
+      },
+      {
+        "model": "noclip_backrooms:block/level1/gothic_column_v1",
+        "weight": 1
+      },
+      {
+        "model": "noclip_backrooms:block/level1/gothic_column_v2",
+        "weight": 1
+      }
+    ]
   }
 }

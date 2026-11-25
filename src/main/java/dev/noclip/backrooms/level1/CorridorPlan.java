@@ -341,9 +341,10 @@ final class CorridorPlan {
 							furniture[x + k + z * SIZE] = 8;
 							furniture[x + (z + k) * SIZE] = 8;
 						}
+						// The chair in front of the desk, on the open side; the bin beside the desk.
 						furniture[x + 1 + (z + 1) * SIZE] = 1;
-						furniture[x + 2 + (z + 2) * SIZE] = 5;
-						if (variety.nextInt(100) < 40) furniture[x + 1 + (z + 2) * SIZE] = 10;
+						furniture[x + 1 + (z + 2) * SIZE] = 5;
+						if (variety.nextInt(100) < 40) furniture[x + 2 + (z + 1) * SIZE] = 10;
 					}
 				}
 			}

@@ -74,7 +74,7 @@ final class Crates {
 				Tile front = Level1Layout.tile(seed, fx, fz);
 				if (front != Tile.FLOOR && front != Tile.LINE && front != Tile.DAMP) continue;
 				BlockPos pos = new BlockPos(fx, Level1ChunkGenerator.FLOOR_Y + 1, fz);
-				if (level.isLoaded(pos) && level.getBlockState(pos).isAir()) return pos;
+				if (Spots.onFloor(level, pos)) return pos;
 			}
 		}
 		return null;
@@ -122,7 +122,7 @@ final class Crates {
 			Tile tile = Level1Layout.tile(seed, x, z);
 			if (tile != Tile.FLOOR && tile != Tile.LINE && tile != Tile.DAMP) continue;
 			BlockPos pos = new BlockPos(x, Level1ChunkGenerator.FLOOR_Y + 1, z);
-			if (!level.isLoaded(pos) || !level.getBlockState(pos).isAir() || !level.getBlockState(pos.above()).isAir()) continue;
+			if (!Spots.onFloor(level, pos) || !level.getBlockState(pos.above()).isAir()) continue;
 			// Most of the time tucked against something; now and then out in the open.
 			if (attempt < 30 && !againstSomething(level, pos)) continue;
 

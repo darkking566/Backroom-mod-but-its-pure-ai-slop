@@ -17,11 +17,11 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * A cot or bedroll in a settlement. Lying down on it means settling there: from then on you wake up
  * here instead of at home, until you sleep in a bed somewhere else.
  */
-final class RestBlock extends ShapedBlock {
+final class RestBlock extends OldComputerBlock {
 	private final String settlement;
 
-	RestBlock(Properties properties, VoxelShape shape, String settlement) {
-		super(properties, shape);
+	RestBlock(Properties properties, VoxelShape shape, int turns, String settlement) {
+		super(properties, shape, turns);
 		this.settlement = settlement;
 	}
 

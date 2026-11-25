@@ -51,7 +51,7 @@ final class Strays {
 	static Cat beside(ServerLevel level, BlockPos crate) {
 		for (Direction side : Direction.Plane.HORIZONTAL) {
 			BlockPos at = crate.relative(side);
-			if (!level.getBlockState(at).isAir() || !level.getBlockState(at.above()).isAir()) continue;
+			if (!Spots.onFloor(level, at) || !level.getBlockState(at.above()).isAir()) continue;
 			if (level.getBlockState(at.below()).getCollisionShape(level, at.below()).isEmpty()) continue;
 			Cat cat = EntityTypes.CAT.create(level, EntitySpawnReason.EVENT);
 			if (cat == null) return null;

@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level1/hospital_bed"
+    "facing=north": {
+      "model": "noclip_backrooms:block/level1/clinic_bed"
+    },
+    "facing=east": {
+      "model": "noclip_backrooms:block/level1/clinic_bed",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "noclip_backrooms:block/level1/clinic_bed",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "noclip_backrooms:block/level1/clinic_bed",
+      "y": 270
     }
   }
 }

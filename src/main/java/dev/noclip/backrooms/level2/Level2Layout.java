@@ -557,6 +557,17 @@ public final class Level2Layout {
 		return backed && Math.floorMod(hash(seed, x, z, 0x41D9), 260) == 0;
 	}
 
+	/** Each outpost turns its fittings its own way, so no two look stamped from one mould. A 2D data value: 0 south, 1 west, 2 north, 3 east. */
+	static int roomTurn(long seed, int x, int z, Room room) {
+		return hash(seed, Math.floorDiv(x, SIZE) * 64 + room.i(), Math.floorDiv(z, SIZE) * 64 + room.j(), 0x7A11) & 3;
+	}
+
+	/** The EL3A chest turns with its room, but never west: the crafting table stands right there and it would open into it. */
+	static int chestTurn(long seed, int x, int z, Room room) {
+		int turn = roomTurn(seed, x, z, room);
+		return turn == 1 ? 3 : turn;
+	}
+
 	static int hash(long seed, int x, int z, int salt) {
 		long h = mix(seed + salt);
 		h = mix(h ^ x);

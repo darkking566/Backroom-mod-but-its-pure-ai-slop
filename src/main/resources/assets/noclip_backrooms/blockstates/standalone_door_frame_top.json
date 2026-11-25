@@ -1,7 +1,11 @@
 {
   "variants": {
-    "": {
+    "axis=x": {
       "model": "noclip_backrooms:block/level1/standalone_door_frame_top"
+    },
+    "axis=z": {
+      "model": "noclip_backrooms:block/level1/standalone_door_frame_top",
+      "y": 90
     }
   }
 }

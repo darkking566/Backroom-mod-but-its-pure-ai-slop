@@ -16,12 +16,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /** Hippocrates-1 treats the sick and wounded for free: right-click to be mended, once every few minutes. */
-final class ClinicBedBlock extends ShapedBlock {
+final class ClinicBedBlock extends OldComputerBlock {
 	private static final int WAIT = 3 * 60 * 20;
 	private static final Map<String, Integer> LAST = new HashMap<>();
 
 	ClinicBedBlock(Properties properties, VoxelShape shape) {
-		super(properties, shape);
+		super(properties, shape, 1);
 	}
 
 	@Override

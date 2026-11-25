@@ -312,6 +312,98 @@
   - 動到 Gemini 的檔案：`BlenderWeaponRenderer.hasBlenderMesh` 加一個判斷、`BlenderPropRenderer` 在試作包開著時改畫方塊模型（`submitMovingBlock`，因為家具方塊設成隱形）；包關掉時完全照舊
   - 新增實機測試 `trial/TrialClientTest`（`-Plevels=trial`：在 Level 0 圍小房間擺兩件家具，六樣東西輪流拿在手上，背包，試作包關／開各拍一輪），通過；並排比較圖 `docs/look/trial/`（`props`、`props_close`、`hands`、`inventory`）；`BackroomsClient` 加一行、語言檔加 2 條、`docs/look/README.md` 加說明
 
+- Level 1 審查報告第二批（家具朝向）：
+  - 有方向的方塊（`ShapedBlock` 的子類別有 `facing` 時）選取框與碰撞箱跟著模型轉（`Shapes.rotateHorizontal`），電腦、發電機、車、販賣機、配電櫃等一起受益；車與廂型車的碰撞箱仍只有 1 格（模型超出 1 格的部分可穿過）
+  - 椅子、補給置物櫃、天然的鎖加 `facing`（`OldComputerBlock` 改成可繼承，三者沿用；預設朝北＝原本的樣子，舊存檔不變）；車道線加 `axis`（新 `LaneLineBlock`，預設 z＝原本的南北向）
+  - 生成：椅子朝相鄰的桌子，沒有桌子就背靠牆朝房內；電腦螢幕朝相鄰的椅子，沒有就背對牆；隔間辦公室的椅子改到桌子正前方、垃圾桶改到桌子旁（`CorridorPlan`）；高架橋東西向那段的車道線轉 90 度；廢棄前哨碉堡的置物櫃與變電所的發電機朝向中間走道；天然的鎖依門洞方向轉
+  - `tools/make_level1.py` 的車道線方塊狀態同步（沒重跑腳本）
+  - 驗證：`gradlew build` 通過；`runClientGameTest -Plevels=1 -Psections=rooms,secrets,checkBlocks` 通過；看過食堂、候診室、教室、隔間截圖（候診室椅子朝房內、食堂椅子朝桌子、教室螢幕朝後面的椅子）；鎖、置物櫃、高架橋車道線、發電機沒在畫面上確認
+  - 中途 build 撞到 GitHub 剛合併進來的武器程式（寫檔中），重跑就過；Antigravity 跑 Level 2 實機測試時先等它結束
+  - 沒做：辦公桌、病床、行軍床、睡袋、櫃檯、門框、出口門、日光燈、收費亭柵欄桿的玩家擺放朝向；大型道具的完整碰撞箱
+
+- Level 1 審查報告第三批（共用落點檢查）：
+  - 新增 `level1/Spots`：`feet`（先試玩家高度、再試一樓地面，要有實心地板、整個身體的碰撞框放得下）、`fits`、`onFloor`
+  - 鈍人、肢團、爬行者、悲尸、尖嘯者、竊皮者、微笑者、牧羊蛇、Nguithrxurh 9 個生成器改用 `Spots.feet`（原本各自只看腳下與頭頂兩格是空氣）；鈍人 3.65 格高，不會再生在 3 格高的走廊；牧羊蛇用蹲下的大小（1.9×2.35）檢查，走廊照樣能生
+  - 補給箱、殘骸堆、門前的畫、門邊的地標、補給箱旁的小貓：腳下要有地板（`Crates`、`Strays`）；施工影子用人形的碰撞框檢查（`Workers`）；柱子上的地標要那根柱子真的在（`Markers`）
+  - 驗證：`gradlew build` 通過；`runClientGameTest -Plevels=1 -Psections=crate,marker,events,secrets,monsters` 通過；自然生怪的位置沒有專門的測試，也沒在畫面上看過
+  - 沒做：管線區的儀表與天花板水管懸空（世界生成，`Level1Sectors`）；其他樓層的生成器
+
+- 實機確認 EL3A：`Level2ClientTest` 的 EL3A 段新增檢查——儲物箱打開有東西、附近貨運礦車打開有東西、EL3A 至少 4 盞吊掛提燈，並拍站在箱子旁往上看提燈的照片（`level2_el3a_lantern`，存一份到 `docs/levels/level2/el3a_lantern.png`）；`runClientGameTest -Plevels=2` 通過兩次，照片裡兩盞角落提燈照亮牆面。第一次的截圖被 Antigravity 接著跑的實機測試清掉，重跑後先把照片複製出來
+
+- Level 1 審查報告第四批（貼圖）：新增 `tools/make_level1_texture_fixes.py`（只寫這批點名的檔案，不重跑 `make_level1.py`）
+  - 車、廂型車、販賣機、配電櫃、棧板、探照燈、施工機具：換成自己的貼圖（車漆、廂型車白漆、車窗玻璃、尾燈、輪胎、深色塑膠、販賣機紅殼，128 像素含 `_n`／`_s`），不再借用磚牆、石磚天花板、朱漆牆；超出 0～16 的元件每面都設 `uv`（不再吸到圖集隔壁的圖）；探照燈用上原本沒用到的 `floodlight_lens`
+  - 撞衫：純白木門改成有木紋與四塊門板的貼圖；報名亭改成貼著報名表的夾板攤位；診所病床改成淺藍床單加綠十字（新模型 `clinic_bed`，物品模型也改）
+  - 六面同圖：收費亭抽屜、書架、宮殿畫、閣樓門、7 種據點招牌改成上下是素面（`cube_column`）；霓虹燈新增 `upright` 屬性（`NeonBlock`，預設躺著＝原本樣子），傳說區直立的霓虹柱用直的燈管
+  - 傳說區木地板、紅線木地板、木格天花板、哥德石磚天花板只轉 0／180 度；停車場柱、哥德磚牆與石柱、朱漆牆與柱、花園柱、銅柱、藍帆布各加 2 種污漬變體（權重 4:1:1）
+  - 立體結構與地標的深谷崖壁、地下迷宮牆改用停車場水泥牆（原本是原版灰水泥，`solidConcrete`），區段也會跟著換材質
+  - 驗證：`gradlew build` 通過；`runClientGameTest -Plevels=1 -Psections=views,sectors,exits,wikiSettlements,checkBlocks` 通過，log 沒有缺模型或貼圖；截圖看到白木門、診所招牌與病床；車、廂型車、販賣機、報名亭、直立霓虹柱、污漬變體沒在遊戲畫面上確認
+  - 沒做：收費亭抽屜的背面仍是抽屜（沒有方向）；花園植物畫風；Level 1 寫實材質包；大型道具碰撞箱
+
+- Level 2 俯視地圖 `MapDump` 補上後來加的內容：悶熱（鏽紅）、極寒（淡藍）、毒氣（病綠）、辦公室走廊（米白）、積水（青綠＝積水地板、藍＝淹水半磚）、鐵軌（暗紅）、排水格柵與電纜槽（深灰點）、錯位牆（亮粉紅）、牆面掛件（黃點）、EL3A（青色）與 Macchina（暗黃銅）；圖例寫在類別說明裡；產出一張存到 `docs/levels/level2/map.png`；只跑了 MapDump 本身
+- 使用者同意推送：抓 GitHub 後發現 Antigravity 已把 `main` 推到 `c5d1bd2`，裡面已包含 Level 1 審查報告四批修正（`95bfcae`、`3ae9f75`、`03ef92a`、`f7d32f8`），只推這筆紀錄；沒有強制推送、沒有改寫歷史
+- Level 1 寫實材質包：新增 `tools/make_level1_realistic.py`（沿用 `make_level0p1_realistic` 的合成法與已下載的 ambientCG CC0 照片），238 張 512 像素貼圖加 `_n`／`_s` 寫到資源包 `textures/block/level1/`（約 121 MB）；依名稱分水泥 77、鋼 40、木 26、烤漆 17、磚 12、布 9、鏽 5、保留原畫 52（玻璃、燈、霓虹、招牌、植物等）
+  - 水泥：試過 Concrete034（抹痕每塊重複）與 Concrete019 原樣（大片雲斑每塊重複），改成只取 Concrete019 的細紋（減去模糊）、強度 0.045，且每張貼圖用照片不同位置
+  - 閃爍壁紙（動畫）沒做，維持 128 像素原畫
+  - 資源包描述改成「Level 0、0.1、1 與 2」（`pack.mcmeta`、兩個語言檔、`make_level0_realistic.py`／`make_level2_realistic.py` 裡的描述同步）；`docs/look/README.md` 更新；對照圖 `docs/look/level1_realistic.png`
+  - 驗證：`gradlew build` 通過；`runClientGameTest -Plevels=1,look -Psections=views,sectors` 通過，log 沒有缺貼圖；看過停車場、走廊、哥德區截圖
+  - 注意：資源包變大很多（Level 1 這份約 121 MB），模組 jar 與 git 倉庫會跟著變大
+- 使用者同意後，把 `main` 推送到 GitHub（`a3bb9fa` Level 1 寫實材質包與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+
+- 實機確認 EL3A 儲物箱朝向：`Level2ClientTest` 檢查遊戲裡箱子的方向和生成器算的一樣，並從箱子正面拍照（`level2_el3a_chest`）；測試世界那處 EL3A 的箱子朝東，照片裡鎖扣朝鏡頭、工作台在後面；`runClientGameTest -Plevels=2` 通過。注意：朝向是每處隨機四選一，大約四分之一的 EL3A 箱子會朝西、正面貼著工作台（沒改）
+
+- EL3A 儲物箱不再朝西（正面貼著工作台）：朝西的改朝東，其他三向照舊隨機；房間朝向與箱子朝向抽成 `Level2Layout.roomTurn`、`chestTurn`（放在不碰 Minecraft 方塊的 `Level2Layout`，單元測試才能直接檢查）；新增單元測試 `el3aChestsNeverFaceTheCraftingTable`（也確認測試範圍裡真的有朝西的房間）；Level 2 單元測試 12 項與 `runClientGameTest -Plevels=2` 通過
+
+- Level 1 審查報告：區段建築與立體結構互撞（`Level1SectorArchitecture`）：
+  - 新增 `Level1ChunkGenerator.baseAt`（區段改造前的方塊）；區段的貨架、拱門、霓虹柱、鷹架、坑洞等改成先看這一格原本的樣子才放：主地板要是實心的、往上只放到第一個已有東西（上層甲板、天橋、樑）為止（天花板下一格的吊燈／水管照舊）；樓梯、樓梯井開口與下沉盆地的洞口本身和旁邊一格整根不放；挖坑只在標準與挑高大廳、而且地板上沒東西的地方
+  - 車、廂型車、販賣機、棧板貨堆改成在區段建築之後判斷：那格區段要自己蓋東西或地板不在就不放（原本先放車、後面的坑把地板挖掉，車就懸空）；不放車的格子照常蓋區段建築
+  - `Level1ClientTest` 新增 `sectorFit` 段（純計算，約 1 分鐘）：2 個種子、284 個有區段變化的大廳，檢查改動的方塊不穿過上層、不蓋在沒地板處、只在標準／挑高大廳挖坑、道具下面是實心、而且被擋掉的只能是一根柱子的上段（不會留下懸空的上半截）；把「旁邊有樓梯只擋最下 3 格」的舊寫法放回去跑，這個檢查會失敗
+  - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=sectorFit,sectors` 通過；六個區段截圖正常，但截圖裡沒有剛好是多層甲板或下沉盆地的大廳，這兩種情況只有自動檢查
+  - 沒做：橫跨的燈籠橋、管線龍門架、未完工樑經過被擋掉的格子時會斷一格（斷口可能掉下去）
+- 使用者同意後，把 `main` 推送到 GitHub（`df91c32` 區段建築配合立體結構與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；Antigravity 未提交的 Level 2 漆磚牆改動沒有一起推；沒有強制推送、沒有改寫歷史
+
+- 白漆磚牆不再每格一樣：基礎與寫實材質包各多畫三張（`painted_brick_wall_1`～`_3`，剝落、髒污與照片紋理位置不同），方塊狀態每格隨機挑一張（`make_level2_polish.py`、`make_level2_realistic.py`）；試過加鏡像，同一張和自己的鏡像相鄰時剝落會變成對稱的蝴蝶形，所以拿掉；泥褐磚與黑磚還沒做。`Level2ClientTest` 新增白漆磚牆照（`level2_painted_brick`，開夜視、正對一段 6 格長的白漆磚牆，存一份到 `docs/levels/level2/painted_brick.png`）；`runClientGameTest -Plevels=2` 通過，照片裡磚縫跨格對齊、剝落每格不同
+- 使用者要求確認服務機器人紅眼與選取框：`Level0p1ClientTest` 的 `props` 段新增創造模式用準星對準相框、鏡子、吊鍋、倒數螢幕、實驗袍、桌上疊盤、地上雜物拍 7 張，以及黑暗中不動的服務機器人近照；`runClientGameTest -Plevels=0.1 -Psections=props` 通過。看過截圖：紅眼在黑暗中明顯發亮；壁掛物的選取框都貼在牆面、包住物件（比物件本身稍大）；桌上疊盤的框底貼著桌面、地上雜物的框在地板上。截圖沒存進 docs（Antigravity 接著跑 Gradle，`build/run` 被清掉）
+- 使用者同意後，把 `main` 推送到 GitHub（`a713b35` 紅眼與選取框測試）；推送前抓過 GitHub，沒有新提交要合併；Antigravity 未提交的 Level 1、Level 2 改動沒有一起推；沒有強制推送、沒有改寫歷史
+- 區段的跨格結構不再斷一格（`Level1SectorArchitecture.span`、`whole`）：傳說區燈籠橋（含欄杆）、銜尾區未完工樑每段 6 格（含下面的鷹架桿）、利爪區天花板水管每整排，改成整座一起判斷——只要有一格放不下（旁邊是樓梯開口、下面沒地板、上面有甲板、出口或道具附近等），整座都不放；牆或柱子本來就佔住的格子不算缺口
+  - `Level1ClientTest` 的 `sectorFit` 段加 `spanFit`：2 個種子、25×25 個大廳，每座橋、每段樑、每排水管要嘛全有、要嘛全沒有；把整座判斷關掉跑一次會失敗（水管一排 16 格有、17 格缺）
+  - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=sectorFit,sectors` 通過
+  - 代價：整座放不下就整座不見，燈籠橋約一半（11／22）、天花板水管排約六成（111／178）、未完工樑約一成（32／342）被拿掉；沒在遊戲畫面上看過橋或樑
+- 使用者同意後，把 `main` 推送到 GitHub（`43f74d0` 跨格結構不斷一格與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；Antigravity 未提交的 Level 2 磚牆改動沒有一起推；沒有強制推送、沒有改寫歷史
+
+- 泥褐磚與黑磚也不再每格一樣：`make_level2_polish.py` 的磚牆變體改成三種磚共用（`BRICKS` 表），基礎與寫實材質包各多畫三張（`muddy_brick_wall_1`～`_3`、`black_brick_wall_1`～`_3`），每格隨機挑一張；白漆磚重產後檔案完全沒變。Macchina 遺跡的黑磚地面也跟著有變化。`Level2ClientTest` 的磚牆照改成三種都拍（`level2_painted_brick`、`level2_muddy_brick`、`level2_black_brick`，存到 `docs/levels/level2/`）；`runClientGameTest -Plevels=2` 通過，照片裡磚縫跨格對齊、沒有一格一格的重複；黑磚就算開夜視也很暗。基礎泥褐磚每格下半部偏暗（原本的畫法）沒改
+- Level 1 審查報告：管線區（往 Level 2）的儀表與天花板水管懸空：
+  - 儀表原本只看配置表「旁邊是柱子」就掛上去，在地下隧道與部分標準大廳裡那根柱子其實不在，儀表掛在空氣上；改成那根柱子真的有方塊才掛（`Level1Sectors.piping`，用 `baseAt`）
+  - 天花板水管查過沒有懸空（每根上面都是實心），沒改
+  - `Level1ClientTest` 新增 `pipeFit` 段：2 個種子、20 個管線區，每根天花板水管（所有高度）上面要是實心、每個儀表背後要是實心；改之前 14 個儀表懸空，改之後 0 個（93355 根水管、3256 個儀表）
+  - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=pipeFit,sectors` 通過；沒在遊戲畫面上看過管線區
+- 使用者同意後，把 `main` 推送到 GitHub（`c5b45e6` 管線區儀表不懸空與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- Level 1 審查報告：玩家擺放辦公桌與床的朝向：
+  - 辦公桌、病床、診所病床、行軍床、睡袋加 `facing`（`OldComputerBlock` 多一個「從玩家視線轉幾個 90 度」的參數；`RestBlock`、`ClinicBedBlock` 改繼承它）；預設朝北＝原本模型的樣子，世界生成與舊存檔不變
+  - 玩家擺放：辦公桌面向玩家；病床、診所病床、行軍床順著玩家看的方向擺、枕頭在遠端；睡袋同樣枕頭在遠端；選取框與碰撞箱跟著轉
+  - 5 個方塊狀態改成四個方向；`tools/make_level1.py`、`make_level1_texture_fixes.py` 同步（沒重跑）
+  - `Level1ClientTest` 新增 `placeFacing` 段：創造模式真的從四個方向右鍵擺放這 5 種，檢查朝向；四個方向的病床與睡袋拍照，枕頭方向都對
+  - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=placeFacing,checkBlocks,rooms,wikiSettlements` 通過，log 沒有缺模型
+  - 沒做（審查報告其餘）：櫃檯、門框、出口門、日光燈、收費亭柵欄桿的擺放朝向
+- 使用者同意後，把 `main` 推送到 GitHub（`98c7a3c` 辦公桌與床的擺放朝向與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- Level 1 審查報告：櫃檯、門框、出口門、日光燈、柵欄桿的擺放朝向：
+  - 新增 `AxisPlacedBlock`（`axis` 屬性，預設 x＝原本模型的樣子，世界生成與舊存檔不變）；`ShapedBlock` 的選取框與碰撞箱也跟著 `axis` 轉
+  - 交易櫃檯、Tom 的櫃檯、獨立門框（上下半）、金屬出口門（上下半）、柵欄桿：玩家擺放時橫在面前（跟視線垂直）；日光燈、壞掉的日光燈：順著視線（`Level1LampBlock` 改繼承它，`lit` 照舊）
+  - 柵欄底座是六面同圖的方塊，不用轉，沒改
+  - 9 個方塊狀態加上 `axis`（日光燈是 `axis`×`lit`）；`tools/make_level1.py` 同步（沒重跑）
+  - `Level1ClientTest` 的 `placeFacing` 段加這 9 種，從兩個方向右鍵擺放並檢查
+  - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=placeFacing,checkBlocks,blackout,exits,wikiSettlements,views,leaveThroughDoor` 通過，log 沒有缺模型；看過日光燈與出口門截圖沒變；玩家擺放後的樣子沒拍照
+- 使用者同意後，把 `main` 推送到 GitHub（`efd01d8` 櫃檯、門框、出口門、日光燈、柵欄桿的擺放朝向與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- Level 1 審查報告：大型道具的完整碰撞箱：
+  - 車（約 2.2 格長）、廂型車（2.2 格長、1.3 格高）、販賣機（1.8 格高）、配電櫃（1.7 格高）、探照燈（1.3 格高）、施工機具改成跟模型一樣大的碰撞箱與選取框（`Level1Blocks`）；遊戲允許方塊的形狀伸出自己那格最多 1 格、照樣會擋人，所以不用加隱形的輔助方塊，舊存檔不受影響；跟著 `facing` 轉
+  - 限制：用準星點伸出去的那一段選不到道具（要點它本身那格）
+  - `Level1ClientTest` 新增 `bigProps` 段：6 種道具 × 4 個方向，在伸出去的每一邊與頂上探測碰撞（36 處）
+  - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=bigProps,checkBlocks,sectors,sectorFit,views,monsters` 通過；沒有實際走去撞車、也沒拍照
+- 使用者同意後，把 `main` 推送到 GitHub（`993f728` 大型道具完整碰撞箱與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- Level 1 審查報告：收費亭抽屜的背面：抽屜加 `facing`（`BoothDrawerBlock`，預設朝南＝朝亭子裡面，世界生成與舊存檔都是這個方向），模型改成只有正面是抽屜、背面與兩側是收費亭的牆板、上下是牆板（`orientable`）；玩家擺放時正面朝玩家；`make_level1.py`、`make_level1_texture_fixes.py` 同步（沒重跑）；`Level1ClientTest` 的 `events` 段檢查抽屜朝南，並從前窗外拍抽屜背面（`level1_booth_drawer_back`，看到是牆板）；`gradlew build` 與 `-Psections=events,checkBlocks` 通過
+- 使用者同意後，把 `main` 推送到 GitHub（`cc8d4a9` 收費亭抽屜背面與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- Level 1 審查報告：花園植物的畫風：新增 `tools/make_garden_plants.py`（只寫這 5 張，不重跑 `make_level1.py`），草叢、蕨類、藍／紅／黃野花改成有明暗的寫實手繪：每片葉子與草葉由根部暗到葉尖亮、中肋一側亮一側暗，草裡夾乾黃的葉、蕨葉尖端有枯褐，野花是好幾枝不同高度、花瓣大小不一、顏色偏灰、有花苞；1024 像素畫好後輸出寫實材質包 512 像素與模組 128 像素，加 `_n`／`_s`（葉子有一點透光）；`make_level1_realistic.py` 改成跳過這 5 張（不然重跑會用 128 像素放大蓋掉）；預覽 `docs/look/level1_garden_plants.png`、遊戲畫面 `docs/look/level1_garden_plants_ingame.png`；`Level1ClientTest` 新增 `gardenPlants` 段（苔蘚上一排近照）；`gradlew build` 與 `-Psections=sectors,views,gardenPlants` 通過
+- 使用者同意後，把 `main` 推送到 GitHub（`ab45c13` 花園植物重畫與這筆紀錄；Level 1 審查報告全部處理完）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23
@@ -500,3 +592,4 @@
     - **集中群聚模式**（約 12～26% 區塊依區域觸發）：包含 5 種主題——① 電影風木椅山群聚（`prop_wood_chair_pile`／折疊椅堆＋周圍 3～5 張零散完整木椅＋1～2 張切半穿模椅）、② 辦公隔間群聚（完好／破損玻璃隔間＋折疊桌＋完好／損壞／穿模電腦＋辦公椅＋檔案櫃＋手機）、③ 休息家電群聚（完好＋穿模沙發＋飲水機＋落地立燈＋冰箱／販賣機／電視／微波爐）、④ 雜物庫房群聚（紙箱山＋窗簾布堆＋全身鏡＋電風扇＋假盆栽＋老電視）、⑤ 稀有流浪者殘骸營地（殘骸＋立燈＋木椅＋急救箱＋機率上鎖軍械箱）
     - **零散出現模式**（其餘約 38～62% 區塊隨機散落 1～3 件獨立物件）：完整涵蓋 `MATERIALS.md` 第 0 層全部物件，並隨離原點距離增加與昏暗區（`DARKENED`）拉高穿模版比例（25% → 50～55%）
   - **驗證**：更新 `BackroomsCraftingTest.java`（67 座方塊＋47 款 Blender 家具）與新增 `Level0PropsTest.java`，執行 `gradlew build runClientGameTest -Plevels=0 --no-daemon` 全數 80 項單元測試與完整 Level 0 客戶端實機測試皆通過（日誌零模型／貼圖／方塊實體警告），並僅於本地 `main` 提交本方改動（保留工作區 Claude 編輯中之 `src/client/` 檔案與 `docs/企劃書/` 未動、未推送）
+- 修正 Level 0.1 螺旋樓梯間往上走會撞頭的問題（Antigravity）：`ZenithLayout.stairwell` 原本每階上方只清出 2 格空氣（`(step+1)&7`、`(step+2)&7`），踏上第 4、5 階（`(3,0)`、`t=4` 與 `(3,1)`、`t=5`）時頭頂會撞到上層天花板（`t=7`）與地板（`t=0`）；改為清出 3 格（加 `(step+3)&7`），並將 `ZenithLayoutTest.reaches` 的爬升淨空檢查改為樓梯也必須通過 `+2` 頭頂空間；`.\gradlew build` 與 `.\gradlew runClientGameTest "-Plevels=0.1" "-Psections=stairs"` 通過並確認實機截圖上方淨空正常

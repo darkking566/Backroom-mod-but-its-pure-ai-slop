@@ -232,8 +232,8 @@ final class ZenithLayout {
 		if (i <= 7) {
 			int step = (i + 1) & 7;
 			if (t == step) return of(Kind.STAIR, RING_DIR[i]);
-			// The two blocks above a step are clear, even through the floor and ceiling layers.
-			if (t == ((step + 1) & 7) || t == ((step + 2) & 7)) return of(Kind.AIR);
+			// The three blocks above a step are clear, even through the floor and ceiling layers, so climbing doesn't hit the ceiling.
+			if (t == ((step + 1) & 7) || t == ((step + 2) & 7) || t == ((step + 3) & 7)) return of(Kind.AIR);
 		}
 		if (t == 0) return of(Kind.FLOOR_CORRIDOR);
 		if (t == 7) return of(Kind.CEILING);

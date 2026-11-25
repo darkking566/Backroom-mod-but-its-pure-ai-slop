@@ -92,6 +92,8 @@ final class Markers {
 			for (Direction side : Direction.Plane.HORIZONTAL) {
 				BlockPos behind = pos.relative(side);
 				if (Level1Layout.tile(seed, behind.getX(), behind.getZ()) != Tile.PILLAR) continue;
+				// Landmarks and basins take some pillars away: hang only on one that is really there.
+				if (level.getBlockState(behind).getCollisionShape(level, behind).isEmpty()) continue;
 				level.setBlock(pos, Level1Blocks.SETTLEMENT_MARKER.defaultBlockState()
 						.setValue(SettlementMarkerBlock.FACING, side.getOpposite()), Block.UPDATE_ALL);
 				PLACED.add(pos);

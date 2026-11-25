@@ -54,7 +54,10 @@ final class Locks {
 					CorridorPlan.Doorway doorway = doorways.get((start + i) % doorways.size());
 					BlockPos at = new BlockPos(dx * Level1Layout.DISTRICT + doorway.lockX(), Level1ChunkGenerator.LOW_CEILING_Y - 1, dz * Level1Layout.DISTRICT + doorway.lockZ());
 					if (!at.closerThan(player.blockPosition(), RANGE) || !level.isLoaded(at) || !level.getBlockState(at).isAir()) continue;
-					level.setBlock(at, Level1Blocks.NATURAL_LOCK.defaultBlockState(), Block.UPDATE_ALL);
+					// Hung across the doorway: turned when the doorway runs along Z.
+					boolean alongZ = doorway.tiles().length > 1 && doorway.tiles()[0][0] == doorway.tiles()[1][0];
+					level.setBlock(at, Level1Blocks.NATURAL_LOCK.defaultBlockState()
+							.setValue(OldComputerBlock.FACING, alongZ ? net.minecraft.core.Direction.EAST : net.minecraft.core.Direction.NORTH), Block.UPDATE_ALL);
 					return at;
 				}
 			}
