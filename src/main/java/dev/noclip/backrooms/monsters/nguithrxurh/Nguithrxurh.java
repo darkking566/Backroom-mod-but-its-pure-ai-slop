@@ -1,5 +1,7 @@
 package dev.noclip.backrooms.monsters.nguithrxurh;
 
+import dev.noclip.backrooms.monsters.Tuning;
+import dev.noclip.backrooms.monsters.Retreat;
 import java.util.EnumSet;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -53,7 +55,7 @@ public class Nguithrxurh extends Monster {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 48)
+				.add(Attributes.MAX_HEALTH, Tuning.hp(48))
 				.add(Attributes.ATTACK_DAMAGE, 8)
 				.add(Attributes.MOVEMENT_SPEED, 0.33)
 				.add(Attributes.FOLLOW_RANGE, 34)
@@ -63,6 +65,7 @@ public class Nguithrxurh extends Monster {
 
 	@Override
 	protected void registerGoals() {
+		Retreat.add(this, goalSelector, targetSelector);
 		goalSelector.addGoal(0, new FloatGoal(this));
 		goalSelector.addGoal(2, new ApexPounceGoal(this));
 		goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.75));

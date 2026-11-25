@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.monsters.beastlevel5;
 
+import dev.noclip.backrooms.monsters.Tuning;
 import java.util.EnumSet;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -61,7 +62,7 @@ public class BeastOfLevel5 extends Monster {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 180)
+				.add(Attributes.MAX_HEALTH, Tuning.bossHp(180))
 				.add(Attributes.ATTACK_DAMAGE, 10)
 				.add(Attributes.MOVEMENT_SPEED, 0.27)
 				.add(Attributes.FOLLOW_RANGE, 40)

@@ -1,5 +1,7 @@
 # 後室生存撤離 RPG 總體玩法企劃書（Gameplay & Systems Master Plan）
 
+> **2026-11-25 方向改變**：遊戲改成以恐怖、逃離後室為主（不是為了變強去後室刷資源），能力值與怪物數值也改了。跟這份衝突的地方以 [docs/HORROR_ESCAPE_PLAN.md](HORROR_ESCAPE_PLAN.md) 為準。
+
 > **文件定位**：本企劃書整理 `noclip_backrooms` 模組之完整核心玩法循環、戰前準備系統、樓層解鎖條件、經濟與 NPC 任務、無限地圖距離難度曲線、角色 RPG 能力值／職業規劃，以及純客戶端渲染之理智幻覺系統。  
 > **關聯設計文件**：
 > - 合成、拆解、工具階梯與五大武器藍圖：[docs/crafting/README.md](crafting/README.md)

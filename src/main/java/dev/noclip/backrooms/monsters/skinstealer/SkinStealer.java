@@ -1,5 +1,7 @@
 package dev.noclip.backrooms.monsters.skinstealer;
 
+import dev.noclip.backrooms.monsters.Tuning;
+import dev.noclip.backrooms.monsters.Retreat;
 import java.util.EnumSet;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -61,7 +63,7 @@ public class SkinStealer extends Monster {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 36)
+				.add(Attributes.MAX_HEALTH, Tuning.hp(36))
 				.add(Attributes.ATTACK_DAMAGE, 8)
 				.add(Attributes.MOVEMENT_SPEED, 0.25)
 				.add(Attributes.FOLLOW_RANGE, 32)
@@ -84,6 +86,7 @@ public class SkinStealer extends Monster {
 
 	@Override
 	protected void registerGoals() {
+		Retreat.add(this, goalSelector, targetSelector);
 		goalSelector.addGoal(0, new FloatGoal(this));
 		goalSelector.addGoal(2, new DeceptionHuntGoal(this));
 		goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.6));

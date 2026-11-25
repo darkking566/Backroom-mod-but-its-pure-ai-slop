@@ -1,5 +1,7 @@
 package dev.noclip.backrooms.monsters.clump;
 
+import dev.noclip.backrooms.monsters.Tuning;
+import dev.noclip.backrooms.monsters.Retreat;
 import java.util.EnumSet;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -52,7 +54,7 @@ public class Clump extends Monster {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 32)
+				.add(Attributes.MAX_HEALTH, Tuning.hp(32))
 				.add(Attributes.ATTACK_DAMAGE, 7)
 				.add(Attributes.MOVEMENT_SPEED, 0.28)
 				.add(Attributes.FOLLOW_RANGE, 26)
@@ -78,6 +80,7 @@ public class Clump extends Monster {
 
 	@Override
 	protected void registerGoals() {
+		Retreat.add(this, goalSelector, targetSelector);
 		goalSelector.addGoal(0, new FloatGoal(this));
 		goalSelector.addGoal(2, new AcousticHuntGoal(this));
 		goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.65));

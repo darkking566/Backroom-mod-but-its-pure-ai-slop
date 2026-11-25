@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.monsters.partypooper;
 
+import dev.noclip.backrooms.monsters.Tuning;
 import dev.noclip.backrooms.level1.Level1Items;
 import dev.noclip.backrooms.monsters.partygoer.Partygoer;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -52,7 +53,7 @@ public class Partypooper extends PathfinderMob {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 36)
+				.add(Attributes.MAX_HEALTH, Tuning.hp(36))
 				.add(Attributes.ATTACK_DAMAGE, 6.5)
 				.add(Attributes.MOVEMENT_SPEED, 0.28)
 				.add(Attributes.FOLLOW_RANGE, 28)

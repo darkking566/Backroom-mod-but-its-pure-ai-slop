@@ -20,8 +20,15 @@ public record PlayerStats(
 		int sanityStat,
 		float sanity
 ) {
-	public static final float BASE_MAX_SANITY = 100.0F;
-	public static final float SANITY_PER_POINT = 10.0F;
+	/*
+	 * Horror direction (docs/HORROR_ESCAPE_PLAN.md, 2026-11-25): levels make you steadier, not stronger. Max health and
+	 * max sanity grow every five levels on their own; points only speed up recovery (with diminishing returns), and
+	 * strength adds little. In the Backrooms the player's health is cut in half (PlayerRpg).
+	 */
+	public static final float BASE_MAX_SANITY = 50.0F;
+	public static final int LEVELS_PER_STEP = 5;
+	public static final float SANITY_PER_STEP = 10.0F;
+	public static final double HEALTH_PER_STEP = 2.0;
 	public static final float HALLUCINATION_THRESHOLD = 0.30F;
 	public static final int POINTS_PER_LEVEL = 3;
 	public static final int INITIAL_STAT_POINTS = 3;
@@ -68,7 +75,7 @@ public record PlayerStats(
 		agility = Math.max(0, agility);
 		vitality = Math.max(0, vitality);
 		sanityStat = Math.max(0, sanityStat);
-		float max = BASE_MAX_SANITY + sanityStat * SANITY_PER_POINT;
+		float max = BASE_MAX_SANITY + SANITY_PER_STEP * (level / LEVELS_PER_STEP);
 		sanity = Mth.clamp(sanity, 0.0F, max);
 	}
 
@@ -76,8 +83,13 @@ public record PlayerStats(
 		return new PlayerStats(1, 0, INITIAL_STAT_POINTS, 0, 0, 0, 0, BASE_MAX_SANITY);
 	}
 
+	/** How many five-level steps the player has climbed (level 5 is the first). */
+	public int steps() {
+		return level / LEVELS_PER_STEP;
+	}
+
 	public float maxSanity() {
-		return BASE_MAX_SANITY + sanityStat * SANITY_PER_POINT;
+		return BASE_MAX_SANITY + SANITY_PER_STEP * steps();
 	}
 
 	public float sanityRatio() {
@@ -94,8 +106,9 @@ public record PlayerStats(
 		return 60 + (level - 1) * 45;
 	}
 
+	/** Strength: +0.2 damage a point, at most +3. */
 	public double attackDamageBonus() {
-		return strength * 0.5;
+		return Math.min(3.0, strength * 0.2);
 	}
 
 	public double moveSpeedBonus() {
@@ -106,32 +119,34 @@ public record PlayerStats(
 		return agility * 0.04;
 	}
 
+	/** Extra max health from levels: one heart every five levels (vitality no longer adds any). */
 	public double maxHealthBonus() {
-		return vitality * 2.0;
+		return HEALTH_PER_STEP * steps();
 	}
 
-	public double armorToughnessBonus() {
-		return vitality * 0.25;
+	/** 0 at no points, rising towards 1: each point adds less than the one before. */
+	private static float curve(int points) {
+		return 1.0F - (float) Math.pow(0.95, points);
 	}
 
-	/** Passive health regenerated per second from Vitality (while not starving). */
+	/** Health regenerated per second from Vitality, once the player has not been hurt for a while (PlayerRpg). */
 	public float healthRegenPerSec() {
-		return vitality * 0.12F;
+		return 0.4F * curve(vitality);
 	}
 
-	/** Fraction of sanity drain negated (capped at 65%). */
+	/** Fraction of sanity drain negated by the Sanity stat, at most 40%. */
 	public float sanityDrainResistance() {
-		return Math.min(0.65F, sanityStat * 0.06F);
+		return 0.4F * curve(sanityStat);
 	}
 
-	/** Multiplier for natural sanity recovery (+10% per SAN point; synergizes with future Mage class). */
+	/** Multiplier for natural sanity recovery, at most 2.5 times. */
 	public float sanityRegenMultiplier() {
-		return 1.0F + sanityStat * 0.10F;
+		return 1.0F + 1.5F * curve(sanityStat);
 	}
 
-	/** Extra passive sanity recovery per second from high SAN when not surrounded in pitch darkness. */
+	/** Extra sanity recovery per second in light with no monsters near, at most 0.3. */
 	public float passiveSanityRegenPerSec() {
-		return sanityStat * 0.05F;
+		return 0.3F * curve(sanityStat);
 	}
 
 	public PlayerStats withSanity(float value) {
@@ -156,7 +171,7 @@ public record PlayerStats(
 			newXp -= 60 + (newLevel - 1) * 45;
 			newLevel++;
 			newPoints += POINTS_PER_LEVEL;
-			newSanity += 20.0F;
+			newSanity += 10.0F;
 		}
 		return new PlayerStats(newLevel, newXp, newPoints, strength, agility, vitality, sanityStat, newSanity);
 	}
@@ -167,7 +182,7 @@ public record PlayerStats(
 			case STRENGTH -> new PlayerStats(level, xp, statPoints - 1, strength + 1, agility, vitality, sanityStat, sanity);
 			case AGILITY -> new PlayerStats(level, xp, statPoints - 1, strength, agility + 1, vitality, sanityStat, sanity);
 			case VITALITY -> new PlayerStats(level, xp, statPoints - 1, strength, agility, vitality + 1, sanityStat, sanity);
-			case SANITY -> new PlayerStats(level, xp, statPoints - 1, strength, agility, vitality, sanityStat + 1, sanity + SANITY_PER_POINT);
+			case SANITY -> new PlayerStats(level, xp, statPoints - 1, strength, agility, vitality, sanityStat + 1, sanity);
 		};
 	}
 
