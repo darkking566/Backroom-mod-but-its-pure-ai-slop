@@ -8,6 +8,7 @@ for doors, machines, props, lights, and wall decals so every UV and detail stays
 
 Run: python tools/make_level2_realistic.py
 """
+import sys
 import copy
 import io
 import json
@@ -499,3 +500,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # The design spec's sizes (128 for whole block faces, 64 for props): drawn big, saved small. See resize_realistic.py.
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import resize_realistic  # noqa: E402
+    resize_realistic.main()

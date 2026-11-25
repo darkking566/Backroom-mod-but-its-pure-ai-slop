@@ -26,7 +26,7 @@
 
 ## 材質怎麼做
 
-`py tools/make_level0_realistic.py` 會寫出 512 像素的彩色貼圖和 labPBR 的 `_n`、`_s`（裝 Iris 光影時才看得到），以及新舊對照 `docs/look/level0_realistic.png`。
+`py tools/make_level0_realistic.py` 會先畫 512 像素的彩色貼圖和 labPBR 的 `_n`、`_s`，存完自動交給 `tools/resize_realistic.py` 縮成規格書的尺寸（整格的面 128、道具 64）（裝 Iris 光影時才看得到），以及新舊對照 `docs/look/level0_realistic.png`。
 
 - 照片材質來自 ambientCG（全部 CC0，可用在不公開原始碼、商業的作品）：地毯 Carpet016、髒污 Fabric028、紙紋 Wallpaper001A、水漬與霉 Wallpaper002A/B/C。第一次跑會自動下載到 `tools/.cache/ambientcg/`（不進 git）。
 - 程式自己畫的：壁紙印花（照 Level 0 原始照片：細珠鍊直線之間是疊起來的 V 形，隔一欄錯開半格）、天花板礦纖板（針孔、細裂紋、斜邊；一格方塊四片，跟真的 60 公分磚差不多大，不再跟著方塊格線）、燈板（稜鏡擴散板、燈管、死蟲）、踢腳板、烤漆金屬。

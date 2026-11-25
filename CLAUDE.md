@@ -293,6 +293,13 @@
   - `runClientGameTest -Plevels=guild` 通過：在莽原村莊旁找到公會（村莊起點外約 80 格），門、狼煙、木牌字、四個人、小路都在；右鍵收購商開商店、賣廢金屬、存硬幣、離太遠不能交易、錢不夠、材料不夠、買槍、買繃帶、死掉後帳戶還在；截圖看過外觀、內部、商店、背包餘額。`gradlew build`（單元測試）這次沒跑（使用者要開遊戲）
   - 本機 Java 25 換了位置：`C:/Program Files/Java/jdk-25.0.4.1` 已不存在，現在是 `C:/Program Files/Microsoft/jdk-25.0.5.102-hotspot`
   - 照規格書 7.1 改 `docs/look/STYLE_GUIDE.md`、`SOP.md` 的貼圖尺寸（整格的面 128、道具 64），新增 `tools/resize_realistic.py`（照模型判斷是整格的面還是道具再縮小）；寫實材質包還沒實際縮
+- 使用者玩完後：`gradlew build`（77 個單元測試）通過
+- 使用者覺得木造公會醜，要求改石磚或其他建材：
+  - `GuildPalette` 全改石材：平原石磚＋深板岩柱＋石板屋頂、沙漠切製砂岩＋紅砂岩屋頂、莽原紅磚、雪原石磚＋黑石屋頂、針葉林凝灰岩磚；牆裡零星混風化石磚（依位置決定，跨區塊一致）；只有門、木牌、床是木頭
+  - 屋簷下加一圈倒置樓梯飾邊、屋脊加半磚、門口燈柱與小路燈柱改石牆柱
+  - 新增測試指令 `/backrooms guild place <plains|desert|savanna|snowy|taiga>`（`Guilds.place`、`GuildPiece.placeNow`、共用的 `GuildPiece.facingFront`）；生成時寫木牌字後，若是在已載入的世界裡蓋就通知玩家更新
+  - `GuildClientTest` 最後在半空草地上把五種樣式各蓋一座拍正面；`runClientGameTest -Plevels=guild` 通過，合成圖 `docs/guild/styles.png`
+- 寫實材質包照規格書縮小：跑 `tools/resize_realistic.py`，789 張整格的面縮成 128×128、234 張道具縮成 64×64（含 `_n`、`_s`），資源包從 159 MB 變 18 MB；`make_level0_realistic.py`、`make_level0p1_realistic.py`、Gemini 的 `make_level2_realistic.py` 最後各加幾行，存完自動縮小，重跑也不會變回 512；`docs/look/README.md` 跟著改；`runClientGameTest -Plevels=look` 通過，截圖看過 Level 0 壁紙、天花板、地毯在 128 下仍清楚。Level 0.1、Level 2 的寫實材質這次沒進遊戲看
 
 ## 動作記錄（Antigravity）
 
