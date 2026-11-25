@@ -348,7 +348,8 @@ final class Maze {
 	/** Whether a cell features a 1-block sunken carpeted basin in its 4x4 core. */
 	static boolean isSunkenCell(long seed, int cx, int cz) {
 		if (cx == 0 && cz == 0) return false;
-		if (ManilaRoomPlan.isRoomCell(seed, cx, cz) || StaircasePlan.isComplexCell(seed, cx, cz)) return false;
+		if (ManilaRoomPlan.isRoomCell(seed, cx, cz) || StaircasePlan.isComplexCell(seed, cx, cz)
+				|| ZonePoiPlan.isStandardPoiCell(seed, cx, cz)) return false;
 		Zone zone = zoneForCell(seed, cx, cz);
 		if (zone != Zone.CLASSIC && zone != Zone.ARCHES && zone != Zone.CUBICLES) return false;
 		if (Math.floorMod(hash(seed, cx, cz, FLOOR), 22) != 0) return false;
@@ -365,6 +366,7 @@ final class Maze {
 	static CeilingStyle ceilingStyle(long seed, int cx, int cz) {
 		if ((cx == 0 && cz == 0) || isStairwellCell(seed, cx, cz) || isAtriumCell(seed, cx, cz)
 				|| ManilaRoomPlan.isRoomCell(seed, cx, cz) || StaircasePlan.isComplexCell(seed, cx, cz)
+				|| ZonePoiPlan.isStandardPoiCell(seed, cx, cz)
 				|| Exits.isProtectedCell(seed, cx, cz)) {
 			return CeilingStyle.FLAT;
 		}
@@ -655,6 +657,10 @@ final class Maze {
 		if (ZonePoiPlan.isRedRoomPoiCell(seed, cx, cz)) {
 			return (ix == 3 || ix == 4) && (iz == 3 || iz == 4);
 		}
+		ZonePoiPlan.Vignette vignette = ZonePoiPlan.vignetteAtCell(seed, cx, cz);
+		if (vignette != null && vignette.type() != ZonePoiPlan.VignetteType.NOCLIP_ALCOVE) {
+			return (ix == 3 || ix == 4) && iz == 3;
+		}
 		int epoch = effectiveEpoch(zone, cx, cz, epochs);
 		long h = mixEpoch(hash(seed, cx, cz, LAMP + 1), epoch);
 		int roll = Math.floorMod(h, 100);
@@ -699,6 +705,13 @@ final class Maze {
 		if (ManilaRoomPlan.roomAtBlock(seed, x, z) != null) return true;
 		int cx = Math.floorDiv(x, CELL), cz = Math.floorDiv(z, CELL);
 		if (ZonePoiPlan.isRedRoomPoiCell(seed, cx, cz)) return true;
+		ZonePoiPlan.Vignette vignette = ZonePoiPlan.vignetteAtCell(seed, cx, cz);
+		if (vignette != null) {
+			if (vignette.type() == ZonePoiPlan.VignetteType.WANDERER_SITE) return false;
+			if (vignette.type() == ZonePoiPlan.VignetteType.GLASS_OFFICE) {
+				return Math.floorMod(x, CELL) == 4 && Math.floorMod(z, CELL) == 3;
+			}
+		}
 		Zone zone = zoneForCell(seed, cx, cz);
 		int epoch = effectiveEpoch(zone, cx, cz, epochs);
 		int roll = Math.floorMod(mixEpoch(hash(seed, cx, cz, LAMP), epoch), 100);

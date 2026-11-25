@@ -516,3 +516,9 @@
   - `RED_ROOM`（紅室）異常祭壇：於 3×3 扇區紅室深處中央格設置虛空石基座、`red_anomaly_cluster`（紅室異常結晶叢）、可直接右鍵開啟的 `anomaly_vault_chest`、流浪者殘骸與 2×2 紅日光燈
   - `DARKENED`（昏暗區）微光訊號點：於 3×3 扇區昏暗區中央移除水窪與內牆，放置螢幕面向南側空地的 `noclipped_crt_tv`（全暗區裡孤立自發光螢幕）、流浪者殘骸與側邊補給箱
   - 相容保護：`Exits.computeDoorIn` 避開興趣點、`EdgeShift` 保護 `RED_ROOM`/`DARKENED` 興趣點不被變形覆寫、`MegahallPlan.bayFloor`/`bayCenter` 開放套件內取用；新增單元測試 `ZonePoiPlanTest` 與 `Level0ClientTest.checkZonePois`（含 4 張實機截圖確認畫面）；`.\gradlew build` 與 `.\gradlew runClientGameTest -Plevels=0` 全部通過
+- Level 0 一般區域新增稀疏微型興趣點（Antigravity，`ZonePoiPlan.Vignette`）：
+  - 生成於起始扇區 `(0, 0)` 以外的 `CLASSIC`、`CUBICLES`、`CORRIDORS`、`ARCHES`、`PILLARS` 扇區（約 60% 扇區各 1 處），避開馬尼拉房間、樓梯間、中庭與出口門，且 `EdgeShift` 不覆寫該格本身（周圍走道仍可變形）
+  - `GLASS_OFFICE`（玻璃隔間辦公室）：煙燻玻璃 L 型隔間、辦公桌＋老電腦、鐵皮檔案櫃、辦公椅、廢紙簍，頂燈固定 1 壞 1 亮
+  - `WANDERER_SITE`（前人失蹤現場）：壞燈下的潮濕厚地毯、流浪者殘骸、穿牆木椅、補給箱與調查筆記
+  - `NOCLIP_ALCOVE`（異常補給角）：發光穿模自動販賣機、飲水機、檔案櫃與辦公椅
+  - `Level0ChunkGenerator` 支援一般區域 `FLOOR_Y + 2` 擺設與 `PILLARS` 區地毯覆寫；`ZonePoiPlanTest` 與 `Level0ClientTest` 新增 3 種微型興趣點驗證與實機截圖（`level0_glass_office`、`level0_wanderer_site`、`level0_noclip_alcove`），`.\gradlew build` 與 `.\gradlew runClientGameTest -Plevels=0` 全部通過

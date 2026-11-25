@@ -10,19 +10,34 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 /**
- * Deterministic points of interest inside Level 0's special macro-zones:
- * - {@link Maze.Zone#CHASM}: a lit deep-tier maintenance outpost with an anomaly vault or supply crate.
- * - {@link Maze.Zone#MEGATHALL}: a suspended low-ceiling lightwell lounge stranded in the vast dark hall.
- * - {@link Maze.Zone#RED_ROOM}: a crimson anomaly shrine with crystal cluster, vault chest, and remains.
- * - {@link Maze.Zone#DARKENED}: a dead-lamp CRT static signal beside wanderer remains and a supply crate.
+ * Deterministic points of interest inside Level 0:
+ * 1. Special macro-zones:
+ *    - {@link Maze.Zone#CHASM}: a lit deep-tier maintenance outpost with an anomaly vault or supply crate.
+ *    - {@link Maze.Zone#MEGATHALL}: a suspended low-ceiling lightwell lounge stranded in the vast dark hall.
+ *    - {@link Maze.Zone#RED_ROOM}: a crimson anomaly shrine with crystal cluster, vault chest, and remains.
+ *    - {@link Maze.Zone#DARKENED}: a dead-lamp CRT static signal beside wanderer remains and a supply crate.
+ * 2. Sparse sector micro-vignettes across standard maze zones:
+ *    - {@link VignetteType#GLASS_OFFICE}: smoked-glass corner office with desk, computer, cabinet, chair, wastebasket.
+ *    - {@link VignetteType#WANDERER_SITE}: damp carpet under a broken lamp with wanderer remains, chair, crate, note.
+ *    - {@link VignetteType#NOCLIP_ALCOVE}: surreal reality-clipped vending machine, water cooler, cabinet, office chair.
  */
 final class ZonePoiPlan {
 	private static final int POI_SALT = 149;
+	private static final int VIGNETTE_SALT = 211;
+
+	enum VignetteType {
+		GLASS_OFFICE,
+		WANDERER_SITE,
+		NOCLIP_ALCOVE
+	}
 
 	record ChasmOutpost(int cx, int cz, int tier, int floorY, int ceilY) {
 	}
 
 	record MegahallLounge(int cx, int cz, int floorY) {
+	}
+
+	record Vignette(int cx, int cz, VignetteType type) {
 	}
 
 	private ZonePoiPlan() {
@@ -34,6 +49,17 @@ final class ZonePoiPlan {
 
 	static MegahallLounge megahallLoungeInMacro(long seed, int baseCx, int baseCz) {
 		return MEGA_CACHE.get().getOrCompute(seed, baseCx, baseCz);
+	}
+
+	static Vignette vignetteInSector(long seed, int sx, int sz) {
+		return VIGNETTE_CACHE.get().getOrCompute(seed, sx, sz);
+	}
+
+	static Vignette vignetteAtCell(long seed, int cx, int cz) {
+		int sx = Math.floorDiv(cx, Maze.SECTOR);
+		int sz = Math.floorDiv(cz, Maze.SECTOR);
+		Vignette v = vignetteInSector(seed, sx, sz);
+		return v != null && v.cx() == cx && v.cz() == cz ? v : null;
 	}
 
 	static boolean isRedRoomPoiCell(long seed, int cx, int cz) {
@@ -57,6 +83,7 @@ final class ZonePoiPlan {
 	}
 
 	static boolean isStandardPoiCell(long seed, int cx, int cz) {
+		if (vignetteAtCell(seed, cx, cz) != null) return true;
 		int sx = Math.floorDiv(cx, Maze.SECTOR);
 		int sz = Math.floorDiv(cz, Maze.SECTOR);
 		int osx = Maze.largeZoneOriginSector(sx);
@@ -232,8 +259,92 @@ final class ZonePoiPlan {
 					return Level1Blocks.SUPPLY_CRATE.defaultBlockState();
 				}
 			}
+			return null;
 		}
-		return null;
+		Vignette v = vignetteAtCell(seed, cx, cz);
+		if (v == null) return null;
+		return vignetteBlockAt(v.type(), y, ix, iz);
+	}
+
+	private static BlockState vignetteBlockAt(VignetteType type, int y, int ix, int iz) {
+		return switch (type) {
+			case GLASS_OFFICE -> {
+				if (y == Level0ChunkGenerator.FLOOR_Y + 1) {
+					if ((ix == 2 && (iz == 2 || iz == 3)) || (ix == 3 && iz == 2)) {
+						yield Blocks.STAINED_GLASS.gray().defaultBlockState();
+					}
+					if (ix == 3 && iz == 3) {
+						yield Level1Blocks.OFFICE_DESK.defaultBlockState()
+								.setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH);
+					}
+					if (ix == 4 && iz == 3) {
+						yield BackroomsProps.NOCLIPPED_FILE_CABINET.defaultBlockState()
+								.setValue(NoClipPropBlock.FACING, Direction.SOUTH);
+					}
+					if (ix == 3 && iz == 4) {
+						yield BackroomsProps.NOCLIPPED_OFFICE_CHAIR.defaultBlockState()
+								.setValue(NoClipPropBlock.FACING, Direction.NORTH);
+					}
+					if (ix == 4 && iz == 4) {
+						yield Level1Blocks.WASTEBASKET.defaultBlockState();
+					}
+				} else if (y == Level0ChunkGenerator.FLOOR_Y + 2) {
+					if ((ix == 2 && (iz == 2 || iz == 3)) || (ix == 3 && iz == 2)) {
+						yield Blocks.STAINED_GLASS.gray().defaultBlockState();
+					}
+					if (ix == 3 && iz == 3) {
+						yield Level1Blocks.OLD_COMPUTER.defaultBlockState()
+								.setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH);
+					}
+				}
+				yield null;
+			}
+			case WANDERER_SITE -> {
+				if (y == Level0ChunkGenerator.FLOOR_Y && (ix == 3 || ix == 4) && iz == 3) {
+					yield ModBlocks.THICK_CARPET.defaultBlockState();
+				}
+				if (y == Level0ChunkGenerator.FLOOR_Y + 1) {
+					if (ix == 3 && iz == 3) {
+						yield BackroomsProps.WANDERER_REMAINS.defaultBlockState()
+								.setValue(NoClipPropBlock.FACING, Direction.EAST);
+					}
+					if (ix == 4 && iz == 3) {
+						yield BackroomsProps.NOCLIPPED_WOOD_CHAIR.defaultBlockState()
+								.setValue(NoClipPropBlock.FACING, Direction.WEST);
+					}
+					if (ix == 2 && iz == 3) {
+						yield Level1Blocks.SUPPLY_CRATE.defaultBlockState();
+					}
+					if (ix == 4 && iz == 4) {
+						yield ModBlocks.FIELD_NOTE.defaultBlockState()
+								.setValue(FieldNoteBlock.FACING, Direction.NORTH)
+								.setValue(FieldNoteBlock.VARIANT, 2);
+					}
+				}
+				yield null;
+			}
+			case NOCLIP_ALCOVE -> {
+				if (y == Level0ChunkGenerator.FLOOR_Y + 1) {
+					if (ix == 3 && iz == 3) {
+						yield BackroomsProps.NOCLIPPED_VENDING_MACHINE.defaultBlockState()
+								.setValue(NoClipPropBlock.FACING, Direction.SOUTH);
+					}
+					if (ix == 4 && iz == 3) {
+						yield BackroomsProps.NOCLIPPED_WATER_COOLER.defaultBlockState()
+								.setValue(NoClipPropBlock.FACING, Direction.SOUTH);
+					}
+					if (ix == 2 && iz == 3) {
+						yield BackroomsProps.NOCLIPPED_FILE_CABINET.defaultBlockState()
+								.setValue(NoClipPropBlock.FACING, Direction.SOUTH);
+					}
+					if (ix == 4 && iz == 4) {
+						yield BackroomsProps.NOCLIPPED_OFFICE_CHAIR.defaultBlockState()
+								.setValue(NoClipPropBlock.FACING, Direction.WEST);
+					}
+				}
+				yield null;
+			}
+		};
 	}
 
 	private static ChasmOutpost computeChasmOutpost(long seed, int baseCx, int baseCz) {
@@ -277,6 +388,38 @@ final class ZonePoiPlan {
 		return null;
 	}
 
+	private static Vignette computeVignette(long seed, int sx, int sz) {
+		if (sx == 0 && sz == 0) return null;
+		Maze.Zone zone = Maze.baseZoneForSector(seed, sx, sz);
+		if (zone != Maze.Zone.CLASSIC && zone != Maze.Zone.CUBICLES && zone != Maze.Zone.CORRIDORS
+				&& zone != Maze.Zone.ARCHES && zone != Maze.Zone.PILLARS) {
+			return null;
+		}
+		int spawnRoll = Math.floorMod(hash(seed, sx, sz, VIGNETTE_SALT), 100);
+		if (spawnRoll >= 60) return null;
+
+		int start = Math.floorMod(hash(seed, sx, sz, VIGNETTE_SALT + 1), 16);
+		for (int i = 0; i < 16; i++) {
+			int pick = (start + i) % 16;
+			int cx = sx * Maze.SECTOR + 2 + (pick & 3);
+			int cz = sz * Maze.SECTOR + 2 + (pick >> 2);
+			if (ManilaRoomPlan.isProtectedCell(seed, cx, cz)) continue;
+			if (StaircasePlan.isProtectedCell(seed, cx, cz)) continue;
+			if (Maze.isAtriumCell(seed, cx, cz)) continue;
+
+			int typeRoll = Math.floorMod(hash(seed, cx, cz, VIGNETTE_SALT + 2), 100);
+			VignetteType type = switch (zone) {
+				case CUBICLES -> typeRoll < 70 ? VignetteType.GLASS_OFFICE : VignetteType.NOCLIP_ALCOVE;
+				case ARCHES -> typeRoll < 50 ? VignetteType.GLASS_OFFICE : VignetteType.WANDERER_SITE;
+				case CORRIDORS -> typeRoll < 65 ? VignetteType.NOCLIP_ALCOVE : VignetteType.WANDERER_SITE;
+				case PILLARS, CLASSIC -> typeRoll < 50 ? VignetteType.WANDERER_SITE : VignetteType.NOCLIP_ALCOVE;
+				default -> VignetteType.WANDERER_SITE;
+			};
+			return new Vignette(cx, cz, type);
+		}
+		return null;
+	}
+
 	private static long hash(long seed, int x, int z, int salt) {
 		long h = mix(seed + salt);
 		h = mix(h ^ x);
@@ -294,6 +437,8 @@ final class ZonePoiPlan {
 			ThreadLocal.withInitial(() -> new MacroCache<>(ZonePoiPlan::computeChasmOutpost));
 	private static final ThreadLocal<MacroCache<MegahallLounge>> MEGA_CACHE =
 			ThreadLocal.withInitial(() -> new MacroCache<>(ZonePoiPlan::computeMegahallLounge));
+	private static final ThreadLocal<MacroCache<Vignette>> VIGNETTE_CACHE =
+			ThreadLocal.withInitial(() -> new MacroCache<>(ZonePoiPlan::computeVignette));
 
 	@FunctionalInterface
 	private interface MacroComputer<T> {

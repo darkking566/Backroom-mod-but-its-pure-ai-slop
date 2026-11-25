@@ -124,4 +124,36 @@ class ZonePoiPlanTest {
 		assertTrue(sawRed, "never verified RED_ROOM POI");
 		assertTrue(sawDarkened, "never verified DARKENED POI");
 	}
+
+	@Test
+	void sectorVignettesGenerateCleanlyAndStayOpen() {
+		long seed = 12345L;
+		EnumSet<ZonePoiPlan.VignetteType> seen = EnumSet.noneOf(ZonePoiPlan.VignetteType.class);
+
+		for (int sx = -24; sx <= 24; sx++) {
+			for (int sz = -24; sz <= 24; sz++) {
+				ZonePoiPlan.Vignette v = ZonePoiPlan.vignetteInSector(seed, sx, sz);
+				if (v == null) continue;
+				seen.add(v.type());
+				int cx = v.cx(), cz = v.cz();
+				assertFalse(sx == 0 && sz == 0, "origin sector must stay clean");
+				assertTrue(ZonePoiPlan.isProtectedCell(seed, cx, cz));
+				assertFalse(ManilaRoomPlan.isProtectedCell(seed, cx, cz), "vignette overlapped Manila Room");
+				assertFalse(StaircasePlan.isProtectedCell(seed, cx, cz), "vignette overlapped staircase");
+				assertFalse(Maze.isAtriumCell(seed, cx, cz), "vignette overlapped atrium");
+				assertFalse(Maze.isSunkenCell(seed, cx, cz), "vignette overlapped sunken basin");
+				assertEquals(Maze.CeilingStyle.FLAT, Maze.ceilingStyle(seed, cx, cz));
+
+				int ox = cx * Maze.CELL, oz = cz * Maze.CELL;
+				for (int ix = 1; ix < Maze.CELL; ix++) {
+					for (int iz = 1; iz < Maze.CELL; iz++) {
+						assertFalse(Maze.isWall(seed, ox + ix, oz + iz, false),
+								"interior wall inside vignette at " + cx + "," + cz);
+					}
+				}
+			}
+		}
+
+		assertEquals(EnumSet.allOf(ZonePoiPlan.VignetteType.class), seen, "missing vignette types: " + seen);
+	}
 }

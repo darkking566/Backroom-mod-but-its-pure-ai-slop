@@ -633,10 +633,95 @@ public final class Level0ClientTest implements FabricClientGameTest {
 					"Darkened signal supply crate missing");
 		});
 
+		// 5. Sector micro-vignettes (GLASS_OFFICE, WANDERER_SITE, NOCLIP_ALCOVE)
+		EnumMap<ZonePoiPlan.VignetteType, ZonePoiPlan.Vignette> vignettes = findAllVignettes(seed);
+		ZonePoiPlan.Vignette glassOffice = vignettes.get(ZonePoiPlan.VignetteType.GLASS_OFFICE);
+		int gx = glassOffice.cx() * Maze.CELL, gz = glassOffice.cz() * Maze.CELL;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (gx + 5.5) + " " + standY + " " + (gz + 5.5) + " 135 8");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_glass_office");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(gx + 2, standY, gz + 2)).is(Blocks.STAINED_GLASS.gray()),
+					"Glass office partition missing");
+			check(level.getBlockState(new BlockPos(gx + 3, standY, gz + 3)).is(Level1Blocks.OFFICE_DESK),
+					"Glass office desk missing");
+			check(level.getBlockState(new BlockPos(gx + 3, standY + 1, gz + 3)).is(Level1Blocks.OLD_COMPUTER),
+					"Glass office computer missing");
+			check(level.getBlockState(new BlockPos(gx + 3, standY, gz + 4)).is(BackroomsProps.NOCLIPPED_OFFICE_CHAIR),
+					"Glass office chair missing");
+			check(level.getBlockState(new BlockPos(gx + 4, standY, gz + 4)).is(Level1Blocks.WASTEBASKET),
+					"Glass office wastebasket missing");
+			check(level.getBlockState(new BlockPos(gx + 4, Level0ChunkGenerator.CEILING_Y, gz + 3)).is(ModBlocks.FLUORESCENT_LIGHT),
+					"Glass office lit lamp missing");
+		});
+
+		ZonePoiPlan.Vignette wandererSite = vignettes.get(ZonePoiPlan.VignetteType.WANDERER_SITE);
+		int wx = wandererSite.cx() * Maze.CELL, wz = wandererSite.cz() * Maze.CELL;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (wx + 5.5) + " " + standY + " " + (wz + 5.5) + " 135 12");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_wanderer_site");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(wx + 3, standY, wz + 3)).is(BackroomsProps.WANDERER_REMAINS),
+					"Wanderer site remains missing");
+			check(level.getBlockState(new BlockPos(wx + 4, standY, wz + 3)).is(BackroomsProps.NOCLIPPED_WOOD_CHAIR),
+					"Wanderer site wood chair missing");
+			check(level.getBlockState(new BlockPos(wx + 2, standY, wz + 3)).is(Level1Blocks.SUPPLY_CRATE),
+					"Wanderer site supply crate missing");
+			check(level.getBlockState(new BlockPos(wx + 4, standY, wz + 4)).is(ModBlocks.FIELD_NOTE),
+					"Wanderer site field note missing");
+			check(level.getBlockState(new BlockPos(wx + 3, Level0ChunkGenerator.CEILING_Y, wz + 3)).is(ModBlocks.BROKEN_FLUORESCENT_LIGHT),
+					"Wanderer site broken lamp missing");
+		});
+
+		ZonePoiPlan.Vignette noclipAlcove = vignettes.get(ZonePoiPlan.VignetteType.NOCLIP_ALCOVE);
+		int nx = noclipAlcove.cx() * Maze.CELL, nz = noclipAlcove.cz() * Maze.CELL;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (nx + 3.5) + " " + standY + " " + (nz + 5.5) + " 180 8");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_noclip_alcove");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(nx + 3, standY, nz + 3)).is(BackroomsProps.NOCLIPPED_VENDING_MACHINE),
+					"Noclip alcove vending machine missing");
+			check(level.getBlockState(new BlockPos(nx + 4, standY, nz + 3)).is(BackroomsProps.NOCLIPPED_WATER_COOLER),
+					"Noclip alcove water cooler missing");
+			check(level.getBlockState(new BlockPos(nx + 2, standY, nz + 3)).is(BackroomsProps.NOCLIPPED_FILE_CABINET),
+					"Noclip alcove file cabinet missing");
+			check(level.getBlockState(new BlockPos(nx + 4, standY, nz + 4)).is(BackroomsProps.NOCLIPPED_OFFICE_CHAIR),
+					"Noclip alcove office chair missing");
+		});
+
 		server.runCommand("gamemode survival @a");
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(5);
+	}
+
+	private static EnumMap<ZonePoiPlan.VignetteType, ZonePoiPlan.Vignette> findAllVignettes(long seed) {
+		EnumMap<ZonePoiPlan.VignetteType, ZonePoiPlan.Vignette> map = new EnumMap<>(ZonePoiPlan.VignetteType.class);
+		for (int radius = 1; radius <= 24 && map.size() < ZonePoiPlan.VignetteType.values().length; radius++) {
+			for (int sx = -radius; sx <= radius; sx++) {
+				for (int sz = -radius; sz <= radius; sz++) {
+					if (Math.max(Math.abs(sx), Math.abs(sz)) != radius) continue;
+					ZonePoiPlan.Vignette v = ZonePoiPlan.vignetteInSector(seed, sx, sz);
+					if (v != null) map.putIfAbsent(v.type(), v);
+				}
+			}
+		}
+		for (ZonePoiPlan.VignetteType t : ZonePoiPlan.VignetteType.values()) {
+			check(map.containsKey(t), "missing vignette type " + t);
+		}
+		return map;
 	}
 
 	private static ZonePoiPlan.ChasmOutpost findChasmOutpost(long seed) {
