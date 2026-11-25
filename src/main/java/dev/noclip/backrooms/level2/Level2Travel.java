@@ -22,7 +22,8 @@ final class Level2Travel {
 		ServerLevel level2 = player.level().getServer().getLevel(Level2.LEVEL_2);
 		if (level2 == null) return false;
 		long seed = Level2ChunkGenerator.planSeed(level2.getChunkSource().randomState());
-		int x = player.getBlockX(), z = player.getBlockZ();
+		int[] at = dev.noclip.backrooms.core.LevelExits.anchor(player);
+		int x = at[0], z = at[1];
 		// If players have built on the nearest spot, look a little further along.
 		for (int i = 0; i < TRIES; i++) {
 			int[] spot = Level2Layout.landing(seed, x + i * Level2Plan.CELL * 3, z);

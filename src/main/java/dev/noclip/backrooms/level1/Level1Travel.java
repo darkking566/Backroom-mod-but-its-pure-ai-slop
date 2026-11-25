@@ -23,7 +23,8 @@ final class Level1Travel {
 		if (level1 == null) return false;
 
 		long seed = Level1ChunkGenerator.planSeed(level1.getChunkSource().randomState());
-		int[] spot = Level1Layout.landing(seed, player.getBlockX(), player.getBlockZ());
+		int[] at = dev.noclip.backrooms.core.LevelExits.anchor(player);
+		int[] spot = Level1Layout.landing(seed, at[0], at[1]);
 		// Walk along the aisle past anything a player has built on the landing spot.
 		for (int i = 0; i < STEPS; i++) {
 			int step = (i + 1) / 2 * (i % 2 == 0 ? 1 : -1);

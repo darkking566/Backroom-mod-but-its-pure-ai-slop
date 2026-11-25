@@ -1,5 +1,6 @@
 package dev.noclip.backrooms;
 
+import dev.noclip.backrooms.core.floors.Floors;
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
 import dev.noclip.backrooms.crafting.BackroomsCrafting;
@@ -30,6 +31,7 @@ public final class BackroomsMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		PlayerRpg.register();
+		Floors.register();
 		BackroomsProps.register();
 		BackroomsItems.register();
 		BackroomsCrafting.register();

@@ -168,6 +168,17 @@
   - 推送前抓 GitHub，合併朋友新推的 1 個提交（Level 0.1 臥室、廚房、健身房、溫室的 18 種家具）
   - 使用者同意後把 `main` 推送到 GitHub（寫實材質包與攝影機濾鏡、變暗、天花板與燈具模型、第 0 層燈減少、測試只跑指定樓層的開關）；沒有強制推送、沒有改寫歷史
 
+### 2026-11-25
+- 使用者要求規劃每一層能破壞、收集的東西，並加入「第幾層」：
+  - 新增 `docs/levels/MATERIALS.md`（第 0、0.1、1、2、3 層：結構拆成材料、物件掉出本身、完好／損壞／穿模三種版本、玻璃系列、之後 Level 13 玻璃瘋狂與 Level 39 魔法森林；材料名稱沿用 Gemini 的 `docs/crafting/01_materials_and_props.md`）與 `docs/FLOORS.md`（層數規則照狐霖的後室 RPG，從舊的攻略紀錄確認：每過一次出口加一層、走回頭也算、層數越高越難）；只提交這兩份（`ab8a4de`），當時 Gemini 有 118 個檔案改到一半
+  - Gemini 做完後放進層數系統：新增 `core/floors/`（`FloorRun`、`Floors`：玩家附加資料、換維度時加一層、回主世界或在主世界重生結束、螢幕中間顯示 Level 與名稱）與客戶端 `FloorsClient`（左上角「第幾層」、背包上方「Level 幾 · 名稱」）；`BackroomsMod`、`BackroomsClient` 各加一行註冊
+  - `core/LevelExits` 加 `anchor()`：走出口時落點離出口 4 萬～16 萬格、由出口位置與目的地決定（同一個出口的隊友在一起），回到去過的 Level 就是全新的一片；改了朋友的 `Level0Arrival` 一行、`Level1Travel`／`Level2Travel`／`Level3Travel` 各一行改用它（Level 0.1 是有限的球，不改）
+  - 攝影機濾鏡的 REC 移到右上角電池旁（左上角給層數）；語言檔加 5 個 Level 名稱與兩個畫面字
+  - 新增單元測試 `FloorRunTest`、實機測試 `floors/FloorsClientTest`（`-Plevels=floors`）；`gradlew build`（75 個單元測試）與 `floors` 實機測試通過，截圖看過（標題、左上角層數、背包上方 Level 名稱都正確）
+  - 其他層的實機測試（因為出口落點改了）：Level 0 通過；Level 0.1 停在 `blocks` 段「`console` 打掉不會掉出自己」（Gemini 先前就記錄過的已知問題：控制台改掉拆解材料、測試沒跟著改，與這次無關）；Level 1 完整跑時停在 `hounds` 段（找不到剛生出的獵犬），單獨跑 `-Psections=hounds` 通過，像是前面段落影響的偶發狀況；Level 2、3 這次還沒跑到，尚未驗證走出口落在遠處對它們的測試有沒有影響
+  - 先提交在本機（沒推），使用者要先討論建模
+  - 使用者問能不能直接套用 Found Footage 的模型、註明出處就好：查了它在 GitHub 的授權是 GPL-3.0，只註明出處不夠，要整個模組也改成 GPL-3.0 開源才行（我們的 GitHub 專案是公開的，但沒有授權檔、模組設定寫保留所有權利），請使用者和朋友決定
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23

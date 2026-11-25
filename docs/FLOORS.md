@@ -1,4 +1,4 @@
-# 層數與樓層標題（規劃，2026-11-24）
+# 層數與樓層標題（2026-11-25 已做好）
 
 使用者要求：層數的算法跟《狐霖的後室 RPG》一樣。
 
@@ -52,4 +52,17 @@
 
 - 出口照舊用 `core/LevelExits`；層數在出口把人送到另一個 Level 時加一。
 - 各 Level 的名稱寫在語言檔，新的 Level 做好時一起加。
-- Gemini 的 RPG 角色面板在背包左邊，Level 名稱放在背包上方，不會重疊。
+- Gemini 的 RPG 角色面板在背包旁邊，Level 名稱放在背包上方，不會重疊。
+
+## 七、程式在哪
+
+| 做什麼 | 在哪 |
+|---|---|
+| 這一趟的層數、去過哪些 Level、最高紀錄（跟著玩家存檔，死掉也保留，只同步給本人） | `core/floors/FloorRun`、`Floors.RUN` |
+| 換 Level 時加一層、回主世界結束、在主世界重生結束、螢幕中間的標題 | `core/floors/Floors` |
+| 左上角「第幾層」、背包上方的 Level 名稱 | 客戶端 `core/floors/FloorsClient` |
+| 走出口落在「全新的一片」：離出口 4 萬～16 萬格、由出口位置和目的地決定，超過 200 萬格會折回來 | `core/LevelExits.anchor`；Level 0、1、2、3 的落點都改用它（Level 0.1 是有限大的球，維持原樣） |
+| 各 Level 的名稱 | 語言檔 `level.noclip_backrooms.<編號>`，新的 Level 做好時一起加 |
+| 測試 | 單元測試 `FloorRunTest`；實機 `floors/FloorsClientTest`（`gradlew runClientGameTest -Plevels=floors`） |
+
+還沒做：層數影響怪物強度與稀有掉落（第四節），等數字定了再接上 `Floors.of(player).floor()`。
