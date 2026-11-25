@@ -21,7 +21,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * A settlement's supply locker. Each player can take a share (its loot table) from each locker,
  * then must wait a while before it has been restocked.
  */
-final class LockerBlock extends ShapedBlock {
+final class LockerBlock extends OldComputerBlock {
 	static final int RESTOCK = 5 * 60 * 20;
 	private static final Map<String, Integer> TAKEN = new HashMap<>();
 

@@ -194,7 +194,7 @@ public final class Level1Landmarks {
 			if (y > lowerY && y < topCeil) return state(Level1Blocks.COPPER_PILLAR);
 		}
 		if ((u == 11 || u == 20) && (v == 10 || v == 16 || v == 22) && y == lowerY + 1) {
-			return state(Level1Blocks.GENERATOR);
+			return state(Level1Blocks.GENERATOR).setValue(GeneratorBlock.FACING, u == 11 ? Direction.EAST : Direction.WEST);
 		}
 		if ((u == 12 || u == 19) && (v == 11 || v == 17) && y == lowerY + 1) {
 			return state(Level1Blocks.FUEL_DRUM);
@@ -415,7 +415,7 @@ public final class Level1Landmarks {
 			if (y == bunkerY) return state(Level1Blocks.CORRIDOR_FLOOR);
 			if (y == FLOOR - 1) return state(Level1Blocks.GARAGE_CEILING);
 			if (y == bunkerY + 1 && (u == 11 || u == 20) && (v == 12 || v == 15 || v == 18)) {
-				return state(Level1Blocks.SUPPLY_LOCKER);
+				return state(Level1Blocks.SUPPLY_LOCKER).setValue(OldComputerBlock.FACING, u == 11 ? Direction.EAST : Direction.WEST);
 			}
 			if (y == bunkerY + 1 && u == 16 && v == 16) return state(Level1Blocks.OFFICE_DESK);
 			if (y == bunkerY + 2 && u == 16 && v == 16) return state(Level1Blocks.OLD_COMPUTER);
@@ -488,7 +488,10 @@ public final class Level1Landmarks {
 
 		// Highway 1 deck (y = 39)
 		if (hwy1) {
-			if (y == 39) return state((v == 15 || v == 16) ? Level1Blocks.GARAGE_FLOOR_LINE : Level1Blocks.GARAGE_FLOOR);
+			if (y == 39) {
+				return (v == 15 || v == 16) ? state(Level1Blocks.GARAGE_FLOOR_LINE).setValue(LaneLineBlock.AXIS, Direction.Axis.X)
+						: state(Level1Blocks.GARAGE_FLOOR);
+			}
 			if (y == 40 && (v == 12 || v == 19) && !(v == 12 && u == 11)) return barrier(Direction.Axis.X); // gap where the stair tops out
 			if (y == 40 && u == 7 && v == 14) return Level1Blocks.ABANDONED_CAR.defaultBlockState().setValue(OldComputerBlock.FACING, Direction.EAST);
 			if (y == 40 && u == 23 && v == 17) return Level1Blocks.ABANDONED_VAN.defaultBlockState().setValue(OldComputerBlock.FACING, Direction.WEST);

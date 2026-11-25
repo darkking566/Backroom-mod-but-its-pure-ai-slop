@@ -2309,7 +2309,9 @@ def all_blockstates():
     b = {}
     b["garage_floor"] = {"variants": {"": spin("garage_floor", 30) + spin("garage_floor_1", 30) + spin("garage_floor_2", 3)
                                       + spin("garage_floor_3", 4) + spin("garage_floor_4", 6) + spin("garage_floor_5", 3)}}
-    b["garage_floor_line"] = {"variants": {"": spin("garage_floor_line", 6, (0, 180)) + spin("garage_floor_line_1", 2, (0, 180))}}
+    b["garage_floor_line"] = {"variants": {
+        "axis=z": spin("garage_floor_line", 6, (0, 180)) + spin("garage_floor_line_1", 2, (0, 180)),
+        "axis=x": spin("garage_floor_line", 6, (90, 270)) + spin("garage_floor_line_1", 2, (90, 270))}}
     b["damp_garage_floor"] = {"variants": {"": spin("damp_garage_floor") + spin("damp_garage_floor_1") + spin("damp_garage_floor_2")}}
     b["puddled_garage_floor"] = {"variants": {"": spin("puddled_garage_floor") + spin("puddled_garage_floor_1")}}
     b["garage_wall"] = {"variants": {"": [{"model": NS + "garage_wall", "weight": 20}, {"model": NS + "garage_wall_1", "weight": 5},

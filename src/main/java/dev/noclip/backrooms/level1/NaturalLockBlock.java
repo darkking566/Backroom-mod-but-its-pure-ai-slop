@@ -18,7 +18,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * A lock that was simply there, hanging in a room's doorway. Use it and it does lock, and then it is gone from where you
  * are looking, and every doorway of the room is shut for good: "never use a natural lock".
  */
-final class NaturalLockBlock extends ShapedBlock {
+final class NaturalLockBlock extends OldComputerBlock {
 	NaturalLockBlock(Properties properties, VoxelShape shape) {
 		super(properties, shape);
 	}

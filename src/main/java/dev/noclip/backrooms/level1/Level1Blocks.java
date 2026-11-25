@@ -37,7 +37,7 @@ public final class Level1Blocks {
 
 	// The parking structure
 	public static final Block GARAGE_FLOOR = register("garage_floor", concrete(MapColor.STONE));
-	public static final Block GARAGE_FLOOR_LINE = register("garage_floor_line", concrete(MapColor.STONE));
+	public static final Block GARAGE_FLOOR_LINE = register("garage_floor_line", concrete(MapColor.STONE), LaneLineBlock::new);
 	public static final Block DAMP_GARAGE_FLOOR = register("damp_garage_floor", concrete(MapColor.STONE));
 	public static final Block PUDDLED_GARAGE_FLOOR = register("puddled_garage_floor", concrete(MapColor.WATER));
 	public static final Block GARAGE_WALL = register("garage_wall", concrete(MapColor.STONE));
@@ -277,7 +277,7 @@ public final class Level1Blocks {
 	/** The chair in the rubber room, sunk into the floor. */
 	public static final Block SUNKEN_CHAIR = register("sunken_chair", Properties.of()
 			.mapColor(MapColor.COLOR_GRAY).strength(0.8F).sound(SoundType.WOOL).noOcclusion(),
-			p -> new ShapedBlock(p, Block.box(4, 0, 4, 12, 13, 12)));
+			p -> new OldComputerBlock(p, Block.box(4, 0, 4, 12, 13, 12)));
 	/** A painting lying on the floor, where no one would put one. */
 	public static final Block FLOOR_PAINTING = register("floor_painting", Properties.of()
 			.mapColor(MapColor.COLOR_BROWN).instabreak().sound(SoundType.WOOD).noOcclusion().noCollision().noLootTable(),

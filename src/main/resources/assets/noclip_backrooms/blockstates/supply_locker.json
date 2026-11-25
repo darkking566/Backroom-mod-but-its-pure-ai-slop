@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=north": {
       "model": "noclip_backrooms:block/level1/supply_locker"
+    },
+    "facing=east": {
+      "model": "noclip_backrooms:block/level1/supply_locker",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "noclip_backrooms:block/level1/supply_locker",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "noclip_backrooms:block/level1/supply_locker",
+      "y": 270
     }
   }
 }

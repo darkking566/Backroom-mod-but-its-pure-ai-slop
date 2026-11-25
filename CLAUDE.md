@@ -284,6 +284,15 @@
   - 等 Antigravity 同時在跑的實機測試結束後才跑自己的（第一次因 `build/run` 被占用失敗）
 - 使用者同意後，抓 GitHub 合併朋友新推的 10 個提交（合成系統、327 個物品 3D 模型、RPG 狀態列、各層畫面標準與光影測試等），沒有衝突；合併後 `gradlew build`（77 個單元測試）與 `runClientGameTest -Plevels=2` 通過（中途一次編譯失敗是別的 Gradle 同時寫 `build/classes`，重跑就過），把 `main` 推送到 GitHub；Antigravity 未提交的 Level 1 改動沒有一起提交；沒有強制推送、沒有改寫歷史
 
+- Level 1 審查報告第二批（家具朝向）：
+  - 有方向的方塊（`ShapedBlock` 的子類別有 `facing` 時）選取框與碰撞箱跟著模型轉（`Shapes.rotateHorizontal`），電腦、發電機、車、販賣機、配電櫃等一起受益；車與廂型車的碰撞箱仍只有 1 格（模型超出 1 格的部分可穿過）
+  - 椅子、補給置物櫃、天然的鎖加 `facing`（`OldComputerBlock` 改成可繼承，三者沿用；預設朝北＝原本的樣子，舊存檔不變）；車道線加 `axis`（新 `LaneLineBlock`，預設 z＝原本的南北向）
+  - 生成：椅子朝相鄰的桌子，沒有桌子就背靠牆朝房內；電腦螢幕朝相鄰的椅子，沒有就背對牆；隔間辦公室的椅子改到桌子正前方、垃圾桶改到桌子旁（`CorridorPlan`）；高架橋東西向那段的車道線轉 90 度；廢棄前哨碉堡的置物櫃與變電所的發電機朝向中間走道；天然的鎖依門洞方向轉
+  - `tools/make_level1.py` 的車道線方塊狀態同步（沒重跑腳本）
+  - 驗證：`gradlew build` 通過；`runClientGameTest -Plevels=1 -Psections=rooms,secrets,checkBlocks` 通過；看過食堂、候診室、教室、隔間截圖（候診室椅子朝房內、食堂椅子朝桌子、教室螢幕朝後面的椅子）；鎖、置物櫃、高架橋車道線、發電機沒在畫面上確認
+  - 中途 build 撞到 GitHub 剛合併進來的武器程式（寫檔中），重跑就過；Antigravity 跑 Level 2 實機測試時先等它結束
+  - 沒做：辦公桌、病床、行軍床、睡袋、櫃檯、門框、出口門、日光燈、收費亭柵欄桿的玩家擺放朝向；大型道具的完整碰撞箱
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23

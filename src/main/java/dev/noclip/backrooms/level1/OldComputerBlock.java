@@ -9,8 +9,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-/** A beige box with a dead screen, facing FACING. */
-final class OldComputerBlock extends ShapedBlock {
+/** A beige box with a dead screen, facing FACING; and the other Level 1 fixtures with a front (chairs, lockers, locks). */
+class OldComputerBlock extends ShapedBlock {
 	static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
 	OldComputerBlock(Properties properties, VoxelShape shape) {
