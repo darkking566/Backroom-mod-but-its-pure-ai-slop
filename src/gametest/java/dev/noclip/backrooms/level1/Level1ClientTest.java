@@ -73,6 +73,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			if (only("sectorFit")) sectorFit();
 			if (only("pipeFit")) pipeFit();
 			if (only("elevationPois")) elevationPois(context, game, seed);
+			if (only("sectorPois")) sectorPois(context, game, seed);
 			if (only("exits")) exits(context, game, seed);
 			if (only("events")) events(context, game, seed);
 			if (only("settlements")) settlements(context, game, seed);
@@ -1513,6 +1514,109 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			}
 		}
 		throw new AssertionError("no elevation POI " + kind + " (deep=" + deepFilter + ") within ring 24");
+	}
+
+	/** All 6 sector-exclusive micro-POIs render cleanly on the main floor without colliding with sector architecture. */
+	private static void sectorPois(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		server.runCommand("gamemode spectator @a");
+
+		// 1. TALON_CRASH_SITE
+		Level1SectorPois.Poi talon = findSectorPoi(seed, Level1SectorPois.Kind.TALON_CRASH_SITE);
+		int tx0 = talon.dx() * 64 + talon.minLx(), tz0 = talon.dz() * 64 + talon.minLz();
+		shoot(context, game, tx0 + 3.5, STAND, tz0 - 2.2, 0, 8, "level1_poi_sector_talon");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			check(level.getBlockState(new BlockPos(tx0 + 2, STAND, tz0 + 3)).is(Level1Blocks.ABANDONED_CAR), "talon car missing");
+			check(level.getBlockState(new BlockPos(talon.lootX(), talon.lootY(), talon.lootZ())).is(dev.noclip.backrooms.props.BackroomsProps.LOCKED_ARMORY_CRATE), "talon crate missing");
+			check(level.getBlockState(new BlockPos(talon.fuseX(), talon.fuseY(), talon.fuseZ())).is(dev.noclip.backrooms.props.BackroomsProps.INDUSTRIAL_FUSE_BOX), "talon fuse missing");
+			check(level.getBlockState(new BlockPos(tx0 + 1, STAND, tz0 + 5)).is(dev.noclip.backrooms.props.BackroomsProps.WANDERER_REMAINS), "talon remains missing");
+		});
+
+		// 2. GILD_TRADE_STALL
+		Level1SectorPois.Poi gild = findSectorPoi(seed, Level1SectorPois.Kind.GILD_TRADE_STALL);
+		int gx0 = gild.dx() * 64 + gild.minLx(), gz0 = gild.dz() * 64 + gild.minLz();
+		shoot(context, game, gx0 + 3.5, STAND, gz0 - 2.2, 0, 8, "level1_poi_sector_gild");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			check(level.getBlockState(new BlockPos(gx0 + 1, STAND, gz0 + 3)).is(Level1Blocks.VENDING_MACHINE), "gild vending missing");
+			check(level.getBlockState(new BlockPos(gx0 + 5, STAND, gz0 + 2)).is(dev.noclip.backrooms.props.BackroomsProps.SALVAGE_BENCH), "gild salvage bench missing");
+			check(level.getBlockState(new BlockPos(gild.lootX(), gild.lootY(), gild.lootZ())).is(dev.noclip.backrooms.props.BackroomsProps.LOCKED_ARMORY_CRATE), "gild crate missing");
+			check(level.getBlockState(new BlockPos(gx0 + 4, STAND, gz0 + 2)).is(dev.noclip.backrooms.props.BackroomsProps.WANDERER_REMAINS), "gild remains missing");
+		});
+
+		// 3. GOTHIC_RELIQUARY_SHRINE
+		Level1SectorPois.Poi gothic = findSectorPoi(seed, Level1SectorPois.Kind.GOTHIC_RELIQUARY_SHRINE);
+		int rx0 = gothic.dx() * 64 + gothic.minLx(), rz0 = gothic.dz() * 64 + gothic.minLz();
+		shoot(context, game, rx0 + 3.5, STAND, rz0 - 2.2, 0, 8, "level1_poi_sector_gothic");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			check(level.getBlockState(new BlockPos(rx0 + 3, STAND + 2, rz0 + 3)).is(dev.noclip.backrooms.props.BackroomsProps.VINTAGE_CHANDELIER), "gothic chandelier missing");
+			check(level.getBlockState(new BlockPos(rx0 + 2, STAND, rz0 + 4)).is(dev.noclip.backrooms.props.BackroomsProps.ALMOND_DISTILLER), "gothic distiller missing");
+			check(level.getBlockState(new BlockPos(gothic.lootX(), gothic.lootY(), gothic.lootZ())).is(dev.noclip.backrooms.props.BackroomsProps.ANOMALY_VAULT_CHEST), "gothic anomaly chest missing");
+			check(level.getBlockState(new BlockPos(rx0 + 1, STAND, rz0 + 3)).is(dev.noclip.backrooms.props.BackroomsProps.WANDERER_REMAINS), "gothic remains missing");
+		});
+
+		// 4. GARDEN_OVERGROWN_CAMP
+		Level1SectorPois.Poi garden = findSectorPoi(seed, Level1SectorPois.Kind.GARDEN_OVERGROWN_CAMP);
+		int fx0 = garden.dx() * 64 + garden.minLx(), fz0 = garden.dz() * 64 + garden.minLz();
+		shoot(context, game, fx0 + 3.5, STAND, fz0 - 2.2, 0, 8, "level1_poi_sector_garden");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			check(level.getBlockState(new BlockPos(fx0 + 2, STAND, fz0 + 3)).is(Level1Blocks.ABANDONED_CAR), "garden car missing");
+			check(level.getBlockState(new BlockPos(fx0 + 4, STAND, fz0 + 3)).is(Level1Blocks.BARREL_FIRE), "garden barrel fire missing");
+			check(level.getBlockState(new BlockPos(fx0 + 1, STAND, fz0 + 4)).is(dev.noclip.backrooms.props.BackroomsProps.PROP_POTTED_PLANT_PLASTIC), "garden potted plant missing");
+			check(level.getBlockState(new BlockPos(garden.lootX(), garden.lootY(), garden.lootZ())).is(dev.noclip.backrooms.props.BackroomsProps.LOCKED_ARMORY_CRATE), "garden crate missing");
+			check(level.getBlockState(new BlockPos(fx0 + 4, STAND, fz0 + 5)).is(dev.noclip.backrooms.props.BackroomsProps.WANDERER_REMAINS), "garden remains missing");
+		});
+
+		// 5. LEGEND_NEON_ARCADE
+		Level1SectorPois.Poi legend = findSectorPoi(seed, Level1SectorPois.Kind.LEGEND_NEON_ARCADE);
+		int lx0 = legend.dx() * 64 + legend.minLx(), lz0 = legend.dz() * 64 + legend.minLz();
+		shoot(context, game, lx0 + 3.5, STAND, lz0 - 2.2, 0, 8, "level1_poi_sector_legend");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			check(level.getBlockState(new BlockPos(lx0 + 1, 36, lz0 + 3)).is(Level1Blocks.NEON_CYAN), "legend neon cyan missing");
+			check(level.getBlockState(new BlockPos(lx0 + 1, STAND + 1, lz0 + 3)).is(dev.noclip.backrooms.props.BackroomsProps.PROP_CRT_TV), "legend CRT TV missing");
+			check(level.getBlockState(new BlockPos(lx0 + 2, STAND, lz0 + 4)).is(Level1Blocks.VENDING_MACHINE), "legend vending missing");
+			check(level.getBlockState(new BlockPos(legend.lootX(), legend.lootY(), legend.lootZ())).is(dev.noclip.backrooms.props.BackroomsProps.ANOMALY_VAULT_CHEST), "legend anomaly chest missing");
+			check(level.getBlockState(new BlockPos(legend.fuseX(), legend.fuseY(), legend.fuseZ())).is(dev.noclip.backrooms.props.BackroomsProps.INDUSTRIAL_FUSE_BOX), "legend fuse missing");
+			check(level.getBlockState(new BlockPos(lx0 + 4, STAND, lz0 + 2)).is(dev.noclip.backrooms.props.BackroomsProps.WANDERER_REMAINS), "legend remains missing");
+		});
+
+		// 6. TAILCHASE_WORKSITE_SHACK + live fuse box restore test
+		Level1SectorPois.Poi tail = findSectorPoi(seed, Level1SectorPois.Kind.TAILCHASE_WORKSITE_SHACK);
+		int wx0 = tail.dx() * 64 + tail.minLx(), wz0 = tail.dz() * 64 + tail.minLz();
+		shoot(context, game, wx0 + 3.5, STAND, wz0 - 2.2, 0, 8, "level1_poi_sector_tailchase");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			BlockPos fusePos = new BlockPos(tail.fuseX(), tail.fuseY(), tail.fuseZ());
+			BlockPos lampPos = new BlockPos(wx0 + 3, 35, wz0 + 2);
+			check(level.getBlockState(new BlockPos(wx0 + 1, STAND, wz0 + 4)).is(dev.noclip.backrooms.props.BackroomsProps.WORKSHOP_BENCH), "tailchase workshop bench missing");
+			check(level.getBlockState(new BlockPos(wx0 + 1, STAND, wz0 + 2)).is(Level1Blocks.SITE_MACHINE), "tailchase site machine missing");
+			check(level.getBlockState(tail.lootX() == 0 ? lampPos : new BlockPos(tail.lootX(), tail.lootY(), tail.lootZ())).is(dev.noclip.backrooms.props.BackroomsProps.LOCKED_ARMORY_CRATE), "tailchase crate missing");
+			check(level.getBlockState(fusePos).is(dev.noclip.backrooms.props.BackroomsProps.INDUSTRIAL_FUSE_BOX), "tailchase fuse missing");
+			check(level.getBlockState(new BlockPos(wx0 + 3, STAND, wz0 + 4)).is(dev.noclip.backrooms.props.BackroomsProps.WANDERER_REMAINS), "tailchase remains missing");
+			check(level.getBlockState(lampPos).is(Level1Blocks.BROKEN_GARAGE_LIGHT), "tailchase broken light missing");
+			check(Level1PoiEvents.trigger(level, player(s), fusePos, true), "tailchase fuse box failed to trigger");
+			BlockState restored = level.getBlockState(lampPos);
+			check(restored.is(Level1Blocks.GARAGE_LIGHT) && restored.getValue(Level1LampBlock.LIT), "tailchase overhead light did not restore lit");
+		});
+	}
+
+	private static Level1SectorPois.Poi findSectorPoi(long seed, Level1SectorPois.Kind kind) {
+		for (int ring = 1; ring <= 28; ring++) {
+			for (int dx = -ring; dx <= ring; dx++) {
+				for (int dz = -ring; dz <= ring; dz++) {
+					if (Math.max(Math.abs(dx), Math.abs(dz)) != ring) continue;
+					Level1SectorPois.Poi poi = Level1SectorPois.poi(seed, dx, dz);
+					if (poi != null && poi.kind() == kind) {
+						return poi;
+					}
+				}
+			}
+		}
+		throw new AssertionError("no sector POI " + kind + " within ring 28");
 	}
 
 	private static void checkBlocks(ClientGameTestContext context, TestSingleplayerContext game) {
