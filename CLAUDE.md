@@ -618,3 +618,4 @@
   - 新增 `tools/make_level0_mystery_doors.py` 產出 128px 基礎與 512px labPBR（`_n`／`_s`）寫實材質貼圖、方塊模型、blockstates 與物品定義，並補齊中英文語言檔及創造分頁（隱藏上半方塊）
   - 於每 `8×8` 扇區（448×448 格，避開起始區域 `(0,0)` 與其他 POI／結構）極稀少生成 1 扇，`Exits` 與 `EdgeShift` 皆保護該格不被覆蓋
   - 驗證：`ZonePoiPlanTest.mysteryExitsGenerateRarelyForHubAndFunWithoutConflicts` 與 `Level0ClientTest`（檢查兩種門方塊、右鍵實測 `LevelExits.refusals()` 增加、拍攝 `level0_hub_door` 與 `level0_fun_door` 實機截圖）皆通過，`.\gradlew build` 與 `.\gradlew runClientGameTest -Plevels=0` 全部通過
+- 合併遠端 `origin/main`（`cb884c24`）並整合 Level 0 興趣點與家具散布：解決 `Level0.java` 註冊順序衝突（同時保留 `FuseBoxEvents.register()` 與 `Level0Props.register()`），新增 `ZonePoiPlan.isAnyPoiBlock` 供 `Level0Props.tryPlaceAnywhereInChunk`／`canPlacePropInChunk` 避開所有 POI 格；合併後執行 `.\gradlew.bat build` 與 `.\gradlew.bat runClientGameTest -Plevels=0` 全部通過並依使用者要求正常推送 `main` 至 GitHub
