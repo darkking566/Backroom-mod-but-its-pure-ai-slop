@@ -6,12 +6,39 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "noclip_backrooms:glass_tube_shard",
+          "name": "noclip_backrooms:broken_mirror_shard",
           "functions": [
-            { "function": "minecraft:set_count", "count": { "type": "minecraft:uniform", "min": 2, "max": 4 } }
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 2,
+                "max": 4
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:sheet_metal",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
           ]
         }
       ]
     }
-  ]
+  ],
+  "random_sequence": "noclip_backrooms:blocks/prop_glass_partition_broken"
 }

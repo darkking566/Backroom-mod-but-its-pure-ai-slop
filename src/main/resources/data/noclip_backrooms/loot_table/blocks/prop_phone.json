@@ -6,9 +6,38 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "noclip_backrooms:prop_phone"
+          "name": "noclip_backrooms:green_circuit"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:battery_cell"
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:plastic_casing",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 1,
+                "max": 2
+              }
+            }
+          ]
         }
       ]
     }
-  ]
+  ],
+  "random_sequence": "noclip_backrooms:blocks/prop_phone"
 }

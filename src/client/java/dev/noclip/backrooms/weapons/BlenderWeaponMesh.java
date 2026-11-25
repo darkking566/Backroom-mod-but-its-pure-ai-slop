@@ -42,12 +42,17 @@ public final class BlenderWeaponMesh {
 	}
 
 	public static BlenderWeaponMesh get(String meshName) {
-		return CACHE.computeIfAbsent(meshName, BlenderWeaponMesh::load);
+		return getFromResource(BASE_PATH + meshName);
 	}
 
-	private static BlenderWeaponMesh load(String meshName) {
-		Map<String, float[]> mtlColors = loadMtl(meshName);
-		try (InputStream in = BlenderWeaponMesh.class.getResourceAsStream(BASE_PATH + meshName + ".obj")) {
+	/** Loads and caches a Blender OBJ+MTL pair from any classpath resource prefix (without .obj/.mtl extension). */
+	public static BlenderWeaponMesh getFromResource(String resourcePrefix) {
+		return CACHE.computeIfAbsent(resourcePrefix, BlenderWeaponMesh::load);
+	}
+
+	private static BlenderWeaponMesh load(String resourcePrefix) {
+		Map<String, float[]> mtlColors = loadMtl(resourcePrefix);
+		try (InputStream in = BlenderWeaponMesh.class.getResourceAsStream(resourcePrefix + ".obj")) {
 			if (in == null) return EMPTY;
 			List<float[]> verts = new ArrayList<>(1024);
 			List<float[]> norms = new ArrayList<>(1024);
@@ -177,9 +182,9 @@ public final class BlenderWeaponMesh {
 		buf.add(p[0], p[1], p[2], n[0], n[1], n[2], c[0], c[1], c[2]);
 	}
 
-	private static Map<String, float[]> loadMtl(String meshName) {
+	private static Map<String, float[]> loadMtl(String resourcePrefix) {
 		Map<String, float[]> map = new HashMap<>();
-		try (InputStream in = BlenderWeaponMesh.class.getResourceAsStream(BASE_PATH + meshName + ".mtl")) {
+		try (InputStream in = BlenderWeaponMesh.class.getResourceAsStream(resourcePrefix + ".mtl")) {
 			if (in == null) return map;
 			String current = null;
 			try (BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8))) {

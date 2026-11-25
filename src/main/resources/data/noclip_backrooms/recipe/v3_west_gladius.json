@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " I ",
+    " S ",
+    " H "
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "S": "noclip_backrooms:heavy_steel_plate",
+    "H": "noclip_backrooms:weapon_grip_wrap"
+  },
+  "result": {
+    "id": "noclip_backrooms:west_gladius",
+    "count": 1
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "PP",
+    "PP"
+  ],
+  "key": {
+    "P": "noclip_backrooms:plastic_casing"
+  },
+  "result": {
+    "id": "noclip_backrooms:polymer_frame",
+    "count": 2
+  }
+}

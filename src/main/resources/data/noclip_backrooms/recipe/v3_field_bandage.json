@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RGR",
+    "AWA",
+    "RTR"
+  ],
+  "key": {
+    "R": "noclip_backrooms:sterile_bandage",
+    "G": "noclip_backrooms:sterile_gauze",
+    "A": "noclip_backrooms:rubbing_alcohol",
+    "W": "noclip_backrooms:almond_water",
+    "T": "noclip_backrooms:insulating_tape"
+  },
+  "result": {
+    "id": "noclip_backrooms:field_bandage",
+    "count": 1
+  }
+}

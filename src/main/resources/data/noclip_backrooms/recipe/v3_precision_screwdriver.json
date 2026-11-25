@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  I",
+    " S ",
+    "P  "
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "S": "noclip_backrooms:screw_nail_box",
+    "P": "noclip_backrooms:plastic_casing"
+  },
+  "result": {
+    "id": "noclip_backrooms:precision_screwdriver",
+    "count": 1
+  }
+}

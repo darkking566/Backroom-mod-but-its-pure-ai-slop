@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " M ",
+    " P ",
+    " R "
+  ],
+  "key": {
+    "M": "noclip_backrooms:sheet_metal",
+    "P": "noclip_backrooms:black_powder",
+    "R": "noclip_backrooms:plastic_casing"
+  },
+  "result": {
+    "id": "noclip_backrooms:ammo_12g_buck",
+    "count": 8
+  }
+}

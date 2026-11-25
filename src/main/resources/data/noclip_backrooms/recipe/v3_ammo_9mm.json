@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " B ",
+    " P ",
+    " M "
+  ],
+  "key": {
+    "B": "noclip_backrooms:brass_ingot",
+    "P": "noclip_backrooms:black_powder",
+    "M": "noclip_backrooms:sheet_metal"
+  },
+  "result": {
+    "id": "noclip_backrooms:ammo_9mm",
+    "count": 12
+  }
+}

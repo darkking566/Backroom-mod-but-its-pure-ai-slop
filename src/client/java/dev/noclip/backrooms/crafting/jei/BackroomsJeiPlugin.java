@@ -1,7 +1,11 @@
 package dev.noclip.backrooms.crafting.jei;
 
 import dev.noclip.backrooms.BackroomsMod;
+import dev.noclip.backrooms.crafting.BackroomsCrafting;
 import dev.noclip.backrooms.crafting.BackroomsRecipeRegistry;
+import dev.noclip.backrooms.crafting.BackroomsStationMenu;
+import dev.noclip.backrooms.crafting.BackroomsStationScreen;
+import dev.noclip.backrooms.crafting.CraftStationPayload;
 import dev.noclip.backrooms.crafting.StationRecipe;
 import dev.noclip.backrooms.crafting.StationType;
 import dev.noclip.backrooms.items.BackroomsItems;
@@ -9,25 +13,35 @@ import dev.noclip.backrooms.mixin.client.AbstractContainerScreenAccess;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.transfer.IRecipeTransferError;
+import mezz.jei.api.recipe.transfer.IRecipeTransferHandler;
+import mezz.jei.api.recipe.transfer.IRecipeTransferHandlerHelper;
 import mezz.jei.api.recipe.types.IRecipeType;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.registration.IRecipeTransferRegistration;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.ItemLike;
 
 /**
  * JEI Mod Plugin for Noclip: Backrooms.
- * Registers all 4 custom workstation recipe categories, catalysts, recipes, Boss Core / Monster Drop
- * acquisition info, and excludes the RPG Character Stats panel bounds so JEI never overlaps it.
+ * Registers all 6 shaped workstation categories (1->4 Salvage, 3x3 Distiller/Altar, 5x5 Workshop,
+ * 7x7 Primary & 9x9 Ultimate Spiderweb), full '+' recipe transfer into physical grids, Boss Core &
+ * Monster Drop info, and GUI exclusion bounds for the RPG panel & Left Categorized Recipe Book.
  */
 @JeiPlugin
 public final class BackroomsJeiPlugin implements IModPlugin {
@@ -108,6 +122,46 @@ public final class BackroomsJeiPlugin implements IModPlugin {
 	}
 
 	@Override
+	public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
+		IRecipeTransferHandlerHelper helper = registration.getTransferHelper();
+		for (StationType type : StationType.values()) {
+			IRecipeType<StationRecipe> recipeType = RECIPE_TYPES.get(type);
+			MenuType<BackroomsStationMenu> menuType = BackroomsCrafting.menuType(type);
+			registration.addRecipeTransferHandler(new IRecipeTransferHandler<BackroomsStationMenu, StationRecipe>() {
+				@Override
+				public Class<? extends BackroomsStationMenu> getContainerClass() {
+					return BackroomsStationMenu.class;
+				}
+
+				@Override
+				public Optional<MenuType<BackroomsStationMenu>> getMenuType() {
+					return Optional.of(menuType);
+				}
+
+				@Override
+				public IRecipeType<StationRecipe> getRecipeType() {
+					return recipeType;
+				}
+
+				@Override
+				public IRecipeTransferError transferRecipe(BackroomsStationMenu container, StationRecipe recipe,
+						IRecipeSlotsView recipeSlots, Player player, boolean maxTransfer, boolean doTransfer) {
+					if (container.stationType() != type || recipe.station() != type) {
+						return helper.createInternalError();
+					}
+					if (!recipe.canCraftFromInventory(player)) {
+						return helper.createUserErrorWithTooltip(Component.translatable("ui.noclip_backrooms.station.missing_materials"));
+					}
+					if (doTransfer) {
+						ClientPlayNetworking.send(new CraftStationPayload(recipe.id(), maxTransfer));
+					}
+					return null;
+				}
+			}, recipeType);
+		}
+	}
+
+	@Override
 	public void registerGuiHandlers(IGuiHandlerRegistration registration) {
 		registration.addGuiContainerHandler(InventoryScreen.class, new IGuiContainerHandler<>() {
 			@Override
@@ -122,6 +176,13 @@ public final class BackroomsJeiPlugin implements IModPlugin {
 						? (left - panelW - 4)
 						: Math.min(screen.width - panelW - 4, left + width + 4);
 				return List.of(new Rect2i(px, top, panelW, panelH));
+			}
+		});
+
+		registration.addGuiContainerHandler(BackroomsStationScreen.class, new IGuiContainerHandler<>() {
+			@Override
+			public List<Rect2i> getGuiExtraAreas(BackroomsStationScreen screen) {
+				return screen.extraGuiAreas();
 			}
 		});
 	}

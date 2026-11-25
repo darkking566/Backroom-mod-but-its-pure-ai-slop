@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  M",
+    " P ",
+    "R  "
+  ],
+  "key": {
+    "M": "noclip_backrooms:sheet_metal",
+    "P": "noclip_backrooms:ballpoint_pen",
+    "R": "noclip_backrooms:rubber_band_ball"
+  },
+  "result": {
+    "id": "noclip_backrooms:ammo_pen_bolt",
+    "count": 6
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " W ",
+    "CWC",
+    " G "
+  ],
+  "key": {
+    "W": "noclip_backrooms:almond_water",
+    "C": "minecraft:charcoal",
+    "G": "noclip_backrooms:sterile_gauze"
+  },
+  "result": {
+    "id": "noclip_backrooms:purified_almond_essence",
+    "count": 2
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " H ",
+    "RWR",
+    " B "
+  ],
+  "key": {
+    "H": "noclip_backrooms:dry_soil_herbs",
+    "R": "noclip_backrooms:rags",
+    "W": "noclip_backrooms:almond_water",
+    "B": "minecraft:glass_bottle"
+  },
+  "result": {
+    "id": "noclip_backrooms:improvised_calming_tea",
+    "count": 2
+  }
+}

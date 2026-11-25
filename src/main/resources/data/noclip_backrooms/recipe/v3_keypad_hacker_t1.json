@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " G ",
+    "PKP",
+    " B "
+  ],
+  "key": {
+    "G": "noclip_backrooms:green_circuit",
+    "P": "noclip_backrooms:plastic_casing",
+    "K": "noclip_backrooms:office_keyboard",
+    "B": "noclip_backrooms:battery_cell"
+  },
+  "result": {
+    "id": "noclip_backrooms:keypad_hacker_t1",
+    "count": 1
+  }
+}

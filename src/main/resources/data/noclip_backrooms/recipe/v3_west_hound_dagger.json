@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  F",
+    " I ",
+    "H  "
+  ],
+  "key": {
+    "F": "noclip_backrooms:hound_fang",
+    "I": "minecraft:iron_ingot",
+    "H": "noclip_backrooms:weapon_grip_wrap"
+  },
+  "result": {
+    "id": "noclip_backrooms:west_hound_dagger",
+    "count": 1
+  }
+}

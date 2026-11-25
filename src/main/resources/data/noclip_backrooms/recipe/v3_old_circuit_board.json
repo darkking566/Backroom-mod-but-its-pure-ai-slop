@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " C ",
+    "CGC",
+    " R "
+  ],
+  "key": {
+    "C": "noclip_backrooms:copper_wire",
+    "G": "noclip_backrooms:green_circuit",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "noclip_backrooms:old_circuit_board",
+    "count": 2
+  }
+}

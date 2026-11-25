@@ -12,8 +12,11 @@ import dev.noclip.backrooms.crafting.BackroomsCrafting;
 import dev.noclip.backrooms.crafting.BackroomsStationScreen;
 import dev.noclip.backrooms.crafting.StationType;
 import dev.noclip.backrooms.items.armor.BackroomsArmorRenderer;
+import dev.noclip.backrooms.props.BackroomsProps;
+import dev.noclip.backrooms.props.BlenderPropRenderer;
 import dev.noclip.backrooms.weapons.WeaponAnimState;
 import dev.noclip.backrooms.weapons.WeaponCrosshairHud;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import dev.noclip.backrooms.level0p1.robots.Robot;
 import dev.noclip.backrooms.level0p1.robots.RobotModel;
 import dev.noclip.backrooms.level0p1.robots.RobotRenderer;
@@ -75,6 +78,7 @@ public final class BackroomsClient implements ClientModInitializer {
 		for (StationType station : StationType.values()) {
 			MenuScreens.register(BackroomsCrafting.menuType(station), BackroomsStationScreen::new);
 		}
+		BlockEntityRenderers.register(BackroomsProps.PROP_BLOCK_ENTITY, BlenderPropRenderer::new);
 		BackroomsArmorRenderer.registerAll();
 		WeaponAnimState.register();
 		WeaponCrosshairHud.register();

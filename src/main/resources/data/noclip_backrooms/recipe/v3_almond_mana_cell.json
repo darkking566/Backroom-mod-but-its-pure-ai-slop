@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " C ",
+    "CWC",
+    " G "
+  ],
+  "key": {
+    "C": "noclip_backrooms:copper_wire",
+    "W": "noclip_backrooms:almond_water",
+    "G": "minecraft:glass_bottle"
+  },
+  "result": {
+    "id": "noclip_backrooms:almond_mana_cell",
+    "count": 2
+  }
+}

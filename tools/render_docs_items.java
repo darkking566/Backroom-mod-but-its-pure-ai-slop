@@ -88,21 +88,35 @@ public final class render_docs_items {
 		}
 		System.out.println("Rendered " + itemModels.size() + " item PNGs (" + blenderWeaponItems + " Blender weapons + " + cuboidItems + " 3D items) -> " + outItems);
 
-		// 4. Render ALL 58 individual 3D blocks/workstations/furniture/chests into docs/items/blocks/<id>.png (256x256)
+		// 4. Render ALL 59 individual 3D blocks/workstations/furniture/chests into docs/items/blocks/<id>.png (256x256)
+		//    - Uses the TRUE multi-block & half-sliced Blender .obj mesh whenever available in models/blender_props/!
 		Path blockModelsDir = ASSETS.resolve("models/block/crafting");
 		Path blockTexDir = ASSETS.resolve("textures/block/crafting3d");
+		Path blenderPropsDir = ASSETS.resolve("models/blender_props");
 		List<Path> blockModels;
 		try (var stream = Files.list(blockModelsDir)) {
-			blockModels = stream.filter(p -> p.toString().endsWith(".json")).sorted().toList();
+			blockModels = stream.filter(p -> p.toString().endsWith(".json"))
+					.filter(p -> !p.getFileName().toString().equals("prop_part.json"))
+					.sorted().toList();
 		}
+		int blenderPropCount = 0;
 		for (Path modelPath : blockModels) {
 			String id = stripExt(modelPath.getFileName().toString());
-			Path texPath = blockTexDir.resolve(id + ".png");
-			BufferedImage tex = Files.exists(texPath) ? ImageIO.read(texPath.toFile()) : null;
-			BufferedImage img = renderCuboidJson(modelPath, tex, 256, 256, 38.0F, 26.0F);
+			Path propObj = blenderPropsDir.resolve(id + ".obj");
+			BufferedImage img;
+			if (Files.exists(propObj)) {
+				ObjMesh mesh = ObjMesh.load(propObj);
+				int[] pal = propEmissivePalette(id);
+				img = renderObj(mesh, pal[0], pal[1], 320, 320, 214.0F, 18.0F);
+				blenderPropCount++;
+			} else {
+				Path texPath = blockTexDir.resolve(id + ".png");
+				BufferedImage tex = Files.exists(texPath) ? ImageIO.read(texPath.toFile()) : null;
+				img = renderCuboidJson(modelPath, tex, 256, 256, 38.0F, 26.0F);
+			}
 			ImageIO.write(img, "PNG", outBlocks.resolve(id + ".png").toFile());
 		}
-		System.out.println("Rendered " + blockModels.size() + " block PNGs -> " + outBlocks);
+		System.out.println("Rendered " + blockModels.size() + " block PNGs (" + blenderPropCount + " Blender multi-block/sliced props) -> " + outBlocks);
 
 		// 5. Render ALL 6 worn 3D armor set full-suit previews into docs/items/armor/<set>.png (256x256)
 		Map<String, List<String>> armorSetPieces = new LinkedHashMap<>();
@@ -129,6 +143,17 @@ public final class render_docs_items {
 	// 1. BLENDER WEAPON MAPPING (mirrors BlenderWeaponRenderer.java 1:1)
 	// =========================================================================
 	private record WeaponSpec(String meshName, int primaryRgb, int secondaryRgb, boolean isFirearm) {}
+
+	private static int[] propEmissivePalette(String id) {
+		if (id.contains("red_anomaly")) return new int[]{0xFF223C, 0xCC1828};
+		if (id.contains("crystal_vein")) return new int[]{0x3CE4FF, 0xA848FF};
+		if (id.contains("neon_sign") || id.contains("arcade")) return new int[]{0xFF38B8, 0x2CE8FF};
+		if (id.contains("boiler") || id.contains("chandelier") || id.contains("floor_lamp")) return new int[]{0xFFB844, 0xFF6622};
+		if (id.contains("vending") || id.contains("water_cooler")) return new int[]{0x56E4FF, 0xFF4448};
+		if (id.contains("computer") || id.contains("crt_tv") || id.contains("phone")) return new int[]{0x48E898, 0x44A8FF};
+		if (id.contains("noclipped")) return new int[]{0x8C58FF, 0x28D8FF};
+		return new int[]{0x66D8FF, 0xFF5252};
+	}
 
 	private static float yawForMesh(String name) {
 		if (name.startsWith("gun_") || name.equals("office_crossbow")) return 68.0F;

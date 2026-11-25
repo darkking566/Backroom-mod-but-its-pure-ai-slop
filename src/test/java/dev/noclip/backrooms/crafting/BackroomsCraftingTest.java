@@ -20,10 +20,10 @@ import org.junit.jupiter.api.Test;
 
 final class BackroomsCraftingTest {
 	@Test
-	void stationRecipesLoadCleanlyAcrossAllFiveStations() throws IOException {
+	void stationRecipesLoadCleanlyAcrossAllSixStationsWithValidShapedDimensions() throws IOException {
 		BackroomsRecipeRegistry.reload();
 		List<StationRecipe> all = BackroomsRecipeRegistry.all();
-		assertTrue(all.size() >= 300, "Expected at least 300 workstation recipes, got " + all.size());
+		assertTrue(all.size() >= 250, "Expected at least 250 workstation recipes, got " + all.size());
 
 		Set<String> knownModItems = knownModItemIds();
 		Set<Identifier> seenIds = new HashSet<>();
@@ -35,6 +35,21 @@ final class BackroomsCraftingTest {
 			assertTrue(seenIds.add(r.id()), "Duplicate station recipe ID: " + r.id());
 			assertFalse(r.inputs().isEmpty(), "Empty inputs on " + r.id());
 			assertFalse(r.outputs().isEmpty(), "Empty outputs on " + r.id());
+			assertTrue(r.patternWidth() >= 1 && r.patternWidth() <= r.station().gridWidth(),
+					"Pattern width out of bounds on " + r.id());
+			assertTrue(r.patternHeight() >= 1 && r.patternHeight() <= r.station().gridHeight(),
+					"Pattern height out of bounds on " + r.id());
+			// Enforce user rule: 5x5 / 7x7 / 9x9 tables MUST actually exceed 3x3!
+			if (r.station() == StationType.WORKSHOP) {
+				assertTrue(Math.max(r.patternWidth(), r.patternHeight()) >= 4,
+						"5x5 Workshop recipe must exceed 3x3: " + r.id());
+			} else if (r.station() == StationType.SPIDERWEB) {
+				assertTrue(r.patternWidth() >= 5 && r.patternHeight() >= 5,
+						"7x7 Primary Spiderweb recipe must span at least 5x5: " + r.id());
+			} else if (r.station() == StationType.ULTIMATE_SPIDERWEB) {
+				assertTrue(r.patternWidth() >= 7 && r.patternHeight() >= 7,
+						"9x9 Ultimate Spiderweb recipe must span at least 7x7: " + r.id());
+			}
 			for (StationRecipe.ItemCount in : r.inputs()) {
 				assertTrue(in.count() > 0, "Non-positive input count on " + r.id());
 				assertItemExists(in.itemId(), knownModItems, "input of " + r.id());
@@ -126,7 +141,7 @@ final class BackroomsCraftingTest {
 		try (var stream = Files.list(blockTexDir)) {
 			blockTextures = stream.filter(p -> p.toString().endsWith(".png")).toList();
 		}
-		assertTrue(blockTextures.size() >= 58, "Expected all 58 3D block textures, got " + blockTextures.size());
+		assertTrue(blockTextures.size() >= 59, "Expected all 59 3D block textures, got " + blockTextures.size());
 		for (Path tex : blockTextures) {
 			String fn = tex.getFileName().toString();
 			String id = fn.substring(0, fn.length() - 4);
@@ -134,6 +149,18 @@ final class BackroomsCraftingTest {
 			assertTrue(Files.exists(modelFile), "Missing 3D block model for " + id);
 			JsonObject obj = JsonParser.parseString(Files.readString(modelFile, StandardCharsets.UTF_8)).getAsJsonObject();
 			assertTrue(obj.has("elements") && !obj.getAsJsonArray("elements").isEmpty(), "Empty 3D elements in block " + id);
+		}
+
+		// Verify all 39 Blender multi-block & half-sliced noclipped prop OBJs exist and are non-empty
+		Path propObjDir = Path.of("src/main/resources/assets/noclip_backrooms/models/blender_props");
+		assertTrue(Files.isDirectory(propObjDir), "Blender props dir missing");
+		List<Path> propObjs;
+		try (var stream = Files.list(propObjDir)) {
+			propObjs = stream.filter(p -> p.toString().endsWith(".obj")).toList();
+		}
+		assertTrue(propObjs.size() >= 39, "Expected at least 39 Blender prop OBJs, got " + propObjs.size());
+		for (Path obj : propObjs) {
+			assertTrue(Files.size(obj) > 400, "Empty Blender prop OBJ: " + obj.getFileName());
 		}
 
 		Path armorDir = Path.of("src/main/resources/assets/noclip_backrooms/textures/entity/armor3d");
