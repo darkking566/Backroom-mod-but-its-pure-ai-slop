@@ -356,6 +356,7 @@
   - `Level1ClientTest` 新增 `placeFacing` 段：創造模式真的從四個方向右鍵擺放這 5 種，檢查朝向；四個方向的病床與睡袋拍照，枕頭方向都對
   - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=placeFacing,checkBlocks,rooms,wikiSettlements` 通過，log 沒有缺模型
   - 沒做（審查報告其餘）：櫃檯、門框、出口門、日光燈、收費亭柵欄桿的擺放朝向
+- 使用者同意後，把 `main` 推送到 GitHub（`98c7a3c` 辦公桌與床的擺放朝向與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
