@@ -184,6 +184,8 @@
   - `build.gradle` 加 `-Pshaders`：自動測試時從 `run/` 複製 Iris、Sodium、光影包到測試用遊戲，套用推薦設定並開啟光影
   - 新增 `docs/look/STYLE_GUIDE.md`（規範）與 `docs/look/SOP.md`（每層流程與規格表）；`AGENTS.md` 加一行指向這兩份；`docs/look/README.md` 加連結
   - 還沒做：開光影的實機截圖與設定調整（使用者的遊戲開著，先不跑 Gradle 測試）；`gradlew help` 確認 build.gradle 能讀
+- 開光影的實機測試（`-Plevels=look -Pshaders`）通過：Iris 載入後室版 Complementary 與推薦設定；燈下一圈暖光、沒燈處幾乎全黑，寫實材質與攝影機濾鏡在光影下都有作用；加 `ATM_FOG_DISTANCE=15` 後有燈處多一層霧氣、遠處朦朧、暗處沒變亮；推薦設定、`STYLE_GUIDE.md` 更新，新增 `docs/look/level0_shaders.jpg`
+- 使用者要搭配光影，幫使用者本機 `run/` 設好（三個原檔先備份到暫存區）：`run/shaderpacks/ComplementaryUnbound_r5.10_Backrooms.txt` 換成推薦設定（保留使用者的 `LIGHT_COLOR_MULTS`，彩色光追蹤改關）、`run/config/iris.properties` 光影改回開啟（使用者 16:15 照建議關掉過）；寫實材質包使用者 16:16 已經自己重新打開，沒改
 
 ## 動作記錄（Antigravity）
 

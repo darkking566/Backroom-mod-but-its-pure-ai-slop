@@ -42,7 +42,8 @@
 - 推薦設定放在 [`shaders/`](shaders/)，檔名跟光影包同名（`ComplementaryUnbound_r5.10_Backrooms.txt`）。
 - `RP_MODE=3`（labPBR）一定要開，光影包才會用我們的 `_n`、`_s`。
 - 光影包把我們的維度當成「沒有天空光的洞穴」，最暗的程度由 `CAVE_LIGHTING` 決定，沒燈的地方暗不暗主要看它和 `AMBIENT_MULT`。
-- 光影包不讀遊戲本身的霧距離，所以開光影時「看不到遠處」主要靠暗，不靠霧。
+- 光影包不讀遊戲本身的霧距離，所以開光影時「看不到遠處」主要靠暗；另外 `ATM_FOG_DISTANCE=15`（大氣霧拉近）會在有燈的地方加一層淡淡的霧氣、遠處變朦朧，暗處不會被霧弄亮。洞穴霧的濃度寫死在光影包裡，調不動。
+- 目前的推薦值（Level 0 用實機截圖看過）：`RP_MODE=3`、`CAVE_LIGHTING=15`、`AMBIENT_MULT=60`、`DIRECTIONAL_BLOCKLIGHT=7`、`TM_CONTRAST=1.15`、`T_SATURATION=0.85`、`TM_DARK_DESATURATION=0.50`、`BLOOM_STRENGTH=0.16`、`CHROMA_ABERRATION=2`、`ATM_FOG_DISTANCE=15`。彩色光追蹤（`COLORED_LIGHTING`）建議關：它認不得模組的燈，而且很吃效能。開光影的對照圖：[level0_shaders.jpg](level0_shaders.jpg)。
 - 調設定時兩種都要拍照比對（見 [SOP.md](SOP.md)）。
 
 ## 六、驗收
