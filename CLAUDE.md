@@ -364,6 +364,7 @@
   - 9 個方塊狀態加上 `axis`（日光燈是 `axis`×`lit`）；`tools/make_level1.py` 同步（沒重跑）
   - `Level1ClientTest` 的 `placeFacing` 段加這 9 種，從兩個方向右鍵擺放並檢查
   - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=placeFacing,checkBlocks,blackout,exits,wikiSettlements,views,leaveThroughDoor` 通過，log 沒有缺模型；看過日光燈與出口門截圖沒變；玩家擺放後的樣子沒拍照
+- 使用者同意後，把 `main` 推送到 GitHub（`efd01d8` 櫃檯、門框、出口門、日光燈、柵欄桿的擺放朝向與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
