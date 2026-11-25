@@ -313,6 +313,12 @@
 
 - Level 2 俯視地圖 `MapDump` 補上後來加的內容：悶熱（鏽紅）、極寒（淡藍）、毒氣（病綠）、辦公室走廊（米白）、積水（青綠＝積水地板、藍＝淹水半磚）、鐵軌（暗紅）、排水格柵與電纜槽（深灰點）、錯位牆（亮粉紅）、牆面掛件（黃點）、EL3A（青色）與 Macchina（暗黃銅）；圖例寫在類別說明裡；產出一張存到 `docs/levels/level2/map.png`；只跑了 MapDump 本身
 - 使用者同意推送：抓 GitHub 後發現 Antigravity 已把 `main` 推到 `c5d1bd2`，裡面已包含 Level 1 審查報告四批修正（`95bfcae`、`3ae9f75`、`03ef92a`、`f7d32f8`），只推這筆紀錄；沒有強制推送、沒有改寫歷史
+- Level 1 寫實材質包：新增 `tools/make_level1_realistic.py`（沿用 `make_level0p1_realistic` 的合成法與已下載的 ambientCG CC0 照片），238 張 512 像素貼圖加 `_n`／`_s` 寫到資源包 `textures/block/level1/`（約 121 MB）；依名稱分水泥 77、鋼 40、木 26、烤漆 17、磚 12、布 9、鏽 5、保留原畫 52（玻璃、燈、霓虹、招牌、植物等）
+  - 水泥：試過 Concrete034（抹痕每塊重複）與 Concrete019 原樣（大片雲斑每塊重複），改成只取 Concrete019 的細紋（減去模糊）、強度 0.045，且每張貼圖用照片不同位置
+  - 閃爍壁紙（動畫）沒做，維持 128 像素原畫
+  - 資源包描述改成「Level 0、0.1、1 與 2」（`pack.mcmeta`、兩個語言檔、`make_level0_realistic.py`／`make_level2_realistic.py` 裡的描述同步）；`docs/look/README.md` 更新；對照圖 `docs/look/level1_realistic.png`
+  - 驗證：`gradlew build` 通過；`runClientGameTest -Plevels=1,look -Psections=views,sectors` 通過，log 沒有缺貼圖；看過停車場、走廊、哥德區截圖
+  - 注意：資源包變大很多（Level 1 這份約 121 MB），模組 jar 與 git 倉庫會跟著變大
 
 ## 動作記錄（Antigravity）
 
