@@ -348,6 +348,7 @@
   - 天花板水管查過沒有懸空（每根上面都是實心），沒改
   - `Level1ClientTest` 新增 `pipeFit` 段：2 個種子、20 個管線區，每根天花板水管（所有高度）上面要是實心、每個儀表背後要是實心；改之前 14 個儀表懸空，改之後 0 個（93355 根水管、3256 個儀表）
   - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=pipeFit,sectors` 通過；沒在遊戲畫面上看過管線區
+- 使用者同意後，把 `main` 推送到 GitHub（`c5b45e6` 管線區儀表不懸空與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
