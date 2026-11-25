@@ -64,7 +64,8 @@ class ZenithLayoutTest {
 		for (int i = 0; i < 20000; i++) {
 			double yaw = i * 2.399963, pitch = Math.asin(((i * 0.618034) % 1.0) * 2 - 1);
 			int x = (int) (478.5 * Math.cos(pitch) * Math.cos(yaw)), y = (int) (478.5 * Math.sin(pitch)), z = (int) (478.5 * Math.cos(pitch) * Math.sin(yaw));
-			if (ZenithLayout.kind(ZenithLayout.cell(seed, x, y, z)) == Kind.WINDOW) windows++;
+			Kind at = ZenithLayout.kind(ZenithLayout.cell(seed, x, y, z));
+			if (at == Kind.WINDOW || at == Kind.WINDOW_CLEAR) windows++;
 		}
 		for (int x = 545; x < 680; x += 2) {
 			for (int y = -30; y < 30; y++) {
@@ -145,7 +146,7 @@ class ZenithLayoutTest {
 		long seed = SEEDS[1];
 		for (int[] p : new int[][] {{0, 478, 0}, {478, 0, 0}, {0, 0, 478}, {0, -478, 0}, {250, 200, 355}, {-250, -200, -355}}) {
 			Kind kind = ZenithLayout.kind(ZenithLayout.cell(seed, p[0], p[1], p[2]));
-			assertTrue(kind == Kind.HULL || kind == Kind.HULL_SEAM || kind == Kind.WINDOW || kind == Kind.AIR, kind.name());
+			assertTrue(kind == Kind.HULL || kind == Kind.HULL_SEAM || kind == Kind.WINDOW || kind == Kind.WINDOW_CLEAR || kind == Kind.AIR, kind.name());
 		}
 	}
 

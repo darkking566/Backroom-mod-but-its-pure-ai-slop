@@ -183,6 +183,10 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 		}
 	}
 
+	private static boolean isWindow(ZenithLayout.Kind kind) {
+		return kind == ZenithLayout.Kind.WINDOW || kind == ZenithLayout.Kind.WINDOW_CLEAR;
+	}
+
 	private static double pick0(int cell, double direction, double distance) {
 		return cell + 0.5 + direction * distance;
 	}
@@ -197,7 +201,7 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 			int x = (int) (478.5 * dx), y = (int) (478.5 * dy), z = (int) (478.5 * dz);
 			double distance = Math.hypot(Math.hypot(x - from.getX(), y - from.getY()), z - from.getZ());
 			final double px = x, py = y, pz = z;
-			if (distance >= best || done.stream().anyMatch(d -> Math.hypot(Math.hypot(d[0] - px, d[1] - py), d[2] - pz) < 40) || ZenithLayout.kind(ZenithLayout.cell(seed, x, y, z)) != ZenithLayout.Kind.WINDOW) continue;
+			if (distance >= best || done.stream().anyMatch(d -> Math.hypot(Math.hypot(d[0] - px, d[1] - py), d[2] - pz) < 40) || !isWindow(ZenithLayout.kind(ZenithLayout.cell(seed, x, y, z)))) continue;
 			int cx = (int) Math.round(473.5 * dx), cz = (int) Math.round(473.5 * dz), cy = (int) Math.round(473.5 * dy);
 			int fy = cy;
 			while (fy > cy - 6 && ZenithLayout.passable(ZenithLayout.cell(seed, cx, fy - 1, cz))) fy--;
@@ -210,7 +214,7 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 				int rx = (int) Math.floor(pick0(cx, hx, r)), rz = (int) Math.floor(pick0(cz, hz, r));
 				ZenithLayout.Kind kind = ZenithLayout.kind(ZenithLayout.cell(seed, rx, fy + 1, rz));
 				if (ZenithLayout.passable(ZenithLayout.cell(seed, rx, fy + 1, rz)) && ZenithLayout.passable(ZenithLayout.cell(seed, rx, fy, rz))) continue;
-				clear = kind == ZenithLayout.Kind.WINDOW && r > 2;
+				clear = isWindow(kind) && r > 2;
 				break;
 			}
 			if (!clear) continue;
@@ -540,6 +544,9 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 		shoot(context, game, x0 + 3.5, y + 0.6, z0 - 2.0, 25, 20, "level0p1_props_coat");
 	}
 
+	private static final java.util.Set<Block> SALVAGED = java.util.Set.of(ZenithBlocks.HANGING_CABLES, ZenithBlocks.CONSOLE,
+			ZenithBlocks.BROKEN_CONSOLE, ZenithBlocks.SERVER_RACK);
+
 	/** Every block has a name and drops itself (the unbreakable ones have no drops). */
 	private void blocks(TestSingleplayerContext game) {
 		game.getServer().runOnServer(s -> {
@@ -548,6 +555,11 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 				check(Language.getInstance().has(block.getDescriptionId()), "no name for " + block);
 				if (block.getLootTable().isEmpty() || block instanceof DoorBlock) continue;
 				var drops = Block.getDrops(block.defaultBlockState(), level, new BlockPos(3, 3, 3), null);
+				// Wiring and electronics break down into materials instead (make_level0p1_props.SALVAGE).
+				if (SALVAGED.contains(block)) {
+					check(drops.stream().noneMatch(d -> d.is(block.asItem())), block + " drops itself instead of materials"); // a cable may yield nothing
+					continue;
+				}
 				check(drops.size() == 1 && drops.getFirst().is(block.asItem()), block + " does not drop itself");
 			}
 		});

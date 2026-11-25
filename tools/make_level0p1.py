@@ -122,6 +122,14 @@ def hull_seam():
     return m
 
 
+def hull_glass():
+    """The hull's inner layers of an outer window: clear, faintly tinted, no frame (the outer pane has the frame)."""
+    m = flat((176, 208, 226), 0.95, 200)
+    glint = step(0.0, 1.0, 1 - np.abs((X + Y * 0.6) % 90 - 22) / 5) * 0.2
+    ALPHA["hull_glass"] = 22.0 + glint * 50
+    return m
+
+
 def inner_hull_plate():
     m = plate((206, 211, 216), 21, 0.85, 120, 64, 0.18)
     paint(m, lines(64, 0.7, axes="y") * 0.0 + box(-2, 58, 130, 61), (96, 190, 220), glow=0.7)
@@ -841,7 +849,7 @@ def variants():
 def all_textures():
     t = {
         "hull_plate": hull_plate(), "hull_seam": hull_seam(), "inner_hull_plate": inner_hull_plate(),
-        "observation_glass": observation_glass(), "bulkhead": bulkhead(),
+        "observation_glass": observation_glass(), "hull_glass": hull_glass(), "bulkhead": bulkhead(),
         "deck_floor": deck_floor(), "station_corridor_floor": corridor_floor(), "station_corridor_floor_stripe": corridor_floor_stripe(),
         "quarters_carpet": quarters_carpet(), "kitchen_tile": kitchen_tile(), "gym_mat": gym_mat(), "garden_floor": garden_floor(),
         "worn_floor": worn_floor(), "hazard_floor": hazard_floor(), "deck_ceiling": deck_ceiling(),
@@ -1022,7 +1030,7 @@ def model_orb():
 
 DOOR_MODELS = ("bottom_left", "bottom_left_open", "bottom_right", "bottom_right_open",
                "top_left", "top_left_open", "top_right", "top_right_open")
-CUBES = ["hull_plate", "hull_seam", "inner_hull_plate", "observation_glass", "bulkhead", "deck_floor", "station_corridor_floor",
+CUBES = ["hull_plate", "hull_seam", "inner_hull_plate", "observation_glass", "hull_glass", "bulkhead", "deck_floor", "station_corridor_floor",
          "station_corridor_floor_stripe", "quarters_carpet", "kitchen_tile", "gym_mat", "garden_floor", "worn_floor", "hazard_floor",
          "deck_ceiling", "ceiling_light", "dead_ceiling_light", "wall_panel", "quarters_wall", "kitchen_wall", "gym_wall",
          "damaged_wall", "frost_wall", "scorched_wall", "frost_floor", "scorched_floor", "frost_ceiling", "scorched_ceiling", "stair_core", "dead_stair_core", "station_crate", "doorway_frame", "static_tear", "truss", "girder",
@@ -1146,7 +1154,7 @@ ITEM_MODEL = {"station_stairs": "station_stairs", "safety_rail": "safety_rail_in
               "plasma": "plasma_0", "station_crate": "station_crate"}
 FACING_MODEL = {"crew_bed": "crew_bed", "crew_locker": "crew_locker", "server_rack": "server_rack", "kitchen_counter": "kitchen_counter", "stove": "stove",
                 "treadmill": "treadmill", "weight_rack": "weight_rack", "console": "console", "broken_console": "broken_console"}
-UNBREAKABLE = {"hull_plate", "hull_seam", "inner_hull_plate", "observation_glass", "station_hatch", "yellow_doorway", "doorway_frame",
+UNBREAKABLE = {"hull_plate", "hull_seam", "inner_hull_plate", "observation_glass", "hull_glass", "station_hatch", "yellow_doorway", "doorway_frame",
                "static_tear", "singularity_core", "singularity_shell", "plasma"}
 
 
@@ -1228,7 +1236,7 @@ def check(blockstates):
 # The shared files: language, mining tags, sounds
 
 LANG_EN = {
-    "hull_plate": "Hull Plate", "hull_seam": "Hull Seam", "inner_hull_plate": "Inner Hull Plate", "observation_glass": "Observation Glass",
+    "hull_plate": "Hull Plate", "hull_seam": "Hull Seam", "inner_hull_plate": "Inner Hull Plate", "observation_glass": "Observation Glass", "hull_glass": "Hull Glass",
     "bulkhead": "Bulkhead", "deck_floor": "Deck Floor", "station_corridor_floor": "Corridor Floor", "station_corridor_floor_stripe": "Marked Corridor Floor",
     "quarters_carpet": "Quarters Carpet", "kitchen_tile": "Galley Tile", "gym_mat": "Gym Mat", "garden_floor": "Hydroponic Moss",
     "worn_floor": "Worn Deck Floor", "hazard_floor": "Hazard Floor", "deck_ceiling": "Deck Ceiling", "ceiling_light": "Ceiling Light",
@@ -1244,7 +1252,7 @@ LANG_EN = {
     "singularity_core": "Singularity Core", "singularity_shell": "Singularity Shell", "plasma": "Plasma",
 }
 LANG_ZH = {
-    "hull_plate": "外殼板", "hull_seam": "外殼接縫", "inner_hull_plate": "內殼板", "observation_glass": "觀景玻璃",
+    "hull_plate": "外殼板", "hull_seam": "外殼接縫", "inner_hull_plate": "內殼板", "observation_glass": "觀景玻璃", "hull_glass": "外殼玻璃",
     "bulkhead": "隔艙壁", "deck_floor": "甲板地板", "station_corridor_floor": "走廊地板", "station_corridor_floor_stripe": "標線走廊地板",
     "quarters_carpet": "寢室地毯", "kitchen_tile": "廚房地磚", "gym_mat": "健身墊", "garden_floor": "水培苔蘚",
     "worn_floor": "磨損甲板", "hazard_floor": "警示地板", "deck_ceiling": "甲板天花板", "ceiling_light": "天花板燈",
@@ -1321,15 +1329,26 @@ def update_lang():
         path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf8")
 
 
+# Blocks not mined with a pickaxe: wood with an axe, moss with a hoe, cloth and carpet with anything (no tag, like wool).
+TOOL = {"crew_desk": "axe", "wall_frame": "axe", "hanging_vines": "axe", "garden_floor": "hoe",
+        "quarters_carpet": None, "gym_mat": None, "mat_stack": None}
+
+
 def update_tags(unbreakable_free):
-    path = DATA / "minecraft/tags/block/mineable/pickaxe.json"
-    data = json.loads(path.read_text(encoding="utf8"))
-    values = data["values"]
+    tags = {}
+    for tool in ("pickaxe", "axe", "hoe"):
+        path = DATA / f"minecraft/tags/block/mineable/{tool}.json"
+        tags[tool] = (path, json.loads(path.read_text(encoding="utf8")) if path.exists() else {"replace": False, "values": []})
     for name in unbreakable_free:
         entry = f"noclip_backrooms:{name}"
-        if entry not in values:
-            values.append(entry)
-    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf8")
+        want = TOOL.get(name, "pickaxe")
+        for tool, (_, data) in tags.items():
+            if tool == want and entry not in data["values"]:
+                data["values"].append(entry)
+            elif tool != want and entry in data["values"]:
+                data["values"].remove(entry)
+    for path, data in tags.values():
+        path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf8")
 
 
 def update_sounds():

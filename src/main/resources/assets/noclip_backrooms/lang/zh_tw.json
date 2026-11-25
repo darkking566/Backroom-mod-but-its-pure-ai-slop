@@ -603,5 +603,6 @@
   "message.noclip_backrooms.level0p1.rhea.0": "【筆記】愛因斯坦－羅森橋，第 41 次運轉：場穩住了。倒數已設定。成功的話，往後沒有人會離任何地方太遠。",
   "message.noclip_backrooms.level0p1.rhea.1": "【筆記】倒數螢幕全都停在零。已經停很久了。我不記得自己關過它們。",
   "message.noclip_backrooms.level0p1.rhea.2": "【筆記】橋沒有開在我們瞄準的地方，它開在我們腳下。我看見了站的外面，然後就看不見了。",
-  "message.noclip_backrooms.level0p1.rhea.3": "【筆記】沒有人回應。走廊現在是黃色的，我一直在走。我只是想坐下來一下。"
+  "message.noclip_backrooms.level0p1.rhea.3": "【筆記】沒有人回應。走廊現在是黃色的，我一直在走。我只是想坐下來一下。",
+  "block.noclip_backrooms.hull_glass": "外殼玻璃"
 }

@@ -84,6 +84,7 @@ final class ZenithChunkGenerator extends ChunkGenerator {
 			case HULL_SEAM -> ZenithBlocks.HULL_SEAM.defaultBlockState();
 			case SKIN_PLATE -> ZenithBlocks.INNER_HULL_PLATE.defaultBlockState();
 			case WINDOW -> ZenithBlocks.OBSERVATION_GLASS.defaultBlockState();
+			case WINDOW_CLEAR -> ZenithBlocks.HULL_GLASS.defaultBlockState();
 			case BULKHEAD -> ZenithBlocks.BULKHEAD.defaultBlockState();
 			case FLOOR -> ZenithBlocks.DECK_FLOOR.defaultBlockState();
 			case FLOOR_CORRIDOR -> ZenithBlocks.CORRIDOR_FLOOR.defaultBlockState();

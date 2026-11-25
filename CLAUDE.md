@@ -215,6 +215,16 @@
   - 新增單元測試 `furnitureHangsOnSomethingAndNoPocketIsSealed`（壁掛物背後是牆、吊掛物往上一定碰到天花板、狹長深室角落是實心）；先用改之前的程式跑過，確認會失敗
   - `gradlew build` 與 `runClientGameTest -Plevels=0.1 -Psections=rooms,variants,doors,robots` 通過，截圖看過合併大廳、挑高房、下沉池、隔間、狹長深室
 - 使用者同意推 5 個提交後，把 `main` 推送到 GitHub 到 `d2bf5cc` 為止（Antigravity 的 Level 2 寫實材質與隱藏出口 `3156447`、`68343bd`，我的 Level 0 卡死修正、畫面修正與補完 `74704bd`、`491a94e`、`d2bf5cc`）；Level 2 這兩個提交我沒重跑測試；之後的 3 個 Level 0.1 審查修正（`2e06b66`、`ab64a57`、`8e53852`）與這筆紀錄還沒推；沒有強制推送、沒有改寫歷史
+- Level 0.1 審查報告第四批：
+  - 外窗：只有最外層是有框的觀景玻璃，外殼內側幾層改成新方塊 `hull_glass`（無框、近乎透明、打不壞，`Kind.WINDOW_CLEAR`），看出去只剩一層窗框
+  - 停電：掃描高度從頭頂 10 格改成 48 格（挑高房、水培大廳的天花板燈也會熄、會亮回）
+  - 環境音：開新世界（`SERVER_STARTED`）時清掉上一個世界留下的計時，不再靜音很久
+  - 自動門：一扇開／關時，同面向、鉸鏈相反的隔壁那扇一起動（`ZenithDoorBlock.setOpen`）；門的開關聲改成站內的氣壓聲（`BlockSetType` 的開關音效），不再鐵門聲加活塞聲疊兩次。門還是原版的轉開，沒有做成滑門
+  - 機器人：拿掉服務機器人臉上的白框（`make_robots.py` 空的 `rect`）；服務機器人的紅眼加發光層 `servant_eyes.png`（`RobotRenderer`）；挨打與損毀改成鐵傀儡的金屬聲
+  - 選取框：`ZenithFacingBlock` 依方向轉選取框；壁掛物（相框、吊鍋、鏡子、倒數螢幕、實驗袍）的框貼在牆面；桌上雜物與疊盤的框往下 3 像素對準模型。放在一般地板上的雜物仍會陷進地板 3 像素（模型就是這樣做的）
+  - 挖掘標籤：書桌、相框、垂藤改用斧頭，苔蘚地板用鋤頭（新增 `mineable/hoe.json`），地毯、健身墊、墊子堆不屬於任何工具；`make_level0p1.update_tags` 依 `TOOL` 表寫入，重跑腳本不會再加回十字鎬
+  - `blocks` 測試段：會拆成材料的四種方塊（電纜、控制台、壞控制台、機櫃）改成檢查不會掉自己
+  - `gradlew build` 與完整 `runClientGameTest -Plevels=0.1`（全部段落，含 `blocks`）通過；看過窗外、停電、機器人、開門截圖，紅眼在截圖裡太小沒確認到，選取框沒有實際用準星看
 
 ## 動作記錄（Antigravity）
 

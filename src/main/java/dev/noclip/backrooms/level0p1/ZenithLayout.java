@@ -42,7 +42,7 @@ final class ZenithLayout {
 	private static final long BULK_OUT2 = (long) (RI + SKIN + PROMENADE + 1) * (RI + SKIN + PROMENADE + 1);
 
 	enum Kind {
-		AIR(true), HULL, HULL_SEAM, SKIN_PLATE, WINDOW, BULKHEAD,
+		AIR(true), HULL, HULL_SEAM, SKIN_PLATE, WINDOW, WINDOW_CLEAR, BULKHEAD,
 		FLOOR, FLOOR_CORRIDOR, FLOOR_STRIPE, FLOOR_QUARTERS, FLOOR_KITCHEN, FLOOR_GYM, FLOOR_GARDEN, FLOOR_WORN, FLOOR_HAZARD, FLOOR_FROST, FLOOR_SCORCH,
 		CEILING, LIGHT, DEAD_LIGHT, CEILING_FROST, CEILING_SCORCH,
 		WALL, WALL_QUARTERS, WALL_KITCHEN, WALL_GYM, WALL_DAMAGED, WALL_FROST, WALL_SCORCH,
@@ -140,7 +140,8 @@ final class ZenithLayout {
 	// The outer hull
 
 	private static int hull(long seed, int x, int y, int z, long d2) {
-		if (window(seed, x, y, z, d2)) return of(Kind.WINDOW);
+		// Only the outer face of a window has a framed pane; the hull's inner layers are clear glass, so it reads as one window, not three.
+		if (window(seed, x, y, z, d2)) return of(d2 >= OUTER2 ? Kind.WINDOW : Kind.WINDOW_CLEAR);
 		boolean seam = (x & 15) == 0 || (y & 15) == 0 || (z & 15) == 0;
 		if (d2 >= OUTER2) return of(seam ? Kind.HULL_SEAM : Kind.HULL);
 		return of(((x + y + z) & 7) == 0 ? Kind.HULL_SEAM : Kind.HULL);

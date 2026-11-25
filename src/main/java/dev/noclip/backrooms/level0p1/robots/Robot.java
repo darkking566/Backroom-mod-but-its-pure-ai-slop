@@ -82,6 +82,16 @@ public class Robot extends PathfinderMob {
 	}
 
 	@Override
+	protected SoundEvent getHurtSound(net.minecraft.world.damagesource.DamageSource source) {
+		return SoundEvents.IRON_GOLEM_HURT;
+	}
+
+	@Override
+	protected SoundEvent getDeathSound() {
+		return SoundEvents.IRON_GOLEM_DEATH;
+	}
+
+	@Override
 	public int getAmbientSoundInterval() {
 		return 200;
 	}

@@ -3,6 +3,7 @@ package dev.noclip.backrooms.level0p1;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -32,6 +33,14 @@ final class ZenithAmbience {
 
 	static void register() {
 		ServerTickEvents.END_SERVER_TICK.register(ZenithAmbience::tick);
+		// The times are server ticks, which start from 0 in every world: what was due in the last one must not wait here.
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
+			NEXT_HUM.clear();
+			NEXT_ALARM.clear();
+			NEXT_VOICE.clear();
+			NEXT_CREAK.clear();
+			ANNOUNCING.clear();
+		});
 	}
 
 	private static void tick(MinecraftServer server) {
