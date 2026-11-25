@@ -71,6 +71,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			if (only("views")) views(context, game, seed);
 			if (only("sectors")) sectors(context, game, seed);
 			if (only("sectorFit")) sectorFit();
+			if (only("pipeFit")) pipeFit();
 			if (only("exits")) exits(context, game, seed);
 			if (only("events")) events(context, game, seed);
 			if (only("settlements")) settlements(context, game, seed);
@@ -1325,6 +1326,50 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		for (var e : tally.entrySet()) {
 			if (e.getValue()[0] == 0) throw new AssertionError(e.getKey() + ": every span was dropped");
 		}
+	}
+
+	/** In the pipe area (the way to Level 2), every ceiling pipe hangs from a real ceiling and every gauge sits on a real pillar. */
+	private static void pipeFit() {
+		int D = Level1Layout.DISTRICT, FLOOR = Level1ChunkGenerator.FLOOR_Y;
+		int size = D * 4;  // Level1Layout's sector region: 4 districts
+		int zones = 0, pipes = 0, gauges = 0;
+		java.util.List<String> bad = new java.util.ArrayList<>();
+		for (long seed = 0; seed < 2; seed++) {
+			for (int rx = -4; rx <= 4; rx++) {
+				for (int rz = -4; rz <= 4; rz++) {
+					int cx = rx * size + size / 2, cz = rz * size + size / 2;
+					if (Level1Layout.pipeZone(seed, cx, cz) < 0) continue;
+					zones++;
+					for (int x = cx - 100; x <= cx + 100; x++) {
+						for (int z = cz - 100; z <= cz + 100; z++) {
+							if (Level1Layout.pipeZone(seed, x, z) < 0) continue;
+							int top = Level1Elevation.ceilingY(seed, Math.floorDiv(x, D), Math.floorDiv(z, D));
+							for (int y = FLOOR + 1; y < top; y++) {
+								if (!Level1ChunkGenerator.blockAt(seed, x, y, z).is(Level1Blocks.CEILING_PIPE)) continue;
+								pipes++;
+								if (!solidShape(Level1ChunkGenerator.blockAt(seed, x, y + 1, z))) {
+									bad.add("pipe " + x + "," + y + "," + z + " s" + seed + " " + Level1Elevation.profile(seed, Math.floorDiv(x, D), Math.floorDiv(z, D))
+											+ " above " + Level1ChunkGenerator.blockAt(seed, x, y + 1, z).getBlock());
+								}
+							}
+							BlockState g = Level1ChunkGenerator.blockAt(seed, x, FLOOR + 2, z);
+							if (g.is(Level1Blocks.PIPE_GAUGE)) {
+								gauges++;
+								net.minecraft.core.Direction back = g.getValue(PhosphorMarkBlock.FACING).getOpposite();
+								BlockState behind = Level1ChunkGenerator.blockAt(seed, x + back.getStepX(), FLOOR + 2, z + back.getStepZ());
+								if (!solidShape(behind)) {
+									bad.add("gauge " + x + "," + (FLOOR + 2) + "," + z + " s" + seed + " " + Level1Elevation.profile(seed, Math.floorDiv(x, D), Math.floorDiv(z, D))
+											+ " behind " + behind.getBlock());
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		System.out.println("[pipeFit] zones " + zones + ", pipes " + pipes + ", gauges " + gauges + ", floating " + bad.size() + " " + bad.subList(0, Math.min(12, bad.size())));
+		if (!bad.isEmpty()) throw new AssertionError(bad.size() + " floating pipes or gauges, first " + bad.get(0));
+		if (zones == 0 || pipes < 100 || gauges < 20) throw new AssertionError("pipe check barely ran: " + zones + " zones, " + pipes + " pipes, " + gauges + " gauges");
 	}
 
 	private static boolean solidShape(BlockState s) {

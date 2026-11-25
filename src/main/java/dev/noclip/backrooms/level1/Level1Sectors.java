@@ -113,7 +113,10 @@ final class Level1Sectors {
 		if (y == topCeil - 1 && roll < (1 - zone) * 60) return Level1Blocks.CEILING_PIPE.defaultBlockState();
 		if (y == FLOOR + 2 && roll < (1 - zone) * 45) {
 			for (Direction side : Direction.Plane.HORIZONTAL) {
-				if (Level1Layout.tile(seed, x + side.getStepX(), z + side.getStepZ()) == Tile.PILLAR) {
+				// The layout's pillar tile, and a real block there too: halls with tunnels or landmarks take some pillars away.
+				if (Level1Layout.tile(seed, x + side.getStepX(), z + side.getStepZ()) == Tile.PILLAR
+						&& !Level1ChunkGenerator.baseAt(seed, x + side.getStepX(), y, z + side.getStepZ())
+								.getCollisionShape(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, net.minecraft.core.BlockPos.ZERO).isEmpty()) {
 					return Level1Blocks.PIPE_GAUGE.defaultBlockState().setValue(PhosphorMarkBlock.FACING, side.getOpposite());
 				}
 			}

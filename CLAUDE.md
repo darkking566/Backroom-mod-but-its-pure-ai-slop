@@ -343,6 +343,11 @@
 - 使用者同意後，把 `main` 推送到 GitHub（`43f74d0` 跨格結構不斷一格與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；Antigravity 未提交的 Level 2 磚牆改動沒有一起推；沒有強制推送、沒有改寫歷史
 
 - 泥褐磚與黑磚也不再每格一樣：`make_level2_polish.py` 的磚牆變體改成三種磚共用（`BRICKS` 表），基礎與寫實材質包各多畫三張（`muddy_brick_wall_1`～`_3`、`black_brick_wall_1`～`_3`），每格隨機挑一張；白漆磚重產後檔案完全沒變。Macchina 遺跡的黑磚地面也跟著有變化。`Level2ClientTest` 的磚牆照改成三種都拍（`level2_painted_brick`、`level2_muddy_brick`、`level2_black_brick`，存到 `docs/levels/level2/`）；`runClientGameTest -Plevels=2` 通過，照片裡磚縫跨格對齊、沒有一格一格的重複；黑磚就算開夜視也很暗。基礎泥褐磚每格下半部偏暗（原本的畫法）沒改
+- Level 1 審查報告：管線區（往 Level 2）的儀表與天花板水管懸空：
+  - 儀表原本只看配置表「旁邊是柱子」就掛上去，在地下隧道與部分標準大廳裡那根柱子其實不在，儀表掛在空氣上；改成那根柱子真的有方塊才掛（`Level1Sectors.piping`，用 `baseAt`）
+  - 天花板水管查過沒有懸空（每根上面都是實心），沒改
+  - `Level1ClientTest` 新增 `pipeFit` 段：2 個種子、20 個管線區，每根天花板水管（所有高度）上面要是實心、每個儀表背後要是實心；改之前 14 個儀表懸空，改之後 0 個（93355 根水管、3256 個儀表）
+  - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=pipeFit,sectors` 通過；沒在遊戲畫面上看過管線區
 
 ## 動作記錄（Antigravity）
 
