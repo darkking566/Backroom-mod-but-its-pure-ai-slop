@@ -214,6 +214,7 @@
   - 隔間群：小門洞兩側那一格不放家具，不會被機櫃或種植架堵住
   - 新增單元測試 `furnitureHangsOnSomethingAndNoPocketIsSealed`（壁掛物背後是牆、吊掛物往上一定碰到天花板、狹長深室角落是實心）；先用改之前的程式跑過，確認會失敗
   - `gradlew build` 與 `runClientGameTest -Plevels=0.1 -Psections=rooms,variants,doors,robots` 通過，截圖看過合併大廳、挑高房、下沉池、隔間、狹長深室
+- 使用者同意推 5 個提交後，把 `main` 推送到 GitHub 到 `d2bf5cc` 為止（Antigravity 的 Level 2 寫實材質與隱藏出口 `3156447`、`68343bd`，我的 Level 0 卡死修正、畫面修正與補完 `74704bd`、`491a94e`、`d2bf5cc`）；Level 2 這兩個提交我沒重跑測試；之後的 3 個 Level 0.1 審查修正（`2e06b66`、`ab64a57`、`8e53852`）與這筆紀錄還沒推；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
