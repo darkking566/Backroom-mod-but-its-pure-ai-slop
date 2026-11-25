@@ -1327,5 +1327,7 @@
   "block.noclip_backrooms.prop_crt_tv": "老式映像管電視",
   "block.noclip_backrooms.prop_water_cooler": "辦公室飲水機",
   "block.noclip_backrooms.prop_vending_machine": "大廳飲料販賣機",
-  "block.noclip_backrooms.prop_fridge": "雙門大冰箱"
+  "block.noclip_backrooms.prop_fridge": "雙門大冰箱",
+  "pack.noclip_backrooms.claude_trial": "後室：Claude 試作模型",
+  "pack.noclip_backrooms.claude_trial.description": "8 樣物品照樓層風格重做，比較用"
 }

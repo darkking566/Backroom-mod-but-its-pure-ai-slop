@@ -42,3 +42,9 @@
 ## 之後
 
 這是試做。使用者看過、確定方向後，再決定：要不要全部樓層都換、資源包預設開或關、濾鏡預設開或關、Level 0 是朋友負責的（要先跟他說）。
+
+## Claude 試作模型（比較用，2026-11-25）
+
+`tools/make_trial_items.py` 照樓層的風格重做 8 樣東西（生鏽鐵管、撬棍、穿牆短杖、土製鐵管手槍、銅線、杏仁藥水、辦公椅、映像管電腦）：方塊模型、64×64 貼圖（CC0 照片打底加髒污磨損、附 `_n`／`_s`）、只有真的會發光的地方微微發光。放在內建資源包「後室：Claude 試作模型」（預設關閉，在資源包畫面打開就換成試作版，關掉就是 Gemini 原本的）。武器和家具平常由 Gemini 的 Blender 模型程式畫，試作包開著時那 8 樣改用一般模型（`core/look/TrialPack`，Gemini 的 `BlenderWeaponRenderer`、`BlenderPropRenderer` 各加了一個判斷）。
+
+並排比較圖在 `docs/look/trial/`（`props.png`、`props_close.png`、`hands.png`、`inventory.png`），材質總覽 `docs/look/trial_materials.png`；實機測試 `gradlew runClientGameTest -Plevels=trial`。

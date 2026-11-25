@@ -1,0 +1,10 @@
+{
+  "pack": {
+    "description": {
+      "translate": "pack.noclip_backrooms.claude_trial.description",
+      "fallback": "Claude's trial models for eight items"
+    },
+    "min_format": 88,
+    "max_format": 88
+  }
+}

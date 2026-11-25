@@ -305,6 +305,12 @@
   - 正面中央 8×8 塔樓：牆高 16、四坡尖頂、圓拱雙開門、門上公會名牌、高處兩面旗、門廊天花板與上層房間的燈；塔樓兩側石柱廊（吊燈、長椅）；前院兩塊花圃（沙漠是仙人掌、枯灌木）、四支燈柱
   - 內部家具與商人的相對位置不變（用 `put` 平移到新的大廳位置）；調色盤加 `roofBlock`、`roofSlab`、`soil`；選址量高度的取樣點、`GuildClientTest` 的座標跟著改；測試的五種樣式改成先載入再一格一格鋪草地（`/fill` 遇到沒載入的區塊會失敗，房子地基一路長到地面）
   - `runClientGameTest -Plevels=guild` 通過，看過村莊旁實際生成的、五種樣式與室內截圖，更新 `docs/guild/styles.png`、`docs/guild.md`
+- 使用者說 Gemini 的工作台做好了、覺得可以；問物品武器裝備的建模（Gemini 做的）是不是讓 Claude 設計會更好。看過 `docs/items` 的 458 張渲染圖與遊戲裡的畫法後回答：問題主要是風格跟樓層對不上（乾淨亮面、霓虹發光、武器是另外畫的曲面網格、貼圖重複），建議先試做 8 個並排比較；使用者同意
+- Claude 試作模型（比較用，不動 Gemini 的模型與貼圖）：
+  - 新增內建資源包「後室：Claude 試作模型」（`resourcepacks/claude_trial/`，預設關閉；客戶端 `core/look/TrialPack` 登記與判斷），換掉 8 樣：生鏽鐵管、撬棍、穿牆短杖、土製鐵管手槍、銅線、杏仁藥水、辦公椅、映像管電腦
+  - 新增 `tools/make_trial_items.py`：26 種 64×64 材質（ambientCG CC0：Rust004、Metal032、Metal049A、Wood051、Fabric028，加 Level 0 寫實壁紙；附 `_n`／`_s`；照片快取在 `tools/.cache/`），方塊模型由程式組出；拿在手上的角度自己調過（Gemini 模型裡那組沒被真的用過：它的武器在手上是畫 Blender 網格）；材質總覽 `docs/look/trial_materials.png`
+  - 動到 Gemini 的檔案：`BlenderWeaponRenderer.hasBlenderMesh` 加一個判斷、`BlenderPropRenderer` 在試作包開著時改畫方塊模型（`submitMovingBlock`，因為家具方塊設成隱形）；包關掉時完全照舊
+  - 新增實機測試 `trial/TrialClientTest`（`-Plevels=trial`：在 Level 0 圍小房間擺兩件家具，六樣東西輪流拿在手上，背包，試作包關／開各拍一輪），通過；並排比較圖 `docs/look/trial/`（`props`、`props_close`、`hands`、`inventory`）；`BackroomsClient` 加一行、語言檔加 2 條、`docs/look/README.md` 加說明
 
 ## 動作記錄（Antigravity）
 

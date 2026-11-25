@@ -33,6 +33,8 @@ public final class BlenderPropRenderer implements BlockEntityRenderer<PropBlockE
 	public static final class PropRenderState extends BlockEntityRenderState {
 		public String propId = null;
 		public Direction facing = Direction.NORTH;
+		/** Set while Claude's trial pack (core.look.TrialPack) redraws this prop from its block model. */
+		public net.minecraft.client.renderer.block.MovingBlockRenderState trial = null;
 	}
 
 	public BlenderPropRenderer(BlockEntityRendererProvider.Context ctx) {
@@ -56,11 +58,27 @@ public final class BlenderPropRenderer implements BlockEntityRenderer<PropBlockE
 		state.propId = BuiltInRegistries.BLOCK.getKey(block).getPath();
 		state.facing = bs.hasProperty(HorizontalDirectionalBlock.FACING)
 				? bs.getValue(HorizontalDirectionalBlock.FACING) : Direction.NORTH;
+		state.trial = null;
+		if (dev.noclip.backrooms.core.look.TrialPack.replaces(state.propId)
+				&& entity.getLevel() instanceof net.minecraft.client.multiplayer.ClientLevel level) {
+			var trial = new net.minecraft.client.renderer.block.MovingBlockRenderState();
+			trial.randomSeedPos = entity.getBlockPos();
+			trial.blockPos = entity.getBlockPos();
+			trial.blockState = bs;
+			trial.biome = level.getBiome(entity.getBlockPos());
+			trial.cardinalLighting = level.cardinalLighting();
+			trial.lightEngine = level.getLightEngine();
+			state.trial = trial;
+		}
 	}
 
 	@Override
 	public void submit(PropRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
 		if (state.propId == null) return;
+		if (state.trial != null) {
+			collector.submitMovingBlock(poseStack, state.trial, 0);
+			return;
+		}
 		BlenderWeaponMesh mesh = BlenderWeaponMesh.getFromResource(PROP_OBJ_PREFIX + state.propId);
 		if (mesh.isEmpty()) return;
 

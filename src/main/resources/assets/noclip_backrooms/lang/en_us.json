@@ -1327,5 +1327,7 @@
   "block.noclip_backrooms.prop_crt_tv": "Retro CRT Television",
   "block.noclip_backrooms.prop_water_cooler": "Office Water Cooler",
   "block.noclip_backrooms.prop_vending_machine": "Lobby Vending Machine",
-  "block.noclip_backrooms.prop_fridge": "Double-Door Refrigerator"
+  "block.noclip_backrooms.prop_fridge": "Double-Door Refrigerator",
+  "pack.noclip_backrooms.claude_trial": "Backrooms: Claude's trial models",
+  "pack.noclip_backrooms.claude_trial.description": "Eight items redrawn in the levels' style, to compare"
 }

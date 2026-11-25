@@ -47,7 +47,8 @@ public final class BlenderWeaponRenderer {
 	}
 
 	public static boolean hasBlenderMesh(ItemStack stack) {
-		return WeaponEvolution.isEvolvable(stack);
+		// Claude's trial pack (core.look.TrialPack) draws a few weapons from ordinary models while it is on.
+		return WeaponEvolution.isEvolvable(stack) && !dev.noclip.backrooms.core.look.TrialPack.replaces(stack);
 	}
 
 	public static void renderFirstPerson(ItemStack stack, boolean rightHand, float time,
