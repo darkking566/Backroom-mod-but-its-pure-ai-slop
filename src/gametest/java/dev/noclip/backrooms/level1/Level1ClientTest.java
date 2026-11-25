@@ -70,6 +70,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			if (only("marker")) marker(context, game);
 			if (only("views")) views(context, game, seed);
 			if (only("sectors")) sectors(context, game, seed);
+			if (only("sectorFit")) sectorFit();
 			if (only("exits")) exits(context, game, seed);
 			if (only("events")) events(context, game, seed);
 			if (only("settlements")) settlements(context, game, seed);
@@ -1209,6 +1210,67 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			}
 		}
 		throw new AssertionError("no " + tile + " near the origin");
+	}
+
+	/** Racks, arches and pits keep to the main floor of decked, sunken and tunnelled halls; parked props stand on something. */
+	private static void sectorFit() {
+		int D = Level1Layout.DISTRICT, FLOOR = Level1ChunkGenerator.FLOOR_Y;
+		java.util.Set<net.minecraft.world.level.block.Block> props = java.util.Set.of(Level1Blocks.ABANDONED_CAR, Level1Blocks.ABANDONED_VAN,
+				Level1Blocks.VENDING_MACHINE, Level1Blocks.PALLET_STACK);
+		int districts = 0, changed = 0, propsSeen = 0;
+		for (long seed = 0; seed < 2; seed++) {
+			for (int dx = -7; dx <= 7; dx++) {
+				for (int dz = -7; dz <= 7; dz++) {
+					if (Level1SectorArchitecture.variant(seed, dx, dz) == Level1SectorArchitecture.Variant.NONE) continue;
+					Level1Elevation.Profile profile = Level1Elevation.profile(seed, dx, dz);
+					boolean standard = profile == Level1Elevation.Profile.STANDARD;
+					districts++;
+					int top = Level1Elevation.ceilingY(seed, dx, dz);
+					for (int lx = 0; lx < D; lx += standard ? 6 : 2) {
+						for (int lz = 0; lz < D; lz += standard ? 6 : 2) {
+							int x = dx * D + lx, z = dz * D + lz;
+							Level1Layout.Tile tile = Level1Layout.tile(seed, x, z);
+							BlockState floor = Level1ChunkGenerator.baseAt(seed, x, FLOOR, z);
+							boolean deckAbove = false;
+							int blockedAt = Integer.MAX_VALUE;
+							for (int y = FLOOR - 9; y < top; y++) {
+								BlockState base = Level1ChunkGenerator.baseAt(seed, x, y, z);
+								if (y >= FLOOR + 3 && !base.isAir()) deckAbove = true;
+								BlockState out = Level1SectorArchitecture.apply(seed, tile, base, x, y, z);
+								if (props.contains(out.getBlock())) {
+									propsSeen++;
+									if (!solidShape(Level1ChunkGenerator.blockAt(seed, x, y - 1, z))) {
+										throw new AssertionError("prop over nothing at " + x + "," + y + "," + z + " seed " + seed);
+									}
+								}
+								BlockState wanted = Level1SectorArchitecture.apply(seed, tile, base, x, y, z, false);
+								if (y > FLOOR && wanted != base) {
+									// Fitting may only trim a piece from the top, never leave its upper part hanging.
+									if (out == base) blockedAt = Math.min(blockedAt, y);
+									else if (y > blockedAt) throw new AssertionError("piece hangs over a removed block at " + x + "," + blockedAt + ".." + y + "," + z
+											+ " seed " + seed + " " + profile + ": " + out);
+								}
+								if (out == base) continue;
+								changed++;
+								String at = profile + " seed " + seed + " " + x + "," + y + "," + z + " " + base + " -> " + out;
+								if (y <= FLOOR) {
+									if (!standard && profile != Level1Elevation.Profile.VAULTED) throw new AssertionError("carved below a " + at);
+								} else {
+									if (!solidShape(floor)) throw new AssertionError("built over no floor " + at);
+									if (deckAbove && y != top - 1) throw new AssertionError("built through a deck " + at);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		if (districts < 10 || changed < 1000) throw new AssertionError("sector fit check barely ran: " + districts + " districts, " + changed + " blocks");
+		System.out.println("[sectorFit] districts " + districts + ", changed blocks " + changed + ", props " + propsSeen);
+	}
+
+	private static boolean solidShape(BlockState s) {
+		return !s.getCollisionShape(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, net.minecraft.core.BlockPos.ZERO).isEmpty();
 	}
 
 	private static void checkBlocks(ClientGameTestContext context, TestSingleplayerContext game) {

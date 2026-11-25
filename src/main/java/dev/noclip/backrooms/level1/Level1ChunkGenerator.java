@@ -58,6 +58,12 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 				Level1Layout.propCell(seed, x, z), Level1Layout.basePiece(seed, x, z), x, y, z);
 	}
 
+	/** What a block is before the sectors restyle and build on it: the hall, its profile or landmark, exits, props, settlements. */
+	static BlockState baseAt(long seed, int x, int y, int z) {
+		return plainBlock(seed, Level1Layout.tile(seed, x, z), Level1Layout.ceiling(seed, x, z), Level1Layout.exitCell(seed, x, z),
+				Level1Layout.propCell(seed, x, z), Level1Layout.basePiece(seed, x, z), x, y, z);
+	}
+
 	private static BlockState block(long seed, Tile tile, Ceiling ceiling, HallPlan.Cell exit, HallPlan.PropCell prop,
 			BasePlan.Piece piece, int x, int y, int z) {
 		BlockState state = plainBlock(seed, tile, ceiling, exit, prop, piece, x, y, z);
