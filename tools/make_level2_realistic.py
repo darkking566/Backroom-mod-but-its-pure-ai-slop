@@ -188,12 +188,17 @@ def load_pbr_substrate(asset, target_rgb=None, contrast=1.0, normal_strength=0.9
     return Material(col, height=disp, normal=norm, smooth=smooth, f0=f0, porosity=porosity, bump=28.0)
 
 
-def brick_substrate(target_rgb, seed, contrast=1.0, mortar_rgb=None, default_smooth=0.14, porosity=0.65):
+def brick_substrate(target_rgb, seed, contrast=1.0, mortar_rgb=None, default_smooth=0.14, porosity=0.65, shift=(0, 0)):
     """Rectangular running-bond brick (8 courses, 4 bricks a row: the same layout as the 128 px base
     texture), each brick with photo concrete grain and its own shade, set back behind recessed mortar.
     Bricks075A was used before, but it is an irregular rubble-stone wall, wrong for tunnels and offices."""
     m = load_pbr_substrate("Concrete034", target_rgb, contrast=contrast, normal_strength=0.7,
                            default_smooth=default_smooth, porosity=porosity)
+    if shift != (0, 0):  # the photo tiles, so sliding it gives each variant other grain in the same bricks
+        m.color = np.roll(m.color, shift, (0, 1))
+        m.height = np.roll(m.height, shift, (0, 1))
+        m.smooth = np.roll(m.smooth, shift, (0, 1))
+        m.normal = None if m.normal is None else np.roll(m.normal, shift, (0, 1))
     course, length = S // 8, S // 4
     row = (Y // course).astype(int)
     shifted = (X + (row % 2) * (length // 2)) % length
@@ -309,10 +314,13 @@ def build_authored_textures(WATER, MOULD):
     black_b = brick_substrate(rgb(40, 40, 44), 272, contrast=1.15, mortar_rgb=rgb(62, 60, 58), default_smooth=0.12, porosity=0.7)
     tex["black_brick_wall"] = black_b
 
-    painted_b = brick_substrate(rgb(206, 206, 198), 273, contrast=0.55, mortar_rgb=rgb(190, 188, 180), default_smooth=0.28, porosity=0.25)
-    peel = smoothstep(0.72, 0.84, fbm(43, base=4))
-    painted_b.color = mix(painted_b.color, rgb(144, 134, 122), peel * 0.6)
-    tex["painted_brick_wall"] = painted_b
+    # Four looks, one picked per block (make_level2_polish.py), so a painted corridor is not one block repeated.
+    for k, name in enumerate(("painted_brick_wall", "painted_brick_wall_1", "painted_brick_wall_2", "painted_brick_wall_3")):
+        painted_b = brick_substrate(rgb(206, 206, 198), 273 + k * 10, contrast=0.55, mortar_rgb=rgb(190, 188, 180),
+                                    default_smooth=0.28, porosity=0.25, shift=(k * 173, k * 291))
+        peel = smoothstep(0.72, 0.84, fbm(43 + k * 10, base=4))
+        painted_b.color = mix(painted_b.color, rgb(144, 134, 122), peel * 0.6)
+        tex[name] = painted_b
 
     # Metals, rust, wood
     steel_brushed = load_pbr_substrate("Metal049A", rgb(156, 162, 168), contrast=0.85, normal_strength=0.75, default_smooth=0.66, f0=234, porosity=0.04)

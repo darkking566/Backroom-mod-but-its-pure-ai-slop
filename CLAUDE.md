@@ -333,6 +333,8 @@
   - 沒做：橫跨的燈籠橋、管線龍門架、未完工樑經過被擋掉的格子時會斷一格（斷口可能掉下去）
 - 使用者同意後，把 `main` 推送到 GitHub（`df91c32` 區段建築配合立體結構與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；Antigravity 未提交的 Level 2 漆磚牆改動沒有一起推；沒有強制推送、沒有改寫歷史
 
+- 白漆磚牆不再每格一樣：基礎與寫實材質包各多畫三張（`painted_brick_wall_1`～`_3`，剝落、髒污與照片紋理位置不同），方塊狀態每格隨機挑一張（`make_level2_polish.py`、`make_level2_realistic.py`）；試過加鏡像，同一張和自己的鏡像相鄰時剝落會變成對稱的蝴蝶形，所以拿掉；泥褐磚與黑磚還沒做。`Level2ClientTest` 新增白漆磚牆照（`level2_painted_brick`，開夜視、正對一段 6 格長的白漆磚牆，存一份到 `docs/levels/level2/painted_brick.png`）；`runClientGameTest -Plevels=2` 通過，照片裡磚縫跨格對齊、剝落每格不同
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23

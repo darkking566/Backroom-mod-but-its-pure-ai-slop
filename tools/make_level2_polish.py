@@ -4,6 +4,7 @@
    so shader packs light them like the rest of Level 2 when the realistic pack is off.
 2. Plain walls and floors pick a random turn (and walls a mirror image) per block, so a long corridor
    is not the same stain repeated every metre.
+3. Painted brick gets three more drawings (other chips, grime and peel), one picked per block.
 """
 import json
 import sys
@@ -24,9 +25,20 @@ METAL = ("pipe_", "toolbox_metal", "breaker_box", "ceiling_vent", "pressure_gaug
 # Floors and ceilings: the top and bottom faces turn, which is where they are seen.
 TURNED = ("utility_floor", "damp_utility_floor", "debris_utility_floor", "frosted_utility_floor",
           "puddled_utility_floor", "utility_ceiling", "void_concrete")
-# Walls: a mirror image is the variation their side faces can show. Brick is left out: mirrored
-# courses would not line up with the block beside them.
+# Walls: a mirror image is the variation their side faces can show.
 MIRRORED = ("utility_wall", "stained_utility_wall", "frosted_utility_wall")
+# Painted brick: four separate drawings. Mirror images were tried, but a block beside its own mirror
+# image turns the peeling paint into a symmetric butterfly along the seam. (Muddy and black brick are
+# not done yet.)
+PAINTED = ("painted_brick_wall", "painted_brick_wall_1", "painted_brick_wall_2", "painted_brick_wall_3")
+
+
+def painted_variants():
+    import make_level2 as l2  # noqa: E402  (heavy; only needed here)
+    mt.OUT = TEXTURES
+    for k, name in enumerate(PAINTED[1:], 1):
+        mt.save(name, l2.painted_brick(540 + k))
+        write_json(MODELS / f"{name}.json", {"parent": "minecraft:block/cube_all", "textures": {"all": NS + name}})
 
 
 def companions():
@@ -70,6 +82,7 @@ def variety():
         write_json(MODELS / f"{name}_mirrored.json", mirrored_model(name))
         variants = [{"model": NS + name}, {"model": NS + f"{name}_mirrored"}]
         write_json(ASSETS / f"blockstates/{name}.json", {"variants": {"": variants}})
+    write_json(ASSETS / "blockstates/painted_brick_wall.json", {"variants": {"": [{"model": NS + name} for name in PAINTED]}})
     # scrap_heap comes from make_level2.py; its outline is square, so any quarter turn fits.
     model = NS + "scrap_heap"
     write_json(ASSETS / "blockstates/scrap_heap.json",
@@ -77,6 +90,7 @@ def variety():
 
 
 def main():
+    painted_variants()
     made = companions()
     variety()
     print(f"companion maps for {len(made)} textures: {' '.join(made)}")
