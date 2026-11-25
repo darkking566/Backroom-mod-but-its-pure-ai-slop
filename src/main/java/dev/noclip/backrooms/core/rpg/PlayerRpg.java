@@ -202,9 +202,21 @@ public final class PlayerRpg {
 			boolean inBackrooms = level.dimension().identifier().getNamespace().equals(BackroomsMod.MOD_ID);
 			float delta;
 			if (!inBackrooms) {
-				// Overworld safe base steadily restores sanity, accelerated by SAN stat.
-				float baseRec = level.dimension() == Level.OVERWORLD ? 0.85F : 0.25F;
-				delta = (baseRec + stats.passiveSanityRegenPerSec() * 0.5F) * stats.sanityRegenMultiplier();
+				int rejectionStage = dev.noclip.backrooms.core.trip.Pull.stage(player);
+				if (rejectionStage >= 1) {
+					// Wretch Rejection in the Overworld: sanity stops recovering and drains steadily!
+					float rejectDrain = switch (rejectionStage) {
+						case 1 -> -0.08F;
+						case 2 -> -0.16F;
+						case 3 -> -0.28F;
+						default -> -0.42F;
+					};
+					delta = rejectDrain * (1.0F - stats.sanityDrainResistance());
+				} else {
+					// Overworld safe base steadily restores sanity, accelerated by SAN stat.
+					float baseRec = level.dimension() == Level.OVERWORLD ? 0.85F : 0.25F;
+					delta = (baseRec + stats.passiveSanityRegenPerSec() * 0.5F) * stats.sanityRegenMultiplier();
+				}
 			} else {
 				BlockPos eyePos = BlockPos.containing(player.getX(), player.getEyeY(), player.getZ());
 				int blockLight = level.getBrightness(LightLayer.BLOCK, eyePos);

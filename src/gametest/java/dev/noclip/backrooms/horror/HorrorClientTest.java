@@ -7,11 +7,13 @@ import dev.noclip.backrooms.core.guild.Contracts;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
 import dev.noclip.backrooms.core.trip.Pull;
 import dev.noclip.backrooms.core.trip.PullState;
+import dev.noclip.backrooms.core.trip.SeepageData;
 import dev.noclip.backrooms.core.trip.Trips;
 import dev.noclip.backrooms.level0.Level0;
 import dev.noclip.backrooms.level1.Level1;
 import dev.noclip.backrooms.monsters.Monsters;
 import dev.noclip.backrooms.monsters.hound.Hound;
+import dev.noclip.backrooms.props.BackroomsProps;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
@@ -115,19 +117,52 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			check(server.computeOnServer(s -> PlayerRpg.get(player(s)).level()) > levelBefore
 					|| server.computeOnServer(s -> PlayerRpg.get(player(s)).xp()) > xpBefore, "no experience for getting out alive");
 
-			// 6. The pull: warning signs, nothing during the day of peace, then down into Level 0.
+			// 6. Mode 1 + Mode 2 (Wretch Rejection & Reversible Overworld Seepage):
+			//    - 2-day buffer holds off escalation;
+			//    - Stage 2+ NEVER forcibly teleports the player, instead seeps natural ground & opens a glowing Rift;
+			//    - Tier 2 Serum restores all seeped ground and seals the Rift;
+			//    - Stepping into the Rift intentionally enters Level 0.
 			long graceUntil = server.computeOnServer(s -> Pull.of(player(s)).graceUntil());
-			server.runOnServer(s -> Pull.set(player(s), new PullState(92.0F, graceUntil)));
+			server.runOnServer(s -> Pull.set(player(s), new PullState(92.0F, graceUntil, true, 0)));
 			server.runCommand("title @a clear");
 			context.waitTicks(30);
 			context.takeScreenshot("horror_pull_warning");
 			server.runCommand("item replace entity @a hotbar.1 with noclip_backrooms:scrap_metal 4");
 			check(server.computeOnServer(s -> Pull.relics(player(s))) == 1, "scrap metal from the Backrooms does not count");
-			server.runOnServer(s -> Pull.set(player(s), new PullState(99.9F, graceUntil)));
+			// Even at severity 99.9 after buffer expires, player is NOT passively teleported away!
+			server.runOnServer(s -> Pull.set(player(s), new PullState(99.9F, 0L, true, 0)));
 			context.waitTicks(60);
-			check(server.computeOnServer(s -> player(s).level().dimension()) == Level.OVERWORLD, "pulled in during the day of peace");
-			server.runOnServer(s -> Pull.set(player(s), new PullState(99.9F, 0L)));
-			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 100);
+			check(server.computeOnServer(s -> player(s).level().dimension()) == Level.OVERWORLD,
+					"player was passively teleported out of the Overworld instead of choosing the Rift");
+			// Verify reversible natural-ground seepage + outdoor Rift opening + full restoration by Tier 2 Serum
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				var ow = s.overworld();
+				SeepageData data = SeepageData.get(ow);
+				for (int i = 0; i < 6; i++) {
+					data.trySeepNear(ow, p.getUUID(), p.blockPosition(), 3, 14, p.getRandom());
+				}
+				BlockPos rift = data.ensureRiftNear(ow, p.getUUID(), p.blockPosition(), p.getRandom());
+				check(rift != null && ow.getBlockState(rift).is(BackroomsProps.BACKROOMS_RIFT),
+						"Stage 2+ seepage failed to open a glowing Backrooms Rift outdoors");
+			});
+			server.runOnServer(s -> Pull.useTier2Serum(player(s)));
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				SeepageData data = SeepageData.get(s.overworld());
+				check(data.countFor(p.getUUID()) == 0, "Tier 2 Serum did not restore all seeped ground blocks");
+				check(data.riftFor(p.getUUID()) == null, "Tier 2 Serum did not seal the Backrooms Rift");
+				check(Pull.inGrace(p), "Tier 2 Serum did not grant relief window");
+			});
+			// Open a Rift again and step directly into it -> deliberately enters Level 0!
+			BlockPos riftPos = server.computeOnServer(s -> {
+				ServerPlayer p = player(s);
+				return SeepageData.get(s.overworld()).ensureRiftNear(s.overworld(), p.getUUID(), p.blockPosition(), p.getRandom());
+			});
+			check(riftPos != null, "Could not spawn Rift for entry test");
+			server.runCommand("execute as @a in minecraft:overworld run tp @s "
+					+ (riftPos.getX() + 0.5) + " " + riftPos.getY() + " " + (riftPos.getZ() + 0.5));
+			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 120);
 
 			// 7. A contract: sent in, reach Level 1, out alive, paid.
 			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 120 0");

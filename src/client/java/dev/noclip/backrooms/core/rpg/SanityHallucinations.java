@@ -90,14 +90,20 @@ public final class SanityHallucinations {
 		}
 
 		PlayerStats stats = PlayerRpg.get(player);
-		if (!stats.isHallucinating()) {
+		int overworldRejectionStage = dev.noclip.backrooms.core.trip.PullClient.stage();
+		boolean rejectionHallucination = overworldRejectionStage >= 3 && !level.isBrightOutside();
+		if (!stats.isHallucinating() && !rejectionHallucination) {
 			clearAll(level);
 			spawnCooldownTicks = 30;
 			return;
 		}
 
-		// Severity scales smoothly from 0.0 (at 30% sanity) to 1.0 (at 0% sanity).
-		float severity = Mth.clamp((PlayerStats.HALLUCINATION_THRESHOLD - stats.sanityRatio()) / PlayerStats.HALLUCINATION_THRESHOLD, 0.0F, 1.0F);
+		// Severity scales smoothly from 0.0 (at 30% sanity) to 1.0 (at 0% sanity), or from Overworld Stage 3-4 seepage.
+		float sanitySev = stats.isHallucinating()
+				? Mth.clamp((PlayerStats.HALLUCINATION_THRESHOLD - stats.sanityRatio()) / PlayerStats.HALLUCINATION_THRESHOLD, 0.0F, 1.0F)
+				: 0.0F;
+		float rejectSev = rejectionHallucination ? (overworldRejectionStage >= 4 ? 0.85F : 0.45F) : 0.0F;
+		float severity = Math.max(sanitySev, rejectSev);
 		RandomSource random = level.getRandom();
 
 		tickPhantoms(level, player, severity, random);

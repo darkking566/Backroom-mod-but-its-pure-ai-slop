@@ -10351,6 +10351,131 @@
           "count": 1
         }
       ]
+    },
+    {
+      "id": "noclip_backrooms:distill_reality_stabilizer_t1",
+      "station": "almond_distiller",
+      "category": "gear",
+      "xp": 10,
+      "pattern": [
+        "B B",
+        "CAC",
+        "D D"
+      ],
+      "key": {
+        "A": {
+          "item": "noclip_backrooms:almond_water",
+          "count": 2
+        },
+        "B": {
+          "item": "noclip_backrooms:dry_soil_herbs",
+          "count": 1
+        },
+        "C": {
+          "item": "noclip_backrooms:sterile_gauze",
+          "count": 1
+        },
+        "D": {
+          "item": "minecraft:glass_bottle",
+          "count": 1
+        }
+      },
+      "outputs": [
+        {
+          "item": "noclip_backrooms:reality_stabilizer_t1",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "noclip_backrooms:distill_reality_serum_t2",
+      "station": "almond_distiller",
+      "category": "gear",
+      "xp": 18,
+      "pattern": [
+        " B ",
+        "DAE",
+        " C "
+      ],
+      "key": {
+        "A": {
+          "item": "noclip_backrooms:purified_almond_essence",
+          "count": 2
+        },
+        "B": {
+          "item": "noclip_backrooms:coolant_vial",
+          "count": 1
+        },
+        "C": {
+          "item": "noclip_backrooms:anomaly_crystal",
+          "count": 1
+        },
+        "D": {
+          "item": "noclip_backrooms:almond_mana_cell",
+          "count": 1
+        },
+        "E": {
+          "item": "noclip_backrooms:copper_wire",
+          "count": 2
+        }
+      },
+      "outputs": [
+        {
+          "item": "noclip_backrooms:reality_serum_t2",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "noclip_backrooms:spiderweb_reality_anchor_core",
+      "station": "spiderweb_crafting_table",
+      "category": "gear",
+      "xp": 35,
+      "pattern": [
+        "O  E  O",
+        "  DFD  ",
+        " B C B ",
+        "E CKC E",
+        " B C B ",
+        "  DFD  ",
+        "O  E  O"
+      ],
+      "key": {
+        "K": {
+          "item": "noclip_backrooms:noclip_shard",
+          "count": 1
+        },
+        "C": {
+          "item": "noclip_backrooms:reality_serum_t2",
+          "count": 1
+        },
+        "B": {
+          "item": "noclip_backrooms:blue_circuit",
+          "count": 1
+        },
+        "D": {
+          "item": "noclip_backrooms:energy_brick",
+          "count": 1
+        },
+        "E": {
+          "item": "minecraft:amethyst_shard",
+          "count": 1
+        },
+        "O": {
+          "item": "minecraft:obsidian",
+          "count": 1
+        },
+        "F": {
+          "item": "noclip_backrooms:aged_almond_reserve",
+          "count": 1
+        }
+      },
+      "outputs": [
+        {
+          "item": "noclip_backrooms:reality_anchor_core",
+          "count": 1
+        }
+      ]
     }
   ]
 }

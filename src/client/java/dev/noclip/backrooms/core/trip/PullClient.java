@@ -9,16 +9,24 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 
 /**
- * The warning signs before the Backrooms take someone back (core.trip.Pull): from UNEASY the hum of fluorescent lights
- * now and then and a faint yellow cast over everything; from CLOSE the hum comes often, the cast deepens and the world
- * flickers dark for a moment, like a failing tube.
+ * Client-side atmospheric dread cues for Overworld Wretch Rejection &amp; Backrooms Seepage (core.trip.Pull):
+ * <ul>
+ *   <li>Stage 1 (25+): faint yellow Level-0 cast and distant 60Hz fluorescent hum.</li>
+ *   <li>Stage 2 (50+): deeper yellow tint, occasional failing-tube dark flickers, and outdoor scratching noises.</li>
+ *   <li>Stage 3–4 (75+): pulsing vignette, frequent flickers/scratches/whispers, plus client-only Smiler/Hound peeks.</li>
+ * </ul>
  */
 public final class PullClient {
 	private static final SoundEvent HUM = SoundEvent.createVariableRangeEvent(BackroomsMod.id("ambient.fluorescent_hum"));
+	private static final SoundEvent SCRATCH = SoundEvent.createVariableRangeEvent(BackroomsMod.id("ambient.wall_scratch"));
+	private static final SoundEvent WHISPER = SoundEvent.createVariableRangeEvent(BackroomsMod.id("ambient.distant_whisper"));
+
 	private static int flicker;
 	private static int nextHum;
+	private static int nextScratch = 240;
 
 	private PullClient() {
 	}
@@ -28,39 +36,68 @@ public final class PullClient {
 		ClientTickEvents.END_CLIENT_TICK.register(PullClient::tick);
 	}
 
-	public static float pull() {
+	public static PullState state() {
 		Minecraft client = Minecraft.getInstance();
-		return client.player == null ? 0.0F : client.player.getAttachedOrElse(Pull.STATE, PullState.NONE).pull();
+		return client.player == null ? PullState.NONE : client.player.getAttachedOrElse(Pull.STATE, PullState.NONE);
+	}
+
+	public static float pull() {
+		return state().pull();
+	}
+
+	public static int stage() {
+		Minecraft client = Minecraft.getInstance();
+		if (client.player == null || client.level == null || client.level.dimension() != Level.OVERWORLD) return 0;
+		return state().stage();
 	}
 
 	private static void tick(Minecraft client) {
-		if (client.player == null || client.isPaused()) return;
-		float pull = pull();
-		if (flicker > 0) flicker--;
-		if (pull >= Pull.CLOSE && flicker == 0 && client.player.getRandom().nextFloat() < 0.015F + (pull - Pull.CLOSE) / 1500.0F) {
-			flicker = 2 + client.player.getRandom().nextInt(4);
-		}
-		if (pull < Pull.UNEASY) {
-			nextHum = 40;
+		if (client.player == null || client.level == null || client.isPaused()) return;
+		if (client.level.dimension() != Level.OVERWORLD) {
+			flicker = 0;
 			return;
 		}
+		float pull = pull();
+		int stage = state().stage();
+		if (flicker > 0) flicker--;
+
+		if (stage >= 2 && flicker == 0 && client.player.getRandom().nextFloat() < (0.008F + (pull - Pull.STAGE_2) / 1800.0F)) {
+			flicker = 2 + client.player.getRandom().nextInt(stage >= 3 ? 5 : 3);
+		}
+		if (stage < 1) {
+			nextHum = 60;
+			nextScratch = 260;
+			return;
+		}
+
+		// 60Hz fluorescent hum grows louder and more frequent with rejection stage
 		if (--nextHum <= 0) {
-			float volume = 0.12F + 0.5F * (pull - Pull.UNEASY) / (Pull.FALL - Pull.UNEASY);
+			float strength = Mth.clamp((pull - Pull.STAGE_1) / (Pull.FALL - Pull.STAGE_1), 0.0F, 1.0F);
+			float volume = 0.10F + 0.48F * strength;
 			client.getSoundManager().play(SimpleSoundInstance.forUI(HUM, 1.0F, volume));
-			nextHum = pull >= Pull.CLOSE ? 70 : 200;
+			nextHum = stage >= 3 ? 85 : (stage == 2 ? 150 : 260);
+		}
+
+		// Outdoor Hound scratching / distant whispers at Stage 2+ (especially eerie at night!)
+		if (stage >= 2 && --nextScratch <= 0) {
+			boolean night = !client.level.isBrightOutside();
+			SoundEvent cue = (stage >= 3 && client.player.getRandom().nextBoolean()) ? WHISPER : SCRATCH;
+			float vol = (night ? 0.45F : 0.24F) + (stage - 2) * 0.12F;
+			client.getSoundManager().play(SimpleSoundInstance.forUI(cue, 0.85F + client.player.getRandom().nextFloat() * 0.25F, vol));
+			nextScratch = stage >= 3 ? 220 : 380;
 		}
 	}
 
 	private static void extract(GuiGraphicsExtractor graphics, DeltaTracker delta) {
 		Minecraft client = Minecraft.getInstance();
-		if (client.player == null) return;
+		if (client.player == null || client.level == null || client.level.dimension() != Level.OVERWORLD) return;
 		float pull = pull();
-		if (pull < Pull.UNEASY) return;
-		float strength = Mth.clamp((pull - Pull.UNEASY) / (Pull.FALL - Pull.UNEASY), 0.0F, 1.0F);
-		float pulse = 0.85F + 0.15F * Mth.sin(client.player.tickCount * 0.09F);
-		int alpha = (int) (255 * 0.42F * strength * pulse);
+		if (pull < Pull.STAGE_1) return;
+		float strength = Mth.clamp((pull - Pull.STAGE_1) / (Pull.FALL - Pull.STAGE_1), 0.0F, 1.0F);
+		float pulse = 0.84F + 0.16F * Mth.sin(client.player.tickCount * 0.08F);
+		int alpha = (int) (255 * 0.36F * strength * pulse);
 		int w = graphics.guiWidth(), h = graphics.guiHeight();
 		if (alpha > 0) graphics.fill(0, 0, w, h, (alpha << 24) | 0xD9C46A);
-		if (flicker > 0) graphics.fill(0, 0, w, h, 0x8C000000);
+		if (flicker > 0) graphics.fill(0, 0, w, h, 0x82000000);
 	}
 }
