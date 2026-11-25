@@ -282,6 +282,7 @@
   - 判斷報告有誤沒改：物品欄圖示背對（物品欄看的是北面）、開門穿模（原版門在自己那格內轉）；`MapDump` 沒更新
   - 驗證：Level 2 單元測試 11 項（強制重跑）與 `runClientGameTest -Plevels=2` 通過；截圖看到警告牌斜紋、長方形白漆磚；EL3A 截圖對著門，提燈與箱子朝向沒拍到；白漆磚的剝落花紋仍每格重複
   - 等 Antigravity 同時在跑的實機測試結束後才跑自己的（第一次因 `build/run` 被占用失敗）
+- 使用者同意後，抓 GitHub 合併朋友新推的 10 個提交（合成系統、327 個物品 3D 模型、RPG 狀態列、各層畫面標準與光影測試等），沒有衝突；合併後 `gradlew build`（77 個單元測試）與 `runClientGameTest -Plevels=2` 通過（中途一次編譯失敗是別的 Gradle 同時寫 `build/classes`，重跑就過），把 `main` 推送到 GitHub；Antigravity 未提交的 Level 1 改動沒有一起提交；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
