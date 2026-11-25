@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "noclip_backrooms:item/trial/copper_wire"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "noclip_backrooms:item/look/copper_wire"
+ }
 }

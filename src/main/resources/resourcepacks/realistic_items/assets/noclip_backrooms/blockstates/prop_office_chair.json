@@ -1,19 +1,19 @@
 {
-  "variants": {
-    "facing=north": {
-      "model": "noclip_backrooms:block/trial/prop_office_chair"
-    },
-    "facing=east": {
-      "model": "noclip_backrooms:block/trial/prop_office_chair",
-      "y": 90
-    },
-    "facing=south": {
-      "model": "noclip_backrooms:block/trial/prop_office_chair",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "noclip_backrooms:block/trial/prop_office_chair",
-      "y": 270
-    }
+ "variants": {
+  "facing=north": {
+   "model": "noclip_backrooms:block/look/prop_office_chair"
+  },
+  "facing=east": {
+   "model": "noclip_backrooms:block/look/prop_office_chair",
+   "y": 90
+  },
+  "facing=south": {
+   "model": "noclip_backrooms:block/look/prop_office_chair",
+   "y": 180
+  },
+  "facing=west": {
+   "model": "noclip_backrooms:block/look/prop_office_chair",
+   "y": 270
   }
+ }
 }

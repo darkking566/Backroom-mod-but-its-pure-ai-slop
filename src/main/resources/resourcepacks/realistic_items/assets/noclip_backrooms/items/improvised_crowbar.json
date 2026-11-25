@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "noclip_backrooms:item/trial/improvised_crowbar"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "noclip_backrooms:item/look/improvised_crowbar"
+ }
 }

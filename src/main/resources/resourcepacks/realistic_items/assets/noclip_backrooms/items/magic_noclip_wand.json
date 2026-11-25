@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "noclip_backrooms:item/trial/magic_noclip_wand"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "noclip_backrooms:item/look/magic_noclip_wand"
+ }
 }

@@ -1,0 +1,84 @@
+"""The realistic items pack: Gemini's items, weapons, gear and props redrawn in the levels' style.
+
+Box models with 64-pixel materials made from CC0 photos plus wear and grime (tools/item_look/mats.py), each with labPBR
+_n / _s. Everything is written into the built-in resource pack "realistic_items" (on by default; core.look.ItemLook),
+which replaces the listed items' models while it is on; Gemini's own models stay as they are underneath.
+
+  tools/item_look/lib.py      helpers: textures, materials, boxes, poses
+  tools/item_look/mats.py     the material library
+  tools/item_look/melee.py    the 41 melee weapons
+  tools/item_look/ported.py   the eight trial pieces (approved 2026-11-25), until their categories are redone
+
+Run from the repository root:  py -I tools/make_realistic_items.py
+The pack's assets are written afresh each time.
+"""
+import json
+import shutil
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "item_look"))
+sys.dont_write_bytecode = True
+
+import numpy as np  # noqa: E402
+from PIL import Image  # noqa: E402
+
+import lib  # noqa: E402
+import mats  # noqa: E402, F401  (registers the materials)
+import melee  # noqa: E402
+import ported  # noqa: E402
+
+ROOT = lib.ROOT
+
+
+def items():
+    """id -> (elements, display) for every redrawn item."""
+    out = {}
+    for name, build in melee.WEAPONS.items():
+        out[name] = build()
+    for name, build in ported.ITEMS.items():
+        out.setdefault(name, build())
+    return out
+
+
+def props():
+    return {name: build() for name, build in ported.PROPS.items()}
+
+
+def main():
+    if lib.OUT.exists():
+        shutil.rmtree(lib.OUT)
+    done = []
+    for name, (elements, display) in items().items():
+        lib.write(lib.OUT / "models/item/look" / f"{name}.json", lib.model(elements, "item", display))
+        lib.write(lib.OUT / "items" / f"{name}.json", {"model": {"type": "minecraft:model", "model": f"noclip_backrooms:item/look/{name}"}})
+        done.append(name)
+    for name, elements in props().items():
+        lib.write(lib.OUT / "models/block/look" / f"{name}.json", lib.model(elements, "block", parent="minecraft:block/block"))
+        lib.write(lib.OUT / "items" / f"{name}.json", {"model": {"type": "minecraft:model", "model": f"noclip_backrooms:block/look/{name}"}})
+        states = json.loads((lib.ASSETS / "blockstates" / f"{name}.json").read_text(encoding="utf8"))
+        for variant in states.get("variants", {}).values():
+            for v in variant if isinstance(variant, list) else [variant]:
+                v["model"] = f"noclip_backrooms:block/look/{name}"
+        lib.write(lib.OUT / "blockstates" / f"{name}.json", states)
+        done.append(name)
+    lib.write(lib.OUT / "item_look.json", {"replaces": sorted(done)})
+    lib.write(lib.PACK / "pack.mcmeta", {"pack": {"description": {"translate": "pack.noclip_backrooms.realistic_items.description",
+                                                                   "fallback": "Items and props in the levels' worn style"},
+                                                  "min_format": 88, "max_format": 88}})
+    # A sheet of the materials, for a look without the game.
+    names = sorted(lib._MADE)
+    cell = 72
+    sheet = Image.new("RGB", (cell * 10, cell * ((len(names) + 9) // 10)), (30, 30, 30))
+    for i, name in enumerate(names):
+        image = lib._MADE[name][0]
+        tile = Image.fromarray((image * 255).round().astype(np.uint8), "RGBA").resize((cell - 6, cell - 6), Image.NEAREST)
+        bg = Image.new("RGBA", tile.size, (60, 60, 60, 255))
+        bg.alpha_composite(tile)
+        sheet.paste(bg.convert("RGB"), ((i % 10) * cell + 3, (i // 10) * cell + 3))
+    sheet.save(ROOT / "docs/look/items_materials.png")
+    print(f"{len(done)} items and props, {len(names)} materials -> {lib.PACK.relative_to(ROOT)}")
+
+
+if __name__ == "__main__":
+    main()

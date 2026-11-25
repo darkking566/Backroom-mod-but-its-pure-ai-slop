@@ -33,7 +33,7 @@ public final class BlenderPropRenderer implements BlockEntityRenderer<PropBlockE
 	public static final class PropRenderState extends BlockEntityRenderState {
 		public String propId = null;
 		public Direction facing = Direction.NORTH;
-		/** Set while Claude's trial pack (core.look.TrialPack) redraws this prop from its block model. */
+		/** Set while the realistic items pack (core.look.ItemLook) redraws this prop from its block model. */
 		public net.minecraft.client.renderer.block.MovingBlockRenderState trial = null;
 	}
 
@@ -59,7 +59,7 @@ public final class BlenderPropRenderer implements BlockEntityRenderer<PropBlockE
 		state.facing = bs.hasProperty(HorizontalDirectionalBlock.FACING)
 				? bs.getValue(HorizontalDirectionalBlock.FACING) : Direction.NORTH;
 		state.trial = null;
-		if (dev.noclip.backrooms.core.look.TrialPack.replaces(state.propId)
+		if (dev.noclip.backrooms.core.look.ItemLook.replaces(state.propId)
 				&& entity.getLevel() instanceof net.minecraft.client.multiplayer.ClientLevel level) {
 			var trial = new net.minecraft.client.renderer.block.MovingBlockRenderState();
 			trial.randomSeedPos = entity.getBlockPos();

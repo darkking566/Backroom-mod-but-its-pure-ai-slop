@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "noclip_backrooms:item/trial/almond_elixir"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "noclip_backrooms:item/look/almond_elixir"
+ }
 }

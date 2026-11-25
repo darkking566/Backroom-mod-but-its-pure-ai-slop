@@ -1328,6 +1328,6 @@
   "block.noclip_backrooms.prop_water_cooler": "辦公室飲水機",
   "block.noclip_backrooms.prop_vending_machine": "大廳飲料販賣機",
   "block.noclip_backrooms.prop_fridge": "雙門大冰箱",
-  "pack.noclip_backrooms.claude_trial": "後室：Claude 試作模型",
-  "pack.noclip_backrooms.claude_trial.description": "8 樣物品照樓層風格重做，比較用"
+  "pack.noclip_backrooms.realistic_items": "後室：寫實物品",
+  "pack.noclip_backrooms.realistic_items.description": "物品、武器、裝備與家具改成跟樓層一樣舊舊髒髒的風格"
 }

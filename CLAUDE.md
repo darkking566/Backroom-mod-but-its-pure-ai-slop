@@ -407,6 +407,13 @@
   - 推送前抓 GitHub：朋友那邊新推了 33 個提交（停車場審查報告各批、Level 2 磚牆四種畫法、Level 0.1 樓梯頭頂空間等），合併時只有 `CLAUDE.md` 衝突（兩邊的 Antigravity 紀錄都保留）
   - 朋友新加的 741 張寫實貼圖是 512（停車場 714、Level 2 磚牆 27），照規格書用 `tools/resize_realistic.py` 縮成 128／64；`make_level1_realistic.py`、`make_garden_plants.py` 最後也加上存完自動縮小；資源包 32 MB；`runClientGameTest -Plevels=1 -Psections=gardenPlants` 通過，截圖看過停車場水泥、標誌、花園植物在 128 下仍清楚
   - 合併後 `gradlew build`（81 個單元測試）通過
+  - 使用者同意後把 `main` 推送到 GitHub（`cb884c24`）；沒有強制推送、沒有改寫歷史
+- 寫實物品第一批（使用者要求「其他全部都做好」，依類別分批做）：
+  - 試作包改成正式的內建資源包「後室：寫實物品」（`resourcepacks/realistic_items/`，預設開啟）；客戶端 `core/look/TrialPack` 改名 `ItemLook`，「換掉哪些」改成在資源包重新載入時讀包裡的 `item_look.json`（包關掉就讀不到、全部回到 Gemini 的版本）；Gemini 兩支繪製程式的判斷跟著改名
+  - 產生工具改成共用工具包：`tools/make_realistic_items.py` 加 `tools/item_look/`（`lib.py` 貼圖、材質登記、方塊與姿勢；`mats.py` 材質庫約 70 種，照片打底再加鏽、剝落、刮痕、髒污；`melee.py`；`ported.py` 試作的 8 樣）；刪掉 `tools/make_trial_items.py` 與 `trial/TrialClientTest`
+  - 41 把冷兵器全部重做（`melee.py`：握柄、柄頭、護手、直刃、彎刃、槍頭、斧頭、錘頭等零件組裝，真實比例）；超過 Minecraft 模型長度上限 3 格的（關刀、長戟）等比例縮小再由顯示比例放大
+  - 拿在手上的姿勢：第一人稱依長度調大小、短的抬高；第三人稱試了四種角度（[0,0,0]、[90,0,0]、[0,0,90]、[-90,0,0]），只有 [-90,0,0] 會立著握，全部用它；刀刃材質調暗（在 Level 0 燈下原本太白）
+  - 新增實機測試 `itemlook/ItemLookClientTest`（`-Plevels=itemlook`：包關／開各一輪，箱子排出全部圖示、8 把拿在手上、5 把第三人稱、家具近照），通過、沒有模型載入錯誤；比較圖 `docs/look/items/`；新增規範 `docs/look/ITEMS.md`（風格、做法、怎麼新增、進度）；`docs/look/README.md` 改成指向它；語言檔包名改為「後室：寫實物品」
 
 ## 動作記錄（Antigravity）
 

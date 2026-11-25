@@ -1,6 +1,6 @@
 {
-  "model": {
-    "type": "minecraft:model",
-    "model": "noclip_backrooms:item/trial/gun_pipe_pistol"
-  }
+ "model": {
+  "type": "minecraft:model",
+  "model": "noclip_backrooms:item/look/gun_pipe_pistol"
+ }
 }
