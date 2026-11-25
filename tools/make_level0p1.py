@@ -403,17 +403,18 @@ def scorched_ceiling():
 def door_leaf(top):
     m = flat((226, 230, 234), 0.85, 120)
     grain(m, 191, 0.02)
-    paint(m, lines(128, 1.0, axes="x") * 0.0 + box(61, -2, 67, 130), (110, 116, 124), height=-2.4)  # the two leaves meet
-    frame = np.maximum(1 - step(5, 7, np.minimum(X, SIZE - 1 - X)), 0)
+    # One leaf per block: the frame on the hinge side (left), the seam where it meets its partner on the right.
+    paint(m, box(122, -2, 130, 130), (110, 116, 124), height=-2.4)
+    frame = np.maximum(1 - step(5, 7, X), 0)
     paint(m, frame, (150, 156, 164), height=1.8, smooth=0.7)
     if top:
-        paint(m, box(26, 20, 102, 96), (34, 40, 52), height=-1.5)
+        paint(m, box(30, 20, 98, 96), (34, 40, 52), height=-1.5)
         sky = (66 + 90 * (Y / SIZE))[..., None] * np.array([0.7, 0.9, 1.2])
-        paint(m, box(28, 22, 100, 94) * 0.55, np.clip(sky, 0, 255), glow=0.2)
+        paint(m, box(32, 22, 96, 94) * 0.55, np.clip(sky, 0, 255), glow=0.2)
         paint(m, box(-2, 110, 130, 114), (214, 176, 48), height=0.6)
     else:
         paint(m, box(8, 100, 120, 126), (140, 146, 154), height=1.2)
-        paint(m, box(54, 52, 58, 76) + box(70, 52, 74, 76), (190, 196, 204), height=1.6, smooth=0.9)
+        paint(m, box(104, 52, 110, 76), (190, 196, 204), height=1.6, smooth=0.9)  # one handle, by the seam
         paint(m, box(-2, 4, 130, 8), (214, 176, 48), height=0.6)
     weather(m, 192 + int(top), 0.35)
     return m
@@ -656,9 +657,10 @@ def cables_texture():
     palette = [(200, 50, 40), (60, 130, 200), (220, 190, 60), (30, 30, 34), (70, 180, 90)]
     rng = np.random.default_rng(351)
     for i in range(7):
-        x0, length = rng.uniform(14, 114), rng.uniform(50, 126)
+        x0, _length = rng.uniform(14, 114), rng.uniform(50, 126)  # length kept so the draws (and wire positions) stay the same
         sway = rng.uniform(-5, 5)
-        wire = (1 - step(1.4, 2.6, np.abs(X - (x0 + sway * np.sin(Y / 30.0 + i))))) * (1 - step(length - 4, length, Y))
+        # Full length and seamless top to bottom (sin of a whole period over 128), so stacked blocks run on as one bundle.
+        wire = 1 - step(1.4, 2.6, np.abs(X - (x0 + sway * np.sin(Y * 2 * np.pi / SIZE + i))))
         colour = palette[i % len(palette)]
         paint(m, wire, colour, height=1.2)
         alpha = np.maximum(alpha, wire)
@@ -978,14 +980,15 @@ def model_console():
     return {"parent": "minecraft:block/block",
             "textures": {"particle": tex("console_side"), "side": tex("console_side"), "top": tex("console_top"), "screen": tex("console_front")},
             "elements": [el((0, 0, 0), (16, 8, 16), {"up": "#top", "down": "#side", "north": "#side", "south": "#side", "east": "#side", "west": "#side"}),
-                         el((1, 8, 9), (15, 12, 15), {"north": {"texture": "#screen", "light_emission": 12}, **sides("#side", ("south", "east", "west", "up"))},
+                         # The screen face shows the whole drawn screen (it sits at 1..15 x 1..13 of the texture), not a strip of it.
+                         el((1, 8, 11), (15, 14, 14), {"north": {"texture": "#screen", "uv": [0, 1, 16, 13], "light_emission": 12}, **sides("#side", ("south", "east", "west", "up"))},
                             rotation={"angle": -22.5, "axis": "x", "origin": [8, 8, 12]})]}
 
 
 def model_broken_console():
     m = model_console()
     m["textures"]["screen"] = tex("broken_console_front")
-    m["elements"][1]["faces"]["north"] = {"texture": "#screen"}
+    m["elements"][1]["faces"]["north"] = {"texture": "#screen", "uv": [0, 1, 16, 13]}
     return m
 
 

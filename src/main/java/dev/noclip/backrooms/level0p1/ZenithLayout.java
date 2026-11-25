@@ -736,10 +736,11 @@ final class ZenithLayout {
 		// A picture over the middle bed.
 		if (t == 2 && b == 0 && a == 1 && room % 4 != 3) return of(Kind.FRAME, face);
 		// A wardrobe standing open, or the plain locker.
-		if (b == 0 && a == 3 && t <= 2) return room % 2 == 0 ? of(Kind.WARDROBE, face) : of(Kind.LOCKER, face, t - 1);
+		// One block tall: the models are whole pieces, and a second one on top reads as two stacked.
+		if (b == 0 && a == 3 && t == 1) return room % 2 == 0 ? of(Kind.WARDROBE, face) : of(Kind.LOCKER, face);
 		// A desk with a lamp, or the plain table with someone's things on it.
 		if (a == 2 && b == 3 && roll % 2 == 0) {
-			if (t == 1) return of(room % 2 == 0 ? Kind.DESK : Kind.TABLE);
+			if (t == 1) return room % 2 == 0 ? of(Kind.DESK, (face + 2) % 4) : of(Kind.TABLE); // drawers toward the wall side
 			if (t == 2 && room % 2 != 0) return of(Kind.ITEMS);
 		}
 		return of(Kind.AIR);
@@ -753,7 +754,7 @@ final class ZenithLayout {
 			if (t == 1) return of(Kind.TABLE);
 			if (t == 2) return of(Kind.DISHES);
 		}
-		if (a == 3 && b == 3 && t <= 2) return roll % 2 == 0 ? of(Kind.FRIDGE, face) : of(Kind.LOCKER, face, t - 1);
+		if (a == 3 && b == 3 && t == 1) return roll % 2 == 0 ? of(Kind.FRIDGE, face) : of(Kind.LOCKER, face);
 		return of(Kind.AIR);
 	}
 
@@ -776,7 +777,7 @@ final class ZenithLayout {
 			if (t == 1) return of(Kind.PLANTER);
 			if (t == 2 && roll % 3 != 0) return of(Kind.LEAVES);
 		}
-		if (a == 3 && b == 0 && t <= 2) return of(Kind.TANK, face);
+		if (a == 3 && b == 0 && t == 1) return of(Kind.TANK, face);
 		if (t == 6 && a == 3 && b == 3) return of(Kind.ORB);
 		if (t == 6 && a == 1 && (b == 1 || b == 3)) return of(Kind.GROW_LIGHT);
 		if (t == 5 && a == 1 && (b == 1 || b == 3) && roll % 2 == 0) return of(Kind.VINES);
@@ -824,7 +825,6 @@ final class ZenithLayout {
 
 	private static int storage(int a, int b, int t, int face, int roll) {
 		if (t == 1 && b == 0) return roll % 2 == 0 ? of(Kind.LOCKER, face) : of(Kind.CRATE);
-		if (t == 2 && b == 0 && roll % 2 == 0) return of(Kind.LOCKER, face, 1);
 		if (t == 1 && roll % 4 == 0) return of(Kind.CRATE);
 		if (t == 2 && roll % 11 == 0) return of(Kind.CRATE);
 		return of(Kind.AIR);

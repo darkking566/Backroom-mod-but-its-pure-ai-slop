@@ -197,6 +197,15 @@
   - 攝影機濾鏡：Level 0.1 的霧改成 24～320 格（`Look.Mood.ZENITH`），環廊與天橋看得到奇點
   - `gradlew build` 與 `runClientGameTest -Plevels=0.1 -Psections=rooms,atrium,middle,details,variants,stairs` 通過，截圖看過欄杆、牆面、奇點；更新 `docs/levels/level0p1/screens/` 8 張
   - 還沒修（報告其餘項目）：雙格家具疊兩顆、雙開門圖案、小家具貼圖與 uv、合併／挑高／狹長房間的懸空與密室、外窗三層玻璃、選取框、自動門、停電高度、換世界後廣播靜音、機器人細節、`blocks` 測試段、挖掘標籤
+- Level 0.1 審查報告第二批：
+  - 冰箱、敞開衣櫃、水箱、置物櫃（寢室、廚房、儲藏室）改成只放 1 格高，不再上下疊兩顆一樣的（`ZenithLayout`）；沒有另做 2 格高的模型
+  - 自動門貼圖改成一格一扇：鉸鏈側是門框、另一側是門縫和一支把手，兩扇並排時鏡像成一組對開門（`make_level0p1.door_leaf`）
+  - 船員書桌加方向（`ZenithFacingBlock`，寢室的抽屜朝牆那側）；只有桌腳櫃正面有抽屜，其他面與桌面側邊改用新的素木貼圖 `desk_wood`
+  - 實驗袍改成 0.5 像素薄、有袖子的鏤空剪影，加深色邊讓它在白牆上看得出來
+  - 控制台、壞控制台的螢幕改成顯示整個畫面（加 `uv`、螢幕加高）
+  - 垂掛電纜的電線改成從頂到底連續，疊 2～3 格不會在中間斷掉又重長
+  - `Level0p1ClientTest` 新增 `props` 段（站外黑暗處擺一排家具拍近照，`-Psections=props`）；`gradlew build` 與 `rooms,details,doors,zones,props` 段實機測試通過，截圖看過門、書桌、控制台、實驗袍、電纜、床；新增 `docs/levels/level0p1/screens/props_*.png`
+  - `docs/levels/level0p1/screens/kitchen.png` 還是上一批拍的（置物櫃疊兩格的樣子），沒重拍
 
 ## 動作記錄（Antigravity）
 

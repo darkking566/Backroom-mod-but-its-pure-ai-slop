@@ -126,7 +126,7 @@ final class ZenithChunkGenerator extends ChunkGenerator {
 			case CRATE -> ZenithBlocks.SUPPLY_CRATE.defaultBlockState();
 			case CABLES -> ZenithBlocks.HANGING_CABLES.defaultBlockState();
 			case TABLE -> ZenithBlocks.CREW_TABLE.defaultBlockState();
-			case DESK -> ZenithBlocks.CREW_DESK.defaultBlockState();
+			case DESK -> facing(ZenithBlocks.CREW_DESK, dir);
 			case WARDROBE -> facing(ZenithBlocks.OPEN_WARDROBE, dir);
 			case BUNK_BED -> facing(ZenithBlocks.BUNK_BED, dir);
 			case FRAME -> facing(ZenithBlocks.WALL_FRAME, dir);

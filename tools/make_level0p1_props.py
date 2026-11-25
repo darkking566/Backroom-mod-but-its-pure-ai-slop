@@ -40,8 +40,12 @@ def desk_top():
     return m
 
 
+def desk_wood():
+    return base((150, 126, 98), 304, 0.3, 10)
+
+
 def desk_side():
-    m = base((150, 126, 98), 304, 0.3, 10)
+    m = desk_wood()
     paint(m, box(18, 20, 110, 56), (128, 104, 80), height=-1.2)
     paint(m, box(18, 70, 110, 106), (128, 104, 80), height=-1.2)
     paint(m, box(54, 34, 74, 40), (210, 204, 190), height=1.5, smooth=0.8)
@@ -334,7 +338,21 @@ def lab_notes():
 
 
 def lab_coat():
+    """A coat on a hook, cut out: shoulders, two sleeves hanging, the body flaring a little toward the hem."""
     m = flat((226, 230, 234), 0.3, 10)
+    half = np.abs(X - 63.5)
+    body = (half < 26 + Y * 0.08) & (Y > 10)
+    sleeves = (half > 28 + Y * 0.06) & (half < 44 + Y * 0.04) & (Y > 16) & (Y < 104)
+    hook = (half < 4) & (Y <= 10)
+    shape = body | sleeves | hook
+    L.ALPHA["lab_coat"] = np.where(shape, 255.0, 0.0)
+    # A darker rim so the white coat reads against the pale station wall.
+    inner = shape.copy()
+    for dy, dx in ((3, 0), (-3, 0), (0, 3), (0, -3)):
+        inner &= np.roll(np.roll(shape, dy, 0), dx, 1)
+    paint(m, (shape & ~inner).astype(float), (128, 134, 142), height=-1)
+    paint(m, hook.astype(float), (120, 124, 130))
+    paint(m, ((half > 26 + Y * 0.08) & (half < 29 + Y * 0.06)).astype(float) * 0.6, (180, 186, 194), height=-1)  # where sleeve meets body
     paint(m, box(44, 0, 84, 30), (200, 206, 212), height=-1)  # the collar
     paint(m, box(60, 30, 68, 128), (190, 196, 204), height=-1)  # the opening
     paint(m, box(16, 74, 44, 100), (206, 212, 218), height=1.5)  # a pocket
@@ -344,7 +362,7 @@ def lab_coat():
 
 
 TEXTURES = {
-    "desk_top": desk_top, "desk_side": desk_side, "desk_lamp": desk_lamp, "wardrobe_front": wardrobe_front,
+    "desk_top": desk_top, "desk_wood": desk_wood, "desk_side": desk_side, "desk_lamp": desk_lamp, "wardrobe_front": wardrobe_front,
     "frame_art": frame_art, "frame_wood": frame_wood,
     "clutter_book": lambda: clutter((176, 60, 52), (230, 220, 200), 333),
     "clutter_cloth": lambda: clutter((70, 110, 170), (210, 214, 220), 334),
@@ -374,9 +392,12 @@ def cuboid(frm, to, face, **extra):
 
 
 def model_desk():
-    return model({"top": "desk_top", "side": "desk_side", "lamp": "desk_lamp", "steel": "bar_steel"}, [
-        el((0, 11, 0), (16, 13, 16), {"up": "#top", "down": "#side", **sides("#side", ("north", "south", "east", "west"))}),
-        cuboid((0, 0, 1), (4, 11, 15), "#side"), cuboid((12, 0, 1), (16, 11, 15), "#side"),
+    # Drawers only on the pedestals' fronts (north); the other faces and the top's edge are plain wood.
+    pedestal = lambda x0, x1: el((x0, 0, 1), (x1, 11, 15), {"north": {"texture": "#side", "uv": FULLUV},
+                                                            **sides("#wood", ("south", "east", "west", "up", "down"))})
+    return model({"top": "desk_top", "side": "desk_side", "wood": "desk_wood", "lamp": "desk_lamp", "steel": "bar_steel"}, [
+        el((0, 11, 0), (16, 13, 16), {"up": "#top", "down": "#wood", **sides("#wood", ("north", "south", "east", "west"))}),
+        pedestal(0, 4), pedestal(12, 16),
         cuboid((11, 13, 11), (14, 14, 14), "#steel"), cuboid((12, 14, 12), (13, 16, 13), "#steel"),
         el((10, 15, 10), (15, 16, 15), {"up": "#lamp", "down": "#lamp", **sides("#lamp", ("north", "south", "east", "west"))}, shade=False, light_emission=14)])
 
@@ -531,7 +552,7 @@ def model_notes():
 
 def model_coat():
     return model({"c": "lab_coat"}, [
-        el((3, 0, 14), (13, 16, 16), {"north": {"texture": "#c", "uv": FULLUV}, **sides("#c", ("south", "east", "west", "up", "down"), uv=FULLUV)})])
+        el((0, 0, 15), (16, 16, 15.5), {"north": {"texture": "#c", "uv": FULLUV}, "south": {"texture": "#c", "uv": [16, 0, 0, 16]}})])
 
 
 MODELS = {
@@ -542,7 +563,7 @@ MODELS = {
     "ceiling_speaker": model_speaker, "icicles": model_icicles, "ice_drift": model_drift, "slag_pile": model_slag, "heat_vent": model_vent,
     "countdown_screen": model_countdown, "bridge_coil": model_coil, "research_notes": model_notes, "lab_coat": model_coat,
 }
-FACING = {"open_wardrobe", "bunk_bed", "wall_frame", "kitchen_sink", "fridge", "hanging_pots", "bench_press", "wall_mirror", "water_dispenser", "water_tank", "countdown_screen", "lab_coat"}
+FACING = {"crew_desk", "open_wardrobe", "bunk_bed", "wall_frame", "kitchen_sink", "fridge", "hanging_pots", "bench_press", "wall_mirror", "water_dispenser", "water_tank", "countdown_screen", "lab_coat"}
 
 NAMES_EN = {
     "crew_desk": "Crew Desk", "open_wardrobe": "Open Wardrobe", "bunk_bed": "Bunk Bed", "wall_frame": "Framed Picture", "personal_items": "Personal Belongings",

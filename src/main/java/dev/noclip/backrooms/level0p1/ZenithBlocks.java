@@ -115,7 +115,7 @@ public final class ZenithBlocks {
 
 	// What makes the rooms look lived in: bedrooms, galleys, gyms, hydroponic greenhouses.
 	public static final Block CREW_DESK = register("crew_desk", steel(MapColor.WOOD, 2.0F).sound(SoundType.WOOD).noOcclusion().lightLevel(s -> 6),
-			p -> new ZenithShapedBlock(p, DESK, true));
+			p -> new ZenithFacingBlock(p, DESK));
 	public static final Block OPEN_WARDROBE = register("open_wardrobe", steel(MapColor.COLOR_LIGHT_GRAY, 3.0F), p -> new ZenithFacingBlock(p, FULL));
 	public static final Block BUNK_BED = register("bunk_bed", steel(MapColor.COLOR_BLUE, 2.0F).sound(SoundType.WOOL).noOcclusion(), p -> new ZenithFacingBlock(p, FULL));
 	public static final Block WALL_FRAME = register("wall_frame", steel(MapColor.WOOD, 0.5F).sound(SoundType.WOOD).noOcclusion().noCollision(), p -> new ZenithFacingBlock(p, THIN));

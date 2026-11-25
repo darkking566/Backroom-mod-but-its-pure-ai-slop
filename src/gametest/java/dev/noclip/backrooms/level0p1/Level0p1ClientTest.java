@@ -67,6 +67,7 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 			if (only("ways")) ways(context, game, arrival);
 			if (only("hatch")) hatch(context, game);
 			if (only("blocks")) blocks(game);
+			if (only("props")) props(context, game);
 		}
 	}
 
@@ -509,6 +510,34 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 			return null;
 		});
 		check(found != null, "the hatch was not put in chunk " + where[0] + ", " + where[1]);
+	}
+
+	/** Close-ups of furniture set out in a row in the empty dark outside the station, all facing the camera (north), on lit floor. */
+	private void props(ClientGameTestContext context, TestSingleplayerContext game) {
+		int x0 = -6, y = 0, z0 = 900;
+		game.getServer().runOnServer(s -> {
+			ServerLevel level = station(s);
+			for (int x = x0 - 1; x <= x0 + 13; x++) {
+				for (int z = z0 - 5; z <= z0 + 1; z++) level.setBlock(new BlockPos(x, y - 1, z), ZenithBlocks.CEILING_LIGHT.defaultBlockState(), 2);
+				for (int dy = 0; dy < 4; dy++) level.setBlock(new BlockPos(x, y + dy, z0 + 1), ZenithBlocks.WALL_PANEL.defaultBlockState(), 2);
+				level.setBlock(new BlockPos(x, y + 3, z0), ZenithBlocks.DECK_CEILING.defaultBlockState(), 2);
+			}
+			Block[] row = {ZenithBlocks.CREW_DESK, ZenithBlocks.CONSOLE, ZenithBlocks.BROKEN_CONSOLE, ZenithBlocks.LAB_COAT, ZenithBlocks.CREW_BED,
+					ZenithBlocks.FRIDGE, ZenithBlocks.CREW_LOCKER};
+			for (int i = 0; i < row.length; i++) {
+				level.setBlock(new BlockPos(x0 + i, y, z0), row[i].defaultBlockState().setValue(ZenithFacingBlock.FACING, net.minecraft.core.Direction.NORTH), 2);
+			}
+			level.setBlock(new BlockPos(x0 + 8, y + 2, z0), ZenithBlocks.HANGING_CABLES.defaultBlockState(), 2);
+			level.setBlock(new BlockPos(x0 + 8, y + 1, z0), ZenithBlocks.HANGING_CABLES.defaultBlockState(), 2);
+			for (int i = 0; i < 2; i++) {
+				for (int half = 0; half < 2; half++) {
+					level.setBlock(new BlockPos(x0 + 10 + i, y + half, z0), ZenithChunkGenerator.state(ZenithLayout.of(ZenithLayout.Kind.DOOR, 0, (half << 1) | i)), 2);
+				}
+			}
+		});
+		shoot(context, game, x0 + 2.5, y + 0.6, z0 - 3.2, 0, 15, "level0p1_props_left");
+		shoot(context, game, x0 + 8.5, y + 0.6, z0 - 3.2, 0, 15, "level0p1_props_right");
+		shoot(context, game, x0 + 3.5, y + 0.6, z0 - 2.0, 25, 20, "level0p1_props_coat");
 	}
 
 	/** Every block has a name and drops itself (the unbreakable ones have no drops). */
