@@ -90,7 +90,13 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 				}
 				return Blocks.AIR.defaultBlockState();
 			}
-			if (Maze.isThickCarpet(seed, x, z)) return ModBlocks.THICK_CARPET.defaultBlockState();
+			if (ix >= 2 && ix <= 5 && iz >= 2 && iz <= 5) {
+				BlockState poi = ZonePoiPlan.standardZoneBlockAt(seed, y, cx, cz, ix, iz, zone);
+				if (poi != null) return poi;
+			}
+			if (Maze.isThickCarpet(seed, x, z)) {
+				return ModBlocks.THICK_CARPET.defaultBlockState();
+			}
 			if (zone == Maze.Zone.PILLARS) return ModBlocks.DRY_CARPET.defaultBlockState();
 			if (ix >= 2 && ix <= 5 && iz >= 2 && iz <= 5) {
 				Maze.FloorAccent accent = Maze.floorAccent(seed, cx, cz);
@@ -126,6 +132,10 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		if (Maze.isWall(seed, x, z, topLayer, epochs)) {
 			return wallBlockAt(seed, x, z, cx, cz, ix, iz, zone, baseboard, epochs);
 		}
+		if (y >= FLOOR_Y + 1 && y <= FLOOR_Y + 3) {
+			BlockState poi = ZonePoiPlan.standardZoneBlockAt(seed, y, cx, cz, ix, iz, zone);
+			if (poi != null) return poi;
+		}
 		if (topLayer && isDroppedCeilingTile(seed, x, z, ix, iz, ceiling, epochs)) {
 			return ModBlocks.CEILING_TILE.defaultBlockState();
 		}
@@ -147,6 +157,8 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		if (y < floorY) {
 			return cliffStrataBlock(y, false);
 		}
+		BlockState poi = ZonePoiPlan.chasmBlockAt(seed, y, cx, cz, ix, iz, floorY, ceilY);
+		if (poi != null) return poi;
 		if (y == floorY) {
 			Direction stair = ChasmPlan.stairFacingAt(seed, x, z);
 			if (stair != null) {
@@ -192,6 +204,9 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 			Maze.EpochSource epochs) {
 		int floorY = MegahallPlan.walkableFloorY(seed, x, z);
 		int ceilY = MegahallPlan.cellCeilingY(seed, cx, cz);
+
+		BlockState poi = ZonePoiPlan.megahallBlockAt(seed, y, cx, cz, ix, iz, floorY, ceilY);
+		if (poi != null) return poi;
 
 		if (y < floorY) return Blocks.CONCRETE.black().defaultBlockState();
 		if (y == floorY) {
@@ -292,6 +307,7 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		if (!Maze.isLamp(seed, x, z, epochs)) return ModBlocks.CEILING_TILE.defaultBlockState();
 		if (Exits.lampPointsToExit(seed, x, z)) return ModBlocks.EXIT_LIGHT.defaultBlockState();
 		if (!Maze.lampWorks(seed, x, z, epochs)) return ModBlocks.BROKEN_FLUORESCENT_LIGHT.defaultBlockState();
+		if (ZonePoiPlan.isFunDoorCell(seed, x, z)) return ModBlocks.MANILA_LIGHT.defaultBlockState();
 		return (zone == Maze.Zone.RED_ROOM ? ModBlocks.RED_FLUORESCENT_LIGHT : ModBlocks.FLUORESCENT_LIGHT).defaultBlockState();
 	}
 

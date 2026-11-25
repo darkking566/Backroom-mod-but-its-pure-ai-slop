@@ -32,6 +32,7 @@ public final class Level0 {
 		PitEffects.register();
 		FlashlightLight.register();
 		StaircaseBreaker.register();
+		FuseBoxEvents.register();
 		Level0Props.register();
 		// How you arrive here through an exit from another level (see core.LevelExits).
 		LevelExits.open("0", Level0Arrival::arrive);

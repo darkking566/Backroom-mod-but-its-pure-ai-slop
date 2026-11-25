@@ -197,7 +197,7 @@ final class MegahallPlan {
 		return ix >= 2 && ix <= 4 && iz >= 2 && iz <= 4;
 	}
 
-	private static BayFloor bayFloor(long seed, int baseCx, int baseCz, int bx, int bz) {
+	static BayFloor bayFloor(long seed, int baseCx, int baseCz, int bx, int bz) {
 		int roll = Math.floorMod(hash(seed, baseCx + bx, baseCz + bz, MEGA_SALT + 7), 10);
 		if (roll < 2) return BayFloor.SUNKEN_PLAZA;
 		if (roll == 2) return BayFloor.RAISED_PODIUM;
@@ -221,7 +221,7 @@ final class MegahallPlan {
 		};
 	}
 
-	private static int bayCenter(int bayIdx) {
+	static int bayCenter(int bayIdx) {
 		return switch (bayIdx) {
 			case 0 -> 2;
 			case 1 -> 5;

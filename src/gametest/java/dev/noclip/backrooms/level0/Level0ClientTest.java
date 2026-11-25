@@ -1,7 +1,9 @@
 package dev.noclip.backrooms.level0;
 
+import dev.noclip.backrooms.core.LevelExits;
 import dev.noclip.backrooms.level1.Level1Blocks;
 import dev.noclip.backrooms.level1.Level1Items;
+import dev.noclip.backrooms.props.BackroomsProps;
 import java.util.ArrayDeque;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -80,6 +82,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			checkFlashlight(context, game, standY);
 			checkManilaRoom(context, game, standY);
 			checkStaircaseComplexes(context, game, standY);
+			checkZonePois(context, game, standY);
 			server.runOnServer(s -> {
 				for (int i = 0; i < ModBlocks.ALL.size(); i++) {
 					player(s).getInventory().setItem(i, new ItemStack(ModBlocks.ALL.get(i)));
@@ -524,6 +527,367 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(5);
+	}
+
+	private static void checkZonePois(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
+		var server = game.getServer();
+		long seed = server.computeOnServer(s -> Level0ChunkGenerator.mazeSeed(
+				s.getLevel(Level0.LEVEL_0).getChunkSource().randomState()));
+
+		ZonePoiPlan.ChasmOutpost chasm = findChasmOutpost(seed);
+		ZonePoiPlan.MegahallLounge megahall = findMegahallLounge(seed);
+		int[] redCell = findLargeZonePoiCell(seed, Maze.Zone.RED_ROOM);
+		int[] darkenedCell = findLargeZonePoiCell(seed, Maze.Zone.DARKENED);
+
+		// 1. CHASM outpost
+		int cx = chasm.cx() * Maze.CELL, cz = chasm.cz() * Maze.CELL;
+		int cFloor = chasm.floorY();
+		server.runCommand("gamemode spectator @a");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (cx + 5.5) + " " + (cFloor + 1) + " " + (cz + 1.5) + " 45 10");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_chasm_outpost");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(cx + 3, cFloor, cz + 3)).is(Level1Blocks.GARAGE_FLOOR),
+					"Chasm outpost floor missing");
+			Block expectedLoot = chasm.tier() >= 4 ? BackroomsProps.ANOMALY_VAULT_CHEST : Level1Blocks.SUPPLY_CRATE;
+			check(level.getBlockState(new BlockPos(cx + 3, cFloor + 1, cz + 3)).is(expectedLoot),
+					"Chasm outpost chest/crate missing");
+			check(level.getBlockState(new BlockPos(cx + 4, cFloor + 1, cz + 3)).is(BackroomsProps.NOCLIPPED_FOLDING_TABLE),
+					"Chasm outpost folding table missing");
+			check(level.getBlockState(new BlockPos(cx + 4, cFloor + 2, cz + 3)).is(Level1Blocks.OLD_COMPUTER),
+					"Chasm outpost computer missing");
+			check(level.getBlockState(new BlockPos(cx + 3, cFloor + 1, cz + 4)).is(BackroomsProps.WANDERER_REMAINS),
+					"Chasm outpost wanderer remains missing");
+			check(level.getBlockState(new BlockPos(cx + 2, cFloor + 1, cz + 4)).is(BackroomsProps.INDUSTRIAL_FUSE_BOX),
+					"Chasm outpost fuse box missing");
+			int lightY = chasm.ceilY() > cFloor + 8 ? cFloor + 4 : chasm.ceilY();
+			check(level.getBlockState(new BlockPos(cx + 3, lightY, cz + 3)).is(ModBlocks.FLUORESCENT_LIGHT),
+					"Chasm outpost fluorescent light missing");
+		});
+
+		// 2. MEGATHALL skylight lounge
+		int mx = megahall.cx() * Maze.CELL, mz = megahall.cz() * Maze.CELL;
+		int mFloor = megahall.floorY();
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (mx + 5.5) + " " + (mFloor + 1) + " " + (mz + 1.5) + " 45 6");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_megahall_lounge");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(mx + 3, mFloor, mz + 3)).is(ModBlocks.MANILA_WOOD_FLOOR),
+					"Megahall lounge wood inlay missing");
+			check(level.getBlockState(new BlockPos(mx + 3, mFloor + 1, mz + 3)).is(BackroomsProps.NOCLIPPED_FOLDING_TABLE),
+					"Megahall lounge table missing");
+			check(level.getBlockState(new BlockPos(mx + 4, mFloor + 1, mz + 3)).is(BackroomsProps.NOCLIPPED_CRT_TV),
+					"Megahall lounge CRT TV missing");
+			check(level.getBlockState(new BlockPos(mx + 3, mFloor + 1, mz + 4)).is(BackroomsProps.NOCLIPPED_OFFICE_CHAIR),
+					"Megahall lounge office chair missing");
+			check(level.getBlockState(new BlockPos(mx + 2, mFloor + 1, mz + 4)).is(BackroomsProps.NOCLIPPED_WATER_COOLER),
+					"Megahall lounge water cooler missing");
+			check(level.getBlockState(new BlockPos(mx + 3, mFloor + 5, mz + 3)).is(ModBlocks.FLUORESCENT_LIGHT),
+					"Megahall lounge lightwell lamp missing");
+		});
+
+		// 3. RED_ROOM anomaly shrine
+		int rx = redCell[0] * Maze.CELL, rz = redCell[1] * Maze.CELL;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (rx + 1.5) + " " + standY + " " + (rz + 1.5) + " -45 6");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_red_shrine");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(rx + 3, Level0ChunkGenerator.FLOOR_Y, rz + 3)).is(ModBlocks.VOID_STONE),
+					"Red Room shrine pedestal missing");
+			check(level.getBlockState(new BlockPos(rx + 3, standY, rz + 3)).is(BackroomsProps.RED_ANOMALY_CLUSTER),
+					"Red Room anomaly cluster missing");
+			check(level.getBlockState(new BlockPos(rx + 4, standY, rz + 3)).is(BackroomsProps.ANOMALY_VAULT_CHEST),
+					"Red Room anomaly vault chest missing");
+			check(level.getBlockState(new BlockPos(rx + 2, standY, rz + 4)).is(BackroomsProps.WANDERER_REMAINS),
+					"Red Room wanderer remains missing");
+			check(level.getBlockState(new BlockPos(rx + 3, Level0ChunkGenerator.CEILING_Y, rz + 3)).is(ModBlocks.RED_FLUORESCENT_LIGHT),
+					"Red Room shrine light missing");
+		});
+
+		// 4. DARKENED static signal
+		int dx = darkenedCell[0] * Maze.CELL, dz = darkenedCell[1] * Maze.CELL;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (dx + 3.5) + " " + standY + " " + (dz + 5.5) + " 180 12");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_darkened_signal");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(dx + 3, standY, dz + 3)).is(BackroomsProps.NOCLIPPED_CRT_TV),
+					"Darkened signal CRT TV missing");
+			check(level.getBlockState(new BlockPos(dx + 4, standY, dz + 3)).is(BackroomsProps.WANDERER_REMAINS),
+					"Darkened signal wanderer remains missing");
+			check(level.getBlockState(new BlockPos(dx + 2, standY, dz + 4)).is(Level1Blocks.SUPPLY_CRATE),
+					"Darkened signal supply crate missing");
+		});
+
+		// 5. Sector micro-vignettes (GLASS_OFFICE, WANDERER_SITE, NOCLIP_ALCOVE)
+		EnumMap<ZonePoiPlan.VignetteType, ZonePoiPlan.Vignette> vignettes = findAllVignettes(seed);
+		ZonePoiPlan.Vignette glassOffice = vignettes.get(ZonePoiPlan.VignetteType.GLASS_OFFICE);
+		int gx = glassOffice.cx() * Maze.CELL, gz = glassOffice.cz() * Maze.CELL;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (gx + 5.5) + " " + standY + " " + (gz + 5.5) + " 135 8");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_glass_office");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(gx + 2, standY, gz + 2)).is(Blocks.STAINED_GLASS.gray()),
+					"Glass office partition missing");
+			check(level.getBlockState(new BlockPos(gx + 3, standY, gz + 3)).is(Level1Blocks.OFFICE_DESK),
+					"Glass office desk missing");
+			check(level.getBlockState(new BlockPos(gx + 3, standY + 1, gz + 3)).is(Level1Blocks.OLD_COMPUTER),
+					"Glass office computer missing");
+			check(level.getBlockState(new BlockPos(gx + 3, standY, gz + 4)).is(BackroomsProps.NOCLIPPED_OFFICE_CHAIR),
+					"Glass office chair missing");
+			check(level.getBlockState(new BlockPos(gx + 4, standY, gz + 4)).is(Level1Blocks.WASTEBASKET),
+					"Glass office wastebasket missing");
+			check(level.getBlockState(new BlockPos(gx + 4, Level0ChunkGenerator.CEILING_Y, gz + 3)).is(ModBlocks.FLUORESCENT_LIGHT),
+					"Glass office lit lamp missing");
+		});
+
+		ZonePoiPlan.Vignette wandererSite = vignettes.get(ZonePoiPlan.VignetteType.WANDERER_SITE);
+		int wx = wandererSite.cx() * Maze.CELL, wz = wandererSite.cz() * Maze.CELL;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (wx + 5.5) + " " + standY + " " + (wz + 5.5) + " 135 12");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_wanderer_site");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(wx + 3, standY, wz + 3)).is(BackroomsProps.WANDERER_REMAINS),
+					"Wanderer site remains missing");
+			check(level.getBlockState(new BlockPos(wx + 4, standY, wz + 3)).is(BackroomsProps.NOCLIPPED_WOOD_CHAIR),
+					"Wanderer site wood chair missing");
+			check(level.getBlockState(new BlockPos(wx + 2, standY, wz + 3)).is(Level1Blocks.SUPPLY_CRATE),
+					"Wanderer site supply crate missing");
+			check(level.getBlockState(new BlockPos(wx + 4, standY, wz + 4)).is(ModBlocks.FIELD_NOTE),
+					"Wanderer site field note missing");
+			check(level.getBlockState(new BlockPos(wx + 3, Level0ChunkGenerator.CEILING_Y, wz + 3)).is(ModBlocks.BROKEN_FLUORESCENT_LIGHT),
+					"Wanderer site broken lamp missing");
+		});
+
+		ZonePoiPlan.Vignette noclipAlcove = vignettes.get(ZonePoiPlan.VignetteType.NOCLIP_ALCOVE);
+		int nx = noclipAlcove.cx() * Maze.CELL, nz = noclipAlcove.cz() * Maze.CELL;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (nx + 3.5) + " " + standY + " " + (nz + 5.5) + " 180 8");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_noclip_alcove");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(nx + 3, standY, nz + 3)).is(BackroomsProps.NOCLIPPED_VENDING_MACHINE),
+					"Noclip alcove vending machine missing");
+			check(level.getBlockState(new BlockPos(nx + 4, standY, nz + 3)).is(BackroomsProps.NOCLIPPED_WATER_COOLER),
+					"Noclip alcove water cooler missing");
+			check(level.getBlockState(new BlockPos(nx + 2, standY, nz + 3)).is(BackroomsProps.NOCLIPPED_FILE_CABINET),
+					"Noclip alcove file cabinet missing");
+			check(level.getBlockState(new BlockPos(nx + 4, standY, nz + 4)).is(BackroomsProps.NOCLIPPED_OFFICE_CHAIR),
+					"Noclip alcove office chair missing");
+		});
+
+		ZonePoiPlan.Vignette breakerNiche = vignettes.get(ZonePoiPlan.VignetteType.BREAKER_NICHE);
+		int bx = breakerNiche.cx() * Maze.CELL, bz = breakerNiche.cz() * Maze.CELL;
+		server.runCommand("gamemode survival @a");
+		server.runCommand("item replace entity @a hotbar.0 with minecraft:air");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (bx + 3.5) + " " + standY + " " + (bz + 5.5) + " 180 12");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_breaker_niche");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(bx + 3, standY, bz + 3)).is(BackroomsProps.INDUSTRIAL_FUSE_BOX),
+					"Breaker niche fuse box missing");
+			check(level.getBlockState(new BlockPos(bx + 4, standY, bz + 3)).is(Level1Blocks.SUPPLY_CRATE),
+					"Breaker niche supply crate missing");
+			check(level.getBlockState(new BlockPos(bx + 2, standY + 2, bz + 3)).is(Level1Blocks.CEILING_PIPE),
+					"Breaker niche ceiling pipe missing");
+			check(level.getBlockState(new BlockPos(bx + 3, Level0ChunkGenerator.CEILING_Y, bz + 3)).is(ModBlocks.BROKEN_FLUORESCENT_LIGHT),
+					"Breaker niche overhead lamp should start broken");
+			check(FuseBoxEvents.trigger(level, player(s), new BlockPos(bx + 3, standY, bz + 3), true),
+					"Breaker niche fuse box failed to restore");
+			check(level.getBlockState(new BlockPos(bx + 3, Level0ChunkGenerator.CEILING_Y, bz + 3)).is(ModBlocks.FLUORESCENT_LIGHT),
+					"Breaker niche overhead lamp did not turn back on");
+			check(FuseBoxEvents.isOnCooldown(level, new BlockPos(bx + 3, standY, bz + 3)),
+					"Breaker niche fuse box did not enter cooldown");
+		});
+
+		ZonePoiPlan.Vignette peekChamber = vignettes.get(ZonePoiPlan.VignetteType.PEEK_CHAMBER);
+		int px = peekChamber.cx() * Maze.CELL, pz = peekChamber.cz() * Maze.CELL;
+		server.runCommand("gamemode spectator @a");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (px + 3.5) + " " + standY + " " + (pz + 5.5) + " 180 8");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_peek_chamber");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(px + 3, standY, pz + 4)).is(Blocks.GLASS),
+					"Peek chamber viewing window missing");
+			check(level.getBlockState(new BlockPos(px + 3, standY, pz + 3)).is(BackroomsProps.NOCLIPPED_WOOD_CHAIR),
+					"Peek chamber chair missing");
+			check(level.getBlockState(new BlockPos(px + 3, standY, pz + 2)).isAir(),
+					"Peek chamber north back entrance must stay open");
+			check(level.getBlockState(new BlockPos(px + 3, Level0ChunkGenerator.CEILING_Y, pz + 3)).is(ModBlocks.FLUORESCENT_LIGHT),
+					"Peek chamber light missing");
+		});
+
+		// 6. Mystery foreshadowing exits (HUB_DOOR -> "hub", FUN_DOOR -> "fun")
+		ZonePoiPlan.MysteryExit hubExit = findMysteryExit(seed, ZonePoiPlan.MysteryKind.HUB);
+		int hx = hubExit.cx() * Maze.CELL, hz = hubExit.cz() * Maze.CELL;
+		server.runCommand("gamemode survival @a");
+		server.runCommand("item replace entity @a hotbar.0 with minecraft:air");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (hx + 3.5) + " " + standY + " " + (hz + 4.8) + " 180 6");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_hub_door");
+		int refusalsBefore = LevelExits.refusals();
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			BlockState door = level.getBlockState(new BlockPos(hx + 3, standY, hz + 3));
+			check(door.is(ModBlocks.HUB_DOOR) && door.getValue(MysteryExitBlock.AXIS) == Direction.Axis.Z,
+					"Hub door missing or wrong axis");
+			check(level.getBlockState(new BlockPos(hx + 3, standY + 1, hz + 3)).is(ModBlocks.HUB_DOOR_TOP),
+					"Hub door top missing");
+		});
+		context.getInput().lookAt(180, 5);
+		context.waitTicks(3);
+		context.getInput().pressMouse(1);
+		server.waitFor(s -> LevelExits.refusals() > refusalsBefore, 40);
+
+		ZonePoiPlan.MysteryExit funExit = findMysteryExit(seed, ZonePoiPlan.MysteryKind.FUN);
+		int fx = funExit.cx() * Maze.CELL, fz = funExit.cz() * Maze.CELL;
+		server.runCommand("gamemode spectator @a");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (fx + 3.5) + " " + standY + " " + (fz + 4.8) + " 180 6");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_fun_door");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(fx + 3, Level0ChunkGenerator.FLOOR_Y, fz + 4)).is(ModBlocks.DRY_CARPET),
+					"Fun door clean carpet missing");
+			check(level.getBlockState(new BlockPos(fx + 3, standY, fz + 3)).is(ModBlocks.FUN_DOOR),
+					"Fun door missing");
+			check(level.getBlockState(new BlockPos(fx + 3, standY + 1, fz + 3)).is(ModBlocks.FUN_DOOR_TOP),
+					"Fun door top missing");
+			check(level.getBlockState(new BlockPos(fx + 3, Level0ChunkGenerator.CEILING_Y, fz + 4)).is(ModBlocks.MANILA_LIGHT),
+					"Fun door warm ceiling light missing");
+		});
+
+		server.runCommand("gamemode survival @a");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(5);
+	}
+
+	private static EnumMap<ZonePoiPlan.VignetteType, ZonePoiPlan.Vignette> findAllVignettes(long seed) {
+		EnumMap<ZonePoiPlan.VignetteType, ZonePoiPlan.Vignette> map = new EnumMap<>(ZonePoiPlan.VignetteType.class);
+		for (int radius = 1; radius <= 24 && map.size() < ZonePoiPlan.VignetteType.values().length; radius++) {
+			for (int sx = -radius; sx <= radius; sx++) {
+				for (int sz = -radius; sz <= radius; sz++) {
+					if (Math.max(Math.abs(sx), Math.abs(sz)) != radius) continue;
+					ZonePoiPlan.Vignette v = ZonePoiPlan.vignetteInSector(seed, sx, sz);
+					if (v != null) map.putIfAbsent(v.type(), v);
+				}
+			}
+		}
+		for (ZonePoiPlan.VignetteType t : ZonePoiPlan.VignetteType.values()) {
+			check(map.containsKey(t), "missing vignette type " + t);
+		}
+		return map;
+	}
+
+	private static ZonePoiPlan.MysteryExit findMysteryExit(long seed, ZonePoiPlan.MysteryKind kind) {
+		for (int radius = 0; radius <= 12; radius++) {
+			for (int rx = -radius; rx <= radius; rx++) {
+				for (int rz = -radius; rz <= radius; rz++) {
+					if (Math.max(Math.abs(rx), Math.abs(rz)) != radius) continue;
+					ZonePoiPlan.MysteryExit exit = ZonePoiPlan.mysteryExitInRegion(seed, rx, rz);
+					if (exit != null && exit.kind() == kind) return exit;
+				}
+			}
+		}
+		throw new AssertionError("no mystery exit " + kind + " found within radius 12 regions");
+	}
+
+	private static ZonePoiPlan.ChasmOutpost findChasmOutpost(long seed) {
+		ZonePoiPlan.ChasmOutpost fallback = null;
+		for (int radius = 0; radius <= 24; radius++) {
+			for (int mx = -radius; mx <= radius; mx++) {
+				for (int mz = -radius; mz <= radius; mz++) {
+					if (Math.max(Math.abs(mx), Math.abs(mz)) != radius) continue;
+					int baseCx = mx * ChasmPlan.MACRO_CELLS;
+					int baseCz = mz * ChasmPlan.MACRO_CELLS;
+					if (Maze.zoneAt(seed, baseCx * Maze.CELL + Maze.CENTER, baseCz * Maze.CELL + Maze.CENTER) != Maze.Zone.CHASM) {
+						continue;
+					}
+					ZonePoiPlan.ChasmOutpost found = ZonePoiPlan.chasmOutpostInMacro(seed, baseCx, baseCz);
+					if (found == null) continue;
+					if (found.tier() >= 4) return found;
+					if (fallback == null) fallback = found;
+				}
+			}
+		}
+		if (fallback != null) return fallback;
+		throw new AssertionError("no CHASM outpost found within macro radius 24");
+	}
+
+	private static ZonePoiPlan.MegahallLounge findMegahallLounge(long seed) {
+		for (int radius = 0; radius <= 24; radius++) {
+			for (int mx = -radius; mx <= radius; mx++) {
+				for (int mz = -radius; mz <= radius; mz++) {
+					if (Math.max(Math.abs(mx), Math.abs(mz)) != radius) continue;
+					int baseCx = mx * MegahallPlan.MACRO_CELLS;
+					int baseCz = mz * MegahallPlan.MACRO_CELLS;
+					if (Maze.zoneAt(seed, baseCx * Maze.CELL + Maze.CENTER, baseCz * Maze.CELL + Maze.CENTER) != Maze.Zone.MEGATHALL) {
+						continue;
+					}
+					ZonePoiPlan.MegahallLounge found = ZonePoiPlan.megahallLoungeInMacro(seed, baseCx, baseCz);
+					if (found != null) return found;
+				}
+			}
+		}
+		throw new AssertionError("no MEGATHALL lounge found within macro radius 24");
+	}
+
+	private static int[] findLargeZonePoiCell(long seed, Maze.Zone target) {
+		for (int radius = 1; radius <= 40; radius++) {
+			for (int sx = -radius; sx <= radius; sx++) {
+				for (int sz = -radius; sz <= radius; sz++) {
+					if (Math.max(Math.abs(sx), Math.abs(sz)) != radius) continue;
+					int osx = Maze.largeZoneOriginSector(sx);
+					int osz = Maze.largeZoneOriginSector(sz);
+					if (osx == 0 && osz == 0) continue;
+					if (Maze.baseZoneForSector(seed, osx, osz) == target) {
+						return new int[] {osx * Maze.SECTOR + 12, osz * Maze.SECTOR + 12};
+					}
+				}
+			}
+		}
+		throw new AssertionError("no " + target + " macro-zone found within sector radius 40");
 	}
 
 	private static void verify3DReachabilityAndNoExposedBedrock(long seed, StaircasePlan.Complex c) {

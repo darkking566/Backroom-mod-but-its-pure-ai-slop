@@ -51,6 +51,10 @@ final class ModBlocks {
 	static final Block EXIT_DOOR = register("exit_door", exit().lightLevel(state -> 4), p -> new ExitDoorBlock(p, true));
 	static final Block EXIT_DOOR_TOP = register("exit_door_top", exit().lightLevel(state -> 4), p -> new ExitDoorBlock(p, true));
 	static final Block EXIT_SIGN = register("exit_sign", exit().lightLevel(state -> 10), p -> new ExitDoorBlock(p, false));
+	static final Block HUB_DOOR = mysteryDoor("hub_door", "hub", SoundType.METAL);
+	static final Block HUB_DOOR_TOP = mysteryDoor("hub_door_top", "hub", SoundType.METAL);
+	static final Block FUN_DOOR = mysteryDoor("fun_door", "fun", SoundType.WOOD);
+	static final Block FUN_DOOR_TOP = mysteryDoor("fun_door_top", "fun", SoundType.WOOD);
 
 	// Manila Room blocks & furniture
 	static final Block MANILA_WALLPAPER = register("manila_wallpaper", wall(MapColor.SAND));
@@ -90,7 +94,9 @@ final class ModBlocks {
 	// Calling this from onInitialize runs the registrations above before the registries freeze.
 	static void register() {
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.BUILDING_BLOCKS)
-				.register(output -> ALL.stream().filter(b -> b != EXIT_DOOR_TOP && b != MANILA_DOOR_TOP).forEach(output::accept));
+				.register(output -> ALL.stream()
+						.filter(b -> b != EXIT_DOOR_TOP && b != MANILA_DOOR_TOP && b != HUB_DOOR_TOP && b != FUN_DOOR_TOP)
+						.forEach(output::accept));
 	}
 
 	private static Properties wall(MapColor color) {
@@ -104,6 +110,11 @@ final class ModBlocks {
 	// Like bedrock, so the way out can be neither destroyed nor carried away.
 	private static Properties exit() {
 		return Properties.of().mapColor(MapColor.COLOR_GREEN).strength(-1.0F, 3600000.0F).noLootTable().sound(SoundType.METAL);
+	}
+
+	private static Block mysteryDoor(String name, String level, SoundType sound) {
+		return register(name, Properties.of().mapColor(MapColor.COLOR_GRAY).strength(-1.0F, 3600000.0F)
+				.noLootTable().noOcclusion().sound(sound), p -> new MysteryExitBlock(p, level));
 	}
 
 	private static Block register(String name, Properties properties) {

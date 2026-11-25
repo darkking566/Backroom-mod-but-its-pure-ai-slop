@@ -288,13 +288,14 @@ final class Level0Props {
 			int z = minZ + 1 + (cell / 14);
 			if (ManilaRoomPlan.roomAtBlock(seed, x, z) != null) continue;
 			if (StaircasePlan.complexAtBlock(seed, x, z) != null) continue;
+			if (ZonePoiPlan.isAnyPoiBlock(seed, x, z)) continue;
 
 			int floorY = findCarpetFloorY(chunk, seed, x, z);
 			if (floorY == Integer.MIN_VALUE) continue;
 			BlockPos masterPos = new BlockPos(x, floorY + 1, z);
 			Direction facing = HORIZONTALS[(facingBase + attempt) & 3];
 
-			if (canPlacePropInChunk(chunk, minX, minZ, masterPos, block, facing)) {
+			if (canPlacePropInChunk(chunk, seed, minX, minZ, masterPos, block, facing)) {
 				placePropInChunk(chunk, masterPos, block, facing);
 				return true;
 			}
@@ -318,7 +319,7 @@ final class Level0Props {
 		return state.is(ModBlocks.CARPET) || state.is(ModBlocks.DRY_CARPET) || state.is(ModBlocks.THICK_CARPET);
 	}
 
-	private static boolean canPlacePropInChunk(LevelChunk chunk, int minX, int minZ, BlockPos masterPos, Block block, Direction facing) {
+	private static boolean canPlacePropInChunk(LevelChunk chunk, long seed, int minX, int minZ, BlockPos masterPos, Block block, Direction facing) {
 		int maxX = minX + 15;
 		int maxZ = minZ + 15;
 		if (block instanceof MultiPartPropBlock multi) {
@@ -328,6 +329,7 @@ final class Level0Props {
 				if (p.getX() < minX + 1 || p.getX() > maxX - 1 || p.getZ() < minZ + 1 || p.getZ() > maxZ - 1) {
 					return false;
 				}
+				if (ZonePoiPlan.isAnyPoiBlock(seed, p.getX(), p.getZ())) return false;
 				if (p.getY() >= Level0ChunkGenerator.MAX_Y - 1) return false;
 				if (!chunk.getBlockState(p).isAir()) return false;
 				if (p.getY() == masterPos.getY()) {
