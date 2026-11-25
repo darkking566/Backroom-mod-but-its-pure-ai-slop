@@ -166,7 +166,71 @@ public final class Level1SectorArchitecture {
 		}
 		BlockState override = structure(v, seed, tile, current, x, y, z, lx, lz, topCeil, hasMainFloor, profile);
 		if (override == null || override == current) return current;
-		return !fit || allowed(seed, profile, topCeil, x, y, z) ? override : current;
+		if (!fit) return override;
+		int[] span = span(v, lx, lz, y, topCeil);
+		if (span != null) return whole(seed, dx, dz, span) ? override : current;
+		return allowed(seed, profile, topCeil, x, y, z) ? override : current;
+	}
+
+	/**
+	 * {lx0, lx1, lz0, lz1, y0, y1} of the bridge, beam or pipe run this piece belongs to, or null. Such a run goes in whole
+	 * or not at all: one cell left out of a walkway is a hole to fall through.
+	 */
+	static int[] span(Variant v, int lx, int lz, int y, int topCeil) {
+		return switch (v) {
+			case LEGEND_LANTERN_BRIDGES -> topCeil >= FLOOR + 9 && lz >= 28 && lz <= 36 && (y == FLOOR + 5 || y == FLOOR + 6)
+					? new int[] {5, D - 6, 28, 36, FLOOR + 5, FLOOR + 6} : null;
+			case TAILCHASE_UNFINISHED_BEAMS -> (lz == 22 || lz == 42) && y >= FLOOR + 2 && y <= FLOOR + 4 && lx % 9 < 6
+					? new int[] {Math.max(5, lx - lx % 9), Math.min(D - 6, lx - lx % 9 + 5), lz, lz, FLOOR + 2, FLOOR + 4} : null;
+			case TALON_PIPE_GANTRY -> y == topCeil - 1 && lz % 12 == 0 ? new int[] {5, D - 6, lz, lz, y, y} : null;
+			default -> null;
+		};
+	}
+
+	private static final ThreadLocal<java.util.Map<String, Boolean>> SPANS = ThreadLocal.withInitial(java.util.HashMap::new);
+
+	/** Whether every cell of the run that would be solid over open air really gets placed. */
+	private static boolean whole(long seed, int dx, int dz, int[] span) {
+		java.util.Map<String, Boolean> cache = SPANS.get();
+		if (cache.size() > 4096) cache.clear();
+		String key = seed + ":" + dx + ":" + dz + ":" + span[0] + ":" + span[2] + ":" + span[4];
+		Boolean known = cache.get(key);
+		if (known != null) return known;
+		boolean ok = true;
+		for (int lx = span[0]; lx <= span[1] && ok; lx++) {
+			for (int lz = span[2]; lz <= span[3] && ok; lz++) {
+				int x = dx * D + lx, z = dz * D + lz;
+				Tile tile = Level1Layout.tile(seed, x, z);
+				for (int y = span[4]; y <= span[5] && ok; y++) {
+					BlockState base = Level1ChunkGenerator.baseAt(seed, x, y, z);
+					if (!base.isAir()) continue;  // a wall or pillar already fills it
+					BlockState wanted = apply(seed, tile, base, x, y, z, false);
+					if (wanted == base || wanted.isAir()) continue;
+					ok = cell(seed, tile, base, x, y, z) != base;
+				}
+			}
+		}
+		cache.put(key, ok);
+		return ok;
+	}
+
+	/** One cell judged on its own (the per-column checks of {@link #apply}, without the run check). */
+	private static BlockState cell(long seed, Tile tile, BlockState current, int x, int y, int z) {
+		int dx = Math.floorDiv(x, D), dz = Math.floorDiv(z, D);
+		int lx = Math.floorMod(x, D), lz = Math.floorMod(z, D);
+		if (tile == Tile.HALL_WALL || tile == Tile.PERIMETER || tile == Tile.EXIT_CORE
+				|| tile == Tile.STAIRWELL || tile == Tile.HATCH || tile == Tile.FRAME
+				|| tile == Tile.BOOTH || tile == Tile.MACHINE || tile == Tile.CRATE) {
+			return current;
+		}
+		if (Level1Elevation.isNearExitOrProp(seed, dx, dz, x, z)) return current;
+		Variant v = variant(seed, dx, dz);
+		int topCeil = Level1Elevation.ceilingY(seed, dx, dz);
+		Level1Elevation.Profile profile = Level1Elevation.profile(seed, dx, dz);
+		boolean hasMainFloor = profile != Level1Elevation.Profile.SUNKEN_BASIN || (lx < 11 || lx > 52 || lz < 11 || lz > 52);
+		BlockState override = structure(v, seed, tile, current, x, y, z, lx, lz, topCeil, hasMainFloor, profile);
+		if (override == null || override == current) return current;
+		return allowed(seed, profile, topCeil, x, y, z) ? override : current;
 	}
 
 	/** The cars, vending machines and pallet stacks a sector leaves about its main floor, or null. */

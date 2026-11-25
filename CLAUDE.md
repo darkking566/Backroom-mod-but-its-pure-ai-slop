@@ -336,6 +336,10 @@
 - 白漆磚牆不再每格一樣：基礎與寫實材質包各多畫三張（`painted_brick_wall_1`～`_3`，剝落、髒污與照片紋理位置不同），方塊狀態每格隨機挑一張（`make_level2_polish.py`、`make_level2_realistic.py`）；試過加鏡像，同一張和自己的鏡像相鄰時剝落會變成對稱的蝴蝶形，所以拿掉；泥褐磚與黑磚還沒做。`Level2ClientTest` 新增白漆磚牆照（`level2_painted_brick`，開夜視、正對一段 6 格長的白漆磚牆，存一份到 `docs/levels/level2/painted_brick.png`）；`runClientGameTest -Plevels=2` 通過，照片裡磚縫跨格對齊、剝落每格不同
 - 使用者要求確認服務機器人紅眼與選取框：`Level0p1ClientTest` 的 `props` 段新增創造模式用準星對準相框、鏡子、吊鍋、倒數螢幕、實驗袍、桌上疊盤、地上雜物拍 7 張，以及黑暗中不動的服務機器人近照；`runClientGameTest -Plevels=0.1 -Psections=props` 通過。看過截圖：紅眼在黑暗中明顯發亮；壁掛物的選取框都貼在牆面、包住物件（比物件本身稍大）；桌上疊盤的框底貼著桌面、地上雜物的框在地板上。截圖沒存進 docs（Antigravity 接著跑 Gradle，`build/run` 被清掉）
 - 使用者同意後，把 `main` 推送到 GitHub（`a713b35` 紅眼與選取框測試）；推送前抓過 GitHub，沒有新提交要合併；Antigravity 未提交的 Level 1、Level 2 改動沒有一起推；沒有強制推送、沒有改寫歷史
+- 區段的跨格結構不再斷一格（`Level1SectorArchitecture.span`、`whole`）：傳說區燈籠橋（含欄杆）、銜尾區未完工樑每段 6 格（含下面的鷹架桿）、利爪區天花板水管每整排，改成整座一起判斷——只要有一格放不下（旁邊是樓梯開口、下面沒地板、上面有甲板、出口或道具附近等），整座都不放；牆或柱子本來就佔住的格子不算缺口
+  - `Level1ClientTest` 的 `sectorFit` 段加 `spanFit`：2 個種子、25×25 個大廳，每座橋、每段樑、每排水管要嘛全有、要嘛全沒有；把整座判斷關掉跑一次會失敗（水管一排 16 格有、17 格缺）
+  - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=sectorFit,sectors` 通過
+  - 代價：整座放不下就整座不見，燈籠橋約一半（11／22）、天花板水管排約六成（111／178）、未完工樑約一成（32／342）被拿掉；沒在遊戲畫面上看過橋或樑
 
 ## 動作記錄（Antigravity）
 

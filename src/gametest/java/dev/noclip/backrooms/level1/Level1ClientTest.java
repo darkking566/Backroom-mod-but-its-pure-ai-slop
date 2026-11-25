@@ -1265,8 +1265,66 @@ public final class Level1ClientTest implements FabricClientGameTest {
 				}
 			}
 		}
+		spanFit();
 		if (districts < 10 || changed < 1000) throw new AssertionError("sector fit check barely ran: " + districts + " districts, " + changed + " blocks");
 		System.out.println("[sectorFit] districts " + districts + ", changed blocks " + changed + ", props " + propsSeen);
+	}
+
+	/** Bridges, unfinished beams and ceiling pipe rows go in whole or not at all: no one-block holes. */
+	private static void spanFit() {
+		int D = Level1Layout.DISTRICT, FLOOR = Level1ChunkGenerator.FLOOR_Y;
+		java.util.Map<String, int[]> tally = new java.util.TreeMap<>();
+		for (long seed = 0; seed < 2; seed++) {
+			for (int dx = -12; dx <= 12; dx++) {
+				for (int dz = -12; dz <= 12; dz++) {
+					Level1SectorArchitecture.Variant v = Level1SectorArchitecture.variant(seed, dx, dz);
+					int top = Level1Elevation.ceilingY(seed, dx, dz);
+					java.util.List<int[]> spans = new java.util.ArrayList<>();
+					switch (v) {
+						case LEGEND_LANTERN_BRIDGES -> {
+							if (top >= FLOOR + 9) spans.add(new int[] {5, D - 6, 28, 36, FLOOR + 5, FLOOR + 6});
+						}
+						case TAILCHASE_UNFINISHED_BEAMS -> {
+							for (int lz : new int[] {22, 42}) {
+								for (int a = 0; a < D; a += 9) {
+									if (Math.min(D - 6, a + 5) >= Math.max(5, a)) spans.add(new int[] {Math.max(5, a), Math.min(D - 6, a + 5), lz, lz, FLOOR + 2, FLOOR + 4});
+								}
+							}
+						}
+						case TALON_PIPE_GANTRY -> {
+							for (int lz = 12; lz <= D - 6; lz += 12) spans.add(new int[] {5, D - 6, lz, lz, top - 1, top - 1});
+						}
+						default -> {}
+					}
+					for (int[] sp : spans) {
+						int placed = 0, missing = 0;
+						for (int lx = sp[0]; lx <= sp[1]; lx++) {
+							for (int lz = sp[2]; lz <= sp[3]; lz++) {
+								int x = dx * D + lx, z = dz * D + lz;
+								Level1Layout.Tile tile = Level1Layout.tile(seed, x, z);
+								for (int y = sp[4]; y <= sp[5]; y++) {
+									BlockState base = Level1ChunkGenerator.baseAt(seed, x, y, z);
+									if (!base.isAir()) continue;
+									BlockState wanted = Level1SectorArchitecture.apply(seed, tile, base, x, y, z, false);
+									if (wanted == base || wanted.isAir()) continue;
+									if (Level1SectorArchitecture.apply(seed, tile, base, x, y, z) != base) placed++;
+									else missing++;
+								}
+							}
+						}
+						if (placed > 0 && missing > 0) {
+							throw new AssertionError(v + " seed " + seed + " district " + dx + "," + dz + " span " + java.util.Arrays.toString(sp)
+									+ " has " + missing + " holes among " + placed + " placed blocks");
+						}
+						if (placed + missing > 0) tally.computeIfAbsent(v.name(), k -> new int[2])[placed > 0 ? 0 : 1]++;
+					}
+				}
+			}
+		}
+		System.out.println("[spanFit] whole/dropped " + tally.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()[0] + "/" + e.getValue()[1]).toList());
+		for (var e : tally.entrySet()) {
+			if (e.getValue()[0] == 0) throw new AssertionError(e.getKey() + ": every span was dropped");
+		}
 	}
 
 	private static boolean solidShape(BlockState s) {
