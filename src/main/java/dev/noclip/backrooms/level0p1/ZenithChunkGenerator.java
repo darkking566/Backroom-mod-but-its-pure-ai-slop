@@ -16,6 +16,7 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -51,7 +52,20 @@ final class ZenithChunkGenerator extends ChunkGenerator {
 	}
 
 	static BlockState blockAt(long seed, int x, int y, int z) {
-		return state(ZenithLayout.cell(seed, x, y, z));
+		int cell = ZenithLayout.cell(seed, x, y, z);
+		BlockState state = state(cell);
+		Kind kind = ZenithLayout.kind(cell);
+		// Rails are fences: they only join up if their arms are set here, since world generation never updates neighbours.
+		if (kind == Kind.RAIL || kind == Kind.RAIL_LAMP) {
+			state = state.setValue(FenceBlock.NORTH, rail(seed, x, y, z - 1)).setValue(FenceBlock.SOUTH, rail(seed, x, y, z + 1))
+					.setValue(FenceBlock.WEST, rail(seed, x - 1, y, z)).setValue(FenceBlock.EAST, rail(seed, x + 1, y, z));
+		}
+		return state;
+	}
+
+	private static boolean rail(long seed, int x, int y, int z) {
+		Kind kind = ZenithLayout.kind(ZenithLayout.cell(seed, x, y, z));
+		return kind == Kind.RAIL || kind == Kind.RAIL_LAMP;
 	}
 
 	// The sea outside is Level 0's own blocks (the lamps still burn), looked up by name so Level 0 keeps them private.

@@ -705,7 +705,7 @@ final class ZenithLayout {
 			if (r % 3 != 0) return of(Kind.AIR);
 			return switch (room) {
 				case GREENHOUSE -> of(Kind.PLANTER);
-				case MACHINES, CONSOLES -> of(Kind.SERVER, rz == 1 ? 2 : 0);
+				case MACHINES, CONSOLES -> of(Kind.SERVER, rz == 1 ? 2 : rz == H - 2 ? 0 : rx == 1 ? 1 : 3);
 				case KITCHEN, BEDROOM -> of(Kind.TABLE);
 				default -> of(Kind.CRATE);
 			};
@@ -718,9 +718,9 @@ final class ZenithLayout {
 		return switch (room) {
 			case BEDROOM -> bedroom(a, b, t, faceV, roll, hash(seed, mx, mz, k + 31));
 			case KITCHEN -> kitchen(a, b, t, faceV, roll);
-			case GYM -> gym(a, b, t, faceV, roll);
+			case GYM -> gym(a, b, t, faceV, faceU, roll);
 			case GREENHOUSE -> greenhouse(a, b, t, faceV, roll);
-			case CONSOLES -> consoles(a, b, t, faceV);
+			case CONSOLES -> consoles(a, b, t, faceV, faceU);
 			case LAB -> lab(a, b, t, faceV, faceU, roll);
 			case MACHINES -> machines(a, b, t, faceU);
 			case STORAGE -> storage(a, b, t, faceV, roll);
@@ -757,13 +757,13 @@ final class ZenithLayout {
 		return of(Kind.AIR);
 	}
 
-	private static int gym(int a, int b, int t, int face, int roll) {
+	private static int gym(int a, int b, int t, int face, int faceU, int roll) {
 		if (t == 1 && b == 0 && a <= 2) return of(Kind.TREADMILL, face);
 		if (t == 2 && b == 0 && a == 1) return of(Kind.MIRROR, face);
-		if (t == 1 && b == 3 && a == 0) return of(Kind.WEIGHTS, face);
+		if (t == 1 && b == 3 && a == 0) return of(Kind.WEIGHTS, faceU);
 		if (t == 1 && b == 3 && a == 1) return of(Kind.BENCH_PRESS, face);
 		if (t == 1 && a == 3 && b == 0) return of(Kind.BAG);
-		if (t == 1 && a == 3 && b == 1) return of(Kind.DISPENSER, face);
+		if (t == 1 && a == 0 && b == 1) return of(Kind.DISPENSER, faceU);
 		if (t == 1 && a == 2 && b == 3 && roll % 2 == 0) return of(Kind.MATS);
 		if (t == 1 && a == 3 && b == 3 && roll % 2 == 0) return of(Kind.BENCH);
 		return of(Kind.AIR);
@@ -783,9 +783,9 @@ final class ZenithLayout {
 		return of(Kind.AIR);
 	}
 
-	private static int consoles(int a, int b, int t, int face) {
+	private static int consoles(int a, int b, int t, int face, int faceU) {
 		if (t == 1 && b == 0) return of(Kind.CONSOLE, face);
-		if (t == 1 && a == 0 && b == 1) return of(Kind.CONSOLE, face);
+		if (t == 1 && a == 0 && b == 1) return of(Kind.CONSOLE, faceU);
 		// A wall screen above the consoles, stopped at zero.
 		if (t == 2 && b == 0 && a == 2) return of(Kind.SCREEN, face);
 		return of(Kind.AIR);

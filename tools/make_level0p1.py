@@ -141,9 +141,6 @@ def observation_glass():
 
 def bulkhead():
     m = plate((112, 122, 134), 31, 0.5, 70, 128)
-    stripe = ((X + Y) % 32 < 16).astype(float) * box(-2, 104, 130, 124, 0.5)
-    paint(m, box(-2, 104, 130, 124, 0.5), (36, 38, 42))
-    paint(m, stripe, (230, 190, 40))
     weather(m, 32, 0.9)
     return m
 
@@ -270,8 +267,6 @@ def dead_ceiling_light():
 
 def wall_panel():
     m = plate((206, 210, 214), 141, 0.8, 120, 64, 0.1)
-    paint(m, box(-2, 98, 130, 100), (118, 190, 214), glow=0.35)  # a thin blue guide line
-    paint(m, box(-2, 108, 130, 130), (140, 146, 154), height=-0.8)  # skirting
     weather(m, 142, 0.5)
     return m
 
@@ -280,8 +275,6 @@ def quarters_wall():
     m = flat((208, 196, 178), 0.4, 20, 40)
     grain(m, 151, 0.025)
     paint(m, lines(64, 1.0, axes="x"), (164, 150, 132), height=-1.8)
-    paint(m, box(-2, 60, 130, 64), (176, 128, 84), height=0.6)  # a warm trim, to make it a home
-    paint(m, box(-2, 108, 130, 130), (118, 98, 80), height=0.6)
     weather(m, 152, 0.4)
     return m
 
@@ -289,7 +282,6 @@ def quarters_wall():
 def kitchen_wall():
     m = flat((230, 232, 230), 0.88, 130)
     paint(m, lines(16, 0.8), (160, 164, 166), height=-1.2)
-    paint(m, box(-2, 48, 130, 56), (96, 150, 130), height=0.5)
     paint(m, step(0.72, 0.85, clouds(161, 6)) * 0.4, (176, 172, 150))
     weather(m, 162, 0.35)
     return m
@@ -825,6 +817,8 @@ VARIANTED = {"wall_panel": wall_panel, "deck_floor": deck_floor, "station_corrid
              "frost_floor": frost_floor, "scorched_floor": scorched_floor,
              "frost_ceiling": frost_ceiling, "scorched_ceiling": scorched_ceiling}
 VARIANTS = 3
+# The damaged wall's v2 has no hole; weighted so most of a wrecked wall is whole and the cable holes stay the odd one out.
+WHOLE, WHOLE_WEIGHT = "damaged_wall_v2", 5
 
 
 def variants():
@@ -1140,14 +1134,14 @@ def fence_state(name):
                           {"when": {"south": "true"}, "apply": side(180)}, {"when": {"west": "true"}, "apply": side(270)}]}
 
 
-SIMPLE = ["crew_bed", "hydroponic_planter", "hanging_cables", "crew_table", "station_bench", "catwalk_grating", "tether_cable",
+SIMPLE = ["hydroponic_planter", "hanging_cables", "crew_table", "station_bench", "catwalk_grating", "tether_cable",
           "glow_orb", "singularity_core", "singularity_shell"] + CUBES
-FACING = ["crew_locker", "server_rack", "kitchen_counter", "stove", "treadmill", "weight_rack", "console", "broken_console"]
+FACING = ["crew_bed", "crew_locker", "server_rack", "kitchen_counter", "stove", "treadmill", "weight_rack", "console", "broken_console"]
 # Blocks whose models are written under another name than the block.
 ITEM_MODEL = {"station_stairs": "station_stairs", "safety_rail": "safety_rail_inventory", "rail_lamp": "rail_lamp_inventory",
               "station_door": "station_door_bottom_left", "station_hatch": "station_hatch_0", "yellow_doorway": "yellow_doorway_0",
               "plasma": "plasma_0", "station_crate": "station_crate"}
-FACING_MODEL = {"crew_locker": "crew_locker", "server_rack": "server_rack", "kitchen_counter": "kitchen_counter", "stove": "stove",
+FACING_MODEL = {"crew_bed": "crew_bed", "crew_locker": "crew_locker", "server_rack": "server_rack", "kitchen_counter": "kitchen_counter", "stove": "stove",
                 "treadmill": "treadmill", "weight_rack": "weight_rack", "console": "console", "broken_console": "broken_console"}
 UNBREAKABLE = {"hull_plate", "hull_seam", "inner_hull_plate", "observation_glass", "station_hatch", "yellow_doorway", "doorway_frame",
                "static_tear", "singularity_core", "singularity_shell", "plasma"}
@@ -1167,7 +1161,8 @@ def all_blockstates():
     b["plasma"] = {"variants": {f"heat={h}": {"model": NS + f"plasma_{h}"} for h in range(4)}}
     for name in VARIANTED:
         models = [name] + [f"{name}_v{n}" for n in range(1, VARIANTS + 1)]
-        b[name] = {"variants": {"": [{"model": NS + model, "y": y} for model in models for y in (0, 90, 180, 270)]}}
+        b[name] = {"variants": {"": [{"model": NS + model, "y": y, **({"weight": WHOLE_WEIGHT} if model == WHOLE else {})}
+                                     for model in models for y in (0, 90, 180, 270)]}}
     return b
 
 

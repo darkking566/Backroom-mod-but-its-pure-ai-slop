@@ -190,6 +190,13 @@
   - EXIT 門、門上半與標誌加 `axis`（預設 x，世界生成不變），玩家放的會轉向
   - `make_manila.py` 同步了門與櫃子的模型和方塊狀態（沒重跑；這支工具本來就有路徑問題，見審查報告）
   - 驗證：`gradlew build`、`runClientGameTest -Plevels=0,look` 通過；截圖看到馬尼拉房間八角桌完整、EXIT 門正常；開門的樣子、樓梯間獨立櫃與辦公桌、生存模式敲門沒有逐一在遊戲裡看過
+- 照 Antigravity 的 Level 0.1 審查報告修第一批（最影響畫面的）：
+  - 欄杆連起來：新增 `data/minecraft/tags/block/fences.json`（安全欄杆、欄杆燈），`ZenithChunkGenerator.blockAt` 生成時依四面鄰格設定欄杆連接
+  - 牆面橫紋：拿掉一般牆板、寢室牆、廚房牆、隔艙壁貼圖裡每格都重複的踢腳板與色帶（`make_level0p1.py`，只重存這 4 種與變體）；損壞牆無洞的 v2 權重 5，大約六成是完整牆
+  - 方向：船員床改成有方向的方塊狀態（北牆的床枕頭朝牆）；控制室側牆控制台、健身室重訓架改用東西向；飲水機移到側牆、不再擋在沙包前；合併大廳東西牆的機櫃面向房內
+  - 攝影機濾鏡：Level 0.1 的霧改成 24～320 格（`Look.Mood.ZENITH`），環廊與天橋看得到奇點
+  - `gradlew build` 與 `runClientGameTest -Plevels=0.1 -Psections=rooms,atrium,middle,details,variants,stairs` 通過，截圖看過欄杆、牆面、奇點；更新 `docs/levels/level0p1/screens/` 8 張
+  - 還沒修（報告其餘項目）：雙格家具疊兩顆、雙開門圖案、小家具貼圖與 uv、合併／挑高／狹長房間的懸空與密室、外窗三層玻璃、選取框、自動門、停電高度、換世界後廣播靜音、機器人細節、`blocks` 測試段、挖掘標籤
 
 ## 動作記錄（Antigravity）
 

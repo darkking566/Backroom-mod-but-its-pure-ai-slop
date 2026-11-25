@@ -35,19 +35,23 @@
       },
       {
         "model": "noclip_backrooms:block/level0p1/damaged_wall_v2",
-        "y": 0
+        "y": 0,
+        "weight": 5
       },
       {
         "model": "noclip_backrooms:block/level0p1/damaged_wall_v2",
-        "y": 90
+        "y": 90,
+        "weight": 5
       },
       {
         "model": "noclip_backrooms:block/level0p1/damaged_wall_v2",
-        "y": 180
+        "y": 180,
+        "weight": 5
       },
       {
         "model": "noclip_backrooms:block/level0p1/damaged_wall_v2",
-        "y": 270
+        "y": 270,
+        "weight": 5
       },
       {
         "model": "noclip_backrooms:block/level0p1/damaged_wall_v3",
