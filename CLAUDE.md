@@ -311,6 +311,8 @@
   - 驗證：`gradlew build` 通過；`runClientGameTest -Plevels=1 -Psections=views,sectors,exits,wikiSettlements,checkBlocks` 通過，log 沒有缺模型或貼圖；截圖看到白木門、診所招牌與病床；車、廂型車、販賣機、報名亭、直立霓虹柱、污漬變體沒在遊戲畫面上確認
   - 沒做：收費亭抽屜的背面仍是抽屜（沒有方向）；花園植物畫風；Level 1 寫實材質包；大型道具碰撞箱
 
+- Level 2 俯視地圖 `MapDump` 補上後來加的內容：悶熱（鏽紅）、極寒（淡藍）、毒氣（病綠）、辦公室走廊（米白）、積水（青綠＝積水地板、藍＝淹水半磚）、鐵軌（暗紅）、排水格柵與電纜槽（深灰點）、錯位牆（亮粉紅）、牆面掛件（黃點）、EL3A（青色）與 Macchina（暗黃銅）；圖例寫在類別說明裡；產出一張存到 `docs/levels/level2/map.png`；只跑了 MapDump 本身
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23
