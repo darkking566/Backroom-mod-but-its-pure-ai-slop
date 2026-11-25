@@ -104,6 +104,16 @@ public final class BackroomsProps {
 	public static final Block PROP_WALL_FIRST_AID_KIT = blenderProp("prop_wall_first_aid_kit", SoundType.METAL, 1.5F, 0);
 	public static final Block PROP_CARDBOARD_PILE = multiProp("prop_cardboard_pile", 2, 2, 2, SoundType.WOOD, 1.0F, 0);
 
+	// 8 Intact Counterparts & Movie-Style Wood Chair Pile (so Level 0 clusters mix intact + half-sliced noclipped props!)
+	public static final Block PROP_WOOD_CHAIR = blenderProp("prop_wood_chair", SoundType.WOOD, 1.2F, 0);
+	public static final Block PROP_WOOD_CHAIR_PILE = multiProp("prop_wood_chair_pile", 2, 2, 2, SoundType.WOOD, 1.8F, 0);
+	public static final Block PROP_FOLDING_TABLE = multiProp("prop_folding_table", 2, 1, 1, SoundType.WOOD, 1.5F, 0);
+	public static final Block PROP_FILE_CABINET = multiProp("prop_file_cabinet", 1, 2, 1, SoundType.METAL, 2.4F, 0);
+	public static final Block PROP_CRT_TV = blenderProp("prop_crt_tv", SoundType.GLASS, 1.8F, 4);
+	public static final Block PROP_WATER_COOLER = multiProp("prop_water_cooler", 1, 2, 1, SoundType.GLASS, 1.4F, 0);
+	public static final Block PROP_VENDING_MACHINE = multiProp("prop_vending_machine", 2, 2, 1, SoundType.METAL, 3.0F, 6);
+	public static final Block PROP_FRIDGE = multiProp("prop_fridge", 2, 3, 1, SoundType.METAL, 2.8F, 0);
+
 	// Shared BlockEntityType for all multi-block + Blender-rendered props (must be registered AFTER all blocks!)
 	public static final BlockEntityType<PropBlockEntity> PROP_BLOCK_ENTITY = Registry.register(
 			BuiltInRegistries.BLOCK_ENTITY_TYPE,

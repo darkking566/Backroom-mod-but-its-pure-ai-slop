@@ -10123,6 +10123,234 @@
           "count": 1
         }
       ]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_wood_chair",
+      "station": "salvage_bench",
+      "category": "parts",
+      "xp": 6,
+      "inputs": [
+        {
+          "item": "noclip_backrooms:prop_wood_chair",
+          "count": 1
+        }
+      ],
+      "outputs": [
+        {
+          "item": "noclip_backrooms:broken_table_leg",
+          "count": 1
+        },
+        {
+          "item": "noclip_backrooms:rags",
+          "count": 1
+        },
+        {
+          "item": "noclip_backrooms:screw_nail_box",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_wood_chair_pile",
+      "station": "salvage_bench",
+      "category": "parts",
+      "xp": 6,
+      "inputs": [
+        {
+          "item": "noclip_backrooms:prop_wood_chair_pile",
+          "count": 1
+        }
+      ],
+      "outputs": [
+        {
+          "item": "noclip_backrooms:broken_table_leg",
+          "count": 4
+        },
+        {
+          "item": "noclip_backrooms:rags",
+          "count": 3
+        },
+        {
+          "item": "noclip_backrooms:foam_padding",
+          "count": 2
+        },
+        {
+          "item": "noclip_backrooms:screw_nail_box",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_folding_table",
+      "station": "salvage_bench",
+      "category": "parts",
+      "xp": 6,
+      "inputs": [
+        {
+          "item": "noclip_backrooms:prop_folding_table",
+          "count": 1
+        }
+      ],
+      "outputs": [
+        {
+          "item": "noclip_backrooms:broken_table_leg",
+          "count": 2
+        },
+        {
+          "item": "noclip_backrooms:sheet_metal",
+          "count": 2
+        },
+        {
+          "item": "noclip_backrooms:screw_nail_box",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_file_cabinet",
+      "station": "salvage_bench",
+      "category": "parts",
+      "xp": 6,
+      "inputs": [
+        {
+          "item": "noclip_backrooms:prop_file_cabinet",
+          "count": 1
+        }
+      ],
+      "outputs": [
+        {
+          "item": "noclip_backrooms:sheet_metal",
+          "count": 2
+        },
+        {
+          "item": "noclip_backrooms:screw_nail_box",
+          "count": 1
+        },
+        {
+          "item": "noclip_backrooms:magazine_bundle",
+          "count": 1
+        },
+        {
+          "item": "noclip_backrooms:damp_paper_scrap",
+          "count": 2
+        }
+      ]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_crt_tv",
+      "station": "salvage_bench",
+      "category": "parts",
+      "xp": 6,
+      "inputs": [
+        {
+          "item": "noclip_backrooms:prop_crt_tv",
+          "count": 1
+        }
+      ],
+      "outputs": [
+        {
+          "item": "noclip_backrooms:crt_tube",
+          "count": 1
+        },
+        {
+          "item": "noclip_backrooms:green_circuit",
+          "count": 1
+        },
+        {
+          "item": "noclip_backrooms:copper_wire",
+          "count": 2
+        },
+        {
+          "item": "noclip_backrooms:office_glass",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_water_cooler",
+      "station": "salvage_bench",
+      "category": "parts",
+      "xp": 6,
+      "inputs": [
+        {
+          "item": "noclip_backrooms:prop_water_cooler",
+          "count": 1
+        }
+      ],
+      "outputs": [
+        {
+          "item": "noclip_backrooms:plastic_casing",
+          "count": 2
+        },
+        {
+          "item": "noclip_backrooms:almond_water",
+          "count": 1
+        },
+        {
+          "item": "noclip_backrooms:copper_pipe",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_vending_machine",
+      "station": "salvage_bench",
+      "category": "parts",
+      "xp": 6,
+      "inputs": [
+        {
+          "item": "noclip_backrooms:prop_vending_machine",
+          "count": 1
+        }
+      ],
+      "outputs": [
+        {
+          "item": "noclip_backrooms:sheet_metal",
+          "count": 3
+        },
+        {
+          "item": "noclip_backrooms:green_circuit",
+          "count": 1
+        },
+        {
+          "item": "noclip_backrooms:almond_water",
+          "count": 2
+        },
+        {
+          "item": "noclip_backrooms:lost_old_coin",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_fridge",
+      "station": "salvage_bench",
+      "category": "parts",
+      "xp": 6,
+      "inputs": [
+        {
+          "item": "noclip_backrooms:prop_fridge",
+          "count": 1
+        }
+      ],
+      "outputs": [
+        {
+          "item": "noclip_backrooms:sheet_metal",
+          "count": 3
+        },
+        {
+          "item": "noclip_backrooms:copper_pipe",
+          "count": 2
+        },
+        {
+          "item": "noclip_backrooms:coolant_vial",
+          "count": 1
+        },
+        {
+          "item": "noclip_backrooms:almond_water",
+          "count": 1
+        }
+      ]
     }
   ]
 }

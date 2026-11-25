@@ -226,12 +226,12 @@ def export_prop(name):
 # =============================================================================
 # MULTI-BLOCK PROPS (FULL REAL-WORLD MULTI-BLOCK DIMENSIONS!)
 # =============================================================================
-def build_noclipped_fridge():
-    """2 wide x 3 tall x 1 deep double-door industrial/office refrigerator, tilted & lower corner half-vanished!"""
+def build_fridge(noclipped=True):
+    """2 wide x 3 tall x 1 deep double-door refrigerator (both intact & half-sliced noclipped variants)."""
     reset_scene()
     M = mats()
     cx = 0.5  # 2 blocks wide: X in [-0.5 .. 1.5]
-    # Main body (1.76m wide x 2.75m tall x 0.86m deep)
+    # Main body (1.72m wide x 2.72m tall x 0.82m deep)
     add_box("Body", (cx, 0.0, 1.44), (1.72, 0.82, 2.72), M["enamel"], 0.04)
     # Recessed door seam & twin French upper doors + bottom freezer drawer
     add_box("DoorUL", (cx - 0.43, 0.43, 1.88), (0.82, 0.06, 1.72), M["enamel"], 0.025)
@@ -247,36 +247,39 @@ def build_noclipped_fridge():
     # Rear cooling coils & compressor
     for i in range(6):
         add_cyl(f"Coil_{i}", (cx, -0.44, 0.55 + i * 0.36), 0.018, 1.40, M["copper"], rot=(0, math.radians(90), 0), verts=8)
-    # Tilt & slice lower right section cleanly into the Backrooms floor!
-    bake_and_slice_noclip(tilt_euler=(math.radians(7), math.radians(-16), math.radians(-5)), shift=(0.06, 0.0, -0.26))
-    export_prop("noclipped_fridge")
+    if noclipped:
+        bake_and_slice_noclip(tilt_euler=(math.radians(7), math.radians(-16), math.radians(-5)), shift=(0.06, 0.0, -0.26))
+        export_prop("noclipped_fridge")
+    else:
+        export_prop("prop_fridge")
 
 
-def build_noclipped_vending_machine():
-    """2 wide x 2 tall x 1 deep illuminated Backrooms vending machine, slightly tilted & bottom clipped!"""
+def build_vending_machine(noclipped=True):
+    """2 wide x 2 tall x 1 deep illuminated Backrooms vending machine (intact & tilted-sliced)."""
     reset_scene()
     M = mats()
     cx = 0.5
     add_box("Cabinet", (cx, 0.0, 1.02), (1.76, 0.84, 1.94), M["red"], 0.03)
     add_box("GlassRecess", (cx - 0.22, 0.40, 1.22), (1.16, 0.08, 1.28), M["dark_metal"], 0.01)
     add_box("GlassGlow", (cx - 0.22, 0.42, 1.22), (1.08, 0.02, 1.20), M["emit_main"], 0.0)
-    # 3 shelves with colorful cans/almond bottles visible behind glass!
     for r in range(3):
         z = 0.78 + r * 0.38
         add_box(f"Shelf_{r}", (cx - 0.22, 0.43, z - 0.08), (1.06, 0.10, 0.03), M["steel"], 0.0)
         for c in range(5):
             add_cyl(f"Can_{r}_{c}", (cx - 0.64 + c * 0.21, 0.44, z + 0.04), 0.045, 0.16,
                     M["brass"] if (r + c) % 2 == 0 else M["blue"], verts=10)
-    # Keypad + coin slot + pickup flap
     add_box("Panel", (cx + 0.60, 0.43, 1.26), (0.34, 0.04, 0.72), M["dark_metal"], 0.01)
     add_box("Display", (cx + 0.60, 0.455, 1.48), (0.24, 0.01, 0.09), M["emit_alt"], 0.0)
     add_box("Pickup", (cx - 0.22, 0.43, 0.30), (1.10, 0.08, 0.30), M["dark_metal"], 0.01)
-    bake_and_slice_noclip(tilt_euler=(math.radians(8), math.radians(11), math.radians(4)), shift=(-0.05, 0.0, -0.18))
-    export_prop("noclipped_vending_machine")
+    if noclipped:
+        bake_and_slice_noclip(tilt_euler=(math.radians(8), math.radians(11), math.radians(4)), shift=(-0.05, 0.0, -0.18))
+        export_prop("noclipped_vending_machine")
+    else:
+        export_prop("prop_vending_machine")
 
 
-def build_noclipped_water_cooler():
-    """1 wide x 2 tall x 1 deep floor-standing water cooler with cylindrical glowing jug, tilted & sliced!"""
+def build_water_cooler(noclipped=True):
+    """1 wide x 2 tall x 1 deep floor-standing water cooler (intact & tilted-sliced)."""
     reset_scene()
     M = mats()
     add_box("Base", (0.0, 0.0, 0.56), (0.58, 0.56, 1.06), M["enamel"], 0.025)
@@ -284,32 +287,36 @@ def build_noclipped_water_cooler():
     add_box("TapHot", (-0.09, 0.31, 0.80), (0.05, 0.08, 0.06), M["red"], 0.005)
     add_box("TapCold", (0.09, 0.31, 0.80), (0.05, 0.08, 0.06), M["blue"], 0.005)
     add_cyl("Collar", (0.0, 0.0, 1.12), 0.16, 0.10, M["steel"], verts=14)
-    # Tapered 5-gallon cyan water jug on top!
     add_cyl("Jug", (0.0, 0.0, 1.50), 0.23, 0.60, M["glass"], verts=16, bevel=0.03)
     add_cyl("WaterCore", (0.0, 0.0, 1.44), 0.20, 0.44, M["emit_main"], verts=14, bevel=0)
     for z in (1.36, 1.52, 1.66):
         add_torus(f"JugRib_{z}", (0.0, 0.0, z), 0.232, 0.010, M["glass"], maj_seg=18, min_seg=6)
-    bake_and_slice_noclip(tilt_euler=(math.radians(-12), math.radians(15), math.radians(8)), shift=(0.04, 0.0, -0.16))
-    export_prop("noclipped_water_cooler")
+    if noclipped:
+        bake_and_slice_noclip(tilt_euler=(math.radians(-12), math.radians(15), math.radians(8)), shift=(0.04, 0.0, -0.16))
+        export_prop("noclipped_water_cooler")
+    else:
+        export_prop("prop_water_cooler")
 
 
-def build_noclipped_file_cabinet():
-    """1 wide x 2 tall x 1 deep 4-drawer office steel cabinet with open drawer, tilted & half-buried!"""
+def build_file_cabinet(noclipped=True):
+    """1 wide x 2 tall x 1 deep 4-drawer office steel cabinet (intact & tilted-sliced)."""
     reset_scene()
     M = mats()
     add_box("Shell", (0.0, 0.0, 0.96), (0.76, 0.76, 1.88), M["steel"], 0.02)
     for i in range(4):
         z = 0.28 + i * 0.44
-        pull = 0.28 if i == 2 else 0.0
+        pull = 0.28 if (i == 2 and noclipped) else (0.14 if i == 2 else 0.0)
         add_box(f"Drawer_{i}", (0.0, 0.38 + pull, z), (0.68, 0.05, 0.39), M["beige"], 0.01)
         add_box(f"Handle_{i}", (0.0, 0.43 + pull, z + 0.04), (0.24, 0.04, 0.04), M["dark_metal"], 0.005)
         if i == 2:
-            # Open drawer interior + tilted paper folders!
             add_box("OpenBox", (0.0, 0.22, z - 0.04), (0.62, 0.42, 0.30), M["dark_metal"], 0.005)
             add_box("Folder1", (-0.08, 0.32, z + 0.06), (0.50, 0.04, 0.26), M["enamel"], 0.0, rot=(math.radians(12), 0, 0))
             add_box("Folder2", (0.06, 0.22, z + 0.08), (0.48, 0.04, 0.26), M["cardboard"], 0.0, rot=(math.radians(-8), 0, 0))
-    bake_and_slice_noclip(tilt_euler=(math.radians(10), math.radians(-19), math.radians(-6)), shift=(0.05, 0.0, -0.24))
-    export_prop("noclipped_file_cabinet")
+    if noclipped:
+        bake_and_slice_noclip(tilt_euler=(math.radians(10), math.radians(-19), math.radians(-6)), shift=(0.05, 0.0, -0.24))
+        export_prop("noclipped_file_cabinet")
+    else:
+        export_prop("prop_file_cabinet")
 
 
 def build_sofa(noclipped=False):
@@ -338,8 +345,8 @@ def build_sofa(noclipped=False):
         export_prop("prop_sofa")
 
 
-def build_noclipped_folding_table():
-    """2 wide x 1 tall x 1 deep folding office table, tilted & one end vanished into floor!"""
+def build_folding_table(noclipped=True):
+    """2 wide x 1 tall x 1 deep folding office table (intact & tilted-sliced)."""
     reset_scene()
     M = mats()
     cx = 0.5
@@ -348,8 +355,68 @@ def build_noclipped_folding_table():
         add_cyl(f"LegF_{lx}", (lx, 0.32, 0.37), 0.022, 0.74, M["steel"], verts=10)
         add_cyl(f"LegB_{lx}", (lx, -0.32, 0.37), 0.022, 0.74, M["steel"], verts=10)
         add_cyl(f"Cross_{lx}", (lx, 0.0, 0.24), 0.018, 0.64, M["steel"], rot=(math.radians(90), 0, 0), verts=8)
-    bake_and_slice_noclip(tilt_euler=(math.radians(-8), math.radians(22), math.radians(6)), shift=(0.0, 0.0, -0.22))
-    export_prop("noclipped_folding_table")
+    if noclipped:
+        bake_and_slice_noclip(tilt_euler=(math.radians(-8), math.radians(22), math.radians(6)), shift=(0.0, 0.0, -0.22))
+        export_prop("noclipped_folding_table")
+    else:
+        export_prop("prop_folding_table")
+
+
+def add_wooden_chair_parts(prefix, M, offset=(0, 0, 0), rot=(0, 0, 0)):
+    """Movie-accurate wooden ladder-back dining/lobby chair with grey padded seat cushion."""
+    ox, oy, oz = offset
+    pivot = bpy.data.objects.new(f"ChairPivot_{prefix}", None)
+    bpy.context.scene.collection.objects.link(pivot)
+    parts = []
+    # 4 tapered wooden legs + stretchers
+    for lx in (-0.21, 0.21):
+        for ly in (-0.20, 0.20):
+            parts.append(add_cyl(f"{prefix}_Leg_{lx}_{ly}", (lx, ly, 0.23), 0.022, 0.46, M["wood"], verts=10))
+        parts.append(add_cyl(f"{prefix}_SideBar_{lx}", (lx, 0.0, 0.16), 0.014, 0.40, M["wood"], rot=(math.radians(90), 0, 0), verts=8))
+        # Tall slightly curved backrest posts
+        parts.append(add_cyl(f"{prefix}_Post_{lx}", (lx, -0.21, 0.72), 0.021, 0.56, M["wood"], rot=(math.radians(-6), 0, 0), verts=10))
+    # Wooden seat frame + slate-grey fabric cushion (like Kane Pixels Backrooms lobby chairs!)
+    parts.append(add_box(f"{prefix}_SeatFrame", (0.0, 0.0, 0.46), (0.50, 0.48, 0.05), M["wood"], 0.012))
+    parts.append(add_box(f"{prefix}_Cushion", (0.0, 0.01, 0.495), (0.44, 0.42, 0.045), M["steel"], 0.02))
+    # 4 horizontal ladder-back slats aligned cleanly along the -6 deg backrest posts!
+    for i, sz in enumerate((0.58, 0.70, 0.82, 0.94)):
+        sy = -0.21 + (sz - 0.72) * math.tan(math.radians(6))
+        parts.append(add_box(f"{prefix}_Slat_{i}", (0.0, sy, sz), (0.42, 0.025, 0.055), M["wood"], 0.008, rot=(math.radians(-6), 0, 0)))
+    for p in parts:
+        p.parent = pivot
+    pivot.rotation_euler = rot
+    pivot.location = (ox, oy, oz)
+    bpy.context.view_layer.update()
+    for p in parts:
+        mw = p.matrix_world.copy()
+        p.parent = None
+        p.matrix_world = mw
+    bpy.data.objects.remove(pivot, do_unlink=True)
+
+
+def build_wood_chair_pile():
+    """2 wide x 2 tall x 2 deep towering Backrooms Lobby movie-style stacked wooden chair mountain!"""
+    reset_scene()
+    M = mats()
+    # Ground layer: 4 upright/slightly angled wooden chairs forming the base
+    base_poses = [
+        (-0.08, -0.05, 0.0, (0.0, 0.0, math.radians(12))),
+        (0.76, -0.08, 0.0, (0.0, 0.0, math.radians(-24))),
+        (0.18, -0.82, 0.0, (0.0, 0.0, math.radians(155))),
+        (0.92, -0.78, 0.0, (0.0, 0.0, math.radians(-108))),
+    ]
+    # Mid & Upper tangled stacked tower (rising up to ~2.0 blocks tall like the film!)
+    stack_poses = [
+        (0.28, -0.32, 0.56, (math.radians(24), math.radians(-18), math.radians(38))),
+        (0.78, -0.46, 0.64, (math.radians(-32), math.radians(22), math.radians(-62))),
+        (0.45, -0.76, 0.78, (math.radians(68), math.radians(14), math.radians(115))),
+        (0.42, -0.44, 1.18, (math.radians(-18), math.radians(-28), math.radians(-18))),
+        (0.72, -0.58, 1.32, (math.radians(152), math.radians(20), math.radians(74))),
+        (0.52, -0.50, 1.62, (math.radians(42), math.radians(-36), math.radians(140))),
+    ]
+    for i, (x, y, z, r) in enumerate(base_poses + stack_poses):
+        add_wooden_chair_parts(f"Ch{i}", M, offset=(x, y, z), rot=r)
+    export_prop("prop_wood_chair_pile")
 
 
 def build_arcade_cabinet():
@@ -599,27 +666,27 @@ def build_single_props():
             bake_and_slice_noclip(tilt_euler=(math.radians(-26), math.radians(32), math.radians(14)), shift=(0, 0, -0.28))
         export_prop(name)
 
-    reset_scene()
-    M = mats()
-    add_box("Seat", (0.0, 0.0, 0.46), (0.52, 0.50, 0.06), M["wood"], 0.015)
-    for lx in (-0.21, 0.21):
-        for ly in (-0.20, 0.20):
-            add_cyl(f"Leg_{lx}_{ly}", (lx, ly, 0.23), 0.025, 0.46, M["wood"], verts=10)
-        add_cyl(f"Post_{lx}", (lx, -0.21, 0.74), 0.024, 0.56, M["wood"], verts=10)
-    add_box("BackSlat", (0.0, -0.21, 0.88), (0.48, 0.04, 0.24), M["wood"], 0.01)
-    bake_and_slice_noclip(tilt_euler=(math.radians(28), math.radians(-35), math.radians(22)), shift=(0, 0, -0.26))
-    export_prop("noclipped_wood_chair")
+    # 3B. Wooden Lobby Chair (both movie-accurate intact & half-sliced noclipped!)
+    for name, is_nc in (("prop_wood_chair", False), ("noclipped_wood_chair", True)):
+        reset_scene()
+        M = mats()
+        add_wooden_chair_parts("Single", M)
+        if is_nc:
+            bake_and_slice_noclip(tilt_euler=(math.radians(28), math.radians(-35), math.radians(22)), shift=(0, 0, -0.26))
+        export_prop(name)
 
-    # 4. CRT TV (half-sliced noclipped!)
-    reset_scene()
-    M = mats()
-    add_box("FrontBox", (0.0, 0.08, 0.36), (0.74, 0.40, 0.60), M["dark_metal"], 0.03)
-    add_box("RearTube", (0.0, -0.22, 0.36), (0.48, 0.28, 0.42), M["dark_metal"], 0.03)
-    add_box("Screen", (-0.06, 0.29, 0.37), (0.54, 0.03, 0.44), M["emit_main"], 0.01)
-    add_cyl("AntL", (-0.14, 0.0, 0.80), 0.008, 0.36, M["steel"], rot=(0, math.radians(-26), 0), verts=8)
-    add_cyl("AntR", (0.14, 0.0, 0.80), 0.008, 0.36, M["steel"], rot=(0, math.radians(26), 0), verts=8)
-    bake_and_slice_noclip(tilt_euler=(math.radians(-18), math.radians(28), math.radians(-10)), shift=(0, 0, -0.18))
-    export_prop("noclipped_crt_tv")
+    # 4. CRT TV (both intact & half-sliced noclipped!)
+    for name, is_nc in (("prop_crt_tv", False), ("noclipped_crt_tv", True)):
+        reset_scene()
+        M = mats()
+        add_box("FrontBox", (0.0, 0.08, 0.36), (0.74, 0.40, 0.60), M["dark_metal"], 0.03)
+        add_box("RearTube", (0.0, -0.22, 0.36), (0.48, 0.28, 0.42), M["dark_metal"], 0.03)
+        add_box("Screen", (-0.06, 0.29, 0.37), (0.54, 0.03, 0.44), M["emit_main"], 0.01)
+        add_cyl("AntL", (-0.14, 0.0, 0.80), 0.008, 0.36, M["steel"], rot=(0, math.radians(-26), 0), verts=8)
+        add_cyl("AntR", (0.14, 0.0, 0.80), 0.008, 0.36, M["steel"], rot=(0, math.radians(26), 0), verts=8)
+        if is_nc:
+            bake_and_slice_noclip(tilt_euler=(math.radians(-18), math.radians(28), math.radians(-10)), shift=(0, 0, -0.18))
+        export_prop(name)
 
     # 5. Electric fan (circular wire cage + angled fan blades + slim pedestal!)
     reset_scene()
@@ -699,13 +766,19 @@ def build_single_props():
 
 
 def main():
-    build_noclipped_fridge()
-    build_noclipped_vending_machine()
-    build_noclipped_water_cooler()
-    build_noclipped_file_cabinet()
+    build_fridge(noclipped=True)
+    build_fridge(noclipped=False)
+    build_vending_machine(noclipped=True)
+    build_vending_machine(noclipped=False)
+    build_water_cooler(noclipped=True)
+    build_water_cooler(noclipped=False)
+    build_file_cabinet(noclipped=True)
+    build_file_cabinet(noclipped=False)
     build_sofa(noclipped=False)
     build_sofa(noclipped=True)
-    build_noclipped_folding_table()
+    build_folding_table(noclipped=True)
+    build_folding_table(noclipped=False)
+    build_wood_chair_pile()
     build_arcade_cabinet()
     build_hospital_gurney()
     build_steam_boiler_unit()
@@ -717,7 +790,7 @@ def main():
     build_folding_chair_pile()
     build_simple_multi_props()
     build_single_props()
-    print("ALL 39 BLENDER MULTI-BLOCK & HALF-SLICED NOCLIPPED PROPS EXPORTED!")
+    print("ALL 47 BLENDER INTACT, MULTI-BLOCK & HALF-SLICED NOCLIPPED PROPS EXPORTED!")
 
 
 if __name__ == "__main__":

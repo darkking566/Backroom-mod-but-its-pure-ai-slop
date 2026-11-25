@@ -2,11 +2,15 @@ package dev.noclip.backrooms.props;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -51,6 +55,18 @@ public final class PropPartBlock extends Block implements EntityBlock {
 			}
 		}
 		return ItemStack.EMPTY;
+	}
+
+	@Override
+	protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos,
+			Direction dir, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+		if (level.getBlockEntity(pos) instanceof PropBlockEntity be) {
+			BlockPos master = be.masterPos();
+			if (!master.equals(pos) && !(level.getBlockState(master).getBlock() instanceof MultiPartPropBlock)) {
+				return Blocks.AIR.defaultBlockState();
+			}
+		}
+		return super.updateShape(state, level, ticks, pos, dir, neighborPos, neighborState, random);
 	}
 
 	@Override

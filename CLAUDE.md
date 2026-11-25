@@ -485,3 +485,12 @@
     - 極窄螢幕或超大縮放並排塞不下時，不再把配方書隱藏到點不開，改為點擊 `[配方書]` 以覆蓋抽屜模式展開於工作台上方（附 `[×]` 關閉鈕，自動填入後自動收合）
   - **開發啟動預設 1080p 視窗**（`build.gradle`）：於 `loom.runs.client` 加入 `programArgs "--width", "1920", "--height", "1080"`（僅影響本機 `play.bat`／`runClient` 啟動視窗，不改動玩家正式版 `options.txt`）
   - **驗證**：執行 `gradlew build runClientGameTest -Plevels=look --no-daemon` 全部 78 項單元測試與客戶端實機測試通過，並僅於本地 `main` 提交本方改動（未推送）
+- 依使用者要求補齊缺少完整版的家具模型並正式加入第 0 層（Level 0）世界生成（含零散出現與電影風格「集中堆疊＋完整／穿模混搭」群聚）：
+  - **補齊 8 款完整版家具與電影風高疊木椅山**（`props/BackroomsProps.java`、`tools/make_blender_props.py`、`tools/rebuild_shaped_recipes.py`、`models/blender_props/*.obj`、全模組擴增至 67 座 3D 方塊與 47 款 Blender 家具網格）：
+    - 新增 `prop_wood_chair`（電影風胡桃木四橫條椅背＋灰坐墊完整木椅）、`prop_wood_chair_pile`（`2×2×2` 堆疊木椅山，底部 4 張立椅＋上方 6 張斜疊木椅塔，還原電影畫面）、`prop_folding_table`（`2×1×1` 完整折疊長桌）、`prop_file_cabinet`（`1×2×1` 完整鐵皮檔案櫃）、`prop_crt_tv`（完整映像管老電視）、`prop_water_cooler`（`1×2×1` 完整飲水機）、`prop_vending_machine`（`2×2×1` 完整飲料販賣機）與 `prop_fridge`（`2×3×1` 完整雙門冰箱），全數配齊多格聯動破壞、實質零件拆解戰利品表、拆解台配方（合計 281 條工作站配方）、`mineable/axe`／`pickaxe` 標籤、雙語名稱與 `docs/items/blocks/` 預覽圖（合計 467 張 PNG）
+    - 同步升級 `noclipped_wood_chair` 與 `prop_wood_chair` 共用同一款木椅造型（斜切半埋版），並於 `PropPartBlock.updateShape` 加入防孤兒自清理保護
+  - **第 0 層零散與集中物品世界生成**（新增 `level0/Level0Props.java`、`level0/Level0PropsTest.java`，於 `level0/Level0.java` 註冊）：
+    - 透過 `ServerChunkEvents.CHUNK_LOAD` 僅於區塊首次生成時放置，嚴格避開原點 `[-32..31]` 著陸／基準測試區、遠距測試點 `(701, -700)`、馬尼拉房間、樓梯間、紅室、深淵與深坑，所有多格佔用格皆鎖定於單一區塊內、檢查全空氣與實心地毯底座並正確建立 `PropBlockEntity` 主副聯動與保留走道通行
+    - **集中群聚模式**（約 12～26% 區塊依區域觸發）：包含 5 種主題——① 電影風木椅山群聚（`prop_wood_chair_pile`／折疊椅堆＋周圍 3～5 張零散完整木椅＋1～2 張切半穿模椅）、② 辦公隔間群聚（完好／破損玻璃隔間＋折疊桌＋完好／損壞／穿模電腦＋辦公椅＋檔案櫃＋手機）、③ 休息家電群聚（完好＋穿模沙發＋飲水機＋落地立燈＋冰箱／販賣機／電視／微波爐）、④ 雜物庫房群聚（紙箱山＋窗簾布堆＋全身鏡＋電風扇＋假盆栽＋老電視）、⑤ 稀有流浪者殘骸營地（殘骸＋立燈＋木椅＋急救箱＋機率上鎖軍械箱）
+    - **零散出現模式**（其餘約 38～62% 區塊隨機散落 1～3 件獨立物件）：完整涵蓋 `MATERIALS.md` 第 0 層全部物件，並隨離原點距離增加與昏暗區（`DARKENED`）拉高穿模版比例（25% → 50～55%）
+  - **驗證**：更新 `BackroomsCraftingTest.java`（67 座方塊＋47 款 Blender 家具）與新增 `Level0PropsTest.java`，執行 `gradlew build runClientGameTest -Plevels=0 --no-daemon` 全數 80 項單元測試與完整 Level 0 客戶端實機測試皆通過（日誌零模型／貼圖／方塊實體警告），並僅於本地 `main` 提交本方改動（保留工作區 Claude 編輯中之 `src/client/` 檔案與 `docs/企劃書/` 未動、未推送）

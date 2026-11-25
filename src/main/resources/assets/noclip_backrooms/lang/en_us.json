@@ -1319,5 +1319,13 @@
   "ui.noclip_backrooms.cat_full.firearms": "Firearms",
   "ui.noclip_backrooms.cat_full.magic": "Magic & Anomaly Weapons",
   "ui.noclip_backrooms.cat_full.armor": "Armor Sets",
-  "ui.noclip_backrooms.cat_full.gear": "Tools, Ammo & Facilities"
+  "ui.noclip_backrooms.cat_full.gear": "Tools, Ammo & Facilities",
+  "block.noclip_backrooms.prop_wood_chair": "Wooden Lobby Chair",
+  "block.noclip_backrooms.prop_wood_chair_pile": "Stacked Wooden Chair Mountain",
+  "block.noclip_backrooms.prop_folding_table": "Office Folding Table",
+  "block.noclip_backrooms.prop_file_cabinet": "Steel Filing Cabinet",
+  "block.noclip_backrooms.prop_crt_tv": "Retro CRT Television",
+  "block.noclip_backrooms.prop_water_cooler": "Office Water Cooler",
+  "block.noclip_backrooms.prop_vending_machine": "Lobby Vending Machine",
+  "block.noclip_backrooms.prop_fridge": "Double-Door Refrigerator"
 }

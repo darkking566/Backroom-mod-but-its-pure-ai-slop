@@ -204,6 +204,26 @@
     "noclip_backrooms:scaffold_pole",
     "noclip_backrooms:glitch_black",
     "noclip_backrooms:glitch_magenta",
-    "noclip_backrooms:glitch_cyan"
+    "noclip_backrooms:glitch_cyan",
+    "noclip_backrooms:prop_part",
+    "noclip_backrooms:ultimate_spiderweb_crafting_table",
+    "noclip_backrooms:prop_file_cabinet",
+    "noclip_backrooms:prop_crt_tv",
+    "noclip_backrooms:prop_water_cooler",
+    "noclip_backrooms:prop_vending_machine",
+    "noclip_backrooms:prop_fridge",
+    "noclip_backrooms:prop_desktop_computer",
+    "noclip_backrooms:prop_desktop_computer_damaged",
+    "noclip_backrooms:prop_desktop_computer_noclipped",
+    "noclip_backrooms:prop_phone",
+    "noclip_backrooms:prop_phone_cracked",
+    "noclip_backrooms:prop_phone_noclipped",
+    "noclip_backrooms:prop_glass_partition",
+    "noclip_backrooms:prop_glass_partition_broken",
+    "noclip_backrooms:prop_folding_chair_pile",
+    "noclip_backrooms:prop_electric_fan",
+    "noclip_backrooms:prop_microwave",
+    "noclip_backrooms:prop_floor_lamp",
+    "noclip_backrooms:prop_wall_first_aid_kit"
   ]
 }

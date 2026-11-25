@@ -549,6 +549,15 @@ PROP_SALVAGE_MAP = {
     "noclipped_vending_machine": [("sheet_metal", 3, 4), ("green_circuit", 1, 2), ("almond_water", 1, 3), ("lost_old_coin", 1, 2)],
     "noclipped_water_cooler": [("plastic_casing", 2, 4), ("almond_water", 1, 2), ("copper_pipe", 1, 2)],
     "noclipped_file_cabinet": [("sheet_metal", 2, 4), ("screw_nail_box", 1, 2), ("magazine_bundle", 1, 2), ("rusted_office_safe", 1, 1)],
+    # 8 new intact counterparts + movie-style towering wood chair pile!
+    "prop_wood_chair": [("broken_table_leg", 1, 3), ("rags", 1, 2), ("screw_nail_box", 1, 1)],
+    "prop_wood_chair_pile": [("broken_table_leg", 4, 8), ("rags", 3, 5), ("foam_padding", 2, 4), ("screw_nail_box", 2, 4)],
+    "prop_folding_table": [("broken_table_leg", 2, 4), ("sheet_metal", 2, 3), ("screw_nail_box", 1, 2)],
+    "prop_file_cabinet": [("sheet_metal", 2, 4), ("screw_nail_box", 1, 2), ("magazine_bundle", 1, 2), ("damp_paper_scrap", 2, 4)],
+    "prop_crt_tv": [("crt_tube", 1, 2), ("green_circuit", 1, 2), ("copper_wire", 2, 3), ("office_glass", 1, 2)],
+    "prop_water_cooler": [("plastic_casing", 2, 4), ("almond_water", 1, 3), ("copper_pipe", 1, 2)],
+    "prop_vending_machine": [("sheet_metal", 3, 5), ("green_circuit", 1, 2), ("almond_water", 2, 4), ("lost_old_coin", 1, 3)],
+    "prop_fridge": [("sheet_metal", 3, 5), ("copper_pipe", 2, 4), ("coolant_vial", 1, 2), ("almond_water", 1, 2)],
 }
 
 
@@ -624,6 +633,60 @@ def write_ultimate_spiderweb_and_prop_part_assets():
     # Write rich 128x128 obsidian/gold/void-violet atlas texture for ultimate_spiderweb_crafting_table
     write_ultimate_table_png(os.path.join(ASSETS, "textures", "block", "crafting3d", "ultimate_spiderweb_crafting_table.png"))
 
+    # 3. Assets (blockstate, item, model, 128x128 texture) for the 8 new intact Level 0 props & movie wood chair pile!
+    intact_clone_sources = {
+        "prop_wood_chair": "noclipped_wood_chair",
+        "prop_wood_chair_pile": "noclipped_wood_chair",
+        "prop_folding_table": "noclipped_folding_table",
+        "prop_file_cabinet": "noclipped_file_cabinet",
+        "prop_crt_tv": "noclipped_crt_tv",
+        "prop_water_cooler": "noclipped_water_cooler",
+        "prop_vending_machine": "noclipped_vending_machine",
+        "prop_fridge": "noclipped_fridge",
+    }
+    import shutil
+    for new_id, src_id in intact_clone_sources.items():
+        with open(os.path.join(ASSETS, "blockstates", f"{new_id}.json"), "w", encoding="utf-8") as f:
+            json.dump({
+                "variants": {
+                    "facing=north": {"model": f"noclip_backrooms:block/crafting/{new_id}"},
+                    "facing=east": {"model": f"noclip_backrooms:block/crafting/{new_id}", "y": 90},
+                    "facing=south": {"model": f"noclip_backrooms:block/crafting/{new_id}", "y": 180},
+                    "facing=west": {"model": f"noclip_backrooms:block/crafting/{new_id}", "y": 270},
+                }
+            }, f, indent=2)
+        with open(os.path.join(ASSETS, "items", f"{new_id}.json"), "w", encoding="utf-8") as f:
+            json.dump({"model": {"type": "minecraft:model", "model": f"noclip_backrooms:block/crafting/{new_id}"}}, f, indent=2)
+        src_model = os.path.join(ASSETS, "models", "block", "crafting", f"{src_id}.json")
+        with open(src_model, "r", encoding="utf-8") as f:
+            m = json.load(f)
+        tex_path = f"noclip_backrooms:block/crafting3d/{new_id}"
+        for k in list(m.get("textures", {}).keys()):
+            m["textures"][k] = tex_path
+        with open(os.path.join(ASSETS, "models", "block", "crafting", f"{new_id}.json"), "w", encoding="utf-8") as f:
+            json.dump(m, f, indent=2)
+        src_tex = os.path.join(ASSETS, "textures", "block", "crafting3d", f"{src_id}.png")
+        dst_tex = os.path.join(ASSETS, "textures", "block", "crafting3d", f"{new_id}.png")
+        shutil.copyfile(src_tex, dst_tex)
+
+    # Update mineable axe & pickaxe block tags so players can break all new props smoothly!
+    axe_path = os.path.join(RES, "data", "minecraft", "tags", "block", "mineable", "axe.json")
+    pick_path = os.path.join(RES, "data", "minecraft", "tags", "block", "mineable", "pickaxe.json")
+    for tag_path, extras in (
+        (axe_path, ["prop_wood_chair", "prop_wood_chair_pile", "prop_folding_table", "prop_sofa", "prop_sofa_noclipped", "prop_cardboard_pile", "prop_standing_mirror", "prop_curtain_heap"]),
+        (pick_path, ["prop_part", "ultimate_spiderweb_crafting_table", "prop_file_cabinet", "prop_crt_tv", "prop_water_cooler", "prop_vending_machine", "prop_fridge", "prop_desktop_computer", "prop_desktop_computer_damaged", "prop_desktop_computer_noclipped", "prop_phone", "prop_phone_cracked", "prop_phone_noclipped", "prop_glass_partition", "prop_glass_partition_broken", "prop_folding_chair_pile", "prop_electric_fan", "prop_microwave", "prop_floor_lamp", "prop_wall_first_aid_kit"]),
+    ):
+        with open(tag_path, "r", encoding="utf-8") as f:
+            td = json.load(f)
+        vals = td.get("values", [])
+        for bid in extras:
+            full = mod(bid)
+            if full not in vals:
+                vals.append(full)
+        td["values"] = vals
+        with open(tag_path, "w", encoding="utf-8") as f:
+            json.dump(td, f, indent=2)
+
 
 def write_ultimate_table_png(path):
     size = 128
@@ -670,6 +733,14 @@ def update_lang_files():
         "block.noclip_backrooms.spiderweb_crafting_table": "Primary Spiderweb Crafting Table (7×7)",
         "block.noclip_backrooms.ultimate_spiderweb_crafting_table": "Ultimate Spiderweb Crafting Table (9×9)",
         "block.noclip_backrooms.prop_part": "Backrooms Structure Part",
+        "block.noclip_backrooms.prop_wood_chair": "Wooden Lobby Chair",
+        "block.noclip_backrooms.prop_wood_chair_pile": "Stacked Wooden Chair Mountain",
+        "block.noclip_backrooms.prop_folding_table": "Office Folding Table",
+        "block.noclip_backrooms.prop_file_cabinet": "Steel Filing Cabinet",
+        "block.noclip_backrooms.prop_crt_tv": "Retro CRT Television",
+        "block.noclip_backrooms.prop_water_cooler": "Office Water Cooler",
+        "block.noclip_backrooms.prop_vending_machine": "Lobby Vending Machine",
+        "block.noclip_backrooms.prop_fridge": "Double-Door Refrigerator",
         "ui.noclip_backrooms.station.book": "Recipes",
         "ui.noclip_backrooms.station.book_title": "Recipe Book",
         "ui.noclip_backrooms.station.clear": "Clear",
@@ -695,6 +766,14 @@ def update_lang_files():
         "block.noclip_backrooms.spiderweb_crafting_table": "初級蜘蛛網合成台（7×7）",
         "block.noclip_backrooms.ultimate_spiderweb_crafting_table": "終極蜘蛛網合成台（9×9）",
         "block.noclip_backrooms.prop_part": "後室物件結構",
+        "block.noclip_backrooms.prop_wood_chair": "大廳木椅",
+        "block.noclip_backrooms.prop_wood_chair_pile": "堆疊木椅山",
+        "block.noclip_backrooms.prop_folding_table": "辦公室折疊長桌",
+        "block.noclip_backrooms.prop_file_cabinet": "鐵皮檔案櫃",
+        "block.noclip_backrooms.prop_crt_tv": "老式映像管電視",
+        "block.noclip_backrooms.prop_water_cooler": "辦公室飲水機",
+        "block.noclip_backrooms.prop_vending_machine": "大廳飲料販賣機",
+        "block.noclip_backrooms.prop_fridge": "雙門大冰箱",
         "ui.noclip_backrooms.station.book": "配方書",
         "ui.noclip_backrooms.station.book_title": "分類配方書",
         "ui.noclip_backrooms.station.clear": "清空",

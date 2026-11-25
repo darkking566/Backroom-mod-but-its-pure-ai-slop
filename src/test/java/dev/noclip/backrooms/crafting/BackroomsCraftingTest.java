@@ -146,7 +146,7 @@ final class BackroomsCraftingTest {
 		try (var stream = Files.list(blockTexDir)) {
 			blockTextures = stream.filter(p -> p.toString().endsWith(".png")).toList();
 		}
-		assertTrue(blockTextures.size() >= 59, "Expected all 59 3D block textures, got " + blockTextures.size());
+		assertTrue(blockTextures.size() >= 67, "Expected all 67 3D block textures, got " + blockTextures.size());
 		for (Path tex : blockTextures) {
 			String fn = tex.getFileName().toString();
 			String id = fn.substring(0, fn.length() - 4);
@@ -156,14 +156,14 @@ final class BackroomsCraftingTest {
 			assertTrue(obj.has("elements") && !obj.getAsJsonArray("elements").isEmpty(), "Empty 3D elements in block " + id);
 		}
 
-		// Verify all 39 Blender multi-block & half-sliced noclipped prop OBJs exist and are non-empty
+		// Verify all 47 Blender intact, multi-block & half-sliced noclipped prop OBJs exist and are non-empty
 		Path propObjDir = Path.of("src/main/resources/assets/noclip_backrooms/models/blender_props");
 		assertTrue(Files.isDirectory(propObjDir), "Blender props dir missing");
 		List<Path> propObjs;
 		try (var stream = Files.list(propObjDir)) {
 			propObjs = stream.filter(p -> p.toString().endsWith(".obj")).toList();
 		}
-		assertTrue(propObjs.size() >= 39, "Expected at least 39 Blender prop OBJs, got " + propObjs.size());
+		assertTrue(propObjs.size() >= 47, "Expected at least 47 Blender prop OBJs, got " + propObjs.size());
 		for (Path obj : propObjs) {
 			assertTrue(Files.size(obj) > 400, "Empty Blender prop OBJ: " + obj.getFileName());
 		}
