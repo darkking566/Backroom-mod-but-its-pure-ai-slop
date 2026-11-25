@@ -433,7 +433,8 @@
   - `runClientGameTest -Plevels=itemlook` 通過，看過手上、瞄準、第三人稱、物品欄圖示、地上的辦公椅；比較圖 `docs/look/items/mesh_trial.png`；`docs/look/ITEMS.md` 加說明
   - 還沒做：其他物品（等使用者看過試作）
   - `gradlew build` 通過
-- 使用者決定物品風格：法杖、魔典等魔法類（之後的魔法劍也是）走奇幻風格（後面還沒做的樓層才拿得到），冷兵器和槍維持寫實；寫進 `docs/look/ITEMS.md`，已做好的 19 件寫實法器之後要重做
+- 使用者決定物品風格：法杖、魔典等魔法類（之後的魔法劍也是）走奇幻風格（後面還沒做的樓層才拿得到），冷兵器和槍維持寫實；寫進 `docs/look/ITEMS.md`
+- 使用者接著決定魔法類直接用 Gemini 原本的模型：寫實物品包拿掉 19 件法器與穿牆短杖（刪除 `tools/item_look/magic.py`，`ported.py` 拿掉短杖），包裡剩 83 件；`ItemLookClientTest` 拿在手上的清單把懷錶換成撬棍；`runClientGameTest -Plevels=itemlook` 通過、沒有缺模型或貼圖
 
 ## 動作記錄（Antigravity）
 

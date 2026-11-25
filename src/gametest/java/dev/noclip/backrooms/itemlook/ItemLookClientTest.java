@@ -38,7 +38,7 @@ public final class ItemLookClientTest implements FabricClientGameTest {
 	private static final int FLOOR = 32;
 	/** A spread of shapes to hold (the batch being worked on). */
 	private static final String[] HELD = {"west_arming_sword", "gun_pistol_9mm", "west_claymore", "gun_revolver", "blunt_twohand_maul",
-			"gun_assault_rifle", "cn_guandao", "magic_stopmotion_watch"};
+			"gun_assault_rifle", "cn_guandao", "improvised_crowbar"};
 	/** Which of HELD to see from outside. */
 	private static final int[] OUTSIDE = {0, 1};
 

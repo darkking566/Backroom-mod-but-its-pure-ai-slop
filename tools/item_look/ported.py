@@ -22,21 +22,6 @@ def improvised_crowbar():
     ], _display("improvised_crowbar", hands([-30, 0, 6], [0, 2.5, 0], 0.52))
 
 
-def magic_noclip_wand():
-    return [
-        box((7.3, -2, 7.3), (8.7, 18, 8.7), "old_wood", seed=1),
-        box((7.0, 4, 7.0), (9.0, 6.5, 9.0), "wallpaper_strip", seed=2),
-        box((7.0, 9, 7.0), (9.0, 11, 9.0), "wallpaper_strip", seed=3),
-        box((7.0, 13.5, 7.0), (9.0, 15.5, 9.0), "wallpaper_strip", seed=4),
-        box((6.9, 16.4, 6.9), (9.1, 18, 9.1), "duct_tape", seed=5),
-        box((6.5, 18, 6.5), (9.5, 19.6, 9.5), "lamp_metal", seed=6),
-        box((7.2, 19.6, 7.2), (8.8, 25.4, 8.8), "fluoro_tube", emit=7, seed=7),
-        box((7.5, 25.4, 7.5), (8.3, 26.3, 8.1), "fluoro_tube", emit=7, seed=8),
-        box((8.7, 14.6, 7.8), (9.1, 18.4, 8.2), "wire_black", seed=9),
-        box((9.1, 14.6, 7.8), (9.6, 15.0, 8.2), "copper_bright", seed=10),
-    ], _display("magic_noclip_wand", hands([-26, 0, 6], [0, 1.5, 0], 0.46))
-
-
 def gun_pipe_pistol():
     grip = ("x", 17, (8, 7, 10.4))
     return [
@@ -121,5 +106,5 @@ def prop_desktop_computer():
     ]
 
 
-ITEMS = {f.__name__: f for f in (improvised_crowbar, magic_noclip_wand, copper_wire, almond_elixir)}
+ITEMS = {f.__name__: f for f in (improvised_crowbar, copper_wire, almond_elixir)}
 PROPS = {f.__name__: f for f in (prop_office_chair, prop_desktop_computer)}
