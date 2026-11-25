@@ -85,6 +85,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			if (only("shepherdSnake")) shepherdSnake(context, game, seed);
 			if (only("placeFacing")) placeFacing(context, game);
 			if (only("bigProps")) bigProps(context, game);
+			if (only("gardenPlants")) gardenPlants(context, game);
 			if (only("checkBlocks")) checkBlocks(context, game);
 			if (only("leaveThroughDoor")) leaveThroughDoor(context, game, seed);
 		}
@@ -1524,6 +1525,23 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			level.setBlock(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
 			System.out.println("[bigProps] probes " + probes);
 		});
+	}
+
+	/** The Garden's grass, fern and three flowers in a row on moss under a lamp, close up. */
+	private static void gardenPlants(ClientGameTestContext context, TestSingleplayerContext game) {
+		var server = game.getServer();
+		server.runCommand("gamemode spectator @a");
+		BlockPos at = server.computeOnServer(s -> player(s).blockPosition());
+		int x0 = at.getX(), z0 = at.getZ();
+		String in = "execute in noclip_backrooms:level_1 run ";
+		server.runCommand(in + String.format(Locale.ROOT, "fill %d %d %d %d %d %d minecraft:air", x0 - 4, STAND, z0 - 4, x0 + 4, STAND + 3, z0 + 4));
+		server.runCommand(in + String.format(Locale.ROOT, "fill %d %d %d %d %d %d noclip_backrooms:garden_moss", x0 - 4, STAND - 1, z0 - 1, x0 + 4, STAND - 1, z0 + 3));
+		String[] plants = {"garden_grass", "garden_fern", "garden_flower_blue", "garden_flower_red", "garden_flower_yellow"};
+		for (int i = 0; i < plants.length; i++) {
+			server.runCommand(in + String.format(Locale.ROOT, "setblock %d %d %d noclip_backrooms:%s", x0 - 2 + i, STAND, z0 + 1, plants[i]));
+		}
+		server.runCommand(in + String.format(Locale.ROOT, "setblock %d %d %d minecraft:sea_lantern", x0, STAND + 3, z0 - 1));
+		shoot(context, game, x0 + 0.5, STAND + 0.3, z0 - 2.2, 0, 12, "level1_garden_plants");
 	}
 
 	/** The nearest exit door, from both of its sides, then out with a right-click. */

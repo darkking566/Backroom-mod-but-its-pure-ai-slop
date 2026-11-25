@@ -67,6 +67,8 @@ def main():
     for f in sorted(OLD.glob("*.png")):
         if f.stem.endswith(("_n", "_s")) or f.with_suffix(".png.mcmeta").exists():
             continue
+        if f.stem.startswith(("garden_grass", "garden_fern", "garden_flower")) and f.stem != "garden_grass_floor":
+            continue  # painted at 512 px by make_garden_plants.py
         with Image.open(f) as image:
             if image.width != image.height:
                 continue
