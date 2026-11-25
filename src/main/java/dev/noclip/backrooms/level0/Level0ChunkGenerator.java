@@ -132,7 +132,7 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		if (Maze.isWall(seed, x, z, topLayer, epochs)) {
 			return wallBlockAt(seed, x, z, cx, cz, ix, iz, zone, baseboard, epochs);
 		}
-		if (y == FLOOR_Y + 1 || y == FLOOR_Y + 2) {
+		if (y >= FLOOR_Y + 1 && y <= FLOOR_Y + 3) {
 			BlockState poi = ZonePoiPlan.standardZoneBlockAt(seed, y, cx, cz, ix, iz, zone);
 			if (poi != null) return poi;
 		}

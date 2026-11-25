@@ -92,6 +92,16 @@ final class ShadowHallucination {
 		return ACTIVE.containsKey(player.getUUID());
 	}
 
+	static void triggerNear(ServerLevel level, ServerPlayer player) {
+		if (player.isCreative() || player.isSpectator() || !player.isAlive()) return;
+		UUID id = player.getUUID();
+		if (ACTIVE.containsKey(id)) return;
+		Vec3 spot = findNaturalSpot(level, player, level.getRandom(), false);
+		if (spot != null) {
+			spawnAt(level, player, spot, level.getServer().getTickCount());
+		}
+	}
+
 	private static int spawnCommand(CommandSourceStack source) {
 		ServerPlayer player = source.getPlayer();
 		if (player == null) {

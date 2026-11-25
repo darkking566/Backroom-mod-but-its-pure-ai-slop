@@ -1,6 +1,7 @@
 package dev.noclip.backrooms.level0;
 
 import dev.noclip.backrooms.level1.Level1Blocks;
+import dev.noclip.backrooms.level1.PipeBlock;
 import dev.noclip.backrooms.props.BackroomsLootChestBlock;
 import dev.noclip.backrooms.props.BackroomsProps;
 import dev.noclip.backrooms.props.NoClipPropBlock;
@@ -28,7 +29,9 @@ final class ZonePoiPlan {
 	enum VignetteType {
 		GLASS_OFFICE,
 		WANDERER_SITE,
-		NOCLIP_ALCOVE
+		NOCLIP_ALCOVE,
+		BREAKER_NICHE,
+		PEEK_CHAMBER
 	}
 
 	record ChasmOutpost(int cx, int cz, int tier, int floorY, int ceilY) {
@@ -344,6 +347,54 @@ final class ZonePoiPlan {
 				}
 				yield null;
 			}
+			case BREAKER_NICHE -> {
+				if (y == Level0ChunkGenerator.FLOOR_Y + 1) {
+					if (ix == 3 && iz == 2) {
+						yield ModBlocks.ROUGH_WALLPAPER_BASEBOARD.defaultBlockState();
+					}
+					if (ix == 3 && iz == 3) {
+						yield BackroomsProps.INDUSTRIAL_FUSE_BOX.defaultBlockState()
+								.setValue(NoClipPropBlock.FACING, Direction.SOUTH);
+					}
+					if (ix == 4 && iz == 3) {
+						yield Level1Blocks.SUPPLY_CRATE.defaultBlockState();
+					}
+				} else if (y == Level0ChunkGenerator.FLOOR_Y + 2) {
+					if (ix == 3 && iz == 2) {
+						yield ModBlocks.ROUGH_WALLPAPER.defaultBlockState();
+					}
+				} else if (y == Level0ChunkGenerator.FLOOR_Y + 3) {
+					if (ix == 3 && iz == 2) {
+						yield ModBlocks.ROUGH_WALLPAPER.defaultBlockState();
+					}
+					if ((ix == 2 || ix == 4) && iz == 3) {
+						yield Level1Blocks.CEILING_PIPE.defaultBlockState()
+								.setValue(PipeBlock.AXIS, Direction.Axis.X);
+					}
+				}
+				yield null;
+			}
+			case PEEK_CHAMBER -> {
+				if (y == Level0ChunkGenerator.FLOOR_Y && ix == 3 && iz == 3) {
+					yield ModBlocks.THICK_CARPET.defaultBlockState();
+				}
+				boolean sideWall = (ix == 2 || ix == 4) && iz >= 2 && iz <= 4;
+				boolean windowCol = ix == 3 && iz == 4;
+				if (y == Level0ChunkGenerator.FLOOR_Y + 1) {
+					if (sideWall) yield ModBlocks.PALE_WALLPAPER_BASEBOARD.defaultBlockState();
+					if (windowCol) yield Blocks.GLASS.defaultBlockState();
+					if (ix == 3 && iz == 3) {
+						yield BackroomsProps.NOCLIPPED_WOOD_CHAIR.defaultBlockState()
+								.setValue(NoClipPropBlock.FACING, Direction.SOUTH);
+					}
+				} else if (y == Level0ChunkGenerator.FLOOR_Y + 2) {
+					if (sideWall) yield ModBlocks.PALE_WALLPAPER.defaultBlockState();
+					if (windowCol) yield Blocks.GLASS.defaultBlockState();
+				} else if (y == Level0ChunkGenerator.FLOOR_Y + 3) {
+					if (sideWall || windowCol) yield ModBlocks.PALE_WALLPAPER.defaultBlockState();
+				}
+				yield null;
+			}
 		};
 	}
 
@@ -396,7 +447,7 @@ final class ZonePoiPlan {
 			return null;
 		}
 		int spawnRoll = Math.floorMod(hash(seed, sx, sz, VIGNETTE_SALT), 100);
-		if (spawnRoll >= 60) return null;
+		if (spawnRoll >= 75) return null;
 
 		int start = Math.floorMod(hash(seed, sx, sz, VIGNETTE_SALT + 1), 16);
 		for (int i = 0; i < 16; i++) {
@@ -409,10 +460,18 @@ final class ZonePoiPlan {
 
 			int typeRoll = Math.floorMod(hash(seed, cx, cz, VIGNETTE_SALT + 2), 100);
 			VignetteType type = switch (zone) {
-				case CUBICLES -> typeRoll < 70 ? VignetteType.GLASS_OFFICE : VignetteType.NOCLIP_ALCOVE;
-				case ARCHES -> typeRoll < 50 ? VignetteType.GLASS_OFFICE : VignetteType.WANDERER_SITE;
-				case CORRIDORS -> typeRoll < 65 ? VignetteType.NOCLIP_ALCOVE : VignetteType.WANDERER_SITE;
-				case PILLARS, CLASSIC -> typeRoll < 50 ? VignetteType.WANDERER_SITE : VignetteType.NOCLIP_ALCOVE;
+				case CUBICLES -> typeRoll < 50 ? VignetteType.GLASS_OFFICE
+						: (typeRoll < 70 ? VignetteType.BREAKER_NICHE
+						: (typeRoll < 85 ? VignetteType.NOCLIP_ALCOVE : VignetteType.PEEK_CHAMBER));
+				case ARCHES -> typeRoll < 35 ? VignetteType.GLASS_OFFICE
+						: (typeRoll < 65 ? VignetteType.PEEK_CHAMBER
+						: (typeRoll < 85 ? VignetteType.WANDERER_SITE : VignetteType.BREAKER_NICHE));
+				case CORRIDORS -> typeRoll < 40 ? VignetteType.NOCLIP_ALCOVE
+						: (typeRoll < 65 ? VignetteType.BREAKER_NICHE
+						: (typeRoll < 85 ? VignetteType.PEEK_CHAMBER : VignetteType.WANDERER_SITE));
+				case PILLARS, CLASSIC -> typeRoll < 30 ? VignetteType.WANDERER_SITE
+						: (typeRoll < 55 ? VignetteType.NOCLIP_ALCOVE
+						: (typeRoll < 80 ? VignetteType.BREAKER_NICHE : VignetteType.PEEK_CHAMBER));
 				default -> VignetteType.WANDERER_SITE;
 			};
 			return new Vignette(cx, cz, type);

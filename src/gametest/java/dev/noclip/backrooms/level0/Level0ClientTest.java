@@ -701,6 +701,55 @@ public final class Level0ClientTest implements FabricClientGameTest {
 					"Noclip alcove office chair missing");
 		});
 
+		ZonePoiPlan.Vignette breakerNiche = vignettes.get(ZonePoiPlan.VignetteType.BREAKER_NICHE);
+		int bx = breakerNiche.cx() * Maze.CELL, bz = breakerNiche.cz() * Maze.CELL;
+		server.runCommand("gamemode survival @a");
+		server.runCommand("item replace entity @a hotbar.0 with minecraft:air");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (bx + 3.5) + " " + standY + " " + (bz + 5.5) + " 180 12");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_breaker_niche");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(bx + 3, standY, bz + 3)).is(BackroomsProps.INDUSTRIAL_FUSE_BOX),
+					"Breaker niche fuse box missing");
+			check(level.getBlockState(new BlockPos(bx + 4, standY, bz + 3)).is(Level1Blocks.SUPPLY_CRATE),
+					"Breaker niche supply crate missing");
+			check(level.getBlockState(new BlockPos(bx + 2, standY + 2, bz + 3)).is(Level1Blocks.CEILING_PIPE),
+					"Breaker niche ceiling pipe missing");
+			check(level.getBlockState(new BlockPos(bx + 3, Level0ChunkGenerator.CEILING_Y, bz + 3)).is(ModBlocks.BROKEN_FLUORESCENT_LIGHT),
+					"Breaker niche overhead lamp should start broken");
+			check(FuseBoxEvents.trigger(level, player(s), new BlockPos(bx + 3, standY, bz + 3), true),
+					"Breaker niche fuse box failed to restore");
+			check(level.getBlockState(new BlockPos(bx + 3, Level0ChunkGenerator.CEILING_Y, bz + 3)).is(ModBlocks.FLUORESCENT_LIGHT),
+					"Breaker niche overhead lamp did not turn back on");
+			check(FuseBoxEvents.isOnCooldown(level, new BlockPos(bx + 3, standY, bz + 3)),
+					"Breaker niche fuse box did not enter cooldown");
+		});
+
+		ZonePoiPlan.Vignette peekChamber = vignettes.get(ZonePoiPlan.VignetteType.PEEK_CHAMBER);
+		int px = peekChamber.cx() * Maze.CELL, pz = peekChamber.cz() * Maze.CELL;
+		server.runCommand("gamemode spectator @a");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (px + 3.5) + " " + standY + " " + (pz + 5.5) + " 180 8");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_peek_chamber");
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			check(level.getBlockState(new BlockPos(px + 3, standY, pz + 4)).is(Blocks.GLASS),
+					"Peek chamber viewing window missing");
+			check(level.getBlockState(new BlockPos(px + 3, standY, pz + 3)).is(BackroomsProps.NOCLIPPED_WOOD_CHAIR),
+					"Peek chamber chair missing");
+			check(level.getBlockState(new BlockPos(px + 3, standY, pz + 2)).isAir(),
+					"Peek chamber north back entrance must stay open");
+			check(level.getBlockState(new BlockPos(px + 3, Level0ChunkGenerator.CEILING_Y, pz + 3)).is(ModBlocks.FLUORESCENT_LIGHT),
+					"Peek chamber light missing");
+		});
+
 		server.runCommand("gamemode survival @a");
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
 		game.getConnection().waitForChunksDownload();

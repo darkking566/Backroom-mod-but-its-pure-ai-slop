@@ -659,6 +659,9 @@ final class Maze {
 		}
 		ZonePoiPlan.Vignette vignette = ZonePoiPlan.vignetteAtCell(seed, cx, cz);
 		if (vignette != null && vignette.type() != ZonePoiPlan.VignetteType.NOCLIP_ALCOVE) {
+			if (vignette.type() == ZonePoiPlan.VignetteType.PEEK_CHAMBER) {
+				return ix == 3 && iz == 3;
+			}
 			return (ix == 3 || ix == 4) && iz == 3;
 		}
 		int epoch = effectiveEpoch(zone, cx, cz, epochs);
@@ -707,7 +710,11 @@ final class Maze {
 		if (ZonePoiPlan.isRedRoomPoiCell(seed, cx, cz)) return true;
 		ZonePoiPlan.Vignette vignette = ZonePoiPlan.vignetteAtCell(seed, cx, cz);
 		if (vignette != null) {
-			if (vignette.type() == ZonePoiPlan.VignetteType.WANDERER_SITE) return false;
+			if (vignette.type() == ZonePoiPlan.VignetteType.WANDERER_SITE
+					|| vignette.type() == ZonePoiPlan.VignetteType.BREAKER_NICHE) {
+				return false;
+			}
+			if (vignette.type() == ZonePoiPlan.VignetteType.PEEK_CHAMBER) return true;
 			if (vignette.type() == ZonePoiPlan.VignetteType.GLASS_OFFICE) {
 				return Math.floorMod(x, CELL) == 4 && Math.floorMod(z, CELL) == 3;
 			}

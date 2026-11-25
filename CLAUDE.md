@@ -522,3 +522,7 @@
   - `WANDERER_SITE`（前人失蹤現場）：壞燈下的潮濕厚地毯、流浪者殘骸、穿牆木椅、補給箱與調查筆記
   - `NOCLIP_ALCOVE`（異常補給角）：發光穿模自動販賣機、飲水機、檔案櫃與辦公椅
   - `Level0ChunkGenerator` 支援一般區域 `FLOOR_Y + 2` 擺設與 `PILLARS` 區地毯覆寫；`ZonePoiPlanTest` 與 `Level0ClientTest` 新增 3 種微型興趣點驗證與實機截圖（`level0_glass_office`、`level0_wanderer_site`、`level0_noclip_alcove`），`.\gradlew build` 與 `.\gradlew runClientGameTest -Plevels=0` 全部通過
+- Level 0 新增光照與電氣互動型興趣點（Antigravity，`FuseBoxEvents`、`ZonePoiPlan`）：
+  - `BREAKER_NICHE`（配電壁龕）＋ `FuseBoxEvents`：於走廊擺放粗糙壁紙背柱、`industrial_fuse_box`、補給箱與天花板管線，頭頂燈預設熄滅；右鍵 `industrial_fuse_box`（含深淵前哨平台的電箱）有 70% 機率恢復半徑 20 格內損壞的日光燈與裸燈泡、30% 機率過載跳電使半徑 16 格內熄燈（不動 EXIT 燈與紅燈）並施加短暫黑暗效果且呼叫 `ShadowHallucination.triggerNear` 生出黑影幻覺，觸發後進入 60 秒冷卻（持久化於 `SavedData`）；新增中英文雙語提示條目
+  - `PEEK_CHAMBER`（窺視玻璃窗室）：三面淺色壁紙與南面透明玻璃窗圍出冷白日光燈照射的室內隔間，內擺朝向窗戶的 `noclipped_wood_chair`，北側保留後門通道維持迷宮連通性（`Level0ChunkGenerator` 支援一般區 `FLOOR_Y + 3` 窗框門楣）
+  - 驗證：`ZonePoiPlanTest` 涵蓋全 5 種微型興趣點，`Level0ClientTest` 新增 `BREAKER_NICHE` 電箱恢復亮燈／冷卻檢查與 `PEEK_CHAMBER` 實機截圖（`level0_breaker_niche`、`level0_peek_chamber`），`.\gradlew build` 與 `.\gradlew runClientGameTest -Plevels=0` 全部通過
