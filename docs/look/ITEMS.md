@@ -26,10 +26,10 @@
 
 | 東西 | 位置 |
 | --- | --- |
-| 產生工具 | `tools/make_realistic_items.py`；`tools/item_look/`（`lib.py` 共用、`mats.py` 材質庫、`melee.py` 冷兵器、`ported.py` 試作的 8 樣） |
+| 產生工具 | `tools/make_realistic_items.py`；`tools/item_look/`（`lib.py` 共用、`mats.py` 材質庫、`melee.py` 冷兵器、`guns.py` 槍彈藥配件、`ported.py` 試作的 8 樣） |
 | 資源包 | `src/main/resources/resourcepacks/realistic_items/`（整個由工具產生，不要手改） |
 | 開關與「誰被換掉」 | `src/client/java/dev/noclip/backrooms/core/look/ItemLook.java`；Gemini 的 `BlenderWeaponRenderer`、`BlenderPropRenderer` 遇到清單裡的東西時改畫一般模型 |
-| 比較圖 | `docs/look/items/`、材質總覽 `docs/look/items_materials.png` |
+| 比較圖 | `docs/look/items/`（`icons_page*.png` 圖示、`melee_hands.png`、`guns_hands.png`、`melee_third_person.png`）、材質總覽 `docs/look/items_materials.png` |
 | 實機測試 | `src/gametest/java/dev/noclip/backrooms/itemlook/ItemLookClientTest.java` |
 
 ## 進度
@@ -37,7 +37,7 @@
 | 類別 | 數量 | 狀態 |
 | --- | --- | --- |
 | 冷兵器 | 41 | 完成 |
-| 槍、彈藥、配件 | 19＋18 | 只有土製管槍（試作） |
+| 槍、彈藥、配件 | 19＋18 | 完成（土製管槍沿用試作版）；第三人稱 `[-90, 180, 0]`（槍口朝前、槍背朝上） |
 | 法器 | 20 | 只有穿牆短杖（試作） |
 | 工具、裝備道具、護甲 | 10＋29＋19 | 只有撬棍、杏仁藥劑（試作） |
 | 材料 | 213 | 只有銅線（試作） |

@@ -36,9 +36,11 @@ import org.lwjgl.glfw.GLFW;
  */
 public final class ItemLookClientTest implements FabricClientGameTest {
 	private static final int FLOOR = 32;
-	/** A spread of shapes to hold: sword, great sword, polearm, maul, nunchaku, rapier, sabre, flail. */
-	private static final String[] HELD = {"west_arming_sword", "west_claymore", "cn_guandao", "blunt_twohand_maul", "cn_nunchaku", "west_rapier",
-			"cn_yanling_dao", "blunt_clump_flail"};
+	/** A spread of shapes to hold (the batch being worked on). */
+	private static final String[] HELD = {"gun_pistol_9mm", "gun_assault_rifle", "gun_double_barrel", "gun_bolt_sniper", "gun_railgun",
+			"office_crossbow", "gun_flamethrower", "west_claymore"};
+	/** Which of HELD to see from outside. */
+	private static final int[] OUTSIDE = {0, 1, 2, 7};
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
@@ -85,7 +87,7 @@ public final class ItemLookClientTest implements FabricClientGameTest {
 				}
 				// From outside, holding a great sword and a polearm.
 				context.runOnClient(client -> client.options.setCameraType(CameraType.THIRD_PERSON_FRONT));
-				for (int i : new int[] {0, 1, 2, 5, 6}) {
+				for (int i : OUTSIDE) {
 					context.getInput().pressKey(GLFW.GLFW_KEY_1 + i);
 					context.waitTicks(20);
 					context.takeScreenshot("itemlook_third_" + HELD[i] + "_" + label);

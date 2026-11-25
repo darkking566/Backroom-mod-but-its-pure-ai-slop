@@ -202,6 +202,28 @@ M = {
     "label": lambda: paper((208, 194, 152), 49, writing=3),
     "twine": lambda: (rgba(bands((150, 126, 88), (118, 96, 64), 3, axis=1)), (0.1, 20, 0.6)),
     "concrete": lambda: stone((130, 128, 122), 240),
+    # Guns and ammunition.
+    "gun_black": lambda: metal((54, 56, 58), 400, scratch=14, smooth=0.4, dirt=0.25),
+    "gun_polymer": lambda: plastic((40, 40, 40), 401, 0.3, 0.25, 10),
+    "gun_wood": lambda: wood((92, 60, 40), 402, crop=260, dirt=0.35),
+    "yellow_paint": lambda: metal((96, 94, 90), 403, rust=0.15, paint=(170, 136, 46), chips=0.66, scratch=14),
+    "olive_paint": lambda: metal((90, 90, 86), 404, rust=0.1, paint=(84, 86, 60), chips=0.72, scratch=10),
+    "rail": lambda: (rgba(grime(bands((60, 62, 64), (30, 31, 32), 4, axis=0, duty=0.6), 405, 0.2, 0.1)), (0.45, 230, 0.1)),
+    "vented": lambda: _vented(),
+    "lens": lambda: (rgba(np.clip(flat((34, 44, 52), 406, 0.05, 3) + (np.clip(1 - np.hypot(*(np.mgrid[0:S, 0:S] / (S - 1) - 0.3)) / 0.35, 0, 1) * 0.12)[..., None], 0, 1)), (0.95, 40, 0.0)),
+    "red_dot": lambda: glow_panel((150, 40, 36), 407, 0.35),
+    "brass_case": lambda: metal((176, 140, 70), 408, smooth=0.6, f0=231, dirt=0.25, scratch=6),
+    "copper_tip": lambda: metal((170, 104, 64), 409, smooth=0.55, f0=234, dirt=0.2),
+    "shell_red": lambda: plastic((132, 40, 34), 410, 0.35, 0.3, 4),
+    "shell_green": lambda: plastic((84, 110, 62), 411, 0.35, 0.3, 4),
+    "tip_phosphor": lambda: glow_panel((150, 176, 120), 412, 0.25),
+    "cardboard": lambda: (rgba(grime(scratches(flat((150, 120, 84), 413, 0.08, 2), 414, 6, (0.42, 0.33, 0.22)), 415, 0.35, 0.35)), (0.08, 20, 0.6)),
+    "ruler": lambda: _ruler(),
+    "pen_blue": lambda: plastic((48, 70, 132), 416, 0.45, 0.2, 4),
+    "pen_white": lambda: plastic((210, 206, 196), 417, 0.4, 0.3, 4),
+    "tank_red": lambda: metal((96, 92, 88), 418, rust=0.3, paint=(126, 38, 32), chips=0.6, scratch=12),
+    "rubber_black": lambda: plastic((30, 30, 30), 419, 0.15, 0.2, 2),
+    "lead": lambda: metal((96, 96, 100), 420, smooth=0.3, dirt=0.3, scratch=4),
     # Props (block textures).
     "office_fabric": lambda: cloth((58, 63, 74), 53, 180, 0.25, 0.28),
     "dark_plastic": lambda: plastic((42, 42, 44), 57, 0.45, 0.2, 8),
@@ -211,6 +233,21 @@ M = {
     "keyboard": lambda: _keyboard(),
     "cable": lambda: (rgba(flat((36, 36, 36), 68, 0.1, 0.8)), (0.35, 20, 0.0)),
 }
+
+
+def _vented():
+    base = metal((52, 54, 56), 430, scratch=8, smooth=0.4, dirt=0.25)[0][..., :3].copy()
+    for y in range(6, S - 4, 12):
+        for x in range(4, S - 4, 10):
+            base[y:y + 6, x:x + 6] *= 0.2
+    return rgba(base), (0.4, 230, 0.1)
+
+
+def _ruler():
+    base = wood((176, 150, 104), 431, crop=200, dirt=0.25)[0][..., :3].copy()
+    for x in range(2, S, 4):
+        base[0:6 if x % 16 == 2 else 3, x] = (0.18, 0.15, 0.12)
+    return rgba(base), (0.25, 20, 0.4)
 
 
 def _wallpaper():
