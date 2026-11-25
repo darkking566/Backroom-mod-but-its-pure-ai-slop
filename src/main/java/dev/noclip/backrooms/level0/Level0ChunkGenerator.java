@@ -90,9 +90,14 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 				}
 				return Blocks.AIR.defaultBlockState();
 			}
-			if (Maze.isThickCarpet(seed, x, z)) return ModBlocks.THICK_CARPET.defaultBlockState();
+			if (Maze.isThickCarpet(seed, x, z)) {
+				BlockState poi = ZonePoiPlan.standardZoneBlockAt(seed, y, cx, cz, ix, iz, zone);
+				return poi != null ? poi : ModBlocks.THICK_CARPET.defaultBlockState();
+			}
 			if (zone == Maze.Zone.PILLARS) return ModBlocks.DRY_CARPET.defaultBlockState();
 			if (ix >= 2 && ix <= 5 && iz >= 2 && iz <= 5) {
+				BlockState poi = ZonePoiPlan.standardZoneBlockAt(seed, y, cx, cz, ix, iz, zone);
+				if (poi != null) return poi;
 				Maze.FloorAccent accent = Maze.floorAccent(seed, cx, cz);
 				if (accent == Maze.FloorAccent.DRY_RUG) return ModBlocks.DRY_CARPET.defaultBlockState();
 				if (accent == Maze.FloorAccent.THICK_RUG) return ModBlocks.THICK_CARPET.defaultBlockState();
@@ -126,6 +131,10 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		if (Maze.isWall(seed, x, z, topLayer, epochs)) {
 			return wallBlockAt(seed, x, z, cx, cz, ix, iz, zone, baseboard, epochs);
 		}
+		if (baseboard) {
+			BlockState poi = ZonePoiPlan.standardZoneBlockAt(seed, y, cx, cz, ix, iz, zone);
+			if (poi != null) return poi;
+		}
 		if (topLayer && isDroppedCeilingTile(seed, x, z, ix, iz, ceiling, epochs)) {
 			return ModBlocks.CEILING_TILE.defaultBlockState();
 		}
@@ -147,6 +156,8 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		if (y < floorY) {
 			return cliffStrataBlock(y, false);
 		}
+		BlockState poi = ZonePoiPlan.chasmBlockAt(seed, y, cx, cz, ix, iz, floorY, ceilY);
+		if (poi != null) return poi;
 		if (y == floorY) {
 			Direction stair = ChasmPlan.stairFacingAt(seed, x, z);
 			if (stair != null) {
@@ -192,6 +203,9 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 			Maze.EpochSource epochs) {
 		int floorY = MegahallPlan.walkableFloorY(seed, x, z);
 		int ceilY = MegahallPlan.cellCeilingY(seed, cx, cz);
+
+		BlockState poi = ZonePoiPlan.megahallBlockAt(seed, y, cx, cz, ix, iz, floorY, ceilY);
+		if (poi != null) return poi;
 
 		if (y < floorY) return Blocks.CONCRETE.black().defaultBlockState();
 		if (y == floorY) {

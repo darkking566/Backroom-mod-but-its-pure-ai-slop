@@ -244,6 +244,7 @@ final class Maze {
 	private static boolean isPuddleCell(long seed, int cx, int cz) {
 		if (cx == 0 && cz == 0) return false;
 		if (zoneForCell(seed, cx, cz) != Zone.DARKENED) return false;
+		if (ZonePoiPlan.isDarkenedPoiCell(seed, cx, cz)) return false;
 		return Math.floorMod(hash(seed, cx, cz, FEATURE), 3) == 0;
 	}
 
@@ -555,6 +556,7 @@ final class Maze {
 
 	private static boolean isInteriorLayoutWall(long seed, int cx, int cz, int ix, int iz, Zone zone, int epoch,
 			boolean topLayer) {
+		if (ZonePoiPlan.isStandardPoiCell(seed, cx, cz)) return false;
 		RoomLayout layout = roomLayout(seed, cx, cz, zone, epoch);
 		if (layout == RoomLayout.OPEN) return false;
 		if (topLayer && isHalfHeightLayout(layout)) return false;
@@ -650,6 +652,9 @@ final class Maze {
 		Zone zone = zoneForCell(seed, cx, cz);
 		if (zone == Zone.MEGATHALL) return MegahallPlan.isLamp(seed, x, z);
 		if (zone == Zone.CHASM) return isLamp(x, z);
+		if (ZonePoiPlan.isRedRoomPoiCell(seed, cx, cz)) {
+			return (ix == 3 || ix == 4) && (iz == 3 || iz == 4);
+		}
 		int epoch = effectiveEpoch(zone, cx, cz, epochs);
 		long h = mixEpoch(hash(seed, cx, cz, LAMP + 1), epoch);
 		int roll = Math.floorMod(h, 100);
@@ -693,6 +698,7 @@ final class Maze {
 	static boolean lampWorks(long seed, int x, int z, EpochSource epochs) {
 		if (ManilaRoomPlan.roomAtBlock(seed, x, z) != null) return true;
 		int cx = Math.floorDiv(x, CELL), cz = Math.floorDiv(z, CELL);
+		if (ZonePoiPlan.isRedRoomPoiCell(seed, cx, cz)) return true;
 		Zone zone = zoneForCell(seed, cx, cz);
 		int epoch = effectiveEpoch(zone, cx, cz, epochs);
 		int roll = Math.floorMod(mixEpoch(hash(seed, cx, cz, LAMP), epoch), 100);
