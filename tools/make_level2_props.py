@@ -85,8 +85,16 @@ def make_lumber_tex():
     img.save(os.path.join(TEX_DIR, "lumber.png"))
 
 
-def all_faces(tex):
-    return {f: {"texture": tex} for f in ("north", "south", "east", "west", "up", "down")}
+def all_faces(tex, uv=(0, 0, 16, 16)):
+    # Explicit uv: without it a part smaller than a block shows only a cropped window of its texture.
+    return {f: {"texture": tex, "uv": list(uv)} for f in ("north", "south", "east", "west", "up", "down")}
+
+
+def toolbox_faces():
+    front = {"texture": "#box", "uv": [0, 0, 16, 16]}
+    side = {"texture": "#box", "uv": [10, 0, 16, 16]}  # right of the latch: just the lid seam
+    lid = {"texture": "#box", "uv": [0, 1, 16, 5]}  # above the seam: plain paint
+    return {"north": front, "south": front, "east": side, "west": side, "up": lid, "down": lid}
 
 
 def write_json(path, obj):
@@ -95,14 +103,16 @@ def write_json(path, obj):
         f.write("\n")
 
 
-def write_block_assets(name, elements, textures):
+def write_block_assets(name, elements, textures, turns=(0, 90, 180, 270)):
     write_json(
         os.path.join(MODEL_DIR, f"{name}.json"),
         {"parent": "minecraft:block/block", "textures": textures, "elements": elements},
     )
     write_json(
         os.path.join(STATE_DIR, f"{name}.json"),
-        {"variants": {"": {"model": f"noclip_backrooms:block/level2/{name}"}}},
+        # A list of variants: each placed block picks one turn, so a row of them is not one copy repeated.
+        {"variants": {"": [{"model": f"noclip_backrooms:block/level2/{name}", "y": t} if t else
+                           {"model": f"noclip_backrooms:block/level2/{name}"} for t in turns]}},
     )
     write_json(
         os.path.join(ITEM_DIR, f"{name}.json"),
@@ -133,7 +143,7 @@ def main():
     write_block_assets(
         "toolbox",
         [
-            {"from": [2, 0, 4], "to": [14, 6, 12], "faces": all_faces("#box")},
+            {"from": [2, 0, 4], "to": [14, 6, 12], "faces": toolbox_faces()},
             {"from": [5, 6, 7], "to": [11, 7.5, 9], "faces": all_faces("#metal")},
         ],
         {
@@ -141,6 +151,7 @@ def main():
             "box": "noclip_backrooms:block/level2/toolbox",
             "metal": "noclip_backrooms:block/level2/toolbox_metal",
         },
+        turns=(0, 180),  # its outline is longer than wide; a quarter turn would leave it outside
     )
 
     write_block_assets(

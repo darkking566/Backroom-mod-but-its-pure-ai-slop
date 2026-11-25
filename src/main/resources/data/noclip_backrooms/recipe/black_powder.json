@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "noclip_backrooms:niter_powder",
+    "noclip_backrooms:niter_powder",
+    "noclip_backrooms:sulfur_dust",
+    "noclip_backrooms:coal_coke"
+  ],
+  "result": {
+    "id": "noclip_backrooms:black_powder",
+    "count": 2
+  }
+}

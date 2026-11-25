@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "noclip_backrooms:block/crafting/noclipped_fridge" },
+    "facing=east":  { "model": "noclip_backrooms:block/crafting/noclipped_fridge", "y": 90 },
+    "facing=south": { "model": "noclip_backrooms:block/crafting/noclipped_fridge", "y": 180 },
+    "facing=west":  { "model": "noclip_backrooms:block/crafting/noclipped_fridge", "y": 270 }
+  }
+}

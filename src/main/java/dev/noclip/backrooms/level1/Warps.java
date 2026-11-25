@@ -57,6 +57,7 @@ final class Warps {
 	static boolean warp(ServerLevel level, ServerPlayer player, Vec3 heading, int sign, int jumps) {
 		long seed = Level1ChunkGenerator.planSeed(level.getChunkSource().randomState());
 		int x = player.getBlockX(), z = player.getBlockZ();
+		if (player.getBlockY() != Level1ChunkGenerator.FLOOR_Y + 1) return false; // not from upper decks or tunnels
 		if (Level1Layout.kindAt(seed, x, z) == Kind.CORRIDORS || Level1Layout.basePiece(seed, x, z) != null) return false;
 		boolean alongX = Math.abs(heading.x) >= Math.abs(heading.z);
 		int step = (alongX ? heading.x : heading.z) >= 0 ? 1 : -1;
@@ -67,6 +68,8 @@ final class Warps {
 		Vec3 landing = new Vec3(tx + 0.5, Level1ChunkGenerator.FLOOR_Y + 1, tz + 0.5);
 		level.getChunk(BlockPos.containing(landing));
 		if (!level.noCollision(player.getDimensions(player.getPose()).makeBoundingBox(landing))) return false;
+		BlockPos floor = BlockPos.containing(landing).below(); // pits, basins and shafts have no floor at the usual height
+		if (level.getBlockState(floor).getCollisionShape(level, floor).isEmpty()) return false;
 		player.teleportTo(level, landing.x, landing.y, landing.z, Set.of(), player.getYRot(), player.getXRot(), true);
 		LAST.put(player.getUUID(), landing);
 		return true;

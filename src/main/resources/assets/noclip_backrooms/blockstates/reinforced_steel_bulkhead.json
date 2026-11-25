@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "noclip_backrooms:block/crafting/reinforced_steel_bulkhead" },
+    "facing=east":  { "model": "noclip_backrooms:block/crafting/reinforced_steel_bulkhead", "y": 90 },
+    "facing=south": { "model": "noclip_backrooms:block/crafting/reinforced_steel_bulkhead", "y": 180 },
+    "facing=west":  { "model": "noclip_backrooms:block/crafting/reinforced_steel_bulkhead", "y": 270 }
+  }
+}

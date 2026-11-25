@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "noclip_backrooms:block/crafting/boss_trophy_chest" },
+    "facing=east":  { "model": "noclip_backrooms:block/crafting/boss_trophy_chest", "y": 90 },
+    "facing=south": { "model": "noclip_backrooms:block/crafting/boss_trophy_chest", "y": 180 },
+    "facing=west":  { "model": "noclip_backrooms:block/crafting/boss_trophy_chest", "y": 270 }
+  }
+}

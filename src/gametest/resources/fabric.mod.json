@@ -4,6 +4,6 @@
 	"version": "1.0.0",
 	"environment": "*",
 	"entrypoints": {
-		"fabric-client-gametest": ["dev.noclip.backrooms.level0.Level0ClientTest", "dev.noclip.backrooms.level0p1.Level0p1ClientTest", "dev.noclip.backrooms.level1.Level1ClientTest", "dev.noclip.backrooms.level2.Level2ClientTest", "dev.noclip.backrooms.level3.Level3ClientTest", "dev.noclip.backrooms.look.LookClientTest"]
+		"fabric-client-gametest": ["dev.noclip.backrooms.level0.Level0ClientTest", "dev.noclip.backrooms.level0p1.Level0p1ClientTest", "dev.noclip.backrooms.level1.Level1ClientTest", "dev.noclip.backrooms.level2.Level2ClientTest", "dev.noclip.backrooms.level3.Level3ClientTest", "dev.noclip.backrooms.look.LookClientTest", "dev.noclip.backrooms.floors.FloorsClientTest"]
 	}
 }

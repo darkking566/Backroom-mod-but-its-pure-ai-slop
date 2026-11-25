@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "noclip_backrooms:damp_paper_scrap",
+    "noclip_backrooms:damp_paper_scrap",
+    "noclip_backrooms:damp_paper_scrap",
+    "noclip_backrooms:damp_paper_scrap",
+    "noclip_backrooms:damp_carpet_fiber",
+    "noclip_backrooms:damp_carpet_fiber",
+    "noclip_backrooms:phosphor_powder"
+  ],
+  "result": {
+    "id": "noclip_backrooms:backrooms_compendium",
+    "count": 1
+  }
+}

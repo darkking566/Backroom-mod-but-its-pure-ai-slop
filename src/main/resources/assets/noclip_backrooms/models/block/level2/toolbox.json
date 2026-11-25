@@ -19,22 +19,58 @@
       ],
       "faces": {
         "north": {
-          "texture": "#box"
+          "texture": "#box",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "south": {
-          "texture": "#box"
+          "texture": "#box",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "east": {
-          "texture": "#box"
+          "texture": "#box",
+          "uv": [
+            10,
+            0,
+            16,
+            16
+          ]
         },
         "west": {
-          "texture": "#box"
+          "texture": "#box",
+          "uv": [
+            10,
+            0,
+            16,
+            16
+          ]
         },
         "up": {
-          "texture": "#box"
+          "texture": "#box",
+          "uv": [
+            0,
+            1,
+            16,
+            5
+          ]
         },
         "down": {
-          "texture": "#box"
+          "texture": "#box",
+          "uv": [
+            0,
+            1,
+            16,
+            5
+          ]
         }
       }
     },
@@ -51,22 +87,58 @@
       ],
       "faces": {
         "north": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "south": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "east": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "west": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "up": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "down": {
-          "texture": "#metal"
+          "texture": "#metal",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         }
       }
     }

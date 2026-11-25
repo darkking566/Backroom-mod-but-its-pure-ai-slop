@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "noclip_backrooms:block/crafting/sealed_vault_wall" },
+    "facing=east":  { "model": "noclip_backrooms:block/crafting/sealed_vault_wall", "y": 90 },
+    "facing=south": { "model": "noclip_backrooms:block/crafting/sealed_vault_wall", "y": 180 },
+    "facing=west":  { "model": "noclip_backrooms:block/crafting/sealed_vault_wall", "y": 270 }
+  }
+}

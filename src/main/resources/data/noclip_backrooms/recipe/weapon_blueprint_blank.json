@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "noclip_backrooms:blueprint_scrap",
+    "noclip_backrooms:blueprint_scrap",
+    "noclip_backrooms:blueprint_scrap",
+    "noclip_backrooms:blueprint_scrap"
+  ],
+  "result": {
+    "id": "noclip_backrooms:weapon_blueprint_blank",
+    "count": 1
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "noclip_backrooms:block/crafting/workshop_bench" },
+    "facing=east":  { "model": "noclip_backrooms:block/crafting/workshop_bench", "y": 90 },
+    "facing=south": { "model": "noclip_backrooms:block/crafting/workshop_bench", "y": 180 },
+    "facing=west":  { "model": "noclip_backrooms:block/crafting/workshop_bench", "y": 270 }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": "noclip_backrooms:angle_iron",
+    "S": "noclip_backrooms:scrap_metal",
+    "R": "noclip_backrooms:rusty_screws",
+    "P": "noclip_backrooms:treated_plank",
+    "M": "noclip_backrooms:scrap_metal"
+  },
+  "pattern": [
+    "PPP",
+    "ASA",
+    "RMR"
+  ],
+  "result": {
+    "id": "noclip_backrooms:salvage_bench",
+    "count": 1
+  }
+}

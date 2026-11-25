@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "noclip_backrooms:red_room_shard",
+    "noclip_backrooms:red_room_shard",
+    "noclip_backrooms:red_room_shard",
+    "noclip_backrooms:red_room_shard",
+    "noclip_backrooms:red_room_shard",
+    "noclip_backrooms:red_room_shard",
+    "noclip_backrooms:red_room_shard",
+    "noclip_backrooms:red_room_shard",
+    "noclip_backrooms:red_room_shard"
+  ],
+  "result": {
+    "id": "noclip_backrooms:blood_resonance_core",
+    "count": 1
+  }
+}

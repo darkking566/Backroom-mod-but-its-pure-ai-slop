@@ -2,7 +2,8 @@
   "parent": "minecraft:block/block",
   "textures": {
     "particle": "noclip_backrooms:block/level2/ceiling_vent",
-    "vent": "noclip_backrooms:block/level2/ceiling_vent"
+    "vent": "noclip_backrooms:block/level2/ceiling_vent",
+    "edge": "noclip_backrooms:block/level2/toolbox_metal"
   },
   "elements": [
     {
@@ -18,22 +19,58 @@
       ],
       "faces": {
         "north": {
-          "texture": "#vent"
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "south": {
-          "texture": "#vent"
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "east": {
-          "texture": "#vent"
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "west": {
-          "texture": "#vent"
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "up": {
-          "texture": "#vent"
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "down": {
-          "texture": "#vent"
+          "texture": "#vent",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         }
       }
     }

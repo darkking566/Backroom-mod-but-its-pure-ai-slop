@@ -14,6 +14,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.vehicle.minecart.MinecartChest;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.storage.loot.LootTable;
+import dev.noclip.backrooms.BackroomsMod;
 import net.minecraft.world.phys.AABB;
 
 /**
@@ -23,6 +27,7 @@ import net.minecraft.world.phys.AABB;
 final class Level2Bases {
 	static final String STAFF_TAG = "noclip_backrooms_level2_bntg";
 	static final String CART_TAG = "noclip_backrooms_level2_cart";
+	static final ResourceKey<LootTable> SUPPLIES = ResourceKey.create(Registries.LOOT_TABLE, BackroomsMod.id("chests/level2_supplies"));
 	private static final int INTERVAL = 20 * 10;
 
 	private Level2Bases() {
@@ -98,6 +103,7 @@ final class Level2Bases {
 				if (!(cartType.create(level, EntitySpawnReason.NATURAL) instanceof MinecartChest cart)) return 0;
 				cart.snapTo(x + 0.5, pos.getY() + 0.0625, z + 0.5, 0, 0);
 				cart.addTag(CART_TAG);
+				cart.setLootTable(SUPPLIES, Level2Layout.hash(seed, x, z, 0x10C8));
 				level.addFreshEntity(cart);
 				return 1;
 			}

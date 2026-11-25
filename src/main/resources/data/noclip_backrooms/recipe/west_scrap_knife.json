@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "noclip_backrooms:scrap_metal",
+    "noclip_backrooms:scrap_metal",
+    "noclip_backrooms:glass_tube_shard",
+    "noclip_backrooms:weapon_grip_wrap"
+  ],
+  "result": {
+    "id": "noclip_backrooms:west_scrap_knife",
+    "count": 1
+  }
+}

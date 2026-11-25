@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "noclip_backrooms:scrap_metal",
+    "noclip_backrooms:scrap_metal",
+    "noclip_backrooms:scrap_metal",
+    "noclip_backrooms:rusty_screws",
+    "noclip_backrooms:rusty_screws",
+    "noclip_backrooms:metal_spring",
+    "noclip_backrooms:tool_handle_basic",
+    "noclip_backrooms:tool_handle_basic"
+  ],
+  "result": {
+    "id": "noclip_backrooms:wire_cutters",
+    "count": 1
+  }
+}

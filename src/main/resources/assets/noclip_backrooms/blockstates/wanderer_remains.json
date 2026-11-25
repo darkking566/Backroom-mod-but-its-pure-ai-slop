@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "noclip_backrooms:block/crafting/wanderer_remains" },
+    "facing=east":  { "model": "noclip_backrooms:block/crafting/wanderer_remains", "y": 90 },
+    "facing=south": { "model": "noclip_backrooms:block/crafting/wanderer_remains", "y": 180 },
+    "facing=west":  { "model": "noclip_backrooms:block/crafting/wanderer_remains", "y": 270 }
+  }
+}

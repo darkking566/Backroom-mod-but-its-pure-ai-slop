@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "noclip_backrooms:synthetic_fabric",
+    "noclip_backrooms:synthetic_fabric",
+    "noclip_backrooms:damp_carpet_fiber",
+    "noclip_backrooms:damp_carpet_fiber",
+    "noclip_backrooms:almond_water"
+  ],
+  "result": {
+    "id": "noclip_backrooms:field_bandage",
+    "count": 2
+  }
+}

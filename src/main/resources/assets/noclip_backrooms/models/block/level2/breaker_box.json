@@ -2,7 +2,8 @@
   "parent": "minecraft:block/block",
   "textures": {
     "particle": "noclip_backrooms:block/level2/breaker_box",
-    "box": "noclip_backrooms:block/level2/breaker_box"
+    "box": "noclip_backrooms:block/level2/breaker_box",
+    "edge": "noclip_backrooms:block/level2/toolbox_metal"
   },
   "elements": [
     {
@@ -18,22 +19,58 @@
       ],
       "faces": {
         "north": {
-          "texture": "#box"
+          "texture": "#box",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "south": {
-          "texture": "#box"
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "east": {
-          "texture": "#box"
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "west": {
-          "texture": "#box"
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "up": {
-          "texture": "#box"
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "down": {
-          "texture": "#box"
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         }
       }
     }

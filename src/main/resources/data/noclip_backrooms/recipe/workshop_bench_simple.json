@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "S": "noclip_backrooms:sheet_metal",
+    "R": "noclip_backrooms:rusty_screws",
+    "A": "noclip_backrooms:alloy",
+    "P": "noclip_backrooms:treated_plank"
+  },
+  "pattern": [
+    "SSS",
+    "APA",
+    "RPR"
+  ],
+  "result": {
+    "id": "noclip_backrooms:workshop_bench",
+    "count": 1
+  }
+}

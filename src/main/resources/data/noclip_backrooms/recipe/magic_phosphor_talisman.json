@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "noclip_backrooms:damp_paper_scrap",
+    "noclip_backrooms:damp_paper_scrap",
+    "noclip_backrooms:damp_paper_scrap",
+    "noclip_backrooms:damp_paper_scrap",
+    "noclip_backrooms:phosphor_powder",
+    "noclip_backrooms:phosphor_powder",
+    "noclip_backrooms:phosphor_powder",
+    "noclip_backrooms:phosphor_powder",
+    "noclip_backrooms:almond_water"
+  ],
+  "result": {
+    "id": "noclip_backrooms:magic_phosphor_talisman",
+    "count": 4
+  }
+}

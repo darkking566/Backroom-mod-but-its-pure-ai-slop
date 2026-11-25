@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "noclip_backrooms:rotten_wood_strip",
+    "noclip_backrooms:rotten_wood_strip",
+    "noclip_backrooms:damp_carpet_fiber",
+    "noclip_backrooms:damp_carpet_fiber",
+    "noclip_backrooms:rusty_nail"
+  ],
+  "result": {
+    "id": "noclip_backrooms:tool_handle_basic",
+    "count": 1
+  }
+}

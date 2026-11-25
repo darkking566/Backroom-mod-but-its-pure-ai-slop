@@ -169,6 +169,28 @@
   - 使用者同意後把 `main` 推送到 GitHub（寫實材質包與攝影機濾鏡、變暗、天花板與燈具模型、第 0 層燈減少、測試只跑指定樓層的開關）；沒有強制推送、沒有改寫歷史
 
 ### 2026-11-25
+- 使用者要求規劃每一層能破壞、收集的東西，並加入「第幾層」：
+  - 新增 `docs/levels/MATERIALS.md`（第 0、0.1、1、2、3 層：結構拆成材料、物件掉出本身、完好／損壞／穿模三種版本、玻璃系列、之後 Level 13 玻璃瘋狂與 Level 39 魔法森林；材料名稱沿用 Gemini 的 `docs/crafting/01_materials_and_props.md`）與 `docs/FLOORS.md`（層數規則照狐霖的後室 RPG，從舊的攻略紀錄確認：每過一次出口加一層、走回頭也算、層數越高越難）；只提交這兩份（`ab8a4de`），當時 Gemini 有 118 個檔案改到一半
+  - Gemini 做完後放進層數系統：新增 `core/floors/`（`FloorRun`、`Floors`：玩家附加資料、換維度時加一層、回主世界或在主世界重生結束、螢幕中間顯示 Level 與名稱）與客戶端 `FloorsClient`（左上角「第幾層」、背包上方「Level 幾 · 名稱」）；`BackroomsMod`、`BackroomsClient` 各加一行註冊
+  - `core/LevelExits` 加 `anchor()`：走出口時落點離出口 4 萬～16 萬格、由出口位置與目的地決定（同一個出口的隊友在一起），回到去過的 Level 就是全新的一片；改了朋友的 `Level0Arrival` 一行、`Level1Travel`／`Level2Travel`／`Level3Travel` 各一行改用它（Level 0.1 是有限的球，不改）
+  - 攝影機濾鏡的 REC 移到右上角電池旁（左上角給層數）；語言檔加 5 個 Level 名稱與兩個畫面字
+  - 新增單元測試 `FloorRunTest`、實機測試 `floors/FloorsClientTest`（`-Plevels=floors`）；`gradlew build`（75 個單元測試）與 `floors` 實機測試通過，截圖看過（標題、左上角層數、背包上方 Level 名稱都正確）
+  - 其他層的實機測試（因為出口落點改了）：Level 0 通過；Level 0.1 停在 `blocks` 段「`console` 打掉不會掉出自己」（Gemini 先前就記錄過的已知問題：控制台改掉拆解材料、測試沒跟著改，與這次無關）；Level 1 完整跑時停在 `hounds` 段（找不到剛生出的獵犬），單獨跑 `-Psections=hounds` 通過，像是前面段落影響的偶發狀況；Level 2、3 這次還沒跑到，尚未驗證走出口落在遠處對它們的測試有沒有影響
+  - 先提交在本機（沒推），使用者要先討論建模
+  - 使用者問能不能直接套用 Found Footage 的模型、註明出處就好：查了它在 GitHub 的授權是 GPL-3.0，只註明出處不夠，要整個模組也改成 GPL-3.0 開源才行（我們的 GitHub 專案是公開的，但沒有授權檔、模組設定寫保留所有權利），請使用者和朋友決定
+- 使用者發現「沒燈的地方不夠暗」：查了使用者本機的 `run/`，玩的時候開著 Iris＋Complementary Unbound（後室版）光影，光影包會蓋掉我們的黑霧與光衰減（它不讀遊戲的霧距離、自己算方塊光）；寫實材質包在 16:06 被關掉（比對時關的）。使用者決定搭配光影：材質包＋霧＋光影包設定，並要每層 SOP 與規範（Gemini 也照做）：
+  - 讀了光影包的設定（只讀不改，它的授權不允許修改或散佈）：我們的維度被當成主世界的「洞穴」；`CAVE_LIGHTING`、`AMBIENT_MULT` 決定沒燈處多暗；洞穴霧濃度寫死，開光影時看不遠主要靠暗；`RP_MODE=3` 才會用我們的 labPBR 貼圖
+  - 新增推薦光影設定 `docs/look/shaders/ComplementaryUnbound_r5.10_Backrooms.txt`（只有設定值，不含光影包）
+  - `build.gradle` 加 `-Pshaders`：自動測試時從 `run/` 複製 Iris、Sodium、光影包到測試用遊戲，套用推薦設定並開啟光影
+  - 新增 `docs/look/STYLE_GUIDE.md`（規範）與 `docs/look/SOP.md`（每層流程與規格表）；`AGENTS.md` 加一行指向這兩份；`docs/look/README.md` 加連結
+  - 還沒做：開光影的實機截圖與設定調整（使用者的遊戲開著，先不跑 Gradle 測試）；`gradlew help` 確認 build.gradle 能讀
+- 開光影的實機測試（`-Plevels=look -Pshaders`）通過：Iris 載入後室版 Complementary 與推薦設定；燈下一圈暖光、沒燈處幾乎全黑，寫實材質與攝影機濾鏡在光影下都有作用；加 `ATM_FOG_DISTANCE=15` 後有燈處多一層霧氣、遠處朦朧、暗處沒變亮；推薦設定、`STYLE_GUIDE.md` 更新，新增 `docs/look/level0_shaders.jpg`
+- 使用者要搭配光影，幫使用者本機 `run/` 設好（三個原檔先備份到暫存區）：`run/shaderpacks/ComplementaryUnbound_r5.10_Backrooms.txt` 換成推薦設定（保留使用者的 `LIGHT_COLOR_MULTS`，彩色光追蹤改關）、`run/config/iris.properties` 光影改回開啟（使用者 16:15 照建議關掉過）；寫實材質包使用者 16:16 已經自己重新打開，沒改
+- 使用者要求全部推上 GitHub，並先把朋友的進度抓下來：
+  - 合併朋友新推的 13 個提交（Level 0 依 Antigravity 審查修紅房間落點等、整格的嵌入燈、補齊寫實材質包；Level 0.1 寫實材質、健身器材、滑門與大量修正；Level 2 的 512 像素寫實材質與隱藏出口）
+  - 衝突只在 `CLAUDE.md`（兩邊各自加的紀錄都保留）和兩個語言檔（兩邊條目都保留，共 1107 條；只有寫實材質包的說明兩邊不同，用朋友的）；`Level0Arrival` 自動合併，我的「全新一片」落點和朋友的紅房間落點檢查都在
+  - 合併後 `gradlew build`（76 個單元測試）與 `runClientGameTest -Plevels=floors,look` 通過
+  - 使用者同意後把 `main` 推送到 GitHub（層數系統、材料規劃與層數規則、畫面規範與每層 SOP、光影推薦設定與 `-Pshaders`、Gemini 之前未推的合成與 3D 模型等）；沒有強制推送、沒有改寫歷史
 - 照 Antigravity 的 Level 0 審查報告，使用者同意先修「會卡死或弄丟東西」的三項（動到朋友的 Level 0 程式）：
   - 紅房間落點：`Level0Arrival` 原本靠探測 ±4 格的紅牆，大半紅房間格子測不到；改用迷宮種子直接判斷區域（`Level0Arrival.inRedRoom`），從主世界卡牆進來（`Noclip`）也加同樣的檢查
   - 迷宮變形（`EdgeShift`）不再改掉 Level 0.1 的白色艙門：新增方塊標籤 `edge_shift_keep`（目前只有 `station_hatch`），Level 0 不用直接依賴 level0p1
@@ -237,6 +259,30 @@
   - `gradlew build` 與完整 `runClientGameTest -Plevels=0.1` 通過（65 張截圖），看過健身器材、雜物、開著的門與寫實材質牆面
   - 沒確認到：服務機器人紅眼發光（截圖太小）、用準星逐一看選取框（只看到牆的框）
 - 使用者同意後，把 `main` 推送到 GitHub（`0403f71` Level 0.1 寫實材質、健身器材、滑門、桌上雜物等）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+
+- 照 Antigravity 的 Level 1 審查報告修第一批（會卡死、刷怪、摔死、走不上去的）：
+  - 停電的蒼白手臂：生成時先加標籤才放進世界，被自己的清理事件當場刪掉（跟巡邏隊、微笑者同一個錯），改成放進世界後加標籤；高度改成往上 2～6 格找真正的天花板吊著，找不到就不生（`Level1Arms`）
+  - 豐饒角：掠奪者追出據點或被打死後每 5 秒補 3 隻，改成每個據點搬進人後 5 分鐘內不再補（`Residents`，開新世界清零）
+  - 遷躍漿果、非歐傳送：落點腳下沒地板就不傳；非歐傳送只在一樓地面觸發（`TeleportBerryItem`、`Warps`）
+  - 挑高大廳：兩段樓梯頂端補平台、拿掉擋路護欄，路上有貨架就整座不放（`Level1Elevation`）；停電清單補上天橋底燈 y=39；走廊門洞與綠色逃生燈在非標準大廳照標準生成
+  - 變電所：上天橋的樓梯改從下層發電機房往上接到天橋，外圈補護欄（北邊樓梯口留空）、樓梯井旁加護欄；立交橋兩座樓梯頂端各開一格護欄缺口（`Level1Landmarks`）
+  - 挖掘標籤：封死門、五個區段方塊、車、販賣機、配電櫃等 33 個加十字鎬，傳說區木地板／木天花板、棧板、掛畫牆加斧頭；招牌、花園地面、布、床、椅子沒加
+  - 驗證：`gradlew build` 通過；`runClientGameTest -Plevels=1` 完整跑一次停在 `hounds`（找不到測試獵犬，之前也偶發過），單跑 `hounds,shepherdSnake,checkBlocks,leaveThroughDoor` 第一次在開頭閃爍牆失敗（沒開出閃爍牆，這次沒改它）、再跑一次通過；新樓梯、護欄、手臂吊天花板都沒在遊戲畫面上看過
+  - 同時 Antigravity 有未提交的 Level 2 改動，build 包含了它們；只提交我的檔案
+  - 還沒做（報告其餘）：家具朝向、貼圖撞衫與亂轉、Level 1 寫實包、區段建築與立體結構互撞、怪物／箱子／地標浮空的共用落點檢查
+
+- 照 Antigravity 的 Level 2 審查報告修正（先逐項對照程式確認真假）：
+  - 小物件貼圖被裁切：配電箱、壓力表、警告牌、通風口、斷電纜、工具箱、高架管橋都加上完整 `uv`；牆面掛件只有正面是圖案、薄邊改金屬（`make_level2_industrial_details.py`、`make_level2_props.py`、`make_level2_scene_variants.py`）
+  - 工具箱（只轉 180°，碰撞框不是正方形）、木材垛、電線盤、廢料堆每格隨機轉向；EL3A 儲物箱、Macchina 機櫃與講台依房間隨機朝向
+  - 一般牆、地板、天花板每格隨機轉向或鏡像（新增 `tools/make_level2_polish.py`，要在其他 `make_level2*.py` 之後跑；磚牆沒做，鏡像後磚縫對不上）；同一支工具幫 19 張後加貼圖補 `_n`／`_s`
+  - 寫實材質包的三種磚牆：Bricks075A 確認是亂石牆，改成照基礎貼圖排法的長方形順砌磚（`brick_substrate`，用已下載的 Concrete034 當表面紋理，沒有新下載）；配電箱燈號發光保留；寫檔偶爾 Errno 22 加重試
+  - EL3A 儲物箱與貨運礦車加戰利品表 `chests/level2_supplies.json`（內容同停車場補給箱）；EL3A 四角掛提燈
+  - 積水的一格深水改成含水石半磚，走得過去不卡
+  - 牆面掛件不再掛在錯位牆上，新增單元測試 `wallDetailsHangOnSolidWall`
+  - 判斷報告有誤沒改：物品欄圖示背對（物品欄看的是北面）、開門穿模（原版門在自己那格內轉）；`MapDump` 沒更新
+  - 驗證：Level 2 單元測試 11 項（強制重跑）與 `runClientGameTest -Plevels=2` 通過；截圖看到警告牌斜紋、長方形白漆磚；EL3A 截圖對著門，提燈與箱子朝向沒拍到；白漆磚的剝落花紋仍每格重複
+  - 等 Antigravity 同時在跑的實機測試結束後才跑自己的（第一次因 `build/run` 被占用失敗）
+- 使用者同意後，抓 GitHub 合併朋友新推的 10 個提交（合成系統、327 個物品 3D 模型、RPG 狀態列、各層畫面標準與光影測試等），沒有衝突；合併後 `gradlew build`（77 個單元測試）與 `runClientGameTest -Plevels=2` 通過（中途一次編譯失敗是別的 Gradle 同時寫 `build/classes`，重跑就過），把 `main` 推送到 GitHub；Antigravity 未提交的 Level 1 改動沒有一起提交；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
@@ -319,6 +365,56 @@
 - Level 2 新增異常環境視覺外觀（Antigravity）：新增 `tools/make_level2_anomaly_visuals.py` 產生 `frosted_utility_wall`（結霜維修牆）、`frosted_utility_floor`（結霜維修地板，微滑）、`frosted_pipes`（結霜管線）與 `burst_gas_pipes`（破損噴氣管）之貼圖、模型、方塊狀態與掉落物表；於 `Level2BankBlock` 新增 `FROST`／`GAS` 粒子與音效、`Level2Heat.tickCold` 補上雪花與白霧冰霧粒子，並接入 `Level2Blocks`、`Level2ChunkGenerator`、`mineable/pickaxe.json` 與中英文語言檔；`.\gradlew test --tests "dev.noclip.backrooms.level2.*"` 與 `.\gradlew runClientGameTest -Plevels=2` 全部通過
 - Level 2 新增積水路段與高架管橋場景變化（Antigravity）：新增 `tools/make_level2_scene_variants.py` 產生 `puddled_utility_floor`（積水維修地板）、`overhead_pipe_bridge`（高架管橋）與 `leaking_overhead_pipe`（漏水高架管，由 `Level2OverheadPipeBlock` 控制水滴粒子與水聲）之貼圖、模型、方塊狀態與掉落物表；於 `Level2Layout`／`Level2ChunkGenerator` 加入走廊積水區段（外圍 `puddled_utility_floor` 搭配走廊中央與樓地板齊平的淺水池 `Blocks.WATER`）及跨走廊／沿積水區懸掛的寬幅高架管橋（並於 `landing` 避開積水區）；一併修正 `Level2ClientTest.facilities` 因 20 tick 等待撞上 `Level2Bases.tick` 自動生成週期而誤判 `staff > 0` 的競態問題；`.\gradlew test --tests "dev.noclip.backrooms.level2.*"` 與 `.\gradlew runClientGameTest -Plevels=2` 全部通過
 - Level 0.1 新增房間大小、深度與挑高變化（Antigravity）：於 `ZenithLayout` 加入 `Shape` 變化與 `48×48` 群組內房間合併（`mergeRect`），包含跨格合併大廳（`26×10`、`10×26`、`26×26`，被吞併的走廊位置改設雙開門穿堂）、兩層挑高室（`DOUBLE_LOWER` / `DOUBLE_UPPER`，`14` 格高附西北角樓梯、二樓欄杆夾層與 2×2 懸空天橋）、下沉池（`SUNKEN_PIT`，由下層 `ceiling` 層轉成地板保持樓下封閉）、抬高平台（`RAISED_DAIS`）、狹長深室（`NARROW_HALL`）、L 型轉角（`L_CORNER`）、隔間群（`CUBICLES`）、壁龕柱廊與橫樑（`ALCOVE_BAYS`）及內縮門廊；氣閘室、螺旋梯、水培中庭與群組外圈走廊維持不變。於 `ZenithLayoutTest` 新增 4 項版型與走動連通測試、`Level0p1ClientTest` 新增 `variants` 實機截圖段並修正 `doors` 改找未合併且非內縮的房間門；`.\gradlew test --tests "dev.noclip.backrooms.level0p1.*"`（13 項單元測試）與 `.\gradlew build` 通過；`.\gradlew runClientGameTest "-Plevels=0.1"` 的 `rooms`/`variants`/`doors` 等探索段落與 60 張截圖皆通過，最後在既有的 `blocks` 段因 `console` 改掉拆解材料而未更新測試條件失敗（未動原本戰利品表）。僅提交 Level 0.1 相關檔案並依使用者要求將 `main` 推送至 `origin/main`（保留工作區其他未提交之寫實材質／語言檔改動）
+- 依使用者要求撰寫完整總體玩法專案企劃並先實作 RPG 能力值、個人介面 UI 與純客戶端理智幻覺地基：
+  - 新增總體玩法企劃文件 `docs/GAMEPLAY_SYSTEM_PLAN.md`：涵蓋主世界安全據點 × 雙格沙子穿模入口 × 後室撤離尋寶循環（死亡噴裝、出口／安頓點帶回主世界、方塊拆解與合成閉環）、戰前準備系統（Pre-Game Loadout）、多樓層條件解鎖（Boss／鑰匙卡／修發電機／NPC 任務）、經濟金錢與商人收購高價合成物／主世界武器兌換／送信與受困小女孩任務、無限地圖由中心往外之距離難度與稀有掉落曲線、RPG 角色能力值與後續職業系統（含法師吸收大氣粒子快回理智、施法耗理智、多 Boss 掉落合成／主世界兌換專屬法杖）、以及純客戶端理智幻覺系統
+  - 新增伺服器與共用 RPG 系統 `src/main/java/dev/noclip/backrooms/core/rpg/`（`PlayerStats`、`AllocateStatPayload`、`PlayerRpg`），透過 Fabric Data Attachment API 持久化於玩家 NBT、死亡保留、僅同步給本人客戶端（`AttachmentSyncPredicate.targetOnly()`）：
+    - 支援力量（`STR`，加近戰攻擊）、敏捷（`AGI`，加移速與攻速）、體質（`VIT`，加最大生命與韌性）、理智（`SAN`，加理智上限、抗流失與回穩倍率），以 `AttributeModifier` 實際生效
+    - 擊殺怪物與 Boss 累積 RPG 經驗值並升級獲得自由屬性點（初期 3 點，每級 +3 點）；主世界自動回復理智，後室暗處與怪物附近流失理智，飲用杏仁水（`Level1Items.ALMOND_WATER`）額外回復 35 理智
+    - 新增測試指令：`/backrooms sanity set|get`、`/backrooms stats addxp|addpoints|reset`
+  - 新增個人介面 UI 與純客戶端理智幻覺 `src/client/java/dev/noclip/backrooms/core/rpg/`（`RpgClient`、`SanityBarHud`、`InventoryStatsPanel`、`SanityHallucinations`）與客戶端 Mixin（`AbstractContainerScreenAccess`、`EntityRenderDispatcherHallucination`）：
+    - 下方 HUD 新增理智值計量條（對齊飽食度條上方並自動閃避水下氣泡與坐騎血條），低於 30% 時抖動變紅並浮現畫面四周暗角脈衝
+    - 打開原版背包（`InventoryScreen`）時於側邊展開角色狀態與升級加點面板（開合成書時自動移至右側避免重疊），顯示等級、經驗條、理智、四項屬性與 `+` 即時加點按鈕及懸停說明
+    - 理智低於 30% 之幻覺 100% 於該玩家客戶端執行與渲染（伺服器零實體同步）：本機 `ClientLevel` 生成負 ID 幻覺後室怪物追殺玩家，玩家揮刀砍向幻影時本地尖嘯煙散（隊友只見其對空氣瘋狂揮刀）；同時透過 `EntityRenderDispatcherHallucination` 在低理智玩家畫面將視野內隊友（`RemotePlayer`）即時替換渲染為後室 3D 怪物模型並隱藏名牌
+  - 新增單元測試 `src/test/java/dev/noclip/backrooms/core/rpg/PlayerStatsTest.java`，於 `BackroomsMod`、`BackroomsClient`、`noclip_backrooms.client.mixins.json`、`en_us.json`、`zh_tw.json` 完成註冊與雙語翻譯；`gradlew build`（含全部單元測試）與 `runClientGameTest -Plevels=look`（實機驗證 Mixin、HUD 與客戶端系統）皆通過
+- 依使用者檢視實機截圖後的回饋調整個人介面 UI 與體質／理智加點效果：
+  - 背包角色狀態面板（`InventoryStatsPanel.java`）改為原版 Minecraft 容器材質風格（`#C6C6C6` 灰石斜面視窗、圓角黑邊、白／深灰立體倒角、`#8B8B8B` 凹槽欄位、`#404040` 字色與自製原版斜面 `+` 按鈕，移除不搭的紫框）
+  - 體質（`VIT`）新增自然回生命速度（每點 `+0.12 HP/秒`，飽食度 `>= 6` 時於伺服器端持續生效）；理智（`SAN`）強化回理智速度（每點回復倍率 `+10%` 並附 `+0.05/秒` 被動回穩），兩者皆即時顯示於面板與懸停說明
+  - 下方 HUD 理智條（`SanityBarHud.java`）改為 Minecraft 風格 9×9 像素小圖示（新增 `assets/noclip_backrooms/textures/gui/sanity_icons.png`：空框／滿／半格 × 冷靜青／不安紫／低於 30% 紅眼抖動），每 100 理智為一排（10 顆圖示），自飽食度上方（`sh - 49`，並自動避讓水下氣泡與坐騎多排血條）**嚴格向上疊排**並採原版多排血量壓縮間距公式，確保無論理智加點擴充幾排都不會與飽食度重疊
+- 依使用者要求將完整後室合成表企劃（`docs/crafting/01_materials_and_props.md` ～ `06_weapons_magic_and_chests.md`）全部實裝進 Minecraft `26.2`，並整合 **JEI（Just Enough Items）`30.48.0.244`**：
+  - 依賴與 JEI 整合（`gradle.properties`、`build.gradle`、`fabric.mod.json`、`src/client/java/dev/noclip/backrooms/crafting/jei/`）：
+    - 加入 BlameJared Maven 與 `mezz.jei:jei-26.2-fabric:30.48.0.244`（透過 `play.bat` / `gradlew runClient` 啟動即自動載入 JEI）
+    - 實作 `BackroomsJeiPlugin`（`jei_mod_plugin` 入口）與 `StationRecipeCategory`：於 JEI 註冊 4 大自訂工作站配方分類（後室拆解台、後室改裝鍛造台、杏仁蒸餾化學組、異常煉成壇）、對應工作站催化劑、全 230 條工作站配方、10 種 Boss 核心與常見怪物掉落取得來源說明，並透過 `IGuiContainerHandler` 向 JEI 回報背包左側 RPG 角色面板區域，確保左側能力值面板與右側 JEI 清單零重疊
+  - 四大工作站與方塊（`src/main/java/dev/noclip/backrooms/props/`、`crafting/`、`src/client/.../crafting/BackroomsStationScreen.java`）：
+    - 實作 4 座可互動工作站方塊（`salvage_bench`、`workshop_bench`、`almond_distiller`、`anomaly_altar`）、原版灰石風格 `BackroomsStationScreen` + `BackroomsStationMenu`（捲動式配方列表、即時背包材料檢查、單次／×8 製作並獲得 RPG 經驗）、C2S `CraftStationPayload` 與共享資料驅動 `BackroomsRecipeRegistry`（`data/noclip_backrooms/backrooms_recipes/station_recipes.json`）
+    - 新增 24 種異常穿模家具與環境物件（`noclipped_wood_chair` ～ `wanderer_remains`，含 `FACING` 方向與拆解掉落表）與 3 種純方塊狀態寶箱（`locked_armory_crate` 需撬棍或開鎖組開啟、`anomaly_vault_chest`、`boss_trophy_chest`）
+  - 完整物品、工具、裝備與五大武器體系（`items/`、`tools/`、`weapons/`）：
+    - 新增 296 種新物品與 31 種新方塊（合計 327 項註冊物件），涵蓋 76 種加工與環境素材、42 種怪物／友善 NPC 掉落物、10 種 Boss 核心、39 種鍛造／槍械／彈藥／法器中間零件、《後室合成圖鑑》、10 種 Tier 1–4 特殊破壞工具、6 種求生消耗品、防毒面具與 4 套功能防具（含套裝被動效果）、41 把冷兵器（中世紀鈍器 11＋撬棍／西式 14／中式 16，含專屬攻速、距離與命中／右鍵特效）、18 把實戰熱兵器槍械（消耗對應 11 種彈藥、射線／霰彈／火焰／電擊／貫穿／聲波效果）與 6 種戰術配件、以及 19 件魔法與異常超自然武器（含短距穿牆短杖、聖光稜鏡杖、連鎖雷弧杖、時間遲緩懷錶、紅室血咒大鐮、命運骰杖、虛空裂隙巨杖與星界魔導書等）
+    - 註冊 4 個後室專屬創造物品欄分頁（素材與零件／工作站工具與裝備／冷兵器／槍械與異常法器），JEI 自動索引全部品項；另保留既有 Level 0/1 方塊戰利品表不動，改於拆解台收錄全 42 種既有方塊與 24 種穿模家具拆解配方，並補齊全 18 隻已實裝原生後室怪物之實體掉落表（`loot_table/entities/*.json`）
+  - 資源、配方與驗證：
+    - 產生全套 16×16 像素圖示與方塊貼圖、模型、blockstates、物品定義、28 個原版 3×3 配方 JSON、230 條工作站配方 JSON、49 個方塊／寶箱／實體戰利品表，以及完整 `en_us.json`／`zh_tw.json` 雙語條目
+    - 新增單元測試 `src/test/java/dev/noclip/backrooms/crafting/BackroomsCraftingTest.java`（驗證全 230 條工作站配方與所有原版 3×3 配方 JSON 及其參照的每個物品 ID 皆存在無誤）；`gradlew build` 與 `runClientGameTest -Plevels=look`（實機確認 JEI `30.48.0.244` 載入並索引 2,628 項物品與全套配方無報錯）全部通過
+- 依使用者要求將全部裝備（武器、槍械、戰術配件、魔法異常法器、破壞工具與防具）全面升級為精緻 3D 模型（含穿戴於角色身上的 3D 立體防具渲染）：
+  - **112 件裝備全 3D 立體手持／物品欄／JEI 模型**（`assets/noclip_backrooms/models/item/crafting/*.json` 與 `textures/item/equipment3d/*.png`）：
+    - 涵蓋全 41 把冷兵器（中世紀鈍器 11／西式 14／中式 16，含立體雙刃菱形剖面、彎刀弧段、青龍偃月關刀、方天畫戟時鐘齒輪、八卦銅錢劍、鎖鏈流星錘／鏈枷與自發光血晶／雷弧／虛空紋路）、18 把熱兵器槍械（含槍托、握把、彈匣、左輪轉輪彈巢、霰彈泵動滑軌、噴火器油罐、高倍狙擊鏡、電磁軌道槍銅線圈加速環與自發光準星／電弧）＋ 6 件 3D 戰術配件、19 件魔法異常法器（含立體浮空晶核法杖、厚封面精裝魔典、紅室血咒大鐮、時間遲緩懷錶、短距穿牆短杖環繞裂片）、10 種 Tier 1–4 特殊破壞工具（撬棍、斷線鉗、工業管鉗、液壓剪、圓盤工業切割機、異常共振鎬、虛空裂解器等）＋ 戰術 UV 手電，以及全部 17 件防具的 3D 物品模型
+    - 每件皆配備獨立 64×64 多材質著色貼圖圖集（金屬拉絲、深槍灰、拋光刀刃、黃銅雕花、纏柄皮革、木紋、鉚釘鋼板、銅線圈、骨質、光學玻璃與 `light_emission: 15` 自發光核心）及依類別微調的第一／第三人稱手持朝向（槍械自然向前瞄準、兵器握柄對齊手心）與背包／JEI 斜角展示
+  - **5 套穿戴於角色身上的真實 3D 立體防具**（`src/client/java/dev/noclip/backrooms/items/armor/BackroomsArmorModels.java`、`BackroomsArmorRenderer.java`、`assets/noclip_backrooms/textures/entity/armor3d/*.png`）：
+    - 透過 Fabric `ArmorRenderer`（四部位獨立 `HumanoidModel` 確保延遲提交零互蓋）與 256×256 零溢色分區貼圖＋ `RenderTypes.eyes` 全亮自發光層，為過濾防毒面具（雙側斜角濾毒罐＋發光青色護目鏡）、廢料治安套（防暴盔側掛頭燈＋鉚釘鋼胸板與戰術彈袋）、竊皮偽裝套（垂墜兜帽＋破舊斗篷披肩）、焦熱隔熱套（黃銅潛水鍋爐盔＋背部雙筒高壓銅蒸氣罐與發光溫度錶）及深海虛空套（夜視複眼鏡面＋雙翼頭冠＋發光胸口虛空裂隙核心與符文肩甲）打造專屬立體穿戴模型
+  - 更新 `BackroomsClient.java` 註冊全 17 件防具 3D 渲染器，並於 `BackroomsCraftingTest.java` 新增全 112 件 3D 模型與 5 套穿戴貼圖完整性檢查；`gradlew build` 與 `runClientGameTest -Plevels=look` 皆零錯誤通過
+- 依使用者要求將其餘所有新增物品與方塊全面 3D 化，並實作槍械／全武器第一人稱使用動畫、開鏡瞄準（ADS）動畫與縮放、以及動態準心／狙擊鏡／命中回饋系統：
+  - **其餘全部 31 座方塊＋184 件物品全面 3D 化（合計全 327 項新增物件 100% 3D 模型）**：
+    - **31 座 3D 立體方塊**（`assets/noclip_backrooms/models/block/crafting/*.json` 與 `textures/block/crafting3d/*.png`）：涵蓋 4 座工作站（拆解台虎鉗與齒輪、改裝鍛造台鐵砧與工具架、杏仁蒸餾化學組燒瓶與冷凝蛇管、異常煉成壇四柱發光符文與懸浮 45° 晶體）、3 種立體帶鎖寶箱（軍械箱／異常金庫／Boss 戰利品箱）與 24 種異常穿模家具（辦公椅、木椅、摺疊桌、檔案櫃、CRT 電視、販賣機、冰箱、飲水機、醫院推床、街機、吊燈、蒸氣鍋爐、發光霓虹招牌、結晶礦脈、異常紅群、電箱、鐵絲網與流浪者遺骸等），並於 `BackroomsProps.java` 補上 `.noOcclusion()` 避免非滿格 3D 模型造成透視破圖
+    - **184 件剩餘 3D 物品**（`models/item/crafting/*.json` 與 `textures/item/equipment3d/*.png`）：涵蓋 76 種加工與環境素材、42 種怪物／NPC 掉落物、10 顆自發光立體 Boss 核心、39 種鍛造／槍械／彈藥／法器零件、立體精裝《後室合成圖鑑》、6 種藥瓶／針劑／求生消耗品與 11 種彈藥盒／彈頭／電磁軌道彈，統一配備 64×64 多材質著色貼圖與斜角 GUI 展示
+  - **槍械、冷兵器與魔法法器第一人稱使用動畫、瞄準（ADS）與動態準心系統**：
+    - **伺服器／連線與武器操作**（`weapons/FireWeaponPayload.java`、`WeaponHitPayload.java`、`BackroomsWeaponNetworking.java`、`BackroomsFirearmItem.java`、`BackroomsMeleeItem.java`、`BackroomsMagicItem.java`）：
+      - 槍械改為標準 FPS 操作：左鍵開火（自動槍長按連發，攔截挖方塊／揮手，並支援開鏡瞄準時左鍵不漏擊與無彈不觸發假後座力）、長按右鍵進入平滑舉槍瞄準（ADS，散布縮減 75%、狙擊／軌道槍開鏡增傷 +20%、第三人稱雙手舉槍姿態）
+      - 冷兵器支援三系連段揮擊（鈍器高舉砸擊／西式交替斜劈與細劍突刺／中式行雲流水橫斬挑斬與長槍直刺）、右鍵主動技揮擊脈衝，以及無主動技冷兵器長按右鍵進入立體橫刀格擋姿態（實戰減傷 35% 並播放金屬招架音效）
+      - 魔法與異常法器依類型區分專屬施法動作（法杖前推、魔典抬升翻頁、儀式鈴鐺阻尼搖鈴震盪、懷錶／魔鏡舉眼脈衝）
+      - 全武器命中目標皆回傳 `WeaponHitPayload` 顯示白／擊殺紅 `×` Hitmarker 並播放清脆命中／擊殺音效
+    - **客戶端動畫、FOV 縮放與動態準心 HUD**（`src/client/java/dev/noclip/backrooms/weapons/WeaponAnimState.java`、`WeaponCrosshairHud.java`、`mixin/client/ItemInHandRendererWeaponAnimation.java`、`AbstractClientPlayerAimFov.java`、`MinecraftFirearmInput.java`）：
+      - 槍械第一人稱支援自然呼吸晃動、平滑移至畫面正中準星對齊（ADS）、彈簧阻尼後座力後退／槍口上揚／滾轉微震與槍口火光；FOV 依槍種平滑放大（手槍／衝鋒槍約 1.25×、步槍 1.55×、栓動狙擊 3.6×、反器材／軌道槍 5.0×），狙擊槍與軌道槍在 ADS 達 72% 時切換為全螢幕圓形光學密位狙擊鏡（自動隱藏槍身模型）
+      - 透過 `HudElementRegistry.replaceElement(VanillaHudElements.CROSSHAIR, ...)` 依武器動態繪製專屬準心（手槍／步槍四向擴散準心與開鏡紅點、霰彈圓環、電弧／火焰／音波括弧、光學狙擊鏡、魔法菱形符文準心與冷卻條、冷兵器戰術準心與格擋括弧／蓄力條）與 Hitmarker `×`
+  - **驗證**：更新 `BackroomsCraftingTest.java` 驗證全 296 件 3D 物品模型、全 31 座 3D 方塊模型與 5 套穿戴 3D 防具貼圖，執行 `gradlew build` 與 `runClientGameTest -Plevels=look` 全部通過且客戶端日誌零模型／貼圖／Mixin 錯誤
+- 依使用者要求推送 `main` 至 GitHub（`origin/main`）：先合併遠端新增的 12 個提交（Level 0.1 細節／背景故事／房間海／多型態房間與 Level 2 怪物／設施／異常／場景細節，`36b45b4`），保留雙邊 `CLAUDE.md` 與 `en_us.json`／`zh_tw.json` 全部條目，驗證 `gradlew build` 通過後正常推送（無強制推送、無改寫歷史）
 - Level 2 延伸 512px 寫實材質包（Antigravity）：新增 `tools/make_level2_realistic.py` 採用 ambientCG CC0 照片素材（`Concrete034`/`019`、`Bricks075A`、`Metal032`/`049A`、`Rust004`、`Wood051`、`Ice003`、`Wallpaper002A/B/C`）產出 Level 2 全數 102 組 512×512 貼圖與 labPBR `_n`／`_s` 貼圖（共 306 張）至 `src/main/resources/resourcepacks/realistic/assets/noclip_backrooms/textures/block/level2/`，並產生前後對比圖 `docs/look/level2_realistic.png` 與更新 `pack.mcmeta` 及中英文語言檔說明；`.\gradlew test --tests "dev.noclip.backrooms.level2.*"` 與 `.\gradlew runClientGameTest -Plevels=2` 全部通過
 - Level 2 新增非門類型隱藏出口（Antigravity）：新增極端高溫區滯留 40 秒觸發 `LevelExits.use(player, "127")`（`Level2Heat.tickHeat`）、異常錯位牆 `noclip_wall`（`Level2NoclipWallBlock` 無碰撞可走入或右鍵互動，並於背牆實心處生成，觸發 `LevelExits.use(player, "2.1")`；含 `tools/make_level2_noclip_wall.py` 128px 貼圖與 `realistic` 512px labPBR 貼圖），以及辦公室死路空間迴圈連觸 3 次崩解送回 `"1"`（`Level2Heat.tickOfficeLoop`）；補上中英文提示詞並將 `noclip_wall` 判斷直接寫入 `Level2ChunkGenerator.block()` 確保 `blockAt` 與區塊生成一致；`.\gradlew test --tests "dev.noclip.backrooms.level2.*"` 與 `.\gradlew runClientGameTest -Plevels=2` 全部通過
 - 修正 Level 0.1 螺旋樓梯間往上走會撞頭的問題（Antigravity）：`ZenithLayout.stairwell` 原本每階上方只清出 2 格空氣（`(step+1)&7`、`(step+2)&7`），踏上第 4、5 階（`(3,0)`、`t=4` 與 `(3,1)`、`t=5`）時頭頂會撞到上層天花板（`t=7`）與地板（`t=0`）；改為清出 3 格（加 `(step+3)&7`），並將 `ZenithLayoutTest.reaches` 的爬升淨空檢查改為樓梯也必須通過 `+2` 頭頂空間；`.\gradlew build` 與 `.\gradlew runClientGameTest "-Plevels=0.1" "-Psections=stairs"` 通過並確認實機截圖上方淨空正常

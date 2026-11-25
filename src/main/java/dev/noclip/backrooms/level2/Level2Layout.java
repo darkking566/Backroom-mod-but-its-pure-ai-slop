@@ -453,7 +453,8 @@ public final class Level2Layout {
 		if (roomKindAt(seed, x, z) != null || isOfficePatch(seed, x, z)) return null;
 		int wallDir = -1;
 		for (int d = 0; d < 4; d++) {
-			if (tile(seed, x + WALL_DX[d], z + WALL_DZ[d]).kind() == Kind.WALL) {
+			int wx = x + WALL_DX[d], wz = z + WALL_DZ[d];
+			if (tile(seed, wx, wz).kind() == Kind.WALL && !isNoclipWall(seed, wx, wz)) {
 				wallDir = Level2Plan.opposite(d);
 				break;
 			}

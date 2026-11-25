@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "noclip_backrooms:scrap_metal",
+    "noclip_backrooms:lead_chunk",
+    "noclip_backrooms:black_powder",
+    "noclip_backrooms:damp_paper_scrap"
+  ],
+  "result": {
+    "id": "noclip_backrooms:ammo_scrap_slug",
+    "count": 8
+  }
+}

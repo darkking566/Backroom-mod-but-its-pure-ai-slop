@@ -88,7 +88,8 @@ def make_overhead_leak_tex():
 
 
 def all_faces(tex):
-    return {f: {"texture": tex} for f in ("north", "south", "east", "west", "up", "down")}
+    # Explicit uv, like steam_pipes: the pipe textures are a shading across the whole width.
+    return {f: {"texture": tex, "uv": [0, 0, 16, 16]} for f in ("north", "south", "east", "west", "up", "down")}
 
 
 def write_json(path, obj):

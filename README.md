@@ -15,6 +15,7 @@ src/main/java/dev/noclip/backrooms/
 ├─ core/                    好幾層都會用到的機制
 │  └─ LevelExits.java       出口登記處：每個出口寫著通往哪一層，這裡決定通不通
 │     （客戶端的 src/client/.../core/look/ 是畫面風格：寫實材質包與攝影機濾鏡，見 docs/look/README.md）
+├─ core/floors/             第幾層（狐霖式層數）、換 Level 時的標題、走出口落在全新的一片；見 docs/FLOORS.md
 ├─ level0/                  Level 0「大廳」（入口檔 Level0.java）
 ├─ level1/                  Level 1「停車場」（入口檔 Level1.java）
 ├─ core/people/             人物（居民、巡邏隊、施工影子）：Person、People 登記八種造型；模型 `monsters/people.json`、貼圖 `textures/entity/people/`、Blender 原檔 `art/people/`，由 `tools/make_people.py` 與 `tools/blender_people.py` 產生

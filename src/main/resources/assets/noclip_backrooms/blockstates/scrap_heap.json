@@ -1,7 +1,21 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level2/scrap_heap"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level2/scrap_heap"
+      },
+      {
+        "model": "noclip_backrooms:block/level2/scrap_heap",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level2/scrap_heap",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level2/scrap_heap",
+        "y": 270
+      }
+    ]
   }
 }

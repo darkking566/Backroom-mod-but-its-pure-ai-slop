@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "noclip_backrooms:rotten_wood_strip",
+    "noclip_backrooms:damp_carpet_fiber",
+    "noclip_backrooms:damp_carpet_fiber",
+    "noclip_backrooms:synthetic_fabric"
+  ],
+  "result": {
+    "id": "noclip_backrooms:weapon_grip_wrap",
+    "count": 2
+  }
+}

@@ -1,0 +1,1614 @@
+{
+  "recipes": [
+    {
+      "id": "noclip_backrooms:salvage_wallpaper",
+      "station": "salvage_bench",
+      "xp": 4,
+      "inputs": [{"item":"noclip_backrooms:wallpaper","count":1}],
+      "outputs": [{"item":"noclip_backrooms:damp_paper_scrap","count":2}, {"item":"noclip_backrooms:plaster_dust","count":1}, {"item":"noclip_backrooms:rotten_wood_strip","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_pale_wallpaper",
+      "station": "salvage_bench",
+      "xp": 4,
+      "inputs": [{"item":"noclip_backrooms:pale_wallpaper","count":1}],
+      "outputs": [{"item":"noclip_backrooms:damp_paper_scrap","count":2}, {"item":"noclip_backrooms:plaster_dust","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_wallpaper_baseboard",
+      "station": "salvage_bench",
+      "xp": 4,
+      "inputs": [{"item":"noclip_backrooms:wallpaper_baseboard","count":1}],
+      "outputs": [{"item":"noclip_backrooms:rotten_wood_strip","count":2}, {"item":"noclip_backrooms:rusty_nail","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_rough_wallpaper",
+      "station": "salvage_bench",
+      "xp": 5,
+      "inputs": [{"item":"noclip_backrooms:rough_wallpaper","count":1}],
+      "outputs": [{"item":"noclip_backrooms:concrete_rubble","count":2}, {"item":"noclip_backrooms:plaster_dust","count":1}, {"item":"noclip_backrooms:rusty_nail","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_red_wallpaper",
+      "station": "salvage_bench",
+      "xp": 12,
+      "inputs": [{"item":"noclip_backrooms:red_wallpaper","count":1}],
+      "outputs": [{"item":"noclip_backrooms:red_room_shard","count":2}, {"item":"noclip_backrooms:cursed_fiber","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_carpet",
+      "station": "salvage_bench",
+      "xp": 4,
+      "inputs": [{"item":"noclip_backrooms:carpet","count":1}],
+      "outputs": [{"item":"noclip_backrooms:damp_carpet_fiber","count":3}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_thick_carpet",
+      "station": "salvage_bench",
+      "xp": 5,
+      "inputs": [{"item":"noclip_backrooms:thick_carpet","count":1}],
+      "outputs": [{"item":"noclip_backrooms:damp_carpet_fiber","count":3}, {"item":"noclip_backrooms:murky_water_vial","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_ceiling_tile",
+      "station": "salvage_bench",
+      "xp": 4,
+      "inputs": [{"item":"noclip_backrooms:ceiling_tile","count":1}],
+      "outputs": [{"item":"noclip_backrooms:plaster_dust","count":2}, {"item":"noclip_backrooms:mineral_wool","count":1}, {"item":"noclip_backrooms:thin_wire","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_fluorescent_light",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item":"noclip_backrooms:fluorescent_light","count":1}],
+      "outputs": [{"item":"noclip_backrooms:glass_tube_shard","count":2}, {"item":"noclip_backrooms:copper_wire","count":2}, {"item":"noclip_backrooms:phosphor_powder","count":1}, {"item":"noclip_backrooms:ballast_coil","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_red_fluorescent_light",
+      "station": "salvage_bench",
+      "xp": 12,
+      "inputs": [{"item":"noclip_backrooms:red_fluorescent_light","count":1}],
+      "outputs": [{"item":"noclip_backrooms:red_room_shard","count":1}, {"item":"noclip_backrooms:ballast_coil","count":1}, {"item":"noclip_backrooms:glass_tube_shard","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_garage_floor",
+      "station": "salvage_bench",
+      "xp": 5,
+      "inputs": [{"item":"noclip_backrooms:garage_floor","count":1}],
+      "outputs": [{"item":"noclip_backrooms:concrete_rubble","count":3}, {"item":"noclip_backrooms:rebar_fragment","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_garage_pillar",
+      "station": "salvage_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:garage_pillar","count":1}],
+      "outputs": [{"item":"noclip_backrooms:rebar_fragment","count":3}, {"item":"noclip_backrooms:concrete_rubble","count":2}, {"item":"noclip_backrooms:alloy","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_old_brick",
+      "station": "salvage_bench",
+      "xp": 5,
+      "inputs": [{"item":"noclip_backrooms:old_brick","count":1}],
+      "outputs": [{"item":"noclip_backrooms:cracked_brick","count":3}, {"item":"noclip_backrooms:plaster_dust","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_padded_wall",
+      "station": "salvage_bench",
+      "xp": 5,
+      "inputs": [{"item":"noclip_backrooms:padded_wall","count":1}],
+      "outputs": [{"item":"noclip_backrooms:foam_padding","count":3}, {"item":"noclip_backrooms:synthetic_fabric","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_garage_light",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item":"noclip_backrooms:garage_light","count":1}],
+      "outputs": [{"item":"noclip_backrooms:glass_tube_shard","count":2}, {"item":"noclip_backrooms:copper_wire","count":2}, {"item":"noclip_backrooms:scrap_metal","count":1}, {"item":"noclip_backrooms:phosphor_powder","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_ceiling_pipe",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item":"noclip_backrooms:ceiling_pipe","count":1}],
+      "outputs": [{"item":"noclip_backrooms:iron_pipe","count":2}, {"item":"noclip_backrooms:pipe_valve","count":1}, {"item":"noclip_backrooms:rusty_screws","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_metal_shelf",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item":"noclip_backrooms:metal_shelf","count":1}],
+      "outputs": [{"item":"noclip_backrooms:angle_iron","count":2}, {"item":"noclip_backrooms:scrap_metal","count":2}, {"item":"noclip_backrooms:rusty_screws","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_office_desk",
+      "station": "salvage_bench",
+      "xp": 5,
+      "inputs": [{"item":"noclip_backrooms:office_desk","count":1}],
+      "outputs": [{"item":"noclip_backrooms:treated_plank","count":3}, {"item":"noclip_backrooms:rusty_nail","count":2}, {"item":"noclip_backrooms:metal_spring","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_old_computer",
+      "station": "salvage_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:old_computer","count":1}],
+      "outputs": [{"item":"noclip_backrooms:old_circuit_board","count":1}, {"item":"noclip_backrooms:capacitor","count":2}, {"item":"noclip_backrooms:plastic_casing","count":2}, {"item":"noclip_backrooms:microchip","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_booth_wall",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item":"noclip_backrooms:booth_wall","count":1}],
+      "outputs": [{"item":"noclip_backrooms:sheet_metal","count":2}, {"item":"noclip_backrooms:alloy","count":1}, {"item":"noclip_backrooms:plastic_casing","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_generator",
+      "station": "salvage_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:generator","count":1}],
+      "outputs": [{"item":"noclip_backrooms:electric_motor","count":1}, {"item":"noclip_backrooms:high_voltage_coil","count":2}, {"item":"noclip_backrooms:steel_gear","count":2}, {"item":"noclip_backrooms:alloy","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_fuel_drum",
+      "station": "salvage_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:fuel_drum","count":1}],
+      "outputs": [{"item":"noclip_backrooms:sheet_metal","count":2}, {"item":"noclip_backrooms:crude_fuel_can","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_floodlight",
+      "station": "salvage_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:floodlight","count":1}],
+      "outputs": [{"item":"noclip_backrooms:optical_lens","count":1}, {"item":"noclip_backrooms:copper_wire","count":2}, {"item":"noclip_backrooms:ballast_coil","count":1}, {"item":"noclip_backrooms:alloy","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_cot",
+      "station": "salvage_bench",
+      "xp": 5,
+      "inputs": [{"item":"noclip_backrooms:cot","count":1}],
+      "outputs": [{"item":"noclip_backrooms:synthetic_fabric","count":3}, {"item":"noclip_backrooms:iron_pipe","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p01_wood_chair",
+      "station": "salvage_bench",
+      "xp": 4,
+      "inputs": [{"item":"noclip_backrooms:noclipped_wood_chair","count":1}],
+      "outputs": [{"item":"noclip_backrooms:rotten_wood_strip","count":3}, {"item":"noclip_backrooms:rusty_nail","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p02_office_chair",
+      "station": "salvage_bench",
+      "xp": 5,
+      "inputs": [{"item":"noclip_backrooms:noclipped_office_chair","count":1}],
+      "outputs": [{"item":"noclip_backrooms:foam_padding","count":2}, {"item":"noclip_backrooms:plastic_casing","count":2}, {"item":"noclip_backrooms:iron_pipe","count":1}, {"item":"noclip_backrooms:metal_spring","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p03_folding_table",
+      "station": "salvage_bench",
+      "xp": 5,
+      "inputs": [{"item":"noclip_backrooms:noclipped_folding_table","count":1}],
+      "outputs": [{"item":"noclip_backrooms:treated_plank","count":2}, {"item":"noclip_backrooms:angle_iron","count":1}, {"item":"noclip_backrooms:rusty_screws","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p04_file_cabinet",
+      "station": "salvage_bench",
+      "xp": 7,
+      "inputs": [{"item":"noclip_backrooms:noclipped_file_cabinet","count":1}],
+      "outputs": [{"item":"noclip_backrooms:sheet_metal","count":2}, {"item":"noclip_backrooms:metal_spring","count":2}, {"item":"noclip_backrooms:damp_paper_scrap","count":3}, {"item":"noclip_backrooms:blueprint_scrap","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p05_crt_tv",
+      "station": "salvage_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:noclipped_crt_tv","count":1}],
+      "outputs": [{"item":"noclip_backrooms:glass_tube_shard","count":3}, {"item":"noclip_backrooms:old_circuit_board","count":1}, {"item":"noclip_backrooms:copper_wire","count":3}, {"item":"noclip_backrooms:capacitor","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p06_water_cooler",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item":"noclip_backrooms:noclipped_water_cooler","count":1}],
+      "outputs": [{"item":"noclip_backrooms:plastic_casing","count":3}, {"item":"noclip_backrooms:almond_water","count":1}, {"item":"noclip_backrooms:pipe_valve","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p07_vending",
+      "station": "salvage_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:noclipped_vending_machine","count":1}],
+      "outputs": [{"item":"noclip_backrooms:sheet_metal","count":2}, {"item":"noclip_backrooms:electric_motor","count":1}, {"item":"noclip_backrooms:capacitor","count":2}, {"item":"noclip_backrooms:almond_water","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p08_fridge",
+      "station": "salvage_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:noclipped_fridge","count":1}],
+      "outputs": [{"item":"noclip_backrooms:sheet_metal","count":2}, {"item":"noclip_backrooms:copper_pipe","count":2}, {"item":"noclip_backrooms:coolant_vial","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p09_barricade",
+      "station": "salvage_bench",
+      "xp": 5,
+      "inputs": [{"item":"noclip_backrooms:boarded_barricade","count":1}],
+      "outputs": [{"item":"noclip_backrooms:treated_plank","count":3}, {"item":"noclip_backrooms:rusty_nail","count":4}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p10_barbed_fence",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item":"noclip_backrooms:barbed_wire_fence","count":1}],
+      "outputs": [{"item":"noclip_backrooms:barbed_wire","count":3}, {"item":"noclip_backrooms:thin_wire","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p11_fuse_box",
+      "station": "salvage_bench",
+      "xp": 12,
+      "inputs": [{"item":"noclip_backrooms:industrial_fuse_box","count":1}],
+      "outputs": [{"item":"noclip_backrooms:high_voltage_coil","count":2}, {"item":"noclip_backrooms:capacitor","count":3}, {"item":"noclip_backrooms:battery_cell","count":2}, {"item":"noclip_backrooms:copper_wire","count":3}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p12_bulkhead",
+      "station": "salvage_bench",
+      "xp": 12,
+      "inputs": [{"item":"noclip_backrooms:reinforced_steel_bulkhead","count":1}],
+      "outputs": [{"item":"noclip_backrooms:heavy_steel_plate","count":2}, {"item":"noclip_backrooms:alloy","count":3}, {"item":"noclip_backrooms:steel_gear","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p13_boiler",
+      "station": "salvage_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:steam_boiler_unit","count":1}],
+      "outputs": [{"item":"noclip_backrooms:heavy_steel_plate","count":2}, {"item":"noclip_backrooms:pipe_valve","count":2}, {"item":"noclip_backrooms:thermal_core","count":1}, {"item":"noclip_backrooms:coal_coke","count":3}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p14_gurney",
+      "station": "salvage_bench",
+      "xp": 7,
+      "inputs": [{"item":"noclip_backrooms:hospital_gurney","count":1}],
+      "outputs": [{"item":"noclip_backrooms:iron_pipe","count":2}, {"item":"noclip_backrooms:synthetic_fabric","count":2}, {"item":"noclip_backrooms:steel_wheel","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p15_chandelier",
+      "station": "salvage_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:vintage_chandelier","count":1}],
+      "outputs": [{"item":"noclip_backrooms:brass_ingot","count":2}, {"item":"noclip_backrooms:prism_glass","count":2}, {"item":"noclip_backrooms:copper_wire","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p16_arcade",
+      "station": "salvage_bench",
+      "xp": 12,
+      "inputs": [{"item":"noclip_backrooms:arcade_cabinet","count":1}],
+      "outputs": [{"item":"noclip_backrooms:microchip","count":2}, {"item":"noclip_backrooms:neon_tube","count":2}, {"item":"noclip_backrooms:old_circuit_board","count":2}, {"item":"noclip_backrooms:plastic_casing","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p17_neon_sign",
+      "station": "salvage_bench",
+      "xp": 9,
+      "inputs": [{"item":"noclip_backrooms:neon_sign_prop","count":1}],
+      "outputs": [{"item":"noclip_backrooms:neon_tube","count":3}, {"item":"noclip_backrooms:high_voltage_coil","count":1}, {"item":"noclip_backrooms:glass_tube_shard","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p18_mold_vent",
+      "station": "salvage_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:mold_vent_grate","count":1}],
+      "outputs": [{"item":"noclip_backrooms:sheet_metal","count":1}, {"item":"noclip_backrooms:toxic_spore_sac","count":2}, {"item":"noclip_backrooms:rusty_screws","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p19_pool_grate",
+      "station": "salvage_bench",
+      "xp": 9,
+      "inputs": [{"item":"noclip_backrooms:pool_ceramic_grate","count":1}],
+      "outputs": [{"item":"noclip_backrooms:ceramic_shard","count":3}, {"item":"noclip_backrooms:stainless_rod","count":1}, {"item":"noclip_backrooms:pure_almond_drop","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p20_red_cluster",
+      "station": "salvage_bench",
+      "xp": 15,
+      "inputs": [{"item":"noclip_backrooms:red_anomaly_cluster","count":1}],
+      "outputs": [{"item":"noclip_backrooms:red_room_shard","count":3}, {"item":"noclip_backrooms:blood_resonance_core","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p21_crystal_vein",
+      "station": "salvage_bench",
+      "xp": 15,
+      "inputs": [{"item":"noclip_backrooms:crystal_vein_node","count":1}],
+      "outputs": [{"item":"noclip_backrooms:anomaly_crystal","count":3}, {"item":"noclip_backrooms:prism_glass","count":2}, {"item":"noclip_backrooms:phosphor_powder","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p22_glitched_seam",
+      "station": "salvage_bench",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:glitched_wall_seam","count":1}],
+      "outputs": [{"item":"noclip_backrooms:reality_fragment","count":2}, {"item":"noclip_backrooms:void_dust","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p23_sealed_vault",
+      "station": "salvage_bench",
+      "xp": 22,
+      "inputs": [{"item":"noclip_backrooms:sealed_vault_wall","count":1}],
+      "outputs": [{"item":"noclip_backrooms:void_alloy_ingot","count":2}, {"item":"noclip_backrooms:void_dust","count":3}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_p24_remains",
+      "station": "salvage_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:wanderer_remains","count":1}],
+      "outputs": [{"item":"noclip_backrooms:bone_fragment","count":2}, {"item":"noclip_backrooms:blueprint_scrap","count":1}, {"item":"noclip_backrooms:weapon_parts_scrap","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_weapon_parts",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item":"noclip_backrooms:weapon_parts_scrap","count":1}],
+      "outputs": [{"item":"noclip_backrooms:metal_spring","count":2}, {"item":"noclip_backrooms:rusty_screws","count":3}, {"item":"noclip_backrooms:scrap_metal","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_battery_lead",
+      "station": "salvage_bench",
+      "xp": 5,
+      "inputs": [{"item":"noclip_backrooms:battery_cell","count":1}],
+      "outputs": [{"item":"noclip_backrooms:lead_chunk","count":2}, {"item":"noclip_backrooms:copper_wire","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:distill_murky_water",
+      "station": "almond_distiller",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:murky_water_vial","count":2}, {"item":"noclip_backrooms:coal_coke","count":1}],
+      "outputs": [{"item":"noclip_backrooms:almond_water","count":1}, {"item":"noclip_backrooms:niter_powder","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:distill_almond_from_dew",
+      "station": "almond_distiller",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:pure_almond_drop","count":2}, {"item":"noclip_backrooms:glass_tube_shard","count":1}],
+      "outputs": [{"item":"noclip_backrooms:almond_water","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:distill_niter_from_rubble",
+      "station": "almond_distiller",
+      "xp": 6,
+      "inputs": [{"item":"noclip_backrooms:concrete_rubble","count":3}, {"item":"noclip_backrooms:murky_water_vial","count":1}],
+      "outputs": [{"item":"noclip_backrooms:niter_powder","count":3}]
+    },
+    {
+      "id": "noclip_backrooms:distill_sulfur_from_fuel",
+      "station": "almond_distiller",
+      "xp": 6,
+      "inputs": [{"item":"noclip_backrooms:crude_fuel_can","count":1}, {"item":"noclip_backrooms:coal_coke","count":1}],
+      "outputs": [{"item":"noclip_backrooms:sulfur_dust","count":3}]
+    },
+    {
+      "id": "noclip_backrooms:distill_coke_from_wood",
+      "station": "almond_distiller",
+      "xp": 5,
+      "inputs": [{"item":"noclip_backrooms:rotten_wood_strip","count":4}],
+      "outputs": [{"item":"noclip_backrooms:coal_coke","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:distill_acid_from_sac",
+      "station": "almond_distiller",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:acid_sac","count":1}, {"item":"noclip_backrooms:glass_tube_shard","count":1}],
+      "outputs": [{"item":"noclip_backrooms:acid_vial","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:distill_acid_from_sulfur",
+      "station": "almond_distiller",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:sulfur_dust","count":2}, {"item":"noclip_backrooms:murky_water_vial","count":2}],
+      "outputs": [{"item":"noclip_backrooms:acid_vial","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:distill_battery_cell",
+      "station": "almond_distiller",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:copper_wire","count":2}, {"item":"noclip_backrooms:lead_chunk","count":1}, {"item":"noclip_backrooms:acid_vial","count":1}],
+      "outputs": [{"item":"noclip_backrooms:battery_cell","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:distill_smokeless_powder",
+      "station": "almond_distiller",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:black_powder","count":2}, {"item":"noclip_backrooms:acid_vial","count":1}, {"item":"noclip_backrooms:damp_paper_scrap","count":2}],
+      "outputs": [{"item":"noclip_backrooms:smokeless_powder","count":4}]
+    },
+    {
+      "id": "noclip_backrooms:distill_polymer_frame",
+      "station": "almond_distiller",
+      "xp": 9,
+      "inputs": [{"item":"noclip_backrooms:plastic_casing","count":3}, {"item":"noclip_backrooms:crude_fuel_can","count":1}],
+      "outputs": [{"item":"noclip_backrooms:polymer_frame","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:distill_quench_oil",
+      "station": "almond_distiller",
+      "xp": 9,
+      "inputs": [{"item":"noclip_backrooms:crude_fuel_can","count":1}, {"item":"noclip_backrooms:almond_water","count":1}, {"item":"noclip_backrooms:bone_fragment","count":1}],
+      "outputs": [{"item":"noclip_backrooms:quench_oil","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:distill_purified_almond",
+      "station": "almond_distiller",
+      "xp": 16,
+      "inputs": [{"item":"noclip_backrooms:almond_water","count":3}, {"item":"noclip_backrooms:phosphor_powder","count":1}, {"item":"noclip_backrooms:anomaly_crystal","count":1}],
+      "outputs": [{"item":"noclip_backrooms:purified_almond_essence","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:distill_purified_almond_smiler",
+      "station": "almond_distiller",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:almond_water","count":3}, {"item":"noclip_backrooms:phosphor_powder","count":1}, {"item":"noclip_backrooms:smiler_remnant","count":1}],
+      "outputs": [{"item":"noclip_backrooms:purified_almond_essence","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:distill_almond_mana_cell",
+      "station": "almond_distiller",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:purified_almond_essence","count":1}, {"item":"noclip_backrooms:battery_cell","count":1}, {"item":"noclip_backrooms:prism_glass","count":1}],
+      "outputs": [{"item":"noclip_backrooms:almond_mana_cell","count":4}]
+    },
+    {
+      "id": "noclip_backrooms:distill_almond_elixir",
+      "station": "almond_distiller",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:purified_almond_essence","count":1}, {"item":"noclip_backrooms:almond_water","count":2}, {"item":"noclip_backrooms:moth_wing_scale","count":1}],
+      "outputs": [{"item":"noclip_backrooms:almond_elixir","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:ws_almond_distiller",
+      "station": "workshop_bench",
+      "xp": 16,
+      "inputs": [{"item":"noclip_backrooms:copper_pipe","count":3}, {"item":"noclip_backrooms:glass_tube_shard","count":4}, {"item":"noclip_backrooms:pipe_valve","count":2}, {"item":"noclip_backrooms:sheet_metal","count":2}, {"item":"noclip_backrooms:almond_water","count":1}],
+      "outputs": [{"item":"noclip_backrooms:almond_distiller","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_anomaly_altar",
+      "station": "workshop_bench",
+      "xp": 25,
+      "inputs": [{"item":"noclip_backrooms:refined_steel_ingot","count":4}, {"item":"noclip_backrooms:anomaly_crystal","count":2}, {"item":"noclip_backrooms:red_room_shard","count":2}, {"item":"noclip_backrooms:purified_almond_essence","count":2}, {"item":"noclip_backrooms:old_circuit_board","count":2}],
+      "outputs": [{"item":"noclip_backrooms:anomaly_altar","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_heavy_steel_plate",
+      "station": "workshop_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:sheet_metal","count":4}, {"item":"noclip_backrooms:alloy","count":2}],
+      "outputs": [{"item":"noclip_backrooms:heavy_steel_plate","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_refined_steel",
+      "station": "workshop_bench",
+      "xp": 10,
+      "inputs": [{"item":"minecraft:iron_ingot","count":2}, {"item":"noclip_backrooms:alloy","count":2}, {"item":"noclip_backrooms:coal_coke","count":1}],
+      "outputs": [{"item":"noclip_backrooms:refined_steel_ingot","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:ws_tungsten_alloy",
+      "station": "workshop_bench",
+      "xp": 16,
+      "inputs": [{"item":"noclip_backrooms:refined_steel_ingot","count":2}, {"item":"noclip_backrooms:rebar_fragment","count":2}, {"item":"noclip_backrooms:thermal_core","count":1}],
+      "outputs": [{"item":"noclip_backrooms:tungsten_alloy","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:ws_stainless_rod",
+      "station": "workshop_bench",
+      "xp": 9,
+      "inputs": [{"item":"noclip_backrooms:refined_steel_ingot","count":2}, {"item":"noclip_backrooms:quench_oil","count":1}],
+      "outputs": [{"item":"noclip_backrooms:stainless_rod","count":3}]
+    },
+    {
+      "id": "noclip_backrooms:ws_steel_gear",
+      "station": "workshop_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:refined_steel_ingot","count":1}, {"item":"noclip_backrooms:rusty_screws","count":2}],
+      "outputs": [{"item":"noclip_backrooms:steel_gear","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:ws_optical_lens",
+      "station": "workshop_bench",
+      "xp": 9,
+      "inputs": [{"item":"noclip_backrooms:prism_glass","count":1}, {"item":"noclip_backrooms:glass_tube_shard","count":2}],
+      "outputs": [{"item":"noclip_backrooms:optical_lens","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_primer_cap",
+      "station": "workshop_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:brass_ingot","count":1}, {"item":"noclip_backrooms:phosphor_powder","count":2}, {"item":"noclip_backrooms:niter_powder","count":1}],
+      "outputs": [{"item":"noclip_backrooms:primer_cap","count":12}]
+    },
+    {
+      "id": "noclip_backrooms:ws_silencer_baffle",
+      "station": "workshop_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:foam_padding","count":2}, {"item":"noclip_backrooms:mineral_wool","count":2}, {"item":"noclip_backrooms:sheet_metal","count":1}],
+      "outputs": [{"item":"noclip_backrooms:silencer_baffle","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:ws_tool_handle_reinforced",
+      "station": "workshop_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:iron_pipe","count":1}, {"item":"noclip_backrooms:weapon_grip_wrap","count":2}, {"item":"noclip_backrooms:rusty_screws","count":2}],
+      "outputs": [{"item":"noclip_backrooms:tool_handle_reinforced","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_insulated_grip",
+      "station": "workshop_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:polymer_frame","count":1}, {"item":"noclip_backrooms:synthetic_fabric","count":2}, {"item":"noclip_backrooms:foam_padding","count":1}],
+      "outputs": [{"item":"noclip_backrooms:insulated_grip","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_hydraulic_module",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:electric_motor","count":1}, {"item":"noclip_backrooms:pipe_valve","count":2}, {"item":"noclip_backrooms:steel_gear","count":2}, {"item":"noclip_backrooms:crude_fuel_can","count":1}],
+      "outputs": [{"item":"noclip_backrooms:hydraulic_module","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_insulated_shears",
+      "station": "workshop_bench",
+      "xp": 15,
+      "inputs": [{"item":"noclip_backrooms:wire_cutters","count":1}, {"item":"noclip_backrooms:refined_steel_ingot","count":2}, {"item":"noclip_backrooms:insulated_grip","count":2}, {"item":"noclip_backrooms:ceramic_shard","count":2}],
+      "outputs": [{"item":"noclip_backrooms:insulated_shears","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_hydraulic_cutter",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:refined_steel_ingot","count":4}, {"item":"noclip_backrooms:hydraulic_module","count":1}, {"item":"noclip_backrooms:tool_handle_reinforced","count":2}, {"item":"noclip_backrooms:heavy_steel_plate","count":1}],
+      "outputs": [{"item":"noclip_backrooms:hydraulic_cutter","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_industrial_saw",
+      "station": "workshop_bench",
+      "xp": 20,
+      "inputs": [{"item":"noclip_backrooms:electric_motor","count":1}, {"item":"noclip_backrooms:refined_steel_ingot","count":3}, {"item":"noclip_backrooms:steel_gear","count":3}, {"item":"noclip_backrooms:sheet_metal","count":2}, {"item":"noclip_backrooms:battery_cell","count":2}, {"item":"noclip_backrooms:insulated_grip","count":1}],
+      "outputs": [{"item":"noclip_backrooms:industrial_saw","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_flashlight",
+      "station": "workshop_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:iron_pipe","count":1}, {"item":"noclip_backrooms:optical_lens","count":1}, {"item":"noclip_backrooms:battery_cell","count":1}, {"item":"noclip_backrooms:copper_wire","count":2}, {"item":"noclip_backrooms:plastic_casing","count":1}],
+      "outputs": [{"item":"noclip_backrooms:flashlight","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_battery_pack",
+      "station": "workshop_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:battery_cell","count":2}, {"item":"noclip_backrooms:copper_wire","count":2}, {"item":"noclip_backrooms:plastic_casing","count":1}],
+      "outputs": [{"item":"noclip_backrooms:flashlight_battery_pack","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_phosphor_flare",
+      "station": "workshop_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:phosphor_powder","count":3}, {"item":"noclip_backrooms:black_powder","count":1}, {"item":"noclip_backrooms:damp_paper_scrap","count":2}],
+      "outputs": [{"item":"noclip_backrooms:phosphor_flare","count":4}]
+    },
+    {
+      "id": "noclip_backrooms:ws_shrapnel_mine",
+      "station": "workshop_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:thin_wire","count":2}, {"item":"noclip_backrooms:black_powder","count":2}, {"item":"noclip_backrooms:rusty_nail","count":4}, {"item":"noclip_backrooms:sheet_metal","count":1}],
+      "outputs": [{"item":"noclip_backrooms:tripwire_shrapnel_mine","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:ws_almond_gas_mask",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:polymer_frame","count":2}, {"item":"noclip_backrooms:optical_lens","count":2}, {"item":"noclip_backrooms:coal_coke","count":3}, {"item":"noclip_backrooms:synthetic_fabric","count":2}],
+      "outputs": [{"item":"noclip_backrooms:almond_gas_mask","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_scrap_helmet",
+      "station": "workshop_bench",
+      "xp": 12,
+      "inputs": [{"item":"noclip_backrooms:sheet_metal","count":3}, {"item":"noclip_backrooms:foam_padding","count":2}, {"item":"noclip_backrooms:alloy","count":1}],
+      "outputs": [{"item":"noclip_backrooms:scrap_tactical_helmet","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_scrap_chest",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:sheet_metal","count":5}, {"item":"noclip_backrooms:foam_padding","count":3}, {"item":"noclip_backrooms:synthetic_fabric","count":2}, {"item":"noclip_backrooms:alloy","count":2}],
+      "outputs": [{"item":"noclip_backrooms:scrap_tactical_chestplate","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_scrap_legs",
+      "station": "workshop_bench",
+      "xp": 13,
+      "inputs": [{"item":"noclip_backrooms:sheet_metal","count":4}, {"item":"noclip_backrooms:foam_padding","count":2}, {"item":"noclip_backrooms:synthetic_fabric","count":2}, {"item":"noclip_backrooms:alloy","count":2}],
+      "outputs": [{"item":"noclip_backrooms:scrap_tactical_leggings","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_scrap_boots",
+      "station": "workshop_bench",
+      "xp": 11,
+      "inputs": [{"item":"noclip_backrooms:sheet_metal","count":2}, {"item":"noclip_backrooms:foam_padding","count":2}, {"item":"noclip_backrooms:alloy","count":1}],
+      "outputs": [{"item":"noclip_backrooms:scrap_tactical_boots","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_skin_helmet",
+      "station": "workshop_bench",
+      "xp": 16,
+      "inputs": [{"item":"noclip_backrooms:thick_disguise_hide","count":3}, {"item":"noclip_backrooms:faceless_membrane","count":2}],
+      "outputs": [{"item":"noclip_backrooms:skin_stealer_helmet","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_skin_chest",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:thick_disguise_hide","count":5}, {"item":"noclip_backrooms:faceless_membrane","count":2}, {"item":"noclip_backrooms:worn_suit_cloth","count":2}],
+      "outputs": [{"item":"noclip_backrooms:skin_stealer_chestplate","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_skin_legs",
+      "station": "workshop_bench",
+      "xp": 17,
+      "inputs": [{"item":"noclip_backrooms:thick_disguise_hide","count":4}, {"item":"noclip_backrooms:worn_suit_cloth","count":2}],
+      "outputs": [{"item":"noclip_backrooms:skin_stealer_leggings","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_skin_boots",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:thick_disguise_hide","count":2}, {"item":"noclip_backrooms:silence_core","count":1}, {"item":"noclip_backrooms:ash_residue","count":2}],
+      "outputs": [{"item":"noclip_backrooms:skin_stealer_boots","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_boiler_helmet",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:moth_chitin","count":3}, {"item":"noclip_backrooms:mineral_wool","count":2}, {"item":"noclip_backrooms:heavy_steel_plate","count":1}],
+      "outputs": [{"item":"noclip_backrooms:boiler_thermal_helmet","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_boiler_chest",
+      "station": "workshop_bench",
+      "xp": 22,
+      "inputs": [{"item":"noclip_backrooms:moth_chitin","count":5}, {"item":"noclip_backrooms:mineral_wool","count":3}, {"item":"noclip_backrooms:heavy_steel_plate","count":2}, {"item":"noclip_backrooms:coolant_vial","count":1}],
+      "outputs": [{"item":"noclip_backrooms:boiler_thermal_chestplate","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_boiler_legs",
+      "station": "workshop_bench",
+      "xp": 20,
+      "inputs": [{"item":"noclip_backrooms:moth_chitin","count":4}, {"item":"noclip_backrooms:mineral_wool","count":3}, {"item":"noclip_backrooms:heavy_steel_plate","count":1}],
+      "outputs": [{"item":"noclip_backrooms:boiler_thermal_leggings","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_boiler_boots",
+      "station": "workshop_bench",
+      "xp": 16,
+      "inputs": [{"item":"noclip_backrooms:moth_chitin","count":2}, {"item":"noclip_backrooms:mineral_wool","count":2}, {"item":"noclip_backrooms:heavy_steel_plate","count":1}],
+      "outputs": [{"item":"noclip_backrooms:boiler_thermal_boots","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_shaft_steel",
+      "station": "workshop_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:rebar_fragment","count":2}, {"item":"noclip_backrooms:stainless_rod","count":1}, {"item":"noclip_backrooms:weapon_grip_wrap","count":2}],
+      "outputs": [{"item":"noclip_backrooms:weapon_shaft_steel","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_crossguard_iron",
+      "station": "workshop_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:alloy","count":2}, {"item":"noclip_backrooms:sheet_metal","count":1}, {"item":"noclip_backrooms:rusty_screws","count":2}],
+      "outputs": [{"item":"noclip_backrooms:crossguard_iron","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_crossguard_brass",
+      "station": "workshop_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:brass_ingot","count":2}, {"item":"noclip_backrooms:refined_steel_ingot","count":1}],
+      "outputs": [{"item":"noclip_backrooms:crossguard_brass","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_pommel_lead",
+      "station": "workshop_bench",
+      "xp": 7,
+      "inputs": [{"item":"noclip_backrooms:lead_chunk","count":2}, {"item":"noclip_backrooms:scrap_metal","count":1}],
+      "outputs": [{"item":"noclip_backrooms:pommel_lead","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_forged_iron_blank",
+      "station": "workshop_bench",
+      "xp": 10,
+      "inputs": [{"item":"minecraft:iron_ingot","count":2}, {"item":"noclip_backrooms:alloy","count":2}, {"item":"noclip_backrooms:coal_coke","count":1}],
+      "outputs": [{"item":"noclip_backrooms:forged_iron_blank","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_forged_steel_blank",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:refined_steel_ingot","count":3}, {"item":"noclip_backrooms:quench_oil","count":1}, {"item":"noclip_backrooms:coal_coke","count":2}],
+      "outputs": [{"item":"noclip_backrooms:forged_steel_blank","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_forged_tungsten_blank",
+      "station": "workshop_bench",
+      "xp": 20,
+      "inputs": [{"item":"noclip_backrooms:tungsten_alloy","count":3}, {"item":"noclip_backrooms:quench_oil","count":2}, {"item":"noclip_backrooms:corrupted_marrow","count":1}],
+      "outputs": [{"item":"noclip_backrooms:forged_tungsten_blank","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_spiked_head_iron",
+      "station": "workshop_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:alloy","count":3}, {"item":"noclip_backrooms:rusty_nail","count":4}, {"item":"noclip_backrooms:lead_chunk","count":1}],
+      "outputs": [{"item":"noclip_backrooms:spiked_head_iron","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_heavy_hammer_head",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:heavy_steel_plate","count":2}, {"item":"noclip_backrooms:refined_steel_ingot","count":2}, {"item":"noclip_backrooms:lead_chunk","count":2}],
+      "outputs": [{"item":"noclip_backrooms:heavy_hammer_head","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_forged_chain_link",
+      "station": "workshop_bench",
+      "xp": 12,
+      "inputs": [{"item":"noclip_backrooms:refined_steel_ingot","count":2}, {"item":"noclip_backrooms:thin_wire","count":4}, {"item":"noclip_backrooms:grasping_tendon","count":1}],
+      "outputs": [{"item":"noclip_backrooms:forged_chain_link","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:ws_blunt_kanabo",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:weapon_shaft_wood","count":1}, {"item":"noclip_backrooms:barbed_wire","count":3}, {"item":"noclip_backrooms:lead_chunk","count":2}, {"item":"noclip_backrooms:hound_fang","count":3}],
+      "outputs": [{"item":"noclip_backrooms:blunt_barbed_kanabo","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_blunt_iron_mace",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:spiked_head_iron","count":1}, {"item":"noclip_backrooms:tool_handle_reinforced","count":1}, {"item":"noclip_backrooms:pommel_lead","count":1}],
+      "outputs": [{"item":"noclip_backrooms:blunt_iron_mace","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_blunt_flanged_mace",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:refined_steel_ingot","count":4}, {"item":"noclip_backrooms:heavy_steel_plate","count":1}, {"item":"noclip_backrooms:tool_handle_reinforced","count":1}, {"item":"noclip_backrooms:pommel_lead","count":1}],
+      "outputs": [{"item":"noclip_backrooms:blunt_flanged_mace","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_blunt_warhammer",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:heavy_hammer_head","count":1}, {"item":"noclip_backrooms:tool_handle_reinforced","count":1}, {"item":"noclip_backrooms:crossguard_iron","count":1}],
+      "outputs": [{"item":"noclip_backrooms:blunt_warhammer_1h","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_blunt_clump_flail",
+      "station": "workshop_bench",
+      "xp": 20,
+      "inputs": [{"item":"noclip_backrooms:forged_chain_link","count":2}, {"item":"noclip_backrooms:tangled_knuckle","count":3}, {"item":"noclip_backrooms:spiked_head_iron","count":1}, {"item":"noclip_backrooms:tool_handle_reinforced","count":1}],
+      "outputs": [{"item":"noclip_backrooms:blunt_clump_flail","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_blunt_twohand_maul",
+      "station": "workshop_bench",
+      "xp": 22,
+      "inputs": [{"item":"noclip_backrooms:heavy_hammer_head","count":2}, {"item":"noclip_backrooms:weapon_shaft_steel","count":1}, {"item":"noclip_backrooms:pommel_lead","count":2}, {"item":"noclip_backrooms:alloy","count":3}],
+      "outputs": [{"item":"noclip_backrooms:blunt_twohand_maul","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_blunt_lucerne",
+      "station": "workshop_bench",
+      "xp": 25,
+      "inputs": [{"item":"noclip_backrooms:heavy_hammer_head","count":1}, {"item":"noclip_backrooms:tungsten_alloy","count":2}, {"item":"noclip_backrooms:weapon_shaft_steel","count":1}, {"item":"noclip_backrooms:rebar_fragment","count":2}],
+      "outputs": [{"item":"noclip_backrooms:blunt_lucerne_hammer","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_west_hound_dagger",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:hound_fang","count":3}, {"item":"noclip_backrooms:hound_sinew","count":2}, {"item":"noclip_backrooms:bone_fragment","count":1}, {"item":"noclip_backrooms:weapon_grip_wrap","count":1}],
+      "outputs": [{"item":"noclip_backrooms:west_hound_dagger","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_west_gladius",
+      "station": "workshop_bench",
+      "xp": 15,
+      "inputs": [{"item":"noclip_backrooms:forged_iron_blank","count":1}, {"item":"noclip_backrooms:crossguard_iron","count":1}, {"item":"noclip_backrooms:weapon_grip_wrap","count":1}, {"item":"noclip_backrooms:pommel_lead","count":1}],
+      "outputs": [{"item":"noclip_backrooms:west_gladius","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_west_arming_sword",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:forged_steel_blank","count":1}, {"item":"noclip_backrooms:crossguard_iron","count":1}, {"item":"noclip_backrooms:tool_handle_reinforced","count":1}, {"item":"noclip_backrooms:pommel_lead","count":1}],
+      "outputs": [{"item":"noclip_backrooms:west_arming_sword","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_west_rapier",
+      "station": "workshop_bench",
+      "xp": 19,
+      "inputs": [{"item":"noclip_backrooms:stainless_rod","count":2}, {"item":"noclip_backrooms:forged_steel_blank","count":1}, {"item":"noclip_backrooms:crossguard_brass","count":1}, {"item":"noclip_backrooms:weapon_grip_wrap","count":1}],
+      "outputs": [{"item":"noclip_backrooms:west_rapier","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_west_viking_axe",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:forged_steel_blank","count":1}, {"item":"noclip_backrooms:angle_iron","count":2}, {"item":"noclip_backrooms:tool_handle_reinforced","count":1}, {"item":"noclip_backrooms:hound_sinew","count":1}],
+      "outputs": [{"item":"noclip_backrooms:west_viking_axe","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_west_claymore",
+      "station": "workshop_bench",
+      "xp": 22,
+      "inputs": [{"item":"noclip_backrooms:forged_steel_blank","count":2}, {"item":"noclip_backrooms:crossguard_iron","count":1}, {"item":"noclip_backrooms:weapon_grip_wrap","count":2}, {"item":"noclip_backrooms:pommel_lead","count":1}],
+      "outputs": [{"item":"noclip_backrooms:west_claymore","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_west_executioner_axe",
+      "station": "workshop_bench",
+      "xp": 24,
+      "inputs": [{"item":"noclip_backrooms:forged_steel_blank","count":2}, {"item":"noclip_backrooms:heavy_steel_plate","count":2}, {"item":"noclip_backrooms:weapon_shaft_steel","count":1}, {"item":"noclip_backrooms:corrupted_marrow","count":1}],
+      "outputs": [{"item":"noclip_backrooms:west_executioner_axe","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_west_halberd",
+      "station": "workshop_bench",
+      "xp": 26,
+      "inputs": [{"item":"noclip_backrooms:forged_tungsten_blank","count":1}, {"item":"noclip_backrooms:weapon_shaft_steel","count":1}, {"item":"noclip_backrooms:long_limb_bone","count":1}, {"item":"noclip_backrooms:rusty_screws","count":4}],
+      "outputs": [{"item":"noclip_backrooms:west_halberd","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_west_zweihander",
+      "station": "workshop_bench",
+      "xp": 28,
+      "inputs": [{"item":"noclip_backrooms:forged_tungsten_blank","count":2}, {"item":"noclip_backrooms:crossguard_brass","count":1}, {"item":"noclip_backrooms:weapon_grip_wrap","count":2}, {"item":"noclip_backrooms:pommel_lead","count":2}],
+      "outputs": [{"item":"noclip_backrooms:west_zweihander","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_west_acid_scimitar",
+      "station": "workshop_bench",
+      "xp": 25,
+      "inputs": [{"item":"noclip_backrooms:forged_steel_blank","count":1}, {"item":"noclip_backrooms:acid_crystal","count":2}, {"item":"noclip_backrooms:acid_sac","count":2}, {"item":"noclip_backrooms:crossguard_brass","count":1}],
+      "outputs": [{"item":"noclip_backrooms:west_acid_scimitar","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_cn_iron_staff",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:iron_pipe","count":2}, {"item":"noclip_backrooms:alloy","count":2}, {"item":"noclip_backrooms:weapon_grip_wrap","count":2}],
+      "outputs": [{"item":"noclip_backrooms:cn_iron_staff","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_cn_ring_dao",
+      "station": "workshop_bench",
+      "xp": 15,
+      "inputs": [{"item":"noclip_backrooms:forged_iron_blank","count":1}, {"item":"noclip_backrooms:alloy","count":1}, {"item":"noclip_backrooms:weapon_grip_wrap","count":1}, {"item":"noclip_backrooms:brass_ingot","count":1}],
+      "outputs": [{"item":"noclip_backrooms:cn_ring_pommel_dao","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_cn_tang_hengdao",
+      "station": "workshop_bench",
+      "xp": 20,
+      "inputs": [{"item":"noclip_backrooms:forged_steel_blank","count":1}, {"item":"noclip_backrooms:crossguard_brass","count":1}, {"item":"noclip_backrooms:weapon_grip_wrap","count":1}, {"item":"noclip_backrooms:quench_oil","count":1}],
+      "outputs": [{"item":"noclip_backrooms:cn_tang_hengdao","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_cn_han_jian",
+      "station": "workshop_bench",
+      "xp": 20,
+      "inputs": [{"item":"noclip_backrooms:forged_steel_blank","count":1}, {"item":"noclip_backrooms:stainless_rod","count":1}, {"item":"noclip_backrooms:crossguard_brass","count":1}, {"item":"noclip_backrooms:pommel_lead","count":1}],
+      "outputs": [{"item":"noclip_backrooms:cn_han_jian","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_cn_yanling_dao",
+      "station": "workshop_bench",
+      "xp": 20,
+      "inputs": [{"item":"noclip_backrooms:forged_steel_blank","count":1}, {"item":"noclip_backrooms:moth_wing_scale","count":2}, {"item":"noclip_backrooms:crossguard_brass","count":1}, {"item":"noclip_backrooms:weapon_grip_wrap","count":1}],
+      "outputs": [{"item":"noclip_backrooms:cn_yanling_dao","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_cn_miaodao",
+      "station": "workshop_bench",
+      "xp": 22,
+      "inputs": [{"item":"noclip_backrooms:forged_steel_blank","count":2}, {"item":"noclip_backrooms:weapon_shaft_wood","count":1}, {"item":"noclip_backrooms:crossguard_brass","count":1}, {"item":"noclip_backrooms:hound_sinew","count":2}],
+      "outputs": [{"item":"noclip_backrooms:cn_miaodao","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_cn_nunchaku",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:iron_pipe","count":2}, {"item":"noclip_backrooms:forged_chain_link","count":1}, {"item":"noclip_backrooms:weapon_grip_wrap","count":2}, {"item":"noclip_backrooms:lead_chunk","count":2}],
+      "outputs": [{"item":"noclip_backrooms:cn_nunchaku","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_cn_red_spear",
+      "station": "workshop_bench",
+      "xp": 22,
+      "inputs": [{"item":"noclip_backrooms:forged_steel_blank","count":1}, {"item":"noclip_backrooms:weapon_shaft_steel","count":1}, {"item":"noclip_backrooms:synthetic_fabric","count":2}, {"item":"noclip_backrooms:red_room_shard","count":1}],
+      "outputs": [{"item":"noclip_backrooms:cn_red_tassel_spear","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_cn_meteor_hammer",
+      "station": "workshop_bench",
+      "xp": 22,
+      "inputs": [{"item":"noclip_backrooms:forged_chain_link","count":3}, {"item":"noclip_backrooms:grasping_tendon","count":2}, {"item":"noclip_backrooms:lead_chunk","count":3}, {"item":"noclip_backrooms:tangled_knuckle","count":2}],
+      "outputs": [{"item":"noclip_backrooms:cn_meteor_hammer","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_cn_sleeve_darts",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:stainless_rod","count":2}, {"item":"noclip_backrooms:metal_spring","count":2}, {"item":"noclip_backrooms:sheet_metal","count":2}, {"item":"noclip_backrooms:rusty_nail","count":6}],
+      "outputs": [{"item":"noclip_backrooms:cn_sleeve_darts","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_cn_guandao",
+      "station": "workshop_bench",
+      "xp": 28,
+      "inputs": [{"item":"noclip_backrooms:forged_tungsten_blank","count":2}, {"item":"noclip_backrooms:weapon_shaft_steel","count":1}, {"item":"noclip_backrooms:crossguard_brass","count":2}, {"item":"noclip_backrooms:spiral_chitin","count":2}],
+      "outputs": [{"item":"noclip_backrooms:cn_guandao","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_magic_almond_censer",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:brass_ingot","count":3}, {"item":"noclip_backrooms:almond_water","count":2}, {"item":"noclip_backrooms:moth_wing_scale","count":2}, {"item":"noclip_backrooms:forged_chain_link","count":1}],
+      "outputs": [{"item":"noclip_backrooms:magic_almond_censer","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_barrel_pipe",
+      "station": "workshop_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:iron_pipe","count":1}, {"item":"noclip_backrooms:scrap_metal","count":2}, {"item":"noclip_backrooms:rusty_screws","count":2}],
+      "outputs": [{"item":"noclip_backrooms:gun_barrel_pipe","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_barrel_short",
+      "station": "workshop_bench",
+      "xp": 12,
+      "inputs": [{"item":"noclip_backrooms:refined_steel_ingot","count":2}, {"item":"noclip_backrooms:copper_pipe","count":1}, {"item":"noclip_backrooms:steel_gear","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_barrel_rifled_short","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_barrel_long",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:refined_steel_ingot","count":3}, {"item":"noclip_backrooms:stainless_rod","count":1}, {"item":"noclip_backrooms:copper_pipe","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_barrel_rifled_long","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_barrel_tungsten",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:tungsten_alloy","count":3}, {"item":"noclip_backrooms:stainless_rod","count":2}, {"item":"noclip_backrooms:quench_oil","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_barrel_heavy_tungsten","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_receiver_basic",
+      "station": "workshop_bench",
+      "xp": 9,
+      "inputs": [{"item":"noclip_backrooms:sheet_metal","count":3}, {"item":"noclip_backrooms:metal_spring","count":2}, {"item":"noclip_backrooms:rusty_screws","count":4}],
+      "outputs": [{"item":"noclip_backrooms:gun_receiver_basic","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_receiver_precision",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:refined_steel_ingot","count":3}, {"item":"noclip_backrooms:steel_gear","count":2}, {"item":"noclip_backrooms:metal_spring","count":2}, {"item":"noclip_backrooms:rusty_screws","count":4}],
+      "outputs": [{"item":"noclip_backrooms:gun_receiver_precision","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_trigger_group",
+      "station": "workshop_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:metal_spring","count":3}, {"item":"noclip_backrooms:alloy","count":2}, {"item":"noclip_backrooms:rusty_screws","count":3}],
+      "outputs": [{"item":"noclip_backrooms:gun_trigger_group","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_revolver_cyl",
+      "station": "workshop_bench",
+      "xp": 12,
+      "inputs": [{"item":"noclip_backrooms:refined_steel_ingot","count":2}, {"item":"noclip_backrooms:steel_gear","count":1}, {"item":"noclip_backrooms:brass_ingot","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_revolver_cylinder","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_pump_action",
+      "station": "workshop_bench",
+      "xp": 12,
+      "inputs": [{"item":"noclip_backrooms:stainless_rod","count":2}, {"item":"noclip_backrooms:metal_spring","count":2}, {"item":"noclip_backrooms:polymer_frame","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_pump_action","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_stock_wood",
+      "station": "workshop_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:treated_plank","count":3}, {"item":"noclip_backrooms:weapon_grip_wrap","count":1}, {"item":"noclip_backrooms:rusty_screws","count":2}],
+      "outputs": [{"item":"noclip_backrooms:gun_stock_wood","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_stock_polymer",
+      "station": "workshop_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:polymer_frame","count":3}, {"item":"noclip_backrooms:foam_padding","count":1}, {"item":"noclip_backrooms:rusty_screws","count":2}],
+      "outputs": [{"item":"noclip_backrooms:gun_stock_polymer","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_mag_pistol",
+      "station": "workshop_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:sheet_metal","count":2}, {"item":"noclip_backrooms:metal_spring","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_mag_pistol","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_mag_rifle",
+      "station": "workshop_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:sheet_metal","count":2}, {"item":"noclip_backrooms:polymer_frame","count":1}, {"item":"noclip_backrooms:metal_spring","count":2}],
+      "outputs": [{"item":"noclip_backrooms:gun_mag_rifle","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_coil_accel",
+      "station": "workshop_bench",
+      "xp": 22,
+      "inputs": [{"item":"noclip_backrooms:high_voltage_coil","count":3}, {"item":"noclip_backrooms:capacitor","count":4}, {"item":"noclip_backrooms:microchip","count":1}, {"item":"noclip_backrooms:copper_wire","count":6}],
+      "outputs": [{"item":"noclip_backrooms:gun_coil_accelerator","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_gun_pipe_shotgun",
+      "station": "workshop_bench",
+      "xp": 16,
+      "inputs": [{"item":"noclip_backrooms:gun_barrel_pipe","count":2}, {"item":"noclip_backrooms:gun_receiver_basic","count":1}, {"item":"noclip_backrooms:gun_stock_wood","count":1}, {"item":"noclip_backrooms:gun_trigger_group","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_pipe_shotgun","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_gun_nailgun",
+      "station": "workshop_bench",
+      "xp": 16,
+      "inputs": [{"item":"noclip_backrooms:gun_receiver_basic","count":1}, {"item":"noclip_backrooms:pipe_valve","count":2}, {"item":"noclip_backrooms:electric_motor","count":1}, {"item":"noclip_backrooms:battery_cell","count":1}, {"item":"noclip_backrooms:polymer_frame","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_nailgun","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_gun_taser",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:gun_receiver_basic","count":1}, {"item":"noclip_backrooms:high_voltage_coil","count":1}, {"item":"noclip_backrooms:capacitor","count":2}, {"item":"noclip_backrooms:copper_wire","count":4}, {"item":"noclip_backrooms:insulated_grip","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_taser","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_gun_flamethrower",
+      "station": "workshop_bench",
+      "xp": 35,
+      "inputs": [{"item":"noclip_backrooms:gun_barrel_pipe","count":2}, {"item":"noclip_backrooms:pipe_valve","count":3}, {"item":"noclip_backrooms:core_steam_turbine","count":1}, {"item":"noclip_backrooms:heavy_steel_plate","count":2}, {"item":"noclip_backrooms:crude_fuel_can","count":2}],
+      "outputs": [{"item":"noclip_backrooms:gun_flamethrower","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_gun_revolver",
+      "station": "workshop_bench",
+      "xp": 20,
+      "inputs": [{"item":"noclip_backrooms:gun_barrel_rifled_short","count":1}, {"item":"noclip_backrooms:gun_revolver_cylinder","count":1}, {"item":"noclip_backrooms:gun_trigger_group","count":1}, {"item":"noclip_backrooms:gun_stock_wood","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_revolver","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_gun_pistol_9mm",
+      "station": "workshop_bench",
+      "xp": 20,
+      "inputs": [{"item":"noclip_backrooms:gun_barrel_rifled_short","count":1}, {"item":"noclip_backrooms:gun_receiver_precision","count":1}, {"item":"noclip_backrooms:gun_trigger_group","count":1}, {"item":"noclip_backrooms:gun_mag_pistol","count":1}, {"item":"noclip_backrooms:polymer_frame","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_pistol_9mm","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_gun_heavy_handgun",
+      "station": "workshop_bench",
+      "xp": 26,
+      "inputs": [{"item":"noclip_backrooms:gun_barrel_rifled_short","count":1}, {"item":"noclip_backrooms:tungsten_alloy","count":2}, {"item":"noclip_backrooms:gun_receiver_precision","count":1}, {"item":"noclip_backrooms:gun_trigger_group","count":1}, {"item":"noclip_backrooms:gun_mag_pistol","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_heavy_handgun","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_gun_double_barrel",
+      "station": "workshop_bench",
+      "xp": 22,
+      "inputs": [{"item":"noclip_backrooms:gun_barrel_rifled_long","count":2}, {"item":"noclip_backrooms:gun_receiver_precision","count":1}, {"item":"noclip_backrooms:gun_trigger_group","count":1}, {"item":"noclip_backrooms:gun_stock_wood","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_double_barrel","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_gun_pump_shotgun",
+      "station": "workshop_bench",
+      "xp": 24,
+      "inputs": [{"item":"noclip_backrooms:gun_barrel_rifled_long","count":1}, {"item":"noclip_backrooms:gun_pump_action","count":1}, {"item":"noclip_backrooms:gun_receiver_precision","count":1}, {"item":"noclip_backrooms:gun_trigger_group","count":1}, {"item":"noclip_backrooms:gun_stock_polymer","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_pump_shotgun","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_gun_auto_shotgun",
+      "station": "workshop_bench",
+      "xp": 35,
+      "inputs": [{"item":"noclip_backrooms:gun_pump_shotgun","count":1}, {"item":"noclip_backrooms:core_acid_queen","count":1}, {"item":"noclip_backrooms:electric_motor","count":1}, {"item":"noclip_backrooms:heavy_steel_plate","count":2}],
+      "outputs": [{"item":"noclip_backrooms:gun_auto_shotgun","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_gun_scrap_smg",
+      "station": "workshop_bench",
+      "xp": 20,
+      "inputs": [{"item":"noclip_backrooms:gun_barrel_rifled_short","count":1}, {"item":"noclip_backrooms:gun_receiver_basic","count":1}, {"item":"noclip_backrooms:gun_trigger_group","count":1}, {"item":"noclip_backrooms:gun_mag_pistol","count":2}, {"item":"noclip_backrooms:iron_pipe","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_scrap_smg","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_gun_tactical_smg",
+      "station": "workshop_bench",
+      "xp": 24,
+      "inputs": [{"item":"noclip_backrooms:gun_barrel_rifled_short","count":1}, {"item":"noclip_backrooms:gun_receiver_precision","count":1}, {"item":"noclip_backrooms:gun_trigger_group","count":1}, {"item":"noclip_backrooms:gun_stock_polymer","count":1}, {"item":"noclip_backrooms:gun_mag_pistol","count":2}],
+      "outputs": [{"item":"noclip_backrooms:gun_tactical_smg","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_gun_assault_rifle",
+      "station": "workshop_bench",
+      "xp": 28,
+      "inputs": [{"item":"noclip_backrooms:gun_barrel_rifled_long","count":1}, {"item":"noclip_backrooms:gun_receiver_precision","count":1}, {"item":"noclip_backrooms:gun_trigger_group","count":1}, {"item":"noclip_backrooms:gun_stock_polymer","count":1}, {"item":"noclip_backrooms:gun_mag_rifle","count":2}, {"item":"noclip_backrooms:alloy","count":3}],
+      "outputs": [{"item":"noclip_backrooms:gun_assault_rifle","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_gun_bolt_sniper",
+      "station": "workshop_bench",
+      "xp": 30,
+      "inputs": [{"item":"noclip_backrooms:gun_barrel_heavy_tungsten","count":1}, {"item":"noclip_backrooms:gun_receiver_precision","count":1}, {"item":"noclip_backrooms:gun_trigger_group","count":1}, {"item":"noclip_backrooms:gun_stock_wood","count":1}, {"item":"noclip_backrooms:mod_sniper_scope","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_bolt_sniper","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_casing_pistol",
+      "station": "workshop_bench",
+      "xp": 6,
+      "inputs": [{"item":"noclip_backrooms:brass_ingot","count":2}],
+      "outputs": [{"item":"noclip_backrooms:casing_pistol","count":16}]
+    },
+    {
+      "id": "noclip_backrooms:ws_casing_rifle",
+      "station": "workshop_bench",
+      "xp": 7,
+      "inputs": [{"item":"noclip_backrooms:brass_ingot","count":2}, {"item":"noclip_backrooms:copper_wire","count":1}],
+      "outputs": [{"item":"noclip_backrooms:casing_rifle","count":12}]
+    },
+    {
+      "id": "noclip_backrooms:ws_hull_shotgun",
+      "station": "workshop_bench",
+      "xp": 7,
+      "inputs": [{"item":"noclip_backrooms:plastic_casing","count":2}, {"item":"noclip_backrooms:brass_ingot","count":1}],
+      "outputs": [{"item":"noclip_backrooms:hull_shotgun","count":12}]
+    },
+    {
+      "id": "noclip_backrooms:ws_bullet_lead",
+      "station": "workshop_bench",
+      "xp": 6,
+      "inputs": [{"item":"noclip_backrooms:lead_chunk","count":2}],
+      "outputs": [{"item":"noclip_backrooms:bullet_lead_tip","count":16}]
+    },
+    {
+      "id": "noclip_backrooms:ws_bullet_ap",
+      "station": "workshop_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:tungsten_alloy","count":1}, {"item":"noclip_backrooms:rebar_fragment","count":2}],
+      "outputs": [{"item":"noclip_backrooms:bullet_ap_core","count":8}]
+    },
+    {
+      "id": "noclip_backrooms:ws_ammo_nails",
+      "station": "workshop_bench",
+      "xp": 5,
+      "inputs": [{"item":"noclip_backrooms:rusty_nail","count":8}, {"item":"noclip_backrooms:scrap_metal","count":1}],
+      "outputs": [{"item":"noclip_backrooms:ammo_steel_nails","count":24}]
+    },
+    {
+      "id": "noclip_backrooms:ws_ammo_9mm",
+      "station": "workshop_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:casing_pistol","count":16}, {"item":"noclip_backrooms:primer_cap","count":4}, {"item":"noclip_backrooms:smokeless_powder","count":1}, {"item":"noclip_backrooms:bullet_lead_tip","count":16}],
+      "outputs": [{"item":"noclip_backrooms:ammo_9mm","count":16}]
+    },
+    {
+      "id": "noclip_backrooms:ws_ammo_12g_buck",
+      "station": "workshop_bench",
+      "xp": 8,
+      "inputs": [{"item":"noclip_backrooms:hull_shotgun","count":8}, {"item":"noclip_backrooms:primer_cap","count":4}, {"item":"noclip_backrooms:smokeless_powder","count":2}, {"item":"noclip_backrooms:lead_chunk","count":2}],
+      "outputs": [{"item":"noclip_backrooms:ammo_12g_buck","count":8}]
+    },
+    {
+      "id": "noclip_backrooms:ws_ammo_12g_acid",
+      "station": "workshop_bench",
+      "xp": 12,
+      "inputs": [{"item":"noclip_backrooms:ammo_12g_buck","count":8}, {"item":"noclip_backrooms:acid_vial","count":1}, {"item":"noclip_backrooms:acid_crystal","count":1}],
+      "outputs": [{"item":"noclip_backrooms:ammo_12g_acid","count":8}]
+    },
+    {
+      "id": "noclip_backrooms:ws_ammo_556",
+      "station": "workshop_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:casing_rifle","count":12}, {"item":"noclip_backrooms:primer_cap","count":4}, {"item":"noclip_backrooms:smokeless_powder","count":2}, {"item":"noclip_backrooms:bullet_lead_tip","count":12}],
+      "outputs": [{"item":"noclip_backrooms:ammo_556","count":12}]
+    },
+    {
+      "id": "noclip_backrooms:ws_ammo_556_phosphor",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:ammo_556","count":12}, {"item":"noclip_backrooms:phosphor_powder","count":4}, {"item":"noclip_backrooms:purified_almond_essence","count":1}],
+      "outputs": [{"item":"noclip_backrooms:ammo_556_phosphor","count":12}]
+    },
+    {
+      "id": "noclip_backrooms:ws_ammo_308",
+      "station": "workshop_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:casing_rifle","count":8}, {"item":"noclip_backrooms:primer_cap","count":4}, {"item":"noclip_backrooms:smokeless_powder","count":2}, {"item":"noclip_backrooms:bullet_lead_tip","count":8}],
+      "outputs": [{"item":"noclip_backrooms:ammo_308","count":8}]
+    },
+    {
+      "id": "noclip_backrooms:ws_ammo_308_ap",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:casing_rifle","count":8}, {"item":"noclip_backrooms:primer_cap","count":4}, {"item":"noclip_backrooms:smokeless_powder","count":3}, {"item":"noclip_backrooms:bullet_ap_core","count":8}],
+      "outputs": [{"item":"noclip_backrooms:ammo_308_ap","count":8}]
+    },
+    {
+      "id": "noclip_backrooms:ws_ammo_fuel",
+      "station": "workshop_bench",
+      "xp": 10,
+      "inputs": [{"item":"noclip_backrooms:crude_fuel_can","count":2}, {"item":"noclip_backrooms:sheet_metal","count":1}, {"item":"noclip_backrooms:sulfur_dust","count":2}],
+      "outputs": [{"item":"noclip_backrooms:ammo_fuel_canister","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:ws_ammo_rail_slug",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:tungsten_alloy","count":2}, {"item":"noclip_backrooms:copper_wire","count":4}, {"item":"noclip_backrooms:anomaly_crystal","count":1}],
+      "outputs": [{"item":"noclip_backrooms:ammo_rail_slug","count":6}]
+    },
+    {
+      "id": "noclip_backrooms:ws_mod_silencer",
+      "station": "workshop_bench",
+      "xp": 16,
+      "inputs": [{"item":"noclip_backrooms:iron_pipe","count":1}, {"item":"noclip_backrooms:silencer_baffle","count":2}, {"item":"noclip_backrooms:silence_core","count":1}],
+      "outputs": [{"item":"noclip_backrooms:mod_silencer","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_mod_red_dot",
+      "station": "workshop_bench",
+      "xp": 12,
+      "inputs": [{"item":"noclip_backrooms:optical_lens","count":1}, {"item":"noclip_backrooms:plastic_casing","count":1}, {"item":"noclip_backrooms:phosphor_powder","count":1}, {"item":"noclip_backrooms:battery_cell","count":1}],
+      "outputs": [{"item":"noclip_backrooms:mod_red_dot","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_mod_sniper_scope",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:optical_lens","count":2}, {"item":"noclip_backrooms:lure_cornea","count":1}, {"item":"noclip_backrooms:iron_pipe","count":1}, {"item":"noclip_backrooms:microchip","count":1}],
+      "outputs": [{"item":"noclip_backrooms:mod_sniper_scope","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_mod_weapon_light",
+      "station": "workshop_bench",
+      "xp": 12,
+      "inputs": [{"item":"noclip_backrooms:flashlight","count":1}, {"item":"noclip_backrooms:angle_iron","count":1}, {"item":"noclip_backrooms:rusty_screws","count":2}],
+      "outputs": [{"item":"noclip_backrooms:mod_weapon_light","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_mod_ext_mag",
+      "station": "workshop_bench",
+      "xp": 12,
+      "inputs": [{"item":"noclip_backrooms:gun_mag_rifle","count":1}, {"item":"noclip_backrooms:metal_spring","count":2}, {"item":"noclip_backrooms:polymer_frame","count":1}],
+      "outputs": [{"item":"noclip_backrooms:mod_ext_mag","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:ws_mod_bayonet",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item":"noclip_backrooms:west_hound_dagger","count":1}, {"item":"noclip_backrooms:angle_iron","count":1}, {"item":"noclip_backrooms:rusty_screws","count":2}],
+      "outputs": [{"item":"noclip_backrooms:mod_bayonet","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_anomalous_mythril",
+      "station": "anomaly_altar",
+      "xp": 20,
+      "inputs": [{"item":"noclip_backrooms:refined_steel_ingot","count":2}, {"item":"noclip_backrooms:anomaly_crystal","count":2}, {"item":"noclip_backrooms:purified_almond_essence","count":1}],
+      "outputs": [{"item":"noclip_backrooms:anomalous_mythril","count":2}]
+    },
+    {
+      "id": "noclip_backrooms:altar_void_alloy",
+      "station": "anomaly_altar",
+      "xp": 35,
+      "inputs": [{"item":"noclip_backrooms:anomalous_mythril","count":2}, {"item":"noclip_backrooms:void_dust","count":4}, {"item":"noclip_backrooms:core_void_weaver","count":1}],
+      "outputs": [{"item":"noclip_backrooms:void_alloy_ingot","count":4}]
+    },
+    {
+      "id": "noclip_backrooms:altar_resonance_cap",
+      "station": "anomaly_altar",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:high_voltage_coil","count":1}, {"item":"noclip_backrooms:microchip","count":1}, {"item":"noclip_backrooms:anomaly_crystal","count":2}],
+      "outputs": [{"item":"noclip_backrooms:resonance_capacitor","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_resonance_emitter",
+      "station": "anomaly_altar",
+      "xp": 22,
+      "inputs": [{"item":"noclip_backrooms:resonance_capacitor","count":1}, {"item":"noclip_backrooms:blood_resonance_core","count":1}, {"item":"noclip_backrooms:prism_glass","count":2}, {"item":"noclip_backrooms:copper_wire","count":4}],
+      "outputs": [{"item":"noclip_backrooms:resonance_emitter","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_forged_mythril_blank",
+      "station": "anomaly_altar",
+      "xp": 24,
+      "inputs": [{"item":"noclip_backrooms:anomalous_mythril","count":3}, {"item":"noclip_backrooms:purified_almond_essence","count":1}, {"item":"noclip_backrooms:quench_oil","count":1}],
+      "outputs": [{"item":"noclip_backrooms:forged_mythril_blank","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_staff_rod",
+      "station": "anomaly_altar",
+      "xp": 18,
+      "inputs": [{"item":"noclip_backrooms:stainless_rod","count":2}, {"item":"noclip_backrooms:anomalous_mythril","count":1}, {"item":"noclip_backrooms:cursed_fiber","count":2}],
+      "outputs": [{"item":"noclip_backrooms:staff_rod_insulated","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_focus_prism",
+      "station": "anomaly_altar",
+      "xp": 20,
+      "inputs": [{"item":"noclip_backrooms:prism_glass","count":3}, {"item":"noclip_backrooms:anomaly_crystal","count":2}, {"item":"noclip_backrooms:purified_almond_essence","count":1}],
+      "outputs": [{"item":"noclip_backrooms:focus_prism_core","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_grimoire_binding",
+      "station": "anomaly_altar",
+      "xp": 20,
+      "inputs": [{"item":"noclip_backrooms:thick_disguise_hide","count":2}, {"item":"noclip_backrooms:rune_parchment","count":4}, {"item":"noclip_backrooms:cursed_fiber","count":2}],
+      "outputs": [{"item":"noclip_backrooms:grimoire_binding","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_resonance_pick",
+      "station": "anomaly_altar",
+      "xp": 30,
+      "inputs": [{"item":"noclip_backrooms:tungsten_alloy","count":3}, {"item":"noclip_backrooms:resonance_emitter","count":1}, {"item":"noclip_backrooms:tool_handle_reinforced","count":1}, {"item":"noclip_backrooms:battery_cell","count":2}, {"item":"noclip_backrooms:purified_almond_essence","count":1}],
+      "outputs": [{"item":"noclip_backrooms:anomaly_resonance_pick","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_crimson_wallbreaker",
+      "station": "anomaly_altar",
+      "xp": 35,
+      "inputs": [{"item":"noclip_backrooms:heavy_steel_plate","count":2}, {"item":"noclip_backrooms:core_crimson_heart","count":1}, {"item":"noclip_backrooms:red_room_shard","count":4}, {"item":"noclip_backrooms:tool_handle_reinforced","count":1}],
+      "outputs": [{"item":"noclip_backrooms:crimson_wallbreaker","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_void_disruptor",
+      "station": "anomaly_altar",
+      "xp": 50,
+      "inputs": [{"item":"noclip_backrooms:anomaly_resonance_pick","count":1}, {"item":"noclip_backrooms:void_alloy_ingot","count":3}, {"item":"noclip_backrooms:core_void_weaver","count":1}, {"item":"noclip_backrooms:core_arc_reactor","count":1}, {"item":"noclip_backrooms:almond_mana_cell","count":2}],
+      "outputs": [{"item":"noclip_backrooms:void_disruptor","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_uv_flashlight",
+      "station": "anomaly_altar",
+      "xp": 24,
+      "inputs": [{"item":"noclip_backrooms:flashlight","count":1}, {"item":"noclip_backrooms:prism_glass","count":2}, {"item":"noclip_backrooms:phosphor_powder","count":4}, {"item":"noclip_backrooms:smiler_remnant","count":2}, {"item":"noclip_backrooms:high_voltage_coil","count":1}],
+      "outputs": [{"item":"noclip_backrooms:tactical_uv_flashlight","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_abyssal_helmet",
+      "station": "anomaly_altar",
+      "xp": 35,
+      "inputs": [{"item":"noclip_backrooms:void_alloy_ingot","count":3}, {"item":"noclip_backrooms:core_abyssal_scale","count":1}, {"item":"noclip_backrooms:watch_ocular_lens","count":1}],
+      "outputs": [{"item":"noclip_backrooms:abyssal_void_helmet","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_abyssal_chest",
+      "station": "anomaly_altar",
+      "xp": 40,
+      "inputs": [{"item":"noclip_backrooms:void_alloy_ingot","count":5}, {"item":"noclip_backrooms:core_abyssal_scale","count":1}, {"item":"noclip_backrooms:anomalous_mythril","count":2}],
+      "outputs": [{"item":"noclip_backrooms:abyssal_void_chestplate","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_abyssal_legs",
+      "station": "anomaly_altar",
+      "xp": 35,
+      "inputs": [{"item":"noclip_backrooms:void_alloy_ingot","count":4}, {"item":"noclip_backrooms:anomalous_mythril","count":2}, {"item":"noclip_backrooms:spectral_cloth","count":2}],
+      "outputs": [{"item":"noclip_backrooms:abyssal_void_leggings","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_abyssal_boots",
+      "station": "anomaly_altar",
+      "xp": 30,
+      "inputs": [{"item":"noclip_backrooms:void_alloy_ingot","count":2}, {"item":"noclip_backrooms:anomalous_mythril","count":2}, {"item":"noclip_backrooms:silence_core","count":1}],
+      "outputs": [{"item":"noclip_backrooms:abyssal_void_boots","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_crimson_crusher",
+      "station": "anomaly_altar",
+      "xp": 38,
+      "inputs": [{"item":"noclip_backrooms:blunt_twohand_maul","count":1}, {"item":"noclip_backrooms:core_crimson_heart","count":1}, {"item":"noclip_backrooms:red_room_shard","count":6}, {"item":"noclip_backrooms:corrupted_marrow","count":2}],
+      "outputs": [{"item":"noclip_backrooms:blunt_crimson_crusher","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_thunder_colossus",
+      "station": "anomaly_altar",
+      "xp": 48,
+      "inputs": [{"item":"noclip_backrooms:blunt_lucerne_hammer","count":1}, {"item":"noclip_backrooms:core_arc_reactor","count":1}, {"item":"noclip_backrooms:high_voltage_coil","count":3}, {"item":"noclip_backrooms:void_alloy_ingot","count":2}],
+      "outputs": [{"item":"noclip_backrooms:blunt_thunder_colossus","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_hallowed_blade",
+      "station": "anomaly_altar",
+      "xp": 32,
+      "inputs": [{"item":"noclip_backrooms:west_arming_sword","count":1}, {"item":"noclip_backrooms:gilded_steel_scrap","count":4}, {"item":"noclip_backrooms:purified_almond_essence","count":2}, {"item":"noclip_backrooms:rune_parchment","count":1}],
+      "outputs": [{"item":"noclip_backrooms:west_hallowed_blade","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_hotel_greatsword",
+      "station": "anomaly_altar",
+      "xp": 42,
+      "inputs": [{"item":"noclip_backrooms:west_zweihander","count":1}, {"item":"noclip_backrooms:core_melancholy_bell","count":1}, {"item":"noclip_backrooms:gilded_steel_scrap","count":3}, {"item":"noclip_backrooms:anomalous_mythril","count":2}],
+      "outputs": [{"item":"noclip_backrooms:west_hotel_greatsword","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_void_greatsword",
+      "station": "anomaly_altar",
+      "xp": 50,
+      "inputs": [{"item":"noclip_backrooms:forged_mythril_blank","count":2}, {"item":"noclip_backrooms:void_alloy_ingot","count":3}, {"item":"noclip_backrooms:core_void_weaver","count":1}, {"item":"noclip_backrooms:reality_fragment","count":2}],
+      "outputs": [{"item":"noclip_backrooms:west_void_greatsword","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_fangtian_ji",
+      "station": "anomaly_altar",
+      "xp": 42,
+      "inputs": [{"item":"noclip_backrooms:forged_tungsten_blank","count":2}, {"item":"noclip_backrooms:weapon_shaft_steel","count":1}, {"item":"noclip_backrooms:core_stopmotion_gear","count":1}, {"item":"noclip_backrooms:anomalous_mythril","count":2}],
+      "outputs": [{"item":"noclip_backrooms:cn_fangtian_ji","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_coin_sword",
+      "station": "anomaly_altar",
+      "xp": 34,
+      "inputs": [{"item":"noclip_backrooms:brass_ingot","count":6}, {"item":"noclip_backrooms:cursed_fiber","count":3}, {"item":"noclip_backrooms:smiler_remnant","count":3}, {"item":"noclip_backrooms:purified_almond_essence","count":2}, {"item":"noclip_backrooms:dread_crystal","count":1}],
+      "outputs": [{"item":"noclip_backrooms:cn_coin_sword","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_alpha_tangdao",
+      "station": "anomaly_altar",
+      "xp": 50,
+      "inputs": [{"item":"noclip_backrooms:cn_miaodao","count":1}, {"item":"noclip_backrooms:core_alpha_fang","count":1}, {"item":"noclip_backrooms:core_void_weaver","count":1}, {"item":"noclip_backrooms:black_filament","count":4}, {"item":"noclip_backrooms:withered_heart","count":2}],
+      "outputs": [{"item":"noclip_backrooms:cn_alpha_tangdao","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_antimateriel_rifle",
+      "station": "anomaly_altar",
+      "xp": 48,
+      "inputs": [{"item":"noclip_backrooms:gun_bolt_sniper","count":1}, {"item":"noclip_backrooms:core_abyssal_scale","count":1}, {"item":"noclip_backrooms:tungsten_alloy","count":4}, {"item":"noclip_backrooms:long_limb_bone","count":2}],
+      "outputs": [{"item":"noclip_backrooms:gun_antimateriel_rifle","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_railgun",
+      "station": "anomaly_altar",
+      "xp": 50,
+      "inputs": [{"item":"noclip_backrooms:gun_barrel_heavy_tungsten","count":1}, {"item":"noclip_backrooms:gun_coil_accelerator","count":2}, {"item":"noclip_backrooms:core_arc_reactor","count":1}, {"item":"noclip_backrooms:gun_stock_polymer","count":1}, {"item":"noclip_backrooms:void_alloy_ingot","count":1}],
+      "outputs": [{"item":"noclip_backrooms:gun_railgun","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_sonic_pulse",
+      "station": "anomaly_altar",
+      "xp": 40,
+      "inputs": [{"item":"noclip_backrooms:gun_receiver_precision","count":1}, {"item":"noclip_backrooms:static_screech_core","count":2}, {"item":"noclip_backrooms:core_fate_die","count":1}, {"item":"noclip_backrooms:old_circuit_board","count":2}, {"item":"noclip_backrooms:brass_ingot","count":3}],
+      "outputs": [{"item":"noclip_backrooms:gun_sonic_pulse","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_screech_bell",
+      "station": "anomaly_altar",
+      "xp": 22,
+      "inputs": [{"item":"noclip_backrooms:brass_ingot","count":3}, {"item":"noclip_backrooms:static_screech_core","count":1}, {"item":"noclip_backrooms:silence_core","count":1}, {"item":"noclip_backrooms:tool_handle_basic","count":1}],
+      "outputs": [{"item":"noclip_backrooms:magic_screech_bell","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_decoy_mirror",
+      "station": "anomaly_altar",
+      "xp": 24,
+      "inputs": [{"item":"noclip_backrooms:false_glass","count":3}, {"item":"noclip_backrooms:lure_cornea","count":1}, {"item":"noclip_backrooms:smiler_remnant","count":1}, {"item":"noclip_backrooms:brass_ingot","count":2}],
+      "outputs": [{"item":"noclip_backrooms:magic_decoy_mirror","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_prism_light_staff",
+      "station": "anomaly_altar",
+      "xp": 28,
+      "inputs": [{"item":"noclip_backrooms:focus_prism_core","count":1}, {"item":"noclip_backrooms:staff_rod_insulated","count":1}, {"item":"noclip_backrooms:smiler_remnant","count":2}, {"item":"noclip_backrooms:neon_tube","count":2}],
+      "outputs": [{"item":"noclip_backrooms:magic_prism_light_staff","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_steam_flame_staff",
+      "station": "anomaly_altar",
+      "xp": 38,
+      "inputs": [{"item":"noclip_backrooms:staff_rod_insulated","count":1}, {"item":"noclip_backrooms:core_steam_turbine","count":1}, {"item":"noclip_backrooms:thermal_core","count":2}, {"item":"noclip_backrooms:copper_pipe","count":2}],
+      "outputs": [{"item":"noclip_backrooms:magic_steam_flame_staff","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_acid_grimoire",
+      "station": "anomaly_altar",
+      "xp": 38,
+      "inputs": [{"item":"noclip_backrooms:grimoire_binding","count":1}, {"item":"noclip_backrooms:core_acid_queen","count":1}, {"item":"noclip_backrooms:acid_crystal","count":4}, {"item":"noclip_backrooms:acid_sac","count":3}],
+      "outputs": [{"item":"noclip_backrooms:magic_acid_grimoire","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_arc_lightning_staff",
+      "station": "anomaly_altar",
+      "xp": 40,
+      "inputs": [{"item":"noclip_backrooms:staff_rod_insulated","count":1}, {"item":"noclip_backrooms:core_arc_reactor","count":1}, {"item":"noclip_backrooms:high_voltage_coil","count":3}, {"item":"noclip_backrooms:resonance_capacitor","count":1}],
+      "outputs": [{"item":"noclip_backrooms:magic_arc_lightning_staff","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_abyssal_frost_scepter",
+      "station": "anomaly_altar",
+      "xp": 40,
+      "inputs": [{"item":"noclip_backrooms:staff_rod_insulated","count":1}, {"item":"noclip_backrooms:core_abyssal_scale","count":1}, {"item":"noclip_backrooms:coolant_vial","count":3}, {"item":"noclip_backrooms:anomaly_crystal","count":3}],
+      "outputs": [{"item":"noclip_backrooms:magic_abyssal_frost_scepter","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_plague_censer_wand",
+      "station": "anomaly_altar",
+      "xp": 34,
+      "inputs": [{"item":"noclip_backrooms:staff_rod_insulated","count":1}, {"item":"noclip_backrooms:plague_ichor","count":3}, {"item":"noclip_backrooms:toxic_spore_sac","count":3}, {"item":"noclip_backrooms:focus_prism_core","count":1}],
+      "outputs": [{"item":"noclip_backrooms:magic_plague_censer_wand","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_noclip_wand",
+      "station": "anomaly_altar",
+      "xp": 42,
+      "inputs": [{"item":"noclip_backrooms:reality_fragment","count":3}, {"item":"noclip_backrooms:spectral_cloth","count":2}, {"item":"noclip_backrooms:anomalous_mythril","count":2}, {"item":"noclip_backrooms:focus_prism_core","count":1}],
+      "outputs": [{"item":"noclip_backrooms:magic_noclip_wand","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_clump_grapple",
+      "station": "anomaly_altar",
+      "xp": 28,
+      "inputs": [{"item":"noclip_backrooms:grasping_tendon","count":4}, {"item":"noclip_backrooms:tangled_knuckle","count":2}, {"item":"noclip_backrooms:forged_chain_link","count":2}, {"item":"noclip_backrooms:anomalous_mythril","count":1}],
+      "outputs": [{"item":"noclip_backrooms:magic_clump_grapple","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_party_grimoire",
+      "station": "anomaly_altar",
+      "xp": 34,
+      "inputs": [{"item":"noclip_backrooms:grimoire_binding","count":1}, {"item":"noclip_backrooms:host_nerve_cord","count":1}, {"item":"noclip_backrooms:smiley_patch","count":3}, {"item":"noclip_backrooms:memory_sliver","count":4}],
+      "outputs": [{"item":"noclip_backrooms:magic_party_grimoire","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_stopmotion_watch",
+      "station": "anomaly_altar",
+      "xp": 40,
+      "inputs": [{"item":"noclip_backrooms:brass_ingot","count":3}, {"item":"noclip_backrooms:core_stopmotion_gear","count":1}, {"item":"noclip_backrooms:cel_paint_shard","count":4}, {"item":"noclip_backrooms:animation_joint","count":2}],
+      "outputs": [{"item":"noclip_backrooms:magic_stopmotion_watch","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_crimson_scythe",
+      "station": "anomaly_altar",
+      "xp": 50,
+      "inputs": [{"item":"noclip_backrooms:forged_mythril_blank","count":2}, {"item":"noclip_backrooms:core_crimson_heart","count":1}, {"item":"noclip_backrooms:red_room_shard","count":8}, {"item":"noclip_backrooms:withered_heart","count":2}, {"item":"noclip_backrooms:staff_rod_insulated","count":1}],
+      "outputs": [{"item":"noclip_backrooms:magic_crimson_scythe","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_beast_summon_bell",
+      "station": "anomaly_altar",
+      "xp": 46,
+      "inputs": [{"item":"noclip_backrooms:core_melancholy_bell","count":1}, {"item":"noclip_backrooms:dread_crystal","count":3}, {"item":"noclip_backrooms:translucent_blood_vial","count":3}, {"item":"noclip_backrooms:gilded_steel_scrap","count":3}],
+      "outputs": [{"item":"noclip_backrooms:magic_beast_summon_bell","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_fate_dice_staff",
+      "station": "anomaly_altar",
+      "xp": 48,
+      "inputs": [{"item":"noclip_backrooms:staff_rod_insulated","count":1}, {"item":"noclip_backrooms:core_fate_die","count":1}, {"item":"noclip_backrooms:luck_token","count":6}, {"item":"noclip_backrooms:neon_tube","count":3}, {"item":"noclip_backrooms:microchip","count":2}],
+      "outputs": [{"item":"noclip_backrooms:magic_fate_dice_staff","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_void_rift_staff",
+      "station": "anomaly_altar",
+      "xp": 55,
+      "inputs": [{"item":"noclip_backrooms:staff_rod_insulated","count":1}, {"item":"noclip_backrooms:core_void_weaver","count":1}, {"item":"noclip_backrooms:void_alloy_ingot","count":4}, {"item":"noclip_backrooms:reality_fragment","count":4}, {"item":"noclip_backrooms:focus_prism_core","count":2}],
+      "outputs": [{"item":"noclip_backrooms:magic_void_rift_staff","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:altar_astral_codex",
+      "station": "anomaly_altar",
+      "xp": 55,
+      "inputs": [{"item":"noclip_backrooms:grimoire_binding","count":1}, {"item":"noclip_backrooms:astral_parchment","count":2}, {"item":"noclip_backrooms:pastel_charm","count":1}, {"item":"noclip_backrooms:purified_almond_essence","count":4}],
+      "outputs": [{"item":"noclip_backrooms:magic_astral_codex","count":1}]
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "noclip_backrooms:treated_plank",
+    "noclip_backrooms:treated_plank",
+    "noclip_backrooms:treated_plank",
+    "noclip_backrooms:damp_carpet_fiber",
+    "noclip_backrooms:damp_carpet_fiber",
+    "noclip_backrooms:rusty_nail",
+    "noclip_backrooms:rusty_nail"
+  ],
+  "result": {
+    "id": "noclip_backrooms:weapon_shaft_wood",
+    "count": 1
+  }
+}

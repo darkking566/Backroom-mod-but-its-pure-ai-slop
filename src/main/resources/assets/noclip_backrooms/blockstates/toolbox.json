@@ -1,7 +1,13 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level2/toolbox"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level2/toolbox"
+      },
+      {
+        "model": "noclip_backrooms:block/level2/toolbox",
+        "y": 180
+      }
+    ]
   }
 }

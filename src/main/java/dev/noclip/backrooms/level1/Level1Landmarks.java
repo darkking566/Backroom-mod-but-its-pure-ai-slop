@@ -143,6 +143,11 @@ public final class Level1Landmarks {
 		if (u < 0 || u > 31 || v < 0 || v > 31) {
 			if (y < FLOOR) return solidConcrete();
 			if (y == FLOOR) return state(Level1Blocks.GARAGE_FLOOR);
+			// A railing all round the drop, open only where the north stair goes down.
+			boolean rim = (u == -1 || u == 32) && v >= -1 && v <= 32 || (v == -1 || v == 32) && u >= -1 && u <= 32;
+			if (y == FLOOR + 1 && rim && !(v == -1 && u >= 14 && u <= 17)) {
+				return barrier(v == -1 || v == 32 ? Direction.Axis.X : Direction.Axis.Z);
+			}
 			if (y == topCeil - 1) return hallFixture(ceiling);
 			return air();
 		}
@@ -154,12 +159,12 @@ public final class Level1Landmarks {
 			if (y < stepY) return state(Level1Blocks.GARAGE_WALL);
 			return y == topCeil - 1 ? hallFixture(ceiling) : air();
 		}
-		// Ascending stair on South side (u = 14..17, v = 25..30) from y=32 up to control catwalk y=38
-		if (u >= 14 && u <= 17 && v >= 25 && v <= 30) {
-			int stepY = FLOOR + 1 + (30 - v); // 33..38
-			if (y == stepY) return stairs(Direction.NORTH);
-			if (y < stepY && y >= FLOOR) return state(Level1Blocks.GARAGE_WALL);
-			if (y < FLOOR) return solidConcrete();
+		// Ascending stair on South side (u = 14..17, v = 19..30) from the generator floor up to the control catwalk y=38
+		if (u >= 14 && u <= 17 && v >= 19 && v <= 30) {
+			int stepY = lowerY + 1 + (v - 19); // 27..38
+			if (y == stepY) return stairs(Direction.SOUTH);
+			if (y == lowerY) return state(Level1Blocks.GARAGE_FLOOR);
+			if (y < stepY) return state(Level1Blocks.GARAGE_WALL);
 			return y == topCeil - 1 ? hallFixture(ceiling) : air();
 		}
 
@@ -169,6 +174,7 @@ public final class Level1Landmarks {
 		if (onCatwalk && y >= 38) {
 			if (y == 38) return state(Level1Blocks.GARAGE_FLOOR);
 			if (y == 39 && onCatwalkEdge) return barrier(v == 27 ? Direction.Axis.X : Direction.Axis.Z);
+			if (y == 39 && (u == 13 || u == 18) && v >= 27 && v <= 30) return barrier(Direction.Axis.Z); // beside the stairwell
 			// Control consoles along the east and west catwalks
 			if (y == 39 && (u == 1 || u == 30) && v >= 8 && v <= 24 && v % 4 == 0) return state(Level1Blocks.OFFICE_DESK);
 			if (y == 40 && (u == 1 || u == 30) && v >= 8 && v <= 24 && v % 4 == 0) {
@@ -483,7 +489,7 @@ public final class Level1Landmarks {
 		// Highway 1 deck (y = 39)
 		if (hwy1) {
 			if (y == 39) return state((v == 15 || v == 16) ? Level1Blocks.GARAGE_FLOOR_LINE : Level1Blocks.GARAGE_FLOOR);
-			if (y == 40 && (v == 12 || v == 19)) return barrier(Direction.Axis.X);
+			if (y == 40 && (v == 12 || v == 19) && !(v == 12 && u == 11)) return barrier(Direction.Axis.X); // gap where the stair tops out
 			if (y == 40 && u == 7 && v == 14) return Level1Blocks.ABANDONED_CAR.defaultBlockState().setValue(OldComputerBlock.FACING, Direction.EAST);
 			if (y == 40 && u == 23 && v == 17) return Level1Blocks.ABANDONED_VAN.defaultBlockState().setValue(OldComputerBlock.FACING, Direction.WEST);
 			if (y == 38 && u % 8 == 4 && v == 15) return state(Level1Blocks.CAGED_LAMP);
@@ -491,7 +497,7 @@ public final class Level1Landmarks {
 		// Highway 2 deck (y = 46)
 		if (hwy2) {
 			if (y == 46) return state((u == 15 || u == 16) ? Level1Blocks.GARAGE_FLOOR_LINE : Level1Blocks.GARAGE_FLOOR);
-			if (y == 47 && (u == 12 || u == 19)) return barrier(Direction.Axis.Z);
+			if (y == 47 && (u == 12 || u == 19) && !(u == 19 && v == 19)) return barrier(Direction.Axis.Z); // gap where the stair tops out
 			if (y == 47 && u == 14 && v == 8) return Level1Blocks.ABANDONED_CAR.defaultBlockState().setValue(OldComputerBlock.FACING, Direction.SOUTH);
 			if (y == 45 && v % 8 == 4 && u == 15) return state(Level1Blocks.CAGED_LAMP);
 		}

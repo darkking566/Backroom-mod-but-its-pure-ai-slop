@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "noclip_backrooms:copper_wire",
+    "noclip_backrooms:copper_wire",
+    "noclip_backrooms:scrap_metal",
+    "noclip_backrooms:plaster_dust"
+  ],
+  "result": {
+    "id": "noclip_backrooms:brass_ingot",
+    "count": 1
+  }
+}

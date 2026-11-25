@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level1;
 
+import dev.noclip.backrooms.core.rpg.PlayerRpg;
 import java.util.function.Function;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.minecraft.core.HolderSet;
@@ -7,15 +8,19 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.Consumables;
 import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
 import net.minecraft.world.item.consume_effects.RemoveStatusEffectsConsumeEffect;
+import net.minecraft.world.level.Level;
 
 /** What wanderers pick up in the parking structure: almond water, alloy and phosphor powder. */
 public final class Level1Items {
@@ -31,7 +36,7 @@ public final class Level1Items {
 							// Sharper eyes than before, the wiki says.
 							.onConsume(new ApplyStatusEffectsConsumeEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 400, 0)))
 							.build())
-			.usingConvertsTo(Items.GLASS_BOTTLE), Item::new);
+			.usingConvertsTo(Items.GLASS_BOTTLE), AlmondWaterItem::new);
 	/** Scrap metal worth something to the settlements; four make an iron ingot. */
 	public static final Item ALLOY = register("alloy", new Item.Properties(), Item::new);
 	/** Dab it on a wall, floor or ceiling to leave a mark that glows in the dark. */
@@ -77,5 +82,20 @@ public final class Level1Items {
 	private static Item register(String name, Item.Properties properties, Function<Item.Properties, Item> factory) {
 		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, Level1.id(name));
 		return Registry.register(BuiltInRegistries.ITEM, key, factory.apply(properties.setId(key)));
+	}
+
+	private static final class AlmondWaterItem extends Item {
+		AlmondWaterItem(Properties properties) {
+			super(properties);
+		}
+
+		@Override
+		public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity entity) {
+			ItemStack result = super.finishUsingItem(stack, level, entity);
+			if (entity instanceof ServerPlayer player) {
+				PlayerRpg.restoreSanity(player, 35.0F);
+			}
+			return result;
+		}
 	}
 }

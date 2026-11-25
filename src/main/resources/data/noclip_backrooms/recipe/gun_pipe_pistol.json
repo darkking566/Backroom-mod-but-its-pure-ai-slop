@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "noclip_backrooms:gun_barrel_pipe",
+    "noclip_backrooms:gun_receiver_basic",
+    "noclip_backrooms:tool_handle_basic",
+    "noclip_backrooms:metal_spring"
+  ],
+  "result": {
+    "id": "noclip_backrooms:gun_pipe_pistol",
+    "count": 1
+  }
+}

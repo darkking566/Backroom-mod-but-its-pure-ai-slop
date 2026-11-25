@@ -49,6 +49,8 @@ final class TeleportBerryItem extends Item {
 			Vec3 landing = new Vec3(x + 0.5, Level1ChunkGenerator.FLOOR_Y + 1, z + 0.5);
 			level.getChunk(BlockPos.containing(landing));
 			if (!level.noCollision(player.getDimensions(player.getPose()).makeBoundingBox(landing))) continue;
+		BlockPos floor = BlockPos.containing(landing).below(); // pits, basins and shafts have no floor at the usual height
+		if (level.getBlockState(floor).getCollisionShape(level, floor).isEmpty()) continue;
 			player.teleportTo(level, landing.x, landing.y, landing.z, Set.of(), player.getYRot(), 0, true);
 			player.resetFallDistance();
 			return true;
