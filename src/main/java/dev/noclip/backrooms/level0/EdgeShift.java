@@ -18,6 +18,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -25,6 +26,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -42,6 +44,8 @@ import net.minecraft.world.phys.Vec3;
  * maze 100% passable and leaving Arches and Exit doorways untouched.
  */
 final class EdgeShift {
+	/** Blocks other levels put into Level 0's walls (the Level 0.1 hatch) that a shift must leave alone. */
+	private static final TagKey<Block> KEEP = TagKey.create(Registries.BLOCK, BackroomsMod.id("edge_shift_keep"));
 	private static GameRule<Boolean> edgeShiftRule;
 
 	private static final int CHECK_INTERVAL_TICKS = 15;
@@ -414,7 +418,8 @@ final class EdgeShift {
 				|| state.is(ModBlocks.EXIT_DOOR)
 				|| state.is(ModBlocks.EXIT_DOOR_TOP)
 				|| state.is(ModBlocks.EXIT_SIGN)
-				|| state.is(ModBlocks.EXIT_LIGHT);
+				|| state.is(ModBlocks.EXIT_LIGHT)
+				|| state.is(KEEP);
 	}
 
 	private static Maze.Zone cellZone(long seed, int cx, int cz) {

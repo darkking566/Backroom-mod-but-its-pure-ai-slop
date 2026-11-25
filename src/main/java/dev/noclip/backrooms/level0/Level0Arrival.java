@@ -1,13 +1,9 @@
 package dev.noclip.backrooms.level0;
 
-import dev.noclip.backrooms.BackroomsMod;
 import java.util.Set;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -15,7 +11,6 @@ import net.minecraft.world.phys.Vec3;
  * in the middle of a free cell near the same coordinates. Never lands in a Red Room, which is meant to be walked into.
  */
 public final class Level0Arrival {
-	private static final TagKey<Block> RED_WALLS = TagKey.create(Registries.BLOCK, BackroomsMod.id("level_0_red_walls"));
 	private static final int CELL = Maze.CELL, CENTER = Maze.CENTER, STAND_Y = Level0ChunkGenerator.FLOOR_Y + 1, RINGS = 12;
 	private static final net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level> LEVEL_0 = Level0.LEVEL_0;
 
@@ -49,10 +44,12 @@ public final class Level0Arrival {
 		level.getChunk(feet);
 		if (level.getBlockState(feet.below()).getCollisionShape(level, feet.below()).isEmpty()) return false;
 		if (!level.noCollision(player.getDimensions(player.getPose()).makeBoundingBox(landing))) return false;
-		// Every wall within reach of a Red Room cell is red.
-		for (int[] d : new int[][] {{4, 0}, {-4, 0}, {0, 4}, {0, -4}}) {
-			if (level.getBlockState(feet.offset(d[0], 1, d[1])).is(RED_WALLS)) return false;
-		}
-		return true;
+		return !inRedRoom(level, feet);
+	}
+
+	/** Red Room zones come from the maze seed; probing walls missed most cells (the room is open where doors are). */
+	static boolean inRedRoom(ServerLevel level0, BlockPos pos) {
+		long seed = Level0ChunkGenerator.mazeSeed(level0.getChunkSource().randomState());
+		return Maze.zoneAt(seed, pos.getX(), pos.getZ()) == Maze.Zone.RED_ROOM;
 	}
 }

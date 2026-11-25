@@ -168,6 +168,14 @@
   - 推送前抓 GitHub，合併朋友新推的 1 個提交（Level 0.1 臥室、廚房、健身房、溫室的 18 種家具）
   - 使用者同意後把 `main` 推送到 GitHub（寫實材質包與攝影機濾鏡、變暗、天花板與燈具模型、第 0 層燈減少、測試只跑指定樓層的開關）；沒有強制推送、沒有改寫歷史
 
+### 2026-11-25
+- 照 Antigravity 的 Level 0 審查報告，使用者同意先修「會卡死或弄丟東西」的三項（動到朋友的 Level 0 程式）：
+  - 紅房間落點：`Level0Arrival` 原本靠探測 ±4 格的紅牆，大半紅房間格子測不到；改用迷宮種子直接判斷區域（`Level0Arrival.inRedRoom`），從主世界卡牆進來（`Noclip`）也加同樣的檢查
+  - 迷宮變形（`EdgeShift`）不再改掉 Level 0.1 的白色艙門：新增方塊標籤 `edge_shift_keep`（目前只有 `station_hatch`），Level 0 不用直接依賴 level0p1
+  - 黑影幻覺：生出來後加標籤，讀檔時清掉；關伺服器時也清（`ShadowHallucination`），不會再被存進地圖
+  - `gradlew build` 與 `runClientGameTest -Plevels=0` 通過；這三項沒有專門的測試（紅房間落點、關服清黑影都沒實機重現）
+  - 注意：本機 JDK 是 `C:/Program Files/Java/jdk-25.0.4.1`（之前紀錄寫的 `jdk-25.0.5.0.3` 不存在）
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23

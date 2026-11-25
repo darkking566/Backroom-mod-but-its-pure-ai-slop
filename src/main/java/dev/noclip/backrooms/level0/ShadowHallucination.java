@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.commands.CommandSourceStack;
@@ -53,6 +55,7 @@ final class ShadowHallucination {
 	private static final double CLOSE_VANISH_DIST = 6.5;
 	private static final double DIRECT_LOOK_DOT = 0.90;
 
+	private static final String TAG = "noclip_backrooms_shadow";
 	private static final Map<UUID, ActiveShadow> ACTIVE = new HashMap<>();
 	private static final Map<UUID, Integer> NEXT_SPAWN_TICK = new HashMap<>();
 
@@ -61,6 +64,16 @@ final class ShadowHallucination {
 
 	static void register() {
 		ServerTickEvents.END_SERVER_TICK.register(ShadowHallucination::tick);
+		// A shadow saved with the world (quit, stop, crash) would stand there forever.
+		ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
+			if (entity.entityTags().contains(TAG)) entity.discard();
+		});
+		ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
+			ServerLevel level0 = server.getLevel(Level0.LEVEL_0);
+			if (level0 != null) for (UUID id : ACTIVE.keySet().toArray(UUID[]::new)) discardActive(level0, id);
+			ACTIVE.clear();
+			NEXT_SPAWN_TICK.clear();
+		});
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
 			UUID id = handler.player.getUUID();
 			ServerLevel level0 = server.getLevel(Level0.LEVEL_0);
@@ -301,6 +314,9 @@ final class ShadowHallucination {
 
 		level.addFreshEntity(torso);
 		level.addFreshEntity(head);
+		// Tag after adding, or the load handler below discards them on the spot.
+		torso.addTag(TAG);
+		head.addTag(TAG);
 		ACTIVE.put(player.getUUID(), new ActiveShadow(torso.getUUID(), head.getUUID(), pos.x, pos.y, pos.z, now, 0));
 	}
 
