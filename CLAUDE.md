@@ -374,6 +374,7 @@
 - Level 1 審查報告：收費亭抽屜的背面：抽屜加 `facing`（`BoothDrawerBlock`，預設朝南＝朝亭子裡面，世界生成與舊存檔都是這個方向），模型改成只有正面是抽屜、背面與兩側是收費亭的牆板、上下是牆板（`orientable`）；玩家擺放時正面朝玩家；`make_level1.py`、`make_level1_texture_fixes.py` 同步（沒重跑）；`Level1ClientTest` 的 `events` 段檢查抽屜朝南，並從前窗外拍抽屜背面（`level1_booth_drawer_back`，看到是牆板）；`gradlew build` 與 `-Psections=events,checkBlocks` 通過
 - 使用者同意後，把 `main` 推送到 GitHub（`cc8d4a9` 收費亭抽屜背面與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 - Level 1 審查報告：花園植物的畫風：新增 `tools/make_garden_plants.py`（只寫這 5 張，不重跑 `make_level1.py`），草叢、蕨類、藍／紅／黃野花改成有明暗的寫實手繪：每片葉子與草葉由根部暗到葉尖亮、中肋一側亮一側暗，草裡夾乾黃的葉、蕨葉尖端有枯褐，野花是好幾枝不同高度、花瓣大小不一、顏色偏灰、有花苞；1024 像素畫好後輸出寫實材質包 512 像素與模組 128 像素，加 `_n`／`_s`（葉子有一點透光）；`make_level1_realistic.py` 改成跳過這 5 張（不然重跑會用 128 像素放大蓋掉）；預覽 `docs/look/level1_garden_plants.png`、遊戲畫面 `docs/look/level1_garden_plants_ingame.png`；`Level1ClientTest` 新增 `gardenPlants` 段（苔蘚上一排近照）；`gradlew build` 與 `-Psections=sectors,views,gardenPlants` 通過
+- 使用者同意後，把 `main` 推送到 GitHub（`ab45c13` 花園植物重畫與這筆紀錄；Level 1 審查報告全部處理完）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
