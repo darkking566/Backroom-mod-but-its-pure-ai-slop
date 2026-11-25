@@ -225,6 +225,7 @@
   - 挖掘標籤：書桌、相框、垂藤改用斧頭，苔蘚地板用鋤頭（新增 `mineable/hoe.json`），地毯、健身墊、墊子堆不屬於任何工具；`make_level0p1.update_tags` 依 `TOOL` 表寫入，重跑腳本不會再加回十字鎬
   - `blocks` 測試段：會拆成材料的四種方塊（電纜、控制台、壞控制台、機櫃）改成檢查不會掉自己
   - `gradlew build` 與完整 `runClientGameTest -Plevels=0.1`（全部段落，含 `blocks`）通過；看過窗外、停電、機器人、開門截圖，紅眼在截圖裡太小沒確認到，選取框沒有實際用準星看
+- 使用者同意後，把 `main` 推送到 GitHub（Level 0.1 審查報告四批修正 `2e06b66`、`ab64a57`、`8e53852`、`5af9bd6` 與紀錄）；推送前抓過 GitHub，沒有新提交要合併；`5af9bd6` 已跑過 `gradlew build` 與完整 Level 0.1 實機測試；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
