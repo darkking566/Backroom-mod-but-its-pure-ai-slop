@@ -1,8 +1,11 @@
 package dev.noclip.backrooms;
 
+import dev.noclip.backrooms.core.economy.Economy;
 import dev.noclip.backrooms.core.floors.Floors;
+import dev.noclip.backrooms.core.guild.Guilds;
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
+import dev.noclip.backrooms.core.trade.Shops;
 import dev.noclip.backrooms.crafting.BackroomsCrafting;
 import dev.noclip.backrooms.items.BackroomsItems;
 import dev.noclip.backrooms.level0.Level0;
@@ -38,6 +41,9 @@ public final class BackroomsMod implements ModInitializer {
 		BackroomsWeaponNetworking.register();
 		Monsters.register();
 		People.register();
+		Economy.register();
+		Shops.register();
+		Guilds.register();
 		Level0.register();
 		Level0p1.register();
 		Level1.register();

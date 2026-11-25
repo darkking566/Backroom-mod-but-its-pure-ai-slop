@@ -283,6 +283,16 @@
   - 驗證：Level 2 單元測試 11 項（強制重跑）與 `runClientGameTest -Plevels=2` 通過；截圖看到警告牌斜紋、長方形白漆磚；EL3A 截圖對著門，提燈與箱子朝向沒拍到；白漆磚的剝落花紋仍每格重複
   - 等 Antigravity 同時在跑的實機測試結束後才跑自己的（第一次因 `build/run` 被占用失敗）
 - 使用者同意後，抓 GitHub 合併朋友新推的 10 個提交（合成系統、327 個物品 3D 模型、RPG 狀態列、各層畫面標準與光影測試等），沒有衝突；合併後 `gradlew build`（77 個單元測試）與 `runClientGameTest -Plevels=2` 通過（中途一次編譯失敗是別的 Gradle 同時寫 `build/classes`，重跑就過），把 `main` 推送到 GitHub；Antigravity 未提交的 Level 1 改動沒有一起提交；沒有強制推送、沒有改寫歷史
+- 使用者給了規格書 `docs/企劃書/backrooms_mod_design_spec.md`（使用者自己放的，沒動），要求做主世界據點與商人；使用者決定：照規格書用永久帳戶、每個村莊旁都有公會、Claude 做公會與商人、Gemini 照規格書對齊材料、貼圖照規格書改 128（牆地天花）／64（道具）、Level 0 天花板高度先不改（要跟朋友討論）：
+  - 永久帳戶（`core/economy`）：`Wallet`（玩家附加資料，死亡保留、只同步給本人）、兩種錢幣 `lost_coin`（10 點）、`static_tape`（40 點），右鍵存入；測試指令 `/backrooms money get|add|set`；背包下方顯示帳戶餘額（客戶端 `WalletClient`）
+  - 錢幣放進停車場補給箱、有眼睛的箱子、殘骸堆、Level 2 的 EL3A 儲物箱與礦車、Level 3 的 M.E.G. 補給箱（各加一段掉落池）；Level 0 是朋友的，沒加
+  - 商店（`core/trade`）：右鍵有角色標籤的人形開商店，伺服器檢查距離 8 格、帳戶、身上的東西；貨單是資料檔 `data/noclip_backrooms/shops/buyer|supplier|quartermaster.json`（收購商收材料與怪物素材、補給商賣藥品食物照明、軍需官賣武器彈藥護甲，好槍要錢＋材料），物品 ID 用 Gemini 的；客戶端商店畫面 `ShopScreen`（Shift 一次 8 份）
+  - 公會（`core/guild`）：結構的放置規則照抄原版村莊（同鹽值與間距），先確認村莊生態域，再在村莊起點外 88～96 格、地面平坦又不是水的地方蓋；門朝村莊、依村莊換材料（平原、沙漠、莽原、雪原、針葉林）；裡面有收購商、補給商、軍需官、會長（`core/people` 的人形，不會動、打不死、頭會轉向玩家）、4 張床、箱子、Gemini 的四座工作台、公告欄木牌，煙囪上有狼煙；門口有小路通往村莊、路口立指路牌；公會裡不生怪物
+  - 新增 `tools/make_economy_items.py`（錢幣圖示，預覽 `docs/guild/items.png`）、說明 `docs/guild.md`、實機測試 `guild/GuildClientTest`（`-Plevels=guild`）；`BackroomsMod`、`BackroomsClient` 各加幾行註冊；語言檔加 52 條
+  - 寫好還沒編譯就讓使用者的 play.bat 打不開：用了 26.2 已改名的寫法（彩色方塊改成 `Blocks.BED.yellow()` 這種、創造模式分頁改 `CreativeModeTabEvents`、開畫面改 `client.gui.setScreen`），修好後編譯通過
+  - `runClientGameTest -Plevels=guild` 通過：在莽原村莊旁找到公會（村莊起點外約 80 格），門、狼煙、木牌字、四個人、小路都在；右鍵收購商開商店、賣廢金屬、存硬幣、離太遠不能交易、錢不夠、材料不夠、買槍、買繃帶、死掉後帳戶還在；截圖看過外觀、內部、商店、背包餘額。`gradlew build`（單元測試）這次沒跑（使用者要開遊戲）
+  - 本機 Java 25 換了位置：`C:/Program Files/Java/jdk-25.0.4.1` 已不存在，現在是 `C:/Program Files/Microsoft/jdk-25.0.5.102-hotspot`
+  - 照規格書 7.1 改 `docs/look/STYLE_GUIDE.md`、`SOP.md` 的貼圖尺寸（整格的面 128、道具 64），新增 `tools/resize_realistic.py`（照模型判斷是整格的面還是道具再縮小）；寫實材質包還沒實際縮
 
 ## 動作記錄（Antigravity）
 

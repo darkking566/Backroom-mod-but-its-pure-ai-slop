@@ -1,6 +1,8 @@
 package dev.noclip.backrooms;
 
+import dev.noclip.backrooms.core.economy.WalletClient;
 import dev.noclip.backrooms.core.floors.FloorsClient;
+import dev.noclip.backrooms.core.trade.ShopClient;
 import dev.noclip.backrooms.core.look.Look;
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.people.PersonModel;
@@ -67,6 +69,8 @@ public final class BackroomsClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		Look.register();
 		FloorsClient.register();
+		ShopClient.register();
+		WalletClient.register();
 		RpgClient.register();
 		for (StationType station : StationType.values()) {
 			MenuScreens.register(BackroomsCrafting.menuType(station), BackroomsStationScreen::new);
