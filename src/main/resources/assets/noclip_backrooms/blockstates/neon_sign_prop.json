@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "noclip_backrooms:block/crafting/neon_sign_prop" },
+    "facing=east":  { "model": "noclip_backrooms:block/crafting/neon_sign_prop", "y": 90 },
+    "facing=south": { "model": "noclip_backrooms:block/crafting/neon_sign_prop", "y": 180 },
+    "facing=west":  { "model": "noclip_backrooms:block/crafting/neon_sign_prop", "y": 270 }
+  }
+}

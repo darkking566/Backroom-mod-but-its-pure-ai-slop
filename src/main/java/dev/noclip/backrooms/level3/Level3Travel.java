@@ -22,7 +22,8 @@ final class Level3Travel {
 		ServerLevel level3 = player.level().getServer().getLevel(Level3.LEVEL_3);
 		if (level3 == null) return false;
 		long seed = Level3ChunkGenerator.planSeed(level3.getChunkSource().randomState());
-		int x = player.getBlockX(), z = player.getBlockZ();
+		int[] at = dev.noclip.backrooms.core.LevelExits.anchor(player);
+		int x = at[0], z = at[1];
 		for (int i = 0; i < TRIES; i++) {
 			int[] spot = Level3Layout.landing(seed, x + i * Level3Plan.CELL * 3, z);
 			Vec3 landing = new Vec3(spot[0] + 0.5, Level3ChunkGenerator.FLOOR_Y + 1, spot[1] + 0.5);

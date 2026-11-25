@@ -1,0 +1,44 @@
+{
+  "textures": {
+    "0": "noclip_backrooms:item/equipment3d/lure_cornea",
+    "particle": "noclip_backrooms:item/equipment3d/lure_cornea"
+  },
+  "gui_light": "side",
+  "elements": [
+    {
+      "from": [3.50, 3.50, 6.00],
+      "to": [12.50, 12.50, 10.00],
+      "faces": {
+        "north": {"uv": [12.15, 0.15, 15.85, 3.85], "texture": "#0"},
+        "east": {"uv": [12.15, 0.15, 15.85, 3.85], "texture": "#0"},
+        "south": {"uv": [12.15, 0.15, 15.85, 3.85], "texture": "#0"},
+        "west": {"uv": [12.15, 0.15, 15.85, 3.85], "texture": "#0"},
+        "up": {"uv": [12.15, 0.15, 15.85, 3.85], "texture": "#0"},
+        "down": {"uv": [12.15, 0.15, 15.85, 3.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [4.50, 4.50, 5.40],
+      "to": [11.50, 11.50, 10.60],
+      "shade": false,
+      "light_emission": 15,
+      "faces": {
+        "north": {"uv": [12.15, 4.15, 15.85, 7.85], "texture": "#0"},
+        "east": {"uv": [12.15, 4.15, 15.85, 7.85], "texture": "#0"},
+        "south": {"uv": [12.15, 4.15, 15.85, 7.85], "texture": "#0"},
+        "west": {"uv": [12.15, 4.15, 15.85, 7.85], "texture": "#0"},
+        "up": {"uv": [12.15, 4.15, 15.85, 7.85], "texture": "#0"},
+        "down": {"uv": [12.15, 4.15, 15.85, 7.85], "texture": "#0"}
+      }
+    }
+  ],
+  "display": {
+    "thirdperson_righthand": {"rotation": [22, 35, 0], "translation": [0, 2.0, 0.5], "scale": [0.55, 0.55, 0.55]},
+    "thirdperson_lefthand": {"rotation": [22, -35, 0], "translation": [0, 2.0, 0.5], "scale": [0.55, 0.55, 0.55]},
+    "firstperson_righthand": {"rotation": [12, 35, 0], "translation": [1.5, 2.5, -0.5], "scale": [0.55, 0.55, 0.55]},
+    "firstperson_lefthand": {"rotation": [12, -35, 0], "translation": [1.5, 2.5, -0.5], "scale": [0.55, 0.55, 0.55]},
+    "ground": {"rotation": [0, 0, 0], "translation": [0, 2.5, 0], "scale": [0.55, 0.55, 0.55]},
+    "gui": {"rotation": [28, 38, 0], "translation": [0, 0, 0], "scale": [0.88, 0.88, 0.88]},
+    "fixed": {"rotation": [0, 0, 0], "translation": [0, 0, 0], "scale": [0.85, 0.85, 0.85]}
+  }
+}

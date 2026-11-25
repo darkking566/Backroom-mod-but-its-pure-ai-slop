@@ -8,7 +8,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 
-/** A camcorder's viewfinder writing: a blinking REC, the battery, the tape counter and the date and time. */
+/**
+ * A camcorder's viewfinder writing: a blinking REC beside the battery (the top left is the floor, see core.floors),
+ * the tape counter and the date and time.
+ */
 final class CamcorderOverlay {
 	private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("MMM. d yyyy", Locale.ENGLISH);
 	private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("h:mm:ss a", Locale.ENGLISH);
@@ -26,8 +29,9 @@ final class CamcorderOverlay {
 		graphics.pose().pushMatrix();
 		graphics.pose().scale(SCALE, SCALE);
 
-		if (System.currentTimeMillis() / 700 % 2 == 0) graphics.text(font, "●", 10, 8, RED, true);
-		graphics.text(font, "REC", 20, 8, TEXT, true);
+		int rec = width - 40 - font.width("REC");
+		if (System.currentTimeMillis() / 700 % 2 == 0) graphics.text(font, "●", rec - 10, 8, RED, true);
+		graphics.text(font, "REC", rec, 8, TEXT, true);
 
 		// The battery, two bars left.
 		int bx = width - 30, by = 8;

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "noclip_backrooms:treated_plank",
+    "noclip_backrooms:treated_plank",
+    "noclip_backrooms:phosphor_powder",
+    "noclip_backrooms:phosphor_powder",
+    "noclip_backrooms:phosphor_powder",
+    "noclip_backrooms:almond_water",
+    "noclip_backrooms:synthetic_fabric"
+  ],
+  "result": {
+    "id": "noclip_backrooms:cn_peachwood_sword",
+    "count": 1
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "A": "noclip_backrooms:alloy",
+    "V": "noclip_backrooms:pipe_valve",
+    "H": "noclip_backrooms:sheet_metal",
+    "S": "noclip_backrooms:heavy_steel_plate",
+    "R": "noclip_backrooms:rusty_screws",
+    "P": "noclip_backrooms:treated_plank"
+  },
+  "pattern": [
+    "HSH",
+    "APA",
+    "RVR"
+  ],
+  "result": {
+    "id": "noclip_backrooms:workshop_bench",
+    "count": 1
+  }
+}

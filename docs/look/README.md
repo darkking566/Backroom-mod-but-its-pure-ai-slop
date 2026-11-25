@@ -1,5 +1,7 @@
 # 畫面風格：寫實材質與攝影機濾鏡
 
+所有人做畫面要照的規則在 [STYLE_GUIDE.md](STYLE_GUIDE.md)，每一層的步驟在 [SOP.md](SOP.md)，光影包的推薦設定在 [shaders/](shaders/)。
+
 目標是「找到的錄影帶」那種寫實後室畫面（使用者參考的是 CurseForge 模組包 Into The Backrooms - Found Footage，核心是 SpacePotato 的 Minecraft Backrooms Found Footage：https://modrinth.com/mod/minecraft-found-footage）。
 那個模組是 GPL 授權、又只能跑在 1.20.1，所以一律自己做，不搬它的素材或程式。
 

@@ -1,9 +1,17 @@
 package dev.noclip.backrooms;
 
+import dev.noclip.backrooms.core.floors.FloorsClient;
 import dev.noclip.backrooms.core.look.Look;
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.people.PersonModel;
 import dev.noclip.backrooms.core.people.PersonRenderer;
+import dev.noclip.backrooms.core.rpg.RpgClient;
+import dev.noclip.backrooms.crafting.BackroomsCrafting;
+import dev.noclip.backrooms.crafting.BackroomsStationScreen;
+import dev.noclip.backrooms.crafting.StationType;
+import dev.noclip.backrooms.items.armor.BackroomsArmorRenderer;
+import dev.noclip.backrooms.weapons.WeaponAnimState;
+import dev.noclip.backrooms.weapons.WeaponCrosshairHud;
 import dev.noclip.backrooms.level0p1.robots.Robot;
 import dev.noclip.backrooms.level0p1.robots.RobotModel;
 import dev.noclip.backrooms.level0p1.robots.RobotRenderer;
@@ -48,6 +56,7 @@ import dev.noclip.backrooms.monsters.wretch.WretchRenderer;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.ModelLayerRegistry;
+import net.minecraft.client.gui.screens.MenuScreens;
 
 /**
  * Client-only setup: how monsters look. Code here lives in src/client and only runs in the game client,
@@ -57,6 +66,14 @@ public final class BackroomsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		Look.register();
+		FloorsClient.register();
+		RpgClient.register();
+		for (StationType station : StationType.values()) {
+			MenuScreens.register(BackroomsCrafting.menuType(station), BackroomsStationScreen::new);
+		}
+		BackroomsArmorRenderer.registerAll();
+		WeaponAnimState.register();
+		WeaponCrosshairHud.register();
 		ModelLayerRegistry.registerModelLayer(HoundModel.LAYER, HoundModel.RIG::layer);
 		EntityRendererRegistry.register(Monsters.HOUND, HoundRenderer::new);
 		ModelLayerRegistry.registerModelLayer(SmilerModel.LAYER, SmilerModel.RIG::layer);

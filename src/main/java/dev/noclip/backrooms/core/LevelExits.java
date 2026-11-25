@@ -46,6 +46,9 @@ public final class LevelExits {
 	}
 
 	private static final Map<UUID, Integer> LOCKED_UNTIL = new HashMap<>();
+	private static final Map<UUID, int[]> ANCHORS = new HashMap<>();
+	/** How far a trip through an exit lands from the exit, in blocks, and how far out anyone is let go. */
+	private static final int NEAR = 40_000, SPREAD = 120_000, LIMIT = 2_000_000;
 
 	/** For this long no exit takes the player anywhere (a teleport berry's price). */
 	public static void lock(ServerPlayer player, int ticks) {
@@ -75,8 +78,41 @@ public final class LevelExits {
 		server.schedule(new TickTask(server.getTickCount(), () -> {
 			if (player.isRemoved() || player.hasDisconnected() || !player.isAlive()) return;
 			if (player.level().dimension() != from) return;
-			arrival.arrive(player);
+			ANCHORS.put(player.getUUID(), fresh(player, level));
+			try {
+				arrival.arrive(player);
+			} finally {
+				ANCHORS.remove(player.getUUID());
+			}
 		}));
+	}
+
+	/**
+	 * Where a level should put a player who is arriving, as {x, z}. Through an exit it is a stretch of the level far
+	 * from the exit, so that coming back to a level is coming to a new part of it, as in 狐霖's Backrooms (docs/FLOORS.md);
+	 * it depends only on where the exit is and where it leads, so whoever takes the same exit lands together.
+	 * Otherwise (falling in from the Overworld, commands) it is where the player stands.
+	 */
+	public static int[] anchor(ServerPlayer player) {
+		int[] at = ANCHORS.get(player.getUUID());
+		return at != null ? at : new int[] {player.getBlockX(), player.getBlockZ()};
+	}
+
+	private static int[] fresh(ServerPlayer player, String level) {
+		int x = player.getBlockX(), z = player.getBlockZ();
+		long h = player.level().dimension().identifier().toString().hashCode() * 0x9E3779B97F4A7C15L;
+		h = (h ^ level.hashCode()) * 0xBF58476D1CE4E5B9L;
+		h = (h ^ Math.floorDiv(x, 32)) * 0x94D049BB133111EBL;
+		h = (h ^ Math.floorDiv(z, 32)) * 0xBF58476D1CE4E5B9L;
+		h ^= h >>> 31;
+		double angle = (h >>> 11) * 0x1.0p-53 * Math.PI * 2;
+		int distance = NEAR + (int) Math.floorMod(h, (long) SPREAD);
+		return new int[] {fold(x + (int) Math.round(Math.cos(angle) * distance)), fold(z + (int) Math.round(Math.sin(angle) * distance))};
+	}
+
+	/** Bounces a coordinate that would go past LIMIT back toward the middle, well inside the world border. */
+	private static int fold(int v) {
+		return Math.abs(v) <= LIMIT ? v : Integer.signum(v) * (2 * LIMIT - Math.abs(v));
 	}
 
 	private static void refuse(ServerPlayer player, String level, int now) {

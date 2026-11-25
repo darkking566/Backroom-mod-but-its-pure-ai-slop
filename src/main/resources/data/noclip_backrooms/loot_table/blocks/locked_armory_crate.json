@@ -1,0 +1,82 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": { "type": "minecraft:uniform", "min": 3, "max": 5 },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:gun_barrel_rifled_short",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:gun_receiver_precision",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:gun_trigger_group",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:gun_mag_pistol",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:gun_mag_rifle",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:ammo_9mm",
+          "weight": 4, "functions": [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": 2, "max": 6}}]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:ammo_12g_buck",
+          "weight": 4, "functions": [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": 2, "max": 6}}]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:ammo_556",
+          "weight": 4, "functions": [{"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": 2, "max": 6}}]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:mod_red_dot",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:west_gladius",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:cn_tang_hengdao",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:gun_revolver",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:gun_pump_shotgun",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:blunt_flanged_mace",
+          "weight": 4
+        }
+
+      ]
+    }
+  ],
+  "random_sequence": "noclip_backrooms:blocks/locked_armory_crate"
+}

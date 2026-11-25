@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    "noclip_backrooms:iron_pipe",
+    "noclip_backrooms:alloy",
+    "noclip_backrooms:alloy",
+    "noclip_backrooms:weapon_grip_wrap",
+    "noclip_backrooms:rusty_nail",
+    "noclip_backrooms:rusty_nail"
+  ],
+  "result": {
+    "id": "noclip_backrooms:improvised_crowbar",
+    "count": 1
+  }
+}

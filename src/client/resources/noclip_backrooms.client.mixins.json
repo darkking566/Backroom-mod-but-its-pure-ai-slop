@@ -4,9 +4,14 @@
 	"package": "dev.noclip.backrooms.mixin.client",
 	"compatibilityLevel": "JAVA_21",
 	"client": [
+		"AbstractClientPlayerAimFov",
+		"AbstractContainerScreenAccess",
+		"EntityRenderDispatcherHallucination",
 		"FogRendererDarkness",
 		"GameRendererAccess",
-		"LightmapFalloff"
+		"ItemInHandRendererWeaponAnimation",
+		"LightmapFalloff",
+		"MinecraftFirearmInput"
 	],
 	"injectors": {
 		"defaultRequire": 1
