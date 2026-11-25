@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  L",
+    " C ",
+    "W  "
+  ],
+  "key": {
+    "L": "noclip_backrooms:flickering_lamp_tube",
+    "C": "noclip_backrooms:ballast_coil",
+    "W": "noclip_backrooms:weapon_shaft_wood"
+  },
+  "result": {
+    "id": "noclip_backrooms:static_pulse_staff",
+    "count": 1
+  }
+}

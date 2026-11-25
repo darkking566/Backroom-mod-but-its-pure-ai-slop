@@ -132,6 +132,64 @@ public final class BackroomsItems {
 	public static final Item RESONANCE_CAPACITOR = mat("resonance_capacitor", Rarity.RARE);
 
 	// =========================================================================
+	// 1B. GDD ALIGNED MATERIALS, CIRCUITS, SCIENCE PACKS, TECH BRICKS & GLASS SERIES
+	//     (docs/企劃書/backrooms_mod_design_spec.md & docs/levels/MATERIALS.md)
+	// =========================================================================
+	// Level 0 Office Junk, Salvage & Electronics (GDD 6.2 A/B/C)
+	public static final Item RAGS = mat("rags", Rarity.COMMON);
+	public static final Item BROKEN_TABLE_LEG = mat("broken_table_leg", Rarity.COMMON);
+	public static final Item SCREW_NAIL_BOX = mat("screw_nail_box", Rarity.COMMON);
+	public static final Item INSULATING_TAPE = mat("insulating_tape", Rarity.COMMON);
+	public static final Item SUPER_GLUE = mat("super_glue", Rarity.COMMON);
+	public static final Item STAPLER = mat("stapler", Rarity.UNCOMMON);
+	public static final Item BALLPOINT_PEN = mat("ballpoint_pen", Rarity.COMMON);
+	public static final Item RUBBER_BAND_BALL = mat("rubber_band_ball", Rarity.COMMON);
+	public static final Item MAGAZINE_BUNDLE = mat("magazine_bundle", Rarity.COMMON);
+	public static final Item BROKEN_MIRROR_SHARD = mat("broken_mirror_shard", Rarity.COMMON);
+	public static final Item CASE_FAN = mat("case_fan", Rarity.COMMON);
+	public static final Item CRT_TUBE = mat("crt_tube", Rarity.UNCOMMON);
+	public static final Item FLICKERING_LAMP_TUBE = mat("flickering_lamp_tube", Rarity.UNCOMMON);
+	public static final Item OFFICE_KEYBOARD = mat("office_keyboard", Rarity.COMMON);
+	public static final Item LANDLINE_PHONE = mat("landline_phone", Rarity.COMMON);
+	public static final Item EMPTY_PLASTIC_BOTTLE = mat("empty_plastic_bottle", Rarity.COMMON);
+	public static final Item STERILE_GAUZE = mat("sterile_gauze", Rarity.COMMON);
+	public static final Item RUBBING_ALCOHOL = mat("rubbing_alcohol", Rarity.COMMON);
+	public static final Item DRY_SOIL_HERBS = mat("dry_soil_herbs", Rarity.COMMON);
+
+	// Trade Goods, Deep Rewards & Monster/Level Exclusive Materials (GDD 5.2, 6.2 D, 6.3, MATERIALS.md)
+	public static final Item STATIC_CASSETTE = mat("static_cassette", Rarity.UNCOMMON);
+	public static final Item NOCLIP_SHARD = mat("noclip_shard", Rarity.EPIC);
+	public static final Item FIRE_SALT = mat("fire_salt", Rarity.RARE);
+	public static final Item SMILER_EYEBALL = mat("smiler_eyeball", Rarity.RARE);
+	public static final Item RUSTED_STAIRWELL_KEY = mat("rusted_stairwell_key", Rarity.UNCOMMON);
+	public static final Item LEVEL_KEYCARD = mat("level_keycard", Rarity.RARE);
+	public static final Item RETRO_TERMINAL = mat("retro_terminal", Rarity.RARE);
+	public static final Item TIRE = mat("tire", Rarity.COMMON);
+	public static final Item RUBBER_CONVEYOR_BELT = mat("rubber_conveyor_belt", Rarity.UNCOMMON);
+
+	// Glass Series (MATERIALS.md Section 7)
+	public static final Item OFFICE_GLASS = mat("office_glass", Rarity.COMMON);
+	public static final Item AUTO_SAFETY_GLASS = mat("auto_safety_glass", Rarity.UNCOMMON);
+	public static final Item WIRE_MESH_GLASS = mat("wire_mesh_glass", Rarity.UNCOMMON);
+	public static final Item REINFORCED_OBSERVATION_GLASS = mat("reinforced_observation_glass", Rarity.RARE);
+	public static final Item SANCTUARY_STAINED_GLASS = mat("sanctuary_stained_glass", Rarity.RARE);
+	public static final Item ANOMALOUS_MIRROR_GLASS = mat("anomalous_mirror_glass", Rarity.EPIC);
+
+	// Factorio Circuits, Science Packs & Modules + Abiotic Factor Tech Bricks (GDD 5.2)
+	public static final Item GREEN_CIRCUIT = mat("green_circuit", Rarity.COMMON);
+	public static final Item RED_CIRCUIT = mat("red_circuit", Rarity.UNCOMMON);
+	public static final Item BLUE_CIRCUIT = mat("blue_circuit", Rarity.RARE);
+	public static final Item SCIENCE_PACK_YELLOW = mat("science_pack_yellow", Rarity.UNCOMMON);
+	public static final Item SCIENCE_PACK_GRAY = mat("science_pack_gray", Rarity.RARE);
+	public static final Item SCIENCE_PACK_PURPLE = mat("science_pack_purple", Rarity.EPIC);
+	public static final Item MODULE_SPEED = mat("module_speed", Rarity.RARE);
+	public static final Item MODULE_PRODUCTIVITY = mat("module_productivity", Rarity.RARE);
+	public static final Item MODULE_EFFICIENCY = mat("module_efficiency", Rarity.RARE);
+	public static final Item ENERGY_BRICK = mat("energy_brick", Rarity.UNCOMMON);
+	public static final Item COMPUTATION_BRICK = mat("computation_brick", Rarity.UNCOMMON);
+	public static final Item CONTROLLER_UNIT = mat("controller_unit", Rarity.UNCOMMON);
+
+	// =========================================================================
 	// 2. MONSTER DROPS & BOSS CORES (02_monsters_bosses_loot.md)
 	// =========================================================================
 	public static final Item HOUND_FANG = mat("hound_fang", Rarity.UNCOMMON);
@@ -255,6 +313,17 @@ public final class BackroomsItems {
 	public static final Item CRIMSON_WALLBREAKER = tool("crimson_wallbreaker", ToolMaterial.NETHERITE, 3, 1650, 9.0F, -3.0F, Rarity.RARE, "lore.noclip_backrooms.crimson_wallbreaker");
 	public static final Item VOID_DISRUPTOR = tool("void_disruptor", ToolMaterial.NETHERITE, 4, 2800, 10.0F, -2.6F, Rarity.EPIC, "lore.noclip_backrooms.void_disruptor");
 
+	// Abiotic Factor Precision Disassembly & Keypad Hackers T1-T4 (GDD 4.3 & 5.2)
+	public static final Item PRECISION_SCREWDRIVER = tool("precision_screwdriver", ToolMaterial.DIAMOND, 2, 640, 3.0F, -2.0F, Rarity.UNCOMMON, "lore.noclip_backrooms.precision_screwdriver");
+	public static final Item KEYPAD_HACKER_T1 = gear("keypad_hacker_t1", new Item.Properties().stacksTo(1).durability(120).rarity(Rarity.COMMON),
+			p -> new BackroomsToolItem(p, 1, "lore.noclip_backrooms.keypad_hacker_t1"));
+	public static final Item KEYPAD_HACKER_T2 = gear("keypad_hacker_t2", new Item.Properties().stacksTo(1).durability(240).rarity(Rarity.UNCOMMON),
+			p -> new BackroomsToolItem(p, 2, "lore.noclip_backrooms.keypad_hacker_t2"));
+	public static final Item KEYPAD_HACKER_T3 = gear("keypad_hacker_t3", new Item.Properties().stacksTo(1).durability(420).rarity(Rarity.RARE),
+			p -> new BackroomsToolItem(p, 3, "lore.noclip_backrooms.keypad_hacker_t3"));
+	public static final Item KEYPAD_HACKER_T4 = gear("keypad_hacker_t4", new Item.Properties().stacksTo(1).durability(800).rarity(Rarity.EPIC),
+			p -> new BackroomsToolItem(p, 4, "lore.noclip_backrooms.keypad_hacker_t4"));
+
 	public static final Item FLASHLIGHT_BATTERY_PACK = gear("flashlight_battery_pack", new Item.Properties().stacksTo(16),
 			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.BATTERY_PACK, "lore.noclip_backrooms.battery_pack"));
 	public static final Item TACTICAL_UV_FLASHLIGHT = gear("tactical_uv_flashlight", new Item.Properties().stacksTo(1).durability(450).rarity(Rarity.RARE),
@@ -268,7 +337,45 @@ public final class BackroomsItems {
 	public static final Item TRIPWIRE_SHRAPNEL_MINE = gear("tripwire_shrapnel_mine", new Item.Properties().stacksTo(16),
 			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.SHRAPNEL_MINE, "lore.noclip_backrooms.shrapnel_mine"));
 
-	// Gas Mask + 4 Full Armor Sets (17 pieces)
+	// GDD Survival Consumables, Extraction Anchor, Geodes, Coins, Utility & Forbidden Scrolls (GDD 2.3, 3.3, 5.2, 6.2-6.4)
+	public static final Item OLD_BANDAID = gear("old_bandaid", new Item.Properties().stacksTo(32),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.OLD_BANDAID, "lore.noclip_backrooms.old_bandaid"));
+	public static final Item EXPIRED_PAINKILLERS = gear("expired_painkillers", new Item.Properties().stacksTo(16),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.EXPIRED_PAINKILLERS, "lore.noclip_backrooms.expired_painkillers"));
+	public static final Item EXPIRED_CANNED_FOOD = gear("expired_canned_food", new Item.Properties().stacksTo(16),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.EXPIRED_CANNED_FOOD, "lore.noclip_backrooms.expired_canned_food"));
+	public static final Item RATION_BISCUIT = gear("ration_biscuit", new Item.Properties().stacksTo(32),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.RATION_BISCUIT, "lore.noclip_backrooms.ration_biscuit"));
+	public static final Item IMPROVISED_CALMING_TEA = gear("improvised_calming_tea", new Item.Properties().stacksTo(16),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.IMPROVISED_CALMING_TEA, "lore.noclip_backrooms.improvised_calming_tea"));
+	public static final Item ROUGH_BANDAGE = gear("rough_bandage", new Item.Properties().stacksTo(16),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.ROUGH_BANDAGE, "lore.noclip_backrooms.rough_bandage"));
+	public static final Item STERILE_BANDAGE = gear("sterile_bandage", new Item.Properties().stacksTo(16).rarity(Rarity.UNCOMMON),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.STERILE_BANDAGE, "lore.noclip_backrooms.sterile_bandage"));
+	public static final Item AGED_ALMOND_RESERVE = gear("aged_almond_reserve", new Item.Properties().stacksTo(16).rarity(Rarity.EPIC),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.AGED_ALMOND_RESERVE, "lore.noclip_backrooms.aged_almond_reserve"));
+	public static final Item MOLOTOV_COCKTAIL = gear("molotov_cocktail", new Item.Properties().stacksTo(16).rarity(Rarity.UNCOMMON),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.MOLOTOV_COCKTAIL, "lore.noclip_backrooms.molotov_cocktail"));
+	public static final Item TACTICAL_CORNER_MIRROR = gear("tactical_corner_mirror", new Item.Properties().stacksTo(1).durability(240).rarity(Rarity.UNCOMMON),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.TACTICAL_CORNER_MIRROR, "lore.noclip_backrooms.tactical_corner_mirror"));
+	public static final Item HOMEWARD_ANCHOR = gear("homeward_anchor", new Item.Properties().stacksTo(4).rarity(Rarity.EPIC),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.HOMEWARD_ANCHOR, "lore.noclip_backrooms.homeward_anchor"));
+	public static final Item LOST_OLD_COIN = gear("lost_old_coin", new Item.Properties().stacksTo(64).rarity(Rarity.UNCOMMON),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.LOST_OLD_COIN, "lore.noclip_backrooms.lost_old_coin"));
+	public static final Item RUSTED_OFFICE_SAFE = gear("rusted_office_safe", new Item.Properties().stacksTo(16).rarity(Rarity.RARE),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.GEODE_SAFE, "lore.noclip_backrooms.rusted_office_safe"));
+	public static final Item ENCRYPTED_HARD_DRIVE = gear("encrypted_hard_drive", new Item.Properties().stacksTo(16).rarity(Rarity.RARE),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.GEODE_DRIVE, "lore.noclip_backrooms.encrypted_hard_drive"));
+	public static final Item FORBIDDEN_SCROLL_LUCK = gear("forbidden_scroll_luck", new Item.Properties().stacksTo(16).rarity(Rarity.EPIC),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.FORBIDDEN_SCROLL_LUCK, "lore.noclip_backrooms.forbidden_scroll_luck"));
+	public static final Item FORBIDDEN_SCROLL_PSY = gear("forbidden_scroll_psy", new Item.Properties().stacksTo(16).rarity(Rarity.EPIC),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.FORBIDDEN_SCROLL_PSY, "lore.noclip_backrooms.forbidden_scroll_psy"));
+	public static final Item FORBIDDEN_SCROLL_TECH = gear("forbidden_scroll_tech", new Item.Properties().stacksTo(16).rarity(Rarity.EPIC),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.FORBIDDEN_SCROLL_TECH, "lore.noclip_backrooms.forbidden_scroll_tech"));
+
+	// Early Improvised Office Armor (GDD 6.2 & 6.4) + Gas Mask + 4 Full Armor Sets (19 pieces)
+	public static final Item MAGAZINE_ARMOR_CHESTPLATE = armor("magazine_armor_chestplate", BackroomsArmorMaterials.IMPROVISED_OFFICE, ArmorType.CHESTPLATE, Rarity.COMMON);
+	public static final Item SILENT_CARPET_BOOTS = armor("silent_carpet_boots", BackroomsArmorMaterials.IMPROVISED_OFFICE, ArmorType.BOOTS, Rarity.COMMON);
 	public static final Item ALMOND_GAS_MASK = armor("almond_gas_mask", BackroomsArmorMaterials.GAS_MASK, ArmorType.HELMET, Rarity.UNCOMMON);
 	public static final Item SCRAP_TACTICAL_HELMET = armor("scrap_tactical_helmet", BackroomsArmorMaterials.SCRAP_TACTICAL, ArmorType.HELMET, Rarity.UNCOMMON);
 	public static final Item SCRAP_TACTICAL_CHESTPLATE = armor("scrap_tactical_chestplate", BackroomsArmorMaterials.SCRAP_TACTICAL, ArmorType.CHESTPLATE, Rarity.UNCOMMON);
@@ -362,8 +469,10 @@ public final class BackroomsItems {
 
 	public static final Item GUN_RAILGUN = gun("gun_railgun", 4, List.of("ammo_rail_slug"), 38.0F, 1, 90.0F, 28, 0.002F, 1600, FireMode.RAILGUN_ARC, Rarity.EPIC);
 	public static final Item GUN_SONIC_PULSE = gun("gun_sonic_pulse", 3, List.of("almond_mana_cell"), 15.0F, 1, 16.0F, 20, 0.01F, 1100, FireMode.SONIC_PULSE, Rarity.EPIC);
+	public static final Item OFFICE_CROSSBOW = gun("office_crossbow", 1, List.of("ammo_pen_bolt"), 9.5F, 1, 32.0F, 18, 0.02F, 260, FireMode.SILENT_NAIL, Rarity.COMMON);
 
-	// 11 Ammo Types
+	// 12 Ammo Types
+	public static final Item AMMO_PEN_BOLT = ammo("ammo_pen_bolt", Rarity.COMMON);
 	public static final Item AMMO_SCRAP_SLUG = ammo("ammo_scrap_slug", Rarity.COMMON);
 	public static final Item AMMO_STEEL_NAILS = ammo("ammo_steel_nails", Rarity.COMMON);
 	public static final Item AMMO_9MM = ammo("ammo_9mm", Rarity.COMMON);
@@ -385,8 +494,9 @@ public final class BackroomsItems {
 	public static final Item MOD_BAYONET = ammo("mod_bayonet", Rarity.UNCOMMON);
 
 	// =========================================================================
-	// 7. MAGIC & ANOMALY WEAPONS (06_weapons_magic_and_chests.md: 19 items)
+	// 7. MAGIC & ANOMALY WEAPONS (06_weapons_magic_and_chests.md + GDD 6.2B: 20 items)
 	// =========================================================================
+	public static final Item STATIC_PULSE_STAFF = magic("static_pulse_staff", 1, Spell.STATIC_PULSE, "", 24, 4.0F, 0.0F, 340, 1, Rarity.UNCOMMON);
 	public static final Item MAGIC_PHOSPHOR_TALISMAN = magic("magic_phosphor_talisman", 1, Spell.PHOSPHOR_TALISMAN, "SELF", 16, 0.0F, 0.0F, 0, 16, Rarity.UNCOMMON);
 	public static final Item MAGIC_ALMOND_CENSER = magic("magic_almond_censer", 2, Spell.ALMOND_CENSER, "almond_water", 60, 0.0F, 0.0F, 400, 1, Rarity.UNCOMMON);
 	public static final Item MAGIC_SCREECH_BELL = magic("magic_screech_bell", 2, Spell.SCREECH_BELL, "", 160, 0.0F, 0.0F, 420, 1, Rarity.RARE);
@@ -434,6 +544,9 @@ public final class BackroomsItems {
 				ItemStack legs = player.getItemBySlot(EquipmentSlot.LEGS);
 				ItemStack feet = player.getItemBySlot(EquipmentSlot.FEET);
 
+				if (feet.is(SILENT_CARPET_BOOTS)) {
+					player.addEffect(new MobEffectInstance(MobEffects.SPEED, 80, 0, true, false));
+				}
 				if (head.is(ALMOND_GAS_MASK)) {
 					player.removeEffect(MobEffects.POISON);
 					player.removeEffect(MobEffects.NAUSEA);

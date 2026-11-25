@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " N ",
+    "NWN",
+    " H "
+  ],
+  "key": {
+    "N": "noclip_backrooms:screw_nail_box",
+    "W": "noclip_backrooms:broken_table_leg",
+    "H": "noclip_backrooms:weapon_grip_wrap"
+  },
+  "result": {
+    "id": "noclip_backrooms:blunt_barbed_kanabo",
+    "count": 1
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "S S",
+    "SSS",
+    "SSS"
+  ],
+  "key": {
+    "S": "noclip_backrooms:heavy_steel_plate"
+  },
+  "result": {
+    "id": "noclip_backrooms:scrap_tactical_chestplate",
+    "count": 1
+  }
+}

@@ -9,6 +9,7 @@
 		"EntityRenderDispatcherHallucination",
 		"FogRendererDarkness",
 		"GameRendererAccess",
+		"ItemInHandLayerBlenderWeapons",
 		"ItemInHandRendererWeaponAnimation",
 		"LightmapFalloff",
 		"MinecraftFirearmInput"

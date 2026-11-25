@@ -132,6 +132,11 @@ public final class BackroomsMeleeItem extends Item {
 	public void postHurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
 		super.postHurtEnemy(stack, target, attacker);
 		if (!(attacker.level() instanceof ServerLevel serverLevel)) return;
+		float evoBonus = (WeaponEvolution.damageMultiplier(stack) - 1.0F) * baseDamage;
+		if (evoBonus > 0.05F && target.isAlive()) {
+			target.invulnerableTime = 0;
+			target.hurtServer(serverLevel, attacker instanceof Player p ? serverLevel.damageSources().playerAttack(p) : serverLevel.damageSources().mobAttack(attacker), evoBonus);
+		}
 		if (attacker instanceof ServerPlayer sp) {
 			BackroomsWeaponNetworking.sendHitmarker(sp, !target.isAlive());
 		}
@@ -247,6 +252,7 @@ public final class BackroomsMeleeItem extends Item {
 
 		Vec3 eye = player.getEyePosition();
 		Vec3 look = player.getLookAngle();
+		float evoMult = WeaponEvolution.damageMultiplier(stack);
 
 		switch (trait) {
 			case VOID_WAVE -> {
@@ -254,7 +260,7 @@ public final class BackroomsMeleeItem extends Item {
 					Vec3 p = eye.add(look.scale(i * 1.1));
 					serverLevel.sendParticles(ParticleTypes.PORTAL, p.x, p.y, p.z, 8, 0.3, 0.3, 0.3, 0.05);
 					for (LivingEntity e : serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(p, p).inflate(1.3), ent -> ent != player)) {
-						e.hurtServer(serverLevel, serverLevel.damageSources().magic(), 11.0F);
+						e.hurtServer(serverLevel, serverLevel.damageSources().magic(), 11.0F * evoMult);
 					}
 				}
 				serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.7F, 0.7F);
@@ -266,7 +272,7 @@ public final class BackroomsMeleeItem extends Item {
 						new AABB(eye, end).inflate(1.5), e -> e != player);
 				if (!targets.isEmpty()) {
 					LivingEntity t = targets.getFirst();
-					t.hurtServer(serverLevel, serverLevel.damageSources().playerAttack(player), 10.0F);
+					t.hurtServer(serverLevel, serverLevel.damageSources().playerAttack(player), 10.0F * evoMult);
 					Vec3 pull = player.position().subtract(t.position()).normalize().scale(0.95);
 					t.setDeltaMovement(pull.x, 0.35, pull.z);
 				}
@@ -281,7 +287,7 @@ public final class BackroomsMeleeItem extends Item {
 						if (step % 3 == 0) serverLevel.sendParticles(ParticleTypes.CRIT, p.x, p.y, p.z, 1, 0, 0, 0, 0);
 						List<LivingEntity> hit = serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(p, p).inflate(0.75), e -> e != player);
 						if (!hit.isEmpty()) {
-							hit.getFirst().hurtServer(serverLevel, serverLevel.damageSources().playerAttack(player), 6.0F);
+							hit.getFirst().hurtServer(serverLevel, serverLevel.damageSources().playerAttack(player), 6.0F * evoMult);
 							break;
 						}
 					}
@@ -295,7 +301,7 @@ public final class BackroomsMeleeItem extends Item {
 				player.removeEffect(MobEffects.NAUSEA);
 				player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 300, 0));
 				for (LivingEntity m : serverLevel.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(8.0), e -> e instanceof Monster)) {
-					m.hurtServer(serverLevel, serverLevel.damageSources().magic(), 8.0F);
+					m.hurtServer(serverLevel, serverLevel.damageSources().magic(), 8.0F * evoMult);
 					pushBack(m, 1.2, m.getX() - player.getX(), m.getZ() - player.getZ());
 					m.addEffect(new MobEffectInstance(MobEffects.GLOWING, 200, 0));
 				}
@@ -333,6 +339,7 @@ public final class BackroomsMeleeItem extends Item {
 			case CHINESE -> "tooltip.noclip_backrooms.style.chinese";
 		};
 		adder.accept(Component.translatable("tooltip.noclip_backrooms.weapon_tier", tier, Component.translatable(styleKey)).withStyle(color));
+		WeaponEvolution.appendTooltip(stack, adder);
 		if (loreKey != null && !loreKey.isEmpty()) {
 			adder.accept(Component.translatable(loreKey).withStyle(ChatFormatting.GRAY));
 		}

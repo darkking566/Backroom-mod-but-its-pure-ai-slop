@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " M ",
+    " N ",
+    " M "
+  ],
+  "key": {
+    "M": "noclip_backrooms:sheet_metal",
+    "N": "noclip_backrooms:screw_nail_box"
+  },
+  "result": {
+    "id": "noclip_backrooms:ammo_steel_nails",
+    "count": 16
+  }
+}

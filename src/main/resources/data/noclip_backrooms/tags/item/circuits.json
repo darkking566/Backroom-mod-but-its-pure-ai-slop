@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "noclip_backrooms:old_circuit_board",
+    "noclip_backrooms:green_circuit",
+    "noclip_backrooms:red_circuit",
+    "noclip_backrooms:blue_circuit"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " A ",
+    "OSO",
+    "OOO"
+  ],
+  "key": {
+    "A": "noclip_backrooms:anomaly_crystal",
+    "O": "minecraft:obsidian",
+    "S": "noclip_backrooms:red_room_shard"
+  },
+  "result": {
+    "id": "noclip_backrooms:anomaly_altar",
+    "count": 1
+  }
+}

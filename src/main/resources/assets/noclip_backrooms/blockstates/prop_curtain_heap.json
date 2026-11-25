@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "noclip_backrooms:block/crafting/prop_curtain_heap" },
+    "facing=east":  { "model": "noclip_backrooms:block/crafting/prop_curtain_heap", "y": 90 },
+    "facing=south": { "model": "noclip_backrooms:block/crafting/prop_curtain_heap", "y": 180 },
+    "facing=west":  { "model": "noclip_backrooms:block/crafting/prop_curtain_heap", "y": 270 }
+  }
+}

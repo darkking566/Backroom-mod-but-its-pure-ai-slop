@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "noclip_backrooms:sterile_gauze",
+    "noclip_backrooms:sterile_gauze",
+    "noclip_backrooms:rubbing_alcohol",
+    "noclip_backrooms:insulating_tape"
+  ],
+  "result": { "id": "noclip_backrooms:sterile_bandage", "count": 1 }
+}

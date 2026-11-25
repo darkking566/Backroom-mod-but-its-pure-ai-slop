@@ -5,6 +5,7 @@ import com.mojang.math.Axis;
 import dev.noclip.backrooms.weapons.BackroomsFirearmItem;
 import dev.noclip.backrooms.weapons.BackroomsMagicItem;
 import dev.noclip.backrooms.weapons.BackroomsMeleeItem;
+import dev.noclip.backrooms.weapons.BlenderWeaponRenderer;
 import dev.noclip.backrooms.weapons.WeaponAnimState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -67,7 +68,11 @@ public abstract class ItemInHandRendererWeaponAnimation {
 			animateMagic((BackroomsMagicItem) stack.getItem(), side, swingProgress, equipProgress, partialTicks, time, poseStack);
 		}
 
-		renderItem(player, stack, ctx, poseStack, collector, light);
+		if (BlenderWeaponRenderer.hasBlenderMesh(stack)) {
+			BlenderWeaponRenderer.renderFirstPerson(stack, rightHand, time, poseStack, collector, light);
+		} else {
+			renderItem(player, stack, ctx, poseStack, collector, light);
+		}
 		poseStack.popPose();
 		ci.cancel();
 	}

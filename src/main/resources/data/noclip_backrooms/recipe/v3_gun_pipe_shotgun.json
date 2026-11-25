@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "PPP",
+    "WTR",
+    "W  "
+  ],
+  "key": {
+    "P": "noclip_backrooms:copper_pipe",
+    "W": "noclip_backrooms:broken_table_leg",
+    "T": "noclip_backrooms:insulating_tape",
+    "R": "noclip_backrooms:metal_spring"
+  },
+  "result": {
+    "id": "noclip_backrooms:gun_pipe_shotgun",
+    "count": 1
+  }
+}

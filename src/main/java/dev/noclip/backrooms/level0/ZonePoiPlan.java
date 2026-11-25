@@ -129,6 +129,20 @@ final class ZonePoiPlan {
 		return isStandardPoiCell(seed, cx, cz);
 	}
 
+	static boolean isAnyPoiBlock(long seed, int x, int z) {
+		int cx = Math.floorDiv(x, Maze.CELL);
+		int cz = Math.floorDiv(z, Maze.CELL);
+		if (isProtectedCell(seed, cx, cz)) return true;
+		int chasmBaseCx = Math.floorDiv(cx, ChasmPlan.MACRO_CELLS) * ChasmPlan.MACRO_CELLS;
+		int chasmBaseCz = Math.floorDiv(cz, ChasmPlan.MACRO_CELLS) * ChasmPlan.MACRO_CELLS;
+		ChasmOutpost outpost = chasmOutpostInMacro(seed, chasmBaseCx, chasmBaseCz);
+		if (outpost != null && outpost.cx() == cx && outpost.cz() == cz) return true;
+		int megaBaseCx = Math.floorDiv(cx, MegahallPlan.MACRO_CELLS) * MegahallPlan.MACRO_CELLS;
+		int megaBaseCz = Math.floorDiv(cz, MegahallPlan.MACRO_CELLS) * MegahallPlan.MACRO_CELLS;
+		MegahallLounge lounge = megahallLoungeInMacro(seed, megaBaseCx, megaBaseCz);
+		return lounge != null && lounge.cx() == cx && lounge.cz() == cz;
+	}
+
 	static BlockState chasmBlockAt(long seed, int y, int cx, int cz, int ix, int iz, int floorY, int ceilY) {
 		if (floorY == Integer.MIN_VALUE || y < floorY || y > ceilY) return null;
 		int baseCx = Math.floorDiv(cx, ChasmPlan.MACRO_CELLS) * ChasmPlan.MACRO_CELLS;

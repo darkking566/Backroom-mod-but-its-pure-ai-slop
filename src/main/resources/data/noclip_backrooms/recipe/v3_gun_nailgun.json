@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "PPP",
+    "MNB",
+    "  H"
+  ],
+  "key": {
+    "P": "noclip_backrooms:plastic_casing",
+    "M": "noclip_backrooms:sheet_metal",
+    "N": "noclip_backrooms:screw_nail_box",
+    "B": "noclip_backrooms:battery_cell",
+    "H": "noclip_backrooms:weapon_grip_wrap"
+  },
+  "result": {
+    "id": "noclip_backrooms:gun_nailgun",
+    "count": 1
+  }
+}

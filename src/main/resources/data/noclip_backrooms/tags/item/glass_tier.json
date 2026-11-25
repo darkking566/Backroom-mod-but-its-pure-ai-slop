@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "noclip_backrooms:glass_tube_shard",
+    "noclip_backrooms:office_glass",
+    "noclip_backrooms:auto_safety_glass",
+    "noclip_backrooms:wire_mesh_glass",
+    "noclip_backrooms:reinforced_observation_glass",
+    "noclip_backrooms:sanctuary_stained_glass",
+    "noclip_backrooms:anomalous_mirror_glass",
+    "noclip_backrooms:prism_glass"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ISI",
+    "SWS",
+    "ISI"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "S": "noclip_backrooms:heavy_steel_plate",
+    "W": "noclip_backrooms:workshop_bench"
+  },
+  "result": {
+    "id": "noclip_backrooms:spiderweb_crafting_table",
+    "count": 1
+  }
+}

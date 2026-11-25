@@ -20,6 +20,7 @@ import net.minecraft.resources.Identifier;
  */
 public final class BackroomsArmorModels {
 	public enum ArmorSet {
+		IMPROVISED_OFFICE("improvised_office", false),
 		GAS_MASK("almond_gas_mask", true),
 		SCRAP_TACTICAL("scrap_tactical", true),
 		SKIN_STEALER("skin_stealer", false),
@@ -102,6 +103,7 @@ public final class BackroomsArmorModels {
 
 	public static LayerDefinition createMainLayer(ArmorSet set) {
 		return switch (set) {
+			case IMPROVISED_OFFICE -> buildImprovisedOfficeMain();
 			case GAS_MASK -> buildGasMask();
 			case SCRAP_TACTICAL -> buildScrapTacticalMain();
 			case SKIN_STEALER -> buildSkinStealerMain();
@@ -112,12 +114,33 @@ public final class BackroomsArmorModels {
 
 	public static LayerDefinition createLegsLayer(ArmorSet set) {
 		return switch (set) {
-			case GAS_MASK -> LayerDefinition.create(blankHumanoidMesh(), 256, 256);
+			case IMPROVISED_OFFICE, GAS_MASK -> LayerDefinition.create(blankHumanoidMesh(), 256, 256);
 			case SCRAP_TACTICAL -> buildScrapTacticalLegs();
 			case SKIN_STEALER -> buildSkinStealerLegs();
 			case BOILER_THERMAL -> buildBoilerThermalLegs();
 			case ABYSSAL_VOID -> buildAbyssalVoidLegs();
 		};
+	}
+
+	/** Magazine Tape Chestplate (stacked yellowed magazines strapped with dark tape) + Silent Carpet Boots. */
+	private static LayerDefinition buildImprovisedOfficeMain() {
+		MeshDefinition mesh = blankHumanoidMesh();
+		PartDefinition root = mesh.getRoot();
+		PartDefinition body = root.getChild("body");
+		body.addOrReplaceChild("magazine_plates", CubeListBuilder.create()
+				.texOffs(U0, V0).addBox(-4.5F, 0.2F, -2.9F, 9.0F, 11.2F, 5.8F)
+				.texOffs(U1, V0).addBox(-4.7F, 2.2F, -3.15F, 9.4F, 1.4F, 6.3F)
+				.texOffs(U1, V0).addBox(-4.7F, 7.6F, -3.15F, 9.4F, 1.4F, 6.3F)
+				.texOffs(U2, V0).addBox(-3.6F, 3.8F, -3.25F, 7.2F, 3.6F, 0.5F), PartPose.ZERO);
+		root.getChild("right_arm").addOrReplaceChild("mag_sleeve_r", CubeListBuilder.create()
+				.texOffs(U0, V0).addBox(-3.5F, -2.2F, -2.5F, 4.9F, 5.6F, 5.0F)
+				.texOffs(U1, V0).addBox(-3.65F, 0.4F, -2.65F, 5.2F, 1.2F, 5.3F), PartPose.ZERO);
+		root.getChild("left_arm").addOrReplaceChild("mag_sleeve_l", CubeListBuilder.create()
+				.texOffs(U0, V0).addBox(-1.4F, -2.2F, -2.5F, 4.9F, 5.6F, 5.0F)
+				.texOffs(U1, V0).addBox(-1.55F, 0.4F, -2.65F, 5.2F, 1.2F, 5.3F), PartPose.ZERO);
+		addArmoredBoot(root.getChild("right_leg"), U0, V1, U1, V1, U1, V0);
+		addArmoredBoot(root.getChild("left_leg"), U0, V1, U1, V1, U1, V0);
+		return LayerDefinition.create(mesh, 256, 256);
 	}
 
 	private static LayerDefinition buildGasMask() {

@@ -36,6 +36,14 @@
     "noclip_backrooms:legend_floor_line",
     "noclip_backrooms:legend_ceiling",
     "noclip_backrooms:pallet_stack",
-    "noclip_backrooms:gallery_wall"
+    "noclip_backrooms:gallery_wall",
+    "noclip_backrooms:prop_wood_chair",
+    "noclip_backrooms:prop_wood_chair_pile",
+    "noclip_backrooms:prop_folding_table",
+    "noclip_backrooms:prop_sofa",
+    "noclip_backrooms:prop_sofa_noclipped",
+    "noclip_backrooms:prop_cardboard_pile",
+    "noclip_backrooms:prop_standing_mirror",
+    "noclip_backrooms:prop_curtain_heap"
   ]
 }

@@ -70,6 +70,9 @@ public final class BackroomsArmorRenderer implements ArmorRenderer {
 			ModelLayerRegistry.registerModelLayer(set.legsLayer(), () -> BackroomsArmorModels.createLegsLayer(set));
 		}
 
+		registerSet(ArmorSet.IMPROVISED_OFFICE,
+				BackroomsItems.MAGAZINE_ARMOR_CHESTPLATE,
+				BackroomsItems.SILENT_CARPET_BOOTS);
 		registerSet(ArmorSet.GAS_MASK, BackroomsItems.ALMOND_GAS_MASK);
 		registerSet(ArmorSet.SCRAP_TACTICAL,
 				BackroomsItems.SCRAP_TACTICAL_HELMET,

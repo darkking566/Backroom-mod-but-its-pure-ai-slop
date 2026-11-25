@@ -283,6 +283,34 @@
   - 驗證：Level 2 單元測試 11 項（強制重跑）與 `runClientGameTest -Plevels=2` 通過；截圖看到警告牌斜紋、長方形白漆磚；EL3A 截圖對著門，提燈與箱子朝向沒拍到；白漆磚的剝落花紋仍每格重複
   - 等 Antigravity 同時在跑的實機測試結束後才跑自己的（第一次因 `build/run` 被占用失敗）
 - 使用者同意後，抓 GitHub 合併朋友新推的 10 個提交（合成系統、327 個物品 3D 模型、RPG 狀態列、各層畫面標準與光影測試等），沒有衝突；合併後 `gradlew build`（77 個單元測試）與 `runClientGameTest -Plevels=2` 通過（中途一次編譯失敗是別的 Gradle 同時寫 `build/classes`，重跑就過），把 `main` 推送到 GitHub；Antigravity 未提交的 Level 1 改動沒有一起提交；沒有強制推送、沒有改寫歷史
+- 使用者給了規格書 `docs/企劃書/backrooms_mod_design_spec.md`（使用者自己放的，沒動），要求做主世界據點與商人；使用者決定：照規格書用永久帳戶、每個村莊旁都有公會、Claude 做公會與商人、Gemini 照規格書對齊材料、貼圖照規格書改 128（牆地天花）／64（道具）、Level 0 天花板高度先不改（要跟朋友討論）：
+  - 永久帳戶（`core/economy`）：`Wallet`（玩家附加資料，死亡保留、只同步給本人）、兩種錢幣 `lost_coin`（10 點）、`static_tape`（40 點），右鍵存入；測試指令 `/backrooms money get|add|set`；背包下方顯示帳戶餘額（客戶端 `WalletClient`）
+  - 錢幣放進停車場補給箱、有眼睛的箱子、殘骸堆、Level 2 的 EL3A 儲物箱與礦車、Level 3 的 M.E.G. 補給箱（各加一段掉落池）；Level 0 是朋友的，沒加
+  - 商店（`core/trade`）：右鍵有角色標籤的人形開商店，伺服器檢查距離 8 格、帳戶、身上的東西；貨單是資料檔 `data/noclip_backrooms/shops/buyer|supplier|quartermaster.json`（收購商收材料與怪物素材、補給商賣藥品食物照明、軍需官賣武器彈藥護甲，好槍要錢＋材料），物品 ID 用 Gemini 的；客戶端商店畫面 `ShopScreen`（Shift 一次 8 份）
+  - 公會（`core/guild`）：結構的放置規則照抄原版村莊（同鹽值與間距），先確認村莊生態域，再在村莊起點外 88～96 格、地面平坦又不是水的地方蓋；門朝村莊、依村莊換材料（平原、沙漠、莽原、雪原、針葉林）；裡面有收購商、補給商、軍需官、會長（`core/people` 的人形，不會動、打不死、頭會轉向玩家）、4 張床、箱子、Gemini 的四座工作台、公告欄木牌，煙囪上有狼煙；門口有小路通往村莊、路口立指路牌；公會裡不生怪物
+  - 新增 `tools/make_economy_items.py`（錢幣圖示，預覽 `docs/guild/items.png`）、說明 `docs/guild.md`、實機測試 `guild/GuildClientTest`（`-Plevels=guild`）；`BackroomsMod`、`BackroomsClient` 各加幾行註冊；語言檔加 52 條
+  - 寫好還沒編譯就讓使用者的 play.bat 打不開：用了 26.2 已改名的寫法（彩色方塊改成 `Blocks.BED.yellow()` 這種、創造模式分頁改 `CreativeModeTabEvents`、開畫面改 `client.gui.setScreen`），修好後編譯通過
+  - `runClientGameTest -Plevels=guild` 通過：在莽原村莊旁找到公會（村莊起點外約 80 格），門、狼煙、木牌字、四個人、小路都在；右鍵收購商開商店、賣廢金屬、存硬幣、離太遠不能交易、錢不夠、材料不夠、買槍、買繃帶、死掉後帳戶還在；截圖看過外觀、內部、商店、背包餘額。`gradlew build`（單元測試）這次沒跑（使用者要開遊戲）
+  - 本機 Java 25 換了位置：`C:/Program Files/Java/jdk-25.0.4.1` 已不存在，現在是 `C:/Program Files/Microsoft/jdk-25.0.5.102-hotspot`
+  - 照規格書 7.1 改 `docs/look/STYLE_GUIDE.md`、`SOP.md` 的貼圖尺寸（整格的面 128、道具 64），新增 `tools/resize_realistic.py`（照模型判斷是整格的面還是道具再縮小）；寫實材質包還沒實際縮
+- 使用者玩完後：`gradlew build`（77 個單元測試）通過
+- 使用者覺得木造公會醜，要求改石磚或其他建材：
+  - `GuildPalette` 全改石材：平原石磚＋深板岩柱＋石板屋頂、沙漠切製砂岩＋紅砂岩屋頂、莽原紅磚、雪原石磚＋黑石屋頂、針葉林凝灰岩磚；牆裡零星混風化石磚（依位置決定，跨區塊一致）；只有門、木牌、床是木頭
+  - 屋簷下加一圈倒置樓梯飾邊、屋脊加半磚、門口燈柱與小路燈柱改石牆柱
+  - 新增測試指令 `/backrooms guild place <plains|desert|savanna|snowy|taiga>`（`Guilds.place`、`GuildPiece.placeNow`、共用的 `GuildPiece.facingFront`）；生成時寫木牌字後，若是在已載入的世界裡蓋就通知玩家更新
+  - `GuildClientTest` 最後在半空草地上把五種樣式各蓋一座拍正面；`runClientGameTest -Plevels=guild` 通過，合成圖 `docs/guild/styles.png`
+- 寫實材質包照規格書縮小：跑 `tools/resize_realistic.py`，789 張整格的面縮成 128×128、234 張道具縮成 64×64（含 `_n`、`_s`），資源包從 159 MB 變 18 MB；`make_level0_realistic.py`、`make_level0p1_realistic.py`、Gemini 的 `make_level2_realistic.py` 最後各加幾行，存完自動縮小，重跑也不會變回 512；`docs/look/README.md` 跟著改；`runClientGameTest -Plevels=look` 通過，截圖看過 Level 0 壁紙、天花板、地毯在 128 下仍清楚。Level 0.1、Level 2 的寫實材質這次沒進遊戲看
+- 使用者覺得公會「太簡單（簡單的斜屋頂）」，要精緻：`GuildPiece` 重畫（範圍變 30×27×24）
+  - 大廳：兩層樓立面（深色牆腳、一樓高窗、腰線、二樓小窗、頂線，側面只開二樓窗）、四坡屋頂（轉角用外角樓梯）、前後坡各兩個老虎窗、屋脊壓半磚、側面與後面一圈石階基座；兩根煙囪（一根狼煙、一根一般的煙）；內部挑高 8 格，橫樑上用鐵鍊吊燈
+  - 正面中央 8×8 塔樓：牆高 16、四坡尖頂、圓拱雙開門、門上公會名牌、高處兩面旗、門廊天花板與上層房間的燈；塔樓兩側石柱廊（吊燈、長椅）；前院兩塊花圃（沙漠是仙人掌、枯灌木）、四支燈柱
+  - 內部家具與商人的相對位置不變（用 `put` 平移到新的大廳位置）；調色盤加 `roofBlock`、`roofSlab`、`soil`；選址量高度的取樣點、`GuildClientTest` 的座標跟著改；測試的五種樣式改成先載入再一格一格鋪草地（`/fill` 遇到沒載入的區塊會失敗，房子地基一路長到地面）
+  - `runClientGameTest -Plevels=guild` 通過，看過村莊旁實際生成的、五種樣式與室內截圖，更新 `docs/guild/styles.png`、`docs/guild.md`
+- 使用者說 Gemini 的工作台做好了、覺得可以；問物品武器裝備的建模（Gemini 做的）是不是讓 Claude 設計會更好。看過 `docs/items` 的 458 張渲染圖與遊戲裡的畫法後回答：問題主要是風格跟樓層對不上（乾淨亮面、霓虹發光、武器是另外畫的曲面網格、貼圖重複），建議先試做 8 個並排比較；使用者同意
+- Claude 試作模型（比較用，不動 Gemini 的模型與貼圖）：
+  - 新增內建資源包「後室：Claude 試作模型」（`resourcepacks/claude_trial/`，預設關閉；客戶端 `core/look/TrialPack` 登記與判斷），換掉 8 樣：生鏽鐵管、撬棍、穿牆短杖、土製鐵管手槍、銅線、杏仁藥水、辦公椅、映像管電腦
+  - 新增 `tools/make_trial_items.py`：26 種 64×64 材質（ambientCG CC0：Rust004、Metal032、Metal049A、Wood051、Fabric028，加 Level 0 寫實壁紙；附 `_n`／`_s`；照片快取在 `tools/.cache/`），方塊模型由程式組出；拿在手上的角度自己調過（Gemini 模型裡那組沒被真的用過：它的武器在手上是畫 Blender 網格）；材質總覽 `docs/look/trial_materials.png`
+  - 動到 Gemini 的檔案：`BlenderWeaponRenderer.hasBlenderMesh` 加一個判斷、`BlenderPropRenderer` 在試作包開著時改畫方塊模型（`submitMovingBlock`，因為家具方塊設成隱形）；包關掉時完全照舊
+  - 新增實機測試 `trial/TrialClientTest`（`-Plevels=trial`：在 Level 0 圍小房間擺兩件家具，六樣東西輪流拿在手上，背包，試作包關／開各拍一輪），通過；並排比較圖 `docs/look/trial/`（`props`、`props_close`、`hands`、`inventory`）；`BackroomsClient` 加一行、語言檔加 2 條、`docs/look/README.md` 加說明
 
 - Level 1 審查報告第二批（家具朝向）：
   - 有方向的方塊（`ShapedBlock` 的子類別有 `facing` 時）選取框與碰撞箱跟著模型轉（`Shapes.rotateHorizontal`），電腦、發電機、車、販賣機、配電櫃等一起受益；車與廂型車的碰撞箱仍只有 1 格（模型超出 1 格的部分可穿過）
@@ -375,6 +403,10 @@
 - 使用者同意後，把 `main` 推送到 GitHub（`cc8d4a9` 收費亭抽屜背面與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 - Level 1 審查報告：花園植物的畫風：新增 `tools/make_garden_plants.py`（只寫這 5 張，不重跑 `make_level1.py`），草叢、蕨類、藍／紅／黃野花改成有明暗的寫實手繪：每片葉子與草葉由根部暗到葉尖亮、中肋一側亮一側暗，草裡夾乾黃的葉、蕨葉尖端有枯褐，野花是好幾枝不同高度、花瓣大小不一、顏色偏灰、有花苞；1024 像素畫好後輸出寫實材質包 512 像素與模組 128 像素，加 `_n`／`_s`（葉子有一點透光）；`make_level1_realistic.py` 改成跳過這 5 張（不然重跑會用 128 像素放大蓋掉）；預覽 `docs/look/level1_garden_plants.png`、遊戲畫面 `docs/look/level1_garden_plants_ingame.png`；`Level1ClientTest` 新增 `gardenPlants` 段（苔蘚上一排近照）；`gradlew build` 與 `-Psections=sectors,views,gardenPlants` 通過
 - 使用者同意後，把 `main` 推送到 GitHub（`ab45c13` 花園植物重畫與這筆紀錄；Level 1 審查報告全部處理完）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- 使用者看過試作比較後說「看起來更好」，要求推上 GitHub 並接著把其他物品全部做好：
+  - 推送前抓 GitHub：朋友那邊新推了 33 個提交（停車場審查報告各批、Level 2 磚牆四種畫法、Level 0.1 樓梯頭頂空間等），合併時只有 `CLAUDE.md` 衝突（兩邊的 Antigravity 紀錄都保留）
+  - 朋友新加的 741 張寫實貼圖是 512（停車場 714、Level 2 磚牆 27），照規格書用 `tools/resize_realistic.py` 縮成 128／64；`make_level1_realistic.py`、`make_garden_plants.py` 最後也加上存完自動縮小；資源包 32 MB；`runClientGameTest -Plevels=1 -Psections=gardenPlants` 通過，截圖看過停車場水泥、標誌、花園植物在 128 下仍清楚
+  - 合併後 `gradlew build`（81 個單元測試）通過
 
 ## 動作記錄（Antigravity）
 
@@ -509,6 +541,61 @@
 - 依使用者要求推送 `main` 至 GitHub（`origin/main`）：先合併遠端新增的 12 個提交（Level 0.1 細節／背景故事／房間海／多型態房間與 Level 2 怪物／設施／異常／場景細節，`36b45b4`），保留雙邊 `CLAUDE.md` 與 `en_us.json`／`zh_tw.json` 全部條目，驗證 `gradlew build` 通過後正常推送（無強制推送、無改寫歷史）
 - Level 2 延伸 512px 寫實材質包（Antigravity）：新增 `tools/make_level2_realistic.py` 採用 ambientCG CC0 照片素材（`Concrete034`/`019`、`Bricks075A`、`Metal032`/`049A`、`Rust004`、`Wood051`、`Ice003`、`Wallpaper002A/B/C`）產出 Level 2 全數 102 組 512×512 貼圖與 labPBR `_n`／`_s` 貼圖（共 306 張）至 `src/main/resources/resourcepacks/realistic/assets/noclip_backrooms/textures/block/level2/`，並產生前後對比圖 `docs/look/level2_realistic.png` 與更新 `pack.mcmeta` 及中英文語言檔說明；`.\gradlew test --tests "dev.noclip.backrooms.level2.*"` 與 `.\gradlew runClientGameTest -Plevels=2` 全部通過
 - Level 2 新增非門類型隱藏出口（Antigravity）：新增極端高溫區滯留 40 秒觸發 `LevelExits.use(player, "127")`（`Level2Heat.tickHeat`）、異常錯位牆 `noclip_wall`（`Level2NoclipWallBlock` 無碰撞可走入或右鍵互動，並於背牆實心處生成，觸發 `LevelExits.use(player, "2.1")`；含 `tools/make_level2_noclip_wall.py` 128px 貼圖與 `realistic` 512px labPBR 貼圖），以及辦公室死路空間迴圈連觸 3 次崩解送回 `"1"`（`Level2Heat.tickOfficeLoop`）；補上中英文提示詞並將 `noclip_wall` 判斷直接寫入 `Level2ChunkGenerator.block()` 確保 `blockAt` 與區塊生成一致；`.\gradlew test --tests "dev.noclip.backrooms.level2.*"` 與 `.\gradlew runClientGameTest -Plevels=2` 全部通過
+- 依使用者要求對齊新版總企劃書 `docs/企劃書/backrooms_mod_design_spec.md` 與各層收集規劃 `docs/levels/MATERIALS.md` 並新增全部對應物品、方塊、3D 模型與合成表（尚未提交）：
+  - **新增 73 件 3D 物品**（`BackroomsItems.java`、`BackroomsConsumableItem.java`、`BackroomsMagicItem.java`、`BackroomsArmorMaterials.java`）：
+    - Level 0 文具／辦公回收／家電零件／陽春醫療糧食（`rags`、`broken_table_leg`、`screw_nail_box`、`insulating_tape`、`super_glue`、`stapler`、`ballpoint_pen`、`rubber_band_ball`、`magazine_bundle`、`broken_mirror_shard`、`case_fan`、`crt_tube`、`flickering_lamp_tube`、`office_keyboard`、`landline_phone`、`empty_plastic_bottle`、`sterile_gauze`、`rubbing_alcohol`、`old_bandaid`、`expired_painkillers`、`expired_canned_food`、`ration_biscuit`、`dry_soil_herbs`、`improvised_calming_tea`）
+    - 貿易品、盲盒、深層獎勵、撤離與禁忌卷軸（`static_cassette`、`lost_old_coin`、`rusted_office_safe`、`encrypted_hard_drive`、`noclip_shard`、`fire_salt`、`smiler_eyeball`、`rusted_stairwell_key`、`level_keycard`、`retro_terminal`、`aged_almond_reserve`、`homeward_anchor`、`forbidden_scroll_luck/psy/tech`）
+    - 《異星工廠》三色電路（`green_circuit`、`red_circuit`、`blue_circuit`）、三色研究瓶（`science_pack_yellow/gray/purple`）、插件晶片（`module_speed/productivity/efficiency`）與《非生物因素》科技積木（`energy_brick`、`computation_brick`、`controller_unit`）、精密拆解螺絲起子與密碼門駭客器 Tier 1–4（`keypad_hacker_t1..t4`）
+    - 早期裝備與武器（`rough_bandage`、`sterile_bandage`、`molotov_cocktail`、`tactical_corner_mirror`、`office_crossbow`＋`ammo_pen_bolt`、`static_pulse_staff` 並於 `BackroomsMagicItem` 補上企劃 3.2 理智不足鎖定提示、`magazine_armor_chestplate` 與 `silent_carpet_boots` 含第 6 套 3D 穿戴防具 `IMPROVISED_OFFICE`）
+    - `MATERIALS.md` 樓層拆解與六階玻璃系列（`tire`、`rubber_conveyor_belt`、`office_glass`、`auto_safety_glass`、`wire_mesh_glass`、`reinforced_observation_glass`、`sanctuary_stained_glass`、`anomalous_mirror_glass`）
+  - **新增 27 座 3D 方塊**（`BackroomsProps.java`、`StationType.java`、`BackroomsCrafting.java`、`BackroomsStationScreen.java`、`StationRecipeCategory.java`、`BackroomsJeiPlugin.java`）：
+    - 第 5 座互動工作站 `spiderweb_crafting_table`（超大型蜘蛛網合成台，工作站 GUI 與 JEI 均擴充支援至 9 格輸入）＋ 6 座主世界／中繼站設施（`scrap_recycler`、`anomaly_distillery_barrel`、`anomaly_research_terminal`、`crystal_replicator`、`anomaly_archive_board`、`relay_dropoff_box`）
+    - 20 種 Level 0 與 `MATERIALS.md` 可破壞 3D 家具與完好／損壞／穿模變體（桌上型電腦×3、手機×3、完好辦公椅、沙發×2、辦公室玻璃隔間×2、折疊椅堆、窗簾布堆、落地全身鏡、塑膠假盆栽、電風扇、微波爐、落地立燈、壁掛急救箱、紙箱山）
+  - **資源、標籤、配方與驗證狀態**：產生全部 73 件 3D 物品＋27 座 3D 方塊模型與 64×64 貼圖、第 6 套 256×256 穿戴防具貼圖、27 份方塊戰利品表、9 組統一物品標籤（`data/noclip_backrooms/tags/item/`）、10 條原版 3×3 配方、70 條工作站／蜘蛛網配方（合計 300 條）、雙語翻譯與 `docs/crafting/README.md`／`BackroomsCraftingTest.java` 更新；執行 `gradlew build` 時本方新增程式碼零編譯錯誤，但因同目錄存在 Claude 同步編寫中未完成之 `core/economy/Economy.java`（引用舊版 `net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents`）導致編譯中止，已暫停未動對方檔案並待使用者指示
+- 依使用者要求參考主流槍械（TACZ／Point Blank）與魔法模組（Iron's Spells 'n Spellbooks／Ars Nouveau）將全部 427 件 3D 物件（369 件物品＋58 座方塊＋6 套 3D 穿戴防具）全面精細化並強化發光特性（尚未提交）：
+  - **全數 427 張貼圖升級至 128×128（16 種 32×32 程序化材質圖塊）＋ 6 套 256×256 穿戴防具與發光貼圖**：導入方向性拉絲槍鋼、碳纖維斜紋、菱形防滑握把、木紋、雕花黃銅、大馬士革刀刃、皮卡汀尼導軌槽、多層鍍膜光學鏡頭、高亮白心電漿核心、陰刻發光符文、銅繞加速線圈、鏽蝕鉚釘鋼板、編織布料、黃黑警戒條紋、PCB 電路板與次發光色，兼顧高質感與企劃 7.1 `<= 128×128` 效能紅線
+  - **高密度多部件 3D 模型重建**：
+    - 全 19 把槍械（單把最高 61 個微長方體）：新增皮卡汀尼導軌齒、拉機柄、拋殼窗、護弓與彎曲扳機、保險撥片、開槽槍口制退器／消音器、側掛 PEQ 戰術雷射盒（發光雷射點）、發光氚光三點機械準星、全息紅點／高倍光學狙擊鏡、電磁軌道槍 6 環銅線圈＋貫穿發光電漿道、噴火器雙壓油罐＋發光火種
+    - 全 20 件魔法法器：多段弧爪冠座法杖＋雙層交錯傾斜發光符文光環＋多面浮空晶核、精裝雕銅角魔典＋封面自發光魔法陣與浮空書籤、立體指針與開蓋齒輪懷錶、四段弧刃發光血咒大鐮、八角儀式鈴鐺
+    - 全 41 把冷兵器（菱形剖面雙刃與血槽、多段彎刀與關刀／方天畫戟時鐘齒輪／銅錢劍發光符索）、18 件高階工具與配件、10 顆雙環浮空 Boss 核心與 5 座主力工作站（蜘蛛網合成台、異常煉成壇、改裝台、蒸餾組、拆解台）
+  - **全模組自發光與客戶端粒子光環**：合計 180 件 3D 物品＋33 座 3D 方塊具 `light_emission: 15` 黑暗自發光；另於 `src/client/java/dev/noclip/backrooms/weapons/WeaponAnimState.java` 加入手持魔法武器、能量／實驗槍械與高階異常冷兵器的純客戶端環境發光粒子（傳送門微粒、電弧火花、火焰、紅室孢子、雪花、終界光點）
+  - **驗證**：以獨立驗證腳本檢查全 369 件物品模型（2,796 個長方體）、全 58 座方塊模型（371 個長方體）、全 427 張 128×128 貼圖與 6 套 256×256 穿戴防具貼圖，確認所有座標皆嚴格位於 Minecraft 合法範圍 `[-16, 32]`、UV 位於 `[0, 16]`、零損毀 JSON（`gradlew build` 仍待同目錄 Claude 未完成之 `core/economy/Economy.java` 修復後執行）
+- 依使用者要求使用 Blender 5.3 試作兩款真曲面高精度代表武器原型並輸出 Cycles 預覽圖（`art/weapons/`，尚未提交）：
+  - **主力槍械原型 `hero_railgun`（電磁軌道槍）**：`art/weapons/hero_railgun.blend`／`.obj`／`.glb` 與預覽圖 `preview_hero_railgun.png`，含倒角槍身機匣、18 齒皮卡汀尼導軌、圓柱多鏡片光學狙擊鏡與黃銅旋鈕、側掛 PEQ 紅光雷射與氚光指示燈、四格發光電能彈匣、雙平行加速導軌、6 環繞線銅線圈與貫穿電漿光道
+  - **可成長本命專武原型 `hero_void_staff_evolution`（虛空裂隙巨杖 Tier 1→2→3 演變）**：`art/weapons/hero_void_staff_evolution.blend`／`.obj`／`.glb` 與預覽圖 `preview_void_staff_evolution.png`、`preview_void_staff_tier3_closeup.png`，展示從一階胡桃木鐵爪微光晶核、二階鍛鋼金環三爪單光環，一路進化至三階黑曜石符文長杖、四根流線彎曲雕花金爪、雙層紫青傾斜發光光環與 6 顆懸浮碎晶衛星之完整視覺成長幅度
+- 依使用者確認正式切換為 **Blender 5.3 真曲面武器遊戲內渲染＋專武三階段進化成長系統**，並依要求將全部物品／方塊／防具／Blender 武器個別 PNG 輸出至 `docs/items/`：
+  - **22 款 Blender 5.3 真曲面武器網格匯出**（`tools/make_blender_weapons.py` → `assets/noclip_backrooms/models/blender/*.obj`／`.mtl` 與 `textures/item/blender_white.png`）：涵蓋 9 款槍械（軌道槍、狙擊槍、突擊步槍、霰彈槍、戰術手槍、左輪手槍、噴火器、音波脈衝炮、辦公十字弓）、7 款法器（三階段進化法杖 `magic_staff_t1..t3`、紅室血咒大鐮、浮空魔典、儀式鈴鐺、懷錶／魔鏡）、5 款冷兵器（菱形雙刃大劍、弧形唐刀／彎刀、重型戰錘、長柄關刀／方天戟、戰術匕首）與旋轉進化光環 `evo_halo_ring`，全數 80 把武器皆對應真曲面模型與專屬元素發光配色
+  - **專武三階段進化成長系統**（`src/main/java/dev/noclip/backrooms/weapons/WeaponEvolution.java`、`BackroomsWeaponNetworking.java`、`BackroomsFirearmItem.java`、`BackroomsMagicItem.java`、`BackroomsMeleeItem.java`）：以 `DataComponents.CUSTOM_DATA` 記錄各把武器累計擊殺怪物數與階段（10 殺進階二階「共鳴進化」傷害 +18%／理智消耗 -15%，30 殺覺醒三階「終極覺醒」傷害 +40%／理智消耗 -30%），附進度懸停說明、進階音效與提示，並新增 `/backrooms weapon tier <1|2|3>` 指令供即時測試各階段外觀切換
+  - **遊戲內第一／第三人稱 Blender 真曲面發光渲染器**（`src/client/java/dev/noclip/backrooms/weapons/BlenderWeaponMesh.java`、`BlenderWeaponRenderer.java`、`mixin/client/ItemInHandRendererWeaponAnimation.java`、`ItemInHandLayerBlenderWeapons.java`、`noclip_backrooms.client.mixins.json`）：透過 MC `26.2` `SubmitNodeCollector.submitCustomGeometry` 結合實心陰影層＋全亮實心發光核＋`RenderTypes.eyes` 泛光層渲染，完整保留 ADS 開鏡對齊、後座力、三段揮擊與施法動畫；法杖隨階段實體切換 `t1→t2→t3` 網格，槍械與冷兵器於二／三階額外展開動態旋轉進化光環
+  - **`docs/items/` 全物品個別 PNG 圖庫**（`tools/render_docs_items.java`）：依使用者要求將全部 458 張個別預覽 PNG 輸出至 `docs/items/`，包含 `docs/items/items/` 全 369 件物品（含 80 把 Blender 真曲面元素發光武器＋289 件 3D 物品）、`docs/items/blocks/` 全 58 座 3D 方塊／工作站／家具／寶箱、`docs/items/weapons_blender/` 全 22 款 Blender 武器大圖與 3 張 Cycles 原型展示圖、以及 `docs/items/armor/` 全 6 套 3D 防具套裝圖
+  - **驗證**：擴充 `BackroomsCraftingTest.java` 驗證全 22 款 Blender `.obj`/`.mtl`、`blender_white.png` 與 `WeaponEvolution` 階級數值，執行 `gradlew build runClientGameTest -Plevels=look --no-daemon` 全部通過（零編譯／測試／模型／貼圖／Mixin 錯誤），並僅於本地 `main` 提交本方改動（未動 `docs/企劃書/`、未推送）
+- 依使用者回饋全面重製「實體格線合成工作站＋蜘蛛網階梯配方」與「多格聯動家具／實質拆解掉落／Blender 真切半穿模家具／非方體細緻 3D 物品」：
+  - **六座真實實體格線工作站＋原版 3×3 擴充＋左側分類配方書（可滑鼠拖曳捲軸）＋JEI `+` 轉移**（`crafting/StationType.java`、`StationRecipe.java`、`BackroomsRecipeRegistry.java`、`BackroomsStationMenu.java`、`BackroomsCrafting.java`、`src/client/.../crafting/BackroomsStationScreen.java`、`jei/StationRecipeCategory.java`、`jei/BackroomsJeiPlugin.java`、`tools/rebuild_shaped_recipes.py`）：
+    - 全面取消舊版「純清單按鈕直出」模式，改為真實 Minecraft 物理合成格線：後室拆解台（`1→4` 實體拆解格）、杏仁蒸餾化學組（`3×3` 形狀）、異常煉成壇（`3×3` 星陣形狀）、後室改裝鍛造台（`5×5` 形狀，全部 106 條配方皆跨越 `>= 4` 格）、初級蜘蛛網合成台 `spiderweb_crafting_table`（`7×7` 同心圓蜘蛛網，38 條配方皆跨越 `7×7`）、以及新增第 6 座工作站 **終極蜘蛛網合成台 `ultimate_spiderweb_crafting_table`**（`9×9` 同心圓蜘蛛網，15 條終局 Tier 4 配方，自身可於 7×7 初級蜘蛛網合成）；合計 273 條工作站配方
+    - 擴充原版 `3×3` 工作台新增 34 條配方（`data/noclip_backrooms/recipe/v3_*.json`），納入早期 Tier 0–1 武器防具、繃帶／鎮靜草茶／杏仁精華等醫療消耗品、基礎零件工具與工作站方塊，不再把 3×3 能擺下的基礎物塞進 5×5／7×7／9×9
+    - 工作站介面左側新增可摺疊分類配方書（`全／料／刃／槍／法／甲／具` 7 頁籤）並實作**真正支援滑鼠點擊與拖曳的捲軸條**（`mouseClicked`／`mouseDragged`／`mouseReleased`＋滾輪），點擊配方後於空格顯示半透明虛影擺放提示，附 `[自動填入]`／`[填滿]`／`[清空]` 按鈕；JEI 同步升級為對應形狀格線圖表、註冊全部 6 座工作站之 `IRecipeTransferHandler`（支援 JEI `+` 一鍵填入實體格線）並向 JEI 回報左側配方書避讓區
+  - **22 種多格聯動大型家具＋實質零件拆解掉落＋39 款 Blender 真切半穿模／寫實家具網格＋154 件非方體 3D 物品**（`props/MultiPartPropBlock.java`、`PropPartBlock.java`、`PropBlockEntity.java`、`BlenderSinglePropBlock.java`、`BackroomsProps.java`、`src/client/.../props/BlenderPropRenderer.java`、`BackroomsClient.java`、`tools/make_blender_props.py`、`tools/rebuild_nonboxy_items.py`、`tools/render_docs_items.java`）：
+    - 將冰箱（`2×3×1`）、販賣機（`2×2×1`）、飲水機（`1×2×1`）、檔案櫃（`1×2×1`）、完好／穿模沙發（`2×1×1`）、蒸氣鍋爐（`2×2×2`）、醫院推床（`1×1×2`）、大型街機（`1×2×1`）、落地全身鏡（`1×2×1`）、落地立燈（`1×2×1`）、玻璃隔間（`2×2×1`）、紙箱山（`2×2×2`）、折疊椅堆（`2×1×2`）、摺疊桌（`2×1×1`）、霓虹招牌（`2×1×1`）、封門木板（`2×2×1`）、鐵絲網柵欄（`2×1×1`）、鋼製隔艙牆（`2×2×1`）、異常情報板（`2×2×1`）與窗簾布堆（`2×1×1`）共 22 種大型物件改為真正多格聯動方塊（`MultiPartPropBlock`＋`PropPartBlock`），敲掉任何一格即整組一併破壞且僅於主方塊掉落一次實質零件
+    - 全部 24 種家具與家電戰利品表更新為直接掉落基礎拆解零件（金屬板、銅管、電路板、散熱風扇、塑膠外殼、彈簧、杏仁水等）而非只掉回方塊本身
+    - 以 Blender 5.3 製作並匯出 39 款多格／單格家具 `.obj`/`.mtl`（`assets/noclip_backrooms/models/blender_props/`）交由 `BlenderPropRenderer` 於世界內立體渲染；所有 `noclipped_*`／`*_noclipped` 穿模物件皆以 `bmesh.ops.bisect_plane`＋`triangle_fill` 真實斜切並讓埋入地板的半邊物理消失
+    - 重建 154 件非武器 3D 物品模型為纖細非方體輪廓（薄弧形彈匣、分顆尖頭子彈／霰彈、超薄電路板與晶片、錐形燒瓶／針筒／酒瓶、細筆／鑰匙／螺絲起子／燈管／齒輪／彈簧／風扇／卡帶／晶核），並修正全部物品與終極蜘蛛網模型貼圖鍵參考（`#0`），同步重新輸出全部 459 張 `docs/items/` 預覽圖（正前 3/4 視角）
+  - **驗證**：更新 `BackroomsCraftingTest.java` 強制驗證全 6 座工作站、5×5/7×7/9×9 尺寸門檻、全原版與工作站配方 ID、59 座方塊貼圖與 39 款 Blender 家具 `.obj`/`.mtl`；執行 `gradlew build runClientGameTest -Plevels=look --no-daemon` 全數 78 項單元測試通過、實機測試與 JEI 載入通過且零模型／貼圖／配方警告，並僅於本地 `main` 提交本方改動（未動 `docs/企劃書/`、未推送）
+- 依使用者回饋修正工作站介面預設看不到左側配方書的問題（方案 A＋B）：
+  - **工作站動態推擠與自適應排版**（`src/client/.../crafting/BackroomsStationScreen.java`、`crafting/StationType.java`、`BackroomsCraftingTest.java`）：
+    - 比照原版配方書，展開左側分類配方書（寬 `136px`）時自動把「配方書＋主工作台」整體動態往右推移並替右側 JEI 預留 `104px`（收合時主視窗回到正中）；在 `1080p 4x`（`480×270`）下即使開啟最大的 9×9 終極蜘蛛網合成台（總寬 `363px`），左配方書、中 9×9 格線與右 JEI 皆完整並排顯示不重疊
+    - 將 `ULTIMATE_SPIDERWEB` 高度由 `248px` 壓縮至 `238px` 並將物品欄標籤移至右側空區，連 `854×480`（`2x` 自動縮放、`427×240`）視窗也能並排且不切邊；單元測試同步鎖定 6 座工作站皆滿足 `136 + 3 + guiWidth + 6 <= 427` 與 `guiHeight <= 240`
+    - 極窄螢幕或超大縮放並排塞不下時，不再把配方書隱藏到點不開，改為點擊 `[配方書]` 以覆蓋抽屜模式展開於工作台上方（附 `[×]` 關閉鈕，自動填入後自動收合）
+  - **開發啟動預設 1080p 視窗**（`build.gradle`）：於 `loom.runs.client` 加入 `programArgs "--width", "1920", "--height", "1080"`（僅影響本機 `play.bat`／`runClient` 啟動視窗，不改動玩家正式版 `options.txt`）
+  - **驗證**：執行 `gradlew build runClientGameTest -Plevels=look --no-daemon` 全部 78 項單元測試與客戶端實機測試通過，並僅於本地 `main` 提交本方改動（未推送）
+- 依使用者要求補齊缺少完整版的家具模型並正式加入第 0 層（Level 0）世界生成（含零散出現與電影風格「集中堆疊＋完整／穿模混搭」群聚）：
+  - **補齊 8 款完整版家具與電影風高疊木椅山**（`props/BackroomsProps.java`、`tools/make_blender_props.py`、`tools/rebuild_shaped_recipes.py`、`models/blender_props/*.obj`、全模組擴增至 67 座 3D 方塊與 47 款 Blender 家具網格）：
+    - 新增 `prop_wood_chair`（電影風胡桃木四橫條椅背＋灰坐墊完整木椅）、`prop_wood_chair_pile`（`2×2×2` 堆疊木椅山，底部 4 張立椅＋上方 6 張斜疊木椅塔，還原電影畫面）、`prop_folding_table`（`2×1×1` 完整折疊長桌）、`prop_file_cabinet`（`1×2×1` 完整鐵皮檔案櫃）、`prop_crt_tv`（完整映像管老電視）、`prop_water_cooler`（`1×2×1` 完整飲水機）、`prop_vending_machine`（`2×2×1` 完整飲料販賣機）與 `prop_fridge`（`2×3×1` 完整雙門冰箱），全數配齊多格聯動破壞、實質零件拆解戰利品表、拆解台配方（合計 281 條工作站配方）、`mineable/axe`／`pickaxe` 標籤、雙語名稱與 `docs/items/blocks/` 預覽圖（合計 467 張 PNG）
+    - 同步升級 `noclipped_wood_chair` 與 `prop_wood_chair` 共用同一款木椅造型（斜切半埋版），並於 `PropPartBlock.updateShape` 加入防孤兒自清理保護
+  - **第 0 層零散與集中物品世界生成**（新增 `level0/Level0Props.java`、`level0/Level0PropsTest.java`，於 `level0/Level0.java` 註冊）：
+    - 透過 `ServerChunkEvents.CHUNK_LOAD` 僅於區塊首次生成時放置，嚴格避開原點 `[-32..31]` 著陸／基準測試區、遠距測試點 `(701, -700)`、馬尼拉房間、樓梯間、紅室、深淵與深坑，所有多格佔用格皆鎖定於單一區塊內、檢查全空氣與實心地毯底座並正確建立 `PropBlockEntity` 主副聯動與保留走道通行
+    - **集中群聚模式**（約 12～26% 區塊依區域觸發）：包含 5 種主題——① 電影風木椅山群聚（`prop_wood_chair_pile`／折疊椅堆＋周圍 3～5 張零散完整木椅＋1～2 張切半穿模椅）、② 辦公隔間群聚（完好／破損玻璃隔間＋折疊桌＋完好／損壞／穿模電腦＋辦公椅＋檔案櫃＋手機）、③ 休息家電群聚（完好＋穿模沙發＋飲水機＋落地立燈＋冰箱／販賣機／電視／微波爐）、④ 雜物庫房群聚（紙箱山＋窗簾布堆＋全身鏡＋電風扇＋假盆栽＋老電視）、⑤ 稀有流浪者殘骸營地（殘骸＋立燈＋木椅＋急救箱＋機率上鎖軍械箱）
+    - **零散出現模式**（其餘約 38～62% 區塊隨機散落 1～3 件獨立物件）：完整涵蓋 `MATERIALS.md` 第 0 層全部物件，並隨離原點距離增加與昏暗區（`DARKENED`）拉高穿模版比例（25% → 50～55%）
+  - **驗證**：更新 `BackroomsCraftingTest.java`（67 座方塊＋47 款 Blender 家具）與新增 `Level0PropsTest.java`，執行 `gradlew build runClientGameTest -Plevels=0 --no-daemon` 全數 80 項單元測試與完整 Level 0 客戶端實機測試皆通過（日誌零模型／貼圖／方塊實體警告），並僅於本地 `main` 提交本方改動（保留工作區 Claude 編輯中之 `src/client/` 檔案與 `docs/企劃書/` 未動、未推送）
 - 修正 Level 0.1 螺旋樓梯間往上走會撞頭的問題（Antigravity）：`ZenithLayout.stairwell` 原本每階上方只清出 2 格空氣（`(step+1)&7`、`(step+2)&7`），踏上第 4、5 階（`(3,0)`、`t=4` 與 `(3,1)`、`t=5`）時頭頂會撞到上層天花板（`t=7`）與地板（`t=0`）；改為清出 3 格（加 `(step+3)&7`），並將 `ZenithLayoutTest.reaches` 的爬升淨空檢查改為樓梯也必須通過 `+2` 頭頂空間；`.\gradlew build` 與 `.\gradlew runClientGameTest "-Plevels=0.1" "-Psections=stairs"` 通過並確認實機截圖上方淨空正常
 - Level 0 特殊大區新增興趣點（Antigravity，`ZonePoiPlan`）：
   - `CHASM`（深淵斷崖）深層前哨平台：於最深層非樓梯／非深淵平台（`tier >= 2`）鋪設車庫地板與低懸日光燈棚，放置 `anomaly_vault_chest`（`tier >= 4`）或 `supply_crate`、折疊桌與老電腦、流浪者殘骸及工業電箱

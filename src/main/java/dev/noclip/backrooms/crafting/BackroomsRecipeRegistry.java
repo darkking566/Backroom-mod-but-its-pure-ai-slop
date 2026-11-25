@@ -11,15 +11,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.Container;
 
 /**
- * Loads all Backrooms workstation recipes from the bundled JSON catalog
+ * Loads all Backrooms workstation recipes from the bundled shaped JSON catalog
  * ({@code data/noclip_backrooms/backrooms_recipes/station_recipes.json}).
- * Deterministic on both server and client so JEI and workstation GUIs always stay 100% synchronized.
+ * Synchronized across server menus, client recipe books, and JEI categories.
  */
 public final class BackroomsRecipeRegistry {
 	public static final String RESOURCE_PATH = "data/" + BackroomsMod.MOD_ID + "/backrooms_recipes/station_recipes.json";
@@ -55,10 +57,61 @@ public final class BackroomsRecipeRegistry {
 				JsonObject obj = elem.getAsJsonObject();
 				Identifier id = Identifier.parse(obj.get("id").getAsString());
 				StationType station = StationType.byId(obj.get("station").getAsString());
-				List<StationRecipe.ItemCount> inputs = parseItemList(obj.getAsJsonArray("inputs"));
-				List<StationRecipe.ItemCount> outputs = parseItemList(obj.getAsJsonArray("outputs"));
+				String category = obj.has("category") ? obj.get("category").getAsString() : "parts";
 				int xp = obj.has("xp") ? obj.get("xp").getAsInt() : 6;
-				StationRecipe recipe = new StationRecipe(id, station, List.copyOf(inputs), List.copyOf(outputs), xp);
+				List<StationRecipe.ItemCount> outputs = parseItemList(obj.getAsJsonArray("outputs"));
+
+				int width;
+				int height;
+				List<StationRecipe.ItemCount> cells;
+				if (obj.has("pattern") && obj.has("key")) {
+					JsonArray patArr = obj.getAsJsonArray("pattern");
+					JsonObject keyObj = obj.getAsJsonObject("key");
+					Map<Character, StationRecipe.ItemCount> keyMap = new HashMap<>();
+					for (Map.Entry<String, JsonElement> e : keyObj.entrySet()) {
+						if (e.getKey().isEmpty()) continue;
+						char ch = e.getKey().charAt(0);
+						if (e.getValue().isJsonPrimitive()) {
+							keyMap.put(ch, new StationRecipe.ItemCount(Identifier.parse(e.getValue().getAsString()), 1));
+						} else {
+							JsonObject ko = e.getValue().getAsJsonObject();
+							Identifier itemId = Identifier.parse(ko.get("item").getAsString());
+							int count = ko.has("count") ? ko.get("count").getAsInt() : 1;
+							keyMap.put(ch, new StationRecipe.ItemCount(itemId, count));
+						}
+					}
+					height = patArr.size();
+					width = 0;
+					for (JsonElement rowEl : patArr) {
+						width = Math.max(width, rowEl.getAsString().length());
+					}
+					cells = new ArrayList<>(width * height);
+					for (int y = 0; y < height; y++) {
+						String row = patArr.get(y).getAsString();
+						for (int x = 0; x < width; x++) {
+							char ch = x < row.length() ? row.charAt(x) : ' ';
+							cells.add(ch == ' ' ? null : keyMap.get(ch));
+						}
+					}
+				} else {
+					// Salvage or 1-slot direct input fallback
+					List<StationRecipe.ItemCount> rawInputs = parseItemList(obj.getAsJsonArray("inputs"));
+					width = Math.min(station.gridWidth(), Math.max(1, rawInputs.size()));
+					height = Math.max(1, (rawInputs.size() + width - 1) / width);
+					cells = new ArrayList<>(width * height);
+					for (int i = 0; i < width * height; i++) {
+						cells.add(i < rawInputs.size() ? rawInputs.get(i) : null);
+					}
+				}
+
+				List<StationRecipe.ItemCount> aggregated = StationRecipe.aggregateInputs(cells);
+				StationRecipe recipe = new StationRecipe(
+						id, station, category, width, height,
+						Collections.unmodifiableList(cells),
+						aggregated,
+						List.copyOf(outputs),
+						xp
+				);
 				list.add(recipe);
 				idMap.put(id, recipe);
 				stationMap.get(station).add(recipe);
@@ -86,6 +139,17 @@ public final class BackroomsRecipeRegistry {
 			out.add(new StationRecipe.ItemCount(itemId, count));
 		}
 		return out;
+	}
+
+	public static StationRecipe.Match findMatch(StationType station, Container container) {
+		ensureLoaded();
+		int gw = station.gridWidth();
+		int gh = station.gridHeight();
+		for (StationRecipe recipe : byStation(station)) {
+			StationRecipe.Match match = recipe.matchInGrid(container, gw, gh);
+			if (match != null) return match;
+		}
+		return null;
 	}
 
 	public static List<StationRecipe> all() {

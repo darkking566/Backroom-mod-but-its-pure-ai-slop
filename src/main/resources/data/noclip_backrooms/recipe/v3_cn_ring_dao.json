@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  I",
+    " S ",
+    "HR "
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "S": "noclip_backrooms:heavy_steel_plate",
+    "H": "noclip_backrooms:weapon_grip_wrap",
+    "R": "noclip_backrooms:steel_gear"
+  },
+  "result": {
+    "id": "noclip_backrooms:cn_ring_pommel_dao",
+    "count": 1
+  }
+}

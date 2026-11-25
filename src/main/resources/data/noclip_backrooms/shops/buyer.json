@@ -1,0 +1,27 @@
+{
+  "buys": [
+    {"item": "noclip_backrooms:damp_paper_scrap", "count": 8, "price": 4},
+    {"item": "noclip_backrooms:rotten_wood_strip", "count": 4, "price": 4},
+    {"item": "noclip_backrooms:scrap_metal", "count": 4, "price": 8},
+    {"item": "noclip_backrooms:rusty_screws", "count": 4, "price": 6},
+    {"item": "noclip_backrooms:plastic_casing", "count": 4, "price": 8},
+    {"item": "noclip_backrooms:glass_tube_shard", "count": 8, "price": 6},
+    {"item": "noclip_backrooms:copper_wire", "count": 4, "price": 12},
+    {"item": "noclip_backrooms:metal_spring", "count": 2, "price": 6},
+    {"item": "noclip_backrooms:capacitor", "count": 2, "price": 10},
+    {"item": "noclip_backrooms:old_circuit_board", "count": 1, "price": 10},
+    {"item": "noclip_backrooms:battery_cell", "count": 1, "price": 12},
+    {"item": "noclip_backrooms:microchip", "count": 1, "price": 25},
+    {"item": "noclip_backrooms:electric_motor", "count": 1, "price": 30},
+    {"item": "noclip_backrooms:alloy", "count": 1, "price": 8},
+    {"item": "noclip_backrooms:almond_water", "count": 1, "price": 10},
+    {"item": "noclip_backrooms:phosphor_powder", "count": 4, "price": 10},
+    {"item": "noclip_backrooms:blueprint_scrap", "count": 1, "price": 20},
+    {"item": "noclip_backrooms:hound_fang", "count": 1, "price": 15},
+    {"item": "noclip_backrooms:smiler_remnant", "count": 1, "price": 25},
+    {"item": "noclip_backrooms:red_room_shard", "count": 1, "price": 30},
+    {"item": "noclip_backrooms:anomaly_crystal", "count": 1, "price": 45},
+    {"item": "noclip_backrooms:reality_fragment", "count": 1, "price": 60},
+    {"item": "noclip_backrooms:core_alpha_fang", "count": 1, "price": 400}
+  ]
+}

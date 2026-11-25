@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "noclip_backrooms:block/crafting/crystal_replicator" },
+    "facing=east":  { "model": "noclip_backrooms:block/crafting/crystal_replicator", "y": 90 },
+    "facing=south": { "model": "noclip_backrooms:block/crafting/crystal_replicator", "y": 180 },
+    "facing=west":  { "model": "noclip_backrooms:block/crafting/crystal_replicator", "y": 270 }
+  }
+}

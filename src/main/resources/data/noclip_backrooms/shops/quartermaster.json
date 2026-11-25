@@ -1,0 +1,16 @@
+{
+  "sells": [
+    {"item": "noclip_backrooms:blunt_rusty_pipe", "count": 1, "price": 40},
+    {"item": "noclip_backrooms:west_scrap_knife", "count": 1, "price": 70},
+    {"item": "noclip_backrooms:blunt_nailed_bat", "count": 1, "price": 90},
+    {"item": "noclip_backrooms:ammo_scrap_slug", "count": 8, "price": 30},
+    {"item": "noclip_backrooms:ammo_steel_nails", "count": 16, "price": 30},
+    {"item": "noclip_backrooms:ammo_9mm", "count": 12, "price": 45},
+    {"item": "noclip_backrooms:scrap_tactical_helmet", "count": 1, "price": 140},
+    {"item": "noclip_backrooms:scrap_tactical_boots", "count": 1, "price": 120},
+    {"item": "noclip_backrooms:gun_pipe_pistol", "count": 1, "price": 220, "extra": {"item": "noclip_backrooms:scrap_metal", "count": 6}},
+    {"item": "noclip_backrooms:gun_nailgun", "count": 1, "price": 280, "extra": {"item": "noclip_backrooms:battery_cell", "count": 2}},
+    {"item": "noclip_backrooms:gun_pipe_shotgun", "count": 1, "price": 320, "extra": {"item": "noclip_backrooms:metal_spring", "count": 4}},
+    {"item": "noclip_backrooms:almond_gas_mask", "count": 1, "price": 160, "extra": {"item": "noclip_backrooms:hound_fang", "count": 2}}
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "noclip_backrooms:magazine_bundle",
+    "noclip_backrooms:magazine_bundle",
+    "noclip_backrooms:insulating_tape",
+    "noclip_backrooms:insulating_tape",
+    "noclip_backrooms:rags",
+    "noclip_backrooms:rags"
+  ],
+  "result": { "id": "noclip_backrooms:magazine_armor_chestplate", "count": 1 }
+}

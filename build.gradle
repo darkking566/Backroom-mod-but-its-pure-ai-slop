@@ -5,6 +5,12 @@ plugins {
 loom {
 	splitEnvironmentSourceSets()
 
+	runs {
+		client {
+			programArgs "--width", "1920", "--height", "1080"
+		}
+	}
+
 	mods {
 		"noclip_backrooms" {
 			sourceSet sourceSets.main

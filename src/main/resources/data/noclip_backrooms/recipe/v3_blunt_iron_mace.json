@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " II",
+    " SI",
+    "H  "
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "S": "noclip_backrooms:heavy_steel_plate",
+    "H": "noclip_backrooms:tool_handle_basic"
+  },
+  "result": {
+    "id": "noclip_backrooms:blunt_iron_mace",
+    "count": 1
+  }
+}

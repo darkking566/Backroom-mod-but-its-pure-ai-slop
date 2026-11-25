@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GCG",
+    "BWB",
+    "SSS"
+  ],
+  "key": {
+    "G": "minecraft:glass",
+    "C": "noclip_backrooms:copper_pipe",
+    "B": "noclip_backrooms:brass_ingot",
+    "W": "noclip_backrooms:almond_water",
+    "S": "noclip_backrooms:sheet_metal"
+  },
+  "result": {
+    "id": "noclip_backrooms:almond_distiller",
+    "count": 1
+  }
+}

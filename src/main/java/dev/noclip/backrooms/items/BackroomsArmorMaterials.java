@@ -13,6 +13,17 @@ import net.minecraft.world.item.equipment.EquipmentAssets;
  * Reuses vanilla EquipmentAssets so worn armor layers render cleanly with zero missing textures.
  */
 public final class BackroomsArmorMaterials {
+	public static final ArmorMaterial IMPROVISED_OFFICE = new ArmorMaterial(
+			14,
+			defenseMap(1, 3, 2, 2),
+			12,
+			SoundEvents.ARMOR_EQUIP_LEATHER,
+			0.0F,
+			0.0F,
+			ItemTags.REPAIRS_LEATHER_ARMOR,
+			EquipmentAssets.LEATHER
+	);
+
 	public static final ArmorMaterial GAS_MASK = new ArmorMaterial(
 			18,
 			defenseMap(2, 4, 3, 2),

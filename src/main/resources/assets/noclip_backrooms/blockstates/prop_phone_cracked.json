@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "noclip_backrooms:block/crafting/prop_phone_cracked" },
+    "facing=east":  { "model": "noclip_backrooms:block/crafting/prop_phone_cracked", "y": 90 },
+    "facing=south": { "model": "noclip_backrooms:block/crafting/prop_phone_cracked", "y": 180 },
+    "facing=west":  { "model": "noclip_backrooms:block/crafting/prop_phone_cracked", "y": 270 }
+  }
+}

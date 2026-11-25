@@ -1,7 +1,10 @@
 package dev.noclip.backrooms;
 
+import dev.noclip.backrooms.core.economy.WalletClient;
 import dev.noclip.backrooms.core.floors.FloorsClient;
+import dev.noclip.backrooms.core.trade.ShopClient;
 import dev.noclip.backrooms.core.look.Look;
+import dev.noclip.backrooms.core.look.TrialPack;
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.people.PersonModel;
 import dev.noclip.backrooms.core.people.PersonRenderer;
@@ -10,8 +13,11 @@ import dev.noclip.backrooms.crafting.BackroomsCrafting;
 import dev.noclip.backrooms.crafting.BackroomsStationScreen;
 import dev.noclip.backrooms.crafting.StationType;
 import dev.noclip.backrooms.items.armor.BackroomsArmorRenderer;
+import dev.noclip.backrooms.props.BackroomsProps;
+import dev.noclip.backrooms.props.BlenderPropRenderer;
 import dev.noclip.backrooms.weapons.WeaponAnimState;
 import dev.noclip.backrooms.weapons.WeaponCrosshairHud;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import dev.noclip.backrooms.level0p1.robots.Robot;
 import dev.noclip.backrooms.level0p1.robots.RobotModel;
 import dev.noclip.backrooms.level0p1.robots.RobotRenderer;
@@ -66,11 +72,15 @@ public final class BackroomsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		Look.register();
+		TrialPack.register();
 		FloorsClient.register();
+		ShopClient.register();
+		WalletClient.register();
 		RpgClient.register();
 		for (StationType station : StationType.values()) {
 			MenuScreens.register(BackroomsCrafting.menuType(station), BackroomsStationScreen::new);
 		}
+		BlockEntityRenderers.register(BackroomsProps.PROP_BLOCK_ENTITY, BlenderPropRenderer::new);
 		BackroomsArmorRenderer.registerAll();
 		WeaponAnimState.register();
 		WeaponCrosshairHud.register();

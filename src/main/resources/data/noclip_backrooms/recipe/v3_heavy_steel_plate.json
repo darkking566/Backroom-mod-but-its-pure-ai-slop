@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "MM ",
+    "MC ",
+    "   "
+  ],
+  "key": {
+    "M": "noclip_backrooms:sheet_metal",
+    "C": "minecraft:coal"
+  },
+  "result": {
+    "id": "noclip_backrooms:heavy_steel_plate",
+    "count": 2
+  }
+}

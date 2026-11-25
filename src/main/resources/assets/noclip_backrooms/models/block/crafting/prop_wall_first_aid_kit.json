@@ -1,0 +1,45 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "0": "noclip_backrooms:block/crafting3d/prop_wall_first_aid_kit",
+    "particle": "noclip_backrooms:block/crafting3d/prop_wall_first_aid_kit"
+  },
+  "elements": [
+    {
+      "from": [3.00, 3.00, 11.00],
+      "to": [13.00, 13.00, 15.80],
+      "faces": {
+        "north": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "east": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "south": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "west": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "up": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
+        "down": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [7.00, 5.20, 10.60],
+      "to": [9.00, 10.80, 11.20],
+      "faces": {
+        "north": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "east": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "south": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "west": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "up": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "down": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"}
+      }
+    },
+    {
+      "from": [5.20, 7.00, 10.60],
+      "to": [10.80, 9.00, 11.20],
+      "faces": {
+        "north": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "east": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "south": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "west": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "up": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
+        "down": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"}
+      }
+    }
+  ]
+}

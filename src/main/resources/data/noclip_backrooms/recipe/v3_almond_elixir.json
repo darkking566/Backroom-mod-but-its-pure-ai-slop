@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " H ",
+    "PWP",
+    " A "
+  ],
+  "key": {
+    "H": "noclip_backrooms:dry_soil_herbs",
+    "P": "noclip_backrooms:expired_painkillers",
+    "W": "noclip_backrooms:almond_water",
+    "A": "noclip_backrooms:almond_mana_cell"
+  },
+  "result": {
+    "id": "noclip_backrooms:almond_elixir",
+    "count": 1
+  }
+}
