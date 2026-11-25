@@ -23,11 +23,14 @@ import net.minecraft.world.phys.BlockHitResult;
  */
 final class BoothDrawerBlock extends Block {
 	static final BooleanProperty EMPTY = BooleanProperty.create("empty");
+	/** The side with the drawer front; south, into the booth, is how every booth is built (and what older saves get). */
+	static final net.minecraft.world.level.block.state.properties.EnumProperty<net.minecraft.core.Direction> FACING =
+			net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
 	static final String LEADS_TO = "LX";
 
 	BoothDrawerBlock(Properties properties) {
 		super(properties);
-		registerDefaultState(stateDefinition.any().setValue(EMPTY, false));
+		registerDefaultState(stateDefinition.any().setValue(EMPTY, false).setValue(FACING, net.minecraft.core.Direction.SOUTH));
 	}
 
 	@Override
@@ -52,7 +55,12 @@ final class BoothDrawerBlock extends Block {
 	}
 
 	@Override
+	public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+		return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+	}
+
+	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(EMPTY);
+		builder.add(EMPTY, FACING);
 	}
 }

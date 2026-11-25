@@ -262,8 +262,10 @@ def main():
     ml.write_json(STATES / "clinic_bed.json", {"variants": {f"facing={f}": ({"model": NS + "clinic_bed", "y": y} if y else {"model": NS + "clinic_bed"})
                                                            for f, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}})
 
-    column("booth_drawer", "booth_drawer", "booth_wall")
-    column("booth_drawer_open", "booth_drawer_open", "booth_wall")
+    # Only the front is a drawer (the blockstate turns it by FACING); the back and ends are the booth's panels.
+    for name in ("booth_drawer", "booth_drawer_open"):
+        ml.write_json(MODELS / f"{name}.json", {"parent": "minecraft:block/orientable", "textures": {
+            "particle": NS + name, "front": NS + name, "side": NS + "booth_wall", "top": NS + "booth_wall"}})
     column("book_shelf", "book_shelf", "shelf_top")
     column("palace_painting", "palace_painting", "painting_frame")
     column("attic_hatch", "attic_hatch", "garage_wall")

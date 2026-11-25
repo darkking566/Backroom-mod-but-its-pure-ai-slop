@@ -371,6 +371,7 @@
   - `Level1ClientTest` 新增 `bigProps` 段：6 種道具 × 4 個方向，在伸出去的每一邊與頂上探測碰撞（36 處）
   - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=bigProps,checkBlocks,sectors,sectorFit,views,monsters` 通過；沒有實際走去撞車、也沒拍照
 - 使用者同意後，把 `main` 推送到 GitHub（`993f728` 大型道具完整碰撞箱與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- Level 1 審查報告：收費亭抽屜的背面：抽屜加 `facing`（`BoothDrawerBlock`，預設朝南＝朝亭子裡面，世界生成與舊存檔都是這個方向），模型改成只有正面是抽屜、背面與兩側是收費亭的牆板、上下是牆板（`orientable`）；玩家擺放時正面朝玩家；`make_level1.py`、`make_level1_texture_fixes.py` 同步（沒重跑）；`Level1ClientTest` 的 `events` 段檢查抽屜朝南，並從前窗外拍抽屜背面（`level1_booth_drawer_back`，看到是牆板）；`gradlew build` 與 `-Psections=events,checkBlocks` 通過
 
 ## 動作記錄（Antigravity）
 

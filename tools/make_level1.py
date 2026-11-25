@@ -2352,7 +2352,9 @@ def all_blockstates():
     b["concrete_stairs"] = stairs_blockstate()
     for name in ("booth_wall", "booth_roof", "barrier_base", "fuel_drum", "caged_lamp", "eyed_crate", "shut_eyed_crate"):
         b[name] = single(name)
-    b["booth_drawer"] = {"variants": {"empty=false": {"model": NS + "booth_drawer"}, "empty=true": {"model": NS + "booth_drawer_open"}}}
+    b["booth_drawer"] = {"variants": {f"empty={e},facing={f}": {"model": NS + m, **({"y": y} if y else {})}
+                                      for e, m in (("false", "booth_drawer"), ("true", "booth_drawer_open"))
+                                      for f, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}}
     for name in ("office_desk", "cot", "bedroll", "hospital_bed"):
         b[name] = {"variants": {f"facing={f}": ({"model": NS + name, "y": y} if y else {"model": NS + name})
                                 for f, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}}

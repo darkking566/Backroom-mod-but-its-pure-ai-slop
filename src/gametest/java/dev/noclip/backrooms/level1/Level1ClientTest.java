@@ -652,6 +652,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		server.runOnServer(s -> {
 			BlockPos drawer = new BlockPos(booth.x0() + 3, STAND, booth.z0() + 7);
 			check(level1(s).getBlockState(drawer).getValue(BoothDrawerBlock.EMPTY), "drawer not emptied");
+			check(level1(s).getBlockState(drawer).getValue(BoothDrawerBlock.FACING) == Direction.SOUTH, "drawer front does not face into the booth");
 			boolean flashlight = false;
 			for (int i = 0; i < 36; i++) {
 				flashlight |= BuiltInRegistries.ITEM.getKey(player(s).getInventory().getItem(i).getItem()).getPath().equals("flashlight");
@@ -659,6 +660,8 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			check(flashlight, "no flashlight from the drawer");
 		});
 		context.takeScreenshot("level1_booth_drawer");
+		// From outside the front window: the drawer's back is the booth's panel, not another drawer.
+		shoot(context, game, booth.x0() + 3.5, STAND + 0.6, booth.z0() + 5.2, 0, 35, "level1_booth_drawer_back");
 
 		HallPlan.PlacedProp room = nearestProp(seed, HallPlan.Prop.GENERATOR_ROOM);
 		int[] door = room.door();
