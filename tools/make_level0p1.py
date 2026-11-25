@@ -957,10 +957,17 @@ def model_bench():
 
 
 def model_treadmill():
-    return {"parent": "minecraft:block/block", "textures": {"particle": tex("treadmill_side"), "belt": tex("treadmill_belt"), "side": tex("treadmill_side")},
-            "elements": [el((1, 0, 0), (15, 5, 16), sides("#side")),
-                         el((2, 5, 1), (14, 6, 15), {"up": "#belt", "down": "#side", **sides("#side", ("north", "south", "east", "west"))}),
-                         el((1, 6, 12), (3, 7, 15), sides("#side")), el((13, 6, 12), (15, 7, 15), sides("#side"))]}
+    """A low deck with the belt on top, two uprights at the front (north) carrying side rails and a tilted console."""
+    full = [0, 0, 16, 16]
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": tex("treadmill_side"), "belt": tex("treadmill_belt"), "side": tex("treadmill_side"), "panel": tex("console_front")},
+            "elements": [el((1, 0, 0), (15, 3, 16), sides("#side")),
+                         el((2, 3, 0.5), (14, 4, 15.5), {"up": "#belt", "down": "#side", **sides("#side", ("north", "south", "east", "west"))}),
+                         el((1, 3, 1), (2.5, 14, 2.5), sides("#side")), el((13.5, 3, 1), (15, 14, 2.5), sides("#side")),
+                         el((1, 11, 2.5), (2.5, 12, 9), sides("#side")), el((13.5, 11, 2.5), (15, 12, 9), sides("#side")),
+                         el((2.5, 12, 0.5), (13.5, 15, 3), {"north": "#side", "up": {"texture": "#panel", "uv": full},
+                                                           **sides("#side", ("south", "east", "west", "down"))},
+                            rotation={"angle": 22.5, "axis": "x", "origin": [8, 13.5, 1.75]})]}
 
 
 def model_weights():
@@ -1074,6 +1081,7 @@ def all_models():
     for part in DOOR_MODELS:
         m[f"station_door_{part}"] = {"parent": f"minecraft:block/door_{part}",
                                      "textures": {"bottom": tex("station_door_bottom"), "top": tex("station_door_top")}}
+    m["station_door_slid"] = {"textures": {"particle": tex("station_door_bottom")}}  # an open door, slid into the wall
     for shape, parent in (("", "stairs"), ("_inner", "inner_stairs"), ("_outer", "outer_stairs")):
         m[f"station_stairs{shape}"] = {"parent": f"minecraft:block/{parent}",
                                        "textures": {"bottom": tex("stair_steps"), "top": tex("stair_steps"), "side": tex("stair_steps")}}
@@ -1110,6 +1118,8 @@ def door_state(door):
                 for opened in (False, True):
                     y = y0 if not opened else (y0 + (90 if hinge == "left" else 270)) % 360
                     model = NS + f"{door}_{part}_{hinge}{'_open' if opened else ''}"
+                    if opened and door == "station_door":
+                        model, y = NS + "station_door_slid", 0  # slid away into the wall: nothing to draw
                     variants[f"facing={facing},half={half},hinge={hinge},open={str(opened).lower()}"] = {"model": model, **({"y": y} if y else {})}
     return {"variants": variants}
 
@@ -1145,14 +1155,14 @@ def fence_state(name):
                           {"when": {"south": "true"}, "apply": side(180)}, {"when": {"west": "true"}, "apply": side(270)}]}
 
 
-SIMPLE = ["hydroponic_planter", "hanging_cables", "crew_table", "station_bench", "catwalk_grating", "tether_cable",
+SIMPLE = ["hydroponic_planter", "hanging_cables", "crew_table", "catwalk_grating", "tether_cable",
           "glow_orb", "singularity_core", "singularity_shell"] + CUBES
-FACING = ["crew_bed", "crew_locker", "server_rack", "kitchen_counter", "stove", "treadmill", "weight_rack", "console", "broken_console"]
+FACING = ["station_bench", "crew_bed", "crew_locker", "server_rack", "kitchen_counter", "stove", "treadmill", "weight_rack", "console", "broken_console"]
 # Blocks whose models are written under another name than the block.
 ITEM_MODEL = {"station_stairs": "station_stairs", "safety_rail": "safety_rail_inventory", "rail_lamp": "rail_lamp_inventory",
               "station_door": "station_door_bottom_left", "station_hatch": "station_hatch_0", "yellow_doorway": "yellow_doorway_0",
               "plasma": "plasma_0", "station_crate": "station_crate"}
-FACING_MODEL = {"crew_bed": "crew_bed", "crew_locker": "crew_locker", "server_rack": "server_rack", "kitchen_counter": "kitchen_counter", "stove": "stove",
+FACING_MODEL = {"station_bench": "station_bench", "crew_bed": "crew_bed", "crew_locker": "crew_locker", "server_rack": "server_rack", "kitchen_counter": "kitchen_counter", "stove": "stove",
                 "treadmill": "treadmill", "weight_rack": "weight_rack", "console": "console", "broken_console": "broken_console"}
 UNBREAKABLE = {"hull_plate", "hull_seam", "inner_hull_plate", "observation_glass", "hull_glass", "station_hatch", "yellow_doorway", "doorway_frame",
                "static_tear", "singularity_core", "singularity_shell", "plasma"}

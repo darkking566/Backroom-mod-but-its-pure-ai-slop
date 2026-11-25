@@ -131,11 +131,11 @@ final class ZenithChunkGenerator extends ChunkGenerator {
 			case WARDROBE -> facing(ZenithBlocks.OPEN_WARDROBE, dir);
 			case BUNK_BED -> facing(ZenithBlocks.BUNK_BED, dir);
 			case FRAME -> facing(ZenithBlocks.WALL_FRAME, dir);
-			case ITEMS -> ZenithBlocks.PERSONAL_ITEMS.defaultBlockState();
+			case ITEMS -> ZenithBlocks.PERSONAL_ITEMS.defaultBlockState().setValue(ZenithClutterBlock.ON_TABLE, true);
 			case SINK -> facing(ZenithBlocks.KITCHEN_SINK, dir);
 			case FRIDGE -> facing(ZenithBlocks.FRIDGE, dir);
 			case POTS -> facing(ZenithBlocks.HANGING_POTS, dir);
-			case DISHES -> ZenithBlocks.DISH_STACK.defaultBlockState();
+			case DISHES -> ZenithBlocks.DISH_STACK.defaultBlockState().setValue(ZenithClutterBlock.ON_TABLE, true);
 			case BENCH_PRESS -> facing(ZenithBlocks.BENCH_PRESS, dir);
 			case BAG -> ZenithBlocks.PUNCHING_BAG.defaultBlockState();
 			case MIRROR -> facing(ZenithBlocks.WALL_MIRROR, dir);
@@ -157,7 +157,7 @@ final class ZenithChunkGenerator extends ChunkGenerator {
 			case SEA_CARPET -> SEA_CARPET;
 			case SEA_LIGHT -> SEA_LIGHT;
 			case VINES -> ZenithBlocks.HANGING_VINES.defaultBlockState();
-			case BENCH -> ZenithBlocks.STATION_BENCH.defaultBlockState();
+			case BENCH -> facing(ZenithBlocks.STATION_BENCH, dir);
 			case PORTAL -> ZenithBlocks.YELLOW_DOORWAY.defaultBlockState().setValue(ZenithPortalBlock.PART, extra);
 			case PORTAL_FRAME -> ZenithBlocks.DOORWAY_FRAME.defaultBlockState();
 			case STATIC_TEAR -> ZenithBlocks.STATIC_TEAR.defaultBlockState();

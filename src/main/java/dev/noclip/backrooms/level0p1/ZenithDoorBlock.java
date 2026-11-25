@@ -6,14 +6,18 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
-/** A sliding door of the station: ZenithDoors opens it when you come near, and it closes itself when nobody is. */
+/** A sliding door of the station (open, it is drawn slid away into the wall): ZenithDoors opens it when you come near, and it closes itself when nobody is. */
 final class ZenithDoorBlock extends DoorBlock {
 	private static final int CHECK = 24;
 
@@ -41,6 +45,17 @@ final class ZenithDoorBlock extends DoorBlock {
 				if (open && level instanceof ServerLevel serverLevel) serverLevel.scheduleTick(other, this, CHECK);
 			}
 		}
+	}
+
+	// An open door has slid into the wall (its open model is empty): nothing left to bump into or aim at.
+	@Override
+	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+		return state.getValue(OPEN) ? Shapes.empty() : super.getShape(state, level, pos, context);
+	}
+
+	@Override
+	protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+		return state.getValue(OPEN) ? Shapes.empty() : super.getCollisionShape(state, level, pos, context);
 	}
 
 	@Override

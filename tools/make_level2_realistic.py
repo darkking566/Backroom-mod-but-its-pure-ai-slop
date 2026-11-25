@@ -419,7 +419,7 @@ def pack_meta():
         "pack": {
             "description": {
                 "translate": "pack.noclip_backrooms.realistic.description",
-                "fallback": "Photo-based textures (Level 0 & Level 2)",
+                "fallback": "Photo-based textures (Level 0, 0.1 & 2)",
             },
             "min_format": 88,
             "max_format": 88,

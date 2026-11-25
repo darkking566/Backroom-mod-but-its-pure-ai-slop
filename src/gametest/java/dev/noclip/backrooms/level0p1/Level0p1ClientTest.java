@@ -542,6 +542,36 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 		shoot(context, game, x0 + 2.5, y + 0.6, z0 - 3.2, 0, 15, "level0p1_props_left");
 		shoot(context, game, x0 + 8.5, y + 0.6, z0 - 3.2, 0, 15, "level0p1_props_right");
 		shoot(context, game, x0 + 3.5, y + 0.6, z0 - 2.0, 25, 20, "level0p1_props_coat");
+		// Second row: gym pieces, a bench, clutter on a table and on the floor, and an open door that has slid away.
+		game.getServer().runOnServer(s -> {
+			ServerLevel level = station(s);
+			Block[] row = {ZenithBlocks.TREADMILL_BLOCK, ZenithBlocks.BENCH_PRESS, ZenithBlocks.STATION_BENCH};
+			for (int i = 0; i < 13; i++) {
+				level.setBlock(new BlockPos(x0 + i, y, z0), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
+				level.setBlock(new BlockPos(x0 + i, y + 1, z0), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
+				level.setBlock(new BlockPos(x0 + i, y + 2, z0), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
+			}
+			for (int i = 0; i < row.length; i++) {
+				level.setBlock(new BlockPos(x0 + i, y, z0), row[i].defaultBlockState().setValue(ZenithFacingBlock.FACING, net.minecraft.core.Direction.NORTH), 2);
+			}
+			level.setBlock(new BlockPos(x0 + 4, y, z0), ZenithBlocks.CREW_TABLE.defaultBlockState(), 2);
+			level.setBlock(new BlockPos(x0 + 4, y + 1, z0), ZenithChunkGenerator.state(ZenithLayout.of(ZenithLayout.Kind.ITEMS)), 2);
+			level.setBlock(new BlockPos(x0 + 5, y, z0), ZenithBlocks.PERSONAL_ITEMS.defaultBlockState(), 2);
+			level.setBlock(new BlockPos(x0 + 6, y, z0), ZenithBlocks.DISH_STACK.defaultBlockState(), 2);
+			for (int i = 0; i < 2; i++) {
+				for (int half = 0; half < 2; half++) {
+					level.setBlock(new BlockPos(x0 + 10 + i, y + half, z0), ZenithChunkGenerator.state(ZenithLayout.of(ZenithLayout.Kind.DOOR, 0, (half << 1) | i)), 2);
+				}
+			}
+			level.setBlock(new BlockPos(x0 + 8, y, z0), ZenithChunkGenerator.state(ZenithLayout.of(ZenithLayout.Kind.DOOR, 0, 0)), 2);
+			level.setBlock(new BlockPos(x0 + 8, y + 1, z0), ZenithChunkGenerator.state(ZenithLayout.of(ZenithLayout.Kind.DOOR, 0, 2)), 2);
+			((ZenithDoorBlock) ZenithBlocks.STATION_DOOR_BLOCK).setOpen(null, level, level.getBlockState(new BlockPos(x0 + 10, y, z0)), new BlockPos(x0 + 10, y, z0), true);
+		});
+		shoot(context, game, x0 + 2.5, y + 0.6, z0 - 3.2, 0, 15, "level0p1_props_gym");
+		game.getServer().runCommand("gamemode survival @a"); // a spectator does not hold an automatic door open
+		shoot(context, game, x0 + 10.0, y + 0.6, z0 - 2.2, 0, 10, "level0p1_props_open_door");
+		game.getServer().runOnServer(s -> check(station(s).getBlockState(new BlockPos(x0 + 11, y, z0)).getValue(DoorBlock.OPEN), "the paired leaf did not open"));
+		game.getServer().runCommand("gamemode spectator @a");
 	}
 
 	private static final java.util.Set<Block> SALVAGED = java.util.Set.of(ZenithBlocks.HANGING_CABLES, ZenithBlocks.CONSOLE,

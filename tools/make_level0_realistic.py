@@ -701,7 +701,7 @@ def models():
 def pack_meta():
     PACK.mkdir(parents=True, exist_ok=True)
     meta = {"pack": {"description": {"translate": "pack.noclip_backrooms.realistic.description",
-                                     "fallback": "Photo-based textures (Level 0 & Level 2)"},
+                                     "fallback": "Photo-based textures (Level 0, 0.1 & 2)"},
                      "min_format": 88, "max_format": 88}}
     (PACK / "pack.mcmeta").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf8")
 

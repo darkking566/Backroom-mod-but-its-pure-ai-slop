@@ -729,6 +729,8 @@ final class ZenithLayout {
 
 	/** A bay's furniture, minus anything hung on a wall that is not there (a merged hall opens up the bays' inner walls). */
 	private static int furnishCoords(long seed, Room room, int mx, int mz, int k, int rx, int rz, int W, int H, int t) {
+		// In a merged hall the bays' inner walls are gone: what stood against them would stand in the middle of the hall.
+		if (W > 12 && (rx == 10 || rx == 17) || H > 12 && (rz == 10 || rz == 17)) return of(Kind.AIR);
 		int cell = furnishBay(seed, room, mx, mz, k, rx, rz, W, H, t);
 		if (!hangsOnWall(kind(cell))) return cell;
 		int d = dir(cell); // the wall is behind, opposite the way it faces
@@ -809,7 +811,7 @@ final class ZenithLayout {
 		if (t == 1 && a == 3 && b == 0) return of(Kind.BAG);
 		if (t == 1 && a == 0 && b == 1) return of(Kind.DISPENSER, faceU);
 		if (t == 1 && a == 2 && b == 3 && roll % 2 == 0) return of(Kind.MATS);
-		if (t == 1 && a == 3 && b == 3 && roll % 2 == 0) return of(Kind.BENCH);
+		if (t == 1 && a == 3 && b == 3 && roll % 2 == 0) return of(Kind.BENCH, faceU); // long side toward the wall side
 		return of(Kind.AIR);
 	}
 

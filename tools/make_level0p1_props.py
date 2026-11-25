@@ -453,11 +453,12 @@ def model_plates():
 
 def model_bench_press():
     return model({"pad": "bench_pad", "bar": "bar_steel", "plates": "plates"}, [
-        cuboid((4, 0, 2), (6, 6, 14), "#bar"), cuboid((10, 0, 2), (12, 6, 14), "#bar"),
-        el((3, 6, 1), (13, 8, 15), {"up": {"texture": "#pad", "uv": FULLUV}, **sides("#pad", ("north", "south", "east", "west", "down"), uv=FULLUV)}),
-        cuboid((0, 11, 3), (16, 12, 4), "#bar"), cuboid((0, 11, 12), (16, 12, 13), "#bar"),
-        cuboid((0, 8, 3), (1, 15, 13), "#plates"), cuboid((15, 8, 3), (16, 15, 13), "#plates"),
-        cuboid((1, 8, 2), (3, 12, 4), "#bar"), cuboid((13, 8, 2), (15, 12, 4), "#bar")])
+        # A narrow pad on two legs, the rack's two uprights at the head end (south), one bar resting across them, a plate on each end.
+        cuboid((6, 0, 2), (10, 6, 4), "#bar"), cuboid((6, 0, 11), (10, 6, 13), "#bar"),
+        el((5, 6, 1), (11, 8, 14), {"up": {"texture": "#pad", "uv": FULLUV}, **sides("#pad", ("north", "south", "east", "west", "down"), uv=FULLUV)}),
+        cuboid((3, 0, 13.5), (4, 15, 14.5), "#bar"), cuboid((12, 0, 13.5), (13, 15, 14.5), "#bar"),
+        cuboid((0, 14, 13.5), (16, 15, 14.5), "#bar"),
+        cuboid((0.5, 11.5, 11.5), (2, 17.5, 16), "#plates"), cuboid((14, 11.5, 11.5), (15.5, 17.5, 16), "#plates")])
 
 
 def model_bag():
@@ -563,6 +564,7 @@ MODELS = {
     "ceiling_speaker": model_speaker, "icicles": model_icicles, "ice_drift": model_drift, "slag_pile": model_slag, "heat_vent": model_vent,
     "countdown_screen": model_countdown, "bridge_coil": model_coil, "research_notes": model_notes, "lab_coat": model_coat,
 }
+ON_TABLE = {"personal_items", "dish_stack"}
 FACING = {"crew_desk", "open_wardrobe", "bunk_bed", "wall_frame", "kitchen_sink", "fridge", "hanging_pots", "bench_press", "wall_mirror", "water_dispenser", "water_tank", "countdown_screen", "lab_coat"}
 
 NAMES_EN = {
@@ -627,8 +629,17 @@ def main():
         L.save_texture(name, draw())
     blockstates = {}
     for name, build in MODELS.items():
-        L.write_json(L.MODELS / f"{name}.json", build())
+        data = build()
         blockstates[name] = L.facing_state(name) if name in FACING else {"variants": {"": {"model": NS + name}}}
+        if name in ON_TABLE:
+            # Drawn sunk 3 px into a table top (13 px high); the plain model is the same lifted onto a whole floor or counter.
+            L.write_json(L.MODELS / f"{name}_on_table.json", data)
+            data = L.json.loads(L.json.dumps(data))
+            for element in data["elements"]:
+                element["from"][1] += 3
+                element["to"][1] += 3
+            blockstates[name] = {"variants": {"on_table=true": {"model": NS + name + "_on_table"}, "on_table=false": {"model": NS + name}}}
+        L.write_json(L.MODELS / f"{name}.json", data)
         L.write_json(L.ASSETS / f"blockstates/{name}.json", blockstates[name])
         L.write_json(L.ASSETS / f"items/{name}.json", {"model": {"type": "minecraft:model", "model": NS + name}})
         L.write_json(L.DATA / f"noclip_backrooms/loot_table/blocks/{name}.json", L.loot_table(name))

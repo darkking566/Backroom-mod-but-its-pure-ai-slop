@@ -32,7 +32,7 @@ public final class ZenithBlocks {
 
 	private static final VoxelShape FULL = Block.box(0, 0, 0, 16, 16, 16);
 	private static final VoxelShape BED = Block.box(0, 0, 0, 16, 9, 16);
-	private static final VoxelShape TREADMILL = Block.box(0, 0, 0, 16, 7, 16);
+	private static final VoxelShape TREADMILL = net.minecraft.world.phys.shapes.Shapes.or(Block.box(1, 0, 0, 15, 4, 16), Block.box(1, 4, 0, 15, 15, 3));
 	private static final VoxelShape WEIGHTS = Block.box(1, 0, 1, 15, 13, 15);
 	private static final VoxelShape PLANTER = Block.box(0, 0, 0, 16, 10, 16);
 	private static final VoxelShape BENCH = Block.box(1, 0, 3, 15, 8, 13);
@@ -40,11 +40,9 @@ public final class ZenithBlocks {
 	private static final VoxelShape CATWALK = Block.box(0, 12, 0, 16, 16, 16);
 	private static final VoxelShape ORB = Block.box(4, 4, 4, 12, 12, 12);
 	private static final VoxelShape DESK = Block.box(0, 0, 0, 16, 13, 16);
-	private static final VoxelShape BENCH_PRESS_SHAPE = Block.box(0, 0, 1, 16, 15, 15);
-	// Wall pieces against the south face (the wall behind a north-facing block; ZenithFacingBlock turns it); table-top
-	// clutter sits 3 pixels down into the table's block, where its model is.
+	private static final VoxelShape BENCH_PRESS_SHAPE = Block.box(0, 0, 1, 16, 16, 16);
+	// Wall pieces against the south face (the wall behind a north-facing block; ZenithFacingBlock turns it).
 	private static final VoxelShape WALL_HUNG = Block.box(1, 1, 14, 15, 15, 16);
-	private static final VoxelShape ON_TABLE = Block.box(2, -3, 2, 14, 1, 14);
 	private static final VoxelShape COLUMN = Block.box(3, 0, 3, 13, 16, 13);
 	private static final VoxelShape MATS = Block.box(1, 0, 1, 15, 6, 15);
 	private static final VoxelShape TETHER = Block.box(2, 0, 2, 14, 16, 14);
@@ -117,7 +115,7 @@ public final class ZenithBlocks {
 	public static final Block HANGING_CABLES = register("hanging_cables", Properties.of().mapColor(MapColor.COLOR_BLACK).strength(0.3F).sound(SoundType.CHAIN)
 			.noOcclusion().noCollision().lightLevel(s -> 6), p -> new ZenithShapedBlock(p, FULL, false)); // live wires spark: the only light in a wreck
 	public static final Block CREW_TABLE = register("crew_table", steel(MapColor.COLOR_LIGHT_GRAY, 2.0F).noOcclusion(), p -> new ZenithShapedBlock(p, TABLE, true));
-	public static final Block STATION_BENCH = register("station_bench", steel(MapColor.COLOR_LIGHT_GRAY, 2.0F).noOcclusion(), p -> new ZenithShapedBlock(p, BENCH, true));
+	public static final Block STATION_BENCH = register("station_bench", steel(MapColor.COLOR_LIGHT_GRAY, 2.0F).noOcclusion(), p -> new ZenithFacingBlock(p, BENCH));
 
 	// What makes the rooms look lived in: bedrooms, galleys, gyms, hydroponic greenhouses.
 	public static final Block CREW_DESK = register("crew_desk", steel(MapColor.WOOD, 2.0F).sound(SoundType.WOOD).noOcclusion().lightLevel(s -> 6),
@@ -126,13 +124,13 @@ public final class ZenithBlocks {
 	public static final Block BUNK_BED = register("bunk_bed", steel(MapColor.COLOR_BLUE, 2.0F).sound(SoundType.WOOL).noOcclusion(), p -> new ZenithFacingBlock(p, FULL));
 	public static final Block WALL_FRAME = register("wall_frame", steel(MapColor.WOOD, 0.5F).sound(SoundType.WOOD).noOcclusion().noCollision(), p -> new ZenithFacingBlock(p, WALL_HUNG));
 	public static final Block PERSONAL_ITEMS = register("personal_items", steel(MapColor.COLOR_RED, 0.3F).sound(SoundType.WOOL).noOcclusion().noCollision(),
-			p -> new ZenithShapedBlock(p, ON_TABLE, false));
+			ZenithClutterBlock::new);
 	public static final Block KITCHEN_SINK = register("kitchen_sink", steel(MapColor.COLOR_LIGHT_GRAY, 2.5F), p -> new ZenithFacingBlock(p, FULL));
 	public static final Block FRIDGE = register("fridge", steel(MapColor.SNOW, 3.0F), p -> new ZenithFacingBlock(p, FULL));
 	public static final Block HANGING_POTS = register("hanging_pots", steel(MapColor.COLOR_GRAY, 0.5F).sound(SoundType.CHAIN).noOcclusion().noCollision(),
 			p -> new ZenithFacingBlock(p, WALL_HUNG));
 	public static final Block DISH_STACK = register("dish_stack", steel(MapColor.SNOW, 0.3F).sound(SoundType.GLASS).noOcclusion().noCollision(),
-			p -> new ZenithShapedBlock(p, ON_TABLE, false));
+			ZenithClutterBlock::new);
 	public static final Block BENCH_PRESS = register("bench_press", steel(MapColor.COLOR_GRAY, 3.0F).noOcclusion(), p -> new ZenithFacingBlock(p, BENCH_PRESS_SHAPE));
 	public static final Block PUNCHING_BAG = register("punching_bag", steel(MapColor.COLOR_RED, 2.0F).sound(SoundType.WOOL).noOcclusion(), p -> new ZenithShapedBlock(p, COLUMN, true));
 	public static final Block WALL_MIRROR = register("wall_mirror", steel(MapColor.COLOR_LIGHT_BLUE, 0.5F).sound(SoundType.GLASS).noOcclusion().noCollision(),

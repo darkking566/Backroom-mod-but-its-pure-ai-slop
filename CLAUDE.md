@@ -227,6 +227,16 @@
   - `gradlew build` 與完整 `runClientGameTest -Plevels=0.1`（全部段落，含 `blocks`）通過；看過窗外、停電、機器人、開門截圖，紅眼在截圖裡太小沒確認到，選取框沒有實際用準星看
 - 使用者同意後，把 `main` 推送到 GitHub（Level 0.1 審查報告四批修正 `2e06b66`、`ab64a57`、`8e53852`、`5af9bd6` 與紀錄）；推送前抓過 GitHub，沒有新提交要合併；`5af9bd6` 已跑過 `gradlew build` 與完整 Level 0.1 實機測試；沒有強制推送、沒有改寫歷史
 
+- 使用者要求把 Level 0.1 審查報告剩下的與之前「沒做」的也做完：
+  - 寫實材質包加 Level 0.1：新增 `tools/make_level0p1_realistic.py`（沿用 `make_level2_realistic.py` 的函式與已下載的 ambientCG CC0 照片），159 張 512 像素貼圖加 `_n`／`_s`（約 53 MB），保留原本的畫面設計、表面依材質（鋼、烤漆、布、地毯、木、水泥、冰、鏽）疊照片紋理；玻璃、燈、螢幕、奇點只放大；預覽 `docs/look/level0p1_realistic.png`；資源包描述改成「Level 0、0.1 與 2」
+  - 跑步機、臥推架重做模型（支架、扶手、斜面板；窄墊、後端立柱、槓鈴與槓片），選取框跟著改；健身房長椅加方向（`station_bench` 改 `ZenithFacingBlock`，健身房朝房內）
+  - 合併大廳原本隔牆的位置（第 10、17 格）不再放家具，不會有家具站在打通處中間
+  - 自動門改成滑門：開著時模型是空的（`station_door_slid`），沒有碰撞也選不到，看起來像滑進牆裡；沒做滑動動畫
+  - 桌上雜物（私人物品、疊盤）新增 `ZenithClutterBlock` 與 `on_table` 屬性：世界生成在桌上用往下 3 像素的模型，玩家放在桌子或書桌上也會自動用這個，放在一般地板上不再陷進去
+  - `Level0p1ClientTest` 的 `props` 段多拍兩張（健身器材、長椅、桌上與地上雜物；開著的對開門，並檢查另一扇一起開）；新增 `docs/levels/level0p1/screens/props_gym.png`、`props_open_door.png`
+  - `gradlew build` 與完整 `runClientGameTest -Plevels=0.1` 通過（65 張截圖），看過健身器材、雜物、開著的門與寫實材質牆面
+  - 沒確認到：服務機器人紅眼發光（截圖太小）、用準星逐一看選取框（只看到牆的框）
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23
