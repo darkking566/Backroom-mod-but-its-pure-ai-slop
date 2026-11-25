@@ -370,6 +370,7 @@
   - 限制：用準星點伸出去的那一段選不到道具（要點它本身那格）
   - `Level1ClientTest` 新增 `bigProps` 段：6 種道具 × 4 個方向，在伸出去的每一邊與頂上探測碰撞（36 處）
   - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=bigProps,checkBlocks,sectors,sectorFit,views,monsters` 通過；沒有實際走去撞車、也沒拍照
+- 使用者同意後，把 `main` 推送到 GitHub（`993f728` 大型道具完整碰撞箱與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
