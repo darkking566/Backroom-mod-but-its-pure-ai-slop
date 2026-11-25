@@ -6,15 +6,7 @@
       },
       {
         "model": "noclip_backrooms:block/level1/gothic_ceiling",
-        "y": 90
-      },
-      {
-        "model": "noclip_backrooms:block/level1/gothic_ceiling",
         "y": 180
-      },
-      {
-        "model": "noclip_backrooms:block/level1/gothic_ceiling",
-        "y": 270
       }
     ]
   }

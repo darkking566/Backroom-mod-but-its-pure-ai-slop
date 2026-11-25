@@ -480,7 +480,7 @@ public final class Level1SectorArchitecture {
 		int color = Math.floorMod(Level1Layout.hash(seed, lx / 12, lz / 12, 113), NEON_COUNT);
 		// Glowing neon drop-columns hanging from the ceiling down to head height
 		if (lx % 12 == 6 && lz % 12 == 6 && y >= FLOOR + 3 && y < topCeil) {
-			return state(neon(color));
+			return state(neon(color)).setValue(NeonBlock.UPRIGHT, true);
 		}
 		// Horizontal neon light-ribbons crisscrossing overhead
 		if ((y == FLOOR + 4 || (topCeil >= 46 && y == FLOOR + 9)) && (lx % 12 == 6 || lz % 12 == 6)) {

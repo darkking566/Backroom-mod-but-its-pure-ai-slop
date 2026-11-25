@@ -536,7 +536,8 @@ public final class Level1Landmarks {
 	}
 
 	private static BlockState solidConcrete() {
-		return Blocks.CONCRETE.gray().defaultBlockState();
+		// Level 1's own concrete, not vanilla's flat grey: cliff walls and tunnel walls show it (and sectors restyle it).
+		return state(Level1Blocks.GARAGE_WALL);
 	}
 
 	private static BlockState state(Block block) {

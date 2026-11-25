@@ -1,7 +1,18 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level1/legend_pillar"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/legend_pillar",
+        "weight": 4
+      },
+      {
+        "model": "noclip_backrooms:block/level1/legend_pillar_v1",
+        "weight": 1
+      },
+      {
+        "model": "noclip_backrooms:block/level1/legend_pillar_v2",
+        "weight": 1
+      }
+    ]
   }
 }

@@ -1,7 +1,10 @@
 {
   "variants": {
-    "": {
+    "upright=false": {
       "model": "noclip_backrooms:block/level1/neon_magenta"
+    },
+    "upright=true": {
+      "model": "noclip_backrooms:block/level1/neon_magenta_upright"
     }
   }
 }

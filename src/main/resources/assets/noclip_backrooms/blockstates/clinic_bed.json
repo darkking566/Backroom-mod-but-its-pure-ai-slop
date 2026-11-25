@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "noclip_backrooms:block/level1/hospital_bed"
+      "model": "noclip_backrooms:block/level1/clinic_bed"
     }
   }
 }

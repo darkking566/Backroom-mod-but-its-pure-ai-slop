@@ -1,7 +1,18 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level1/garden_pillar"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/garden_pillar",
+        "weight": 4
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garden_pillar_v1",
+        "weight": 1
+      },
+      {
+        "model": "noclip_backrooms:block/level1/garden_pillar_v2",
+        "weight": 1
+      }
+    ]
   }
 }

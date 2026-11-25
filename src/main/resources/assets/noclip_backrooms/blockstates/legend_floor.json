@@ -6,15 +6,7 @@
       },
       {
         "model": "noclip_backrooms:block/level1/legend_floor",
-        "y": 90
-      },
-      {
-        "model": "noclip_backrooms:block/level1/legend_floor",
         "y": 180
-      },
-      {
-        "model": "noclip_backrooms:block/level1/legend_floor",
-        "y": 270
       }
     ]
   }

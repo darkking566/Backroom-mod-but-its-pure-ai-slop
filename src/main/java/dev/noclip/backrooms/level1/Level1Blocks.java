@@ -235,11 +235,11 @@ public final class Level1Blocks {
 	public static final Block LEGEND_CEILING = register("legend_ceiling", Properties.of().mapColor(MapColor.COLOR_BROWN).strength(2.0F).sound(SoundType.WOOD));
 	public static final Block COPPER_PILLAR = register("copper_pillar", Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(2.0F).sound(SoundType.METAL));
 	/** Neon in the Legend Sector: not on the lamps' circuit, so a blackout leaves it burning. */
-	public static final Block NEON_CYAN = register("neon_cyan", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12));
+	public static final Block NEON_CYAN = register("neon_cyan", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12), NeonBlock::new);
 	/** Neon in the Legend Sector: not on the lamps' circuit, so a blackout leaves it burning. */
-	public static final Block NEON_MAGENTA = register("neon_magenta", Properties.of().mapColor(MapColor.COLOR_MAGENTA).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12));
+	public static final Block NEON_MAGENTA = register("neon_magenta", Properties.of().mapColor(MapColor.COLOR_MAGENTA).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12), NeonBlock::new);
 	/** Neon in the Legend Sector: not on the lamps' circuit, so a blackout leaves it burning. */
-	public static final Block NEON_AMBER = register("neon_amber", Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12));
+	public static final Block NEON_AMBER = register("neon_amber", Properties.of().mapColor(MapColor.COLOR_ORANGE).strength(0.5F).sound(SoundType.GLASS).lightLevel(state -> 12), NeonBlock::new);
 	public static final Block GARDEN_GRASS = register("garden_grass", Properties.of().mapColor(MapColor.PLANT).instabreak().noCollision().noOcclusion().replaceable().sound(SoundType.GRASS),
 			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 12, 14)));
 	public static final Block GARDEN_FERN = register("garden_fern", Properties.of().mapColor(MapColor.PLANT).instabreak().noCollision().noOcclusion().replaceable().sound(SoundType.GRASS),

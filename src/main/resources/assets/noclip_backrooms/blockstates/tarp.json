@@ -1,7 +1,18 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level1/tarp"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level1/tarp",
+        "weight": 4
+      },
+      {
+        "model": "noclip_backrooms:block/level1/tarp_v1",
+        "weight": 1
+      },
+      {
+        "model": "noclip_backrooms:block/level1/tarp_v2",
+        "weight": 1
+      }
+    ]
   }
 }
