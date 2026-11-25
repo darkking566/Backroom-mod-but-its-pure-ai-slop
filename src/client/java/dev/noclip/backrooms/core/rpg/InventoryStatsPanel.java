@@ -104,8 +104,7 @@ public final class InventoryStatsPanel {
 					case VITALITY -> List.of(
 							Component.translatable("ui.noclip_backrooms.rpg.vit.title"),
 							Component.translatable("ui.noclip_backrooms.rpg.vit.desc",
-									String.format(Locale.ROOT, "+%.0f", stats.maxHealthBonus()),
-									String.format(Locale.ROOT, "+%.2f", stats.armorToughnessBonus())),
+									String.format(Locale.ROOT, "+%.0f", stats.maxHealthBonus())),
 							Component.translatable("ui.noclip_backrooms.rpg.vit.regen",
 									String.format(Locale.ROOT, "+%.2f", stats.healthRegenPerSec()))
 					);

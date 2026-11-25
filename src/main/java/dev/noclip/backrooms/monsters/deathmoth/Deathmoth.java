@@ -1,5 +1,7 @@
 package dev.noclip.backrooms.monsters.deathmoth;
 
+import dev.noclip.backrooms.monsters.Tuning;
+import dev.noclip.backrooms.monsters.Retreat;
 import dev.noclip.backrooms.level1.Level1Items;
 import dev.noclip.backrooms.monsters.smiler.Smiler;
 import java.util.EnumSet;
@@ -64,7 +66,7 @@ public class Deathmoth extends Monster {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 36)
+				.add(Attributes.MAX_HEALTH, Tuning.hp(36))
 				.add(Attributes.ATTACK_DAMAGE, 6)
 				.add(Attributes.MOVEMENT_SPEED, 0.29)
 				.add(Attributes.FOLLOW_RANGE, 32)
@@ -87,6 +89,7 @@ public class Deathmoth extends Monster {
 
 	@Override
 	protected void registerGoals() {
+		Retreat.add(this, goalSelector, targetSelector);
 		goalSelector.addGoal(0, new FloatGoal(this));
 		goalSelector.addGoal(2, new MothHuntGoal(this));
 		goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.75));

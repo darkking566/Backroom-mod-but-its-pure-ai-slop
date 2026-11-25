@@ -1,5 +1,7 @@
 package dev.noclip.backrooms.monsters.partygoer;
 
+import dev.noclip.backrooms.monsters.Tuning;
+import dev.noclip.backrooms.monsters.Retreat;
 import dev.noclip.backrooms.monsters.partypooper.Partypooper;
 import java.util.EnumSet;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -48,7 +50,7 @@ public class Partygoer extends Monster {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 34)
+				.add(Attributes.MAX_HEALTH, Tuning.hp(34))
 				.add(Attributes.ATTACK_DAMAGE, 6.5)
 				.add(Attributes.MOVEMENT_SPEED, 0.27)
 				.add(Attributes.FOLLOW_RANGE, 28)
@@ -71,6 +73,7 @@ public class Partygoer extends Monster {
 
 	@Override
 	protected void registerGoals() {
+		Retreat.add(this, goalSelector, targetSelector);
 		goalSelector.addGoal(0, new FloatGoal(this));
 		goalSelector.addGoal(2, new PartyChaseGoal(this));
 		goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 0.55) {

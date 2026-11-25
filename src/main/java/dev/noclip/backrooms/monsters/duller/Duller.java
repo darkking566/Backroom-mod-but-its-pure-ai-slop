@@ -1,5 +1,7 @@
 package dev.noclip.backrooms.monsters.duller;
 
+import dev.noclip.backrooms.monsters.Tuning;
+import dev.noclip.backrooms.monsters.Retreat;
 import java.util.EnumSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -80,7 +82,7 @@ public class Duller extends Monster {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 30)
+				.add(Attributes.MAX_HEALTH, Tuning.hp(30))
 				.add(Attributes.ATTACK_DAMAGE, 7)
 				.add(Attributes.MOVEMENT_SPEED, 0.27)
 				.add(Attributes.FOLLOW_RANGE, 32)
@@ -89,6 +91,7 @@ public class Duller extends Monster {
 
 	@Override
 	protected void registerGoals() {
+		Retreat.add(this, goalSelector, targetSelector);
 		goalSelector.addGoal(0, new FloatGoal(this));
 		goalSelector.addGoal(2, new WallPhaseAmbushGoal(this));
 		goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.65));

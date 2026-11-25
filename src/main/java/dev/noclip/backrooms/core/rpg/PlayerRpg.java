@@ -4,11 +4,15 @@ import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.monsters.beastlevel5.BeastOfLevel5;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -53,6 +57,12 @@ public final class PlayerRpg {
 	private static final Identifier MOD_AGI_ATK = BackroomsMod.id("rpg_agility_attack");
 	private static final Identifier MOD_VIT_HP = BackroomsMod.id("rpg_vitality_health");
 	private static final Identifier MOD_VIT_TOUGH = BackroomsMod.id("rpg_vitality_toughness");
+	private static final Identifier MOD_BACKROOMS_HP = BackroomsMod.id("backrooms_frailty");
+	/** The Backrooms take half of the player's base 20 health (docs/HORROR_ESCAPE_PLAN.md). */
+	public static final double BACKROOMS_HEALTH_PENALTY = -10.0;
+	/** Vitality's regeneration waits this long after the player was last hurt: you heal by hiding, not mid-fight. */
+	private static final int REGEN_DELAY_TICKS = 100;
+	private static final Map<UUID, Long> LAST_HURT = new HashMap<>();
 
 	private static final int SANITY_TICK_INTERVAL = 10; // 0.5 seconds
 
@@ -75,6 +85,18 @@ public final class PlayerRpg {
 		});
 
 		ServerPlayerEvents.JOIN.register(player -> applyAttributes(player, get(player)));
+		ServerPlayerEvents.LEAVE.register(player -> LAST_HURT.remove(player.getUUID()));
+		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register((player, from, to) -> {
+			// Keep the share of health across the change: full in the Backrooms is full at home, half is half.
+			float share = player.getMaxHealth() > 0.0F ? player.getHealth() / player.getMaxHealth() : 1.0F;
+			applyAttributes(player, get(player));
+			if (player.isAlive()) player.setHealth(Math.max(1.0F, share * player.getMaxHealth()));
+		});
+		ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damageTaken, blocked) -> {
+			if (entity instanceof ServerPlayer player && damageTaken > 0.0F) {
+				LAST_HURT.put(player.getUUID(), player.level().getGameTime());
+			}
+		});
 
 		ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
 			PlayerStats current = get(newPlayer);
@@ -146,10 +168,16 @@ public final class PlayerRpg {
 		updateModifier(player, Attributes.MOVEMENT_SPEED, MOD_AGI_MOVE, stats.moveSpeedBonus(), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 		updateModifier(player, Attributes.ATTACK_SPEED, MOD_AGI_ATK, stats.attackSpeedBonus(), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 		updateModifier(player, Attributes.MAX_HEALTH, MOD_VIT_HP, stats.maxHealthBonus(), AttributeModifier.Operation.ADD_VALUE);
-		updateModifier(player, Attributes.ARMOR_TOUGHNESS, MOD_VIT_TOUGH, stats.armorToughnessBonus(), AttributeModifier.Operation.ADD_VALUE);
+		updateModifier(player, Attributes.MAX_HEALTH, MOD_BACKROOMS_HP, inBackrooms(player) ? BACKROOMS_HEALTH_PENALTY : 0.0,
+				AttributeModifier.Operation.ADD_VALUE);
+		updateModifier(player, Attributes.ARMOR_TOUGHNESS, MOD_VIT_TOUGH, 0.0, AttributeModifier.Operation.ADD_VALUE);
 		if (player.getHealth() > player.getMaxHealth()) {
 			player.setHealth(player.getMaxHealth());
 		}
+	}
+
+	public static boolean inBackrooms(ServerPlayer player) {
+		return player.level().dimension().identifier().getNamespace().equals(BackroomsMod.MOD_ID);
 	}
 
 	private static void updateModifier(ServerPlayer player, Holder<Attribute> attribute, Identifier id, double amount, AttributeModifier.Operation op) {
@@ -169,8 +197,10 @@ public final class PlayerRpg {
 			ServerLevel level = player.level();
 			PlayerStats stats = get(player);
 
-			// Vitality passive health regeneration (0.5s tick step; requires non-starving food >= 6).
-			if (stats.vitality() > 0 && player.getHealth() < player.getMaxHealth() && player.getFoodData().getFoodLevel() >= 6) {
+			// Vitality passive health regeneration (0.5s tick step; not starving, and not hurt in the last five seconds).
+			long sinceHurt = level.getGameTime() - LAST_HURT.getOrDefault(player.getUUID(), Long.MIN_VALUE / 2);
+			if (stats.vitality() > 0 && player.getHealth() < player.getMaxHealth() && player.getFoodData().getFoodLevel() >= 6
+					&& sinceHurt >= REGEN_DELAY_TICKS) {
 				player.heal(stats.healthRegenPerSec() * 0.5F);
 			}
 

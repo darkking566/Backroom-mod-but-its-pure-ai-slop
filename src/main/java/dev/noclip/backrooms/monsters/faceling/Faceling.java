@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.monsters.faceling;
 
+import dev.noclip.backrooms.monsters.Tuning;
 import dev.noclip.backrooms.level1.Level1Items;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -48,7 +49,7 @@ public class Faceling extends PathfinderMob {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 26)
+				.add(Attributes.MAX_HEALTH, Tuning.hp(26))
 				.add(Attributes.ATTACK_DAMAGE, 5)
 				.add(Attributes.MOVEMENT_SPEED, 0.25)
 				.add(Attributes.FOLLOW_RANGE, 24);

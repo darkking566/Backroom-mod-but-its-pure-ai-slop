@@ -1,0 +1,10 @@
+{
+ "pack": {
+  "description": {
+   "translate": "pack.noclip_backrooms.realistic_items.description",
+   "fallback": "Items and props in the levels' worn style"
+  },
+  "min_format": 88,
+  "max_format": 88
+ }
+}

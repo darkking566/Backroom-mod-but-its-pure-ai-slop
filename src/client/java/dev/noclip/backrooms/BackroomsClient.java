@@ -4,7 +4,7 @@ import dev.noclip.backrooms.core.economy.WalletClient;
 import dev.noclip.backrooms.core.floors.FloorsClient;
 import dev.noclip.backrooms.core.trade.ShopClient;
 import dev.noclip.backrooms.core.look.Look;
-import dev.noclip.backrooms.core.look.TrialPack;
+import dev.noclip.backrooms.core.look.ItemLook;
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.people.PersonModel;
 import dev.noclip.backrooms.core.people.PersonRenderer;
@@ -72,7 +72,7 @@ public final class BackroomsClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		Look.register();
-		TrialPack.register();
+		ItemLook.register();
 		FloorsClient.register();
 		ShopClient.register();
 		WalletClient.register();

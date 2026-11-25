@@ -37,13 +37,27 @@ public final class WeaponCrosshairHud {
 		});
 	}
 
+	/**
+	 * Draws a reticle about the exact middle of the screen, two screen pixels to a unit whatever the GUI scale, so it
+	 * stays small and centred (drawn on whole GUI pixels it was half a pixel off, and grew with the GUI scale). Unit
+	 * pixel (0, 0) is the middle; shapes are drawn symmetric about it.
+	 */
+	private static void centred(GuiGraphicsExtractor g, Minecraft mc, Runnable draw) {
+		var pose = g.pose();
+		pose.pushMatrix();
+		float k = 2.0F / (float) mc.getWindow().getGuiScale();
+		pose.translate(g.guiWidth() / 2.0F, g.guiHeight() / 2.0F);
+		pose.scale(k, k);
+		pose.translate(-0.5F, -0.5F);
+		draw.run();
+		pose.popMatrix();
+	}
+
 	private static void drawFirearmHud(GuiGraphicsExtractor g, Minecraft mc, ItemStack stack,
 			BackroomsFirearmItem gun, DeltaTracker delta) {
 		float partial = delta.getGameTimeDeltaPartialTick(true);
 		int sw = g.guiWidth();
 		int sh = g.guiHeight();
-		int cx = sw / 2;
-		int cy = sh / 2;
 		float ads = WeaponAnimState.adsProgress(partial);
 		float kick = WeaponAnimState.recoilKick(partial);
 
@@ -55,13 +69,13 @@ public final class WeaponCrosshairHud {
 
 		// High-magnification optical sniper/railgun scope overlay when fully aimed
 		if (gun.hasOpticalScope() && ads >= 0.72F) {
-			drawOpticalScope(g, mc, stack, gun, sw, sh, cx, cy);
-			drawHitmarker(g, cx, cy);
+			drawOpticalScope(g, mc, stack, gun, sw, sh, sw / 2, sh / 2);
+			centred(g, mc, () -> drawHitmarker(g, 0, 0));
 			return;
 		}
 
 		float moveBloom = (float) mc.player.getDeltaMovement().horizontalDistance() * 14.0F;
-		float spreadGap = (6.0F + gun.baseSpread() * 75.0F + kick * 10.0F + moveBloom) * (1.0F - ads * 0.72F);
+		float spreadGap = (4.0F + gun.baseSpread() * 75.0F + kick * 10.0F + moveBloom) * (1.0F - ads * 0.72F);
 		int gap = Math.max(2, Math.round(spreadGap));
 		int color = 0xF0FFFFFF;
 		int accent = switch (gun.fireMode()) {
@@ -71,50 +85,48 @@ public final class WeaponCrosshairHud {
 			case SONIC_PULSE -> 0xFFD888FF;
 			default -> 0xFFFF3E3E;
 		};
-
-		switch (gun.crosshairStyle()) {
-			case SHOTGUN_CIRCLE -> {
-				int r = Math.max(5, Math.round((13.0F + kick * 7.0F) * (1.0F - ads * 0.35F)));
-				drawArcDotCircle(g, cx, cy, r, color);
-				drawOutlinedRect(g, cx - 1, cy - 1, 2, 2, accent);
-			}
-			case ARC_BRACKET -> {
-				int br = Math.max(6, gap + 4);
-				// Left & right tactical bracket arcs
-				drawOutlinedRect(g, cx - br - 2, cy - 6, 2, 12, accent);
-				drawOutlinedRect(g, cx - br, cy - 6, 3, 2, accent);
-				drawOutlinedRect(g, cx - br, cy + 4, 3, 2, accent);
-				drawOutlinedRect(g, cx + br, cy - 6, 2, 12, accent);
-				drawOutlinedRect(g, cx + br - 3, cy - 6, 3, 2, accent);
-				drawOutlinedRect(g, cx + br - 3, cy + 4, 3, 2, accent);
-				drawOutlinedRect(g, cx - 1, cy - 1, 2, 2, color);
-			}
-			default -> {
-				// Crisp 4-arm dynamic tactical crosshair + pinpoint ADS red dot
-				if (ads < 0.85F) {
-					int armLen = gun.crosshairStyle() == BackroomsFirearmItem.CrosshairStyle.RIFLE_CROSS ? 6 : 4;
-					drawOutlinedRect(g, cx - gap - armLen, cy, armLen, 1, color);
-					drawOutlinedRect(g, cx + gap + 1, cy, armLen, 1, color);
-					drawOutlinedRect(g, cx, cy - gap - armLen, 1, armLen, color);
-					drawOutlinedRect(g, cx, cy + gap + 1, 1, armLen, color);
-				}
-				// Glowing center ADS / holographic dot
-				drawOutlinedRect(g, cx - 1, cy - 1, 2, 2, ads > 0.35F ? accent : color);
-			}
-		}
-
-		// Subtle cooldown recharge bar beneath crosshair
 		float cd = mc.player.getCooldowns().getCooldownPercent(stack, partial);
-		if (cd > 0.01F) {
-			int bw = 20;
-			int bx = cx - bw / 2;
-			int by = cy + 16;
-			g.fill(bx - 1, by - 1, bx + bw + 1, by + 3, 0xA0000000);
-			int fill = Math.round(bw * (1.0F - cd));
-			g.fill(bx, by, bx + fill, by + 2, accent);
-		}
 
-		drawHitmarker(g, cx, cy);
+		centred(g, mc, () -> {
+			// Aimed down the sights, the gun's own sights are the aim: no reticle over them.
+			if (ads < 0.85F) {
+				switch (gun.crosshairStyle()) {
+					case SHOTGUN_CIRCLE -> {
+						int r = Math.max(5, Math.round((11.0F + kick * 7.0F) * (1.0F - ads * 0.35F)));
+						for (int i = 0; i < 16; i++) {
+							double a = Math.PI * 2.0 * i / 16;
+							drawOutlinedRect(g, (int) Math.round(Math.cos(a) * r), (int) Math.round(Math.sin(a) * r), 1, 1, color);
+						}
+						drawOutlinedRect(g, 0, 0, 1, 1, accent);
+					}
+					case ARC_BRACKET -> {
+						int br = Math.max(5, gap + 3);
+						drawOutlinedRect(g, -br - 1, -5, 1, 11, accent);
+						drawOutlinedRect(g, -br, -5, 2, 1, accent);
+						drawOutlinedRect(g, -br, 5, 2, 1, accent);
+						drawOutlinedRect(g, br + 1, -5, 1, 11, accent);
+						drawOutlinedRect(g, br - 1, -5, 2, 1, accent);
+						drawOutlinedRect(g, br - 1, 5, 2, 1, accent);
+						drawOutlinedRect(g, 0, 0, 1, 1, color);
+					}
+					default -> {
+						int arm = gun.crosshairStyle() == BackroomsFirearmItem.CrosshairStyle.RIFLE_CROSS ? 5 : 3;
+						drawOutlinedRect(g, -gap - arm, 0, arm, 1, color);
+						drawOutlinedRect(g, gap + 1, 0, arm, 1, color);
+						drawOutlinedRect(g, 0, -gap - arm, 1, arm, color);
+						drawOutlinedRect(g, 0, gap + 1, 1, arm, color);
+						drawOutlinedRect(g, 0, 0, 1, 1, ads > 0.35F ? accent : color);
+					}
+				}
+			}
+			// Subtle cooldown recharge bar beneath the reticle
+			if (cd > 0.01F) {
+				int by = 14;
+				g.fill(-11, by - 1, 12, by + 3, 0xA0000000);
+				g.fill(-10, by, -10 + Math.round(21 * (1.0F - cd)), by + 2, accent);
+			}
+			drawHitmarker(g, 0, 0);
+		});
 	}
 
 	private static void drawOpticalScope(GuiGraphicsExtractor g, Minecraft mc, ItemStack stack,
@@ -175,8 +187,6 @@ public final class WeaponCrosshairHud {
 	private static void drawMagicCrosshair(GuiGraphicsExtractor g, Minecraft mc, ItemStack stack,
 			BackroomsMagicItem magic, DeltaTracker delta) {
 		float partial = delta.getGameTimeDeltaPartialTick(true);
-		int cx = g.guiWidth() / 2;
-		int cy = g.guiHeight() / 2;
 		float cast = WeaponAnimState.castAnim(partial);
 		float cd = mc.player.getCooldowns().getCooldownPercent(stack, partial);
 
@@ -188,70 +198,61 @@ public final class WeaponCrosshairHud {
 			default -> 0xFF66F0FF;
 		};
 
-		// Diamond arcane rune reticle expanding smoothly on spell cast
-		int d = 6 + Math.round(cast * 5.0F);
-		drawOutlinedRect(g, cx - 1, cy - d - 2, 2, 3, color);
-		drawOutlinedRect(g, cx - 1, cy + d, 2, 3, color);
-		drawOutlinedRect(g, cx - d - 2, cy - 1, 3, 2, color);
-		drawOutlinedRect(g, cx + d, cy - 1, 3, 2, color);
-		// Inner 4 diagonal rune pips
-		int k = Math.max(3, d - 3);
-		drawOutlinedRect(g, cx - k, cy - k, 1, 1, 0xE8FFFFFF);
-		drawOutlinedRect(g, cx + k, cy - k, 1, 1, 0xE8FFFFFF);
-		drawOutlinedRect(g, cx - k, cy + k, 1, 1, 0xE8FFFFFF);
-		drawOutlinedRect(g, cx + k, cy + k, 1, 1, 0xE8FFFFFF);
-		drawOutlinedRect(g, cx - 1, cy - 1, 2, 2, cd <= 0.01F ? color : 0xAA888888);
-
-		if (cd > 0.01F) {
-			int bw = 22;
-			int bx = cx - bw / 2;
-			int by = cy + 14;
-			g.fill(bx - 1, by - 1, bx + bw + 1, by + 3, 0xA0000000);
-			g.fill(bx, by, bx + Math.round(bw * (1.0F - cd)), by + 2, color);
-		}
-
-		drawHitmarker(g, cx, cy);
+		centred(g, mc, () -> {
+			// Diamond rune reticle, opening a little on a cast
+			int d = 4 + Math.round(cast * 4.0F);
+			drawOutlinedRect(g, 0, -d - 2, 1, 3, color);
+			drawOutlinedRect(g, 0, d, 1, 3, color);
+			drawOutlinedRect(g, -d - 2, 0, 3, 1, color);
+			drawOutlinedRect(g, d, 0, 3, 1, color);
+			int k = Math.max(2, d - 2);
+			drawOutlinedRect(g, -k, -k, 1, 1, 0xE8FFFFFF);
+			drawOutlinedRect(g, k, -k, 1, 1, 0xE8FFFFFF);
+			drawOutlinedRect(g, -k, k, 1, 1, 0xE8FFFFFF);
+			drawOutlinedRect(g, k, k, 1, 1, 0xE8FFFFFF);
+			drawOutlinedRect(g, 0, 0, 1, 1, cd <= 0.01F ? color : 0xAA888888);
+			if (cd > 0.01F) {
+				int by = 12;
+				g.fill(-11, by - 1, 12, by + 3, 0xA0000000);
+				g.fill(-10, by, -10 + Math.round(21 * (1.0F - cd)), by + 2, color);
+			}
+			drawHitmarker(g, 0, 0);
+		});
 	}
 
 	private static void drawMeleeCrosshair(GuiGraphicsExtractor g, Minecraft mc, ItemStack stack,
 			BackroomsMeleeItem melee, DeltaTracker delta) {
 		float partial = delta.getGameTimeDeltaPartialTick(true);
-		int cx = g.guiWidth() / 2;
-		int cy = g.guiHeight() / 2;
 		float guard = WeaponAnimState.guardProgress(partial);
 		float charge = mc.player.getAttackStrengthScale(partial);
-
 		int mainColor = guard > 0.4F ? 0xFF72E8FF : 0xEEFFFFFF;
-		// Sleek tactical chevron crosshair
-		drawOutlinedRect(g, cx - 5, cy, 3, 1, mainColor);
-		drawOutlinedRect(g, cx + 3, cy, 3, 1, mainColor);
-		drawOutlinedRect(g, cx, cy - 5, 1, 3, mainColor);
-		drawOutlinedRect(g, cx, cy + 3, 1, 3, mainColor);
-		drawOutlinedRect(g, cx, cy, 1, 1, charge >= 0.99F ? 0xFFFFE67A : 0xAA909090);
 
-		// Guard shield brackets when blocking with Right Click
-		if (guard > 0.35F) {
-			drawOutlinedRect(g, cx - 9, cy - 4, 2, 8, 0xFF66E4FF);
-			drawOutlinedRect(g, cx + 8, cy - 4, 2, 8, 0xFF66E4FF);
-		}
-
-		// Swing attack charge bar
-		if (charge < 0.99F) {
-			int bw = 18;
-			int bx = cx - bw / 2;
-			int by = cy + 10;
-			g.fill(bx - 1, by - 1, bx + bw + 1, by + 3, 0x90000000);
-			g.fill(bx, by, bx + Math.round(bw * Mth.clamp(charge, 0.0F, 1.0F)), by + 2, 0xFFF2D668);
-		}
-
-		drawHitmarker(g, cx, cy);
+		centred(g, mc, () -> {
+			drawOutlinedRect(g, -5, 0, 3, 1, mainColor);
+			drawOutlinedRect(g, 3, 0, 3, 1, mainColor);
+			drawOutlinedRect(g, 0, -5, 1, 3, mainColor);
+			drawOutlinedRect(g, 0, 3, 1, 3, mainColor);
+			drawOutlinedRect(g, 0, 0, 1, 1, charge >= 0.99F ? 0xFFFFE67A : 0xAA909090);
+			// Guard brackets when blocking with Right Click
+			if (guard > 0.35F) {
+				drawOutlinedRect(g, -9, -4, 2, 9, 0xFF66E4FF);
+				drawOutlinedRect(g, 8, -4, 2, 9, 0xFF66E4FF);
+			}
+			// Swing charge bar
+			if (charge < 0.99F) {
+				int by = 9;
+				g.fill(-10, by - 1, 11, by + 3, 0x90000000);
+				g.fill(-9, by, -9 + Math.round(19 * Mth.clamp(charge, 0.0F, 1.0F)), by + 2, 0xFFF2D668);
+			}
+			drawHitmarker(g, 0, 0);
+		});
 	}
 
 	private static void drawHitmarker(GuiGraphicsExtractor g, int cx, int cy) {
 		int ticks = WeaponAnimState.hitmarkerTicks();
 		if (ticks <= 0) return;
 		int col = WeaponAnimState.hitmarkerKill() ? 0xFFFF2A3C : 0xFFFFFFFF;
-		for (int i = 3; i <= 7; i++) {
+		for (int i = 3; i <= 6; i++) {
 			g.fill(cx - i, cy - i, cx - i + 1, cy - i + 1, col);
 			g.fill(cx + i, cy - i, cx + i + 1, cy - i + 1, col);
 			g.fill(cx - i, cy + i, cx - i + 1, cy + i + 1, col);

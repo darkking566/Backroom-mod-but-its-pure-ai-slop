@@ -1,5 +1,7 @@
 package dev.noclip.backrooms.monsters.smiler;
 
+import dev.noclip.backrooms.monsters.Tuning;
+import dev.noclip.backrooms.monsters.Retreat;
 import dev.noclip.backrooms.monsters.Monsters;
 import java.util.EnumSet;
 import net.minecraft.core.particles.ParticleTypes;
@@ -60,7 +62,7 @@ public class Smiler extends Monster {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 28)
+				.add(Attributes.MAX_HEALTH, Tuning.hp(28))
 				.add(Attributes.ATTACK_DAMAGE, 6)
 				.add(Attributes.MOVEMENT_SPEED, 0.27)
 				.add(Attributes.FOLLOW_RANGE, 36);
@@ -85,6 +87,7 @@ public class Smiler extends Monster {
 
 	@Override
 	protected void registerGoals() {
+		Retreat.add(this, goalSelector, targetSelector);
 		goalSelector.addGoal(0, new FloatGoal(this));
 		goalSelector.addGoal(2, new SmilerHuntGoal(this));
 		goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.65));

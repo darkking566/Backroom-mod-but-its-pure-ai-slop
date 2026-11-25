@@ -407,6 +407,43 @@
   - 推送前抓 GitHub：朋友那邊新推了 33 個提交（停車場審查報告各批、Level 2 磚牆四種畫法、Level 0.1 樓梯頭頂空間等），合併時只有 `CLAUDE.md` 衝突（兩邊的 Antigravity 紀錄都保留）
   - 朋友新加的 741 張寫實貼圖是 512（停車場 714、Level 2 磚牆 27），照規格書用 `tools/resize_realistic.py` 縮成 128／64；`make_level1_realistic.py`、`make_garden_plants.py` 最後也加上存完自動縮小；資源包 32 MB；`runClientGameTest -Plevels=1 -Psections=gardenPlants` 通過，截圖看過停車場水泥、標誌、花園植物在 128 下仍清楚
   - 合併後 `gradlew build`（81 個單元測試）通過
+  - 使用者同意後把 `main` 推送到 GitHub（`cb884c24`）；沒有強制推送、沒有改寫歷史
+- 寫實物品第一批（使用者要求「其他全部都做好」，依類別分批做）：
+  - 試作包改成正式的內建資源包「後室：寫實物品」（`resourcepacks/realistic_items/`，預設開啟）；客戶端 `core/look/TrialPack` 改名 `ItemLook`，「換掉哪些」改成在資源包重新載入時讀包裡的 `item_look.json`（包關掉就讀不到、全部回到 Gemini 的版本）；Gemini 兩支繪製程式的判斷跟著改名
+  - 產生工具改成共用工具包：`tools/make_realistic_items.py` 加 `tools/item_look/`（`lib.py` 貼圖、材質登記、方塊與姿勢；`mats.py` 材質庫約 70 種，照片打底再加鏽、剝落、刮痕、髒污；`melee.py`；`ported.py` 試作的 8 樣）；刪掉 `tools/make_trial_items.py` 與 `trial/TrialClientTest`
+  - 41 把冷兵器全部重做（`melee.py`：握柄、柄頭、護手、直刃、彎刃、槍頭、斧頭、錘頭等零件組裝，真實比例）；超過 Minecraft 模型長度上限 3 格的（關刀、長戟）等比例縮小再由顯示比例放大
+  - 拿在手上的姿勢：第一人稱依長度調大小、短的抬高；第三人稱試了四種角度（[0,0,0]、[90,0,0]、[0,0,90]、[-90,0,0]），只有 [-90,0,0] 會立著握，全部用它；刀刃材質調暗（在 Level 0 燈下原本太白）
+  - 新增實機測試 `itemlook/ItemLookClientTest`（`-Plevels=itemlook`：包關／開各一輪，箱子排出全部圖示、8 把拿在手上、5 把第三人稱、家具近照），通過、沒有模型載入錯誤；比較圖 `docs/look/items/`；新增規範 `docs/look/ITEMS.md`（風格、做法、怎麼新增、進度）；`docs/look/README.md` 改成指向它；語言檔包名改為「後室：寫實物品」
+  - 第一次提交時 `git add` 被已不存在的路徑卡住，只收進改名和刪檔（`c43f9de5`），其餘補在 `c20051b2`
+- 寫實物品第二批：槍、彈藥、配件（`tools/item_look/guns.py`）：18 把槍（土製管槍沿用試作版）用槍管、機匣、握把、彈匣、槍托、瞄準鏡、導軌等零件組出，加 12 種彈藥、6 種配件；材質庫加槍用材質（磷化黑鋼、聚合物、胡桃木、黃色工業漆、導軌、散熱孔、鏡片、暗紅點、彈殼、霰彈殼、紙箱、尺、原子筆等）；第三人稱用推算的 `[-90, 180, 0]`（槍口朝前、槍背朝上），從正面截圖分辨不出幾種角度的差別；`runClientGameTest -Plevels=itemlook` 通過、沒有模型載入錯誤，看過 7 把槍的第一人稱與兩頁圖示；比較圖 `docs/look/items/icons_page*.png`、`guns_hands.png`
+- 寫實物品第三批：法器 19 件（`tools/item_look/magic.py`；穿牆短杖沿用試作版）：法杖用絕緣棍、銅管、礙子、鏽鐵件，魔典是泡過水的舊書，鈴、懷錶、香爐、手鏡是舊實物，只有一點點暗光；小東西在第一人稱縮小（Gemini 的法器動畫會把它們拉近）；材質庫加符紙、書皮、書頁、錶面、骰子、礙子等
+- 使用者回報三件事，處理了兩件：
+  - 準心太大或中心歪：Gemini 的 `WeaponCrosshairHud` 用整數介面格子畫，中間的點和四條線差半格、而且跟著介面倍率放大；改成在畫面正中央的精確位置、以螢幕 2 像素為一單位畫，所有形狀對稱（槍、法器、冷兵器、命中標記都改；光學鏡不動）；瞄準到底時非光學鏡的槍不畫準心
+  - 右鍵瞄準時槍擋住視線、不像機瞄：Gemini 的瞄準動畫把槍移到固定位置，我換了槍模型後槍身擋在中間；改成每把槍記下準星高度和照門位置（`guns.py` 的 `SIGHTS`、長短槍照 `isLongGun` 規則），算出拿槍位置讓瞄準時準星正好在畫面中央、照門在眼前 0.2 格；照門改成左右兩根留縫、突擊步槍紅點改成中空框、擊錘與擊針壓到準星線下、長槍槍托壓低；土製管槍搬進 `guns.py`
+  - `runClientGameTest -Plevels=itemlook` 通過，看過 7 把槍腰射與瞄準、準心近照；比較圖 `docs/look/items/guns_hip_and_aimed.png`
+  - 「全部都很塑膠」還沒處理：使用者建議用 Blender，下一步試
+- Blender 烘焙試作（處理「塑膠感」）：使用者本機的 Blender 5.3 在 `E:/SteamLibrary/steamapps/common/Blender/blender.exe`（使用者開著的那個連著 MCP，我另外用背景模式跑，不動它）
+  - 新增 `tools/item_look/bake.py`（每件東西的方塊面攤到專屬 128×128 貼圖、交給 Blender、合成：材質 × 陰影 × 打光、縫隙積灰、外緣磨亮，模型改用這張貼圖）與 `tools/item_look/blender_bake.py`（Blender 裡照 Minecraft 的貼圖方向重建方塊，Cycles 烘焙 AO 與漫射光）；`lib.model` 可改用整張烘焙貼圖
+  - 先套在騎士長劍、9mm 手槍、辦公椅；`runClientGameTest -Plevels=itemlook` 通過；辦公椅座墊下與縫隙有陰影、比較立體，手槍與長劍只好一點點
+  - 也用 `-Pshaders`（Iris＋Complementary）跑了一次：我的物品是霧面偏暗、不會像打蠟，椅子和映像管電腦像真的；比較圖 `docs/look/items/bake_before_after.png`、`with_shaders.png`
+- 使用者選「Blender 真曲面模型」，先試作騎士長劍、9mm 手槍、辦公椅三件（烘焙那版先停用，`BAKED` 改成空的）：
+  - 新增 `tools/item_look/blender_mesh.py`（Blender 背景執行：用 Minecraft 模型座標寫造型，倒角、圓柱、車床迴轉體、布林刻槽，劍身是有血槽的菱形斷面；拆 UV，烘焙底色、AO 與 labPBR 數值，匯出 OBJ）與 `tools/item_look/mesh.py`（材質交給 Blender、合成貼圖縮成 128、寫進資源包）；`lib.SHIFTS` 記下方塊版置中時移動的距離，網格跟著移，姿勢與瞄準對齊沿用方塊版
+  - 遊戲端：新增 `core/look/MeshModel`（讀 OBJ）、`MeshItemRenderer`（新的物品模型類型 `noclip_backrooms:mesh`，物品定義用 `minecraft:special`，`base` 是原本的方塊模型）與 client mixin `SpecialModelRenderersAccess`（登記新類型，Fabric 沒有這個接口）；`ItemLook` 登記類型、讀家具網格；Gemini 的 `BlenderPropRenderer` 在資源包有該家具的網格時改畫網格
+  - 第一次進遊戲劍身變成一堆亂三角形：實體繪製一次吃四個點，改成每個三角形送成重複第三點的四邊形
+  - `runClientGameTest -Plevels=itemlook` 通過，看過手上、瞄準、第三人稱、物品欄圖示、地上的辦公椅；比較圖 `docs/look/items/mesh_trial.png`；`docs/look/ITEMS.md` 加說明
+  - 還沒做：其他物品（等使用者看過試作）
+  - `gradlew build` 通過
+- 使用者決定物品風格：法杖、魔典等魔法類（之後的魔法劍也是）走奇幻風格（後面還沒做的樓層才拿得到），冷兵器和槍維持寫實；寫進 `docs/look/ITEMS.md`
+- 使用者接著決定魔法類直接用 Gemini 原本的模型：寫實物品包拿掉 19 件法器與穿牆短杖（刪除 `tools/item_look/magic.py`，`ported.py` 拿掉短杖），包裡剩 83 件；`ItemLookClientTest` 拿在手上的清單把懷錶換成撬棍；`runClientGameTest -Plevels=itemlook` 通過、沒有缺模型或貼圖
+- 討論第 0 層（使用者覺得空間偏小、朋友希望有「演算法生成感」）：讀了朋友的 `Maze`（7 格房間、天花板 3 格高、每段牆各自擲骰）與 Gemini 的 `Level0Props`（每區塊擲骰），用暫時的單元測試畫了目前的俯視地圖（畫完已刪除），另用 Python 畫了「長走廊＋切房間＋照規則擺物資」的草圖給使用者看；還沒改任何東西，等使用者和朋友決定
+- 使用者決定遊戲改成恐怖、逃離後室為主（玩家是掉進後室的 M.E.G. 調查員，要找據點安頓再撤離），先改數值：
+  - 新增企劃書 `docs/HORROR_ESCAPE_PLAN.md`（大方向、已決定的規則、再掉進去的三種方式、經驗來源、平衡原則、待討論事項、分工）；`AGENTS.md` 加一行指向它，Gemini 的 `docs/GAMEPLAY_SYSTEM_PLAN.md` 開頭加一行「衝突時以新企劃為準」
+  - 能力值（Gemini 的 `core/rpg`）：後室裡生命上限 −10（20→10，回主世界恢復，`PlayerRpg.BACKROOMS_HEALTH_PENALTY`，換維度時重新套用）；理智上限 100→50；每 5 級生命上限 +2、理智上限 +10，加點不再加上限；體質只加回血（越點越少，最多約 0.4／秒），而且要 5 秒沒受傷才回；理智點只加回復與少扣（越點越少）；力量每點 +0.2、最多 +3；拿掉體質的護甲韌性；升級補的理智從 20 改 10；角色面板說明文字跟著改；理智條改成上限多少就畫幾格（原本固定 10 格，上限 60 時有 4 格永遠空著）
+  - 怪物：新增 `monsters/Tuning.java`（一般怪物血量 ×2.5、Boss ×3，18 種怪物都改用它）與 `monsters/Retreat.java`（被玩家打到 30% 以下就不追、往附近最暗處退，沒人在 12 格內時每秒回 1%，回到 60% 再回來）；13 種會走的敵對怪物加上，Boss、無面靈、派對掃興客、手臂不加
+  - 測試：改寫 Gemini 的 `PlayerStatsTest`（新規則，加每 5 級成長、力量上限、越點越少）；新增實機測試 `horror/HorrorClientTest`（`-Plevels=horror`：主世界 20、後室 10、Level 5 時 12 與理智 60、換世界保留血量比例、獵犬 75 血、重傷的獵犬不追人並退開）
+  - 朋友的 Level 0 測試失敗在「從 EXIT 門出去時受傷」（後室滿血 10，回主世界上限 20 但血還是 10）：改成換世界時保留血量比例，後室滿血回家也是滿血
+  - 驗證：`gradlew build`、`runClientGameTest -Plevels=horror,0,2,3`、Level 1 的 `monsters,hounds` 段都通過
+- 使用者要求做完直接推上 GitHub：抓 GitHub 合併朋友新推的 6 個提交（Level 0 各區地標、斷路器與保險絲事件、玻璃辦公室與流浪者營地、Hub 與 Level Fun 的預告門），沒有衝突；朋友新加的 18 張寫實貼圖是 512，照規格書用 `tools/resize_realistic.py` 縮成 128；合併後 `gradlew build` 與 `runClientGameTest -Plevels=0,horror` 通過；把 `main` 推送到 GitHub（寫實物品三批、Blender 烘焙與網格試作、魔法類改回 Gemini 的、恐怖方向企劃與數值）；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 

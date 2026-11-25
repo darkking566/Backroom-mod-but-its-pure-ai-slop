@@ -1,0 +1,11 @@
+{
+ "model": {
+  "type": "minecraft:special",
+  "base": "noclip_backrooms:item/look/gun_pistol_9mm",
+  "model": {
+   "type": "noclip_backrooms:mesh",
+   "mesh": "noclip_backrooms:models/mesh/gun_pistol_9mm.obj",
+   "texture": "noclip_backrooms:textures/item/mesh/gun_pistol_9mm.png"
+  }
+ }
+}

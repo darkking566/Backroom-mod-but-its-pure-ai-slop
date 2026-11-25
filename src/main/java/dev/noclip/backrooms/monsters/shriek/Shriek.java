@@ -1,5 +1,7 @@
 package dev.noclip.backrooms.monsters.shriek;
 
+import dev.noclip.backrooms.monsters.Tuning;
+import dev.noclip.backrooms.monsters.Retreat;
 import java.util.EnumSet;
 import java.util.List;
 import net.minecraft.core.particles.ParticleTypes;
@@ -57,7 +59,7 @@ public class Shriek extends Monster {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 22)
+				.add(Attributes.MAX_HEALTH, Tuning.hp(22))
 				.add(Attributes.ATTACK_DAMAGE, 3)
 				.add(Attributes.MOVEMENT_SPEED, 0.28)
 				.add(Attributes.FOLLOW_RANGE, 28);
@@ -75,6 +77,7 @@ public class Shriek extends Monster {
 
 	@Override
 	protected void registerGoals() {
+		Retreat.add(this, goalSelector, targetSelector);
 		goalSelector.addGoal(0, new FloatGoal(this));
 		goalSelector.addGoal(1, new ShriekAlarmGoal(this));
 		goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 0.75));

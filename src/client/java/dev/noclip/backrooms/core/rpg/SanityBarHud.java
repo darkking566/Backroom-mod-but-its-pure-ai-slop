@@ -72,7 +72,8 @@ public final class SanityBarHud {
 			baseY = sh - 39 - occupiedRightRows * 10;
 		}
 
-		int totalIcons = Math.max(ICONS_PER_ROW, Mth.ceil(stats.maxSanity() / 10.0F));
+		// One icon per 10 sanity: 5 icons at the starting 50, one more every five levels (no empty slots for sanity you lack).
+		int totalIcons = Math.max(1, Mth.ceil(stats.maxSanity() / 10.0F));
 		int totalRows = Mth.ceil(totalIcons / (float) ICONS_PER_ROW);
 		// Compress multi-row vertical spacing upward just like vanilla Minecraft's multi-row hearts.
 		int rowStep = totalRows <= 1 ? 10 : Math.max(3, 10 - (totalRows - 2));

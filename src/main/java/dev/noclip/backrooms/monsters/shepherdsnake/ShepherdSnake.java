@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.monsters.shepherdsnake;
 
+import dev.noclip.backrooms.monsters.Tuning;
 import java.util.EnumSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -71,7 +72,7 @@ public class ShepherdSnake extends Monster {
 
 	public static AttributeSupplier.Builder createAttributes() {
 		return Monster.createMonsterAttributes()
-				.add(Attributes.MAX_HEALTH, 120)
+				.add(Attributes.MAX_HEALTH, Tuning.bossHp(120))
 				.add(Attributes.ATTACK_DAMAGE, 11)
 				.add(Attributes.MOVEMENT_SPEED, 0.27)
 				.add(Attributes.FOLLOW_RANGE, 48)
