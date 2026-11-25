@@ -3,7 +3,12 @@ package dev.noclip.backrooms.core.guild;
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.core.people.Person;
 import dev.noclip.backrooms.core.trade.ShopRole;
+import java.util.Locale;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.minecraft.commands.Commands;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -40,6 +45,25 @@ public final class Guilds {
 
 	public static void register() {
 		ServerTickEvents.END_SERVER_TICK.register(Guilds::tick);
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			var place = Commands.literal("place");
+			for (GuildPalette palette : GuildPalette.values()) {
+				place.then(Commands.literal(palette.name().toLowerCase(Locale.ROOT)).executes(ctx -> {
+					ServerPlayer player = ctx.getSource().getPlayerOrException();
+					place(player, palette);
+					return 1;
+				}));
+			}
+			dispatcher.register(Commands.literal("backrooms").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+					.then(Commands.literal("guild").then(place)));
+		});
+	}
+
+	/** /backrooms guild place <style>: a hall a few blocks in front of the player, its door toward them. */
+	public static GuildPiece place(ServerPlayer player, GuildPalette palette) {
+		Direction ahead = player.getDirection();
+		BlockPos front = player.blockPosition().relative(ahead, 4).below();
+		return GuildPiece.placeNow(player.level(), front, ahead, palette);
 	}
 
 	/** The merchants turn their heads to whoever comes up to the counter. */

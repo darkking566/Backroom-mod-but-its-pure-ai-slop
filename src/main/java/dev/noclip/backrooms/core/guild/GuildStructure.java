@@ -73,15 +73,8 @@ public final class GuildStructure extends Structure {
 			Direction across = across(side);
 			int fx = vx + side.getStepX() * distance + across.getStepX() * lateral;
 			int fz = vz + side.getStepZ() * distance + across.getStepZ() * lateral;
-			int d = GuildPiece.DEPTH - 1, door = GuildPiece.DOOR_X;
-			int minX, minZ;
-			switch (side) {
-				case NORTH -> { minX = fx - door; minZ = fz - d; }
-				case SOUTH -> { minX = fx - door; minZ = fz; }
-				case WEST -> { minX = fx - d; minZ = fz - door; }
-				default -> { minX = fx; minZ = fz - door; }
-			}
-			GuildPiece probe = new GuildPiece(minX, 0, minZ, side, GuildPalette.PLAINS);
+			GuildPiece probe = GuildPiece.facingFront(fx, 0, fz, side, GuildPalette.PLAINS);
+			int minX = probe.getBoundingBox().minX(), minZ = probe.getBoundingBox().minZ();
 			int[][] spots = {{2, 2}, {23, 2}, {2, 17}, {23, 17}, {12, 9}, {12, 0}};
 			int[] heights = new int[spots.length];
 			for (int i = 0; i < spots.length; i++) {

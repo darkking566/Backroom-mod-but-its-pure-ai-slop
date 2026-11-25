@@ -119,8 +119,9 @@ public final class GuildRoadPiece extends StructurePiece {
 	private void post(WorldGenLevel level, BoundingBox box, BlockPos cell) {
 		BlockPos at = ground(level, box, cell);
 		if (at == null) return;
-		level.setBlock(at.above(), Blocks.SPRUCE_FENCE.defaultBlockState(), 2);
-		level.setBlock(at.above(2), Blocks.SPRUCE_FENCE.defaultBlockState(), 2);
+		BlockState post = sand ? Blocks.SANDSTONE_WALL.defaultBlockState() : Blocks.STONE_BRICK_WALL.defaultBlockState();
+		level.setBlock(at.above(), post, 2);
+		level.setBlock(at.above(2), post, 2);
 		level.setBlock(at.above(3), Blocks.LANTERN.defaultBlockState(), 2);
 	}
 
@@ -129,7 +130,7 @@ public final class GuildRoadPiece extends StructurePiece {
 		BlockPos at = ground(level, box, cell);
 		if (at == null) return;
 		BlockPos pos = at.above();
-		level.setBlock(pos, Blocks.SPRUCE_SIGN.defaultBlockState().setValue(StandingSignBlock.ROTATION, RotationSegment.convertToSegment(toward)), 2);
+		level.setBlock(pos, Blocks.DARK_OAK_SIGN.defaultBlockState().setValue(StandingSignBlock.ROTATION, RotationSegment.convertToSegment(toward)), 2);
 		if (!(level.getBlockEntity(pos) instanceof SignBlockEntity sign)) return;
 		SignText text = new SignText().setColor(DyeColor.BLACK)
 				.setMessage(0, Component.translatable("guild.noclip_backrooms.road.1"))

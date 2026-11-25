@@ -3,6 +3,7 @@ package dev.noclip.backrooms.guild;
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.core.economy.Economy;
 import dev.noclip.backrooms.core.economy.Wallet;
+import dev.noclip.backrooms.core.guild.GuildPalette;
 import dev.noclip.backrooms.core.guild.GuildPiece;
 import dev.noclip.backrooms.core.guild.Guilds;
 import dev.noclip.backrooms.core.people.Person;
@@ -194,6 +195,30 @@ public final class GuildClientTest implements FabricClientGameTest {
 			context.waitTicks(5);
 			context.takeScreenshot("guild_inventory_balance");
 			context.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
+
+			// Each village's style, built with /backrooms guild place, seen from the front.
+			server.runCommand("gamemode creative @a");
+			for (GuildPalette style : GuildPalette.values()) {
+				// On a lawn high in the air, so hills, trees and the sea stay out of the picture.
+				int x = start.getX() + 300 + style.ordinal() * 48, z = start.getZ() + 300, y = 180;
+				server.runCommand(String.format("tp @a %d %d %d 180 0", x, y + 1, z));
+				server.runCommand(String.format("fill %d %d %d %d %d %d minecraft:grass_block", x - 22, y, z - 30, x + 22, y, z + 24));
+				GuildPiece built = server.computeOnServer(s -> {
+					ServerPlayer player = player(s);
+					player.teleportTo(x + 0.5, y + 1, z + 0.5);
+					return Guilds.place(player, style);
+				});
+				BlockPos eye = built.at(12, 7, -15), aim = built.at(12, 6, 9);
+				server.runOnServer(s -> {
+					player(s).getAbilities().flying = true;
+					player(s).onUpdateAbilities();
+				});
+				server.runCommand(String.format("tp @a %d.5 %d %d.5 facing %d.5 %.2f %d.5", eye.getX(), eye.getY(), eye.getZ(), aim.getX(), aim.getY() - EYE + 1.62, aim.getZ()));
+				context.waitTicks(20);
+				game.getConnection().waitForChunksRender();
+				context.waitTicks(10);
+				context.takeScreenshot("guild_style_" + style.name().toLowerCase(java.util.Locale.ROOT));
+			}
 		}
 	}
 

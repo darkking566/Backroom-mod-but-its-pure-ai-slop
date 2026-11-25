@@ -10,6 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.RegistryOps;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -37,6 +38,7 @@ import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.Half;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -77,6 +79,32 @@ public final class GuildPiece extends StructurePiece {
 	protected void addAdditionalSaveData(StructurePieceSerializationContext context, CompoundTag tag) {
 		tag.putInt("Palette", palette.ordinal());
 		tag.putInt("Spawned", spawned);
+	}
+
+	/**
+	 * A hall whose door's left cell, at the front wall's foot, is (fx, fz), standing on the side {@code side} of whoever
+	 * looks at it: the door faces back the other way.
+	 */
+	static GuildPiece facingFront(int fx, int floorY, int fz, Direction side, GuildPalette palette) {
+		int d = DEPTH - 1;
+		int minX, minZ;
+		switch (side) {
+			case NORTH -> { minX = fx - DOOR_X; minZ = fz - d; }
+			case SOUTH -> { minX = fx - DOOR_X; minZ = fz; }
+			case WEST -> { minX = fx - d; minZ = fz - DOOR_X; }
+			default -> { minX = fx; minZ = fz - DOOR_X; }
+		}
+		return new GuildPiece(minX, floorY, minZ, side, palette);
+	}
+
+	/** Builds a hall at once in a live world, its door toward {@code side}'s opposite; for /backrooms guild place and tests. */
+	public static GuildPiece placeNow(ServerLevel level, BlockPos front, Direction side, GuildPalette palette) {
+		GuildPiece hall = facingFront(front.getX(), front.getY(), front.getZ(), side, palette);
+		BoundingBox b = hall.getBoundingBox();
+		BoundingBox all = new BoundingBox(b.minX(), level.getMinY() + 1, b.minZ(), b.maxX(), level.getMaxY(), b.maxZ());
+		hall.postProcess(level, level.structureManager(), level.getChunkSource().getGenerator(), level.getRandom(), all,
+				ChunkPos.containing(b.getCenter()), b.getCenter());
+		return hall;
 	}
 
 	GuildPalette palette() {
@@ -131,7 +159,7 @@ public final class GuildPiece extends StructurePiece {
 					if (y == 6 && !pillar) state = axis(p.beam, Direction.Axis.X);
 					else if (pillar) state = axis(p.pillar, Direction.Axis.Y);
 					else if ((y == 2 || y == 3) && window(x, z == 1)) state = pane(Direction.Axis.X);
-					else state = p.wall.defaultBlockState();
+					else state = p.wallAt(x, y, z).defaultBlockState();
 					placeBlock(level, state, x, y, z, box);
 				}
 			}
@@ -139,7 +167,7 @@ public final class GuildPiece extends StructurePiece {
 				for (int x : new int[] {1, 24}) {
 					boolean pillar = z == 5 || z == 9 || z == 14;
 					BlockState state = y == 6 && !pillar ? axis(p.beam, Direction.Axis.Z)
-							: pillar ? axis(p.pillar, Direction.Axis.Y) : p.wall.defaultBlockState();
+							: pillar ? axis(p.pillar, Direction.Axis.Y) : p.wallAt(x, y, z).defaultBlockState();
 					placeBlock(level, state, x, y, z, box);
 				}
 			}
@@ -172,9 +200,17 @@ public final class GuildPiece extends StructurePiece {
 			for (int z = i + 1; z <= 18 - i; z++) {
 				boolean glass = (y == 9 || y == 10) && (z == 9 || z == 10);
 				for (int x : new int[] {1, 24}) {
-					placeBlock(level, glass ? pane(Direction.Axis.Z) : p.wall.defaultBlockState(), x, y, z, box);
+					placeBlock(level, glass ? pane(Direction.Axis.Z) : p.wallAt(x, y, z).defaultBlockState(), x, y, z, box);
 				}
 			}
+		}
+		// A cornice under the eaves, front and back, and a cap along the ridge.
+		for (int x = 1; x <= 24; x++) {
+			placeBlock(level, stair(p.roof, Direction.NORTH).setValue(StairBlock.HALF, Half.TOP), x, 5, 0, box);
+			placeBlock(level, stair(p.roof, Direction.SOUTH).setValue(StairBlock.HALF, Half.TOP), x, 5, 19, box);
+		}
+		for (int x = 0; x <= 25; x++) {
+			for (int z = 9; z <= 10; z++) placeBlock(level, slab(p.tableSlab, SlabType.BOTTOM), x, 16, z, box);
 		}
 		// Tie beams across the hall.
 		for (int x : new int[] {5, 10, 15, 20}) {
@@ -192,10 +228,11 @@ public final class GuildPiece extends StructurePiece {
 		for (int x : new int[] {5, 10, 15, 20}) {
 			for (int z : new int[] {4, 9, 14}) placeBlock(level, hanging, x, 5, z, box);
 		}
-		// Lamp posts by the door outside.
+		// Stone lamp posts by the door outside.
 		for (int x : new int[] {10, 15}) {
-			placeBlock(level, palette.fence.defaultBlockState(), x, 1, 0, box);
-			placeBlock(level, Blocks.LANTERN.defaultBlockState(), x, 2, 0, box);
+			placeBlock(level, palette.post.defaultBlockState(), x, 1, 0, box);
+			placeBlock(level, palette.post.defaultBlockState(), x, 2, 0, box);
+			placeBlock(level, Blocks.LANTERN.defaultBlockState(), x, 3, 0, box);
 		}
 	}
 
@@ -347,11 +384,18 @@ public final class GuildPiece extends StructurePiece {
 		CompoundTag tag = new CompoundTag();
 		SignText.DIRECT_CODEC.encodeStart(RegistryOps.create(NbtOps.INSTANCE, level.registryAccess()), text).ifSuccess(t -> tag.put("front_text", t));
 		sign.loadCustomOnly(TagValueInput.create(ProblemReporter.DISCARDING, level.registryAccess(), tag));
+		// Built in a live world (the place command), players need telling.
+		if (level instanceof ServerLevel live) live.sendBlockUpdated(pos, sign.getBlockState(), sign.getBlockState(), 3);
 	}
 
 	private static BlockState axis(Block block, Direction.Axis axis) {
 		BlockState state = block.defaultBlockState();
 		return state.hasProperty(RotatedPillarBlock.AXIS) ? state.setValue(RotatedPillarBlock.AXIS, axis) : state;
+	}
+
+	private static BlockState slab(Block block, SlabType type) {
+		BlockState state = block.defaultBlockState();
+		return state.hasProperty(SlabBlock.TYPE) ? state.setValue(SlabBlock.TYPE, type) : state;
 	}
 
 	private static BlockState stair(Block block, Direction facing) {
