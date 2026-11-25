@@ -286,6 +286,51 @@ class ZenithLayoutTest {
 		}
 	}
 
+	/** Nothing hangs in the air: wall pieces have a wall behind them, ceiling pieces a ceiling above, and no room has a sealed pocket. */
+	@Test
+	void furnitureHangsOnSomethingAndNoPocketIsSealed() {
+		int[][] behind = {{0, 1}, {-1, 0}, {0, -1}, {1, 0}}; // opposite north, east, south, west
+		int hung = 0, pockets = 0;
+		for (long seed : SEEDS) {
+			for (int mx = 14; mx <= 22; mx++) {
+				for (int mz = -5; mz <= 5; mz++) {
+					for (int k = 1; k <= 8; k++) {
+						double d = Math.hypot(Math.hypot(mx * 16 + 8, mz * 16 + 8), k * 8 + 4);
+						if (d < ZenithLayout.RI + 40 || d > ZenithLayout.RO - 40) continue;
+						if (ZenithLayout.atrium(seed, Math.floorDiv(mx, 3), Math.floorDiv(mz, 3), Math.floorDiv(k, 6))) continue;
+						for (int x = mx * 16; x < mx * 16 + 16; x++) {
+							for (int z = mz * 16; z < mz * 16 + 16; z++) {
+								for (int y = k * 8; y < k * 8 + 8; y++) {
+									int cell = ZenithLayout.cell(seed, x, y, z);
+									Kind kind = ZenithLayout.kind(cell);
+									if (ZenithLayout.hangsOnWall(kind)) {
+										int[] o = behind[ZenithLayout.dir(cell)];
+										assertTrue(!passable(seed, x + o[0], y, z + o[1]), kind + " with no wall behind at " + x + "," + y + "," + z);
+										hung++;
+									}
+									if (ZenithLayout.hangsFromCeiling(kind)) {
+										int top = y + 1;
+										while (ZenithLayout.hangsFromCeiling(ZenithLayout.kind(ZenithLayout.cell(seed, x, top, z)))) top++;
+										assertTrue(!passable(seed, x, top, z), kind + " with no ceiling above at " + x + "," + y + "," + z);
+										hung++;
+									}
+								}
+							}
+						}
+						if (ZenithLayout.shape(seed, mx, mz, k) == ZenithLayout.Shape.NARROW_HALL && !ZenithLayout.isMerged(seed, mx, mz, k)) {
+							int x0 = mx * 16 + 4, z0 = mz * 16 + 4, y = k * 8 + 1;
+							for (int[] c : new int[][] {{1, 1}, {10, 1}, {1, 10}, {10, 10}}) {
+								assertTrue(!passable(seed, x0 + c[0], y, z0 + c[1]), "sealed pocket in a narrow hall at " + (x0 + c[0]) + "," + y + "," + (z0 + c[1]));
+							}
+							pockets++;
+						}
+					}
+				}
+			}
+		}
+		assertTrue(hung > 100 && pockets > 0, "too few rooms looked at: " + hung + " hung pieces, " + pockets + " narrow halls");
+	}
+
 	private static int[] findShape(long seed, ZenithLayout.Shape target, boolean requireMerged) {
 		for (int mx = -18; mx <= 18; mx++) {
 			for (int mz = -18; mz <= 18; mz++) {

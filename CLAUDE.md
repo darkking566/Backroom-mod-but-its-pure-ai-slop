@@ -206,6 +206,14 @@
   - 垂掛電纜的電線改成從頂到底連續，疊 2～3 格不會在中間斷掉又重長
   - `Level0p1ClientTest` 新增 `props` 段（站外黑暗處擺一排家具拍近照，`-Psections=props`）；`gradlew build` 與 `rooms,details,doors,zones,props` 段實機測試通過，截圖看過門、書桌、控制台、實驗袍、電纜、床；新增 `docs/levels/level0p1/screens/props_*.png`
   - `docs/levels/level0p1/screens/kitchen.png` 還是上一批拍的（置物櫃疊兩格的樣子），沒重拍
+- Level 0.1 審查報告第三批（房間變化版型的懸空與密室，`ZenithLayout`）：
+  - 壁掛物（相框、鏡子、吊鍋、倒數螢幕、實驗袍）背後不是房間外牆就不放（合併大廳打通的位置不再浮在半空）
+  - 挑高兩層房的一樓不放吊掛物（植物燈、垂藤、電纜、冰柱），因為上面沒有自己的天花板
+  - 下沉池：池邊保留地板，欄杆站在地板上；池底（下一層的天花板上）放第一層家具，其他家具也往下一格；吊掛物留在天花板下。原本池底第一層家具整個不見、欄杆懸在池邊上方
+  - 狹長深室：四個角落沒有門的 2×2 小空間填成牆（機器人不會再生在裡面）
+  - 隔間群：小門洞兩側那一格不放家具，不會被機櫃或種植架堵住
+  - 新增單元測試 `furnitureHangsOnSomethingAndNoPocketIsSealed`（壁掛物背後是牆、吊掛物往上一定碰到天花板、狹長深室角落是實心）；先用改之前的程式跑過，確認會失敗
+  - `gradlew build` 與 `runClientGameTest -Plevels=0.1 -Psections=rooms,variants,doors,robots` 通過，截圖看過合併大廳、挑高房、下沉池、隔間、狹長深室
 
 ## 動作記錄（Antigravity）
 
