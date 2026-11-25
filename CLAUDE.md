@@ -178,6 +178,12 @@
   - 其他層的實機測試（因為出口落點改了）：Level 0 通過；Level 0.1 停在 `blocks` 段「`console` 打掉不會掉出自己」（Gemini 先前就記錄過的已知問題：控制台改掉拆解材料、測試沒跟著改，與這次無關）；Level 1 完整跑時停在 `hounds` 段（找不到剛生出的獵犬），單獨跑 `-Psections=hounds` 通過，像是前面段落影響的偶發狀況；Level 2、3 這次還沒跑到，尚未驗證走出口落在遠處對它們的測試有沒有影響
   - 先提交在本機（沒推），使用者要先討論建模
   - 使用者問能不能直接套用 Found Footage 的模型、註明出處就好：查了它在 GitHub 的授權是 GPL-3.0，只註明出處不夠，要整個模組也改成 GPL-3.0 開源才行（我們的 GitHub 專案是公開的，但沒有授權檔、模組設定寫保留所有權利），請使用者和朋友決定
+- 使用者發現「沒燈的地方不夠暗」：查了使用者本機的 `run/`，玩的時候開著 Iris＋Complementary Unbound（後室版）光影，光影包會蓋掉我們的黑霧與光衰減（它不讀遊戲的霧距離、自己算方塊光）；寫實材質包在 16:06 被關掉（比對時關的）。使用者決定搭配光影：材質包＋霧＋光影包設定，並要每層 SOP 與規範（Gemini 也照做）：
+  - 讀了光影包的設定（只讀不改，它的授權不允許修改或散佈）：我們的維度被當成主世界的「洞穴」；`CAVE_LIGHTING`、`AMBIENT_MULT` 決定沒燈處多暗；洞穴霧濃度寫死，開光影時看不遠主要靠暗；`RP_MODE=3` 才會用我們的 labPBR 貼圖
+  - 新增推薦光影設定 `docs/look/shaders/ComplementaryUnbound_r5.10_Backrooms.txt`（只有設定值，不含光影包）
+  - `build.gradle` 加 `-Pshaders`：自動測試時從 `run/` 複製 Iris、Sodium、光影包到測試用遊戲，套用推薦設定並開啟光影
+  - 新增 `docs/look/STYLE_GUIDE.md`（規範）與 `docs/look/SOP.md`（每層流程與規格表）；`AGENTS.md` 加一行指向這兩份；`docs/look/README.md` 加連結
+  - 還沒做：開光影的實機截圖與設定調整（使用者的遊戲開著，先不跑 Gradle 測試）；`gradlew help` 確認 build.gradle 能讀
 
 ## 動作記錄（Antigravity）
 
