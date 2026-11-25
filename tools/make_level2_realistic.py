@@ -305,16 +305,17 @@ def build_authored_textures(WATER, MOULD):
     ceil.height += cable_shadow * 0.18
     tex["utility_ceiling"] = ceil
 
-    # Brick walls
-    muddy = brick_substrate(rgb(118, 86, 68), 271, contrast=1.05)
-    grime = smoothstep(0.3, 0.95, T * 0.8 + fbm(41, base=4) * 0.35)
-    muddy.color = mix(muddy.color, rgb(64, 52, 42), grime * 0.45)
-    tex["muddy_brick_wall"] = muddy
+    # Brick walls: four looks each, one picked per block (make_level2_polish.py), so a brick corridor is not one block repeated.
+    for k in range(4):
+        suffix = f"_{k}" if k else ""
+        shift = (k * 173, k * 291)  # the photo tiles, so sliding it gives other grain in the same bricks
+        muddy = brick_substrate(rgb(118, 86, 68), 271 + k * 10, contrast=1.05, shift=shift)
+        grime = smoothstep(0.3, 0.95, T * 0.8 + fbm(41 + k * 10, base=4) * 0.35)
+        muddy.color = mix(muddy.color, rgb(64, 52, 42), grime * 0.45)
+        tex["muddy_brick_wall" + suffix] = muddy
+        tex["black_brick_wall" + suffix] = brick_substrate(rgb(40, 40, 44), 272 + k * 10, contrast=1.15, mortar_rgb=rgb(62, 60, 58),
+                                                           default_smooth=0.12, porosity=0.7, shift=shift)
 
-    black_b = brick_substrate(rgb(40, 40, 44), 272, contrast=1.15, mortar_rgb=rgb(62, 60, 58), default_smooth=0.12, porosity=0.7)
-    tex["black_brick_wall"] = black_b
-
-    # Four looks, one picked per block (make_level2_polish.py), so a painted corridor is not one block repeated.
     for k, name in enumerate(("painted_brick_wall", "painted_brick_wall_1", "painted_brick_wall_2", "painted_brick_wall_3")):
         painted_b = brick_substrate(rgb(206, 206, 198), 273 + k * 10, contrast=0.55, mortar_rgb=rgb(190, 188, 180),
                                     default_smooth=0.28, porosity=0.25, shift=(k * 173, k * 291))

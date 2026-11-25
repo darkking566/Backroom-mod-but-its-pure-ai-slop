@@ -342,6 +342,8 @@
   - 代價：整座放不下就整座不見，燈籠橋約一半（11／22）、天花板水管排約六成（111／178）、未完工樑約一成（32／342）被拿掉；沒在遊戲畫面上看過橋或樑
 - 使用者同意後，把 `main` 推送到 GitHub（`43f74d0` 跨格結構不斷一格與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；Antigravity 未提交的 Level 2 磚牆改動沒有一起推；沒有強制推送、沒有改寫歷史
 
+- 泥褐磚與黑磚也不再每格一樣：`make_level2_polish.py` 的磚牆變體改成三種磚共用（`BRICKS` 表），基礎與寫實材質包各多畫三張（`muddy_brick_wall_1`～`_3`、`black_brick_wall_1`～`_3`），每格隨機挑一張；白漆磚重產後檔案完全沒變。Macchina 遺跡的黑磚地面也跟著有變化。`Level2ClientTest` 的磚牆照改成三種都拍（`level2_painted_brick`、`level2_muddy_brick`、`level2_black_brick`，存到 `docs/levels/level2/`）；`runClientGameTest -Plevels=2` 通過，照片裡磚縫跨格對齊、沒有一格一格的重複；黑磚就算開夜視也很暗。基礎泥褐磚每格下半部偏暗（原本的畫法）沒改
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23

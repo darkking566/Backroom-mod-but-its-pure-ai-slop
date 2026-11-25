@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.locale.Language;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -222,20 +223,22 @@ public final class Level2ClientTest implements FabricClientGameTest {
 		int[] office = nearest(seed, from, tile -> tile.kind() == Kind.FLOOR, 0, (x, z) -> Level2Layout.isOfficePatch(seed, x, z));
 		shoot(context, game, office[0] + 0.5, STAND, office[1] + 0.5, 0, 5, "level2_office_corridor");
 
-		// Along a run of painted brick wall, with night vision so the bricks show: no block should look like its neighbour.
-		Block painted = Level2Blocks.PAINTED_BRICK_WALL;
-		int[] brick = nearest(seed, from, tile -> tile.kind() == Kind.FLOOR, 0, (x, z) -> {
-			for (int k = 0; k < 6; k++) {
-				if (!Level2ChunkGenerator.blockAt(seed, x + 1, STAND + 1, z + k).is(painted)) return false;
-				for (int back = 0; back <= 2; back++) {
-					if (!Level2ChunkGenerator.blockAt(seed, x - back, STAND, z + k).isAir()
-							|| !Level2ChunkGenerator.blockAt(seed, x - back, STAND + 1, z + k).isAir()) return false;
+		// Facing a run of each brick wall, with night vision so the bricks show: no block should look like its neighbour.
+		server.runCommand("effect give @a minecraft:night_vision 60 0 true");
+		for (Block wall : new Block[] {Level2Blocks.PAINTED_BRICK_WALL, Level2Blocks.MUDDY_BRICK_WALL, Level2Blocks.BLACK_BRICK_WALL}) {
+			int[] brick = nearest(seed, from, tile -> tile.kind() == Kind.FLOOR, 0, (x, z) -> {
+				for (int k = 0; k < 6; k++) {
+					if (!Level2ChunkGenerator.blockAt(seed, x + 1, STAND + 1, z + k).is(wall)) return false;
+					for (int back = 0; back <= 2; back++) {
+						if (!Level2ChunkGenerator.blockAt(seed, x - back, STAND, z + k).isAir()
+								|| !Level2ChunkGenerator.blockAt(seed, x - back, STAND + 1, z + k).isAir()) return false;
+					}
 				}
-			}
-			return true;
-		});
-		server.runCommand("effect give @a minecraft:night_vision 30 0 true");
-		shoot(context, game, brick[0] - 1.5, STAND, brick[1] + 3, -90, 0, "level2_painted_brick");
+				return true;
+			});
+			String name = BuiltInRegistries.BLOCK.getKey(wall).getPath().replace("_wall", "");
+			shoot(context, game, brick[0] - 1.5, STAND, brick[1] + 3, -90, 0, "level2_" + name);
+		}
 		server.runCommand("effect clear @a minecraft:night_vision");
 	}
 
