@@ -443,6 +443,7 @@
   - 測試：改寫 Gemini 的 `PlayerStatsTest`（新規則，加每 5 級成長、力量上限、越點越少）；新增實機測試 `horror/HorrorClientTest`（`-Plevels=horror`：主世界 20、後室 10、Level 5 時 12 與理智 60、換世界保留血量比例、獵犬 75 血、重傷的獵犬不追人並退開）
   - 朋友的 Level 0 測試失敗在「從 EXIT 門出去時受傷」（後室滿血 10，回主世界上限 20 但血還是 10）：改成換世界時保留血量比例，後室滿血回家也是滿血
   - 驗證：`gradlew build`、`runClientGameTest -Plevels=horror,0,2,3`、Level 1 的 `monsters,hounds` 段都通過
+- 使用者要求做完直接推上 GitHub：抓 GitHub 合併朋友新推的 6 個提交（Level 0 各區地標、斷路器與保險絲事件、玻璃辦公室與流浪者營地、Hub 與 Level Fun 的預告門），沒有衝突；朋友新加的 18 張寫實貼圖是 512，照規格書用 `tools/resize_realistic.py` 縮成 128；合併後 `gradlew build` 與 `runClientGameTest -Plevels=0,horror` 通過；把 `main` 推送到 GitHub（寫實物品三批、Blender 烘焙與網格試作、魔法類改回 Gemini 的、恐怖方向企劃與數值）；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
