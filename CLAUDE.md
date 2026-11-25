@@ -334,6 +334,7 @@
 - 使用者同意後，把 `main` 推送到 GitHub（`df91c32` 區段建築配合立體結構與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；Antigravity 未提交的 Level 2 漆磚牆改動沒有一起推；沒有強制推送、沒有改寫歷史
 
 - 白漆磚牆不再每格一樣：基礎與寫實材質包各多畫三張（`painted_brick_wall_1`～`_3`，剝落、髒污與照片紋理位置不同），方塊狀態每格隨機挑一張（`make_level2_polish.py`、`make_level2_realistic.py`）；試過加鏡像，同一張和自己的鏡像相鄰時剝落會變成對稱的蝴蝶形，所以拿掉；泥褐磚與黑磚還沒做。`Level2ClientTest` 新增白漆磚牆照（`level2_painted_brick`，開夜視、正對一段 6 格長的白漆磚牆，存一份到 `docs/levels/level2/painted_brick.png`）；`runClientGameTest -Plevels=2` 通過，照片裡磚縫跨格對齊、剝落每格不同
+- 使用者要求確認服務機器人紅眼與選取框：`Level0p1ClientTest` 的 `props` 段新增創造模式用準星對準相框、鏡子、吊鍋、倒數螢幕、實驗袍、桌上疊盤、地上雜物拍 7 張，以及黑暗中不動的服務機器人近照；`runClientGameTest -Plevels=0.1 -Psections=props` 通過。看過截圖：紅眼在黑暗中明顯發亮；壁掛物的選取框都貼在牆面、包住物件（比物件本身稍大）；桌上疊盤的框底貼著桌面、地上雜物的框在地板上。截圖沒存進 docs（Antigravity 接著跑 Gradle，`build/run` 被清掉）
 
 ## 動作記錄（Antigravity）
 
