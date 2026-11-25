@@ -1,6 +1,12 @@
 package dev.noclip.backrooms.core.floors;
 
 import dev.noclip.backrooms.BackroomsMod;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.BiConsumer;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
@@ -30,13 +36,34 @@ public final class Floors {
 					.copyOnDeath()
 					.syncWith(FloorRun.STREAM_CODEC, AttachmentSyncPredicate.targetOnly()));
 
+	/** Told about every arrival in a Backrooms level; {@code newLevel} when it is a level this trip had not seen. */
+	@FunctionalInterface
+	public interface Arrival {
+		void arrived(ServerPlayer player, String level, FloorRun run, boolean newLevel);
+	}
+
+	private static final List<Arrival> ARRIVALS = new ArrayList<>();
+	private static final List<BiConsumer<ServerPlayer, FloorRun>> HOMECOMINGS = new ArrayList<>();
+	/** Server tick each player last woke up after dying: the change of level that comes with it is not a journey. */
+	private static final Map<UUID, Integer> RESPAWNED = new HashMap<>();
+
 	private Floors() {
+	}
+
+	public static void onArrive(Arrival listener) {
+		ARRIVALS.add(listener);
+	}
+
+	/** Told when a trip ends with the player walking out alive (not dying), with the trip as it was. */
+	public static void onHome(BiConsumer<ServerPlayer, FloorRun> listener) {
+		HOMECOMINGS.add(listener);
 	}
 
 	public static void register() {
 		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register(Floors::changed);
 		// Waking up in the Overworld after dying ends the trip; waking up at a base in the Backrooms carries on.
 		ServerPlayerEvents.AFTER_RESPAWN.register((old, player, alive) -> {
+			RESPAWNED.put(player.getUUID(), player.level().getServer().getTickCount());
 			if (key(player.level()) == null) end(player);
 		});
 	}
@@ -58,14 +85,23 @@ public final class Floors {
 	}
 
 	private static void changed(ServerPlayer player, ServerLevel from, ServerLevel to) {
+		// Waking up somewhere else after dying fires this too: that is handled on respawn, and is neither a way home nor
+		// a floor further down.
+		Integer woke = RESPAWNED.remove(player.getUUID());
+		if (woke != null && woke == player.level().getServer().getTickCount()) return;
 		String level = key(to);
+		FloorRun run = of(player);
 		if (level == null) {
+			if (run.floor() != 0) for (var listener : HOMECOMINGS) listener.accept(player, run);
 			end(player);
 			return;
 		}
-		FloorRun run = of(player);
-		player.setAttached(RUN, key(from) == null || run.floor() == 0 ? run.start(level) : run.enter(level));
+		boolean starting = key(from) == null || run.floor() == 0;
+		FloorRun next = starting ? run.start(level) : run.enter(level);
+		player.setAttached(RUN, next);
 		announce(player, level);
+		boolean newLevel = !starting && next.distinct() > run.distinct();
+		for (var listener : ARRIVALS) listener.arrived(player, level, next, newLevel);
 	}
 
 	private static void end(ServerPlayer player) {

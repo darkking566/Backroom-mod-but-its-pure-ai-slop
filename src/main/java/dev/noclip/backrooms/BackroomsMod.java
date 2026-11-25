@@ -14,6 +14,10 @@ import dev.noclip.backrooms.level1.Level1;
 import dev.noclip.backrooms.level2.Level2;
 import dev.noclip.backrooms.level3.Level3;
 import dev.noclip.backrooms.monsters.Monsters;
+import dev.noclip.backrooms.core.guild.Contracts;
+import dev.noclip.backrooms.core.rpg.SurvivalXp;
+import dev.noclip.backrooms.core.trip.Pull;
+import dev.noclip.backrooms.core.trip.Trips;
 import dev.noclip.backrooms.props.BackroomsProps;
 import dev.noclip.backrooms.weapons.BackroomsWeaponNetworking;
 import net.fabricmc.api.ModInitializer;
@@ -44,6 +48,11 @@ public final class BackroomsMod implements ModInitializer {
 		Economy.register();
 		Shops.register();
 		Guilds.register();
+		// The horror direction (docs/HORROR_ESCAPE_PLAN.md): trips in and out, being pulled back, contracts, experience.
+		Trips.register();
+		Pull.register();
+		Contracts.register();
+		SurvivalXp.register();
 		Level0.register();
 		Level0p1.register();
 		Level1.register();

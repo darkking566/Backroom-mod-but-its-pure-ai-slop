@@ -116,7 +116,9 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			server.runCommand("kill @a");
 			context.waitFor(client -> client.player != null && client.player.isDeadOrDying());
 			context.runOnClient(client -> client.player.respawn());
-			server.waitFor(s -> player(s).isAlive() && player(s).level().dimension() == Level.OVERWORLD, 400);
+			// Dying in the Backrooms without having settled at a base wakes the player lost in Level 0 again, not at home
+			// (docs/HORROR_ESCAPE_PLAN.md, 2026-11-25); suffocate() below takes them back to the Overworld.
+			server.waitFor(s -> player(s).isAlive() && player(s).level().dimension() == Level0.LEVEL_0, 400);
 			game.getConnection().waitForChunksRender();
 
 			// Second entry, onto a landing spot someone has built on.

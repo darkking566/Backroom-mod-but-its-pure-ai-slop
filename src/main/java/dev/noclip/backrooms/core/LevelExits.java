@@ -88,6 +88,23 @@ public final class LevelExits {
 	}
 
 	/**
+	 * Drops the player into a level as if they had fallen in where they stand: no exit, no lock, nothing refused. For
+	 * the Backrooms pulling someone back in (core.trip.Pull), waking up lost after dying, and M.E.G. contracts.
+	 */
+	public static boolean fallInto(ServerPlayer player, String level) {
+		Arrival arrival = OPEN.get(level);
+		if (arrival == null) return false;
+		MinecraftServer server = player.level().getServer();
+		var from = player.level().dimension();
+		server.schedule(new TickTask(server.getTickCount(), () -> {
+			if (player.isRemoved() || player.hasDisconnected() || !player.isAlive()) return;
+			if (player.level().dimension() != from) return;
+			arrival.arrive(player);
+		}));
+		return true;
+	}
+
+	/**
 	 * Where a level should put a player who is arriving, as {x, z}. Through an exit it is a stretch of the level far
 	 * from the exit, so that coming back to a level is coming to a new part of it, as in 狐霖's Backrooms (docs/FLOORS.md);
 	 * it depends only on where the exit is and where it leads, so whoever takes the same exit lands together.

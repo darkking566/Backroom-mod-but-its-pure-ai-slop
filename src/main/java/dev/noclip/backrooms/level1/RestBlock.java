@@ -14,8 +14,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * A cot or bedroll in a settlement. Lying down on it means settling there: from then on you wake up
- * here instead of at home, until you sleep in a bed somewhere else.
+ * A cot or bedroll in a settlement. Lying down on it means settling there: from then on you wake up here instead of at
+ * home, until M.E.G. takes you home from here or you sleep somewhere else (core.trip.Trips).
  */
 final class RestBlock extends OldComputerBlock {
 	private final String settlement;
@@ -30,7 +30,7 @@ final class RestBlock extends OldComputerBlock {
 		if (!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.SUCCESS;
 		// Where the player stands, beside the cot: always somewhere a player fits.
 		LevelData.RespawnData spot = LevelData.RespawnData.of(level.dimension(), serverPlayer.blockPosition(), serverPlayer.getYRot(), 0);
-		serverPlayer.setRespawnPosition(new ServerPlayer.RespawnConfig(spot, true), false);
+		dev.noclip.backrooms.core.trip.Trips.settle(serverPlayer, spot);
 		level.playSound(null, pos, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 0.8F, 0.8F);
 		serverPlayer.sendOverlayMessage(Component.translatable("message.noclip_backrooms.settled",
 				Component.translatable("settlement.noclip_backrooms." + settlement)));

@@ -9,6 +9,7 @@ import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.people.PersonModel;
 import dev.noclip.backrooms.core.people.PersonRenderer;
 import dev.noclip.backrooms.core.rpg.RpgClient;
+import dev.noclip.backrooms.core.trip.PullClient;
 import dev.noclip.backrooms.crafting.BackroomsCrafting;
 import dev.noclip.backrooms.crafting.BackroomsStationScreen;
 import dev.noclip.backrooms.crafting.StationType;
@@ -77,6 +78,7 @@ public final class BackroomsClient implements ClientModInitializer {
 		ShopClient.register();
 		WalletClient.register();
 		RpgClient.register();
+		PullClient.register();
 		for (StationType station : StationType.values()) {
 			MenuScreens.register(BackroomsCrafting.menuType(station), BackroomsStationScreen::new);
 		}

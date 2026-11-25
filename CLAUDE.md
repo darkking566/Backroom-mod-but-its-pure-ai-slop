@@ -445,6 +445,20 @@
   - 驗證：`gradlew build`、`runClientGameTest -Plevels=horror,0,2,3`、Level 1 的 `monsters,hounds` 段都通過
 - 使用者要求做完直接推上 GitHub：抓 GitHub 合併朋友新推的 6 個提交（Level 0 各區地標、斷路器與保險絲事件、玻璃辦公室與流浪者營地、Hub 與 Level Fun 的預告門），沒有衝突；朋友新加的 18 張寫實貼圖是 512，照規格書用 `tools/resize_realistic.py` 縮成 128；合併後 `gradlew build` 與 `runClientGameTest -Plevels=0,horror` 通過；把 `main` 推送到 GitHub（寫實物品三批、Blender 烘焙與網格試作、魔法類改回 Gemini 的、恐怖方向企劃與數值）；沒有強制推送、沒有改寫歷史
 
+### 2026-11-26
+- 使用者要求把企劃書裡「待做」的都做完，並決定：後室裡吃飽回血放慢、扣理智扣慢一點、主世界血量也砍半（細節見 `docs/HORROR_ESCAPE_PLAN.md`）：
+  - 血量：主世界也是 10（`PlayerRpg.FRAILTY`，拿掉上一版「只有後室砍半、換世界保留比例」）；新增第一個非客戶端 mixin 設定 `noclip_backrooms.mixins.json` 與 `mixin/FoodDataBackroomsRegen`（後室裡原版吃飽回血 ×0.25）；`fabric.mod.json` 加這個設定
+  - 理智：黑暗、昏暗、怪物造成的扣除都減半
+  - 死亡、安頓、撤離（新增 `core/trip/Trips`）：在後室死掉又沒安頓 → 在 Level 0 醒來（新的一趟），東西照原版掉在原地；安頓過 → 在據點醒來；安頓時記下原本的重生點，聊天欄出現「[請 M.E.G. 帶我回家]」（`/meg extract`，要在床附近 8 格內），回家後還原重生點；停車場的 `RestBlock` 改用 `Trips.settle`
+  - 被拉回後室（新增 `core/trip/Pull`、`PullState`、客戶端 `PullClient`）：主世界的拉力值（黑暗封閉、地底、理智低、身上的後室物資），滿 100 掉進 Level 0；50 起嗡嗡聲與泛黃、75 起閃黑；在暗房睡覺 20% 醒來在 Level 0；回到地面後一天內不會被拉
+  - 委託（新增 `core/guild/Contracts`）：右鍵前哨指揮官列出三份委託（到 Level 1／2／3，150／400／800 點），接受就被送進 Level 0，到達目標再活著回來付錢；`Shops` 的會長改呼叫它
+  - 公會改名 M.E.G. 地面前哨站、會長改叫前哨指揮官（語言檔、台詞、`docs/guild.md`；ID 不變）
+  - 經驗（新增 `core/rpg/SurvivalXp`）：新樓層 40、甩掉追擊 20、安頓 50、活著回家 30＋每層 20、委託報酬五分之一；殺怪改成後室怪物 12、原版 4、Boss 150
+  - 共用：`LevelExits.fallInto`（不經出口直接掉進某層）；`Floors.onArrive`、`Floors.onHome` 讓別的系統知道「到了哪一層」「活著回到家」；死後重生跟著換世界的那一下不算走回家（不然死掉會被當成逃出來、委託會被判失敗）
+  - 改了朋友的 `Level0ClientTest` 一行：在 Level 0 死掉現在會在 Level 0 醒來（原本檢查回主世界）
+  - 測試：`HorrorClientTest` 擴充成整條流程（血量、回血變慢、獵犬退開、死掉迷失在 Level 0、安頓後在據點醒來、撤離、寬限期內不會被拉、拉力滿了掉進去、委託付錢），截圖看過預兆的泛黃；`gradlew build`、`runClientGameTest -Plevels=horror,0,floors,guild` 與 Level 1 的 `settlements,wikiSettlements,leaveThroughDoor,monsters` 段通過
+  - 還沒做（企劃書裡標成待討論）：安頓與撤離的細節、Level 0 綠色 EXIT 門要不要改、怪物特殊效果、找到筆記的經驗、武器護甲數值
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23
