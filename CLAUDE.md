@@ -365,6 +365,11 @@
   - `Level1ClientTest` 的 `placeFacing` 段加這 9 種，從兩個方向右鍵擺放並檢查
   - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=placeFacing,checkBlocks,blackout,exits,wikiSettlements,views,leaveThroughDoor` 通過，log 沒有缺模型；看過日光燈與出口門截圖沒變；玩家擺放後的樣子沒拍照
 - 使用者同意後，把 `main` 推送到 GitHub（`efd01d8` 櫃檯、門框、出口門、日光燈、柵欄桿的擺放朝向與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- Level 1 審查報告：大型道具的完整碰撞箱：
+  - 車（約 2.2 格長）、廂型車（2.2 格長、1.3 格高）、販賣機（1.8 格高）、配電櫃（1.7 格高）、探照燈（1.3 格高）、施工機具改成跟模型一樣大的碰撞箱與選取框（`Level1Blocks`）；遊戲允許方塊的形狀伸出自己那格最多 1 格、照樣會擋人，所以不用加隱形的輔助方塊，舊存檔不受影響；跟著 `facing` 轉
+  - 限制：用準星點伸出去的那一段選不到道具（要點它本身那格）
+  - `Level1ClientTest` 新增 `bigProps` 段：6 種道具 × 4 個方向，在伸出去的每一邊與頂上探測碰撞（36 處）
+  - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=bigProps,checkBlocks,sectors,sectorFit,views,monsters` 通過；沒有實際走去撞車、也沒拍照
 
 ## 動作記錄（Antigravity）
 

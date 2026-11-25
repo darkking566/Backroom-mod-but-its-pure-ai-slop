@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public final class Level1Blocks {
@@ -186,7 +187,7 @@ public final class Level1Blocks {
 	/** On the settlement's own power: the Flickering never reaches it. */
 	public static final Block FLOODLIGHT = register("floodlight", Properties.of()
 			.mapColor(MapColor.METAL).strength(1.5F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 15),
-			p -> new ShapedBlock(p, Block.box(3, 0, 3, 13, 16, 13)));
+			p -> new ShapedBlock(p, Block.box(3, 0, 3, 13, 21, 13)));
 	public static final Block TRADER_SIGN = register("trader_sign", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(2.0F).sound(SoundType.METAL));
 	public static final Block CLINIC_SIGN = register("clinic_sign", Properties.of().mapColor(MapColor.SNOW).strength(2.0F).sound(SoundType.METAL));
 	public static final Block TOM_SIGN = register("tom_sign", Properties.of().mapColor(MapColor.COLOR_RED).strength(2.0F).sound(SoundType.METAL).lightLevel(state -> 6));
@@ -255,22 +256,24 @@ public final class Level1Blocks {
 	public static final Block SCAFFOLD_POLE = register("scaffold_pole", Properties.of().mapColor(MapColor.METAL).strength(0.5F).sound(SoundType.METAL).noOcclusion().noCollision(),
 			p -> new ShapedBlock(p, Block.box(7, 0, 7, 9, 16, 9)));
 	public static final Block SITE_MACHINE = register("site_machine", Properties.of().mapColor(MapColor.COLOR_YELLOW).strength(0.5F).sound(SoundType.METAL).noOcclusion(),
-			p -> new ShapedBlock(p, Block.box(2, 0, 2, 14, 14, 14)));
+			p -> new ShapedBlock(p, Block.box(0.5, 0, 2, 15.5, 10.5, 19)));
+	// The big props collide as far as their models reach: a block's shape may stick out up to one block past its own
+	// space and the game still checks it (only clicking on the part that sticks out does not pick the block).
 	/** A dusty 90s abandoned sedan parked in the garage halls and indoor overpasses. */
 	public static final Block ABANDONED_CAR = register("abandoned_car", Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F).sound(SoundType.METAL).noOcclusion(),
-			p -> new OldComputerBlock(p, Block.box(0, 0, 0, 16, 16, 16)));
+			p -> new OldComputerBlock(p, Shapes.or(Block.box(0, 0, -8.4, 16, 9.6, 24.4), Block.box(1.2, 9.6, -0.8, 14.8, 16.8, 18.4))));
 	/** A boxy 90s cargo delivery van parked in garage stalls and loading docks. */
 	public static final Block ABANDONED_VAN = register("abandoned_van", Properties.of().mapColor(MapColor.SNOW).strength(3.0F).sound(SoundType.METAL).noOcclusion(),
-			p -> new OldComputerBlock(p, Block.box(0, 0, 0, 16, 16, 16)));
+			p -> new OldComputerBlock(p, Shapes.or(Block.box(0, 0, -9, 16, 11.2, 25), Block.box(0.2, 11.2, -5.8, 15.8, 20.6, 25))));
 	/** A softly humming retro vending machine with a lit display window. */
 	public static final Block VENDING_MACHINE = register("vending_machine", Properties.of().mapColor(MapColor.COLOR_RED).strength(2.5F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 7),
-			p -> new OldComputerBlock(p, Block.box(1, 0, 2, 15, 16, 14)));
+			p -> new OldComputerBlock(p, Block.box(0.8, 0, 2, 15.2, 29.4, 14.2)));
 	/** A wooden shipping pallet stacked with boxes and a red hand-truck. */
 	public static final Block PALLET_STACK = register("pallet_stack", Properties.of().mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD).noOcclusion(),
 			p -> new OldComputerBlock(p, Block.box(0, 0, 0, 16, 15, 16)));
 	/** A tall industrial electrical switchgear cabinet with conduits and indicator lights. */
 	public static final Block ELECTRICAL_CABINET = register("electrical_cabinet", Properties.of().mapColor(MapColor.COLOR_GRAY).strength(3.0F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 4),
-			p -> new OldComputerBlock(p, Block.box(1, 0, 2, 15, 16, 14)));
+			p -> new OldComputerBlock(p, Block.box(1, 0, 2, 15, 27, 14)));
 	public static final Block GLITCH_BLACK = register("glitch_black", Properties.of().mapColor(MapColor.COLOR_BLACK).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 0));
 	public static final Block GLITCH_MAGENTA = register("glitch_magenta", Properties.of().mapColor(MapColor.COLOR_MAGENTA).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 6));
 	public static final Block GLITCH_CYAN = register("glitch_cyan", Properties.of().mapColor(MapColor.COLOR_CYAN).strength(2.0F).sound(SoundType.STONE).lightLevel(state -> 6));

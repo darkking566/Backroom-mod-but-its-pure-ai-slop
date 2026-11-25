@@ -84,6 +84,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			if (only("hounds")) hounds(context, game, seed);
 			if (only("shepherdSnake")) shepherdSnake(context, game, seed);
 			if (only("placeFacing")) placeFacing(context, game);
+			if (only("bigProps")) bigProps(context, game);
 			if (only("checkBlocks")) checkBlocks(context, game);
 			if (only("leaveThroughDoor")) leaveThroughDoor(context, game, seed);
 		}
@@ -1480,6 +1481,46 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run setblock %d %d %d minecraft:sea_lantern", x0, STAND + 3, z0 + 1));
 		shoot(context, game, x0 + 0.5, STAND + 2.6, z0 - 2.5, 0, 55, "level1_place_facing");
 		server.runCommand(clear);
+	}
+
+	/** Cars, vans and the other big props collide as far as their models reach, also in the neighbouring blocks and above. */
+	private static void bigProps(ClientGameTestContext context, TestSingleplayerContext game) {
+		var server = game.getServer();
+		BlockPos at = server.computeOnServer(s -> player(s).blockPosition());
+		int x0 = at.getX(), z0 = at.getZ();
+		server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run fill %d %d %d %d %d %d minecraft:air", x0 - 4, STAND, z0 - 4, x0 + 4, STAND + 3, z0 + 4));
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			BlockPos pos = new BlockPos(x0, STAND, z0);
+			Block[] props = {Level1Blocks.ABANDONED_CAR, Level1Blocks.ABANDONED_VAN, Level1Blocks.VENDING_MACHINE, Level1Blocks.ELECTRICAL_CABINET,
+					Level1Blocks.FLOODLIGHT, Level1Blocks.SITE_MACHINE};
+			int probes = 0;
+			for (Block block : props) {
+				for (Direction facing : Direction.Plane.HORIZONTAL) {
+					BlockState state = block.defaultBlockState();
+					if (state.hasProperty(OldComputerBlock.FACING)) state = state.setValue(OldComputerBlock.FACING, facing);
+					level.setBlock(pos, state, Block.UPDATE_CLIENTS);
+					net.minecraft.world.phys.AABB b = state.getCollisionShape(level, pos).bounds();
+					// Probe just inside each side of the outline that sticks out of the block, low down where every prop is solid.
+					java.util.List<net.minecraft.world.phys.AABB> inside = new java.util.ArrayList<>();
+					double cx = (b.minX + b.maxX) / 2, cz = (b.minZ + b.maxZ) / 2, low = Math.min(0.4, b.maxY / 2);
+					if (b.maxZ > 1.05) inside.add(new net.minecraft.world.phys.AABB(cx - 0.05, low, b.maxZ - 0.1, cx + 0.05, low + 0.1, b.maxZ - 0.05));
+					if (b.minZ < -0.05) inside.add(new net.minecraft.world.phys.AABB(cx - 0.05, low, b.minZ + 0.05, cx + 0.05, low + 0.1, b.minZ + 0.1));
+					if (b.maxX > 1.05) inside.add(new net.minecraft.world.phys.AABB(b.maxX - 0.1, low, cz - 0.05, b.maxX - 0.05, low + 0.1, cz + 0.05));
+					if (b.minX < -0.05) inside.add(new net.minecraft.world.phys.AABB(b.minX + 0.05, low, cz - 0.05, b.minX + 0.1, low + 0.1, cz + 0.05));
+					if (b.maxY > 1.05) inside.add(new net.minecraft.world.phys.AABB(cx - 0.05, b.maxY - 0.1, cz - 0.05, cx + 0.05, b.maxY - 0.05, cz + 0.05));
+					check(!inside.isEmpty(), block + " facing " + facing + " does not reach past its block: " + b);
+					for (net.minecraft.world.phys.AABB probe : inside) {
+						net.minecraft.world.phys.AABB world = probe.move(pos);
+						probes++;
+						check(level.getBlockCollisions(null, world).iterator().hasNext(),
+								block + " facing " + facing + " lets you through at " + world + " (outline " + b + ")");
+					}
+				}
+			}
+			level.setBlock(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+			System.out.println("[bigProps] probes " + probes);
+		});
 	}
 
 	/** The nearest exit door, from both of its sides, then out with a right-click. */
