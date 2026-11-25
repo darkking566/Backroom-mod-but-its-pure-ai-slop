@@ -458,6 +458,10 @@
   - 改了朋友的 `Level0ClientTest` 一行：在 Level 0 死掉現在會在 Level 0 醒來（原本檢查回主世界）
   - 測試：`HorrorClientTest` 擴充成整條流程（血量、回血變慢、獵犬退開、死掉迷失在 Level 0、安頓後在據點醒來、撤離、寬限期內不會被拉、拉力滿了掉進去、委託付錢），截圖看過預兆的泛黃；`gradlew build`、`runClientGameTest -Plevels=horror,0,floors,guild` 與 Level 1 的 `settlements,wikiSettlements,leaveThroughDoor,monsters` 段通過
   - 還沒做（企劃書裡標成待討論）：安頓與撤離的細節、Level 0 綠色 EXIT 門要不要改、怪物特殊效果、找到筆記的經驗、武器護甲數值
+- 使用者決定：Level 0 綠色 EXIT 門改成很稀有；撤離不是只有 M.E.G. 的據點（其他組織也行）：
+  - 改朋友的 `level0/Exits`：新增 `RARITY = 8`、`hasExit`，大約每 8 區（560×560 格）才有一扇門（原本每區一扇）；照著改朋友的 `ExitsTest`（「每區都有門」改成「有門的區約佔八分之一、每扇門都在牆上且兩邊有路」，走得到門的測試改成挑有門的區）；`ExitClientChecks` 沒改（它在半徑 30 區內找各種區域的門，應該還找得到）
+  - 撤離的文字改成「這裡的人知道回地面的路」「[請他們帶我回家]」（不再只說 M.E.G.）；`Trips` 說明跟著改；`docs/HORROR_ESCAPE_PLAN.md`、`docs/levels/level0/README.md` 記下兩個決定
+  - **還沒測試**：改完時 Gemini 已在同一個資料夾動工（`core/trip` 的現實排斥與滲透、新的裂隙方塊、消耗品），他寫到一半的程式讓整個專案編譯失敗，照協作規則先停手；只提交自己的檔案，等 Gemini 做完再跑 `gradlew build` 與 `runClientGameTest -Plevels=0,horror`
 
 ## 動作記錄（Antigravity）
 

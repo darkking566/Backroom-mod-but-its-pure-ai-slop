@@ -35,7 +35,8 @@ import net.minecraft.world.phys.Vec3;
  * A trip into the Backrooms and back (docs/HORROR_ESCAPE_PLAN.md):
  * <ul>
  * <li>settling at a base (a cot in a settlement) makes it where the player wakes up, for the rest of the trip;</li>
- * <li>from there M.E.G. can take them home ({@code /meg extract}, offered in chat when they settle);</li>
+ * <li>from there the people of the base, whichever group runs it (M.E.G. or another), can take them home
+ * ({@code /meg extract}, offered in chat when they settle);</li>
  * <li>dying in the Backrooms without having settled means waking up lost in Level 0, with everything left where they
  * fell;</li>
  * <li>back home, the spot they woke up at before the trip is theirs again, and the Backrooms leave them alone for a day

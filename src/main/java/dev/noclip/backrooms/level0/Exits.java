@@ -3,7 +3,9 @@ package dev.noclip.backrooms.level0;
 import java.util.SplittableRandom;
 
 /**
- * Where the ways out of Level 0 are. There is one in every region of 10x10 sectors.
+ * Where the ways out of Level 0 are. Since the game turned to horror (docs/HORROR_ESCAPE_PLAN.md, 2026-11-26) they are
+ * very rare: about one region of 10x10 sectors in RARITY has one, so the usual way home is to go deeper and settle at
+ * a base.
  *
  * An exit only replaces blocks that are already wall, so it never changes which positions are passable
  * and new chunks still line up with ones generated before exits existed.
@@ -11,6 +13,8 @@ import java.util.SplittableRandom;
 final class Exits {
 	static final int REGION_CELLS = Maze.SECTOR * 10;
 	static final int REGION = REGION_CELLS * Maze.CELL;
+	/** About one region in this many has an exit door. */
+	static final int RARITY = 8;
 	/** How many cells away the lamps start to turn green. */
 	static final int HINT_CELLS = 3;
 
@@ -46,12 +50,20 @@ final class Exits {
 		return false;
 	}
 
-	/** The door of a region, or null if it has no solid wall to hold one. */
+	/** The door of a region, or null if it has none (most do not) or no solid wall to hold one. */
 	static Door doorIn(long seed, int rx, int rz) {
 		return DOOR_CACHE.get().getOrCompute(seed, rx, rz);
 	}
 
+	/** Whether a region is one of the rare ones with an exit door. */
+	static boolean hasExit(long seed, int rx, int rz) {
+		long h = (seed + 0x5DEECE66DL) ^ rx * 0xBF58476D1CE4E5B9L ^ rz * 0x94D049BB133111EBL;
+		h = (h ^ (h >>> 31)) * 0x9E3779B97F4A7C15L;
+		return Math.floorMod(h ^ (h >>> 29), RARITY) == 0;
+	}
+
 	private static Door computeDoorIn(long seed, int rx, int rz) {
+		if (!hasExit(seed, rx, rz)) return null;
 		int cells = REGION_CELLS * REGION_CELLS;
 		long regionSeed = seed ^ rx * 0x9E3779B97F4A7C15L ^ rz * 0xC2B2AE3D27D4EB4FL;
 		int first = new SplittableRandom(regionSeed).nextInt(cells);

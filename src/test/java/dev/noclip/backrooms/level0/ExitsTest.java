@@ -3,7 +3,6 @@ package dev.noclip.backrooms.level0;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
@@ -16,16 +15,20 @@ class ExitsTest {
 	private static final int BORDER_REGION = 29_900_000 / Exits.REGION;
 	private static final int[] REGIONS = {0, -1, 7, -BORDER_REGION, BORDER_REGION};
 
+	/** Doors are rare (about one region in Exits.RARITY, 2026-11-26); each one sits in a wall with room on both sides. */
 	@Test
-	void everyRegionHasADoorInAWallWithRoomOnBothSides() {
+	void rareDoorsSitInAWallWithRoomOnBothSides() {
 		Random random = new Random(1);
+		int regions = 0, withDoor = 0;
 		for (int run = 0; run < 500; run++) {
 			long seed = random.nextLong();
 			for (int origin : REGIONS) {
 				for (int rx = origin - 1; rx <= origin + 1; rx++) {
 					for (int rz = origin - 1; rz <= origin + 1; rz++) {
+						regions++;
 						Exits.Door door = Exits.doorIn(seed, rx, rz);
-						assertNotNull(door, "no exit, seed " + seed);
+						if (door == null) continue;
+						withDoor++;
 						int x = door.x(), z = door.z();
 						assertTrue(Exits.isDoor(seed, x, z));
 						assertEquals(rx, Math.floorDiv(x, Exits.REGION));
@@ -44,8 +47,18 @@ class ExitsTest {
 				}
 			}
 		}
+		double share = withDoor / (double) regions;
+		assertTrue(share > 0.5 / Exits.RARITY && share < 1.5 / Exits.RARITY, "share of regions with a door: " + share);
 	}
 
+	/** A region near {@code region} that has a door. */
+	private static int regionWithDoor(long seed, int region) {
+		for (int r = region; ; r++) {
+			if (Exits.doorIn(seed, r, r) != null) return r;
+		}
+	}
+
+	/** Every walkable block of a region with a door can walk to it (and, the way the maze is built, not too far). */
 	@Test
 	void anExitIsWalkableFromEverywhere() {
 		Random random = new Random(2);
@@ -54,7 +67,7 @@ class ExitsTest {
 
 		for (int run = 0; run < 40; run++) {
 			long seed = random.nextLong();
-			int region = REGIONS[run % REGIONS.length];
+			int region = regionWithDoor(seed, REGIONS[run % REGIONS.length]);
 			int origin = (region - 1) * Exits.REGION;
 			Arrays.fill(walked, Integer.MAX_VALUE);
 			byte[] floorY = new byte[size * size];
@@ -68,6 +81,7 @@ class ExitsTest {
 			for (int rx = region - 1; rx <= region + 1; rx++) {
 				for (int rz = region - 1; rz <= region + 1; rz++) {
 					Exits.Door door = Exits.doorIn(seed, rx, rz);
+					if (door == null) continue;
 					for (int x : new int[] {door.x() - 1, door.x() + 1}) {
 						if (x < origin || x >= origin + size) continue;
 						int at = x - origin + (door.z() - origin) * size;
@@ -89,7 +103,7 @@ class ExitsTest {
 				}
 			}
 
-			// Only the middle region: the others may be nearer to a door outside the window.
+			// Only the middle region, which has a door: the others may be nearer to a door outside the window.
 			for (int x = Exits.REGION; x < Exits.REGION * 2; x++) {
 				for (int z = Exits.REGION; z < Exits.REGION * 2; z++) {
 					int at = x + z * size;
@@ -104,7 +118,8 @@ class ExitsTest {
 		Random random = new Random(3);
 		for (int run = 0; run < 500; run++) {
 			long seed = random.nextLong();
-			Exits.Door door = Exits.doorIn(seed, run % 5 - 2, run % 3 - 1);
+			int region = regionWithDoor(seed, run % 5 - 2);
+			Exits.Door door = Exits.doorIn(seed, region, region);
 			assertTrue(Exits.lampPointsToExit(seed, door.x() + Maze.CENTER, door.z()));
 			assertTrue(Exits.lampPointsToExit(seed, door.x() - Maze.CELL + Maze.CENTER, door.z()));
 			assertTrue(Exits.lampPointsToExit(seed, door.x() + Exits.HINT_CELLS * Maze.CELL + Maze.CENTER, door.z()));
