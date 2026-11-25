@@ -25,6 +25,7 @@ sys.dont_write_bytecode = True
 import numpy as np  # noqa: E402
 from PIL import Image  # noqa: E402
 
+import bake  # noqa: E402
 import lib  # noqa: E402
 import mats  # noqa: E402, F401  (registers the materials)
 import guns  # noqa: E402
@@ -53,16 +54,30 @@ def props():
     return {name: build() for name, build in ported.PROPS.items()}
 
 
+# Baked in Blender (bake.py): shading, worn edges and dust painted onto a per-item atlas. Being tried on these first.
+BAKED = {"west_arming_sword", "gun_pistol_9mm", "prop_office_chair"}
+
+
 def main():
     if lib.OUT.exists():
         shutil.rmtree(lib.OUT)
     done = []
-    for name, (elements, display) in items().items():
-        lib.write(lib.OUT / "models/item/look" / f"{name}.json", lib.model(elements, "item", display))
+    all_items, all_props = items(), props()
+    baked = bake.bake({**{n: (e, "item") for n, (e, _) in all_items.items() if n in BAKED},
+                       **{n: (e, "block") for n, e in all_props.items() if n in BAKED}})
+    for name, (elements, display) in all_items.items():
+        if name in baked:
+            elements, atlas = baked[name]
+            lib.write(lib.OUT / "models/item/look" / f"{name}.json", lib.model(elements, "item", display, atlas=atlas))
+        else:
+            lib.write(lib.OUT / "models/item/look" / f"{name}.json", lib.model(elements, "item", display))
         lib.write(lib.OUT / "items" / f"{name}.json", {"model": {"type": "minecraft:model", "model": f"noclip_backrooms:item/look/{name}"}})
         done.append(name)
-    for name, elements in props().items():
-        lib.write(lib.OUT / "models/block/look" / f"{name}.json", lib.model(elements, "block", parent="minecraft:block/block"))
+    for name, elements in all_props.items():
+        atlas = None
+        if name in baked:
+            elements, atlas = baked[name]
+        lib.write(lib.OUT / "models/block/look" / f"{name}.json", lib.model(elements, "block", parent="minecraft:block/block", atlas=atlas))
         lib.write(lib.OUT / "items" / f"{name}.json", {"model": {"type": "minecraft:model", "model": f"noclip_backrooms:block/look/{name}"}})
         states = json.loads((lib.ASSETS / "blockstates" / f"{name}.json").read_text(encoding="utf8"))
         for variant in states.get("variants", {}).values():

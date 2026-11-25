@@ -422,6 +422,10 @@
   - 右鍵瞄準時槍擋住視線、不像機瞄：Gemini 的瞄準動畫把槍移到固定位置，我換了槍模型後槍身擋在中間；改成每把槍記下準星高度和照門位置（`guns.py` 的 `SIGHTS`、長短槍照 `isLongGun` 規則），算出拿槍位置讓瞄準時準星正好在畫面中央、照門在眼前 0.2 格；照門改成左右兩根留縫、突擊步槍紅點改成中空框、擊錘與擊針壓到準星線下、長槍槍托壓低；土製管槍搬進 `guns.py`
   - `runClientGameTest -Plevels=itemlook` 通過，看過 7 把槍腰射與瞄準、準心近照；比較圖 `docs/look/items/guns_hip_and_aimed.png`
   - 「全部都很塑膠」還沒處理：使用者建議用 Blender，下一步試
+- Blender 烘焙試作（處理「塑膠感」）：使用者本機的 Blender 5.3 在 `E:/SteamLibrary/steamapps/common/Blender/blender.exe`（使用者開著的那個連著 MCP，我另外用背景模式跑，不動它）
+  - 新增 `tools/item_look/bake.py`（每件東西的方塊面攤到專屬 128×128 貼圖、交給 Blender、合成：材質 × 陰影 × 打光、縫隙積灰、外緣磨亮，模型改用這張貼圖）與 `tools/item_look/blender_bake.py`（Blender 裡照 Minecraft 的貼圖方向重建方塊，Cycles 烘焙 AO 與漫射光）；`lib.model` 可改用整張烘焙貼圖
+  - 先套在騎士長劍、9mm 手槍、辦公椅；`runClientGameTest -Plevels=itemlook` 通過；辦公椅座墊下與縫隙有陰影、比較立體，手槍與長劍只好一點點
+  - 也用 `-Pshaders`（Iris＋Complementary）跑了一次：我的物品是霧面偏暗、不會像打蠟，椅子和映像管電腦像真的；比較圖 `docs/look/items/bake_before_after.png`、`with_shaders.png`
 
 ## 動作記錄（Antigravity）
 

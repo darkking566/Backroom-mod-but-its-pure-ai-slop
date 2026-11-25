@@ -216,15 +216,19 @@ def centre_y(elements):
     return dy
 
 
-def model(elements, folder, display=None, parent=None):
-    textures = sorted({f["texture"][1:] for e in elements for f in e["faces"].values()})
-    for name in textures:
-        write_material(name, folder)
+def model(elements, folder, display=None, parent=None, atlas=None):
+    """A model JSON. With `atlas` (a baked texture id, see bake.py) every face uses that one texture."""
     data = {}
     if parent:
         data["parent"] = parent
-    data["textures"] = {t: f"noclip_backrooms:{folder}/look/{t}" for t in textures}
-    data["textures"]["particle"] = data["textures"][textures[0]]
+    if atlas:
+        data["textures"] = {"baked": atlas, "particle": atlas}
+    else:
+        textures = sorted({f["texture"][1:] for e in elements for f in e["faces"].values()})
+        for name in textures:
+            write_material(name, folder)
+        data["textures"] = {t: f"noclip_backrooms:{folder}/look/{t}" for t in textures}
+        data["textures"]["particle"] = data["textures"][textures[0]]
     data["elements"] = elements
     if display:
         data["display"] = display
