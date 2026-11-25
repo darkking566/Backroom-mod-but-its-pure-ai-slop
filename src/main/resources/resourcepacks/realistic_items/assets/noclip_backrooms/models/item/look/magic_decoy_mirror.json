@@ -1,0 +1,336 @@
+{
+ "textures": {
+  "dark_wood": "noclip_backrooms:item/look/dark_wood",
+  "lens": "noclip_backrooms:item/look/lens",
+  "steel": "noclip_backrooms:item/look/steel",
+  "particle": "noclip_backrooms:item/look/dark_wood"
+ },
+ "elements": [
+  {
+   "from": [
+    4.0,
+    4,
+    7.4
+   ],
+   "to": [
+    12.0,
+    14,
+    8.6
+   ],
+   "faces": {
+    "north": {
+     "texture": "#dark_wood",
+     "uv": [
+      0.31,
+      2.94,
+      8.31,
+      12.94
+     ]
+    },
+    "south": {
+     "texture": "#dark_wood",
+     "uv": [
+      1.35,
+      4.4,
+      9.35,
+      14.4
+     ]
+    },
+    "east": {
+     "texture": "#dark_wood",
+     "uv": [
+      14.45,
+      3.81,
+      15.65,
+      13.81
+     ]
+    },
+    "west": {
+     "texture": "#dark_wood",
+     "uv": [
+      8.24,
+      4.61,
+      9.44,
+      14.61
+     ]
+    },
+    "up": {
+     "texture": "#dark_wood",
+     "uv": [
+      6.21,
+      9.34,
+      14.21,
+      10.54
+     ]
+    },
+    "down": {
+     "texture": "#dark_wood",
+     "uv": [
+      3.86,
+      3.71,
+      11.86,
+      4.91
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    5.0,
+    5,
+    7.3
+   ],
+   "to": [
+    11.0,
+    13,
+    7.4
+   ],
+   "faces": {
+    "north": {
+     "texture": "#lens",
+     "uv": [
+      9.41,
+      1.29,
+      15.41,
+      9.29
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    7.8,
+    5,
+    7.25
+   ],
+   "to": [
+    8.2,
+    13,
+    7.3
+   ],
+   "faces": {
+    "north": {
+     "texture": "#steel",
+     "uv": [
+      13.58,
+      5.18,
+      13.98,
+      13.18
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    5.0,
+    8.8,
+    7.25
+   ],
+   "to": [
+    11.0,
+    9.2,
+    7.3
+   ],
+   "faces": {
+    "north": {
+     "texture": "#steel",
+     "uv": [
+      9.92,
+      6.48,
+      15.92,
+      6.88
+     ]
+    }
+   }
+  },
+  {
+   "from": [
+    7.2,
+    0.5,
+    7.4
+   ],
+   "to": [
+    8.8,
+    4,
+    8.6
+   ],
+   "faces": {
+    "north": {
+     "texture": "#dark_wood",
+     "uv": [
+      7.0,
+      10.29,
+      8.6,
+      13.79
+     ]
+    },
+    "south": {
+     "texture": "#dark_wood",
+     "uv": [
+      4.01,
+      8.82,
+      5.61,
+      12.32
+     ]
+    },
+    "east": {
+     "texture": "#dark_wood",
+     "uv": [
+      2.26,
+      2.79,
+      3.46,
+      6.29
+     ]
+    },
+    "west": {
+     "texture": "#dark_wood",
+     "uv": [
+      11.55,
+      4.71,
+      12.75,
+      8.21
+     ]
+    },
+    "up": {
+     "texture": "#dark_wood",
+     "uv": [
+      8.87,
+      14.05,
+      10.47,
+      15.25
+     ]
+    },
+    "down": {
+     "texture": "#dark_wood",
+     "uv": [
+      14.17,
+      0.23,
+      15.77,
+      1.43
+     ]
+    }
+   }
+  }
+ ],
+ "display": {
+  "gui": {
+   "rotation": [
+    25,
+    40,
+    0
+   ],
+   "translation": [
+    0,
+    0,
+    0
+   ],
+   "scale": [
+    0.85,
+    0.85,
+    0.85
+   ]
+  },
+  "ground": {
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "translation": [
+    0,
+    2,
+    0
+   ],
+   "scale": [
+    0.5,
+    0.5,
+    0.5
+   ]
+  },
+  "fixed": {
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "translation": [
+    0,
+    0,
+    0
+   ],
+   "scale": [
+    0.8,
+    0.8,
+    0.8
+   ]
+  },
+  "firstperson_righthand": {
+   "rotation": [
+    0,
+    30,
+    0
+   ],
+   "translation": [
+    1.5,
+    1.0,
+    -1.5
+   ],
+   "scale": [
+    0.34,
+    0.34,
+    0.34
+   ]
+  },
+  "firstperson_lefthand": {
+   "rotation": [
+    0,
+    -30,
+    0
+   ],
+   "translation": [
+    1.5,
+    1.0,
+    -1.5
+   ],
+   "scale": [
+    0.34,
+    0.34,
+    0.34
+   ]
+  },
+  "thirdperson_righthand": {
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "translation": [
+    0,
+    3,
+    1
+   ],
+   "scale": [
+    0.55,
+    0.55,
+    0.55
+   ]
+  },
+  "thirdperson_lefthand": {
+   "rotation": [
+    0,
+    0,
+    0
+   ],
+   "translation": [
+    0,
+    3,
+    1
+   ],
+   "scale": [
+    0.55,
+    0.55,
+    0.55
+   ]
+  }
+ }
+}

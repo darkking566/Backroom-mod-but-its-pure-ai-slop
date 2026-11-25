@@ -37,10 +37,10 @@ import org.lwjgl.glfw.GLFW;
 public final class ItemLookClientTest implements FabricClientGameTest {
 	private static final int FLOOR = 32;
 	/** A spread of shapes to hold (the batch being worked on). */
-	private static final String[] HELD = {"gun_pistol_9mm", "gun_assault_rifle", "gun_double_barrel", "gun_bolt_sniper", "gun_railgun",
-			"office_crossbow", "gun_flamethrower", "west_claymore"};
+	private static final String[] HELD = {"gun_pistol_9mm", "gun_revolver", "gun_assault_rifle", "gun_double_barrel", "gun_pump_shotgun",
+			"gun_tactical_smg", "office_crossbow", "magic_stopmotion_watch"};
 	/** Which of HELD to see from outside. */
-	private static final int[] OUTSIDE = {0, 1, 2, 7};
+	private static final int[] OUTSIDE = {2, 7};
 
 	@Override
 	public void runTest(ClientGameTestContext context) {
@@ -84,6 +84,14 @@ public final class ItemLookClientTest implements FabricClientGameTest {
 					context.getInput().pressKey(GLFW.GLFW_KEY_1 + i);
 					context.waitTicks(25);
 					context.takeScreenshot("itemlook_hand_" + HELD[i] + "_" + label);
+					if (HELD[i].startsWith("gun_") || HELD[i].equals("office_crossbow")) {
+						// Aimed down the sights: the sights should line up on the middle, the gun below them.
+						context.getInput().holdMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+						context.waitTicks(25);
+						context.takeScreenshot("itemlook_ads_" + HELD[i] + "_" + label);
+						context.getInput().releaseMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+						context.waitTicks(15);
+					}
 				}
 				// From outside, holding a great sword and a polearm.
 				context.runOnClient(client -> client.options.setCameraType(CameraType.THIRD_PERSON_FRONT));

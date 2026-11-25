@@ -224,6 +224,19 @@ M = {
     "tank_red": lambda: metal((96, 92, 88), 418, rust=0.3, paint=(126, 38, 32), chips=0.6, scratch=12),
     "rubber_black": lambda: plastic((30, 30, 30), 419, 0.15, 0.2, 2),
     "lead": lambda: metal((96, 96, 100), 420, smooth=0.3, dirt=0.3, scratch=4),
+    # Magic: found things gone strange.
+    "talisman": lambda: _talisman(),
+    "book_moth": lambda: leather((86, 82, 58), 440),
+    "book_party": lambda: cloth((168, 148, 78), 441, 140, 0.4, 0.35),
+    "book_astral": lambda: _astral(),
+    "book_brown": lambda: leather((92, 60, 40), 442),
+    "pages": lambda: (rgba(grime(bands((214, 202, 170), (176, 164, 134), 2, axis=0, duty=0.5), 443, 0.35, 0.3)), (0.08, 20, 0.6)),
+    "dial": lambda: _dial(),
+    "die": lambda: _die(),
+    "ceramic": lambda: plastic((206, 200, 186), 444, 0.6, 0.35, 4),
+    "glass_green": lambda: glass((150, 170, 150), 445, 0.55, (96, 120, 70), 0.35),
+    "almond_ember": lambda: glow_panel((176, 130, 84), 446, 0.3),
+    "frost": lambda: crystal((150, 176, 190), 447, 0.15),
     # Props (block textures).
     "office_fabric": lambda: cloth((58, 63, 74), 53, 180, 0.25, 0.28),
     "dark_plastic": lambda: plastic((42, 42, 44), 57, 0.45, 0.2, 8),
@@ -233,6 +246,46 @@ M = {
     "keyboard": lambda: _keyboard(),
     "cable": lambda: (rgba(flat((36, 36, 36), 68, 0.1, 0.8)), (0.35, 20, 0.0)),
 }
+
+
+def _talisman():
+    base = paper((196, 164, 88), 450, writing=0, stains=0.25)[0][..., :3].copy()
+    rnd = random.Random(451)
+    for x in range(20, 44, 5):
+        for y in range(8, 56, 4):
+            if rnd.random() < 0.7:
+                base[y:y + 2, x:x + rnd.randint(2, 4)] = (0.5, 0.12, 0.1)
+    return rgba(base), (0.08, 20, 0.6)
+
+
+def _astral():
+    base = cloth((40, 46, 70), 452, 140, 0.35)[0][..., :3].copy()
+    rnd = random.Random(453)
+    for _ in range(14):
+        x, y = rnd.randint(4, S - 5), rnd.randint(4, S - 5)
+        base[y:y + 2, x:x + 2] = (0.62, 0.5, 0.28)
+    return rgba(base), (0.2, 20, 0.5)
+
+
+def _dial():
+    y, x = np.mgrid[0:S, 0:S] / (S - 1)
+    base = paper((214, 204, 176), 454, 0, 0.4)[0][..., :3].copy()
+    r = np.hypot(x - 0.5, y - 0.5)
+    base[(r > 0.44) & (r < 0.48)] = (0.3, 0.25, 0.2)
+    for k in range(12):
+        a = k / 12 * 2 * np.pi
+        cx, cy = int(32 + np.cos(a) * 24), int(32 + np.sin(a) * 24)
+        base[cy - 1:cy + 1, cx - 1:cx + 1] = (0.2, 0.17, 0.14)
+    base[18:33, 31:33] = (0.12, 0.1, 0.08)
+    base[31:33, 31:44] = (0.12, 0.1, 0.08)
+    return rgba(base), (0.5, 40, 0.2)
+
+
+def _die():
+    base = bone((214, 206, 186), 455, 3)[0][..., :3].copy()
+    for cx, cy in ((16, 16), (32, 32), (48, 48), (16, 48), (48, 16)):
+        base[cy - 4:cy + 4, cx - 4:cx + 4] = (0.14, 0.1, 0.1)
+    return rgba(base), (0.35, 30, 0.3)
 
 
 def _vented():

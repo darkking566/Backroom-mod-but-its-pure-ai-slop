@@ -121,5 +121,5 @@ def prop_desktop_computer():
     ]
 
 
-ITEMS = {f.__name__: f for f in (improvised_crowbar, magic_noclip_wand, gun_pipe_pistol, copper_wire, almond_elixir)}
+ITEMS = {f.__name__: f for f in (improvised_crowbar, magic_noclip_wand, copper_wire, almond_elixir)}
 PROPS = {f.__name__: f for f in (prop_office_chair, prop_desktop_computer)}

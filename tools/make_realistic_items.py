@@ -8,6 +8,7 @@ which replaces the listed items' models while it is on; Gemini's own models stay
   tools/item_look/mats.py     the material library
   tools/item_look/melee.py    the 41 melee weapons
   tools/item_look/guns.py     firearms, ammunition and attachments
+  tools/item_look/magic.py    magic and anomalous items
   tools/item_look/ported.py   the eight trial pieces (approved 2026-11-25), until their categories are redone
 
 Run from the repository root:  py -I tools/make_realistic_items.py
@@ -27,6 +28,7 @@ from PIL import Image  # noqa: E402
 import lib  # noqa: E402
 import mats  # noqa: E402, F401  (registers the materials)
 import guns  # noqa: E402
+import magic  # noqa: E402
 import melee  # noqa: E402
 import ported  # noqa: E402
 
@@ -39,6 +41,8 @@ def items():
     for name, build in melee.WEAPONS.items():
         out[name] = build()
     for name, build in guns.ITEMS.items():
+        out[name] = build()
+    for name, build in magic.ITEMS.items():
         out[name] = build()
     for name, build in ported.ITEMS.items():
         out.setdefault(name, build())

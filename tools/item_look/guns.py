@@ -49,6 +49,12 @@ def post(z, y, h=0.8, tex="gun_black"):
     return blk(7.75, y, z - 0.3, 8.25, y + h, z + 0.3, tex, 82)
 
 
+def rear(z, y, h=0.5, gap=0.35, tex="gun_black"):
+    """A rear sight: two posts with a notch between them, through which the front post shows."""
+    half = gap / 2
+    return [blk(8 - half - 0.3, y, z - 0.3, 8 - half, y + h, z + 0.3, tex, 83), blk(8 + half, y, z - 0.3, 8 + half + 0.3, y + h, z + 0.3, tex, 84)]
+
+
 def flatten(parts):
     out = []
     for p in parts:
@@ -66,20 +72,41 @@ def flatten(parts):
 THIRD_GUN = [-90, 180, 0]
 THIRD_TRY = {}
 
+# Gemini's first-person firearm animation (ItemInHandRendererWeaponAnimation.animateFirearm) moves a gun, aiming, to
+# (0, -0.34, -0.52) for long guns and (0, -0.38, -0.60) for the rest (BackroomsFirearmItem.isLongGun); the hip pose
+# is the same gun further right, lower and forward. Each gun's sight line (the height its sights line up at, and where
+# the rear sight is) sets the hand pose so that, aiming, the sight line is exactly the middle of the screen and the
+# rear sight a hand's breadth in front of the eye: the gun sits below what is aimed at, not over it.
+LONG = {"gun_pipe_shotgun", "gun_flamethrower", "gun_heavy_handgun", "gun_double_barrel", "gun_pump_shotgun", "gun_auto_shotgun",
+        "gun_assault_rifle", "gun_bolt_sniper", "gun_antimateriel_rifle", "gun_railgun", "gun_sonic_pulse"}
+SIGHTS = {
+    "gun_pipe_pistol": (9.65, 9.4), "gun_pipe_shotgun": (9.5, 9.5), "gun_nailgun": (11.1, 8.0), "gun_taser": (10.5, 5.0),
+    "gun_flamethrower": (11.2, 6.0), "gun_revolver": (10.4, 6.0), "gun_pistol_9mm": (10.9, 6.8), "gun_heavy_handgun": (11.4, 7.4),
+    "gun_double_barrel": (10.2, 7.0), "gun_pump_shotgun": (11.0, 8.0), "gun_auto_shotgun": (11.2, 9.6), "gun_scrap_smg": (10.1, 8.0),
+    "gun_tactical_smg": (10.6, 6.0), "gun_assault_rifle": (11.3, 4.6), "gun_bolt_sniper": (11.6, 8.0), "gun_antimateriel_rifle": (12.2, 8.0),
+    "gun_railgun": (10.7, 9.0), "gun_sonic_pulse": (12.8, 4.0), "office_crossbow": (9.4, 9.0),
+}
+EYE_GAP = 0.2
+
 
 def gun(name, parts):
     elements = flatten(parts)
     lo, hi = extent(elements, 2)
     length = hi - lo
-    shift(elements, dz=round(8 - (lo + hi) / 2, 3))
+    dz = round(8 - (lo + hi) / 2, 3)
+    shift(elements, dz=dz)
     fp = round(0.52 * (15 / length) ** 0.45, 3)
     tp = round(0.8 * (15 / length) ** 0.5, 3)
+    ads_y, ads_z = (-0.34, -0.52) if name in LONG else (-0.38, -0.60)
+    sight_y, rear_z = SIGHTS[name]
+    ty = 16 * -ads_y - fp * (sight_y - 8)
+    tz = 16 * (-EYE_GAP - ads_z) - fp * (rear_z + dz - 8)
     display = {
         "gui": pose([22, 135, 0], [0.5, 0.5, 0], round(min(0.9, 17 / length), 3)),
         "ground": pose([0, 0, 0], [0, 2, 0], round(0.5 * min(1.0, 18 / length), 3)),
         "fixed": pose([0, 90, 0], [0, 0, 0], round(min(0.85, 17 / length), 3)),
     }
-    display.update(hands([0, 0, 0], [0, 2.5, -1.2], fp))
+    display.update(hands([0, 0, 0], [0, round(ty, 3), round(tz, 3)], fp))
     display.update(third(THIRD_TRY.get(name, THIRD_GUN), [0, 2.0, 1.5], tp))
     return elements, display
 
@@ -95,6 +122,21 @@ def small(elements, gui=0.9):
 
 
 # ---------------------------------------------------------------- firearms
+
+
+def gun_pipe_pistol():
+    """The approved trial piece."""
+    grip_rot = ("x", 17, (8, 7, 10.4))
+    return gun("gun_pipe_pistol", [
+        blk(7, 7, -3, 9, 9, 7, "galv_steel", 1), blk(6.8, 6.8, -3.2, 9.2, 9.2, -2.4, "rust_pipe", 2),
+        blk(6.8, 6.8, 0.6, 9.2, 9.2, 1.4, "bare_steel", 3), blk(6.8, 6.8, 3.8, 9.2, 9.2, 4.6, "bare_steel", 4),
+        blk(6.4, 6.4, 6.6, 9.6, 9.6, 9.4, "galv_steel", 5), blk(7.4, 7.4, 9.4, 8.6, 8.6, 10.2, "rust_pipe", 6),
+        blk(8.6, 9.0, 8.4, 9.2, 9.9, 9.0, "bare_steel", 7),
+        blk(7.05, 1.8, 9.2, 8.95, 7.2, 11.6, "scrap_wood", 8, rot=grip_rot), blk(6.95, 3.6, 9.1, 9.05, 5.0, 11.7, "duct_tape", 9, rot=grip_rot),
+        blk(7.4, 6.2, 6.8, 8.6, 7.0, 10.4, "galv_steel", 10), blk(7.8, 5.4, 7.6, 8.2, 6.4, 8.0, "bare_steel", 11),
+        blk(7.75, 4.9, 6.4, 8.25, 5.2, 8.8, "bare_steel", 12), blk(7.75, 5.2, 6.4, 8.25, 6.4, 6.7, "bare_steel", 13),
+        blk(7.75, 9.0, -2.2, 8.25, 9.65, -1.6, "bare_steel", 14),
+    ])
 
 
 def gun_pipe_shotgun():
@@ -140,7 +182,7 @@ def gun_revolver():
     return gun("gun_revolver", [
         tube(-6, 1.6, 0.6, "gun_black", y=9.2, seed=1), blk(7.4, 9.6, -6, 8.6, 10.2, 1.6, "gun_black", 2),
         blk(6.7, 7.4, 1.6, 9.3, 10.0, 5.2, "steel_dark", 3), blk(7.2, 7.0, 5.2, 8.8, 10.2, 7.2, "gun_black", 4),
-        blk(7.6, 10.2, 5.6, 8.4, 11.0, 6.8, "gun_black", 5, rot=("x", -20, (8, 10.2, 6.2))),
+        blk(7.6, 9.4, 7.0, 8.4, 10.25, 7.8, "gun_black", 5),
         grip(7.6, 7.4, 5.2, "gun_wood", 1.7, 2.6, 22, 6), trigger(4.6, 7.4), post(-5.6, 9.8, 0.6),
     ])
 
@@ -149,7 +191,7 @@ def gun_pistol_9mm():
     return gun("gun_pistol_9mm", [
         blk(7.1, 8.6, -4, 8.9, 10.4, 7.4, "gun_black", 1), blk(7.2, 7.4, -3.4, 8.8, 8.6, 6.6, "gun_polymer", 2),
         grip(5.6, 7.6, 5.4, "gun_polymer", 1.7, 2.6, 16, 3), mag(5.4, 2.6, 0.8, "gun_black", 1.8, 2.8, 16, 4),
-        trigger(2.2, 7.4, "gun_polymer"), post(-3.4, 10.4, 0.5), post(6.8, 10.4, 0.5), rail(-3.2, 0.4, 7.0, "rail"),
+        trigger(2.2, 7.4, "gun_polymer"), post(-3.4, 10.4, 0.5), rear(6.8, 10.4, 0.6), rail(-3.2, 0.4, 7.0, "rail"),
     ])
 
 
@@ -157,7 +199,7 @@ def gun_heavy_handgun():
     return gun("gun_heavy_handgun", [
         blk(6.8, 8.4, -6, 9.2, 10.8, 8, "steel_worn", 1), blk(7.0, 7.2, -5, 9.0, 8.4, 7, "gun_black", 2),
         [blk(6.75, 9.4, z, 9.25, 10.4, z + 0.6, "gun_black", 3 + i) for i, z in enumerate((-5.4, -4.2))],
-        grip(6.2, 7.4, 6.0, "gun_wood", 2.0, 3.0, 16, 5), trigger(2.6, 7.2), post(-5.6, 10.8, 0.6), post(7.4, 10.8, 0.6),
+        grip(6.2, 7.4, 6.0, "gun_wood", 2.0, 3.0, 16, 5), trigger(2.6, 7.2), post(-5.6, 10.8, 0.6), rear(7.4, 10.8, 0.7),
     ])
 
 
@@ -165,7 +207,7 @@ def gun_double_barrel():
     return gun("gun_double_barrel", [
         tube(-16, 3, 0.85, "steel_dark", x=7.15, y=9.0, seed=1), tube(-16, 3, 0.85, "steel_dark", x=8.85, y=9.0, seed=2),
         blk(6.6, 7.2, -10, 9.4, 8.4, -2, "gun_wood", 3), blk(6.6, 7.0, 3, 9.4, 10.0, 7, "steel_worn", 4),
-        trigger(5.6, 7.0), stock(7, 20, 9.4, 6.6, "gun_wood", 1.8, 5, 8), grip(8.4, 7.4, 2.6, "gun_wood", 1.6, 2.4, 30, 6),
+        trigger(5.6, 7.0), stock(7, 20, 8.6, 6.4, "gun_wood", 1.8, 5, 8), grip(8.4, 7.4, 2.6, "gun_wood", 1.6, 2.4, 30, 6),
         blk(7.85, 9.85, -15.8, 8.15, 10.15, -15.4, "brass", 7),
     ])
 
@@ -174,7 +216,7 @@ def gun_pump_shotgun():
     return gun("gun_pump_shotgun", [
         tube(-14, 3, 0.75, "gun_black", y=9.4, seed=1), tube(-12, 2, 0.6, "steel_dark", y=7.9, seed=2),
         blk(6.9, 7.2, -9, 9.1, 8.8, -3.5, "gun_polymer", 3), blk(6.8, 7.0, 2, 9.2, 10.4, 9, "gun_black", 4),
-        trigger(7.4, 7.0), stock(9, 21, 10.0, 6.6, "gun_polymer", 1.8, 5, 6), grip(9.6, 7.4, 3.2, "gun_polymer", 1.6, 2.4, 22, 6),
+        trigger(7.4, 7.0), stock(9, 21, 9.0, 6.4, "gun_polymer", 1.8, 5, 6), grip(9.6, 7.4, 3.2, "gun_polymer", 1.6, 2.4, 22, 6),
         post(-13.6, 10.1, 0.4), rail(3, 8, 10.4),
     ])
 
@@ -183,7 +225,7 @@ def gun_auto_shotgun():
     return gun("gun_auto_shotgun", [
         tube(-13, 2, 0.8, "blade_acid", y=9.4, seed=1), blk(6.8, 7.6, -9, 9.2, 9.0, -2, "gun_polymer", 2),
         blk(6.6, 7.0, 2, 9.4, 10.6, 10, "gun_black", 3), blk(6.0, 3.0, 2.6, 10.0, 7.0, 6.6, "olive_paint", 4),
-        trigger(7.6, 7.0), stock(10, 19, 10.2, 6.8, "gun_polymer", 1.8, 5, 4), grip(9.0, 7.2, 3.6, "gun_polymer", 1.6, 2.4, 18, 6),
+        trigger(7.6, 7.0), stock(10, 19, 9.2, 6.6, "gun_polymer", 1.8, 5, 4), grip(9.0, 7.2, 3.6, "gun_polymer", 1.6, 2.4, 18, 6),
         rail(2.4, 9.6, 10.6), tube(-14, -13, 1.0, "steel_dark", y=9.4, seed=7),
     ])
 
@@ -201,7 +243,7 @@ def gun_tactical_smg():
     return gun("gun_tactical_smg", [
         blk(7.0, 7.4, -3, 9.0, 10.0, 7, "gun_black", 1), tube(-12, -3, 0.9, "gun_polymer", y=8.6, seed=2),
         mag(1.0, 7.4, 5.0, "gun_black", 1.3, 1.6, 4, 3), grip(5.6, 7.4, 3.6, "gun_polymer", 1.6, 2.2, 18, 4), trigger(3.2, 7.4),
-        grip(-5, 7.6, 2.6, "gun_polymer", 1.2, 1.2, -6, 5), rail(-3, 6, 10.0), stock(7, 14, 9.4, 8.6, "steel_dark", 1.4, 6, 0),
+        grip(-5, 7.6, 2.6, "gun_polymer", 1.2, 1.2, -6, 5), rail(-3, 6, 10.0), stock(7, 14, 8.8, 8.0, "steel_dark", 1.4, 6, 0),
         blk(7.0, 7.2, 13.4, 9.0, 9.6, 14.2, "rubber_black", 7),
     ])
 
@@ -211,9 +253,11 @@ def gun_assault_rifle():
         tube(-14, -7, 0.4, "gun_black", y=8.8, seed=1), tube(-15.4, -14, 0.55, "steel_dark", y=8.8, seed=2),
         blk(6.9, 7.6, -7, 9.1, 10.0, 0, "vented", 3), blk(7.0, 7.0, 0, 9.0, 10.2, 7, "gun_black", 4), rail(-6.8, 7, 10.2),
         mag(2.0, 7.0, 3.2, "gun_black", 1.3, 1.8, 6, 5), mag(1.7, 3.9, 2.4, "gun_black", 1.3, 1.8, 20, 6),
-        grip(5.8, 7.2, 3.8, "gun_polymer", 1.6, 2.2, 20, 7), trigger(3.8, 7.0), stock(7, 15, 9.6, 6.8, "gun_polymer", 1.8, 8, 4),
-        blk(7.2, 6.6, 14.4, 8.8, 9.8, 15.2, "rubber_black", 9), post(-6.6, 10.2, 1.2),
-        blk(7.4, 10.7, 2.4, 8.6, 11.9, 4.6, "gun_black", 10), blk(7.6, 11.0, 2.35, 8.4, 11.6, 2.4, "red_dot", 11, emit=2, faces=("north",)),
+        grip(5.8, 7.2, 3.8, "gun_polymer", 1.6, 2.2, 20, 7), trigger(3.8, 7.0), stock(7, 15, 9.0, 6.6, "gun_polymer", 1.8, 8, 4),
+        blk(7.2, 6.6, 14.4, 8.8, 9.8, 15.2, "rubber_black", 9), post(-6.6, 10.2, 1.0),
+        blk(7.3, 10.7, 2.4, 8.7, 10.9, 4.6, "gun_black", 10), blk(7.3, 11.7, 2.4, 8.7, 11.9, 4.6, "gun_black", 11),
+        blk(7.3, 10.9, 2.4, 7.5, 11.7, 4.6, "gun_black", 12), blk(8.5, 10.9, 2.4, 8.7, 11.7, 4.6, "gun_black", 13),
+        blk(7.94, 11.24, 2.4, 8.06, 11.36, 2.45, "red_dot", 14, emit=3),
     ])
 
 
@@ -222,7 +266,7 @@ def gun_bolt_sniper():
         tube(-20, 2, 0.5, "steel_dark", y=9.0, seed=1), blk(6.9, 6.8, -10, 9.1, 9.0, 3, "gun_wood", 2),
         blk(7.0, 8.4, 2, 9.0, 10.0, 8, "steel_worn", 3), blk(9.0, 9.2, 6.2, 10.6, 9.6, 6.8, "steel_worn", 4),
         blk(10.4, 8.8, 6.0, 11.2, 9.6, 7.0, "steel_dark", 5), trigger(6.4, 8.4), grip(8.8, 8.0, 3.0, "gun_wood", 1.6, 2.4, 26, 6),
-        stock(8, 20, 9.6, 6.6, "gun_wood", 1.9, 7, 7), scope(-1, 8, 11.6, 0.95),
+        stock(8, 20, 9.0, 6.4, "gun_wood", 1.9, 7, 7), scope(-1, 8, 11.6, 0.95),
         blk(7.6, 7.4, -9, 8.4, 7.8, -2, "gun_black", 8),
     ])
 
@@ -246,7 +290,7 @@ def gun_railgun():
         parts.append(blk(6.6, 6.8, z, 9.4, 10.2, z + 1.2, "copper_winding", 4 + i))
     parts += [blk(6.4, 6.4, 2, 9.6, 10.6, 9, "gun_black", 10), blk(6.0, 4.2, 3.0, 10.0, 6.4, 7.6, "gun_polymer", 11),
               blk(6.1, 4.6, 2.9, 9.9, 5.0, 3.0, "spark_blue", 12, emit=2, faces=("north",)), grip(8.4, 6.6, 3.4, "rubber_black", 1.6, 2.4, 18, 13),
-              trigger(6.8, 6.4), stock(9, 17, 9.8, 7.0, "gun_black", 1.6, 14, 5), blk(9.6, 6.0, 6.0, 10.2, 6.4, 13, "wire_black", 15)]
+              trigger(6.8, 6.4), stock(9, 17, 9.0, 6.8, "gun_black", 1.6, 14, 5), blk(9.6, 6.0, 6.0, 10.2, 6.4, 13, "wire_black", 15)]
     return gun("gun_railgun", parts)
 
 
