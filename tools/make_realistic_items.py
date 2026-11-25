@@ -10,6 +10,8 @@ which replaces the listed items' models while it is on; Gemini's own models stay
   tools/item_look/guns.py     firearms, ammunition and attachments
   tools/item_look/magic.py    magic and anomalous items
   tools/item_look/ported.py   the eight trial pieces (approved 2026-11-25), until their categories are redone
+  tools/item_look/bake.py     baked shading for box models (Blender)
+  tools/item_look/mesh.py     items modelled in Blender with real shapes (blender_mesh.py)
 
 Run from the repository root:  py -I tools/make_realistic_items.py
 The pack's assets are written afresh each time.
@@ -30,6 +32,7 @@ import lib  # noqa: E402
 import mats  # noqa: E402, F401  (registers the materials)
 import guns  # noqa: E402
 import magic  # noqa: E402
+import mesh  # noqa: E402
 import melee  # noqa: E402
 import ported  # noqa: E402
 
@@ -54,8 +57,10 @@ def props():
     return {name: build() for name, build in ported.PROPS.items()}
 
 
-# Baked in Blender (bake.py): shading, worn edges and dust painted onto a per-item atlas. Being tried on these first.
-BAKED = {"west_arming_sword", "gun_pistol_9mm", "prop_office_chair"}
+# Baked in Blender (bake.py): shading, worn edges and dust painted onto a per-item atlas of the box model.
+BAKED = set()
+# Modelled in Blender with real shapes (mesh.py, blender_mesh.py); being tried on these first.
+MESH = {"west_arming_sword", "gun_pistol_9mm", "prop_office_chair"}
 
 
 def main():
@@ -85,6 +90,11 @@ def main():
                 v["model"] = f"noclip_backrooms:block/look/{name}"
         lib.write(lib.OUT / "blockstates" / f"{name}.json", states)
         done.append(name)
+    meshes = mesh.run({n: (lib.SHIFTS.get(n, (0.0, 0.0, 0.0)), "block" if n in all_props else "item") for n in MESH})
+    for name, (mesh_id, texture) in meshes.items():
+        base = f"noclip_backrooms:{'block' if name in all_props else 'item'}/look/{name}"
+        lib.write(lib.OUT / "items" / f"{name}.json", {"model": {"type": "minecraft:special", "base": base,
+                                                               "model": {"type": "noclip_backrooms:mesh", "mesh": mesh_id, "texture": texture}}})
     lib.write(lib.OUT / "item_look.json", {"replaces": sorted(done)})
     lib.write(lib.PACK / "pack.mcmeta", {"pack": {"description": {"translate": "pack.noclip_backrooms.realistic_items.description",
                                                                    "fallback": "Items and props in the levels' worn style"},

@@ -12,7 +12,8 @@
 		"ItemInHandLayerBlenderWeapons",
 		"ItemInHandRendererWeaponAnimation",
 		"LightmapFalloff",
-		"MinecraftFirearmInput"
+		"MinecraftFirearmInput",
+		"SpecialModelRenderersAccess"
 	],
 	"injectors": {
 		"defaultRequire": 1

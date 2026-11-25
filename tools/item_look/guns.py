@@ -2,7 +2,7 @@
 hand, not to the millimetre: a pistol about 13 sixteenths long, a rifle about 26, a long rifle 32. The pipe pistol is
 the approved trial piece (ported.py).
 """
-from lib import box, extent, hands, pose, shift, third
+from lib import SHIFTS, box, extent, hands, pose, shift, third
 
 # ---------------------------------------------------------------- parts
 
@@ -95,6 +95,7 @@ def gun(name, parts):
     length = hi - lo
     dz = round(8 - (lo + hi) / 2, 3)
     shift(elements, dz=dz)
+    SHIFTS[name] = (0.0, 0.0, dz)
     fp = round(0.52 * (15 / length) ** 0.45, 3)
     tp = round(0.8 * (15 / length) ** 0.5, 3)
     ads_y, ads_z = (-0.34, -0.52) if name in LONG else (-0.38, -0.60)

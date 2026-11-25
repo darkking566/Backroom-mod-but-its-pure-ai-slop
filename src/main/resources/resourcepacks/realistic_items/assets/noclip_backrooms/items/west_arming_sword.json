@@ -1,6 +1,11 @@
 {
  "model": {
-  "type": "minecraft:model",
-  "model": "noclip_backrooms:item/look/west_arming_sword"
+  "type": "minecraft:special",
+  "base": "noclip_backrooms:item/look/west_arming_sword",
+  "model": {
+   "type": "noclip_backrooms:mesh",
+   "mesh": "noclip_backrooms:models/mesh/west_arming_sword.obj",
+   "texture": "noclip_backrooms:textures/item/mesh/west_arming_sword.png"
+  }
  }
 }

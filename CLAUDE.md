@@ -426,6 +426,14 @@
   - 新增 `tools/item_look/bake.py`（每件東西的方塊面攤到專屬 128×128 貼圖、交給 Blender、合成：材質 × 陰影 × 打光、縫隙積灰、外緣磨亮，模型改用這張貼圖）與 `tools/item_look/blender_bake.py`（Blender 裡照 Minecraft 的貼圖方向重建方塊，Cycles 烘焙 AO 與漫射光）；`lib.model` 可改用整張烘焙貼圖
   - 先套在騎士長劍、9mm 手槍、辦公椅；`runClientGameTest -Plevels=itemlook` 通過；辦公椅座墊下與縫隙有陰影、比較立體，手槍與長劍只好一點點
   - 也用 `-Pshaders`（Iris＋Complementary）跑了一次：我的物品是霧面偏暗、不會像打蠟，椅子和映像管電腦像真的；比較圖 `docs/look/items/bake_before_after.png`、`with_shaders.png`
+- 使用者選「Blender 真曲面模型」，先試作騎士長劍、9mm 手槍、辦公椅三件（烘焙那版先停用，`BAKED` 改成空的）：
+  - 新增 `tools/item_look/blender_mesh.py`（Blender 背景執行：用 Minecraft 模型座標寫造型，倒角、圓柱、車床迴轉體、布林刻槽，劍身是有血槽的菱形斷面；拆 UV，烘焙底色、AO 與 labPBR 數值，匯出 OBJ）與 `tools/item_look/mesh.py`（材質交給 Blender、合成貼圖縮成 128、寫進資源包）；`lib.SHIFTS` 記下方塊版置中時移動的距離，網格跟著移，姿勢與瞄準對齊沿用方塊版
+  - 遊戲端：新增 `core/look/MeshModel`（讀 OBJ）、`MeshItemRenderer`（新的物品模型類型 `noclip_backrooms:mesh`，物品定義用 `minecraft:special`，`base` 是原本的方塊模型）與 client mixin `SpecialModelRenderersAccess`（登記新類型，Fabric 沒有這個接口）；`ItemLook` 登記類型、讀家具網格；Gemini 的 `BlenderPropRenderer` 在資源包有該家具的網格時改畫網格
+  - 第一次進遊戲劍身變成一堆亂三角形：實體繪製一次吃四個點，改成每個三角形送成重複第三點的四邊形
+  - `runClientGameTest -Plevels=itemlook` 通過，看過手上、瞄準、第三人稱、物品欄圖示、地上的辦公椅；比較圖 `docs/look/items/mesh_trial.png`；`docs/look/ITEMS.md` 加說明
+  - 還沒做：其他物品（等使用者看過試作）
+  - `gradlew build` 通過
+- 使用者決定物品風格：法杖、魔典等魔法類（之後的魔法劍也是）走奇幻風格（後面還沒做的樓層才拿得到），冷兵器和槍維持寫實；寫進 `docs/look/ITEMS.md`，已做好的 19 件寫實法器之後要重做
 
 ## 動作記錄（Antigravity）
 

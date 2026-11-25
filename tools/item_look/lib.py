@@ -108,6 +108,9 @@ def rgba(rgb, alpha=None):
 # ---------------------------------------------------------------- materials
 # name -> maker; a maker returns (rgba image, (smoothness, f0, porosity[, emissive])). f0 230+ are labPBR's metals.
 
+# How far each item's boxes were moved (centred) after being drawn: the Blender meshes are moved the same way.
+SHIFTS = {}
+
 MAKERS = {}
 _MADE = {}
 _WRITTEN = set()

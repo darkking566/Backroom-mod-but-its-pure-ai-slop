@@ -1,6 +1,11 @@
 {
  "model": {
-  "type": "minecraft:model",
-  "model": "noclip_backrooms:block/look/prop_office_chair"
+  "type": "minecraft:special",
+  "base": "noclip_backrooms:block/look/prop_office_chair",
+  "model": {
+   "type": "noclip_backrooms:mesh",
+   "mesh": "noclip_backrooms:models/mesh/prop_office_chair.obj",
+   "texture": "noclip_backrooms:textures/block/mesh/prop_office_chair.png"
+  }
  }
 }

@@ -35,6 +35,9 @@ public final class BlenderPropRenderer implements BlockEntityRenderer<PropBlockE
 		public Direction facing = Direction.NORTH;
 		/** Set while the realistic items pack (core.look.ItemLook) redraws this prop from its block model. */
 		public net.minecraft.client.renderer.block.MovingBlockRenderState trial = null;
+		/** Or from a Blender mesh of its own, when the pack has one. */
+		public dev.noclip.backrooms.core.look.MeshModel trialMesh = null;
+		public net.minecraft.resources.Identifier trialTexture = null;
 	}
 
 	public BlenderPropRenderer(BlockEntityRendererProvider.Context ctx) {
@@ -59,6 +62,15 @@ public final class BlenderPropRenderer implements BlockEntityRenderer<PropBlockE
 		state.facing = bs.hasProperty(HorizontalDirectionalBlock.FACING)
 				? bs.getValue(HorizontalDirectionalBlock.FACING) : Direction.NORTH;
 		state.trial = null;
+		state.trialMesh = null;
+		if (dev.noclip.backrooms.core.look.ItemLook.replaces(state.propId)) {
+			var mesh = dev.noclip.backrooms.core.look.ItemLook.propMesh(state.propId);
+			if (!mesh.isEmpty()) {
+				state.trialMesh = mesh;
+				state.trialTexture = dev.noclip.backrooms.core.look.ItemLook.propTexture(state.propId);
+				return;
+			}
+		}
 		if (dev.noclip.backrooms.core.look.ItemLook.replaces(state.propId)
 				&& entity.getLevel() instanceof net.minecraft.client.multiplayer.ClientLevel level) {
 			var trial = new net.minecraft.client.renderer.block.MovingBlockRenderState();
@@ -77,6 +89,23 @@ public final class BlenderPropRenderer implements BlockEntityRenderer<PropBlockE
 		if (state.propId == null) return;
 		if (state.trial != null) {
 			collector.submitMovingBlock(poseStack, state.trial, 0);
+			return;
+		}
+		if (state.trialMesh != null) {
+			var mesh = state.trialMesh;
+			int light = state.lightCoords;
+			poseStack.pushPose();
+			poseStack.translate(0.5F, 0.0F, 0.5F);
+			poseStack.mulPose(Axis.YP.rotationDegrees(switch (state.facing) {
+				case WEST -> 90.0F;
+				case SOUTH -> 180.0F;
+				case EAST -> -90.0F;
+				default -> 0.0F;
+			}));
+			poseStack.translate(-0.5F, 0.0F, -0.5F);
+			collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(state.trialTexture),
+					(pose, vc) -> mesh.emit(pose, vc, light, OverlayTexture.NO_OVERLAY));
+			poseStack.popPose();
 			return;
 		}
 		BlenderWeaponMesh mesh = BlenderWeaponMesh.getFromResource(PROP_OBJ_PREFIX + state.propId);

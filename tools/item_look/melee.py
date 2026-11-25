@@ -6,7 +6,7 @@ import math
 
 import numpy as np
 
-from lib import bar, box, centre_y, define, extent, hands, pose, rgba, third
+from lib import SHIFTS, bar, box, centre_y, define, extent, hands, pose, rgba, third
 from mats import metal
 
 define("coins", lambda: _coins())
@@ -195,7 +195,7 @@ def weapon(parts, grip_y):
     k = fit(elements)
     grip_scaled = (lo + hi) / 2 + (grip_y - (lo + hi) / 2) * k
     poses = display(elements, grip_scaled, name, k)
-    centre_y(elements)
+    SHIFTS[name] = (0.0, centre_y(elements), 0.0)
     return elements, poses
 
 

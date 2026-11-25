@@ -6,7 +6,10 @@ import dev.noclip.backrooms.BackroomsMod;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import dev.noclip.backrooms.mixin.client.SpecialModelRenderersAccess;
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.fabricmc.fabric.api.resource.v1.pack.PackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -34,6 +37,7 @@ public final class ItemLook {
 	private static final Logger LOGGER = LoggerFactory.getLogger("noclip_backrooms/item_look");
 	private static final Identifier LIST = BackroomsMod.id("item_look.json");
 	private static volatile Set<String> covered = Set.of();
+	private static final Map<String, MeshModel> PROP_MESHES = new ConcurrentHashMap<>();
 
 	private ItemLook() {
 	}
@@ -43,6 +47,8 @@ public final class ItemLook {
 				Component.translatable("pack.noclip_backrooms.realistic_items"), PackActivationType.DEFAULT_ENABLED);
 		ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(BackroomsMod.id("item_look"),
 				(ResourceManagerReloadListener) ItemLook::reload);
+		// Items modelled in Blender: {"type": "minecraft:special", "model": {"type": "noclip_backrooms:mesh", ...}}.
+		SpecialModelRenderersAccess.idMapper().put(BackroomsMod.id("mesh"), MeshItemRenderer.Unbaked.CODEC);
 	}
 
 	private static void reload(ResourceManager manager) {
@@ -55,6 +61,16 @@ public final class ItemLook {
 			}
 		});
 		covered = Set.copyOf(ids);
+		PROP_MESHES.clear();
+	}
+
+	/** A prop's Blender mesh in the pack, or MeshModel.EMPTY if it has none (then its block model is drawn). */
+	public static MeshModel propMesh(String blockPath) {
+		return PROP_MESHES.computeIfAbsent(blockPath, id -> MeshModel.load(BackroomsMod.id("models/mesh/" + id + ".obj")));
+	}
+
+	public static Identifier propTexture(String blockPath) {
+		return BackroomsMod.id("textures/block/mesh/" + blockPath + ".png");
 	}
 
 	/** What the pack redraws now (empty when it is off). */
