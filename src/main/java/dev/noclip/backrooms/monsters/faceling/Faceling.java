@@ -22,6 +22,7 @@ import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -42,9 +43,19 @@ public class Faceling extends PathfinderMob {
 
 	private int inspectTicks;
 	private int angerTicks;
+	private boolean hostile;
 
 	public Faceling(EntityType<? extends Faceling> type, Level level) {
 		super(type, level);
+	}
+
+	public boolean isHostile() {
+		return hostile;
+	}
+
+	public void setHostile(boolean hostile) {
+		this.hostile = hostile;
+		if (hostile) setAiState(STATE_AGGRO);
 	}
 
 	public static AttributeSupplier.Builder createAttributes() {
@@ -77,11 +88,12 @@ public class Faceling extends PathfinderMob {
 		goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8));
 		goalSelector.addGoal(7, new RandomLookAroundGoal(this));
 		targetSelector.addGoal(1, new HurtByTargetGoal(this).setAlertOthers());
+		targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true, (entity, level) -> hostile));
 	}
 
 	@Override
 	protected InteractionResult mobInteract(Player player, InteractionHand hand) {
-		if (aiState() == STATE_AGGRO) return super.mobInteract(player, hand);
+		if (hostile || aiState() == STATE_AGGRO) return super.mobInteract(player, hand);
 		ItemStack stack = player.getItemInHand(hand);
 		if (stack.is(Level1Items.ALLOY)) {
 			if (!level().isClientSide()) {
@@ -105,13 +117,17 @@ public class Faceling extends PathfinderMob {
 	protected void customServerAiStep(ServerLevel level) {
 		super.customServerAiStep(level);
 		LivingEntity target = getTarget();
-		if (target != null && target.isAlive() && angerTicks > 0) {
-			angerTicks--;
+		if (target != null && target.isAlive() && (hostile || angerTicks > 0)) {
+			if (angerTicks > 0) angerTicks--;
 			setAiState(STATE_AGGRO);
 			return;
 		}
-		if (angerTicks <= 0 && target != null) {
+		if (!hostile && angerTicks <= 0 && target != null) {
 			setTarget(null);
+		}
+		if (hostile) {
+			setAiState(STATE_AGGRO);
+			return;
 		}
 		if (inspectTicks > 0) {
 			inspectTicks--;

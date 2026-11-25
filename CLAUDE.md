@@ -680,3 +680,8 @@
   - 寫實材質包：新增 `tools/make_level3_realistic.py` 產出 Level 3 全數 86 張靜態寫實貼圖與 labPBR `_n`／`_s`（紅磚、褐磚沿用 `make_level2_realistic.brick_substrate` 順砌長方磚＋`Concrete034` 細紋；其餘依材質搭既有 CC0 照片；經 `tools/resize_realistic.py` 縮至整格面 128×128、道具 64×64），並產出對照圖 `docs/look/level3_realistic.png`；更新 `pack.mcmeta`、雙語語言檔與 `docs/look/README.md`
   - 黑暗氣氛與測試修復：`Look.Mood.LEVEL_3(6, 30, 0.18F)`；`Level3Events.spawnPack` 抽樣次數 40→120 與 `Level3ClientTest.hounds` 改先找離安全區 ≥52 格的 `FLOOR` 再測生怪（修復連兩次偶發抽不到空地的失敗）
   - 驗證：`.\gradlew.bat build --no-daemon`、`.\gradlew.bat runClientGameTest -Plevels=3 --no-daemon`（不開光影）與 `.\gradlew.bat runClientGameTest -Plevels=3 -Pshaders --no-daemon`（開 Iris＋Complementary 光影）全數通過且日誌零缺模型／缺貼圖錯誤；合成並檢視雙組對照圖 `docs/look/level3_ingame.jpg`；僅於本機 `main` 提交（未推送）
+- Level 3 **Batch 2（高智能多實體生態與聖所全域庇護）**（Antigravity）：
+  - 無面靈敵意模式：`Faceling` 新增 `setHostile(boolean)`／`isHostile()`（預設 false，保留其他樓層溫和交易行為；true 時主動鎖定玩家攻擊且維持 `STATE_AGGRO`）
+  - 多實體生態：`level3/Level3Monsters.java`（於 `Level3.register()` 註冊），接入敵對武裝無面靈（持石劍／斧／鎬與 35% 盾牌、不掉落免費裝備）、死亡飛蛾（2～3 隻成群）、笑魇（暗處）、肢團（可鑽窄／矮道）、竊皮者與悲尸；組裝線大廳提高無面靈與飛蛾群出沒機率；所有怪物生成避開 Base Gamma 與聖所 24 格緩衝
+  - 聖所全域庇護：`Level3Events.scareOff` 改為對所有 `Monster` 與 `Faceling` 生效，靠近天使雕像 14 格內一律驚懼消散
+  - 驗證：`Level3ClientTest` 擴充 `angel`（同時驗證驅離獵犬／死亡飛蛾／無面靈）與新增 `monsters`（驗證 6 種實體生成與無面靈敵意武裝）；`.\gradlew.bat build --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=3 --no-daemon` 全數通過；僅於本機 `main` 提交（未推送）

@@ -61,11 +61,12 @@ Wiki 沒有寫從 Level 3 回 Level 2 的路，所以目前進來後只能往下
 - 於 `Look.Mood` 加入 `LEVEL_3(6, 30, 0.18F)`，同步更新 `pack.mcmeta`、語言檔、`docs/look/README.md`。
 - 驗收：`gradlew build` + `runClientGameTest -Plevels=3` 與 `runClientGameTest -Plevels=3 -Pshaders` 雙組通過，雙組遊戲畫面對照見 [`docs/look/level3_ingame.jpg`](../../look/level3_ingame.jpg)。
 
-### 第 2 批（Batch 2）：高智能多實體生態與聖所全域庇護
-- 接入模組既有 3D 怪物中原文點名的實體：敵對武裝無面靈、雌雄皆主動攻擊的成群死亡飛蛾、竊皮者、暗處微光埋伏的笑魇、肢團、悲尸（搭配現有獵犬群），依 [`docs/HORROR_ESCAPE_PLAN.md`](../../HORROR_ESCAPE_PLAN.md) 維持高壓逃生定位，並做出編隊／圍堵與高風險組裝線出沒邏輯。
-- 擴充聖所天使雕像驅離邏輯，使其對所有後室敵對實體均有效（不再只限獵犬）。
-- 可選追加（需新做 3D `BoxRig` 模型）：原文的高智能「尸鼠（Death Rat）」與簡易電氣陷阱，獨立列為可選支線以免卡住主進度。
-- 驗收：新增單元與實機測試驗證多實體生成、聖所驅離全部實體。
+### 第 2 批（Batch 2）：高智能多實體生態與聖所全域庇護（**已完成**）
+- 實作 `Level3Monsters` 並於 `Level3` 註冊：接入敵對武裝無面靈（持石製武器與機率盾牌，組裝線更常出現）、成群死亡飛蛾（2～3 隻）、笑魇、肢團（可鑽進窄／矮道）、竊皮者與悲尸，均避開 Base Gamma 與聖所。
+- 擴充 `Faceling.setHostile(boolean)` 支援 Level 3 敵對模式（不影響其他樓層原本的溫和無面靈）。
+- 擴充 `Level3Events.scareOff` 讓聖所天使雕像驅離所有後室敵對實體（不限於獵犬）。
+- 可選支線（尚未實作，需另建 3D `BoxRig` 模型）：原文的高智能「尸鼠（Death Rat）」與簡易電氣陷阱。
+- 驗收：`gradlew build` + `runClientGameTest -Plevels=3` 通過（驗證 6 種實體生成、無面靈敵意武裝、聖所驅離獵犬／死亡飛蛾／無面靈）。
 
 ### 第 3 批（Batch 3）：四大據點升級與新據點實裝
 - **M.E.G. Gamma 基地升級**：強化外牆防禦、監視器與安檢門禁（呼應原文指尖驗血防竊皮者）、武裝守衛與可安頓設重生點／交易設施，延伸做出公共部大廳與附屬的 **B.N.T.G. 存儲設施**（當舖交易與小型稀有品展櫃，含 Object 56《後室終極食譜》展品）。

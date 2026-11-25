@@ -6,6 +6,7 @@ import dev.noclip.backrooms.level3.Level3Layout.Profile;
 import dev.noclip.backrooms.level3.Level3Layout.Tile;
 import dev.noclip.backrooms.level3.Level3Plan.HallKind;
 import dev.noclip.backrooms.monsters.Monsters;
+import dev.noclip.backrooms.monsters.faceling.Faceling;
 import java.util.Locale;
 import java.util.function.Predicate;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
@@ -37,7 +38,10 @@ public final class Level3ClientTest implements FabricClientGameTest {
 			server.runCommand("gamerule send_command_feedback false");
 			server.runCommand("gamerule noclip_backrooms:edge_shift false");
 			server.runCommand("gamemode survival @a");
-			server.runOnServer(s -> Level3Events.holdOffHounds(s, 20 * 60 * 20));
+			server.runOnServer(s -> {
+				Level3Events.holdOffHounds(s, 20 * 60 * 20);
+				Level3Monsters.holdOff(s, 20 * 60 * 20);
+			});
 
 			enterFromLevel2(context, game);
 			long seed = server.computeOnServer(s -> Level3ChunkGenerator.planSeed(level3(s).getChunkSource().randomState()));
@@ -60,6 +64,7 @@ public final class Level3ClientTest implements FabricClientGameTest {
 			paranoia(context, game, seed, arrival);
 			angel(context, game, seed, arrival);
 			hounds(context, game, seed, arrival);
+			monsters(context, game, seed, arrival);
 			checkBlocks(game);
 		}
 	}
@@ -250,8 +255,17 @@ public final class Level3ClientTest implements FabricClientGameTest {
 			var hound = Monsters.HOUND.create(level3(s), EntitySpawnReason.COMMAND);
 			hound.snapTo(angel.x + 4, STAND, angel.z + 1, 0, 0);
 			level3(s).addFreshEntity(hound);
+			var moth = Monsters.DEATHMOTH.create(level3(s), EntitySpawnReason.COMMAND);
+			moth.snapTo(angel.x - 4, STAND, angel.z + 1, 0, 0);
+			level3(s).addFreshEntity(moth);
+			var faceling = Monsters.FACELING.create(level3(s), EntitySpawnReason.COMMAND);
+			faceling.snapTo(angel.x + 1, STAND, angel.z - 4, 0, 0);
+			faceling.setHostile(true);
+			level3(s).addFreshEntity(faceling);
 		});
-		server.waitFor(s -> level3(s).getEntities(Monsters.HOUND, h -> h.position().distanceTo(angel) < 20).isEmpty(), 80);
+		server.waitFor(s -> level3(s).getEntities(Monsters.HOUND, h -> h.position().distanceTo(angel) < 20).isEmpty()
+				&& level3(s).getEntities(Monsters.DEATHMOTH, m -> m.position().distanceTo(angel) < 20).isEmpty()
+				&& level3(s).getEntities(Monsters.FACELING, f -> f.position().distanceTo(angel) < 20).isEmpty(), 80);
 	}
 
 	private static void hounds(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
@@ -266,6 +280,29 @@ public final class Level3ClientTest implements FabricClientGameTest {
 		int came = server.computeOnServer(s -> Level3Events.spawnPack(player(s)));
 		check(came >= 2, "a pack of " + came + " hounds");
 		server.runCommand("kill @e[tag=" + Level3Events.HOUND_TAG + "]");
+		server.runCommand("gamemode spectator @a");
+	}
+
+	private static void monsters(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
+		var server = game.getServer();
+		int[] spot = nearest(seed, from, t -> t.kind() == Kind.FLOOR && t.clearance() >= 3,
+				(x, z) -> Level3Events.hallsNear(seed, x, z, 52).stream()
+						.noneMatch(p -> p.hall().kind() == HallKind.SANCTUM || p.hall().kind() == HallKind.BASE));
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_3 run tp @s %.1f %d %.1f", spot[0] + 0.5, STAND, spot[1] + 0.5));
+		server.runCommand("gamemode survival @a");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(20);
+		server.runOnServer(s -> {
+			for (Level3Monsters.Entry entry : Level3Monsters.POOL) {
+				var mob = Level3Monsters.spawnOne(player(s), entry.type());
+				check(mob != null, "failed to spawn " + entry.type().getDescriptionId());
+				if (mob instanceof Faceling faceling) {
+					check(faceling.isHostile(), "Level 3 faceling is not hostile");
+					check(!faceling.getMainHandItem().isEmpty(), "Level 3 faceling is unarmed");
+				}
+			}
+		});
+		server.runCommand("kill @e[tag=" + Level3Monsters.TAG + "]");
 		server.runCommand("gamemode spectator @a");
 	}
 
