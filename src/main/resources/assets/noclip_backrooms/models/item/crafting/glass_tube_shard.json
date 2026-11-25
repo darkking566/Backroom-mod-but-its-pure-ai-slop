@@ -35,6 +35,8 @@
       "from": [9.60, 2.00, 7.50],
       "to": [12.00, 9.50, 10.00],
       "rotation": {"angle": -24.0, "axis": "z", "origin": [10.80, 2.00, 8.80]},
+      "shade": false,
+      "light_emission": 15,
       "faces": {
         "north": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},
         "east": {"uv": [0.15, 0.15, 3.85, 3.85], "texture": "#0"},

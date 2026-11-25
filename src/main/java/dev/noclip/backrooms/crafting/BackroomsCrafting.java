@@ -63,6 +63,7 @@ public final class BackroomsCrafting {
 					case WORKSHOP -> SoundEvents.SMITHING_TABLE_USE;
 					case DISTILLER -> SoundEvents.BREWING_STAND_BREW;
 					case ALTAR -> SoundEvents.ENCHANTMENT_TABLE_USE;
+					case SPIDERWEB -> SoundEvents.BEACON_ACTIVATE;
 				};
 				player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
 						sound, SoundSource.BLOCKS, 0.75F, 1.0F + player.getRandom().nextFloat() * 0.15F);

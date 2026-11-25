@@ -84,6 +84,16 @@ public final class BackroomsJeiPlugin implements IModPlugin {
 		addInfo(registration, BackroomsItems.YELLOW_PARTY_HIDE, "jei.noclip_backrooms.info.partygoer_drops");
 		addInfo(registration, BackroomsItems.PASTEL_CHARM, "jei.noclip_backrooms.info.friendly_npc_drops");
 		addInfo(registration, BackroomsItems.ASTRAL_PARCHMENT, "jei.noclip_backrooms.info.friendly_npc_drops");
+
+		// GDD special items acquisition & function notes inside JEI
+		addInfo(registration, BackroomsItems.NOCLIP_SHARD, "jei.noclip_backrooms.info.noclip_shard");
+		addInfo(registration, BackroomsItems.FIRE_SALT, "jei.noclip_backrooms.info.fire_salt");
+		addInfo(registration, BackroomsItems.RUSTED_OFFICE_SAFE, "jei.noclip_backrooms.info.geodes");
+		addInfo(registration, BackroomsItems.ENCRYPTED_HARD_DRIVE, "jei.noclip_backrooms.info.geodes");
+		addInfo(registration, BackroomsItems.HOMEWARD_ANCHOR, "jei.noclip_backrooms.info.homeward_anchor");
+		addInfo(registration, BackroomsItems.FORBIDDEN_SCROLL_LUCK, "jei.noclip_backrooms.info.forbidden_scrolls");
+		addInfo(registration, BackroomsItems.FORBIDDEN_SCROLL_PSY, "jei.noclip_backrooms.info.forbidden_scrolls");
+		addInfo(registration, BackroomsItems.FORBIDDEN_SCROLL_TECH, "jei.noclip_backrooms.info.forbidden_scrolls");
 	}
 
 	private static void addInfo(IRecipeRegistration registration, ItemLike item, String langKey) {

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "noclip_backrooms:block/crafting/prop_electric_fan" },
+    "facing=east":  { "model": "noclip_backrooms:block/crafting/prop_electric_fan", "y": 90 },
+    "facing=south": { "model": "noclip_backrooms:block/crafting/prop_electric_fan", "y": 180 },
+    "facing=west":  { "model": "noclip_backrooms:block/crafting/prop_electric_fan", "y": 270 }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "replace": false,
+  "values": [
+    "noclip_backrooms:copper_wire",
+    "noclip_backrooms:ballast_coil",
+    "noclip_backrooms:capacitor",
+    "noclip_backrooms:old_circuit_board",
+    "noclip_backrooms:microchip",
+    "noclip_backrooms:battery_cell",
+    "noclip_backrooms:high_voltage_coil",
+    "noclip_backrooms:case_fan",
+    "noclip_backrooms:crt_tube",
+    "noclip_backrooms:flickering_lamp_tube",
+    "noclip_backrooms:office_keyboard",
+    "noclip_backrooms:landline_phone",
+    "noclip_backrooms:green_circuit",
+    "noclip_backrooms:red_circuit",
+    "noclip_backrooms:blue_circuit"
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "noclip_backrooms:scrap_metal",
+    "noclip_backrooms:sheet_metal",
+    "noclip_backrooms:heavy_steel_plate",
+    "noclip_backrooms:angle_iron",
+    "noclip_backrooms:iron_pipe",
+    "noclip_backrooms:rebar_fragment",
+    "noclip_backrooms:alloy"
+  ]
+}

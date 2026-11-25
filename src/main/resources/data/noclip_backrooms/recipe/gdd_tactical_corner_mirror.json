@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "noclip_backrooms:scrap_metal",
+    "noclip_backrooms:scrap_metal",
+    "noclip_backrooms:broken_mirror_shard",
+    "noclip_backrooms:broken_mirror_shard",
+    "noclip_backrooms:insulating_tape"
+  ],
+  "result": { "id": "noclip_backrooms:tactical_corner_mirror", "count": 1 }
+}

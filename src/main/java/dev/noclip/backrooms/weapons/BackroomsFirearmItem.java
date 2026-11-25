@@ -172,6 +172,7 @@ public final class BackroomsFirearmItem extends Item {
 		boolean apAmmo = "ammo_308_ap".equals(usedAmmo) || mode == FireMode.PIERCING_AP || mode == FireMode.RAILGUN_ARC;
 		float effSpread = aiming ? spread * 0.25F : spread;
 		float adsBonus = (aiming && hasOpticalScope()) ? 1.20F : 1.0F;
+		float evoMult = WeaponEvolution.damageMultiplier(stack);
 
 		Vec3 eye = player.getEyePosition();
 		Vec3 look = player.getLookAngle();
@@ -193,7 +194,7 @@ public final class BackroomsFirearmItem extends Item {
 				Vec3 p = eye.add(look.scale(step * 1.1));
 				serverLevel.sendParticles(ParticleTypes.SONIC_BOOM, p.x, p.y, p.z, 1, 0, 0, 0, 0);
 				for (LivingEntity e : serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(p, p).inflate(1.8), ent -> ent != player)) {
-					if (e.hurtServer(serverLevel, serverLevel.damageSources().sonicBoom(player), damage)) {
+					if (e.hurtServer(serverLevel, serverLevel.damageSources().sonicBoom(player), damage * evoMult)) {
 						hitAny = true;
 						if (!e.isAlive()) killedAny = true;
 					}
@@ -210,7 +211,7 @@ public final class BackroomsFirearmItem extends Item {
 				Vec3 p = eye.add(look.scale(step * 0.95));
 				serverLevel.sendParticles(ParticleTypes.FLAME, p.x, p.y, p.z, 6, 0.35, 0.35, 0.35, 0.04);
 				for (LivingEntity e : serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(p, p).inflate(1.35), ent -> ent != player)) {
-					if (e.hurtServer(serverLevel, serverLevel.damageSources().onFire(), damage)) {
+					if (e.hurtServer(serverLevel, serverLevel.damageSources().onFire(), damage * evoMult)) {
 						hitAny = true;
 						if (!e.isAlive()) killedAny = true;
 					}
@@ -249,7 +250,7 @@ public final class BackroomsFirearmItem extends Item {
 					if (!hits.isEmpty()) {
 						LivingEntity target = hits.getFirst();
 						hitIds.add(target.getId());
-						float dealt = damage * adsBonus;
+						float dealt = damage * adsBonus * evoMult;
 						if (mode == FireMode.ACID_SHOTGUN && "ammo_12g_acid".equals(usedAmmo)) dealt *= 1.35F;
 						if (phosphorBonus) {
 							String path = target.getType().builtInRegistryHolder().key().identifier().getPath();
@@ -348,7 +349,8 @@ public final class BackroomsFirearmItem extends Item {
 			default -> ChatFormatting.GRAY;
 		};
 		adder.accept(Component.translatable("tooltip.noclip_backrooms.firearm_stats",
-				tier, String.format("%.1f", damage * pellets)).withStyle(color));
+				tier, String.format("%.1f", damage * pellets * WeaponEvolution.damageMultiplier(stack))).withStyle(color));
+		WeaponEvolution.appendTooltip(stack, adder);
 		if (!ammoIds.isEmpty()) {
 			Component ammoName = Component.translatable("item.noclip_backrooms." + ammoIds.getFirst());
 			adder.accept(Component.translatable("tooltip.noclip_backrooms.firearm_ammo", ammoName).withStyle(ChatFormatting.YELLOW));

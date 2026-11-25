@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "noclip_backrooms:rags",
+    "noclip_backrooms:synthetic_fabric",
+    "noclip_backrooms:damp_carpet_fiber",
+    "noclip_backrooms:sterile_gauze",
+    "noclip_backrooms:worn_suit_cloth"
+  ]
+}

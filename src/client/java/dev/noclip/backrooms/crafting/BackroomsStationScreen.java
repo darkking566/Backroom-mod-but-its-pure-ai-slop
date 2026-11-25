@@ -125,20 +125,25 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 			String title = font.plainSubstrByWidth(out.getHoverName().getString(), DETAIL_W - 8);
 			g.text(font, title, x + DETAIL_X + 4, y + DETAIL_Y + 4, 0xFFFFFFA0, true);
 
-			// Input grid (up to 6 slots: 3 cols x 2 rows)
-			for (int i = 0; i < sel.inputs().size() && i < 6; i++) {
+			// Input grid (up to 6 slots in 3x2, or up to 9 compact slots in 3x3 for Spiderweb recipes)
+			boolean compact = sel.inputs().size() > 6;
+			int maxInputs = compact ? 9 : 6;
+			int step = compact ? 19 : 22;
+			int slotSize = compact ? 18 : 20;
+			int itemPad = compact ? 1 : 2;
+			for (int i = 0; i < sel.inputs().size() && i < maxInputs; i++) {
 				StationRecipe.ItemCount req = sel.inputs().get(i);
 				int col = i % 3;
 				int row = i / 3;
-				int sx = x + DETAIL_X + 5 + col * 22;
-				int sy = y + DETAIL_Y + 17 + row * 22;
+				int sx = x + DETAIL_X + 5 + col * step;
+				int sy = y + DETAIL_Y + 16 + row * step;
 				int owned = mc.player != null ? StationRecipe.countInInventory(mc.player.getInventory(), req.resolveItem()) : 0;
 				boolean enough = (mc.player != null && mc.player.isCreative()) || owned >= req.count();
-				drawVanillaSlot(g, sx, sy, 20, 20, enough ? 0xFF5A8A5A : 0xFF8A5555);
+				drawVanillaSlot(g, sx, sy, slotSize, slotSize, enough ? 0xFF5A8A5A : 0xFF8A5555);
 				ItemStack st = req.toStack();
 				if (!st.isEmpty()) {
-					g.item(st, sx + 2, sy + 2);
-					g.itemDecorations(font, st, sx + 2, sy + 2, String.valueOf(req.count()));
+					g.item(st, sx + itemPad, sy + itemPad);
+					g.itemDecorations(font, st, sx + itemPad, sy + itemPad, String.valueOf(req.count()));
 				}
 			}
 
@@ -170,10 +175,14 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 		if (sel != null) {
 			int x = leftPos;
 			int y = topPos;
-			for (int i = 0; i < sel.inputs().size() && i < 6; i++) {
-				int sx = x + DETAIL_X + 5 + (i % 3) * 22;
-				int sy = y + DETAIL_Y + 17 + (i / 3) * 22;
-				if (mouseX >= sx && mouseX < sx + 20 && mouseY >= sy && mouseY < sy + 20) {
+			boolean compact = sel.inputs().size() > 6;
+			int maxInputs = compact ? 9 : 6;
+			int step = compact ? 19 : 22;
+			int slotSize = compact ? 18 : 20;
+			for (int i = 0; i < sel.inputs().size() && i < maxInputs; i++) {
+				int sx = x + DETAIL_X + 5 + (i % 3) * step;
+				int sy = y + DETAIL_Y + 16 + (i / 3) * step;
+				if (mouseX >= sx && mouseX < sx + slotSize && mouseY >= sy && mouseY < sy + slotSize) {
 					ItemStack st = sel.inputs().get(i).toStack();
 					if (!st.isEmpty()) g.setTooltipForNextFrame(font, st, mouseX, mouseY);
 					return;

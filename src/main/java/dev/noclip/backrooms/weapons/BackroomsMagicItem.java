@@ -46,6 +46,7 @@ import net.minecraft.world.phys.Vec3;
 public final class BackroomsMagicItem extends Item {
 	public enum Spell {
 		PHOSPHOR_TALISMAN,
+		STATIC_PULSE,
 		ALMOND_CENSER,
 		SCREECH_BELL,
 		DECOY_MIRROR,
@@ -114,6 +115,16 @@ public final class BackroomsMagicItem extends Item {
 		if (player.getCooldowns().isOnCooldown(stack)) return InteractionResult.PASS;
 		if (!(level instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS;
 
+		// GDD 3.2 Resource-lock rule + Signature Weapon Evolution sanity efficiency (-15% T2 / -30% T3)
+		float evoDmg = WeaponEvolution.damageMultiplier(stack);
+		float effSanityCost = sanityCost * WeaponEvolution.sanityCostMultiplier(stack);
+		if (effSanityCost > 0.0F && player instanceof ServerPlayer sp && !player.isCreative()
+				&& PlayerRpg.get(sp).sanity() < effSanityCost) {
+			sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.magic.low_sanity"));
+			serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.5F, 1.1F);
+			return InteractionResult.FAIL;
+		}
+
 		if (!consumeCost(player, stack)) {
 			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.magic.no_mana"));
 			serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.5F, 1.4F);
@@ -124,12 +135,24 @@ public final class BackroomsMagicItem extends Item {
 		Vec3 look = player.getLookAngle();
 
 		switch (spell) {
+			case STATIC_PULSE -> {
+				for (int i = 1; i <= 10; i++) {
+					Vec3 p = eye.add(look.scale(i * 0.95));
+					serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, p.x, p.y, p.z, 3, 0.25, 0.25, 0.25, 0.04);
+					for (LivingEntity e : serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(p, p).inflate(1.25), ent -> ent != player)) {
+						e.hurtServer(serverLevel, serverLevel.damageSources().magic(), 7.5F * evoDmg);
+						e.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 50, 2));
+						e.addEffect(new MobEffectInstance(MobEffects.GLOWING, 80, 0));
+					}
+				}
+				serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.85F, 1.75F);
+			}
 			case PHOSPHOR_TALISMAN -> {
 				Vec3 target = eye.add(look.scale(6.0));
 				serverLevel.sendParticles(ParticleTypes.FLAME, target.x, target.y, target.z, 36, 2.2, 1.0, 2.2, 0.08);
 				serverLevel.sendParticles(ParticleTypes.END_ROD, target.x, target.y, target.z, 24, 2.0, 1.0, 2.0, 0.06);
 				for (LivingEntity e : serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(target, target).inflate(4.5), ent -> ent instanceof Monster)) {
-					e.hurtServer(serverLevel, serverLevel.damageSources().magic(), 10.0F);
+					e.hurtServer(serverLevel, serverLevel.damageSources().magic(), 10.0F * evoDmg);
 					e.igniteForSeconds(4);
 					pushBack(e, 1.2, e.getX() - player.getX(), e.getZ() - player.getZ());
 				}
@@ -141,7 +164,7 @@ public final class BackroomsMagicItem extends Item {
 					ally.removeEffect(MobEffects.DARKNESS);
 					ally.removeEffect(MobEffects.NAUSEA);
 					ally.removeEffect(MobEffects.BLINDNESS);
-					ally.heal(4.0F);
+					ally.heal(4.0F * evoDmg);
 					if (ally instanceof ServerPlayer sp) PlayerRpg.restoreSanity(sp, 30.0F);
 				}
 				serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.9F, 1.1F);
@@ -149,7 +172,7 @@ public final class BackroomsMagicItem extends Item {
 			case SCREECH_BELL -> {
 				serverLevel.sendParticles(ParticleTypes.SONIC_BOOM, player.getX(), player.getY() + 1.0, player.getZ(), 3, 1.5, 0.4, 1.5, 0.0);
 				for (LivingEntity m : serverLevel.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(7.0), e -> e instanceof Monster)) {
-					m.hurtServer(serverLevel, serverLevel.damageSources().magic(), 6.0F);
+					m.hurtServer(serverLevel, serverLevel.damageSources().magic(), 6.0F * evoDmg);
 					m.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 60, 4));
 					pushBack(m, 1.1, m.getX() - player.getX(), m.getZ() - player.getZ());
 				}
@@ -171,7 +194,7 @@ public final class BackroomsMagicItem extends Item {
 					serverLevel.sendParticles(ParticleTypes.END_ROD, p.x, p.y, p.z, 4, 0.15, 0.15, 0.15, 0.02);
 					for (LivingEntity e : serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(p, p).inflate(1.1), ent -> ent != player)) {
 						String path = e.getType().builtInRegistryHolder().key().identifier().getPath();
-						float dmg = (path.contains("smiler") || path.contains("wretch") || path.contains("duller") || path.contains("bacteria")) ? 22.0F : 9.0F;
+						float dmg = ((path.contains("smiler") || path.contains("wretch") || path.contains("duller") || path.contains("bacteria")) ? 22.0F : 9.0F) * evoDmg;
 						e.hurtServer(serverLevel, serverLevel.damageSources().magic(), dmg);
 						e.igniteForSeconds(3);
 						e.addEffect(new MobEffectInstance(MobEffects.GLOWING, 160, 0));
@@ -184,7 +207,7 @@ public final class BackroomsMagicItem extends Item {
 				serverLevel.sendParticles(ParticleTypes.FLAME, impact.x, impact.y, impact.z, 48, 2.5, 1.5, 2.5, 0.12);
 				serverLevel.sendParticles(ParticleTypes.CLOUD, impact.x, impact.y, impact.z, 24, 2.5, 1.2, 2.5, 0.05);
 				for (LivingEntity e : serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(impact, impact).inflate(4.5), ent -> ent != player)) {
-					e.hurtServer(serverLevel, serverLevel.damageSources().onFire(), 16.0F);
+					e.hurtServer(serverLevel, serverLevel.damageSources().onFire(), 16.0F * evoDmg);
 					e.igniteForSeconds(7);
 				}
 				serverLevel.playSound(null, impact.x, impact.y, impact.z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 0.85F, 1.1F);
@@ -193,7 +216,7 @@ public final class BackroomsMagicItem extends Item {
 				Vec3 center = eye.add(look.scale(7.5));
 				serverLevel.sendParticles(ParticleTypes.ITEM_SLIME, center.x, center.y + 1.5, center.z, 60, 3.5, 1.8, 3.5, 0.08);
 				for (LivingEntity e : serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(center, center).inflate(5.5), ent -> ent != player)) {
-					e.hurtServer(serverLevel, serverLevel.damageSources().magic(), 14.0F);
+					e.hurtServer(serverLevel, serverLevel.damageSources().magic(), 14.0F * evoDmg);
 					e.addEffect(new MobEffectInstance(MobEffects.POISON, 160, 2));
 					e.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 160, 1));
 				}
@@ -204,7 +227,7 @@ public final class BackroomsMagicItem extends Item {
 				int bounces = Math.min(5, list.size());
 				for (int i = 0; i < bounces; i++) {
 					LivingEntity t = list.get(i);
-					t.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), 15.0F);
+					t.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), 15.0F * evoDmg);
 					t.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 50, 3));
 					serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, t.getX(), t.getY() + 1.0, t.getZ(), 20, 0.5, 0.7, 0.5, 0.12);
 				}
@@ -215,7 +238,7 @@ public final class BackroomsMagicItem extends Item {
 				float bonus = player.isInWater() ? 2.0F : 1.0F;
 				serverLevel.sendParticles(ParticleTypes.SNOWFLAKE, center.x, center.y, center.z, 55, 3.0, 1.2, 3.0, 0.08);
 				for (LivingEntity e : serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(center, center).inflate(5.0), ent -> ent != player)) {
-					e.hurtServer(serverLevel, serverLevel.damageSources().freeze(), 13.0F * bonus);
+					e.hurtServer(serverLevel, serverLevel.damageSources().freeze(), 13.0F * bonus * evoDmg);
 					e.setTicksFrozen(200);
 					e.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 90, 5));
 				}
@@ -225,7 +248,7 @@ public final class BackroomsMagicItem extends Item {
 				Vec3 center = eye.add(look.scale(6.0));
 				serverLevel.sendParticles(ParticleTypes.SPORE_BLOSSOM_AIR, center.x, center.y, center.z, 55, 3.5, 1.2, 3.5, 0.04);
 				for (LivingEntity e : serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(center, center).inflate(5.5), ent -> ent != player)) {
-					e.hurtServer(serverLevel, serverLevel.damageSources().magic(), 9.0F);
+					e.hurtServer(serverLevel, serverLevel.damageSources().magic(), 9.0F * evoDmg);
 					e.addEffect(new MobEffectInstance(MobEffects.POISON, 180, 1));
 					e.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 140, 2));
 				}
@@ -283,7 +306,7 @@ public final class BackroomsMagicItem extends Item {
 					Vec3 p = eye.add(look.scale(i * 1.1));
 					serverLevel.sendParticles(ParticleTypes.CRIMSON_SPORE, p.x, p.y, p.z, 10, 0.5, 0.3, 0.5, 0.05);
 					for (LivingEntity e : serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(p, p).inflate(1.5), ent -> ent != player)) {
-						e.hurtServer(serverLevel, serverLevel.damageSources().magic(), 18.0F);
+						e.hurtServer(serverLevel, serverLevel.damageSources().magic(), 18.0F * evoDmg);
 						e.addEffect(new MobEffectInstance(MobEffects.WITHER, 100, 1));
 						player.heal(1.5F);
 					}
@@ -308,13 +331,13 @@ public final class BackroomsMagicItem extends Item {
 				if (roll >= 18) {
 					serverLevel.sendParticles(ParticleTypes.EXPLOSION_EMITTER, player.getX(), player.getY() + 1.0, player.getZ(), 2, 1.0, 1.0, 1.0, 0.0);
 					for (LivingEntity m : serverLevel.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(12.0), e -> e instanceof Monster)) {
-						m.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), 26.0F);
+						m.hurtServer(serverLevel, serverLevel.damageSources().lightningBolt(), 26.0F * evoDmg);
 						m.igniteForSeconds(5);
 					}
 					player.heal(8.0F);
 				} else if (roll >= 8) {
 					for (LivingEntity m : serverLevel.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(9.0), e -> e instanceof Monster)) {
-						m.hurtServer(serverLevel, serverLevel.damageSources().magic(), 8.0F + roll * 0.6F);
+						m.hurtServer(serverLevel, serverLevel.damageSources().magic(), (8.0F + roll * 0.6F) * evoDmg);
 					}
 				} else if (roll <= 2) {
 					player.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 80, 0));
@@ -328,7 +351,7 @@ public final class BackroomsMagicItem extends Item {
 				for (LivingEntity e : serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(center, center).inflate(6.5), ent -> ent != player)) {
 					Vec3 pull = center.subtract(e.position()).normalize().scale(0.85);
 					e.setDeltaMovement(pull.x, 0.25, pull.z);
-					e.hurtServer(serverLevel, serverLevel.damageSources().magic(), 22.0F);
+					e.hurtServer(serverLevel, serverLevel.damageSources().magic(), 22.0F * evoDmg);
 				}
 				serverLevel.playSound(null, center.x, center.y, center.z, SoundEvents.END_PORTAL_SPAWN, SoundSource.PLAYERS, 0.55F, 1.6F);
 			}
@@ -340,15 +363,15 @@ public final class BackroomsMagicItem extends Item {
 					if (ally instanceof ServerPlayer sp) PlayerRpg.restoreSanity(sp, 35.0F);
 				}
 				for (LivingEntity m : serverLevel.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(14.0), e -> e instanceof Monster)) {
-					m.hurtServer(serverLevel, serverLevel.damageSources().magic(), 18.0F);
+					m.hurtServer(serverLevel, serverLevel.damageSources().magic(), 18.0F * evoDmg);
 					serverLevel.sendParticles(ParticleTypes.GLOW, m.getX(), m.getY() + 1.0, m.getZ(), 14, 0.4, 0.6, 0.4, 0.05);
 				}
 				serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 0.9F, 1.3F);
 			}
 		}
 
-		if (sanityCost > 0.0F && player instanceof ServerPlayer sp && !player.isCreative()) {
-			PlayerRpg.drainSanity(sp, sanityCost);
+		if (effSanityCost > 0.0F && player instanceof ServerPlayer sp && !player.isCreative()) {
+			PlayerRpg.drainSanity(sp, effSanityCost);
 		}
 		if (stack.isDamageableItem()) {
 			stack.hurtAndBreak(1, player, hand);
@@ -398,6 +421,7 @@ public final class BackroomsMagicItem extends Item {
 			default -> ChatFormatting.GRAY;
 		};
 		adder.accept(Component.translatable("tooltip.noclip_backrooms.magic_tier", tier).withStyle(color));
+		WeaponEvolution.appendTooltip(stack, adder);
 		if (costItemId != null && !costItemId.isEmpty() && !"SELF".equals(costItemId)) {
 			adder.accept(Component.translatable("tooltip.noclip_backrooms.magic_cost",
 					Component.translatable("item.noclip_backrooms." + costItemId)).withStyle(ChatFormatting.AQUA));

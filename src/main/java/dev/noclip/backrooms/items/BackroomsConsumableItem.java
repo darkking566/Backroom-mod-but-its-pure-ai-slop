@@ -2,8 +2,11 @@ package dev.noclip.backrooms.items;
 
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
+import dev.noclip.backrooms.core.rpg.PlayerStats;
+import java.util.Set;
 import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -26,7 +29,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-/** Functional survival consumables, utility gear, and the Backrooms Compendium guidebook. */
+/** Functional survival consumables, utility gear, geodes, scrolls, extraction anchor, and the Backrooms Compendium. */
 public final class BackroomsConsumableItem extends Item {
 	public enum Kind {
 		COMPENDIUM,
@@ -35,7 +38,24 @@ public final class BackroomsConsumableItem extends Item {
 		BATTERY_PACK,
 		UV_FLASHLIGHT,
 		PHOSPHOR_FLARE,
-		SHRAPNEL_MINE
+		SHRAPNEL_MINE,
+		OLD_BANDAID,
+		EXPIRED_PAINKILLERS,
+		EXPIRED_CANNED_FOOD,
+		RATION_BISCUIT,
+		IMPROVISED_CALMING_TEA,
+		ROUGH_BANDAGE,
+		STERILE_BANDAGE,
+		AGED_ALMOND_RESERVE,
+		MOLOTOV_COCKTAIL,
+		TACTICAL_CORNER_MIRROR,
+		HOMEWARD_ANCHOR,
+		LOST_OLD_COIN,
+		GEODE_SAFE,
+		GEODE_DRIVE,
+		FORBIDDEN_SCROLL_LUCK,
+		FORBIDDEN_SCROLL_PSY,
+		FORBIDDEN_SCROLL_TECH
 	}
 
 	private final Kind kind;
@@ -143,6 +163,151 @@ public final class BackroomsConsumableItem extends Item {
 				server.playSound(null, pos.x, pos.y, pos.z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.PLAYERS, 0.85F, 1.3F);
 				if (!player.isCreative()) stack.shrink(1);
 				player.getCooldowns().addCooldown(stack, 40);
+			}
+			case OLD_BANDAID -> {
+				player.heal(2.5F);
+				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WOOL_PLACE, SoundSource.PLAYERS, 0.6F, 1.35F);
+				if (!player.isCreative()) stack.shrink(1);
+				player.getCooldowns().addCooldown(stack, 20);
+			}
+			case EXPIRED_PAINKILLERS -> {
+				player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 180, 0));
+				player.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 60, 0));
+				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EAT.value(), SoundSource.PLAYERS, 0.8F, 1.1F);
+				if (!player.isCreative()) stack.shrink(1);
+				player.getCooldowns().addCooldown(stack, 60);
+			}
+			case EXPIRED_CANNED_FOOD -> {
+				player.getFoodData().eat(4, 0.35F);
+				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EAT.value(), SoundSource.PLAYERS, 0.9F, 0.95F);
+				if (!player.isCreative()) stack.shrink(1);
+				player.getCooldowns().addCooldown(stack, 25);
+			}
+			case RATION_BISCUIT -> {
+				player.getFoodData().eat(6, 0.65F);
+				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EAT.value(), SoundSource.PLAYERS, 0.9F, 1.15F);
+				if (!player.isCreative()) stack.shrink(1);
+				player.getCooldowns().addCooldown(stack, 25);
+			}
+			case IMPROVISED_CALMING_TEA -> {
+				player.heal(2.0F);
+				if (player instanceof ServerPlayer sp) PlayerRpg.restoreSanity(sp, 22.0F);
+				server.sendParticles(ParticleTypes.HAPPY_VILLAGER, player.getX(), player.getY() + 1.0, player.getZ(), 10, 0.4, 0.5, 0.4, 0.04);
+				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.HONEY_DRINK.value(), SoundSource.PLAYERS, 0.85F, 1.05F);
+				if (!player.isCreative()) stack.shrink(1);
+				player.getCooldowns().addCooldown(stack, 30);
+			}
+			case ROUGH_BANDAGE -> {
+				player.heal(3.5F);
+				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WOOL_PLACE, SoundSource.PLAYERS, 0.75F, 1.1F);
+				if (!player.isCreative()) stack.shrink(1);
+				player.getCooldowns().addCooldown(stack, 25);
+			}
+			case STERILE_BANDAGE -> {
+				player.heal(8.0F);
+				player.removeEffect(MobEffects.POISON);
+				player.removeEffect(MobEffects.WITHER);
+				server.sendParticles(ParticleTypes.HEART, player.getX(), player.getY() + 1.1, player.getZ(), 5, 0.4, 0.4, 0.4, 0.02);
+				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.WOOL_PLACE, SoundSource.PLAYERS, 0.85F, 1.3F);
+				if (!player.isCreative()) stack.shrink(1);
+				player.getCooldowns().addCooldown(stack, 35);
+			}
+			case AGED_ALMOND_RESERVE -> {
+				player.removeEffect(MobEffects.DARKNESS);
+				player.removeEffect(MobEffects.NAUSEA);
+				player.removeEffect(MobEffects.BLINDNESS);
+				player.removeEffect(MobEffects.POISON);
+				player.heal(8.0F);
+				player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 220, 1));
+				player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 400, 0));
+				if (player instanceof ServerPlayer sp) PlayerRpg.restoreSanity(sp, 100.0F);
+				server.sendParticles(ParticleTypes.END_ROD, player.getX(), player.getY() + 1.1, player.getZ(), 24, 0.5, 0.7, 0.5, 0.06);
+				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.HONEY_DRINK.value(), SoundSource.PLAYERS, 1.0F, 1.25F);
+				if (!player.isCreative()) stack.shrink(1);
+				player.getCooldowns().addCooldown(stack, 40);
+			}
+			case MOLOTOV_COCKTAIL -> {
+				Vec3 impact = player.getEyePosition().add(player.getLookAngle().scale(6.0));
+				server.sendParticles(ParticleTypes.FLAME, impact.x, impact.y, impact.z, 55, 2.2, 0.8, 2.2, 0.09);
+				server.sendParticles(ParticleTypes.SMOKE, impact.x, impact.y + 0.4, impact.z, 25, 1.8, 0.8, 1.8, 0.05);
+				for (LivingEntity e : server.getEntitiesOfClass(LivingEntity.class, new AABB(impact, impact).inflate(3.8), ent -> ent != player)) {
+					e.hurtServer(server, server.damageSources().onFire(), 10.0F);
+					e.igniteForSeconds(6);
+				}
+				server.playSound(null, impact.x, impact.y, impact.z, SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 0.9F, 1.1F);
+				server.playSound(null, impact.x, impact.y, impact.z, SoundEvents.FIRECHARGE_USE, SoundSource.PLAYERS, 0.9F, 0.9F);
+				if (!player.isCreative()) stack.shrink(1);
+				player.getCooldowns().addCooldown(stack, 30);
+			}
+			case TACTICAL_CORNER_MIRROR -> {
+				Vec3 eye = player.getEyePosition();
+				Vec3 look = player.getLookAngle();
+				for (int i = 1; i <= 16; i++) {
+					Vec3 p = eye.add(look.scale(i * 0.95));
+					for (LivingEntity e : server.getEntitiesOfClass(LivingEntity.class, new AABB(p, p).inflate(3.0), ent -> ent instanceof Monster)) {
+						e.addEffect(new MobEffectInstance(MobEffects.GLOWING, 200, 0));
+						String path = e.getType().builtInRegistryHolder().key().identifier().getPath();
+						if (path.contains("smiler") || path.contains("duller") || path.contains("bacteria")) {
+							e.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 50, 2));
+						}
+					}
+				}
+				server.sendParticles(ParticleTypes.GLOW, eye.x + look.x, eye.y + look.y, eye.z + look.z, 10, 0.3, 0.3, 0.3, 0.02);
+				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.7F, 1.5F);
+				stack.hurtAndBreak(1, player, hand);
+				player.getCooldowns().addCooldown(stack, 30);
+			}
+			case HOMEWARD_ANCHOR -> {
+				if (player instanceof ServerPlayer sp) {
+					ServerLevel overworld = server.getServer().overworld();
+					BlockPos spawn = overworld.getRespawnData().pos();
+					overworld.getChunk(spawn);
+					server.sendParticles(ParticleTypes.PORTAL, sp.getX(), sp.getY() + 1.0, sp.getZ(), 45, 0.6, 1.0, 0.6, 0.12);
+					sp.stopRiding();
+					sp.teleportTo(overworld, spawn.getX() + 0.5, spawn.getY() + 1.0, spawn.getZ() + 0.5, Set.of(), sp.getYRot(), 0, true);
+					sp.setDeltaMovement(Vec3.ZERO);
+					sp.resetFallDistance();
+					overworld.playSound(null, spawn.getX() + 0.5, spawn.getY() + 1.0, spawn.getZ() + 0.5,
+							SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0F, 1.2F);
+					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.homeward_anchor.used"));
+					if (!sp.isCreative()) stack.shrink(1);
+					sp.getCooldowns().addCooldown(stack, 60);
+				}
+			}
+			case LOST_OLD_COIN -> {
+				server.sendParticles(ParticleTypes.HAPPY_VILLAGER, player.getX(), player.getY() + 1.0, player.getZ(), 8, 0.3, 0.4, 0.3, 0.03);
+				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.7F, 1.65F);
+				if (player instanceof ServerPlayer sp) {
+					PlayerRpg.grantXp(sp, 8);
+					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.coin.collected"));
+				}
+				if (!player.isCreative()) stack.shrink(1);
+				player.getCooldowns().addCooldown(stack, 8);
+			}
+			case GEODE_SAFE, GEODE_DRIVE -> {
+				Item[] pool = kind == Kind.GEODE_SAFE
+						? new Item[]{BackroomsItems.LOST_OLD_COIN, BackroomsItems.BLUEPRINT_SCRAP, BackroomsItems.STATIC_CASSETTE, BackroomsItems.STAPLER, BackroomsItems.NOCLIP_SHARD}
+						: new Item[]{BackroomsItems.GREEN_CIRCUIT, BackroomsItems.RED_CIRCUIT, BackroomsItems.MICROCHIP, BackroomsItems.SCIENCE_PACK_YELLOW, BackroomsItems.FORBIDDEN_SCROLL_TECH};
+				int roll = player.getRandom().nextInt(pool.length);
+				int qty = (roll == 0) ? 3 : 1;
+				ItemStack reward = new ItemStack(pool[roll], qty);
+				if (!player.getInventory().add(reward)) player.drop(reward, false);
+				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.IRON_DOOR_OPEN, SoundSource.PLAYERS, 0.85F, 1.25F);
+				if (!player.isCreative()) stack.shrink(1);
+				player.getCooldowns().addCooldown(stack, 15);
+			}
+			case FORBIDDEN_SCROLL_LUCK, FORBIDDEN_SCROLL_PSY, FORBIDDEN_SCROLL_TECH -> {
+				if (player instanceof ServerPlayer sp) {
+					PlayerStats cur = PlayerRpg.get(sp);
+					PlayerRpg.set(sp, new PlayerStats(cur.level(), cur.xp(), cur.statPoints() + 1,
+							cur.strength(), cur.agility(), cur.vitality(), cur.sanityStat(), cur.sanity()));
+					PlayerRpg.grantXp(sp, 120);
+					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.scroll.unlocked", stack.getHoverName()));
+					server.sendParticles(ParticleTypes.ENCHANT, sp.getX(), sp.getY() + 1.2, sp.getZ(), 30, 0.6, 0.8, 0.6, 0.1);
+					server.playSound(null, sp.getX(), sp.getY(), sp.getZ(), SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.PLAYERS, 0.9F, 1.2F);
+					if (!sp.isCreative()) stack.shrink(1);
+					sp.getCooldowns().addCooldown(stack, 20);
+				}
 			}
 		}
 		return InteractionResult.SUCCESS;

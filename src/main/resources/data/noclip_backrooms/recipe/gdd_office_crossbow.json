@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "noclip_backrooms:broken_table_leg",
+    "noclip_backrooms:plastic_casing",
+    "noclip_backrooms:plastic_casing",
+    "noclip_backrooms:rubber_band_ball",
+    "noclip_backrooms:rubber_band_ball",
+    "noclip_backrooms:rubber_band_ball",
+    "noclip_backrooms:stapler"
+  ],
+  "result": { "id": "noclip_backrooms:office_crossbow", "count": 1 }
+}

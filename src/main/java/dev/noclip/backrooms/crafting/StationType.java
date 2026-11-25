@@ -7,12 +7,13 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 
-/** The four custom Backrooms crafting workstations (in addition to vanilla 3x3 Crafting Table). */
+/** The five custom Backrooms crafting workstations (in addition to vanilla 3x3 Crafting Table). */
 public enum StationType {
 	SALVAGE("salvage_bench"),
 	WORKSHOP("workshop_bench"),
 	DISTILLER("almond_distiller"),
-	ALTAR("anomaly_altar");
+	ALTAR("anomaly_altar"),
+	SPIDERWEB("spiderweb_crafting_table");
 
 	private final String id;
 

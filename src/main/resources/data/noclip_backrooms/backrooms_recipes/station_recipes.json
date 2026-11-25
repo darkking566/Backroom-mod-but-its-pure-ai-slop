@@ -1609,6 +1609,496 @@
       "xp": 55,
       "inputs": [{"item":"noclip_backrooms:grimoire_binding","count":1}, {"item":"noclip_backrooms:astral_parchment","count":2}, {"item":"noclip_backrooms:pastel_charm","count":1}, {"item":"noclip_backrooms:purified_almond_essence","count":4}],
       "outputs": [{"item":"noclip_backrooms:magic_astral_codex","count":1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_pen_bolts",
+      "station": "workshop_bench",
+      "xp": 8,
+      "inputs": [{"item": "noclip_backrooms:ballpoint_pen", "count": 5}, {"item": "noclip_backrooms:scrap_metal", "count": 5}],
+      "outputs": [{"item": "noclip_backrooms:ammo_pen_bolt", "count": 10}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_office_crossbow_ws",
+      "station": "workshop_bench",
+      "xp": 12,
+      "inputs": [{"item": "noclip_backrooms:broken_table_leg", "count": 1}, {"item": "noclip_backrooms:plastic_casing", "count": 2}, {"item": "noclip_backrooms:rubber_band_ball", "count": 3}, {"item": "noclip_backrooms:stapler", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:office_crossbow", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_static_pulse_staff",
+      "station": "workshop_bench",
+      "xp": 16,
+      "inputs": [{"item": "noclip_backrooms:flickering_lamp_tube", "count": 2}, {"item": "noclip_backrooms:copper_wire", "count": 4}, {"item": "noclip_backrooms:broken_table_leg", "count": 1}, {"item": "noclip_backrooms:insulating_tape", "count": 2}],
+      "outputs": [{"item": "noclip_backrooms:static_pulse_staff", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_retro_terminal",
+      "station": "workshop_bench",
+      "xp": 24,
+      "inputs": [{"item": "noclip_backrooms:crt_tube", "count": 1}, {"item": "noclip_backrooms:green_circuit", "count": 2}, {"item": "noclip_backrooms:copper_wire", "count": 4}, {"item": "noclip_backrooms:plastic_casing", "count": 4}],
+      "outputs": [{"item": "noclip_backrooms:retro_terminal", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_red_circuit",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item": "noclip_backrooms:green_circuit", "count": 2}, {"item": "noclip_backrooms:plastic_casing", "count": 2}, {"item": "noclip_backrooms:copper_wire", "count": 2}],
+      "outputs": [{"item": "noclip_backrooms:red_circuit", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_blue_circuit",
+      "station": "almond_distiller",
+      "xp": 22,
+      "inputs": [{"item": "noclip_backrooms:red_circuit", "count": 2}, {"item": "noclip_backrooms:green_circuit", "count": 4}, {"item": "noclip_backrooms:acid_vial", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:blue_circuit", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_science_yellow",
+      "station": "workshop_bench",
+      "xp": 16,
+      "inputs": [{"item": "noclip_backrooms:damp_paper_scrap", "count": 2}, {"item": "noclip_backrooms:steel_gear", "count": 2}, {"item": "noclip_backrooms:stapler", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:science_pack_yellow", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_science_gray",
+      "station": "workshop_bench",
+      "xp": 24,
+      "inputs": [{"item": "noclip_backrooms:ammo_9mm", "count": 4}, {"item": "noclip_backrooms:red_circuit", "count": 1}, {"item": "noclip_backrooms:gun_trigger_group", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:science_pack_gray", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_science_purple",
+      "station": "anomaly_altar",
+      "xp": 36,
+      "inputs": [{"item": "noclip_backrooms:noclip_shard", "count": 1}, {"item": "noclip_backrooms:blue_circuit", "count": 1}, {"item": "noclip_backrooms:purified_almond_essence", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:science_pack_purple", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_module_speed",
+      "station": "workshop_bench",
+      "xp": 22,
+      "inputs": [{"item": "noclip_backrooms:red_circuit", "count": 2}, {"item": "noclip_backrooms:green_circuit", "count": 2}, {"item": "noclip_backrooms:copper_wire", "count": 4}],
+      "outputs": [{"item": "noclip_backrooms:module_speed", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_module_productivity",
+      "station": "workshop_bench",
+      "xp": 24,
+      "inputs": [{"item": "noclip_backrooms:red_circuit", "count": 2}, {"item": "noclip_backrooms:steel_gear", "count": 3}, {"item": "noclip_backrooms:fire_salt", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:module_productivity", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_module_efficiency",
+      "station": "workshop_bench",
+      "xp": 22,
+      "inputs": [{"item": "noclip_backrooms:green_circuit", "count": 4}, {"item": "noclip_backrooms:capacitor", "count": 2}, {"item": "noclip_backrooms:purified_almond_essence", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:module_efficiency", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_energy_brick",
+      "station": "workshop_bench",
+      "xp": 16,
+      "inputs": [{"item": "noclip_backrooms:battery_cell", "count": 2}, {"item": "noclip_backrooms:case_fan", "count": 1}, {"item": "noclip_backrooms:copper_wire", "count": 4}, {"item": "noclip_backrooms:sheet_metal", "count": 2}],
+      "outputs": [{"item": "noclip_backrooms:energy_brick", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_computation_brick",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item": "noclip_backrooms:green_circuit", "count": 2}, {"item": "noclip_backrooms:case_fan", "count": 1}, {"item": "noclip_backrooms:old_circuit_board", "count": 1}, {"item": "noclip_backrooms:plastic_casing", "count": 2}],
+      "outputs": [{"item": "noclip_backrooms:computation_brick", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_controller_unit",
+      "station": "workshop_bench",
+      "xp": 18,
+      "inputs": [{"item": "noclip_backrooms:office_keyboard", "count": 1}, {"item": "noclip_backrooms:landline_phone", "count": 1}, {"item": "noclip_backrooms:green_circuit", "count": 2}, {"item": "noclip_backrooms:screw_nail_box", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:controller_unit", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_precision_screwdriver",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item": "noclip_backrooms:refined_steel_ingot", "count": 2}, {"item": "noclip_backrooms:plastic_casing", "count": 2}, {"item": "noclip_backrooms:insulating_tape", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:precision_screwdriver", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_keypad_hacker_t1",
+      "station": "workshop_bench",
+      "xp": 20,
+      "inputs": [{"item": "noclip_backrooms:controller_unit", "count": 1}, {"item": "noclip_backrooms:battery_cell", "count": 1}, {"item": "noclip_backrooms:copper_wire", "count": 3}, {"item": "noclip_backrooms:insulating_tape", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:keypad_hacker_t1", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_keypad_hacker_t2",
+      "station": "workshop_bench",
+      "xp": 28,
+      "inputs": [{"item": "noclip_backrooms:keypad_hacker_t1", "count": 1}, {"item": "noclip_backrooms:red_circuit", "count": 2}, {"item": "noclip_backrooms:energy_brick", "count": 1}, {"item": "noclip_backrooms:stapler", "count": 2}],
+      "outputs": [{"item": "noclip_backrooms:keypad_hacker_t2", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_keypad_hacker_t3",
+      "station": "workshop_bench",
+      "xp": 38,
+      "inputs": [{"item": "noclip_backrooms:keypad_hacker_t2", "count": 1}, {"item": "noclip_backrooms:blue_circuit", "count": 2}, {"item": "noclip_backrooms:computation_brick", "count": 1}, {"item": "noclip_backrooms:microchip", "count": 2}],
+      "outputs": [{"item": "noclip_backrooms:keypad_hacker_t3", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_keypad_hacker_t4",
+      "station": "anomaly_altar",
+      "xp": 55,
+      "inputs": [{"item": "noclip_backrooms:keypad_hacker_t3", "count": 1}, {"item": "noclip_backrooms:noclip_shard", "count": 2}, {"item": "noclip_backrooms:void_alloy_ingot", "count": 2}, {"item": "noclip_backrooms:resonance_capacitor", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:keypad_hacker_t4", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_level_keycard",
+      "station": "workshop_bench",
+      "xp": 16,
+      "inputs": [{"item": "noclip_backrooms:plastic_casing", "count": 2}, {"item": "noclip_backrooms:green_circuit", "count": 1}, {"item": "noclip_backrooms:copper_wire", "count": 2}],
+      "outputs": [{"item": "noclip_backrooms:level_keycard", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_aged_almond_reserve",
+      "station": "almond_distiller",
+      "xp": 30,
+      "inputs": [{"item": "noclip_backrooms:almond_water", "count": 4}, {"item": "noclip_backrooms:purified_almond_essence", "count": 1}, {"item": "noclip_backrooms:dry_soil_herbs", "count": 2}],
+      "outputs": [{"item": "noclip_backrooms:aged_almond_reserve", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_spiderweb_table",
+      "station": "workshop_bench",
+      "xp": 40,
+      "inputs": [{"item": "noclip_backrooms:workshop_bench", "count": 1}, {"item": "noclip_backrooms:anomaly_altar", "count": 1}, {"item": "noclip_backrooms:computation_brick", "count": 2}, {"item": "noclip_backrooms:energy_brick", "count": 2}, {"item": "minecraft:obsidian", "count": 4}, {"item": "minecraft:ender_pearl", "count": 2}],
+      "outputs": [{"item": "noclip_backrooms:spiderweb_crafting_table", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_scrap_recycler",
+      "station": "workshop_bench",
+      "xp": 24,
+      "inputs": [{"item": "noclip_backrooms:salvage_bench", "count": 1}, {"item": "noclip_backrooms:electric_motor", "count": 1}, {"item": "noclip_backrooms:steel_gear", "count": 4}, {"item": "noclip_backrooms:energy_brick", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:scrap_recycler", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_distillery_barrel",
+      "station": "workshop_bench",
+      "xp": 20,
+      "inputs": [{"item": "noclip_backrooms:almond_distiller", "count": 1}, {"item": "noclip_backrooms:treated_plank", "count": 6}, {"item": "noclip_backrooms:copper_pipe", "count": 4}, {"item": "noclip_backrooms:brass_ingot", "count": 2}],
+      "outputs": [{"item": "noclip_backrooms:anomaly_distillery_barrel", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_research_terminal",
+      "station": "workshop_bench",
+      "xp": 26,
+      "inputs": [{"item": "noclip_backrooms:retro_terminal", "count": 1}, {"item": "noclip_backrooms:computation_brick", "count": 1}, {"item": "noclip_backrooms:office_keyboard", "count": 1}, {"item": "noclip_backrooms:red_circuit", "count": 2}],
+      "outputs": [{"item": "noclip_backrooms:anomaly_research_terminal", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_crystal_replicator",
+      "station": "anomaly_altar",
+      "xp": 48,
+      "inputs": [{"item": "noclip_backrooms:energy_brick", "count": 2}, {"item": "noclip_backrooms:blue_circuit", "count": 2}, {"item": "noclip_backrooms:anomaly_crystal", "count": 4}, {"item": "noclip_backrooms:fire_salt", "count": 2}, {"item": "noclip_backrooms:reinforced_observation_glass", "count": 2}],
+      "outputs": [{"item": "noclip_backrooms:crystal_replicator", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_archive_board",
+      "station": "workshop_bench",
+      "xp": 14,
+      "inputs": [{"item": "noclip_backrooms:treated_plank", "count": 4}, {"item": "noclip_backrooms:magazine_bundle", "count": 2}, {"item": "noclip_backrooms:damp_paper_scrap", "count": 4}, {"item": "noclip_backrooms:stapler", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:anomaly_archive_board", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:gdd_relay_dropoff",
+      "station": "workshop_bench",
+      "xp": 28,
+      "inputs": [{"item": "noclip_backrooms:heavy_steel_plate", "count": 4}, {"item": "noclip_backrooms:controller_unit", "count": 1}, {"item": "minecraft:ender_pearl", "count": 2}, {"item": "noclip_backrooms:noclip_shard", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:relay_dropoff_box", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:spiderweb_homeward_anchor",
+      "station": "spiderweb_crafting_table",
+      "xp": 50,
+      "inputs": [{"item": "noclip_backrooms:noclip_shard", "count": 2}, {"item": "noclip_backrooms:energy_brick", "count": 1}, {"item": "noclip_backrooms:controller_unit", "count": 1}, {"item": "noclip_backrooms:purified_almond_essence", "count": 1}, {"item": "minecraft:obsidian", "count": 4}, {"item": "minecraft:ender_pearl", "count": 2}, {"item": "minecraft:copper_ingot", "count": 4}],
+      "outputs": [{"item": "noclip_backrooms:homeward_anchor", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:spiderweb_anomalous_mirror_glass",
+      "station": "spiderweb_crafting_table",
+      "xp": 45,
+      "inputs": [{"item": "noclip_backrooms:noclip_shard", "count": 1}, {"item": "noclip_backrooms:reinforced_observation_glass", "count": 2}, {"item": "noclip_backrooms:sanctuary_stained_glass", "count": 2}, {"item": "noclip_backrooms:broken_mirror_shard", "count": 4}, {"item": "minecraft:amethyst_shard", "count": 4}, {"item": "minecraft:glass", "count": 4}],
+      "outputs": [{"item": "noclip_backrooms:anomalous_mirror_glass", "count": 2}]
+    },
+    {
+      "id": "noclip_backrooms:spiderweb_crystal_clone_noclip",
+      "station": "spiderweb_crafting_table",
+      "xp": 55,
+      "inputs": [{"item": "noclip_backrooms:noclip_shard", "count": 1}, {"item": "noclip_backrooms:science_pack_purple", "count": 1}, {"item": "noclip_backrooms:energy_brick", "count": 2}, {"item": "noclip_backrooms:blue_circuit", "count": 1}, {"item": "minecraft:amethyst_shard", "count": 6}, {"item": "minecraft:redstone", "count": 8}, {"item": "minecraft:diamond", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:noclip_shard", "count": 2}]
+    },
+    {
+      "id": "noclip_backrooms:spiderweb_crystal_clone_firesalt",
+      "station": "spiderweb_crafting_table",
+      "xp": 32,
+      "inputs": [{"item": "noclip_backrooms:fire_salt", "count": 1}, {"item": "noclip_backrooms:sulfur_dust", "count": 4}, {"item": "noclip_backrooms:coal_coke", "count": 4}, {"item": "noclip_backrooms:energy_brick", "count": 1}, {"item": "minecraft:blaze_powder", "count": 2}, {"item": "minecraft:redstone", "count": 4}],
+      "outputs": [{"item": "noclip_backrooms:fire_salt", "count": 3}]
+    },
+    {
+      "id": "noclip_backrooms:spiderweb_forbidden_luck",
+      "station": "spiderweb_crafting_table",
+      "xp": 45,
+      "inputs": [{"item": "noclip_backrooms:luck_token", "count": 1}, {"item": "noclip_backrooms:science_pack_yellow", "count": 2}, {"item": "noclip_backrooms:lost_old_coin", "count": 6}, {"item": "noclip_backrooms:rune_parchment", "count": 1}, {"item": "minecraft:gold_ingot", "count": 4}, {"item": "minecraft:emerald", "count": 2}, {"item": "minecraft:paper", "count": 4}],
+      "outputs": [{"item": "noclip_backrooms:forbidden_scroll_luck", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:spiderweb_forbidden_psy",
+      "station": "spiderweb_crafting_table",
+      "xp": 48,
+      "inputs": [{"item": "noclip_backrooms:smiler_eyeball", "count": 2}, {"item": "noclip_backrooms:science_pack_purple", "count": 1}, {"item": "noclip_backrooms:aged_almond_reserve", "count": 1}, {"item": "noclip_backrooms:rune_parchment", "count": 1}, {"item": "minecraft:amethyst_shard", "count": 4}, {"item": "minecraft:glass_bottle", "count": 2}, {"item": "minecraft:ender_pearl", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:forbidden_scroll_psy", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:spiderweb_forbidden_tech",
+      "station": "spiderweb_crafting_table",
+      "xp": 48,
+      "inputs": [{"item": "noclip_backrooms:computation_brick", "count": 2}, {"item": "noclip_backrooms:science_pack_gray", "count": 2}, {"item": "noclip_backrooms:blue_circuit", "count": 1}, {"item": "noclip_backrooms:stapler", "count": 3}, {"item": "minecraft:iron_ingot", "count": 4}, {"item": "minecraft:copper_ingot", "count": 4}, {"item": "minecraft:redstone", "count": 6}],
+      "outputs": [{"item": "noclip_backrooms:forbidden_scroll_tech", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:spiderweb_void_disruptor_alt",
+      "station": "spiderweb_crafting_table",
+      "xp": 65,
+      "inputs": [{"item": "noclip_backrooms:core_void_weaver", "count": 1}, {"item": "noclip_backrooms:noclip_shard", "count": 2}, {"item": "noclip_backrooms:blue_circuit", "count": 2}, {"item": "noclip_backrooms:energy_brick", "count": 2}, {"item": "noclip_backrooms:void_alloy_ingot", "count": 3}, {"item": "minecraft:netherite_ingot", "count": 1}, {"item": "minecraft:obsidian", "count": 4}],
+      "outputs": [{"item": "noclip_backrooms:void_disruptor", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:spiderweb_railgun_alt",
+      "station": "spiderweb_crafting_table",
+      "xp": 65,
+      "inputs": [{"item": "noclip_backrooms:core_arc_reactor", "count": 1}, {"item": "noclip_backrooms:gun_coil_accelerator", "count": 2}, {"item": "noclip_backrooms:blue_circuit", "count": 2}, {"item": "noclip_backrooms:energy_brick", "count": 2}, {"item": "noclip_backrooms:module_speed", "count": 1}, {"item": "minecraft:copper_ingot", "count": 8}, {"item": "minecraft:iron_ingot", "count": 6}],
+      "outputs": [{"item": "noclip_backrooms:gun_railgun", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:spiderweb_astral_codex_alt",
+      "station": "spiderweb_crafting_table",
+      "xp": 65,
+      "inputs": [{"item": "noclip_backrooms:astral_parchment", "count": 2}, {"item": "noclip_backrooms:science_pack_purple", "count": 2}, {"item": "noclip_backrooms:sanctuary_stained_glass", "count": 2}, {"item": "noclip_backrooms:aged_almond_reserve", "count": 1}, {"item": "minecraft:amethyst_shard", "count": 6}, {"item": "minecraft:ender_pearl", "count": 2}, {"item": "minecraft:gold_ingot", "count": 4}],
+      "outputs": [{"item": "noclip_backrooms:magic_astral_codex", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_screw_nail_box",
+      "station": "salvage_bench",
+      "xp": 4,
+      "inputs": [{"item": "noclip_backrooms:screw_nail_box", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:rusty_screws", "count": 3}, {"item": "noclip_backrooms:rusty_nail", "count": 3}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_rusted_safe",
+      "station": "salvage_bench",
+      "xp": 12,
+      "inputs": [{"item": "noclip_backrooms:rusted_office_safe", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:lost_old_coin", "count": 3}, {"item": "noclip_backrooms:blueprint_scrap", "count": 1}, {"item": "noclip_backrooms:static_cassette", "count": 1}, {"item": "noclip_backrooms:stapler", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_encrypted_drive",
+      "station": "salvage_bench",
+      "xp": 14,
+      "inputs": [{"item": "noclip_backrooms:encrypted_hard_drive", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:green_circuit", "count": 2}, {"item": "noclip_backrooms:red_circuit", "count": 1}, {"item": "noclip_backrooms:microchip", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_desktop_computer",
+      "station": "salvage_bench",
+      "xp": 8,
+      "inputs": [{"item": "noclip_backrooms:prop_desktop_computer", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:case_fan", "count": 1}, {"item": "noclip_backrooms:old_circuit_board", "count": 1}, {"item": "noclip_backrooms:crt_tube", "count": 1}, {"item": "noclip_backrooms:office_keyboard", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_desktop_computer_damaged",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item": "noclip_backrooms:prop_desktop_computer_damaged", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:plastic_casing", "count": 2}, {"item": "noclip_backrooms:copper_wire", "count": 2}, {"item": "noclip_backrooms:glass_tube_shard", "count": 2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_desktop_computer_noclipped",
+      "station": "salvage_bench",
+      "xp": 14,
+      "inputs": [{"item": "noclip_backrooms:prop_desktop_computer_noclipped", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:reality_fragment", "count": 1}, {"item": "noclip_backrooms:green_circuit", "count": 1}, {"item": "noclip_backrooms:crt_tube", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_phone",
+      "station": "salvage_bench",
+      "xp": 8,
+      "inputs": [{"item": "noclip_backrooms:prop_phone", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:battery_cell", "count": 1}, {"item": "noclip_backrooms:green_circuit", "count": 1}, {"item": "noclip_backrooms:glass_tube_shard", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_phone_cracked",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item": "noclip_backrooms:prop_phone_cracked", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:battery_cell", "count": 1}, {"item": "noclip_backrooms:copper_wire", "count": 2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_phone_noclipped",
+      "station": "salvage_bench",
+      "xp": 14,
+      "inputs": [{"item": "noclip_backrooms:prop_phone_noclipped", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:reality_fragment", "count": 1}, {"item": "noclip_backrooms:microchip", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_office_chair",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item": "noclip_backrooms:prop_office_chair", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:foam_padding", "count": 2}, {"item": "noclip_backrooms:metal_spring", "count": 2}, {"item": "noclip_backrooms:plastic_casing", "count": 2}, {"item": "noclip_backrooms:iron_pipe", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_sofa",
+      "station": "salvage_bench",
+      "xp": 8,
+      "inputs": [{"item": "noclip_backrooms:prop_sofa", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:rags", "count": 3}, {"item": "noclip_backrooms:foam_padding", "count": 3}, {"item": "noclip_backrooms:metal_spring", "count": 2}, {"item": "noclip_backrooms:broken_table_leg", "count": 2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_sofa_noclipped",
+      "station": "salvage_bench",
+      "xp": 14,
+      "inputs": [{"item": "noclip_backrooms:prop_sofa_noclipped", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:rags", "count": 2}, {"item": "noclip_backrooms:foam_padding", "count": 2}, {"item": "noclip_backrooms:reality_fragment", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_glass_partition",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item": "noclip_backrooms:prop_glass_partition", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:office_glass", "count": 2}, {"item": "noclip_backrooms:angle_iron", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_glass_partition_broken",
+      "station": "salvage_bench",
+      "xp": 4,
+      "inputs": [{"item": "noclip_backrooms:prop_glass_partition_broken", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:glass_tube_shard", "count": 3}, {"item": "noclip_backrooms:scrap_metal", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_folding_chair_pile",
+      "station": "salvage_bench",
+      "xp": 8,
+      "inputs": [{"item": "noclip_backrooms:prop_folding_chair_pile", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:scrap_metal", "count": 3}, {"item": "noclip_backrooms:iron_pipe", "count": 2}, {"item": "noclip_backrooms:screw_nail_box", "count": 1}, {"item": "noclip_backrooms:stapler", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_curtain_heap",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item": "noclip_backrooms:prop_curtain_heap", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:rags", "count": 4}, {"item": "noclip_backrooms:damp_carpet_fiber", "count": 2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_standing_mirror",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item": "noclip_backrooms:prop_standing_mirror", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:broken_mirror_shard", "count": 3}, {"item": "noclip_backrooms:broken_table_leg", "count": 2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_potted_plant_plastic",
+      "station": "salvage_bench",
+      "xp": 5,
+      "inputs": [{"item": "noclip_backrooms:prop_potted_plant_plastic", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:plastic_casing", "count": 2}, {"item": "noclip_backrooms:ceramic_shard", "count": 2}, {"item": "noclip_backrooms:dry_soil_herbs", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_electric_fan",
+      "station": "salvage_bench",
+      "xp": 7,
+      "inputs": [{"item": "noclip_backrooms:prop_electric_fan", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:case_fan", "count": 1}, {"item": "noclip_backrooms:copper_wire", "count": 3}, {"item": "noclip_backrooms:scrap_metal", "count": 2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_microwave",
+      "station": "salvage_bench",
+      "xp": 8,
+      "inputs": [{"item": "noclip_backrooms:prop_microwave", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:sheet_metal", "count": 2}, {"item": "noclip_backrooms:capacitor", "count": 2}, {"item": "noclip_backrooms:copper_wire", "count": 3}, {"item": "noclip_backrooms:glass_tube_shard", "count": 2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_floor_lamp",
+      "station": "salvage_bench",
+      "xp": 7,
+      "inputs": [{"item": "noclip_backrooms:prop_floor_lamp", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:flickering_lamp_tube", "count": 1}, {"item": "noclip_backrooms:copper_wire", "count": 2}, {"item": "noclip_backrooms:brass_ingot", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_wall_first_aid_kit",
+      "station": "salvage_bench",
+      "xp": 8,
+      "inputs": [{"item": "noclip_backrooms:prop_wall_first_aid_kit", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:sterile_gauze", "count": 2}, {"item": "noclip_backrooms:rubbing_alcohol", "count": 1}, {"item": "noclip_backrooms:old_bandaid", "count": 2}, {"item": "noclip_backrooms:expired_painkillers", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_prop_cardboard_pile",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item": "noclip_backrooms:prop_cardboard_pile", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:magazine_bundle", "count": 2}, {"item": "noclip_backrooms:insulating_tape", "count": 1}, {"item": "noclip_backrooms:ballpoint_pen", "count": 3}, {"item": "noclip_backrooms:rubber_band_ball", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_car_parts",
+      "station": "salvage_bench",
+      "xp": 12,
+      "inputs": [{"item": "noclip_backrooms:abandoned_car", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:tire", "count": 2}, {"item": "noclip_backrooms:auto_safety_glass", "count": 1}, {"item": "noclip_backrooms:battery_cell", "count": 1}, {"item": "noclip_backrooms:sheet_metal", "count": 3}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_van_parts",
+      "station": "salvage_bench",
+      "xp": 14,
+      "inputs": [{"item": "noclip_backrooms:abandoned_van", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:tire", "count": 2}, {"item": "noclip_backrooms:auto_safety_glass", "count": 2}, {"item": "noclip_backrooms:battery_cell", "count": 1}, {"item": "noclip_backrooms:heavy_steel_plate", "count": 2}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_rusted_car_parts",
+      "station": "salvage_bench",
+      "xp": 12,
+      "inputs": [{"item": "noclip_backrooms:rusted_car", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:tire", "count": 2}, {"item": "noclip_backrooms:auto_safety_glass", "count": 1}, {"item": "noclip_backrooms:scrap_metal", "count": 4}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_tire_rubber",
+      "station": "salvage_bench",
+      "xp": 6,
+      "inputs": [{"item": "noclip_backrooms:tire", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:rubber_band_ball", "count": 2}, {"item": "noclip_backrooms:scrap_metal", "count": 1}]
+    },
+    {
+      "id": "noclip_backrooms:salvage_conveyor_belt",
+      "station": "salvage_bench",
+      "xp": 8,
+      "inputs": [{"item": "noclip_backrooms:rubber_conveyor_belt", "count": 1}],
+      "outputs": [{"item": "noclip_backrooms:steel_wheel", "count": 2}, {"item": "noclip_backrooms:rubber_band_ball", "count": 2}]
+    },
+    {
+      "id": "noclip_backrooms:craft_wire_mesh_glass",
+      "station": "workshop_bench",
+      "xp": 12,
+      "inputs": [{"item": "noclip_backrooms:office_glass", "count": 2}, {"item": "noclip_backrooms:thin_wire", "count": 4}],
+      "outputs": [{"item": "noclip_backrooms:wire_mesh_glass", "count": 2}]
+    },
+    {
+      "id": "noclip_backrooms:craft_reinforced_obs_glass",
+      "station": "workshop_bench",
+      "xp": 20,
+      "inputs": [{"item": "noclip_backrooms:auto_safety_glass", "count": 2}, {"item": "noclip_backrooms:wire_mesh_glass", "count": 2}, {"item": "noclip_backrooms:refined_steel_ingot", "count": 2}],
+      "outputs": [{"item": "noclip_backrooms:reinforced_observation_glass", "count": 2}]
+    },
+    {
+      "id": "noclip_backrooms:craft_sanctuary_stained_glass",
+      "station": "anomaly_altar",
+      "xp": 24,
+      "inputs": [{"item": "noclip_backrooms:reinforced_observation_glass", "count": 1}, {"item": "noclip_backrooms:brass_ingot", "count": 2}, {"item": "noclip_backrooms:prism_glass", "count": 2}],
+      "outputs": [{"item": "noclip_backrooms:sanctuary_stained_glass", "count": 1}]
     }
   ]
 }

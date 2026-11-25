@@ -4,11 +4,14 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Smooth client-side weapon animation state: firearm ADS interpolation, damped recoil kick/pitch/roll,
@@ -121,6 +124,56 @@ public final class WeaponAnimState {
 				if (guardProgress < 0.01F) guardProgress = 0.0F;
 			}
 		}
+
+		// Subtle client-only ambient emissive weapon particles (Iron's Spells / TACZ energy shimmer)
+		spawnHeldWeaponGlowParticles(mc, held);
+	}
+
+	private static void spawnHeldWeaponGlowParticles(Minecraft mc, ItemStack held) {
+		if (mc.level == null || mc.player == null || mc.player.tickCount % 4 != 0) return;
+		if (isInOpticalScope(mc, 1.0F)) return;
+
+		ParticleOptions particle = null;
+		if (held.getItem() instanceof BackroomsMagicItem magic) {
+			particle = switch (magic.spell()) {
+				case VOID_RIFT, NOCLIP_WAND, FATE_DICE, PARTY_GRIMOIRE -> ParticleTypes.PORTAL;
+				case ARC_LIGHTNING, STATIC_PULSE -> ParticleTypes.ELECTRIC_SPARK;
+				case STEAM_FLAME, PHOSPHOR_TALISMAN -> ParticleTypes.FLAME;
+				case CRIMSON_SCYTHE -> ParticleTypes.CRIMSON_SPORE;
+				case ABYSSAL_FROST -> ParticleTypes.SNOWFLAKE;
+				case ACID_GRIMOIRE, PLAGUE_CENSER -> ParticleTypes.SPORE_BLOSSOM_AIR;
+				default -> ParticleTypes.END_ROD;
+			};
+		} else if (held.getItem() instanceof BackroomsFirearmItem gun) {
+			particle = switch (gun.fireMode()) {
+				case RAILGUN_ARC, TASER_STUN -> ParticleTypes.ELECTRIC_SPARK;
+				case FLAMETHROWER -> ParticleTypes.FLAME;
+				case ACID_SHOTGUN -> ParticleTypes.SPORE_BLOSSOM_AIR;
+				case SONIC_PULSE -> ParticleTypes.END_ROD;
+				default -> null;
+			};
+		} else if (held.getItem() instanceof BackroomsMeleeItem melee) {
+			particle = switch (melee.trait()) {
+				case VOID_WAVE -> ParticleTypes.PORTAL;
+				case THUNDER_AOE -> ParticleTypes.ELECTRIC_SPARK;
+				case CRIMSON_SHOCKWAVE, ALPHA_BLOODLUST, VAMPIRIC_CLEANSE -> ParticleTypes.CRIMSON_SPORE;
+				case ACID_CORRODE -> ParticleTypes.SPORE_BLOSSOM_AIR;
+				case UNDEAD_SMILER_BANE, COIN_WARD, STOPMOTION_FREEZE -> ParticleTypes.END_ROD;
+				default -> null;
+			};
+		}
+		if (particle == null) return;
+
+		Vec3 look = mc.player.getLookAngle();
+		Vec3 right = look.cross(new Vec3(0, 1, 0));
+		if (right.lengthSqr() > 1.0E-4) right = right.normalize();
+		double side = mc.player.getMainArm() == net.minecraft.world.entity.HumanoidArm.RIGHT ? 0.36 : -0.36;
+		double jitter = (mc.player.getRandom().nextDouble() - 0.5) * 0.14;
+		Vec3 pos = mc.player.getEyePosition()
+				.add(look.scale(0.62))
+				.add(right.scale(side + jitter))
+				.add(0, -0.22 + jitter, 0);
+		mc.level.addParticle(particle, pos.x, pos.y, pos.z, 0.0, 0.015, 0.0);
 	}
 
 	public static void tryFireFirearm(Minecraft mc, ItemStack stack, BackroomsFirearmItem gun) {

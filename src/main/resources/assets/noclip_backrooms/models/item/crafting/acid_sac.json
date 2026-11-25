@@ -21,6 +21,8 @@
       "from": [5.00, 5.00, 5.00],
       "to": [11.00, 11.00, 11.00],
       "rotation": {"angle": 35.0, "axis": "y", "origin": [8.00, 8.00, 8.00]},
+      "shade": false,
+      "light_emission": 15,
       "faces": {
         "north": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},
         "east": {"uv": [8.15, 0.15, 11.85, 3.85], "texture": "#0"},

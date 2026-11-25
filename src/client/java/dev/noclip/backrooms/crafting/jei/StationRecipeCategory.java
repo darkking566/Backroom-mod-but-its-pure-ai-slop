@@ -21,7 +21,7 @@ import net.minecraft.world.item.ItemStack;
  */
 public final class StationRecipeCategory implements IRecipeCategory<StationRecipe> {
 	private static final int WIDTH = 156;
-	private static final int HEIGHT = 56;
+	private static final int HEIGHT = 64;
 
 	private final StationType stationType;
 	private final IRecipeType<StationRecipe> recipeType;
@@ -67,14 +67,18 @@ public final class StationRecipeCategory implements IRecipeCategory<StationRecip
 
 	@Override
 	public void setRecipe(IRecipeLayoutBuilder builder, StationRecipe recipe, IFocusGroup focuses) {
-		// Left 3x2 input grid (up to 6 ingredients with exact counts)
+		// Left 3x2 or 3x3 input grid (up to 9 ingredients with exact counts for Spiderweb recipes)
 		List<StationRecipe.ItemCount> inputs = recipe.inputs();
-		for (int i = 0; i < inputs.size() && i < 6; i++) {
+		boolean compact = inputs.size() > 6;
+		int maxInputs = compact ? 9 : 6;
+		int step = compact ? 19 : 20;
+		int yStart = compact ? 4 : 12;
+		for (int i = 0; i < inputs.size() && i < maxInputs; i++) {
 			int col = i % 3;
 			int row = i / 3;
 			ItemStack stack = inputs.get(i).toStack();
 			if (!stack.isEmpty()) {
-				builder.addInputSlot(6 + col * 20, 8 + row * 20)
+				builder.addInputSlot(6 + col * step, yStart + row * step)
 						.add(stack)
 						.setStandardSlotBackground();
 			}
@@ -83,14 +87,14 @@ public final class StationRecipeCategory implements IRecipeCategory<StationRecip
 		// Right output slot(s): 1 centered output or 2x2 grid for salvage multi-outputs
 		List<ItemStack> outputs = recipe.allOutputStacks();
 		if (outputs.size() == 1) {
-			builder.addOutputSlot(114, 18)
+			builder.addOutputSlot(114, 22)
 					.add(outputs.getFirst())
 					.setOutputSlotBackground();
 		} else {
 			for (int i = 0; i < outputs.size() && i < 4; i++) {
 				int col = i % 2;
 				int row = i / 2;
-				builder.addOutputSlot(106 + col * 20, 8 + row * 20)
+				builder.addOutputSlot(106 + col * 20, 12 + row * 20)
 						.add(outputs.get(i))
 						.setStandardSlotBackground();
 			}
@@ -99,6 +103,6 @@ public final class StationRecipeCategory implements IRecipeCategory<StationRecip
 
 	@Override
 	public void draw(StationRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphicsExtractor guiGraphics, double mouseX, double mouseY) {
-		arrow.draw(guiGraphics, 74, 19);
+		arrow.draw(guiGraphics, 74, 23);
 	}
 }

@@ -1,11 +1,13 @@
 package dev.noclip.backrooms.crafting;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import dev.noclip.backrooms.weapons.WeaponEvolution;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -18,10 +20,10 @@ import org.junit.jupiter.api.Test;
 
 final class BackroomsCraftingTest {
 	@Test
-	void stationRecipesLoadCleanlyAcrossAllFourStations() throws IOException {
+	void stationRecipesLoadCleanlyAcrossAllFiveStations() throws IOException {
 		BackroomsRecipeRegistry.reload();
 		List<StationRecipe> all = BackroomsRecipeRegistry.all();
-		assertTrue(all.size() >= 170, "Expected at least 170 workstation recipes, got " + all.size());
+		assertTrue(all.size() >= 300, "Expected at least 300 workstation recipes, got " + all.size());
 
 		Set<String> knownModItems = knownModItemIds();
 		Set<Identifier> seenIds = new HashSet<>();
@@ -53,7 +55,7 @@ final class BackroomsCraftingTest {
 		try (var stream = Files.list(recipeDir)) {
 			files = stream.filter(p -> p.toString().endsWith(".json")).toList();
 		}
-		assertTrue(files.size() >= 20, "Expected at least 20 vanilla 3x3 recipes, got " + files.size());
+		assertTrue(files.size() >= 38, "Expected at least 38 vanilla 3x3 recipes, got " + files.size());
 		for (Path f : files) {
 			JsonObject obj = JsonParser.parseString(Files.readString(f, StandardCharsets.UTF_8)).getAsJsonObject();
 			assertTrue(obj.has("type"), "Missing type in " + f.getFileName());
@@ -106,7 +108,7 @@ final class BackroomsCraftingTest {
 		try (var stream = Files.list(equipTexDir)) {
 			textures = stream.filter(p -> p.toString().endsWith(".png")).toList();
 		}
-		assertTrue(textures.size() >= 296, "Expected all 296 3D item textures, got " + textures.size());
+		assertTrue(textures.size() >= 369, "Expected all 369 3D item textures, got " + textures.size());
 		for (Path tex : textures) {
 			String fn = tex.getFileName().toString();
 			String id = fn.substring(0, fn.length() - 4);
@@ -124,7 +126,7 @@ final class BackroomsCraftingTest {
 		try (var stream = Files.list(blockTexDir)) {
 			blockTextures = stream.filter(p -> p.toString().endsWith(".png")).toList();
 		}
-		assertTrue(blockTextures.size() >= 31, "Expected all 31 3D block textures, got " + blockTextures.size());
+		assertTrue(blockTextures.size() >= 58, "Expected all 58 3D block textures, got " + blockTextures.size());
 		for (Path tex : blockTextures) {
 			String fn = tex.getFileName().toString();
 			String id = fn.substring(0, fn.length() - 4);
@@ -135,8 +137,52 @@ final class BackroomsCraftingTest {
 		}
 
 		Path armorDir = Path.of("src/main/resources/assets/noclip_backrooms/textures/entity/armor3d");
-		for (String set : List.of("almond_gas_mask", "scrap_tactical", "skin_stealer", "boiler_thermal", "abyssal_void")) {
+		for (String set : List.of("improvised_office", "almond_gas_mask", "scrap_tactical", "skin_stealer", "boiler_thermal", "abyssal_void")) {
 			assertTrue(Files.exists(armorDir.resolve(set + ".png")), "Missing worn 3D armor texture for " + set);
 		}
+
+		// Verify all 9 unified GDD item tags exist and reference valid items
+		Path tagDir = Path.of("src/main/resources/data/noclip_backrooms/tags/item");
+		Set<String> knownModItems = knownModItemIds();
+		for (String tag : List.of("electronics", "scrap_metal", "office_junk", "cloth", "wood_scrap", "glass_tier", "circuits", "science_packs", "geodes")) {
+			Path f = tagDir.resolve(tag + ".json");
+			assertTrue(Files.exists(f), "Missing item tag " + tag);
+			JsonObject obj = JsonParser.parseString(Files.readString(f, StandardCharsets.UTF_8)).getAsJsonObject();
+			for (JsonElement v : obj.getAsJsonArray("values")) {
+				assertItemExists(Identifier.parse(v.getAsString()), knownModItems, "tag " + tag);
+			}
+		}
+	}
+
+	@Test
+	void allBlenderWeaponMeshesAndEvolutionMathAreValid() throws IOException {
+		Path blenderDir = Path.of("src/main/resources/assets/noclip_backrooms/models/blender");
+		assertTrue(Files.isDirectory(blenderDir), "Blender weapon mesh directory missing");
+		List<String> expectedMeshes = List.of(
+				"gun_railgun", "gun_sniper", "gun_assault_rifle", "gun_shotgun",
+				"gun_pistol", "gun_revolver", "gun_flamethrower", "gun_sonic_pulse", "office_crossbow",
+				"magic_staff_t1", "magic_staff_t2", "magic_staff_t3",
+				"magic_crimson_scythe", "magic_grimoire", "magic_bell", "magic_watch",
+				"melee_greatsword", "melee_curved_dao", "melee_warhammer", "melee_polearm", "melee_dagger",
+				"evo_halo_ring"
+		);
+		for (String name : expectedMeshes) {
+			Path obj = blenderDir.resolve(name + ".obj");
+			Path mtl = blenderDir.resolve(name + ".mtl");
+			assertTrue(Files.exists(obj) && Files.size(obj) > 500, "Missing or empty Blender OBJ: " + name);
+			assertTrue(Files.exists(mtl) && Files.size(mtl) > 50, "Missing or empty Blender MTL: " + name);
+		}
+		Path whiteTex = Path.of("src/main/resources/assets/noclip_backrooms/textures/item/blender_white.png");
+		assertTrue(Files.exists(whiteTex) && Files.size(whiteTex) > 40, "Missing blender_white.png");
+
+		// Verify signature weapon evolution thresholds & scaling math
+		assertEquals(1, WeaponEvolution.tierForKills(0));
+		assertEquals(1, WeaponEvolution.tierForKills(9));
+		assertEquals(2, WeaponEvolution.tierForKills(10));
+		assertEquals(2, WeaponEvolution.tierForKills(29));
+		assertEquals(3, WeaponEvolution.tierForKills(30));
+		assertTrue(WeaponEvolution.damageMultiplierForTier(3) > WeaponEvolution.damageMultiplierForTier(2));
+		assertTrue(WeaponEvolution.damageMultiplierForTier(2) > WeaponEvolution.damageMultiplierForTier(1));
+		assertTrue(WeaponEvolution.sanityMultiplierForTier(3) < WeaponEvolution.sanityMultiplierForTier(2));
 	}
 }
