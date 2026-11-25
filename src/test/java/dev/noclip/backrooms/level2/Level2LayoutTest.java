@@ -263,4 +263,25 @@ class Level2LayoutTest {
 		}
 		assertTrue(details > 0, "no wall details appeared");
 	}
+
+	@Test
+	void el3aChestsNeverFaceTheCraftingTable() {
+		Set<Integer> roomTurns = new java.util.HashSet<>();
+		int rooms = 0;
+		for (int rx = -12; rx < 12; rx++) {
+			for (int rz = -12; rz < 12; rz++) {
+				for (Level2Plan.Room room : Level2Plan.of(SEED, rx, rz).rooms) {
+					if (room.kind() != Level2Plan.RoomKind.EL3A) continue;
+					rooms++;
+					int x = rx * SIZE + room.x0(), z = rz * SIZE + room.z0();
+					roomTurns.add(Level2Layout.roomTurn(SEED, x, z, room));
+					// 2D data value 1 is west, where the crafting table stands.
+					assertTrue(Level2Layout.chestTurn(SEED, x, z, room) != 1, "an EL3A chest faces the crafting table in region " + rx + ", " + rz);
+				}
+			}
+		}
+		assertTrue(rooms > 3, "only " + rooms + " EL3A rooms to check");
+		assertTrue(roomTurns.size() > 1, "every EL3A is turned the same way");
+		assertTrue(roomTurns.contains(1), "no EL3A here would have turned its chest west, so this checks nothing");
+	}
 }

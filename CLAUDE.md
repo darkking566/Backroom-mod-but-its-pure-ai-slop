@@ -323,6 +323,8 @@
 
 - 實機確認 EL3A 儲物箱朝向：`Level2ClientTest` 檢查遊戲裡箱子的方向和生成器算的一樣，並從箱子正面拍照（`level2_el3a_chest`）；測試世界那處 EL3A 的箱子朝東，照片裡鎖扣朝鏡頭、工作台在後面；`runClientGameTest -Plevels=2` 通過。注意：朝向是每處隨機四選一，大約四分之一的 EL3A 箱子會朝西、正面貼著工作台（沒改）
 
+- EL3A 儲物箱不再朝西（正面貼著工作台）：朝西的改朝東，其他三向照舊隨機；房間朝向與箱子朝向抽成 `Level2Layout.roomTurn`、`chestTurn`（放在不碰 Minecraft 方塊的 `Level2Layout`，單元測試才能直接檢查）；新增單元測試 `el3aChestsNeverFaceTheCraftingTable`（也確認測試範圍裡真的有朝西的房間）；Level 2 單元測試 12 項與 `runClientGameTest -Plevels=2` 通過
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23
