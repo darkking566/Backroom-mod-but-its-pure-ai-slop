@@ -96,3 +96,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+    # The design spec's sizes (128 for whole block faces, 64 for props): drawn big, saved small. See resize_realistic.py.
+    import resize_realistic  # noqa: E402  (same folder, already on the path for make_level2_realistic)
+    resize_realistic.main()

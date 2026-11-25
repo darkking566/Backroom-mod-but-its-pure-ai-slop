@@ -403,6 +403,10 @@
 - 使用者同意後，把 `main` 推送到 GitHub（`cc8d4a9` 收費亭抽屜背面與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 - Level 1 審查報告：花園植物的畫風：新增 `tools/make_garden_plants.py`（只寫這 5 張，不重跑 `make_level1.py`），草叢、蕨類、藍／紅／黃野花改成有明暗的寫實手繪：每片葉子與草葉由根部暗到葉尖亮、中肋一側亮一側暗，草裡夾乾黃的葉、蕨葉尖端有枯褐，野花是好幾枝不同高度、花瓣大小不一、顏色偏灰、有花苞；1024 像素畫好後輸出寫實材質包 512 像素與模組 128 像素，加 `_n`／`_s`（葉子有一點透光）；`make_level1_realistic.py` 改成跳過這 5 張（不然重跑會用 128 像素放大蓋掉）；預覽 `docs/look/level1_garden_plants.png`、遊戲畫面 `docs/look/level1_garden_plants_ingame.png`；`Level1ClientTest` 新增 `gardenPlants` 段（苔蘚上一排近照）；`gradlew build` 與 `-Psections=sectors,views,gardenPlants` 通過
 - 使用者同意後，把 `main` 推送到 GitHub（`ab45c13` 花園植物重畫與這筆紀錄；Level 1 審查報告全部處理完）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- 使用者看過試作比較後說「看起來更好」，要求推上 GitHub 並接著把其他物品全部做好：
+  - 推送前抓 GitHub：朋友那邊新推了 33 個提交（停車場審查報告各批、Level 2 磚牆四種畫法、Level 0.1 樓梯頭頂空間等），合併時只有 `CLAUDE.md` 衝突（兩邊的 Antigravity 紀錄都保留）
+  - 朋友新加的 741 張寫實貼圖是 512（停車場 714、Level 2 磚牆 27），照規格書用 `tools/resize_realistic.py` 縮成 128／64；`make_level1_realistic.py`、`make_garden_plants.py` 最後也加上存完自動縮小；資源包 32 MB；`runClientGameTest -Plevels=1 -Psections=gardenPlants` 通過，截圖看過停車場水泥、標誌、花園植物在 128 下仍清楚
+  - 合併後 `gradlew build`（81 個單元測試）通過
 
 ## 動作記錄（Antigravity）
 
