@@ -72,6 +72,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			if (only("sectors")) sectors(context, game, seed);
 			if (only("sectorFit")) sectorFit();
 			if (only("pipeFit")) pipeFit();
+			if (only("elevationPois")) elevationPois(context, game, seed);
 			if (only("exits")) exits(context, game, seed);
 			if (only("events")) events(context, game, seed);
 			if (only("settlements")) settlements(context, game, seed);
@@ -1380,6 +1381,138 @@ public final class Level1ClientTest implements FabricClientGameTest {
 
 	private static boolean solidShape(BlockState s) {
 		return !s.getCollisionShape(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, net.minecraft.core.BlockPos.ZERO).isEmpty();
+	}
+
+	/** All 4 vertical-space elevation POIs (and Sub2 deep sump variant) render cleanly and trigger Level 1 fuse box events. */
+	private static void elevationPois(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		server.runCommand("gamemode spectator @a");
+
+		// 1. VAULTED: Skywalk Watchpost + fuse box restoring nearby broken garage light
+		Level1ElevationPois.Poi skywalk = findElevationPoi(seed, Level1ElevationPois.Kind.SKYWALK_WATCHPOST, null);
+		int sx0 = skywalk.dx() * 64 + skywalk.minLx(), sz0 = skywalk.dz() * 64 + skywalk.minLz();
+		shoot(context, game, sx0 + 3.0, 41.0, sz0 + 9.5, 180, 8, "level1_poi_skywalk_watchpost");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			BlockPos fusePos = new BlockPos(skywalk.fuseX(), skywalk.fuseY(), skywalk.fuseZ());
+			BlockPos lampPos = new BlockPos(skywalk.lampX(), skywalk.lampY(), skywalk.lampZ());
+			BlockPos chestPos = new BlockPos(skywalk.chestX(), skywalk.chestY(), skywalk.chestZ());
+			check(level.getBlockState(fusePos).is(dev.noclip.backrooms.props.BackroomsProps.INDUSTRIAL_FUSE_BOX), "skywalk fuse box missing");
+			check(level.getBlockState(lampPos).is(Level1Blocks.BROKEN_GARAGE_LIGHT), "skywalk broken light missing");
+			check(level.getBlockState(chestPos).is(dev.noclip.backrooms.props.BackroomsProps.LOCKED_ARMORY_CRATE), "skywalk armory crate missing");
+			check(level.getBlockState(new BlockPos(sx0 + 1, 44, sz0 + 3)).is(Level1Blocks.CAGED_LAMP), "skywalk caged lamp 1 missing");
+			check(level.getBlockState(new BlockPos(sx0 + 4, 44, sz0 + 3)).is(Level1Blocks.CAGED_LAMP), "skywalk caged lamp 2 missing");
+			check(level.getBlockState(new BlockPos(sx0 + 5, 41, sz0 + 4)).is(dev.noclip.backrooms.props.BackroomsProps.WANDERER_REMAINS), "skywalk remains missing");
+			check(level.getBlockState(new BlockPos(sx0 + 2, 41, sz0 + 1)).is(dev.noclip.backrooms.props.BackroomsProps.PROP_OFFICE_CHAIR), "skywalk office chair missing");
+			check(level.getBlockState(new BlockPos(sx0 + 2, 42, sz0 + 0)).is(Level1Blocks.OLD_COMPUTER), "skywalk old computer missing");
+			check(Level1PoiEvents.trigger(level, player(s), fusePos, true), "skywalk fuse box failed to trigger");
+			BlockState restored = level.getBlockState(lampPos);
+			check(restored.is(Level1Blocks.GARAGE_LIGHT) && restored.getValue(Level1LampBlock.LIT), "skywalk lamp did not restore lit");
+			check(Level1PoiEvents.isOnCooldown(level, fusePos), "skywalk fuse box did not enter cooldown");
+		});
+
+		// 2. MULTI_DECK: B1 Garage Checkpoint + fuse box clearing active blackout
+		Level1ElevationPois.Poi b1 = findElevationPoi(seed, Level1ElevationPois.Kind.B1_GARAGE_CHECKPOINT, null);
+		int bx0 = b1.dx() * 64 + b1.minLx(), bz0 = b1.dz() * 64 + b1.minLz();
+		shoot(context, game, bx0 + 4.8, 25.0, bz0 + 9.5, 175, 6, "level1_poi_b1_checkpoint");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			BlockPos fusePos = new BlockPos(b1.fuseX(), b1.fuseY(), b1.fuseZ());
+			BlockPos lampPos = new BlockPos(b1.lampX(), b1.lampY(), b1.lampZ());
+			BlockPos chestPos = new BlockPos(b1.chestX(), b1.chestY(), b1.chestZ());
+			check(level.getBlockState(fusePos).is(dev.noclip.backrooms.props.BackroomsProps.INDUSTRIAL_FUSE_BOX), "b1 fuse box missing");
+			check(level.getBlockState(lampPos).is(Level1Blocks.BROKEN_GARAGE_LIGHT), "b1 broken light missing");
+			check(level.getBlockState(chestPos).is(dev.noclip.backrooms.props.BackroomsProps.LOCKED_ARMORY_CRATE), "b1 armory crate missing");
+			check(level.getBlockState(new BlockPos(bx0 + 2, 25, bz0 + 4)).is(Level1Blocks.ABANDONED_VAN), "b1 abandoned van missing");
+			check(level.getBlockState(new BlockPos(bx0 + 8, 25, bz0 + 5)).is(dev.noclip.backrooms.props.BackroomsProps.SALVAGE_BENCH), "b1 salvage bench missing");
+			check(level.getBlockState(new BlockPos(bx0 + 2, 25, bz0 + 7)).is(dev.noclip.backrooms.props.BackroomsProps.WANDERER_REMAINS), "b1 remains missing");
+			check(level.getBlockState(new BlockPos(bx0 + 3, 30, bz0 + 4)).is(Level1Blocks.CAGED_LAMP), "b1 caged lamp missing");
+			Blackouts.startNow();
+		});
+		server.waitFor(s -> Blackouts.phase() == Blackouts.Phase.DARK, 200);
+		server.runOnServer(s -> {
+			BlockPos fusePos = new BlockPos(b1.fuseX(), b1.fuseY(), b1.fuseZ());
+			check(Level1PoiEvents.trigger(level1(s), player(s), fusePos, null), "b1 fuse box failed during blackout");
+		});
+		server.waitFor(s -> Blackouts.phase() == Blackouts.Phase.NORMAL, 80);
+		server.runOnServer(s -> Blackouts.holdOff(20 * 60 * 10));
+
+		// 3. SUNKEN_BASIN: Deep Basin Pump Station + shallow LOCKED_ARMORY_CRATE verification
+		Level1ElevationPois.Poi basinDeep = findElevationPoi(seed, Level1ElevationPois.Kind.BASIN_PUMP_STATION, true);
+		Level1ElevationPois.Poi basinShallow = findElevationPoi(seed, Level1ElevationPois.Kind.BASIN_PUMP_STATION, false);
+		int px0 = basinDeep.dx() * 64 + basinDeep.minLx(), pz0 = basinDeep.dz() * 64 + basinDeep.minLz();
+		int platY = basinDeep.floorY();
+		boolean westSide = basinDeep.minLx() == 17;
+		double camX = westSide ? px0 + 10.5 : px0 - 2.5;
+		float camYaw = westSide ? 90.0F : -90.0F;
+		shoot(context, game, camX, platY, pz0 + 4.5, camYaw, 2, "level1_poi_basin_pump");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			BlockPos fusePos = new BlockPos(basinDeep.fuseX(), basinDeep.fuseY(), basinDeep.fuseZ());
+			BlockPos lampPos = new BlockPos(basinDeep.lampX(), basinDeep.lampY(), basinDeep.lampZ());
+			BlockPos chestPos = new BlockPos(basinDeep.chestX(), basinDeep.chestY(), basinDeep.chestZ());
+			check(level.getBlockState(fusePos).is(dev.noclip.backrooms.props.BackroomsProps.INDUSTRIAL_FUSE_BOX), "basin fuse box missing");
+			check(level.getBlockState(lampPos).is(Level1Blocks.BROKEN_GARAGE_LIGHT), "basin broken light missing");
+			check(level.getBlockState(chestPos).is(dev.noclip.backrooms.props.BackroomsProps.ANOMALY_VAULT_CHEST), "deep basin anomaly vault chest missing");
+			check(level.getBlockState(new BlockPos(px0 + 2, platY + 1, pz0 + 7)).is(dev.noclip.backrooms.props.BackroomsProps.ALMOND_DISTILLER), "basin almond distiller missing");
+			check(level.getBlockState(new BlockPos(px0 + 3, platY + 1, pz0 + 7)).is(dev.noclip.backrooms.props.BackroomsProps.PROP_CRT_TV), "basin CRT TV missing");
+			check(level.getBlockState(new BlockPos(px0 + 5, platY + 1, pz0 + 7)).is(dev.noclip.backrooms.props.BackroomsProps.WANDERER_REMAINS), "basin remains missing");
+			check(level.getBlockState(new BlockPos(px0 + 2, platY + 1, pz0 + 1)).is(Level1Blocks.ELECTRICAL_CABINET), "basin electrical cabinet missing");
+			check(level.getBlockState(new BlockPos(px0 + 4, platY + 4, pz0 + 2)).is(Level1Blocks.CEILING_PIPE), "basin ceiling pipe missing");
+			BlockState shallowChest = Level1ChunkGenerator.blockAt(seed, basinShallow.chestX(), basinShallow.chestY(), basinShallow.chestZ());
+			check(shallowChest.is(dev.noclip.backrooms.props.BackroomsProps.LOCKED_ARMORY_CRATE), "shallow basin armory crate missing");
+		});
+
+		// 4. SUBLEVEL_TUNNELS (deep == false): Sub1 Maintenance Alcove
+		Level1ElevationPois.Poi sub1 = findElevationPoi(seed, Level1ElevationPois.Kind.TUNNEL_SERVICE_CACHE, false);
+		int t1x0 = sub1.dx() * 64 + sub1.minLx(), t1z0 = sub1.dz() * 64 + sub1.minLz();
+		shoot(context, game, t1x0 + 3.5, 23.0, t1z0 + 8.5, 180, 6, "level1_poi_tunnel_cache");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			BlockPos fusePos = new BlockPos(sub1.fuseX(), sub1.fuseY(), sub1.fuseZ());
+			BlockPos lampPos = new BlockPos(sub1.lampX(), sub1.lampY(), sub1.lampZ());
+			BlockPos chestPos = new BlockPos(sub1.chestX(), sub1.chestY(), sub1.chestZ());
+			check(level.getBlockState(fusePos).is(dev.noclip.backrooms.props.BackroomsProps.INDUSTRIAL_FUSE_BOX), "sub1 fuse box missing");
+			check(level.getBlockState(lampPos).is(Level1Blocks.BROKEN_GARAGE_LIGHT), "sub1 broken light missing");
+			check(level.getBlockState(chestPos).is(dev.noclip.backrooms.props.BackroomsProps.LOCKED_ARMORY_CRATE), "sub1 armory crate missing");
+			check(level.getBlockState(new BlockPos(t1x0 + 2, 23, t1z0 + 2)).is(dev.noclip.backrooms.props.BackroomsProps.PROP_OFFICE_CHAIR), "sub1 chair missing");
+			check(level.getBlockState(new BlockPos(t1x0 + 2, 24, t1z0 + 1)).is(Level1Blocks.OLD_COMPUTER), "sub1 computer missing");
+			check(level.getBlockState(new BlockPos(t1x0 + 5, 23, t1z0 + 5)).is(dev.noclip.backrooms.props.BackroomsProps.WANDERER_REMAINS), "sub1 remains missing");
+			check(level.getBlockState(new BlockPos(t1x0 + 5, 23, t1z0 + 1)).is(Level1Blocks.ELECTRICAL_CABINET), "sub1 cabinet missing");
+		});
+
+		// 5. SUBLEVEL_TUNNELS (deep == true): Sub2 Deep Sump Vault
+		Level1ElevationPois.Poi sub2 = findElevationPoi(seed, Level1ElevationPois.Kind.TUNNEL_SERVICE_CACHE, true);
+		int t2x0 = sub2.dx() * 64 + sub2.minLx(), t2z0 = sub2.dz() * 64 + sub2.minLz();
+		shoot(context, game, t2x0 + 8.5, 15.0, t2z0 + 3.5, 90, 6, "level1_poi_deep_sump_vault");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			BlockPos fusePos = new BlockPos(sub2.fuseX(), sub2.fuseY(), sub2.fuseZ());
+			BlockPos lampPos = new BlockPos(sub2.lampX(), sub2.lampY(), sub2.lampZ());
+			BlockPos chestPos = new BlockPos(sub2.chestX(), sub2.chestY(), sub2.chestZ());
+			check(level.getBlockState(fusePos).is(dev.noclip.backrooms.props.BackroomsProps.INDUSTRIAL_FUSE_BOX), "sub2 fuse box missing");
+			check(level.getBlockState(lampPos).is(Level1Blocks.BROKEN_GARAGE_LIGHT), "sub2 broken light missing");
+			check(level.getBlockState(chestPos).is(dev.noclip.backrooms.props.BackroomsProps.ANOMALY_VAULT_CHEST), "sub2 anomaly vault chest missing");
+			check(level.getBlockState(new BlockPos(t2x0 + 1, 15, t2z0 + 1)).is(dev.noclip.backrooms.props.BackroomsProps.WORKSHOP_BENCH), "sub2 workshop bench missing");
+			check(level.getBlockState(new BlockPos(t2x0 + 1, 15, t2z0 + 5)).is(Level1Blocks.GENERATOR), "sub2 generator missing");
+			check(level.getBlockState(new BlockPos(t2x0 + 5, 15, t2z0 + 5)).is(dev.noclip.backrooms.props.BackroomsProps.WANDERER_REMAINS), "sub2 remains missing");
+			check(level.getBlockState(new BlockPos(t2x0 + 2, 18, t2z0 + 2)).is(Level1Blocks.CAGED_LAMP), "sub2 caged lamp missing");
+		});
+	}
+
+	private static Level1ElevationPois.Poi findElevationPoi(long seed, Level1ElevationPois.Kind kind, Boolean deepFilter) {
+		for (int ring = 1; ring <= 24; ring++) {
+			for (int dx = -ring; dx <= ring; dx++) {
+				for (int dz = -ring; dz <= ring; dz++) {
+					if (Math.max(Math.abs(dx), Math.abs(dz)) != ring) continue;
+					Level1ElevationPois.Poi poi = Level1ElevationPois.poi(seed, dx, dz);
+					if (poi != null && poi.kind() == kind && (deepFilter == null || poi.deep() == deepFilter)) {
+						return poi;
+					}
+				}
+			}
+		}
+		throw new AssertionError("no elevation POI " + kind + " (deep=" + deepFilter + ") within ring 24");
 	}
 
 	private static void checkBlocks(ClientGameTestContext context, TestSingleplayerContext game) {

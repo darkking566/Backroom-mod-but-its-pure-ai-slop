@@ -90,6 +90,8 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 		if (y == 0 || y >= HEIGHT - 1) return Blocks.BEDROCK.defaultBlockState();
 		BlockState landmark = Level1Landmarks.block(seed, tile, ceiling, x, y, z);
 		if (landmark != null) return landmark;
+		BlockState elevationPoi = Level1ElevationPois.block(seed, tile, ceiling, x, y, z);
+		if (elevationPoi != null) return elevationPoi;
 		BlockState elevated = Level1Elevation.block(seed, tile, ceiling, x, y, z);
 		if (elevated != null) return elevated;
 		if (y > CEILING_Y) return Blocks.CONCRETE.gray().defaultBlockState();
