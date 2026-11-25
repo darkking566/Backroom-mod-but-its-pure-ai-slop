@@ -49,11 +49,8 @@ final class ShepherdSnakes {
 			int bx = (int) Math.floor(player.getX() + Math.cos(angle) * dist);
 			int bz = (int) Math.floor(player.getZ() + Math.sin(angle) * dist);
 			if (!Level1Layout.tile(seed, bx, bz).walkable() || Marauders.nearSettlement(seed, bx, bz)) continue;
-			BlockPos feet = new BlockPos(bx, baseY, bz);
-			if (!level.isLoaded(feet) || !level.getBlockState(feet).isAir() || !level.getBlockState(feet.above(2)).isAir()) {
-				feet = new BlockPos(bx, Level1ChunkGenerator.FLOOR_Y + 1, bz);
-				if (!level.isLoaded(feet) || !level.getBlockState(feet).isAir() || !level.getBlockState(feet.above(2)).isAir()) continue;
-			}
+			BlockPos feet = Spots.feet(level, net.minecraft.world.entity.EntityDimensions.scalable(1.9F, 2.35F) /* crouched */, bx, baseY, bz);
+			if (feet == null) continue;
 			ShepherdSnake mob = Monsters.SHEPHERD_SNAKE.create(level, EntitySpawnReason.NATURAL);
 			if (mob == null) return;
 			mob.setPos(bx + 0.5, feet.getY(), bz + 0.5);

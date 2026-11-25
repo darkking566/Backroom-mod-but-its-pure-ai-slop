@@ -49,11 +49,8 @@ final class Wretches {
 			int bx = (int) Math.floor(player.getX() + Math.cos(angle) * dist);
 			int bz = (int) Math.floor(player.getZ() + Math.sin(angle) * dist);
 			if (!Level1Layout.tile(seed, bx, bz).walkable() || Marauders.nearSettlement(seed, bx, bz)) continue;
-			BlockPos feet = new BlockPos(bx, baseY, bz);
-			if (!level.isLoaded(feet) || !level.getBlockState(feet).isAir() || !level.getBlockState(feet.above()).isAir()) {
-				feet = new BlockPos(bx, Level1ChunkGenerator.FLOOR_Y + 1, bz);
-				if (!level.isLoaded(feet) || !level.getBlockState(feet).isAir() || !level.getBlockState(feet.above()).isAir()) continue;
-			}
+			BlockPos feet = Spots.feet(level, Monsters.WRETCH.getDimensions(), bx, baseY, bz);
+			if (feet == null) continue;
 			Wretch mob = Monsters.WRETCH.create(level, EntitySpawnReason.NATURAL);
 			if (mob == null) return;
 			mob.setPos(bx + 0.5, feet.getY(), bz + 0.5);

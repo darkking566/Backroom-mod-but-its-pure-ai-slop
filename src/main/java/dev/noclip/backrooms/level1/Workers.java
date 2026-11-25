@@ -100,7 +100,7 @@ final class Workers {
 			int x = (int) Math.floor(player.getX() + Math.cos(angle) * distance), z = (int) Math.floor(player.getZ() + Math.sin(angle) * distance);
 			if (Level1Layout.tile(seed, x, z) != Tile.FLOOR) continue;
 			BlockPos at = new BlockPos(x, Level1ChunkGenerator.FLOOR_Y + 1, z);
-			if (!level.isLoaded(at) || !level.getBlockState(at).isAir() || !level.getBlockState(at.above()).isAir()) continue;
+			if (!Spots.fits(level, People.type("shadow_worker").getDimensions(), at)) continue;
 			Mob worker = People.type("shadow_worker").create(level, EntitySpawnReason.EVENT);
 			if (worker == null) return false;
 			worker.snapTo(x + 0.5, at.getY(), z + 0.5, random.nextFloat() * 360, 0);
