@@ -59,11 +59,11 @@ public final class Level3Layout {
 	}
 
 	enum Light {
-		NONE, FLUORESCENT, FLICKERING, BROKEN, BULB, DEAD_BULB
+		NONE, FLUORESCENT, DIM_FLUORESCENT, FLICKERING, BROKEN, BULB, DEAD_BULB
 	}
 
 	enum Circuit {
-		ON, FLICKERING, DEAD
+		ON, DIM, FLICKERING, DEAD
 	}
 
 	enum Hazard {
@@ -207,7 +207,7 @@ public final class Level3Layout {
 	static Circuit circuit(long seed, int x, int z) {
 		int ci = Math.floorDiv(Math.floorDiv(x, CELL), CIRCUIT), cj = Math.floorDiv(Math.floorDiv(z, CELL), CIRCUIT);
 		int roll = Math.floorMod(hash(seed, ci, cj, LIGHTS), 100);
-		return roll < 55 ? Circuit.ON : roll < 70 ? Circuit.FLICKERING : Circuit.DEAD;
+		return roll < 42 ? Circuit.ON : roll < 57 ? Circuit.DIM : roll < 70 ? Circuit.FLICKERING : Circuit.DEAD;
 	}
 
 	/** The light over a tunnel column: one in the middle of each cell, a bulb in the narrow ones, none in the low ones. */
@@ -224,6 +224,7 @@ public final class Level3Layout {
 			case NARROW -> circuit == Circuit.DEAD ? Light.DEAD_BULB : Light.BULB;
 			default -> switch (circuit) {
 				case ON -> Light.FLUORESCENT;
+				case DIM -> Light.DIM_FLUORESCENT;
 				case FLICKERING -> Light.FLICKERING;
 				case DEAD -> Light.BROKEN;
 			};

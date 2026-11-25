@@ -176,6 +176,7 @@ final class Level3ChunkGenerator extends ChunkGenerator {
 			Block block = switch (Level3Layout.light(seed, x, z)) {
 				case NONE -> null;
 				case FLUORESCENT -> Level3Blocks.STATION_LIGHT;
+				case DIM_FLUORESCENT -> Level3Blocks.DIM_STATION_LIGHT;
 				case FLICKERING -> Level3Blocks.FLICKERING_STATION_LIGHT;
 				case BROKEN -> Level3Blocks.BROKEN_STATION_LIGHT;
 				case BULB -> Level3Blocks.CAGE_BULB;

@@ -11,7 +11,7 @@
 
 | 部分 | 在哪 | 怎麼關 |
 |---|---|---|
-| 寫實材質包（Level 0、0.1、1、2） | `src/main/resources/resourcepacks/realistic/`，由 `core/look/Look` 登記成內建資源包，預設開啟 | 選項 → 資源包 → 關掉「後室：寫實材質」，就回到原本畫的貼圖 |
+| 寫實材質包（Level 0、0.1、1、2、3） | `src/main/resources/resourcepacks/realistic/`，由 `core/look/Look` 登記成內建資源包，預設開啟 | 選項 → 資源包 → 關掉「後室：寫實材質」，就回到原本畫的貼圖 |
 | 攝影機濾鏡（鏡頭變形、色差、泛光、偏黃褪色的錄影機色調、暗角、雜訊、掃描線、偶爾滾過的訊號線）與 REC 畫面字，加上「暗」：遠處沉進黑色、光只照到燈附近 | `post_effect/camcorder.json`、`shaders/post/camcorder.fsh`、`core/look/CamcorderOverlay`、`mixin/client/FogRendererDarkness`、`mixin/client/LightmapFalloff` | F7（控制設定裡的「後室 → 攝影機濾鏡」）；只在後室各層開，回主世界自動關 |
 
 - 資源包是「同名覆蓋」：原本 `make_textures.py` 畫的貼圖和工具都沒動，關掉資源包就回到原樣。
@@ -35,7 +35,7 @@
 - 每種變體的意思跟原本的一樣（水漬、滴痕、霉、補丁、氣泡、破洞……），只是做成寫實的樣子；原本的出現機率也不變。
 - `_n` 會稍微柔化並降低精度，不然照片的雜訊會讓檔案大一倍。
 
-其他樓層各有一支工具，都沿用 `make_level2_realistic.py` 下載好的 ambientCG CC0 照片：`make_level0p1_realistic.py`、`make_level2_realistic.py`、`make_level1_realistic.py`（停車場 238 張，依名稱分成水泥、鋼、烤漆、木、布、磚、鏽或保留原畫；水泥只取照片的細紋、每張貼圖用照片不同的位置，避免整片地板重複同一塊斑；會動的閃爍壁紙不做；對照圖 `docs/look/level1_realistic.png`）。
+其他樓層各有一支工具，都沿用 `make_level2_realistic.py` 下載好的 ambientCG CC0 照片：`make_level0p1_realistic.py`、`make_level2_realistic.py`、`make_level1_realistic.py`（停車場 238 張，依名稱分成水泥、鋼、烤漆、木、布、磚、鏽或保留原畫；水泥只取照片的細紋、每張貼圖用照片不同的位置，避免整片地板重複同一塊斑；會動的閃爍壁紙不做；對照圖 `docs/look/level1_realistic.png`）、`make_level3_realistic.py`（發電站 86 張，紅磚與褐磚沿用 `brick_substrate` 順砌磚＋`Concrete034` 細紋，對照圖 `docs/look/level3_realistic.png`、`docs/look/level3_ingame.jpg`）。
 
 ## 看效果
 

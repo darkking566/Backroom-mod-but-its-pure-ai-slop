@@ -256,7 +256,10 @@ public final class Level3ClientTest implements FabricClientGameTest {
 
 	private static void hounds(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
 		var server = game.getServer();
-		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_3 run tp @s %.1f %d %.1f", from.getX() + 0.5, STAND, from.getZ() + 0.5));
+		int[] spot = nearest(seed, from, t -> t.kind() == Kind.FLOOR && t.clearance() >= 3,
+				(x, z) -> Level3Events.hallsNear(seed, x, z, 52).stream()
+						.noneMatch(p -> p.hall().kind() == HallKind.SANCTUM || p.hall().kind() == HallKind.BASE));
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_3 run tp @s %.1f %d %.1f", spot[0] + 0.5, STAND, spot[1] + 0.5));
 		server.runCommand("gamemode survival @a");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(20);

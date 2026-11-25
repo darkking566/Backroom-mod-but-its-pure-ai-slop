@@ -199,7 +199,7 @@ final class Level3Events {
 		long seed = Level3ChunkGenerator.planSeed(level.getChunkSource().randomState());
 		if (level.getEntitiesOfClass(Hound.class, new AABB(player.blockPosition()).inflate(NEAR)).size() >= MAX_NEAR) return 0;
 		RandomSource random = level.getRandom();
-		for (int attempt = 0; attempt < 40; attempt++) {
+		for (int attempt = 0; attempt < 120; attempt++) {
 			double angle = random.nextDouble() * Math.PI * 2, distance = NEAREST + random.nextDouble() * (FARTHEST - NEAREST);
 			int x = (int) Math.floor(player.getX() + Math.cos(angle) * distance), z = (int) Math.floor(player.getZ() + Math.sin(angle) * distance);
 			Level3Layout.Tile tile = Level3Layout.tile(seed, x, z);

@@ -64,6 +64,7 @@ public final class Level3Blocks {
 
 	// Lights
 	public static final Block STATION_LIGHT = register("station_light", fixture(10), p -> new Level3AxisBlock(p, FIXTURE));
+	public static final Block DIM_STATION_LIGHT = register("dim_station_light", fixture(7), p -> new Level3AxisBlock(p, FIXTURE));
 	public static final Block FLICKERING_STATION_LIGHT = register("flickering_station_light", fixture(8), p -> new Level3AxisBlock(p, FIXTURE));
 	public static final Block BROKEN_STATION_LIGHT = register("broken_station_light", fixture(0), p -> new Level3AxisBlock(p, FIXTURE));
 	public static final Block CAGE_BULB = register("cage_bulb", fixture(9), p -> new Level3AxisBlock(p, BULB));

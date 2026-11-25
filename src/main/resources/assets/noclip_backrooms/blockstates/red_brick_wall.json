@@ -1,7 +1,18 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level3/red_brick_wall"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level3/red_brick_wall"
+      },
+      {
+        "model": "noclip_backrooms:block/level3/red_brick_wall_1"
+      },
+      {
+        "model": "noclip_backrooms:block/level3/red_brick_wall_2"
+      },
+      {
+        "model": "noclip_backrooms:block/level3/red_brick_wall_3"
+      }
+    ]
   }
 }

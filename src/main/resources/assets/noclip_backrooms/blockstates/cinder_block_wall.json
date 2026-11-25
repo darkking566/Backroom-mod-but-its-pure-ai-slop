@@ -1,7 +1,18 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level3/cinder_block_wall"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level3/cinder_block_wall"
+      },
+      {
+        "model": "noclip_backrooms:block/level3/cinder_block_wall_1"
+      },
+      {
+        "model": "noclip_backrooms:block/level3/cinder_block_wall_2"
+      },
+      {
+        "model": "noclip_backrooms:block/level3/cinder_block_wall_3"
+      }
+    ]
   }
 }
