@@ -34,5 +34,6 @@ public final class Level3 {
 		LevelExits.open("3", Level3Travel::enter);
 		Level3Events.register();
 		Level3Monsters.register();
+		Level3Bases.register();
 	}
 }

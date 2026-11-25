@@ -29,15 +29,17 @@ MATERIAL = [
     (("sludge_steel", "chain", "car_paint", "car_front", "car_rear"), "rust"),
     (("brass", "bronze", "copper", "elevator_"), "brass"),
     (("bars_", "lock", "conduit", "electrical_", "light_housing", "cage", "generator_", "switchgear_",
-      "green_steel", "conveyor_side", "press_", "meg_wall", "table_top", "tray", "cables", "base_gamma_door_"), "steel"),
+      "green_steel", "conveyor_side", "press_", "meg_wall", "table_top", "tray", "cables", "base_gamma_door_",
+      "security_camera", "uec_apparatus"), "steel"),
     (("valve", "tyre", "cable_black"), "paint"),
     (("parts_crate_", "meg_crate_"), "wood"),
     (("cot_canvas",), "fabric"),
     (("glazed_tile",), "tile"),
-    (("dusty_floor", "station_ceiling", "cinder_block", "pillar", "marble", "sparking_outlet", "purpified_brick"), "concrete"),
+    (("dusty_floor", "station_ceiling", "cinder_block", "pillar", "marble", "sparking_outlet", "purpified_brick",
+      "foj_white_wall"), "concrete"),
 ]
 PLAIN = ("light_lens", "floodlight_lens", "bulb_warm", "bulb_off", "stained_glass", "car_glass",
-         "insulator", "meg_sign", "meg_arrow_r", "meg_arrow_l", "meg_warning")
+         "insulator", "meg_sign", "meg_arrow_r", "meg_arrow_l", "meg_warning", "jerry_mural")
 
 
 def kind(name):

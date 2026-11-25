@@ -33,7 +33,13 @@ final class Level3Plan {
 		/** A room with a car in it: get in, and it takes you to Level 69. */
 		CAR,
 		/** An M.E.G. outpost of Base Gamma, with the door back to Level 11. */
-		BASE
+		BASE,
+		/** B.N.T.G. Storage Facility: supply warehouse, pawnshop counter, and rare-item showcase. */
+		BNTG_STORAGE,
+		/** Followers of Jerry - Blue Salvation: converted generator room with white drywall, blue lights, and murals. */
+		BLUE_SALVATION,
+		/** U.E.C. Scylla Colony: dark, hostile research outpost with apparatus and locked crates. */
+		SCYLLA_COLONY
 	}
 
 	/** What joins a cell to the next one on one side. */
@@ -155,6 +161,9 @@ final class Level3Plan {
 		List<HallKind> wanted = new ArrayList<>();
 		if (random.nextDouble() < Level3Exit.BASE_GAMMA_DOOR.chance) wanted.add(HallKind.BASE);
 		if (random.nextDouble() < Level3Exit.CAR.chance) wanted.add(HallKind.CAR);
+		if (random.nextDouble() < 0.18) wanted.add(HallKind.BNTG_STORAGE);
+		if (random.nextDouble() < 0.14) wanted.add(HallKind.BLUE_SALVATION);
+		if (random.nextDouble() < 0.14) wanted.add(HallKind.SCYLLA_COLONY);
 		int ordinary = 2 + random.nextInt(2);
 		for (int n = 0; n < ordinary; n++) {
 			int roll = random.nextInt(100);
@@ -167,8 +176,12 @@ final class Level3Plan {
 					w = 1;
 					h = 2;
 				}
-				case GENERATOR, BOILER -> {
-					w = 2 + random.nextInt(2);
+				case GENERATOR, BOILER, BLUE_SALVATION -> {
+					w = 2 + (kind == HallKind.BLUE_SALVATION ? 0 : random.nextInt(2));
+					h = 2;
+				}
+				case BNTG_STORAGE, SCYLLA_COLONY -> {
+					w = 3;
 					h = 2;
 				}
 				default -> {

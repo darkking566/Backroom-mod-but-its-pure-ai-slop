@@ -1,6 +1,8 @@
 package dev.noclip.backrooms.level3;
 
 import dev.noclip.backrooms.core.LevelExits;
+import dev.noclip.backrooms.core.people.Person;
+import dev.noclip.backrooms.core.trade.ShopRole;
 import dev.noclip.backrooms.level3.Level3Layout.Kind;
 import dev.noclip.backrooms.level3.Level3Layout.Profile;
 import dev.noclip.backrooms.level3.Level3Layout.Tile;
@@ -19,8 +21,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.monster.illager.Pillager;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -65,6 +69,7 @@ public final class Level3ClientTest implements FabricClientGameTest {
 			angel(context, game, seed, arrival);
 			hounds(context, game, seed, arrival);
 			monsters(context, game, seed, arrival);
+			bases(context, game, seed, arrival);
 			checkBlocks(game);
 		}
 	}
@@ -304,6 +309,47 @@ public final class Level3ClientTest implements FabricClientGameTest {
 		});
 		server.runCommand("kill @e[tag=" + Level3Monsters.TAG + "]");
 		server.runCommand("gamemode spectator @a");
+	}
+
+	private static void bases(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
+		var server = game.getServer();
+		for (HallKind kind : new HallKind[] {HallKind.BASE, HallKind.BNTG_STORAGE, HallKind.SCYLLA_COLONY}) {
+			int[] at = nearest(seed, from, t -> t.kind() == Kind.HALL && t.hall().kind() == kind && t.hx() == 2 && t.hz() == 2, (x, z) -> true);
+			server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_3 run tp @s %.1f %d %.1f", at[0] + 0.5, STAND, at[1] + 0.5));
+			server.runCommand("gamemode survival @a");
+			game.getConnection().waitForChunksDownload();
+			context.waitTicks(15);
+			server.runOnServer(s -> {
+				ServerLevel level = level3(s);
+				Level3Bases.populateNear(level, seed, player(s));
+				AABB box = new AABB(player(s).blockPosition()).inflate(24);
+				if (kind == HallKind.BASE) {
+					var staff = level.getEntitiesOfClass(Person.class, box, p -> p.entityTags().contains(Level3Bases.STAFF_TAG));
+					check(staff.size() >= 2, "Base Gamma missing staff");
+					check(staff.stream().anyMatch(p -> ShopRole.of(p) == ShopRole.QUARTERMASTER), "Base Gamma missing Quartermaster");
+					BlockPos cot = null;
+					for (int dx = -16; dx <= 16 && cot == null; dx++) {
+						for (int dz = -16; dz <= 16 && cot == null; dz++) {
+							BlockPos p = player(s).blockPosition().offset(dx, 0, dz);
+							if (level.getBlockState(p).is(Level3Blocks.COT)) cot = p;
+						}
+					}
+					check(cot != null, "Base Gamma missing cot");
+					level.getBlockState(cot).useWithoutItem(level, player(s),
+							new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(cot), net.minecraft.core.Direction.UP, cot, false));
+					check(player(s).getRespawnConfig() != null && player(s).getRespawnConfig().respawnData().dimension() == Level3.LEVEL_3,
+							"cot did not set Level 3 respawn");
+				} else if (kind == HallKind.BNTG_STORAGE) {
+					var staff = level.getEntitiesOfClass(Person.class, box, p -> p.entityTags().contains(Level3Bases.STAFF_TAG));
+					check(staff.stream().anyMatch(p -> ShopRole.of(p) == ShopRole.BUYER), "B.N.T.G. Storage missing Buyer");
+				} else {
+					var ops = level.getEntitiesOfClass(Pillager.class, box, p -> p.entityTags().contains(Level3Bases.UEC_TAG));
+					check(ops.size() >= 2, "Scylla Colony missing U.E.C. operatives");
+				}
+			});
+			server.runCommand("gamemode spectator @a");
+		}
+		server.runCommand("kill @e[tag=" + Level3Bases.UEC_TAG + "]");
 	}
 
 	private static void checkBlocks(TestSingleplayerContext game) {

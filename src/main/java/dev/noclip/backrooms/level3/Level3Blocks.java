@@ -96,7 +96,7 @@ public final class Level3Blocks {
 	public static final Block STAINED_GLASS = register("sanctum_stained_glass", Properties.of().mapColor(MapColor.COLOR_RED)
 			.strength(-1.0F, 3600000.0F).noLootTable().sound(SoundType.GLASS).lightLevel(state -> 7));
 	public static final Block COT = register("meg_cot", Properties.of().mapColor(MapColor.COLOR_GREEN).strength(1.0F)
-			.sound(SoundType.WOOL).noOcclusion(), p -> new Level3FacingBlock(p, Level3Shapes.facing(1, 0, 0, 15, 7, 16), Level3FacingBlock.Effect.NONE));
+			.sound(SoundType.WOOL).noOcclusion(), p -> new Level3RestBlock(p, Level3Shapes.facing(1, 0, 0, 15, 7, 16), "base_gamma"));
 	public static final Block SUPPLY_CRATE = register("meg_supply_crate", Properties.of().mapColor(MapColor.COLOR_GREEN).strength(2.0F).sound(SoundType.WOOD));
 	public static final Block TABLE = register("meg_table", Properties.of().mapColor(MapColor.METAL).strength(2.0F).sound(SoundType.METAL).noOcclusion(),
 			p -> new Level3FacingBlock(p, Level3Shapes.full(), Level3FacingBlock.Effect.NONE));
@@ -104,6 +104,14 @@ public final class Level3Blocks {
 	/** The M.E.G. signs on passage walls: an arrow towards Base Gamma, and warnings at the paranoia hotspots. */
 	public static final Block MEG_ARROW_SIGN = register("meg_arrow_sign", sign(), Level3SignBlock::new);
 	public static final Block MEG_WARNING_SIGN = register("meg_warning_sign", sign(), Level3SignBlock::new);
+	public static final Block SECURITY_CAMERA = register("security_camera", mounted().lightLevel(s -> 2),
+			p -> new Level3FacingBlock(p, Level3Shapes.facing(5, 8, 0, 11, 14, 7), Level3FacingBlock.Effect.NONE));
+	public static final Block FOJ_WHITE_WALL = register("foj_white_wall", brick(MapColor.QUARTZ));
+	public static final Block JERRY_MURAL = register("jerry_mural", sign(),
+			p -> new Level3FacingBlock(p, Level3Shapes.facing(1, 1, 0, 15, 15, 1), Level3FacingBlock.Effect.NONE));
+	public static final Block BLUE_STATION_LIGHT = register("blue_station_light", fixture(9), p -> new Level3AxisBlock(p, FIXTURE));
+	public static final Block UEC_APPARATUS = register("uec_apparatus", machine().noOcclusion().lightLevel(s -> 3),
+			p -> new Level3FacingBlock(p, Level3Shapes.full(), Level3FacingBlock.Effect.WHIR));
 
 	// Ways out, which nothing breaks either
 	public static final Block ELEVATOR = register("station_elevator", unbreakable(MapColor.GOLD).lightLevel(state -> 3),

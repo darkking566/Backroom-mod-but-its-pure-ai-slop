@@ -227,7 +227,10 @@ final class Level3Events {
 
 	static boolean nearSafety(long seed, int x, int z) {
 		for (Placed placed : hallsNear(seed, x, z, SANCTUM_KEEP_CLEAR)) {
-			if (placed.hall().kind() == HallKind.SANCTUM || placed.hall().kind() == HallKind.BASE) return true;
+			HallKind kind = placed.hall().kind();
+			if (kind == HallKind.SANCTUM || kind == HallKind.BASE || kind == HallKind.BNTG_STORAGE || kind == HallKind.BLUE_SALVATION) {
+				return true;
+			}
 		}
 		return false;
 	}
