@@ -17,6 +17,9 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.vehicle.minecart.MinecartChest;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LanternBlock;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -282,6 +285,47 @@ public final class Level2ClientTest implements FabricClientGameTest {
 		check(staff > 0, "no B.N.T.G. staff spawned at EL3A");
 		context.takeScreenshot("level2_el3a");
 
+		// The supply chest has loot, and lanterns hang near the corners: {chest x, chest z, items, lanterns, lantern x, lantern z}.
+		int[] base = server.computeOnServer(s -> {
+			ServerLevel l2 = level2(s);
+			ServerPlayer p = player(s);
+			int[] found = {0, 0, 0, 0, 0, 0};
+			boolean chest = false;
+			for (int dx = -24; dx <= 24; dx++) {
+				for (int dz = -24; dz <= 24; dz++) {
+					int x = el3a[0] + dx, z = el3a[1] + dz;
+					if (Level2Layout.roomKindAt(seed, x, z) != Level2Plan.RoomKind.EL3A) continue;
+					BlockState top = l2.getBlockState(new BlockPos(x, Level2ChunkGenerator.FLOOR_Y + 4, z));
+					if (top.is(Blocks.LANTERN) && top.getValue(LanternBlock.HANGING)) {
+						found[3]++;
+						found[4] = x;
+						found[5] = z;
+					}
+					if (!chest && l2.getBlockEntity(new BlockPos(x, STAND, z)) instanceof ChestBlockEntity box) {
+						chest = true;
+						found[0] = x;
+						found[1] = z;
+						box.unpackLootTable(p);
+						for (int i = 0; i < box.getContainerSize(); i++) if (!box.getItem(i).isEmpty()) found[2]++;
+					}
+				}
+			}
+			return found;
+		});
+		check(base[0] != 0 || base[1] != 0, "no supply chest at EL3A");
+		check(base[2] > 0, "the EL3A supply chest is empty");
+		check(base[3] >= 4, "only " + base[3] + " hanging corner lanterns at EL3A");
+		// Stand by the chest and look up at a corner lantern.
+		double ex = base[0] + 0.5, ez = base[1] - 0.5, eye = STAND + 1.62;
+		double lx = base[4] + 0.5 - ex, lz = base[5] + 0.5 - ez, ly = Level2ChunkGenerator.FLOOR_Y + 4.5 - eye;
+		float lanternYaw = (float) Math.toDegrees(Math.atan2(-lx, lz));
+		float lanternPitch = (float) -Math.toDegrees(Math.atan2(ly, Math.sqrt(lx * lx + lz * lz)));
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_2 run tp @s %.2f %d %.2f", ex, STAND, ez));
+		context.waitTicks(5);
+		context.getInput().lookAt(lanternYaw, lanternPitch);
+		context.waitTicks(5);
+		context.takeScreenshot("level2_el3a_lantern");
+
 		int[] rail = nearest(seed, from, tile -> tile.kind() == Kind.FLOOR, 0,
 				(x, z) -> Level2Layout.railAxis(seed, x, z) >= 0);
 		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_2 run tp @s %.1f %d %.1f", rail[0] + 0.5, STAND, rail[1] + 0.5));
@@ -294,6 +338,16 @@ public final class Level2ClientTest implements FabricClientGameTest {
 			return l2.getEntitiesOfClass(MinecartChest.class, new AABB(p.blockPosition()).inflate(36)).size();
 		});
 		check(carts > 0, "no cargo minecart spawned on Level 2 rail");
+		int cargo = server.computeOnServer(s -> {
+			ServerPlayer p = player(s);
+			int items = 0;
+			for (MinecartChest cart : level2(s).getEntitiesOfClass(MinecartChest.class, new AABB(p.blockPosition()).inflate(36))) {
+				cart.unpackChestVehicleLootTable(p);
+				for (int i = 0; i < cart.getContainerSize(); i++) if (!cart.getItem(i).isEmpty()) items++;
+			}
+			return items;
+		});
+		check(cargo > 0, "the cargo minecart is empty");
 		context.takeScreenshot("level2_rail");
 
 		server.runCommand("kill @e[tag=" + Level2Bases.STAFF_TAG + "]");

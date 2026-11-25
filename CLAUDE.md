@@ -300,6 +300,8 @@
   - 驗證：`gradlew build` 通過；`runClientGameTest -Plevels=1 -Psections=crate,marker,events,secrets,monsters` 通過；自然生怪的位置沒有專門的測試，也沒在畫面上看過
   - 沒做：管線區的儀表與天花板水管懸空（世界生成，`Level1Sectors`）；其他樓層的生成器
 
+- 實機確認 EL3A：`Level2ClientTest` 的 EL3A 段新增檢查——儲物箱打開有東西、附近貨運礦車打開有東西、EL3A 至少 4 盞吊掛提燈，並拍站在箱子旁往上看提燈的照片（`level2_el3a_lantern`，存一份到 `docs/levels/level2/el3a_lantern.png`）；`runClientGameTest -Plevels=2` 通過兩次，照片裡兩盞角落提燈照亮牆面。第一次的截圖被 Antigravity 接著跑的實機測試清掉，重跑後先把照片複製出來
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23
