@@ -236,6 +236,7 @@
   - `Level0p1ClientTest` 的 `props` 段多拍兩張（健身器材、長椅、桌上與地上雜物；開著的對開門，並檢查另一扇一起開）；新增 `docs/levels/level0p1/screens/props_gym.png`、`props_open_door.png`
   - `gradlew build` 與完整 `runClientGameTest -Plevels=0.1` 通過（65 張截圖），看過健身器材、雜物、開著的門與寫實材質牆面
   - 沒確認到：服務機器人紅眼發光（截圖太小）、用準星逐一看選取框（只看到牆的框）
+- 使用者同意後，把 `main` 推送到 GitHub（`0403f71` Level 0.1 寫實材質、健身器材、滑門、桌上雜物等）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
