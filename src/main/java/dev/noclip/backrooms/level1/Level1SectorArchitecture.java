@@ -151,6 +151,7 @@ public final class Level1SectorArchitecture {
 		}
 		if (Level1Elevation.isNearExitOrProp(seed, dx, dz, x, z)) return current;
 		if (Level1SectorPois.isReserved(seed, dx, dz, lx, lz)) return current;
+		if (Level1Vignettes.isReserved(seed, dx, dz, lx, lz)) return current;
 
 		int topCeil = Level1Elevation.ceilingY(seed, dx, dz);
 		Level1Elevation.Profile profile = Level1Elevation.profile(seed, dx, dz);
@@ -226,6 +227,7 @@ public final class Level1SectorArchitecture {
 		}
 		if (Level1Elevation.isNearExitOrProp(seed, dx, dz, x, z)) return current;
 		if (Level1SectorPois.isReserved(seed, dx, dz, lx, lz)) return current;
+		if (Level1Vignettes.isReserved(seed, dx, dz, lx, lz)) return current;
 		Variant v = variant(seed, dx, dz);
 		int topCeil = Level1Elevation.ceilingY(seed, dx, dz);
 		Level1Elevation.Profile profile = Level1Elevation.profile(seed, dx, dz);

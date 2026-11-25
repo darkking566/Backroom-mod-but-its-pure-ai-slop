@@ -136,6 +136,17 @@ final class CorridorPlan {
 		return bulbs[ci + cj * N];
 	}
 
+	/** Bitmask of open cell walls from cell (ci, cj): 1=North, 2=East, 4=South, 8=West. */
+	int openMask(int ci, int cj) {
+		int cell = ci + cj * N;
+		int mask = 0;
+		if (cj > 0 && south[cell - N]) mask |= 1;
+		if (ci < N - 1 && east[cell]) mask |= 2;
+		if (cj < N - 1 && south[cell]) mask |= 4;
+		if (ci > 0 && east[cell - 1]) mask |= 8;
+		return mask;
+	}
+
 	/** Never called for the district's own edge lines (lx == 0 or lz == 0); Level1Layout handles those. */
 	Tile tile(int lx, int lz) {
 		int item = furniture[lx + lz * SIZE];

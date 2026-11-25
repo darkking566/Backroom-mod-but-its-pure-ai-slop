@@ -5,7 +5,11 @@ import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.props.BackroomsProps;
 import it.unimi.dsi.fastutil.longs.Long2IntMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongIterator;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.BlockPos;
@@ -15,19 +19,26 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
+import net.minecraft.world.phys.AABB;
 
 /**
- * Interactive industrial fuse boxes in Level 1 vertical-space POIs.
- * Right-clicking can snap Level 1 out of an active blackout, restore nearby broken garage lights
- * and bare bulbs (70%), or overload the local circuit (30%).
+ * Interactive events in Level 1 POIs and vignettes:
+ * <ul>
+ *   <li>{@code industrial_fuse_box}: ends an active blackout, restores nearby broken lights (70%), or trips local power (30%).</li>
+ *   <li>{@code abandoned_car} / {@code abandoned_van}: one-time glovebox/trunk scavenging with 25% car-alarm risk.</li>
+ *   <li>{@code vending_machine}: trade 1 Alloy for Almond Water (plus a 15% bonus Bandage).</li>
+ * </ul>
  */
 final class Level1PoiEvents {
 	private static final int COOLDOWN_TICKS = 1200;
@@ -35,6 +46,7 @@ final class Level1PoiEvents {
 	private static final int TRIP_RADIUS_XZ = 16;
 	private static final int RADIUS_DOWN = 8;
 	private static final int RADIUS_UP = 18;
+	private static final int ALARM_RADIUS = 28;
 
 	private Level1PoiEvents() {
 	}
@@ -45,15 +57,96 @@ final class Level1PoiEvents {
 			if (!(level instanceof ServerLevel serverLevel) || !serverLevel.dimension().equals(Level1.LEVEL_1)) {
 				return InteractionResult.PASS;
 			}
+			if (!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.PASS;
 			BlockPos pos = hitResult.getBlockPos();
-			if (!serverLevel.getBlockState(pos).is(BackroomsProps.INDUSTRIAL_FUSE_BOX)) {
-				return InteractionResult.PASS;
-			}
-			if (player instanceof ServerPlayer serverPlayer) {
+			BlockState target = serverLevel.getBlockState(pos);
+			if (target.is(BackroomsProps.INDUSTRIAL_FUSE_BOX)) {
 				trigger(serverLevel, serverPlayer, pos, null);
+				return InteractionResult.SUCCESS;
 			}
-			return InteractionResult.SUCCESS;
+			if (target.is(Level1Blocks.ABANDONED_CAR) || target.is(Level1Blocks.ABANDONED_VAN)) {
+				scavengeVehicle(serverLevel, serverPlayer, pos, null);
+				return InteractionResult.SUCCESS;
+			}
+			if (target.is(Level1Blocks.VENDING_MACHINE)) {
+				useVendingMachine(serverLevel, serverPlayer, pos);
+				return InteractionResult.SUCCESS;
+			}
+			return InteractionResult.PASS;
 		});
+	}
+
+	static boolean scavengeVehicle(ServerLevel level, ServerPlayer player, BlockPos pos, Boolean forceAlarm) {
+		VehicleState state = level.getDataStorage().computeIfAbsent(VehicleState.TYPE);
+		if (state.isScavenged(pos)) {
+			level.playSound(null, pos, SoundEvents.IRON_DOOR_CLOSE, SoundSource.BLOCKS, 0.55F, 1.1F);
+			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level1_vehicle.empty"));
+			return false;
+		}
+		state.markScavenged(pos);
+		level.sendParticles(ParticleTypes.CLOUD, pos.getX() + 0.5, pos.getY() + 0.8, pos.getZ() + 0.5, 6, 0.3, 0.2, 0.3, 0.02);
+
+		RandomSource random = level.getRandom();
+		boolean alarm = forceAlarm != null ? forceAlarm : random.nextInt(100) < 25;
+		if (!alarm) {
+			level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_OPEN, SoundSource.BLOCKS, 0.7F, 0.95F);
+			level.playSound(null, pos, Level1Sounds.DRAWER, SoundSource.BLOCKS, 0.7F, 1.0F);
+			int roll = random.nextInt(100);
+			ItemStack loot;
+			if (roll < 35) loot = new ItemStack(Level1Items.ALMOND_WATER);
+			else if (roll < 60) loot = new ItemStack(Level1Items.ALLOY, 1 + random.nextInt(2));
+			else if (roll < 80) loot = new ItemStack(Level1Items.BANDAGE);
+			else if (roll < 95) loot = new ItemStack(Level1Items.PHOSPHOR_POWDER, 1 + random.nextInt(2));
+			else if (roll < 99) loot = new ItemStack(Level1Items.CROWBAR);
+			else loot = new ItemStack(Level1Items.CLIPP_CARD);
+
+			Component name = loot.getHoverName();
+			giveOrDrop(player, loot);
+			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level1_vehicle.found", name));
+		} else {
+			level.playSound(null, pos, SoundEvents.BELL_RESONATE, SoundSource.BLOCKS, 0.9F, 1.4F);
+			level.playSound(null, pos, Level1Sounds.RUMBLE, SoundSource.BLOCKS, 0.8F, 1.2F);
+			level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_OPEN, SoundSource.BLOCKS, 0.7F, 0.9F);
+			giveOrDrop(player, new ItemStack(Level1Items.ALLOY));
+			if (!player.isCreative() && !player.isSpectator()) {
+				for (Monster monster : level.getEntitiesOfClass(Monster.class, new AABB(pos).inflate(ALARM_RADIUS))) {
+					monster.setTarget(player);
+				}
+			}
+			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level1_vehicle.alarm"));
+		}
+		return true;
+	}
+
+	static boolean isVehicleScavenged(ServerLevel level, BlockPos pos) {
+		return level.getDataStorage().computeIfAbsent(VehicleState.TYPE).isScavenged(pos);
+	}
+
+	static boolean useVendingMachine(ServerLevel level, ServerPlayer player, BlockPos pos) {
+		ItemStack held = player.getMainHandItem();
+		if (!held.is(Level1Items.ALLOY)) {
+			level.playSound(null, pos, SoundEvents.DISPENSER_FAIL, SoundSource.BLOCKS, 0.7F, 1.1F);
+			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level1_vending.need_alloy"));
+			return false;
+		}
+		if (!player.isCreative()) {
+			held.shrink(1);
+		}
+		level.playSound(null, pos, SoundEvents.DISPENSER_DISPENSE, SoundSource.BLOCKS, 0.8F, 1.0F);
+		level.playSound(null, pos, SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.BLOCKS, 0.5F, 1.3F);
+		level.sendParticles(ParticleTypes.ELECTRIC_SPARK, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 6, 0.25, 0.3, 0.25, 0.04);
+		giveOrDrop(player, new ItemStack(Level1Items.ALMOND_WATER));
+		if (level.getRandom().nextInt(100) < 15) {
+			giveOrDrop(player, new ItemStack(Level1Items.BANDAGE));
+		}
+		player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level1_vending.dispensed"));
+		return true;
+	}
+
+	private static void giveOrDrop(ServerPlayer player, ItemStack stack) {
+		if (!player.getInventory().add(stack) && !stack.isEmpty()) {
+			player.drop(stack, false);
+		}
 	}
 
 	static boolean trigger(ServerLevel level, ServerPlayer player, BlockPos pos, Boolean forceRestore) {
@@ -187,6 +280,50 @@ final class Level1PoiEvents {
 					long key = Long.parseLong(entry.getKey());
 					int readyAt = entry.getValue();
 					state.cooldownUntilTick.put(key, readyAt);
+				} catch (NumberFormatException ignored) {
+				}
+			}
+			return state;
+		}
+	}
+
+	static final class VehicleState extends SavedData {
+		static final Codec<VehicleState> CODEC = Codec.STRING.listOf()
+				.optionalFieldOf("scavenged", List.of())
+				.xmap(VehicleState::fromSerialized, VehicleState::toSerialized)
+				.codec();
+
+		static final SavedDataType<VehicleState> TYPE = new SavedDataType<>(
+				BackroomsMod.id("level1_scavenged_vehicles"),
+				VehicleState::new,
+				CODEC,
+				DataFixTypes.SAVED_DATA_COMMAND_STORAGE);
+
+		private final LongOpenHashSet scavenged = new LongOpenHashSet();
+
+		boolean isScavenged(BlockPos pos) {
+			return scavenged.contains(pos.asLong());
+		}
+
+		void markScavenged(BlockPos pos) {
+			scavenged.add(pos.asLong());
+			setDirty();
+		}
+
+		private List<String> toSerialized() {
+			List<String> out = new ArrayList<>(scavenged.size());
+			LongIterator it = scavenged.iterator();
+			while (it.hasNext()) {
+				out.add(Long.toString(it.nextLong()));
+			}
+			return out;
+		}
+
+		private static VehicleState fromSerialized(List<String> raw) {
+			VehicleState state = new VehicleState();
+			for (String entry : raw) {
+				try {
+					state.scavenged.add(Long.parseLong(entry));
 				} catch (NumberFormatException ignored) {
 				}
 			}

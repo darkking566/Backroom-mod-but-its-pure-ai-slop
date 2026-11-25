@@ -74,6 +74,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			if (only("pipeFit")) pipeFit();
 			if (only("elevationPois")) elevationPois(context, game, seed);
 			if (only("sectorPois")) sectorPois(context, game, seed);
+			if (only("vignettes")) vignettes(context, game, seed);
 			if (only("exits")) exits(context, game, seed);
 			if (only("events")) events(context, game, seed);
 			if (only("settlements")) settlements(context, game, seed);
@@ -1617,6 +1618,106 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			}
 		}
 		throw new AssertionError("no sector POI " + kind + " within ring 28");
+	}
+
+	/** All 5 corridor/hall micro-vignettes render cleanly and verify fuse box, vehicle scavenging, and vending alloy trade. */
+	private static void vignettes(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		server.runCommand("gamemode spectator @a");
+
+		// 1. CORRIDOR_SECURITY_NOOK + fuse box restores BROKEN_BARE_BULB -> BARE_BULB[lit=true]
+		Level1Vignettes.Vignette sec = findVignette(seed, Level1Vignettes.Kind.CORRIDOR_SECURITY_NOOK);
+		shootCorridorVignette(context, game, sec, "level1_poi_corridor_security");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			BlockPos bulbPos = new BlockPos(sec.dx() * 64 + sec.minLx() + 1, 35, sec.dz() * 64 + sec.minLz() + 1);
+			BlockPos fusePos = new BlockPos(sec.keyX(), sec.keyY(), sec.keyZ());
+			check(level.getBlockState(fusePos).is(dev.noclip.backrooms.props.BackroomsProps.INDUSTRIAL_FUSE_BOX), "corridor security fuse missing");
+			check(level.getBlockState(bulbPos).is(Level1Blocks.BROKEN_BARE_BULB), "corridor security broken bulb missing");
+			check(Level1PoiEvents.trigger(level, player(s), fusePos, true), "corridor fuse box failed to trigger");
+			BlockState litBulb = level.getBlockState(bulbPos);
+			check(litBulb.is(Level1Blocks.BARE_BULB) && litBulb.getValue(Level1LampBlock.LIT), "corridor bare bulb did not restore lit");
+		});
+
+		// 2. CORRIDOR_SHELTER_CACHE
+		Level1Vignettes.Vignette shelter = findVignette(seed, Level1Vignettes.Kind.CORRIDOR_SHELTER_CACHE);
+		shootCorridorVignette(context, game, shelter, "level1_poi_corridor_shelter");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			BlockPos cratePos = new BlockPos(shelter.keyX(), shelter.keyY(), shelter.keyZ());
+			check(level.getBlockState(cratePos).is(dev.noclip.backrooms.props.BackroomsProps.LOCKED_ARMORY_CRATE), "corridor shelter crate missing");
+		});
+
+		// 3. CORRIDOR_VENDING_ALCOVE + 1 Alloy -> Almond Water
+		Level1Vignettes.Vignette vend = findVignette(seed, Level1Vignettes.Kind.CORRIDOR_VENDING_ALCOVE);
+		shootCorridorVignette(context, game, vend, "level1_poi_corridor_vending");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			ServerPlayer player = player(s);
+			BlockPos vendingPos = new BlockPos(vend.keyX(), vend.keyY(), vend.keyZ());
+			check(level.getBlockState(vendingPos).is(Level1Blocks.VENDING_MACHINE), "corridor vending machine missing");
+			player.getInventory().clearContent();
+			player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, new net.minecraft.world.item.ItemStack(Level1Items.ALLOY));
+			check(Level1PoiEvents.useVendingMachine(level, player, vendingPos), "vending machine refused alloy");
+			check(player.getInventory().countItem(Level1Items.ALLOY) == 0, "vending machine did not consume alloy");
+			check(player.getInventory().countItem(Level1Items.ALMOND_WATER) >= 1, "vending machine did not dispense almond water");
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 4. HALL_BREAKDOWN_SPOT + vehicle scavenging (once only)
+		Level1Vignettes.Vignette breakdown = findVignette(seed, Level1Vignettes.Kind.HALL_BREAKDOWN_SPOT);
+		int bx0 = breakdown.dx() * 64 + breakdown.minLx(), bz0 = breakdown.dz() * 64 + breakdown.minLz();
+		shoot(context, game, bx0 + 2.5, STAND, bz0 + 5.6, 180, 8, "level1_poi_hall_breakdown");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			ServerPlayer player = player(s);
+			BlockPos carPos = new BlockPos(breakdown.keyX(), breakdown.keyY(), breakdown.keyZ());
+			BlockState car = level.getBlockState(carPos);
+			check(car.is(Level1Blocks.ABANDONED_CAR) || car.is(Level1Blocks.ABANDONED_VAN), "hall breakdown vehicle missing");
+			player.getInventory().clearContent();
+			check(Level1PoiEvents.scavengeVehicle(level, player, carPos, false), "vehicle scavenge failed");
+			check(Level1PoiEvents.isVehicleScavenged(level, carPos), "vehicle not marked scavenged");
+			check(!player.getInventory().isEmpty(), "vehicle scavenge gave no loot");
+			check(!Level1PoiEvents.scavengeVehicle(level, player, carPos, false), "vehicle allowed second scavenge");
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 5. HALL_VENDING_BREAK_CORNER
+		Level1Vignettes.Vignette hallVend = findVignette(seed, Level1Vignettes.Kind.HALL_VENDING_BREAK_CORNER);
+		int hx0 = hallVend.dx() * 64 + hallVend.minLx(), hz0 = hallVend.dz() * 64 + hallVend.minLz();
+		shoot(context, game, hx0 + 2.5, STAND, hz0 + 5.6, 180, 8, "level1_poi_hall_vending");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			BlockPos vendingPos = new BlockPos(hallVend.keyX(), hallVend.keyY(), hallVend.keyZ());
+			check(level.getBlockState(vendingPos).is(Level1Blocks.VENDING_MACHINE), "hall vending machine missing");
+			check(level.getBlockState(new BlockPos(hx0 + 4, STAND, hz0 + 2)).is(dev.noclip.backrooms.props.BackroomsProps.INDUSTRIAL_FUSE_BOX), "hall vending fuse missing");
+			check(level.getBlockState(new BlockPos(hx0 + 1, STAND + 1, hz0 + 3)).is(dev.noclip.backrooms.props.BackroomsProps.PROP_CRT_TV), "hall vending CRT TV missing");
+		});
+	}
+
+	private static void shootCorridorVignette(ClientGameTestContext context, TestSingleplayerContext game, Level1Vignettes.Vignette v, String name) {
+		int cx = v.dx() * 64 + v.minLx() + 1;
+		int cz = v.dz() * 64 + v.minLz() + 1;
+		Direction open = v.openDir();
+		shoot(context, game, cx + 0.5 + open.getStepX() * 2.5, STAND, cz + 0.5 + open.getStepZ() * 2.5,
+				open.getOpposite().toYRot(), 8, name);
+	}
+
+	private static Level1Vignettes.Vignette findVignette(long seed, Level1Vignettes.Kind kind) {
+		for (int ring = 1; ring <= 24; ring++) {
+			for (int dx = -ring; dx <= ring; dx++) {
+				for (int dz = -ring; dz <= ring; dz++) {
+					if (Math.max(Math.abs(dx), Math.abs(dz)) != ring) continue;
+					Level1Vignettes.Vignette v = Level1Vignettes.vignette(seed, dx, dz);
+					if (v != null && v.kind() == kind) {
+						return v;
+					}
+				}
+			}
+		}
+		throw new AssertionError("no vignette " + kind + " within ring 24");
 	}
 
 	private static void checkBlocks(ClientGameTestContext context, TestSingleplayerContext game) {
