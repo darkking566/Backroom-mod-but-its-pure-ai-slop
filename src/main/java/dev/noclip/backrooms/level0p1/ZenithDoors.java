@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
@@ -40,8 +39,7 @@ final class ZenithDoors {
 						if (!(state.getBlock() instanceof ZenithDoorBlock door)) continue;
 						if (state.getValue(DoorBlock.HALF) != DoubleBlockHalf.LOWER || state.getValue(DoorBlock.OPEN)) continue;
 						if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5) > 3.2 * 3.2) continue;
-						door.setOpen(player, level, state, pos, true);
-						level.playSound(null, pos, ZenithSounds.DOOR, SoundSource.BLOCKS, 0.7F, 0.9F + level.getRandom().nextFloat() * 0.2F);
+						door.setOpen(player, level, state, pos, true); // opens its partner too, and plays the door's own sound
 					}
 				}
 			}

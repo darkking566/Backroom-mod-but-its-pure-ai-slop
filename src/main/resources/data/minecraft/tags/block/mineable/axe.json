@@ -28,6 +28,9 @@
     "noclip_backrooms:meg_supply_crate",
     "noclip_backrooms:parts_crate",
     "noclip_backrooms:cable_reel",
-    "noclip_backrooms:lumber_stack"
+    "noclip_backrooms:lumber_stack",
+    "noclip_backrooms:crew_desk",
+    "noclip_backrooms:wall_frame",
+    "noclip_backrooms:hanging_vines"
   ]
 }

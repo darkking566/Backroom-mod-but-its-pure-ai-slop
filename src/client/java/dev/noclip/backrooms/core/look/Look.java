@@ -56,9 +56,15 @@ public final class Look {
 	 */
 	record Mood(int start, int end, float falloff) {
 		static final Mood LEVEL_0 = new Mood(3, 20, 0.38F), DEFAULT = new Mood(9, 44, 0.15F);
+		// Zenith Station is seen across: the singularity is some 180 blocks from the ring windows, the sea of rooms 60 out.
+		static final Mood ZENITH = new Mood(24, 320, 0.15F);
 
 		static Mood of(Identifier dimension) {
-			return dimension.getPath().equals("level_0") ? LEVEL_0 : DEFAULT;
+			return switch (dimension.getPath()) {
+				case "level_0" -> LEVEL_0;
+				case "level_0.1" -> ZENITH;
+				default -> DEFAULT;
+			};
 		}
 	}
 

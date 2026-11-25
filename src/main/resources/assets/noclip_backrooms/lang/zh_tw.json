@@ -565,7 +565,7 @@
   "entity.noclip_backrooms.beast_level5": "第五層野獸紳士",
   "item.noclip_backrooms.beast_level5_spawn_egg": "第五層野獸紳士生怪蛋",
   "pack.noclip_backrooms.realistic": "後室：寫實材質",
-  "pack.noclip_backrooms.realistic.description": "照片材質（試做：Level 0）",
+  "pack.noclip_backrooms.realistic.description": "照片材質（Level 0、0.1 與 2）",
   "key.category.noclip_backrooms.backrooms": "後室",
   "key.noclip_backrooms.camcorder": "攝影機濾鏡",
   "message.noclip_backrooms.camcorder_on": "攝影機濾鏡：開",
@@ -1101,5 +1101,9 @@
   "level.noclip_backrooms.2": "廢棄維修通道",
   "level.noclip_backrooms.3": "電力站",
   "hud.noclip_backrooms.floor": "第 %s 層",
-  "hud.noclip_backrooms.level_in_inventory": "Level %s · %s"
+  "hud.noclip_backrooms.level_in_inventory": "Level %s · %s",
+  "block.noclip_backrooms.noclip_wall": "異常錯位牆",
+  "message.noclip_backrooms.level2.heat_exit": "灼熱的空氣開始扭曲……前方的牆面彷彿在融化。",
+  "message.noclip_backrooms.level2.loop_exit": "走廊徹底錯位崩解，你直接穿出這條死路……",
+  "block.noclip_backrooms.hull_glass": "外殼玻璃"
 }

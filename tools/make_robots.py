@@ -186,7 +186,6 @@ def detail(draw, kind, palette, by):
             rect(draw, box, 0.08, 0.1 + k * 0.1, 0.18, 0.14 + k * 0.1, fill=(60, 200, 90, 255) if k == 0 else (200, 70, 60, 255))
     else:
         box = faces(by[("SHead", 0)])["front"]
-        rect(draw, box, 0.0, 0.0, 1.0, 1.0, fill=None)
         rect(draw, box, 0.12, 0.3, 0.42, 0.52, fill=(14, 14, 16, 255))  # a dead eye, crossed out
         draw.line((box[0] + (box[2] - box[0]) * 0.14, box[1] + (box[3] - box[1]) * 0.32, box[0] + (box[2] - box[0]) * 0.4, box[1] + (box[3] - box[1]) * 0.5), fill=(90, 90, 96, 255), width=2)
         rect(draw, box, 0.58, 0.3, 0.86, 0.52, fill=(240, 60, 44, 255))  # the red one
@@ -274,7 +273,17 @@ def main():
     art = ROOT / "art/robots"
     art.mkdir(parents=True, exist_ok=True)
     for kind in KINDS:
-        paint(kind, cubes).save(tex / f"{kind}.png")
+        image = paint(kind, cubes)
+        image.save(tex / f"{kind}.png")
+        if kind == "servant":
+            # Its one working eye, alone on black: the eyes layer adds it at full brightness, so it shows in the dark.
+            px = np.asarray(image.convert("RGBA")).astype(int)
+            red = np.zeros(px.shape[:2], bool)
+            for colour in ((240, 60, 44), (255, 190, 170)):  # the eye and its glint, exactly as detail() paints them
+                red |= (px[..., :3] == colour).all(-1)
+            eyes = np.zeros_like(px)
+            eyes[red] = px[red]
+            Image.fromarray(eyes.astype("uint8"), "RGBA").save(tex / "servant_eyes.png")
     (art / "robots_spec.json").write_text(json.dumps(spec, indent=1) + "\n", encoding="utf8")
     print("wrote", out, len(cubes), "boxes,", len(KINDS), "robots")
 

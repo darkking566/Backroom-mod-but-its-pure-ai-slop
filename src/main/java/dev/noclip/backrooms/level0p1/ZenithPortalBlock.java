@@ -7,7 +7,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
 /** A doorway of yellow wallpaper standing alone in an airlock: right-click it and you are back in Level 0. */
-final class ZenithPortalBlock extends LevelExitBlock {
+class ZenithPortalBlock extends LevelExitBlock {
 	static final IntegerProperty PART = IntegerProperty.create("part", 0, 1);
 
 	ZenithPortalBlock(Properties properties, Use use) {

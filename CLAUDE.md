@@ -186,6 +186,79 @@
   - 還沒做：開光影的實機截圖與設定調整（使用者的遊戲開著，先不跑 Gradle 測試）；`gradlew help` 確認 build.gradle 能讀
 - 開光影的實機測試（`-Plevels=look -Pshaders`）通過：Iris 載入後室版 Complementary 與推薦設定；燈下一圈暖光、沒燈處幾乎全黑，寫實材質與攝影機濾鏡在光影下都有作用；加 `ATM_FOG_DISTANCE=15` 後有燈處多一層霧氣、遠處朦朧、暗處沒變亮；推薦設定、`STYLE_GUIDE.md` 更新，新增 `docs/look/level0_shaders.jpg`
 - 使用者要搭配光影，幫使用者本機 `run/` 設好（三個原檔先備份到暫存區）：`run/shaderpacks/ComplementaryUnbound_r5.10_Backrooms.txt` 換成推薦設定（保留使用者的 `LIGHT_COLOR_MULTS`，彩色光追蹤改關）、`run/config/iris.properties` 光影改回開啟（使用者 16:15 照建議關掉過）；寫實材質包使用者 16:16 已經自己重新打開，沒改
+- 使用者要求全部推上 GitHub，並先把朋友的進度抓下來：
+  - 合併朋友新推的 13 個提交（Level 0 依 Antigravity 審查修紅房間落點等、整格的嵌入燈、補齊寫實材質包；Level 0.1 寫實材質、健身器材、滑門與大量修正；Level 2 的 512 像素寫實材質與隱藏出口）
+  - 衝突只在 `CLAUDE.md`（兩邊各自加的紀錄都保留）和兩個語言檔（兩邊條目都保留，共 1107 條；只有寫實材質包的說明兩邊不同，用朋友的）；`Level0Arrival` 自動合併，我的「全新一片」落點和朋友的紅房間落點檢查都在
+  - 合併後 `gradlew build`（76 個單元測試）與 `runClientGameTest -Plevels=floors,look` 通過
+  - 使用者同意後把 `main` 推送到 GitHub（層數系統、材料規劃與層數規則、畫面規範與每層 SOP、光影推薦設定與 `-Pshaders`、Gemini 之前未推的合成與 3D 模型等）；沒有強制推送、沒有改寫歷史
+- 照 Antigravity 的 Level 0 審查報告，使用者同意先修「會卡死或弄丟東西」的三項（動到朋友的 Level 0 程式）：
+  - 紅房間落點：`Level0Arrival` 原本靠探測 ±4 格的紅牆，大半紅房間格子測不到；改用迷宮種子直接判斷區域（`Level0Arrival.inRedRoom`），從主世界卡牆進來（`Noclip`）也加同樣的檢查
+  - 迷宮變形（`EdgeShift`）不再改掉 Level 0.1 的白色艙門：新增方塊標籤 `edge_shift_keep`（目前只有 `station_hatch`），Level 0 不用直接依賴 level0p1
+  - 黑影幻覺：生出來後加標籤，讀檔時清掉；關伺服器時也清（`ShadowHallucination`），不會再被存進地圖
+  - `gradlew build` 與 `runClientGameTest -Plevels=0` 通過；這三項沒有專門的測試（紅房間落點、關服清黑影都沒實機重現）
+  - 注意：本機 JDK 是 `C:/Program Files/Java/jdk-25.0.4.1`（之前紀錄寫的 `jdk-25.0.5.0.3` 不存在）
+- 使用者同意後修 Level 0 審查報告的畫面問題：
+  - 天花板水管可以轉向：新增 `level1/PipeBlock`（`axis` 屬性，預設 x，停車場的水管全部不變），`ceiling_pipe`、`leaking_ceiling_pipe` 的方塊狀態加 `axis=z` 轉 90 度；Level 0 樓梯間依房間旋轉設定方向（`StaircasePlan.pipe`），不再斷成一截一截；`make_level1.py` 同步
+  - Level 0.1 白色艙門有面向：新增 `StationHatchBlock`（`facing`），`ZenithEntrance` 用原本算好的空氣那一面；模型只有正面是艙門、其餘是 Level 0 壁紙；`make_level0p1.py` 同步（只寫了艙門的模型與方塊狀態，沒重跑整支）
+  - 寫實材質包補上淺色、紅色、粗糙熄燈壁紙（含踢腳板）、9 種剝落露紅壁紙、乾燥與厚地毯、紅日光燈與 EXIT 燈（EXIT 燈也改成嵌燈），共 79 張貼圖；水漬、霉斑、地毯污漬在方塊邊緣前淡出（`fade_edges`）；踢腳板沿長度方向不變（轉角重疊處不閃）；資源包從約 58 MB 變約 87 MB
+  - 重跑 `make_level0_realistic.py` 會覆寫 `pack.mcmeta`，已把工具裡的描述改成跟現在的檔案一樣（Level 0 & Level 2）
+  - 驗證：`gradlew build` 通過；實機測試 Level 0、畫面風格（look）、Level 0.1 的 `hatch,ways`、Level 1 全部段落通過。Level 1 的 `secrets`（巡邏隊）與 `hounds` 各失敗過一次、重跑通過，改動前的程式單跑 `hounds` 也會過，判斷是偶發；Level 0.1 完整跑會停在本來就壞的 `blocks` 段（console 掉落物）
+  - 沒在遊戲畫面上逐一看過：艙門正面方向、樓梯間水管接起來的樣子、新貼圖在遊戲裡的樣子（只看了貼圖預覽 `docs/look/level0_realistic.png`）
+  - 沒做：寫實包嵌燈在南北向燈帶仍會變成斑馬條紋（燈沒有方向）、馬尼拉桌與門、EXIT 門不能轉向
+- 使用者要求把上一條「沒做」的也做完：
+  - 寫實包嵌燈改成整格方形燈具（四邊都有框，`make_level0_realistic.troffer`），燈帶、2×2、3×3 燈盤不管哪個方向都接得起來，貼圖也不再被壓扁；只重寫了 4 個燈的模型
+  - 樓梯間：單獨擺的馬尼拉桌（八角桌的四分之一）換成停車場的辦公桌；馬尼拉櫃加 `single` 屬性，樓梯間的櫃子用四面都是抽屜的獨立櫃（`manila_cabinet_single`），馬尼拉房間的八角桌不變
+  - 馬尼拉門：兩面門板貼圖互為鏡像（門把從兩面看都在離鉸鏈遠的那側）；開門時門板繞鉸鏈轉到門框旁（伸進隔壁格的部分沒有碰撞），不再從門框中間穿過；上下半互相依賴，敲掉一半另一半一起掉，只有下半會掉門；上半沒有掉落物（刪掉 `manila_door_top` 的戰利品表）；放下門會自動放上半；兩種門的上半不再出現在創造模式物品欄
+  - EXIT 門、門上半與標誌加 `axis`（預設 x，世界生成不變），玩家放的會轉向
+  - `make_manila.py` 同步了門與櫃子的模型和方塊狀態（沒重跑；這支工具本來就有路徑問題，見審查報告）
+  - 驗證：`gradlew build`、`runClientGameTest -Plevels=0,look` 通過；截圖看到馬尼拉房間八角桌完整、EXIT 門正常；開門的樣子、樓梯間獨立櫃與辦公桌、生存模式敲門沒有逐一在遊戲裡看過
+- 照 Antigravity 的 Level 0.1 審查報告修第一批（最影響畫面的）：
+  - 欄杆連起來：新增 `data/minecraft/tags/block/fences.json`（安全欄杆、欄杆燈），`ZenithChunkGenerator.blockAt` 生成時依四面鄰格設定欄杆連接
+  - 牆面橫紋：拿掉一般牆板、寢室牆、廚房牆、隔艙壁貼圖裡每格都重複的踢腳板與色帶（`make_level0p1.py`，只重存這 4 種與變體）；損壞牆無洞的 v2 權重 5，大約六成是完整牆
+  - 方向：船員床改成有方向的方塊狀態（北牆的床枕頭朝牆）；控制室側牆控制台、健身室重訓架改用東西向；飲水機移到側牆、不再擋在沙包前；合併大廳東西牆的機櫃面向房內
+  - 攝影機濾鏡：Level 0.1 的霧改成 24～320 格（`Look.Mood.ZENITH`），環廊與天橋看得到奇點
+  - `gradlew build` 與 `runClientGameTest -Plevels=0.1 -Psections=rooms,atrium,middle,details,variants,stairs` 通過，截圖看過欄杆、牆面、奇點；更新 `docs/levels/level0p1/screens/` 8 張
+  - 還沒修（報告其餘項目）：雙格家具疊兩顆、雙開門圖案、小家具貼圖與 uv、合併／挑高／狹長房間的懸空與密室、外窗三層玻璃、選取框、自動門、停電高度、換世界後廣播靜音、機器人細節、`blocks` 測試段、挖掘標籤
+- Level 0.1 審查報告第二批：
+  - 冰箱、敞開衣櫃、水箱、置物櫃（寢室、廚房、儲藏室）改成只放 1 格高，不再上下疊兩顆一樣的（`ZenithLayout`）；沒有另做 2 格高的模型
+  - 自動門貼圖改成一格一扇：鉸鏈側是門框、另一側是門縫和一支把手，兩扇並排時鏡像成一組對開門（`make_level0p1.door_leaf`）
+  - 船員書桌加方向（`ZenithFacingBlock`，寢室的抽屜朝牆那側）；只有桌腳櫃正面有抽屜，其他面與桌面側邊改用新的素木貼圖 `desk_wood`
+  - 實驗袍改成 0.5 像素薄、有袖子的鏤空剪影，加深色邊讓它在白牆上看得出來
+  - 控制台、壞控制台的螢幕改成顯示整個畫面（加 `uv`、螢幕加高）
+  - 垂掛電纜的電線改成從頂到底連續，疊 2～3 格不會在中間斷掉又重長
+  - `Level0p1ClientTest` 新增 `props` 段（站外黑暗處擺一排家具拍近照，`-Psections=props`）；`gradlew build` 與 `rooms,details,doors,zones,props` 段實機測試通過，截圖看過門、書桌、控制台、實驗袍、電纜、床；新增 `docs/levels/level0p1/screens/props_*.png`
+  - `docs/levels/level0p1/screens/kitchen.png` 還是上一批拍的（置物櫃疊兩格的樣子），沒重拍
+- Level 0.1 審查報告第三批（房間變化版型的懸空與密室，`ZenithLayout`）：
+  - 壁掛物（相框、鏡子、吊鍋、倒數螢幕、實驗袍）背後不是房間外牆就不放（合併大廳打通的位置不再浮在半空）
+  - 挑高兩層房的一樓不放吊掛物（植物燈、垂藤、電纜、冰柱），因為上面沒有自己的天花板
+  - 下沉池：池邊保留地板，欄杆站在地板上；池底（下一層的天花板上）放第一層家具，其他家具也往下一格；吊掛物留在天花板下。原本池底第一層家具整個不見、欄杆懸在池邊上方
+  - 狹長深室：四個角落沒有門的 2×2 小空間填成牆（機器人不會再生在裡面）
+  - 隔間群：小門洞兩側那一格不放家具，不會被機櫃或種植架堵住
+  - 新增單元測試 `furnitureHangsOnSomethingAndNoPocketIsSealed`（壁掛物背後是牆、吊掛物往上一定碰到天花板、狹長深室角落是實心）；先用改之前的程式跑過，確認會失敗
+  - `gradlew build` 與 `runClientGameTest -Plevels=0.1 -Psections=rooms,variants,doors,robots` 通過，截圖看過合併大廳、挑高房、下沉池、隔間、狹長深室
+- 使用者同意推 5 個提交後，把 `main` 推送到 GitHub 到 `d2bf5cc` 為止（Antigravity 的 Level 2 寫實材質與隱藏出口 `3156447`、`68343bd`，我的 Level 0 卡死修正、畫面修正與補完 `74704bd`、`491a94e`、`d2bf5cc`）；Level 2 這兩個提交我沒重跑測試；之後的 3 個 Level 0.1 審查修正（`2e06b66`、`ab64a57`、`8e53852`）與這筆紀錄還沒推；沒有強制推送、沒有改寫歷史
+- Level 0.1 審查報告第四批：
+  - 外窗：只有最外層是有框的觀景玻璃，外殼內側幾層改成新方塊 `hull_glass`（無框、近乎透明、打不壞，`Kind.WINDOW_CLEAR`），看出去只剩一層窗框
+  - 停電：掃描高度從頭頂 10 格改成 48 格（挑高房、水培大廳的天花板燈也會熄、會亮回）
+  - 環境音：開新世界（`SERVER_STARTED`）時清掉上一個世界留下的計時，不再靜音很久
+  - 自動門：一扇開／關時，同面向、鉸鏈相反的隔壁那扇一起動（`ZenithDoorBlock.setOpen`）；門的開關聲改成站內的氣壓聲（`BlockSetType` 的開關音效），不再鐵門聲加活塞聲疊兩次。門還是原版的轉開，沒有做成滑門
+  - 機器人：拿掉服務機器人臉上的白框（`make_robots.py` 空的 `rect`）；服務機器人的紅眼加發光層 `servant_eyes.png`（`RobotRenderer`）；挨打與損毀改成鐵傀儡的金屬聲
+  - 選取框：`ZenithFacingBlock` 依方向轉選取框；壁掛物（相框、吊鍋、鏡子、倒數螢幕、實驗袍）的框貼在牆面；桌上雜物與疊盤的框往下 3 像素對準模型。放在一般地板上的雜物仍會陷進地板 3 像素（模型就是這樣做的）
+  - 挖掘標籤：書桌、相框、垂藤改用斧頭，苔蘚地板用鋤頭（新增 `mineable/hoe.json`），地毯、健身墊、墊子堆不屬於任何工具；`make_level0p1.update_tags` 依 `TOOL` 表寫入，重跑腳本不會再加回十字鎬
+  - `blocks` 測試段：會拆成材料的四種方塊（電纜、控制台、壞控制台、機櫃）改成檢查不會掉自己
+  - `gradlew build` 與完整 `runClientGameTest -Plevels=0.1`（全部段落，含 `blocks`）通過；看過窗外、停電、機器人、開門截圖，紅眼在截圖裡太小沒確認到，選取框沒有實際用準星看
+- 使用者同意後，把 `main` 推送到 GitHub（Level 0.1 審查報告四批修正 `2e06b66`、`ab64a57`、`8e53852`、`5af9bd6` 與紀錄）；推送前抓過 GitHub，沒有新提交要合併；`5af9bd6` 已跑過 `gradlew build` 與完整 Level 0.1 實機測試；沒有強制推送、沒有改寫歷史
+
+- 使用者要求把 Level 0.1 審查報告剩下的與之前「沒做」的也做完：
+  - 寫實材質包加 Level 0.1：新增 `tools/make_level0p1_realistic.py`（沿用 `make_level2_realistic.py` 的函式與已下載的 ambientCG CC0 照片），159 張 512 像素貼圖加 `_n`／`_s`（約 53 MB），保留原本的畫面設計、表面依材質（鋼、烤漆、布、地毯、木、水泥、冰、鏽）疊照片紋理；玻璃、燈、螢幕、奇點只放大；預覽 `docs/look/level0p1_realistic.png`；資源包描述改成「Level 0、0.1 與 2」
+  - 跑步機、臥推架重做模型（支架、扶手、斜面板；窄墊、後端立柱、槓鈴與槓片），選取框跟著改；健身房長椅加方向（`station_bench` 改 `ZenithFacingBlock`，健身房朝房內）
+  - 合併大廳原本隔牆的位置（第 10、17 格）不再放家具，不會有家具站在打通處中間
+  - 自動門改成滑門：開著時模型是空的（`station_door_slid`），沒有碰撞也選不到，看起來像滑進牆裡；沒做滑動動畫
+  - 桌上雜物（私人物品、疊盤）新增 `ZenithClutterBlock` 與 `on_table` 屬性：世界生成在桌上用往下 3 像素的模型，玩家放在桌子或書桌上也會自動用這個，放在一般地板上不再陷進去
+  - `Level0p1ClientTest` 的 `props` 段多拍兩張（健身器材、長椅、桌上與地上雜物；開著的對開門，並檢查另一扇一起開）；新增 `docs/levels/level0p1/screens/props_gym.png`、`props_open_door.png`
+  - `gradlew build` 與完整 `runClientGameTest -Plevels=0.1` 通過（65 張截圖），看過健身器材、雜物、開著的門與寫實材質牆面
+  - 沒確認到：服務機器人紅眼發光（截圖太小）、用準星逐一看選取框（只看到牆的框）
+- 使用者同意後，把 `main` 推送到 GitHub（`0403f71` Level 0.1 寫實材質、健身器材、滑門、桌上雜物等）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
@@ -318,3 +391,5 @@
       - 透過 `HudElementRegistry.replaceElement(VanillaHudElements.CROSSHAIR, ...)` 依武器動態繪製專屬準心（手槍／步槍四向擴散準心與開鏡紅點、霰彈圓環、電弧／火焰／音波括弧、光學狙擊鏡、魔法菱形符文準心與冷卻條、冷兵器戰術準心與格擋括弧／蓄力條）與 Hitmarker `×`
   - **驗證**：更新 `BackroomsCraftingTest.java` 驗證全 296 件 3D 物品模型、全 31 座 3D 方塊模型與 5 套穿戴 3D 防具貼圖，執行 `gradlew build` 與 `runClientGameTest -Plevels=look` 全部通過且客戶端日誌零模型／貼圖／Mixin 錯誤
 - 依使用者要求推送 `main` 至 GitHub（`origin/main`）：先合併遠端新增的 12 個提交（Level 0.1 細節／背景故事／房間海／多型態房間與 Level 2 怪物／設施／異常／場景細節，`36b45b4`），保留雙邊 `CLAUDE.md` 與 `en_us.json`／`zh_tw.json` 全部條目，驗證 `gradlew build` 通過後正常推送（無強制推送、無改寫歷史）
+- Level 2 延伸 512px 寫實材質包（Antigravity）：新增 `tools/make_level2_realistic.py` 採用 ambientCG CC0 照片素材（`Concrete034`/`019`、`Bricks075A`、`Metal032`/`049A`、`Rust004`、`Wood051`、`Ice003`、`Wallpaper002A/B/C`）產出 Level 2 全數 102 組 512×512 貼圖與 labPBR `_n`／`_s` 貼圖（共 306 張）至 `src/main/resources/resourcepacks/realistic/assets/noclip_backrooms/textures/block/level2/`，並產生前後對比圖 `docs/look/level2_realistic.png` 與更新 `pack.mcmeta` 及中英文語言檔說明；`.\gradlew test --tests "dev.noclip.backrooms.level2.*"` 與 `.\gradlew runClientGameTest -Plevels=2` 全部通過
+- Level 2 新增非門類型隱藏出口（Antigravity）：新增極端高溫區滯留 40 秒觸發 `LevelExits.use(player, "127")`（`Level2Heat.tickHeat`）、異常錯位牆 `noclip_wall`（`Level2NoclipWallBlock` 無碰撞可走入或右鍵互動，並於背牆實心處生成，觸發 `LevelExits.use(player, "2.1")`；含 `tools/make_level2_noclip_wall.py` 128px 貼圖與 `realistic` 512px labPBR 貼圖），以及辦公室死路空間迴圈連觸 3 次崩解送回 `"1"`（`Level2Heat.tickOfficeLoop`）；補上中英文提示詞並將 `noclip_wall` 判斷直接寫入 `Level2ChunkGenerator.block()` 確保 `blockAt` 與區塊生成一致；`.\gradlew test --tests "dev.noclip.backrooms.level2.*"` 與 `.\gradlew runClientGameTest -Plevels=2` 全部通過

@@ -1,6 +1,7 @@
 package dev.noclip.backrooms.level0;
 
 import dev.noclip.backrooms.level1.Level1Blocks;
+import dev.noclip.backrooms.level1.PipeBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeverBlock;
@@ -354,15 +355,23 @@ final class StaircasePlan {
 			return ModBlocks.CEILING_TILE.defaultBlockState();
 		}
 		if (y == UPPER_CEIL_Y - 1 && lv == 9) {
-			return (lu == 10 ? Level1Blocks.LEAKING_CEILING_PIPE : Level1Blocks.CEILING_PIPE).defaultBlockState();
+			return pipe(c, lu == 10, true);
 		}
 		if (y == UPPER_FLOOR_Y + 1 && inAlcove) {
 			if (lv == 8) return Level1Blocks.SUPPLY_CRATE.defaultBlockState();
 			return ModBlocks.MANILA_CABINET.defaultBlockState()
 					.setValue(ManilaCabinetBlock.FACING, c.worldDir(Direction.NORTH))
-					.setValue(ManilaCabinetBlock.OPENED, false);
+					.setValue(ManilaCabinetBlock.OPENED, false)
+						.setValue(ManilaCabinetBlock.SINGLE, true);
 		}
 		return Blocks.AIR.defaultBlockState();
+	}
+
+	/** A ceiling pipe running along local U (alongU) or local V, turned to match the complex's rotation. */
+	private static BlockState pipe(Complex c, boolean leaking, boolean alongU) {
+		boolean alongX = alongU == (c.rot() % 2 == 0);
+		return (leaking ? Level1Blocks.LEAKING_CEILING_PIPE : Level1Blocks.CEILING_PIPE).defaultBlockState()
+				.setValue(PipeBlock.AXIS, alongX ? Direction.Axis.X : Direction.Axis.Z);
 	}
 
 	private static BlockState utilityLoftBlockAt(Complex c, int lu, int y, int lv) {
@@ -392,9 +401,7 @@ final class StaircasePlan {
 		if (doorway) return Blocks.AIR.defaultBlockState();
 
 		if (y == UPPER_CEIL_Y - 1 && (lu == 9 || lu == 15) && lv >= 5 && lv <= 15) {
-			return (lu == 9 && lv == 13)
-					? Level1Blocks.LEAKING_CEILING_PIPE.defaultBlockState()
-					: Level1Blocks.CEILING_PIPE.defaultBlockState();
+			return pipe(c, lu == 9 && lv == 13, false);
 		}
 
 		// Electrical breaker assembly against east wall (lu=16, lv=10).
@@ -422,7 +429,8 @@ final class StaircasePlan {
 			if (lu == 11 && lv == 14) {
 				return ModBlocks.MANILA_CABINET.defaultBlockState()
 						.setValue(ManilaCabinetBlock.FACING, c.worldDir(Direction.NORTH))
-						.setValue(ManilaCabinetBlock.OPENED, false);
+						.setValue(ManilaCabinetBlock.OPENED, false)
+						.setValue(ManilaCabinetBlock.SINGLE, true);
 			}
 			if (lu == 12 && lv == 14) return Level1Blocks.SUPPLY_CRATE.defaultBlockState();
 		}
@@ -470,8 +478,7 @@ final class StaircasePlan {
 		// Desk overlooking the glass window + supplies.
 		if (y == UPPER_FLOOR_Y + 1) {
 			if (lu == 15 && lv == 6) {
-				return ModBlocks.MANILA_TABLE.defaultBlockState()
-						.setValue(ManilaFurnitureBlock.FACING, c.worldDir(Direction.WEST));
+				return Level1Blocks.OFFICE_DESK.defaultBlockState();
 			}
 			if (lu == 14 && lv == 6) {
 				return ModBlocks.MANILA_CHAIR.defaultBlockState()
@@ -480,7 +487,8 @@ final class StaircasePlan {
 			if (lu == 15 && lv == 13) {
 				return ModBlocks.MANILA_CABINET.defaultBlockState()
 						.setValue(ManilaCabinetBlock.FACING, c.worldDir(Direction.WEST))
-						.setValue(ManilaCabinetBlock.OPENED, false);
+						.setValue(ManilaCabinetBlock.OPENED, false)
+						.setValue(ManilaCabinetBlock.SINGLE, true);
 			}
 			if (lu == 15 && lv == 14) return Level1Blocks.SUPPLY_CRATE.defaultBlockState();
 		}
@@ -535,8 +543,7 @@ final class StaircasePlan {
 		}
 		// Keep Void Stone immediately behind the closed door too (covered by alcove wall lu=10, lv=6!).
 		if (lu == 9 && lv == 12 && y == UPPER_FLOOR_Y + 1) {
-			return ModBlocks.MANILA_TABLE.defaultBlockState()
-					.setValue(ManilaFurnitureBlock.FACING, c.worldDir(Direction.NORTH));
+			return Level1Blocks.OFFICE_DESK.defaultBlockState();
 		}
 		if (lu == 9 && lv == 12 && y == UPPER_FLOOR_Y + 2) {
 			return ModBlocks.FIELD_NOTE.defaultBlockState()
@@ -592,20 +599,18 @@ final class StaircasePlan {
 		if (doorway) return Blocks.AIR.defaultBlockState();
 
 		if (y == BASEMENT_CEIL_Y - 1 && (lu == 13 || lu == 16) && lv >= 5 && lv <= 15) {
-			return (lu == 13 && lv == 10)
-					? Level1Blocks.LEAKING_CEILING_PIPE.defaultBlockState()
-					: Level1Blocks.CEILING_PIPE.defaultBlockState();
+			return pipe(c, lu == 13 && lv == 10, false);
 		}
 		if (y == dryFloor + 1) {
 			if (lu == 17 && lv == 9) return Level1Blocks.SUPPLY_CRATE.defaultBlockState();
 			if (lu == 17 && lv == 11) {
 				return ModBlocks.MANILA_CABINET.defaultBlockState()
 						.setValue(ManilaCabinetBlock.FACING, c.worldDir(Direction.WEST))
-						.setValue(ManilaCabinetBlock.OPENED, false);
+						.setValue(ManilaCabinetBlock.OPENED, false)
+						.setValue(ManilaCabinetBlock.SINGLE, true);
 			}
 			if (lu == 17 && lv == 10) {
-				return ModBlocks.MANILA_TABLE.defaultBlockState()
-						.setValue(ManilaFurnitureBlock.FACING, c.worldDir(Direction.WEST));
+				return Level1Blocks.OFFICE_DESK.defaultBlockState();
 			}
 		}
 		if (y == dryFloor + 2 && lu == 17 && lv == 10) {

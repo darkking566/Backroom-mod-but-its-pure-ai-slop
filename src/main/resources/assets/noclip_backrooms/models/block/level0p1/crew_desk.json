@@ -3,6 +3,7 @@
   "textures": {
     "top": "noclip_backrooms:block/level0p1/desk_top",
     "side": "noclip_backrooms:block/level0p1/desk_side",
+    "wood": "noclip_backrooms:block/level0p1/desk_wood",
     "lamp": "noclip_backrooms:block/level0p1/desk_lamp",
     "steel": "noclip_backrooms:block/level0p1/bar_steel",
     "particle": "noclip_backrooms:block/level0p1/desk_top"
@@ -24,19 +25,19 @@
           "texture": "#top"
         },
         "down": {
-          "texture": "#side"
+          "texture": "#wood"
         },
         "north": {
-          "texture": "#side"
+          "texture": "#wood"
         },
         "south": {
-          "texture": "#side"
+          "texture": "#wood"
         },
         "east": {
-          "texture": "#side"
+          "texture": "#wood"
         },
         "west": {
-          "texture": "#side"
+          "texture": "#wood"
         }
       }
     },
@@ -62,49 +63,19 @@
           ]
         },
         "south": {
-          "texture": "#side",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
+          "texture": "#wood"
         },
         "east": {
-          "texture": "#side",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
+          "texture": "#wood"
         },
         "west": {
-          "texture": "#side",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
+          "texture": "#wood"
         },
         "up": {
-          "texture": "#side",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
+          "texture": "#wood"
         },
         "down": {
-          "texture": "#side",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
+          "texture": "#wood"
         }
       }
     },
@@ -130,49 +101,19 @@
           ]
         },
         "south": {
-          "texture": "#side",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
+          "texture": "#wood"
         },
         "east": {
-          "texture": "#side",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
+          "texture": "#wood"
         },
         "west": {
-          "texture": "#side",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
+          "texture": "#wood"
         },
         "up": {
-          "texture": "#side",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
+          "texture": "#wood"
         },
         "down": {
-          "texture": "#side",
-          "uv": [
-            0,
-            0,
-            16,
-            16
-          ]
+          "texture": "#wood"
         }
       }
     },

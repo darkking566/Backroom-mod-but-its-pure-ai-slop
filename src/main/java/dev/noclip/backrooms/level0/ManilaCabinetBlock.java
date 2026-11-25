@@ -31,21 +31,23 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 final class ManilaCabinetBlock extends Block {
 	static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 	static final BooleanProperty OPENED = BlockStateProperties.OPEN;
+	/** On its own (the staircase rooms) rather than a quarter of the Manila Room's table. */
+	static final BooleanProperty SINGLE = BooleanProperty.create("single");
 	private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 16, 16);
 
 	ManilaCabinetBlock(Properties properties) {
 		super(properties);
-		registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(OPENED, false));
+		registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(OPENED, false).setValue(SINGLE, false));
 	}
 
 	@Override
 	protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-		builder.add(FACING, OPENED);
+		builder.add(FACING, OPENED, SINGLE);
 	}
 
 	@Override
 	public BlockState getStateForPlacement(BlockPlaceContext context) {
-		return defaultBlockState().setValue(FACING, context.getHorizontalDirection()).setValue(OPENED, false);
+		return defaultBlockState().setValue(FACING, context.getHorizontalDirection()).setValue(OPENED, false).setValue(SINGLE, true);
 	}
 
 	@Override

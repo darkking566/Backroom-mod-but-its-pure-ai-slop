@@ -40,33 +40,45 @@
     },
     {
       "from": [
+        1.55,
         0,
-        0,
-        1
+        9.2
       ],
       "to": [
-        2.4,
+        3.95,
         16,
-        15
+        23.7
       ],
       "faces": {
-        "north": {
-          "texture": "#leaf"
-        },
-        "south": {
-          "texture": "#leaf"
+        "west": {
+          "texture": "#leaf",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "east": {
-          "texture": "#leaf"
+          "texture": "#leaf",
+          "uv": [
+            16,
+            0,
+            0,
+            16
+          ]
         },
-        "west": {
-          "texture": "#leaf"
+        "north": {
+          "texture": "#wood"
+        },
+        "south": {
+          "texture": "#wood"
         },
         "up": {
-          "texture": "#leaf"
+          "texture": "#wood"
         },
         "down": {
-          "texture": "#leaf"
+          "texture": "#wood"
         }
       }
     }

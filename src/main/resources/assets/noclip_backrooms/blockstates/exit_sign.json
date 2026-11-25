@@ -1,7 +1,11 @@
 {
   "variants": {
-    "": {
+    "axis=x": {
       "model": "noclip_backrooms:block/level0/exit_sign"
+    },
+    "axis=z": {
+      "model": "noclip_backrooms:block/level0/exit_sign",
+      "y": 90
     }
   }
 }

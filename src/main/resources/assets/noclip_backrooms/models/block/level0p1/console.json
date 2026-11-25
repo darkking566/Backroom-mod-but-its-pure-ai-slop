@@ -43,16 +43,22 @@
       "from": [
         1,
         8,
-        9
+        11
       ],
       "to": [
         15,
-        12,
-        15
+        14,
+        14
       ],
       "faces": {
         "north": {
           "texture": "#screen",
+          "uv": [
+            0,
+            1,
+            16,
+            13
+          ],
           "light_emission": 12
         },
         "south": {

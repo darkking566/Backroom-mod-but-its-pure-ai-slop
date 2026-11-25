@@ -565,7 +565,7 @@
   "entity.noclip_backrooms.beast_level5": "The Beast of Level 5",
   "item.noclip_backrooms.beast_level5_spawn_egg": "The Beast of Level 5 Spawn Egg",
   "pack.noclip_backrooms.realistic": "Backrooms: Realistic Textures",
-  "pack.noclip_backrooms.realistic.description": "Photo-based textures (first sample: Level 0)",
+  "pack.noclip_backrooms.realistic.description": "Photo-based textures (Level 0, 0.1 & 2)",
   "key.category.noclip_backrooms.backrooms": "Backrooms",
   "key.noclip_backrooms.camcorder": "Camcorder Filter",
   "message.noclip_backrooms.camcorder_on": "Camcorder filter on",
@@ -1101,5 +1101,9 @@
   "level.noclip_backrooms.2": "Abandoned Utility Halls",
   "level.noclip_backrooms.3": "Electrical Station",
   "hud.noclip_backrooms.floor": "Floor %s",
-  "hud.noclip_backrooms.level_in_inventory": "Level %s · %s"
+  "hud.noclip_backrooms.level_in_inventory": "Level %s · %s",
+  "block.noclip_backrooms.noclip_wall": "Unstable Concrete Wall",
+  "message.noclip_backrooms.level2.heat_exit": "The blistering heat bends the air... the tunnel ahead seems to melt.",
+  "message.noclip_backrooms.level2.loop_exit": "The hall folds in on itself—you slip straight through the floor...",
+  "block.noclip_backrooms.hull_glass": "Hull Glass"
 }

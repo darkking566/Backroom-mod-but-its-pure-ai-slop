@@ -42,7 +42,7 @@ final class ZenithLayout {
 	private static final long BULK_OUT2 = (long) (RI + SKIN + PROMENADE + 1) * (RI + SKIN + PROMENADE + 1);
 
 	enum Kind {
-		AIR(true), HULL, HULL_SEAM, SKIN_PLATE, WINDOW, BULKHEAD,
+		AIR(true), HULL, HULL_SEAM, SKIN_PLATE, WINDOW, WINDOW_CLEAR, BULKHEAD,
 		FLOOR, FLOOR_CORRIDOR, FLOOR_STRIPE, FLOOR_QUARTERS, FLOOR_KITCHEN, FLOOR_GYM, FLOOR_GARDEN, FLOOR_WORN, FLOOR_HAZARD, FLOOR_FROST, FLOOR_SCORCH,
 		CEILING, LIGHT, DEAD_LIGHT, CEILING_FROST, CEILING_SCORCH,
 		WALL, WALL_QUARTERS, WALL_KITCHEN, WALL_GYM, WALL_DAMAGED, WALL_FROST, WALL_SCORCH,
@@ -140,7 +140,8 @@ final class ZenithLayout {
 	// The outer hull
 
 	private static int hull(long seed, int x, int y, int z, long d2) {
-		if (window(seed, x, y, z, d2)) return of(Kind.WINDOW);
+		// Only the outer face of a window has a framed pane; the hull's inner layers are clear glass, so it reads as one window, not three.
+		if (window(seed, x, y, z, d2)) return of(d2 >= OUTER2 ? Kind.WINDOW : Kind.WINDOW_CLEAR);
 		boolean seam = (x & 15) == 0 || (y & 15) == 0 || (z & 15) == 0;
 		if (d2 >= OUTER2) return of(seam ? Kind.HULL_SEAM : Kind.HULL);
 		return of(((x + y + z) & 7) == 0 ? Kind.HULL_SEAM : Kind.HULL);
@@ -352,7 +353,13 @@ final class ZenithLayout {
 		int rx = x - (info.minMx * MODULE + 4);
 		int rz = z - (info.minMz * MODULE + 4);
 		if (info.shape == Shape.DOUBLE_UPPER) return doubleUpperCell(seed, x, z, rx, rz, W, H, t, info);
-		if (t == 0) return roomFloor(seed, x, z, rx, rz, W, H, info);
+		if (t == 0) {
+			int f = roomFloor(seed, x, z, rx, rz, W, H, info);
+			// The pit's bottom is the deck below's ceiling: furniture stands right on it, one block down.
+			if (info.shape == Shape.SUNKEN_PIT && kind(f) == Kind.AIR && !isCrossSlot(rx, W) && !isCrossSlot(rz, H))
+				return pitFurniture(seed, info.room, mx, mz, k, rx, rz, W, H, 0);
+			return f;
+		}
 		boolean wallW = rx == 0, wallE = rx == W - 1, wallN = rz == 0, wallS = rz == H - 1;
 		if (wallW || wallE || wallN || wallS) return wall(seed, info, k, rx, rz, W, H, t, wallW, wallE, wallN, wallS);
 		return roomInterior(seed, x, z, mx, mz, k, rx, rz, W, H, t, info);
@@ -409,7 +416,8 @@ final class ZenithLayout {
 			if (rz == H - 4 && crossX) return of(Kind.STAIR, 2);
 			if (rx == 3 && crossZ) return of(Kind.STAIR, 3);
 			if (rx == W - 4 && crossZ) return of(Kind.STAIR, 1);
-			return of(Kind.AIR);
+			// The rim keeps its floor, so its rails stand on something; only the inside is sunk.
+			if (rx >= 4 && rx <= W - 5 && rz >= 4 && rz <= H - 5) return of(Kind.AIR);
 		}
 		boolean hazard = info.room == Room.AIRLOCK && rx >= 3 && rx <= 8 && rz >= 3 && rz <= 8;
 		return floor(seed, x, z, rx + 4, rz + 4, false, info.zone, info.room, hazard);
@@ -627,6 +635,8 @@ final class ZenithLayout {
 		}
 
 		if (shape == Shape.NARROW_HALL) {
+			// The corners between the hall's walls and the room's would be closed 2x2 cells with no way in: fill them.
+			if ((rz <= 2 || rz >= H - 3) && (rx <= 2 || rx >= W - 3)) return wallBlock;
 			boolean alongX = W > H || (W == H && (info.variant & 1) == 0);
 			if (alongX) {
 				if ((rz == 3 || rz == H - 4) && !isCrossSlot(rx, W)) return wallBlock;
@@ -644,6 +654,8 @@ final class ZenithLayout {
 			boolean subDoorX = rz == 2 || rz == H - 3 || (H > 12 && (rz == 18 || rz == 19));
 			boolean subDoorZ = rx == 2 || rx == W - 3 || (W > 12 && (rx == 18 || rx == 19));
 			boolean divider = (wallX && !subDoorX) || (wallZ && !subDoorZ);
+			// Keep the cell either side of each small doorway clear, or a rack or cabinet stands in it.
+			if (subDoorX && (cubicleCol(rx - 1, W) || cubicleCol(rx + 1, W)) || subDoorZ && (cubicleCol(rz - 1, H) || cubicleCol(rz + 1, H))) return of(Kind.AIR);
 			if (divider && (!halfWall || t <= 3)) return wallBlock;
 			if (divider) return of(Kind.AIR);
 		}
@@ -664,8 +676,7 @@ final class ZenithLayout {
 			if (onRim) return of(Kind.AIR);
 			if (rx >= 4 && rx <= W - 5 && rz >= 4 && rz <= H - 5) {
 				if (isCrossSlot(rx, W) || isCrossSlot(rz, H)) return of(Kind.AIR);
-				// Furniture inside the sunken pit rests one block lower (t=1 maps to t=0).
-				return t <= 5 ? furnishCoords(seed, room, mx, mz, k, rx, rz, W, H, t + 1) : of(Kind.AIR);
+				return pitFurniture(seed, room, mx, mz, k, rx, rz, W, H, t);
 			}
 		}
 
@@ -690,10 +701,44 @@ final class ZenithLayout {
 		}
 
 		if (W == 28 && H == 28 && (rx == 11 || rx == 16) && (rz == 11 || rz == 16)) return wallBlock;
-		return furnishCoords(seed, room, mx, mz, k, rx, rz, W, H, t);
+		int cell = furnishCoords(seed, room, mx, mz, k, rx, rz, W, H, t);
+		// A two-storey room has no ceiling of its own: what would hang from it is left out.
+		if (shape == Shape.DOUBLE_LOWER && hangsFromCeiling(kind(cell))) return of(Kind.AIR);
+		return cell;
 	}
 
+	private static boolean cubicleCol(int c, int size) {
+		return c == 4 || c == size - 5 || (size > 12 && (c == 11 || c == 16));
+	}
+
+	static boolean hangsFromCeiling(Kind kind) {
+		return kind == Kind.GROW_LIGHT || kind == Kind.VINES || kind == Kind.CABLES || kind == Kind.ICICLES;
+	}
+
+	static boolean hangsOnWall(Kind kind) {
+		return kind == Kind.FRAME || kind == Kind.MIRROR || kind == Kind.POTS || kind == Kind.SCREEN || kind == Kind.COAT;
+	}
+
+	/** Inside a sunken pit floor furniture rests one block lower; what hangs from the ceiling stays at the ceiling. */
+	private static int pitFurniture(long seed, Room room, int mx, int mz, int k, int rx, int rz, int W, int H, int t) {
+		int up = t >= 1 ? furnishCoords(seed, room, mx, mz, k, rx, rz, W, H, t) : of(Kind.AIR);
+		if (hangsFromCeiling(kind(up))) return up;
+		int down = t <= 5 ? furnishCoords(seed, room, mx, mz, k, rx, rz, W, H, t + 1) : of(Kind.AIR);
+		return hangsFromCeiling(kind(down)) ? of(Kind.AIR) : down;
+	}
+
+	/** A bay's furniture, minus anything hung on a wall that is not there (a merged hall opens up the bays' inner walls). */
 	private static int furnishCoords(long seed, Room room, int mx, int mz, int k, int rx, int rz, int W, int H, int t) {
+		// In a merged hall the bays' inner walls are gone: what stood against them would stand in the middle of the hall.
+		if (W > 12 && (rx == 10 || rx == 17) || H > 12 && (rz == 10 || rz == 17)) return of(Kind.AIR);
+		int cell = furnishBay(seed, room, mx, mz, k, rx, rz, W, H, t);
+		if (!hangsOnWall(kind(cell))) return cell;
+		int d = dir(cell); // the wall is behind, opposite the way it faces
+		int bx = rx - (d == 1 ? 1 : d == 3 ? -1 : 0), bz = rz - (d == 2 ? 1 : d == 0 ? -1 : 0);
+		return bx <= 0 || bx >= W - 1 || bz <= 0 || bz >= H - 1 ? cell : of(Kind.AIR);
+	}
+
+	private static int furnishBay(long seed, Room room, int mx, int mz, int k, int rx, int rz, int W, int H, int t) {
 		if (isCrossSlot(rx, W) || isCrossSlot(rz, H)) return of(Kind.AIR);
 		int bx = rx <= 10 ? rx : (rx >= 17 ? rx - 16 : -1);
 		int bz = rz <= 10 ? rz : (rz >= 17 ? rz - 16 : -1);
@@ -705,7 +750,7 @@ final class ZenithLayout {
 			if (r % 3 != 0) return of(Kind.AIR);
 			return switch (room) {
 				case GREENHOUSE -> of(Kind.PLANTER);
-				case MACHINES, CONSOLES -> of(Kind.SERVER, rz == 1 ? 2 : 0);
+				case MACHINES, CONSOLES -> of(Kind.SERVER, rz == 1 ? 2 : rz == H - 2 ? 0 : rx == 1 ? 1 : 3);
 				case KITCHEN, BEDROOM -> of(Kind.TABLE);
 				default -> of(Kind.CRATE);
 			};
@@ -718,9 +763,9 @@ final class ZenithLayout {
 		return switch (room) {
 			case BEDROOM -> bedroom(a, b, t, faceV, roll, hash(seed, mx, mz, k + 31));
 			case KITCHEN -> kitchen(a, b, t, faceV, roll);
-			case GYM -> gym(a, b, t, faceV, roll);
+			case GYM -> gym(a, b, t, faceV, faceU, roll);
 			case GREENHOUSE -> greenhouse(a, b, t, faceV, roll);
-			case CONSOLES -> consoles(a, b, t, faceV);
+			case CONSOLES -> consoles(a, b, t, faceV, faceU);
 			case LAB -> lab(a, b, t, faceV, faceU, roll);
 			case MACHINES -> machines(a, b, t, faceU);
 			case STORAGE -> storage(a, b, t, faceV, roll);
@@ -736,10 +781,11 @@ final class ZenithLayout {
 		// A picture over the middle bed.
 		if (t == 2 && b == 0 && a == 1 && room % 4 != 3) return of(Kind.FRAME, face);
 		// A wardrobe standing open, or the plain locker.
-		if (b == 0 && a == 3 && t <= 2) return room % 2 == 0 ? of(Kind.WARDROBE, face) : of(Kind.LOCKER, face, t - 1);
+		// One block tall: the models are whole pieces, and a second one on top reads as two stacked.
+		if (b == 0 && a == 3 && t == 1) return room % 2 == 0 ? of(Kind.WARDROBE, face) : of(Kind.LOCKER, face);
 		// A desk with a lamp, or the plain table with someone's things on it.
 		if (a == 2 && b == 3 && roll % 2 == 0) {
-			if (t == 1) return of(room % 2 == 0 ? Kind.DESK : Kind.TABLE);
+			if (t == 1) return room % 2 == 0 ? of(Kind.DESK, (face + 2) % 4) : of(Kind.TABLE); // drawers toward the wall side
 			if (t == 2 && room % 2 != 0) return of(Kind.ITEMS);
 		}
 		return of(Kind.AIR);
@@ -753,19 +799,19 @@ final class ZenithLayout {
 			if (t == 1) return of(Kind.TABLE);
 			if (t == 2) return of(Kind.DISHES);
 		}
-		if (a == 3 && b == 3 && t <= 2) return roll % 2 == 0 ? of(Kind.FRIDGE, face) : of(Kind.LOCKER, face, t - 1);
+		if (a == 3 && b == 3 && t == 1) return roll % 2 == 0 ? of(Kind.FRIDGE, face) : of(Kind.LOCKER, face);
 		return of(Kind.AIR);
 	}
 
-	private static int gym(int a, int b, int t, int face, int roll) {
+	private static int gym(int a, int b, int t, int face, int faceU, int roll) {
 		if (t == 1 && b == 0 && a <= 2) return of(Kind.TREADMILL, face);
 		if (t == 2 && b == 0 && a == 1) return of(Kind.MIRROR, face);
-		if (t == 1 && b == 3 && a == 0) return of(Kind.WEIGHTS, face);
+		if (t == 1 && b == 3 && a == 0) return of(Kind.WEIGHTS, faceU);
 		if (t == 1 && b == 3 && a == 1) return of(Kind.BENCH_PRESS, face);
 		if (t == 1 && a == 3 && b == 0) return of(Kind.BAG);
-		if (t == 1 && a == 3 && b == 1) return of(Kind.DISPENSER, face);
+		if (t == 1 && a == 0 && b == 1) return of(Kind.DISPENSER, faceU);
 		if (t == 1 && a == 2 && b == 3 && roll % 2 == 0) return of(Kind.MATS);
-		if (t == 1 && a == 3 && b == 3 && roll % 2 == 0) return of(Kind.BENCH);
+		if (t == 1 && a == 3 && b == 3 && roll % 2 == 0) return of(Kind.BENCH, faceU); // long side toward the wall side
 		return of(Kind.AIR);
 	}
 
@@ -776,16 +822,16 @@ final class ZenithLayout {
 			if (t == 1) return of(Kind.PLANTER);
 			if (t == 2 && roll % 3 != 0) return of(Kind.LEAVES);
 		}
-		if (a == 3 && b == 0 && t <= 2) return of(Kind.TANK, face);
+		if (a == 3 && b == 0 && t == 1) return of(Kind.TANK, face);
 		if (t == 6 && a == 3 && b == 3) return of(Kind.ORB);
 		if (t == 6 && a == 1 && (b == 1 || b == 3)) return of(Kind.GROW_LIGHT);
 		if (t == 5 && a == 1 && (b == 1 || b == 3) && roll % 2 == 0) return of(Kind.VINES);
 		return of(Kind.AIR);
 	}
 
-	private static int consoles(int a, int b, int t, int face) {
+	private static int consoles(int a, int b, int t, int face, int faceU) {
 		if (t == 1 && b == 0) return of(Kind.CONSOLE, face);
-		if (t == 1 && a == 0 && b == 1) return of(Kind.CONSOLE, face);
+		if (t == 1 && a == 0 && b == 1) return of(Kind.CONSOLE, faceU);
 		// A wall screen above the consoles, stopped at zero.
 		if (t == 2 && b == 0 && a == 2) return of(Kind.SCREEN, face);
 		return of(Kind.AIR);
@@ -824,7 +870,6 @@ final class ZenithLayout {
 
 	private static int storage(int a, int b, int t, int face, int roll) {
 		if (t == 1 && b == 0) return roll % 2 == 0 ? of(Kind.LOCKER, face) : of(Kind.CRATE);
-		if (t == 2 && b == 0 && roll % 2 == 0) return of(Kind.LOCKER, face, 1);
 		if (t == 1 && roll % 4 == 0) return of(Kind.CRATE);
 		if (t == 2 && roll % 11 == 0) return of(Kind.CRATE);
 		return of(Kind.AIR);

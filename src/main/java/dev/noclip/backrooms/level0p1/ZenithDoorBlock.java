@@ -1,16 +1,23 @@
 package dev.noclip.backrooms.level0p1;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
-/** A sliding door of the station: ZenithDoors opens it when you come near, and it closes itself when nobody is. */
+/** A sliding door of the station (open, it is drawn slid away into the wall): ZenithDoors opens it when you come near, and it closes itself when nobody is. */
 final class ZenithDoorBlock extends DoorBlock {
 	private static final int CHECK = 24;
 
@@ -20,8 +27,35 @@ final class ZenithDoorBlock extends DoorBlock {
 
 	@Override
 	public void setOpen(Entity entity, Level level, BlockState state, BlockPos pos, boolean open) {
+		if (state.getValue(HALF) == DoubleBlockHalf.UPPER) {
+			pos = pos.below();
+			state = level.getBlockState(pos);
+			if (!state.is(this)) return;
+		}
 		super.setOpen(entity, level, state, pos, open);
 		if (open && level instanceof ServerLevel serverLevel) serverLevel.scheduleTick(pos, this, CHECK);
+		// The other leaf of a pair moves with this one (quietly: one sound for the pair). The upper half follows by itself.
+		Direction facing = state.getValue(FACING);
+		for (Direction side : new Direction[] {facing.getClockWise(), facing.getCounterClockWise()}) {
+			BlockPos other = pos.relative(side);
+			BlockState leaf = level.getBlockState(other);
+			if (leaf.is(this) && leaf.getValue(HALF) == DoubleBlockHalf.LOWER && leaf.getValue(FACING) == facing
+					&& leaf.getValue(HINGE) != state.getValue(HINGE) && leaf.getValue(OPEN) != open) {
+				level.setBlock(other, leaf.setValue(OPEN, open), Block.UPDATE_CLIENTS | Block.UPDATE_IMMEDIATE);
+				if (open && level instanceof ServerLevel serverLevel) serverLevel.scheduleTick(other, this, CHECK);
+			}
+		}
+	}
+
+	// An open door has slid into the wall (its open model is empty): nothing left to bump into or aim at.
+	@Override
+	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+		return state.getValue(OPEN) ? Shapes.empty() : super.getShape(state, level, pos, context);
+	}
+
+	@Override
+	protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+		return state.getValue(OPEN) ? Shapes.empty() : super.getCollisionShape(state, level, pos, context);
 	}
 
 	@Override

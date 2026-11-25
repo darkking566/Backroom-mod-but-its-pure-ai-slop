@@ -78,7 +78,9 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 		}
 		int h = y - FLOOR_Y; // 1..4
 		return switch (tile.kind()) {
-			case WALL -> wall(seed, x, z);
+			case WALL -> (h == 1 || h == 2) && Level2Layout.isNoclipWall(seed, x, z)
+					? state(Level2Blocks.NOCLIP_WALL)
+					: wall(seed, x, z);
 			case VOID_WALL -> state(Level2Blocks.VOID_CONCRETE);
 			case FLOOR -> floorBlock(seed, x, z, h);
 			case ROOM -> roomBlock(seed, x, z, h);

@@ -26,7 +26,8 @@ final class ZenithBlackouts {
 	private static final int FIRST_DELAY = 3 * 60 * 20, DELAY = 6 * 60 * 20, DELAY_SPREAD = 4 * 60 * 20;
 	private static final int DARK = 20 * 20, DARK_SPREAD = 30 * 20;
 	private static final int WARNING = 80, RESTORING = 40;
-	private static final int REACH = 24, BELOW = 6, ABOVE = 10;
+	// ABOVE reaches a two-storey room's ceiling (14) and the hydroponic atrium's (46) from their floors.
+	private static final int REACH = 24, BELOW = 6, ABOVE = 48;
 	private static final int SYNC_INTERVAL = 20, NORMAL_SYNC_INTERVAL = 100;
 
 	enum Phase {

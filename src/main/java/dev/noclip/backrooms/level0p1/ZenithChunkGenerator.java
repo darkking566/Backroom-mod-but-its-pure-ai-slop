@@ -16,6 +16,7 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -51,7 +52,20 @@ final class ZenithChunkGenerator extends ChunkGenerator {
 	}
 
 	static BlockState blockAt(long seed, int x, int y, int z) {
-		return state(ZenithLayout.cell(seed, x, y, z));
+		int cell = ZenithLayout.cell(seed, x, y, z);
+		BlockState state = state(cell);
+		Kind kind = ZenithLayout.kind(cell);
+		// Rails are fences: they only join up if their arms are set here, since world generation never updates neighbours.
+		if (kind == Kind.RAIL || kind == Kind.RAIL_LAMP) {
+			state = state.setValue(FenceBlock.NORTH, rail(seed, x, y, z - 1)).setValue(FenceBlock.SOUTH, rail(seed, x, y, z + 1))
+					.setValue(FenceBlock.WEST, rail(seed, x - 1, y, z)).setValue(FenceBlock.EAST, rail(seed, x + 1, y, z));
+		}
+		return state;
+	}
+
+	private static boolean rail(long seed, int x, int y, int z) {
+		Kind kind = ZenithLayout.kind(ZenithLayout.cell(seed, x, y, z));
+		return kind == Kind.RAIL || kind == Kind.RAIL_LAMP;
 	}
 
 	// The sea outside is Level 0's own blocks (the lamps still burn), looked up by name so Level 0 keeps them private.
@@ -70,6 +84,7 @@ final class ZenithChunkGenerator extends ChunkGenerator {
 			case HULL_SEAM -> ZenithBlocks.HULL_SEAM.defaultBlockState();
 			case SKIN_PLATE -> ZenithBlocks.INNER_HULL_PLATE.defaultBlockState();
 			case WINDOW -> ZenithBlocks.OBSERVATION_GLASS.defaultBlockState();
+			case WINDOW_CLEAR -> ZenithBlocks.HULL_GLASS.defaultBlockState();
 			case BULKHEAD -> ZenithBlocks.BULKHEAD.defaultBlockState();
 			case FLOOR -> ZenithBlocks.DECK_FLOOR.defaultBlockState();
 			case FLOOR_CORRIDOR -> ZenithBlocks.CORRIDOR_FLOOR.defaultBlockState();
@@ -112,15 +127,15 @@ final class ZenithChunkGenerator extends ChunkGenerator {
 			case CRATE -> ZenithBlocks.SUPPLY_CRATE.defaultBlockState();
 			case CABLES -> ZenithBlocks.HANGING_CABLES.defaultBlockState();
 			case TABLE -> ZenithBlocks.CREW_TABLE.defaultBlockState();
-			case DESK -> ZenithBlocks.CREW_DESK.defaultBlockState();
+			case DESK -> facing(ZenithBlocks.CREW_DESK, dir);
 			case WARDROBE -> facing(ZenithBlocks.OPEN_WARDROBE, dir);
 			case BUNK_BED -> facing(ZenithBlocks.BUNK_BED, dir);
 			case FRAME -> facing(ZenithBlocks.WALL_FRAME, dir);
-			case ITEMS -> ZenithBlocks.PERSONAL_ITEMS.defaultBlockState();
+			case ITEMS -> ZenithBlocks.PERSONAL_ITEMS.defaultBlockState().setValue(ZenithClutterBlock.ON_TABLE, true);
 			case SINK -> facing(ZenithBlocks.KITCHEN_SINK, dir);
 			case FRIDGE -> facing(ZenithBlocks.FRIDGE, dir);
 			case POTS -> facing(ZenithBlocks.HANGING_POTS, dir);
-			case DISHES -> ZenithBlocks.DISH_STACK.defaultBlockState();
+			case DISHES -> ZenithBlocks.DISH_STACK.defaultBlockState().setValue(ZenithClutterBlock.ON_TABLE, true);
 			case BENCH_PRESS -> facing(ZenithBlocks.BENCH_PRESS, dir);
 			case BAG -> ZenithBlocks.PUNCHING_BAG.defaultBlockState();
 			case MIRROR -> facing(ZenithBlocks.WALL_MIRROR, dir);
@@ -142,7 +157,7 @@ final class ZenithChunkGenerator extends ChunkGenerator {
 			case SEA_CARPET -> SEA_CARPET;
 			case SEA_LIGHT -> SEA_LIGHT;
 			case VINES -> ZenithBlocks.HANGING_VINES.defaultBlockState();
-			case BENCH -> ZenithBlocks.STATION_BENCH.defaultBlockState();
+			case BENCH -> facing(ZenithBlocks.STATION_BENCH, dir);
 			case PORTAL -> ZenithBlocks.YELLOW_DOORWAY.defaultBlockState().setValue(ZenithPortalBlock.PART, extra);
 			case PORTAL_FRAME -> ZenithBlocks.DOORWAY_FRAME.defaultBlockState();
 			case STATIC_TEAR -> ZenithBlocks.STATIC_TEAR.defaultBlockState();

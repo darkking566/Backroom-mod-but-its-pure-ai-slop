@@ -6,20 +6,21 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.shapes.VoxelShape;
 
 /** A ceiling pipe that drips onto the floor below; the puddle under it is part of the floor plan. */
-final class LeakingPipeBlock extends ShapedBlock {
-	LeakingPipeBlock(Properties properties, VoxelShape shape) {
-		super(properties, shape);
+final class LeakingPipeBlock extends PipeBlock {
+	LeakingPipeBlock(Properties properties) {
+		super(properties);
 	}
 
 	@Override
 	public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
 		if (random.nextInt(3) == 0) {
-			double x = pos.getX() + 0.35 + random.nextDouble() * 0.3;
-			double z = pos.getZ() + 0.45 + random.nextDouble() * 0.1;
-			level.addParticle(ParticleTypes.DRIPPING_WATER, x, pos.getY() + 0.64, z, 0, 0, 0);
+			double along = 0.35 + random.nextDouble() * 0.3, across = 0.45 + random.nextDouble() * 0.1;
+			boolean z = state.getValue(AXIS) == net.minecraft.core.Direction.Axis.Z;
+			double x = pos.getX() + (z ? across : along);
+			double zz = pos.getZ() + (z ? along : across);
+			level.addParticle(ParticleTypes.DRIPPING_WATER, x, pos.getY() + 0.64, zz, 0, 0, 0);
 		}
 		if (random.nextInt(10) == 0) {
 			double floor = Level1ChunkGenerator.FLOOR_Y + 1;

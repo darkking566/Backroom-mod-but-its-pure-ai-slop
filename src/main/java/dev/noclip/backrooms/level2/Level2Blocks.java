@@ -145,6 +145,9 @@ public final class Level2Blocks {
 			p -> new Level2OverheadPipeBlock(p, false));
 	public static final Block LEAKING_OVERHEAD_PIPE = register("leaking_overhead_pipe", pipe(MapColor.COLOR_GRAY),
 			p -> new Level2OverheadPipeBlock(p, true));
+	public static final Block NOCLIP_WALL = register("noclip_wall",
+			Properties.of().mapColor(MapColor.COLOR_GRAY).strength(-1.0F, 3600000.0F).noCollision().noLootTable().sound(SoundType.STONE),
+			Level2NoclipWallBlock::new);
 
 	private Level2Blocks() {
 	}

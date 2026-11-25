@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level2;
 
+import dev.noclip.backrooms.core.LevelExits;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -26,12 +27,15 @@ final class Level2Heat {
 	/** Exhaustion per second in the heat: about a hunger point every ten seconds. */
 	static final float EXHAUSTION = 0.4F;
 	private static final int WEAKENS_AFTER = 30;
+	private static final int HEAT_EXIT_AFTER = 40;
 	private static final int POISON_AFTER = 10;
 	private static final int LOOP_COOLDOWN_SECONDS = 45;
+	private static final int LOOP_EXIT_TRIGGERS = 3;
 	private static final Map<UUID, Integer> HOT_SECONDS = new HashMap<>();
 	private static final Map<UUID, Integer> COLD_SECONDS = new HashMap<>();
 	private static final Map<UUID, Integer> GAS_SECONDS = new HashMap<>();
 	private static final Map<UUID, Integer> LOOP_COOLDOWN = new HashMap<>();
+	private static final Map<UUID, Integer> LOOP_COUNT = new HashMap<>();
 
 	private Level2Heat() {
 	}
@@ -43,6 +47,7 @@ final class Level2Heat {
 			COLD_SECONDS.clear();
 			GAS_SECONDS.clear();
 			LOOP_COOLDOWN.clear();
+			LOOP_COUNT.clear();
 		});
 	}
 
@@ -78,8 +83,14 @@ final class Level2Heat {
 		int seconds = HOT_SECONDS.merge(player.getUUID(), 1, Integer::sum);
 		if (seconds == 1) player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level2.heat"));
 		player.causeFoodExhaustion(EXHAUSTION);
+		if (seconds == WEAKENS_AFTER) {
+			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level2.heat_exit"));
+		}
 		if (seconds >= WEAKENS_AFTER) {
 			player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 60, 0, true, false, true));
+		}
+		if (seconds >= HEAT_EXIT_AFTER && (seconds - HEAT_EXIT_AFTER) % 5 == 0) {
+			LevelExits.use(player, "127");
 		}
 	}
 
@@ -132,6 +143,14 @@ final class Level2Heat {
 		int tx = x + Level2Plan.DX[openDir] * 10, tz = z + Level2Plan.DZ[openDir] * 10;
 		if (Level2Layout.tile(seed, tx, tz).kind() != Level2Layout.Kind.FLOOR) return;
 		LOOP_COOLDOWN.put(id, LOOP_COOLDOWN_SECONDS);
+		int count = LOOP_COUNT.merge(id, 1, Integer::sum);
+		if (count >= LOOP_EXIT_TRIGGERS) {
+			LOOP_COUNT.remove(id);
+			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level2.loop_exit"));
+			level.playSound(null, x, player.getY(), z, SoundEvents.ENDERMAN_TELEPORT, SoundSource.AMBIENT, 0.6F, 0.5F);
+			LevelExits.use(player, "1");
+			return;
+		}
 		player.teleportTo(level, tx + 0.5, player.getY(), tz + 0.5, java.util.Set.of(), player.getYRot(), player.getXRot(), false);
 		player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level2.loop"));
 		level.playSound(null, tx, player.getY(), tz, SoundEvents.ENDERMAN_TELEPORT, SoundSource.AMBIENT, 0.35F, 0.7F);

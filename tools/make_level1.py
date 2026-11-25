@@ -2314,10 +2314,12 @@ def all_blockstates():
     b["puddled_garage_floor"] = {"variants": {"": spin("puddled_garage_floor") + spin("puddled_garage_floor_1")}}
     b["garage_wall"] = {"variants": {"": [{"model": NS + "garage_wall", "weight": 20}, {"model": NS + "garage_wall_1", "weight": 5},
                                           {"model": NS + "garage_wall_2", "weight": 3}, {"model": NS + "garage_wall_3", "weight": 3}]}}
-    for name in ("garage_pillar", "garage_pillar_base", "garage_pillar_marked", "ceiling_pipe", "leaking_ceiling_pipe",
+    for name in ("garage_pillar", "garage_pillar_base", "garage_pillar_marked",
                  "broken_garage_light", "supply_crate", "broken_bare_bulb", "green_bare_bulb", "metal_exit_door",
                  "metal_exit_door_top", "office_desk", "flickering_wallpaper"):
         b[name] = single(name)
+    for name in ("ceiling_pipe", "leaking_ceiling_pipe"):
+        b[name] = {"variants": {"axis=x": {"model": NS + name}, "axis=z": {"model": NS + name, "y": 90}}}
     # Formwork boards all run the same way, so only half turns.
     b["garage_ceiling"] = {"variants": {"": spin("garage_ceiling", 8, (0, 180)) + spin("garage_ceiling_1", 1, (0, 180))}}
     b["garage_light"] = {"variants": {"lit=true": {"model": NS + "garage_light"}, "lit=false": {"model": NS + "garage_light_off"}}}

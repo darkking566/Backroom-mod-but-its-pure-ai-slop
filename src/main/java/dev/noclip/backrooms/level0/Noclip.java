@@ -56,6 +56,7 @@ final class Noclip {
 			Vec3 landing = centreHasFloor ? centre
 					: new Vec3(baseX + 1.5, Level0ChunkGenerator.FLOOR_Y + 1, baseZ + 1.5);
 			BlockPos floorPos = BlockPos.containing(landing).below();
+			if (Level0Arrival.inRedRoom(level0, floorPos)) continue;
 			if (level0.getBlockState(floorPos).getCollisionShape(level0, floorPos).isEmpty()) continue;
 			if (!level0.noCollision(player.getDimensions(player.getPose()).makeBoundingBox(landing))) continue;
 

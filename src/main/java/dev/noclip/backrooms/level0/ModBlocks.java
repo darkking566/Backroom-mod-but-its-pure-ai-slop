@@ -48,9 +48,9 @@ final class ModBlocks {
 	static final Block BROKEN_FLUORESCENT_LIGHT = register("broken_fluorescent_light", lamp());
 	static final Block RED_FLUORESCENT_LIGHT = register("red_fluorescent_light", lamp().lightLevel(state -> 7));
 	static final Block EXIT_LIGHT = register("exit_light", lamp().lightLevel(state -> 12));
-	static final Block EXIT_DOOR = register("exit_door", exit().lightLevel(state -> 4), ExitDoorBlock::new);
-	static final Block EXIT_DOOR_TOP = register("exit_door_top", exit().lightLevel(state -> 4), ExitDoorBlock::new);
-	static final Block EXIT_SIGN = register("exit_sign", exit().lightLevel(state -> 10));
+	static final Block EXIT_DOOR = register("exit_door", exit().lightLevel(state -> 4), p -> new ExitDoorBlock(p, true));
+	static final Block EXIT_DOOR_TOP = register("exit_door_top", exit().lightLevel(state -> 4), p -> new ExitDoorBlock(p, true));
+	static final Block EXIT_SIGN = register("exit_sign", exit().lightLevel(state -> 10), p -> new ExitDoorBlock(p, false));
 
 	// Manila Room blocks & furniture
 	static final Block MANILA_WALLPAPER = register("manila_wallpaper", wall(MapColor.SAND));
@@ -64,8 +64,9 @@ final class ModBlocks {
 	static final Block MANILA_DOOR = register("manila_door", Properties.of()
 			.mapColor(MapColor.WOOD).strength(2.0F).sound(SoundType.WOOD).noOcclusion(),
 			p -> new ManilaDoorBlock(p, false));
+	// The lower half drops the door; breaking either half takes the other with it.
 	static final Block MANILA_DOOR_TOP = register("manila_door_top", Properties.of()
-			.mapColor(MapColor.WOOD).strength(2.0F).sound(SoundType.WOOD).noOcclusion(),
+			.mapColor(MapColor.WOOD).strength(2.0F).sound(SoundType.WOOD).noOcclusion().noLootTable(),
 			p -> new ManilaDoorBlock(p, true));
 	static final Block MANILA_TABLE = register("manila_table", Properties.of()
 			.mapColor(MapColor.WOOD).strength(1.8F).sound(SoundType.WOOD).noOcclusion(),
@@ -89,7 +90,7 @@ final class ModBlocks {
 	// Calling this from onInitialize runs the registrations above before the registries freeze.
 	static void register() {
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.BUILDING_BLOCKS)
-				.register(output -> ALL.forEach(output::accept));
+				.register(output -> ALL.stream().filter(b -> b != EXIT_DOOR_TOP && b != MANILA_DOOR_TOP).forEach(output::accept));
 	}
 
 	private static Properties wall(MapColor color) {

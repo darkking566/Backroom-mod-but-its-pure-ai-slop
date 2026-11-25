@@ -58,8 +58,9 @@ final class ZenithEntrance {
 				if (chunk.getBlockState(low.relative(side)).isAir() && chunk.getBlockState(high.relative(side)).isAir()) open = side;
 			}
 			if (open == null) continue;
-			chunk.setBlockState(low, ZenithBlocks.STATION_HATCH.defaultBlockState().setValue(ZenithPortalBlock.PART, 0), 0);
-			chunk.setBlockState(high, ZenithBlocks.STATION_HATCH.defaultBlockState().setValue(ZenithPortalBlock.PART, 1), 0);
+			BlockState hatch = ZenithBlocks.STATION_HATCH.defaultBlockState().setValue(StationHatchBlock.FACING, open);
+			chunk.setBlockState(low, hatch.setValue(ZenithPortalBlock.PART, 0), 0);
+			chunk.setBlockState(high, hatch.setValue(ZenithPortalBlock.PART, 1), 0);
 			return true;
 		}
 		return false;

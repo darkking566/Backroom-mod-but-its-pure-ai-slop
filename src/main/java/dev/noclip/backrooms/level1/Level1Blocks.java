@@ -26,7 +26,6 @@ public final class Level1Blocks {
 	static final List<Block> ALL = new ArrayList<>();
 
 	private static final VoxelShape LIGHT_SHAPE = Block.box(0, 9, 4.5, 16, 16, 11.5);
-	private static final VoxelShape PIPE_SHAPE = Block.box(0, 10, 5.5, 16, 16, 10.5);
 	private static final VoxelShape BULB_SHAPE = Block.box(5.5, 3, 5.5, 10.5, 16, 10.5);
 	private static final VoxelShape DESK_SHAPE = Block.box(0, 0, 0.5, 16, 14, 15.5);
 	private static final VoxelShape COMPUTER_SHAPE = Block.box(2, 0, 2, 14, 11, 14);
@@ -48,8 +47,8 @@ public final class Level1Blocks {
 	public static final Block GARAGE_CEILING = register("garage_ceiling", concrete(MapColor.STONE));
 	public static final Block GARAGE_LIGHT = register("garage_light", fixture().lightLevel(lit(15)), p -> new Level1LampBlock(p, LIGHT_SHAPE));
 	public static final Block BROKEN_GARAGE_LIGHT = register("broken_garage_light", fixture(), p -> new ShapedBlock(p, LIGHT_SHAPE));
-	public static final Block CEILING_PIPE = register("ceiling_pipe", pipe(), p -> new ShapedBlock(p, PIPE_SHAPE));
-	public static final Block LEAKING_CEILING_PIPE = register("leaking_ceiling_pipe", pipe(), p -> new LeakingPipeBlock(p, PIPE_SHAPE));
+	public static final Block CEILING_PIPE = register("ceiling_pipe", pipe(), PipeBlock::new);
+	public static final Block LEAKING_CEILING_PIPE = register("leaking_ceiling_pipe", pipe(), LeakingPipeBlock::new);
 	public static final Block METAL_SHELF = register("metal_shelf", Properties.of()
 			.mapColor(MapColor.METAL).strength(2.0F).sound(SoundType.METAL).noOcclusion());
 	public static final Block SUPPLY_CRATE = register("supply_crate", Properties.of()

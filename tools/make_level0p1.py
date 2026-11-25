@@ -122,6 +122,14 @@ def hull_seam():
     return m
 
 
+def hull_glass():
+    """The hull's inner layers of an outer window: clear, faintly tinted, no frame (the outer pane has the frame)."""
+    m = flat((176, 208, 226), 0.95, 200)
+    glint = step(0.0, 1.0, 1 - np.abs((X + Y * 0.6) % 90 - 22) / 5) * 0.2
+    ALPHA["hull_glass"] = 22.0 + glint * 50
+    return m
+
+
 def inner_hull_plate():
     m = plate((206, 211, 216), 21, 0.85, 120, 64, 0.18)
     paint(m, lines(64, 0.7, axes="y") * 0.0 + box(-2, 58, 130, 61), (96, 190, 220), glow=0.7)
@@ -141,9 +149,6 @@ def observation_glass():
 
 def bulkhead():
     m = plate((112, 122, 134), 31, 0.5, 70, 128)
-    stripe = ((X + Y) % 32 < 16).astype(float) * box(-2, 104, 130, 124, 0.5)
-    paint(m, box(-2, 104, 130, 124, 0.5), (36, 38, 42))
-    paint(m, stripe, (230, 190, 40))
     weather(m, 32, 0.9)
     return m
 
@@ -270,8 +275,6 @@ def dead_ceiling_light():
 
 def wall_panel():
     m = plate((206, 210, 214), 141, 0.8, 120, 64, 0.1)
-    paint(m, box(-2, 98, 130, 100), (118, 190, 214), glow=0.35)  # a thin blue guide line
-    paint(m, box(-2, 108, 130, 130), (140, 146, 154), height=-0.8)  # skirting
     weather(m, 142, 0.5)
     return m
 
@@ -280,8 +283,6 @@ def quarters_wall():
     m = flat((208, 196, 178), 0.4, 20, 40)
     grain(m, 151, 0.025)
     paint(m, lines(64, 1.0, axes="x"), (164, 150, 132), height=-1.8)
-    paint(m, box(-2, 60, 130, 64), (176, 128, 84), height=0.6)  # a warm trim, to make it a home
-    paint(m, box(-2, 108, 130, 130), (118, 98, 80), height=0.6)
     weather(m, 152, 0.4)
     return m
 
@@ -289,7 +290,6 @@ def quarters_wall():
 def kitchen_wall():
     m = flat((230, 232, 230), 0.88, 130)
     paint(m, lines(16, 0.8), (160, 164, 166), height=-1.2)
-    paint(m, box(-2, 48, 130, 56), (96, 150, 130), height=0.5)
     paint(m, step(0.72, 0.85, clouds(161, 6)) * 0.4, (176, 172, 150))
     weather(m, 162, 0.35)
     return m
@@ -411,17 +411,18 @@ def scorched_ceiling():
 def door_leaf(top):
     m = flat((226, 230, 234), 0.85, 120)
     grain(m, 191, 0.02)
-    paint(m, lines(128, 1.0, axes="x") * 0.0 + box(61, -2, 67, 130), (110, 116, 124), height=-2.4)  # the two leaves meet
-    frame = np.maximum(1 - step(5, 7, np.minimum(X, SIZE - 1 - X)), 0)
+    # One leaf per block: the frame on the hinge side (left), the seam where it meets its partner on the right.
+    paint(m, box(122, -2, 130, 130), (110, 116, 124), height=-2.4)
+    frame = np.maximum(1 - step(5, 7, X), 0)
     paint(m, frame, (150, 156, 164), height=1.8, smooth=0.7)
     if top:
-        paint(m, box(26, 20, 102, 96), (34, 40, 52), height=-1.5)
+        paint(m, box(30, 20, 98, 96), (34, 40, 52), height=-1.5)
         sky = (66 + 90 * (Y / SIZE))[..., None] * np.array([0.7, 0.9, 1.2])
-        paint(m, box(28, 22, 100, 94) * 0.55, np.clip(sky, 0, 255), glow=0.2)
+        paint(m, box(32, 22, 96, 94) * 0.55, np.clip(sky, 0, 255), glow=0.2)
         paint(m, box(-2, 110, 130, 114), (214, 176, 48), height=0.6)
     else:
         paint(m, box(8, 100, 120, 126), (140, 146, 154), height=1.2)
-        paint(m, box(54, 52, 58, 76) + box(70, 52, 74, 76), (190, 196, 204), height=1.6, smooth=0.9)
+        paint(m, box(104, 52, 110, 76), (190, 196, 204), height=1.6, smooth=0.9)  # one handle, by the seam
         paint(m, box(-2, 4, 130, 8), (214, 176, 48), height=0.6)
     weather(m, 192 + int(top), 0.35)
     return m
@@ -664,9 +665,10 @@ def cables_texture():
     palette = [(200, 50, 40), (60, 130, 200), (220, 190, 60), (30, 30, 34), (70, 180, 90)]
     rng = np.random.default_rng(351)
     for i in range(7):
-        x0, length = rng.uniform(14, 114), rng.uniform(50, 126)
+        x0, _length = rng.uniform(14, 114), rng.uniform(50, 126)  # length kept so the draws (and wire positions) stay the same
         sway = rng.uniform(-5, 5)
-        wire = (1 - step(1.4, 2.6, np.abs(X - (x0 + sway * np.sin(Y / 30.0 + i))))) * (1 - step(length - 4, length, Y))
+        # Full length and seamless top to bottom (sin of a whole period over 128), so stacked blocks run on as one bundle.
+        wire = 1 - step(1.4, 2.6, np.abs(X - (x0 + sway * np.sin(Y * 2 * np.pi / SIZE + i))))
         colour = palette[i % len(palette)]
         paint(m, wire, colour, height=1.2)
         alpha = np.maximum(alpha, wire)
@@ -825,6 +827,8 @@ VARIANTED = {"wall_panel": wall_panel, "deck_floor": deck_floor, "station_corrid
              "frost_floor": frost_floor, "scorched_floor": scorched_floor,
              "frost_ceiling": frost_ceiling, "scorched_ceiling": scorched_ceiling}
 VARIANTS = 3
+# The damaged wall's v2 has no hole; weighted so most of a wrecked wall is whole and the cable holes stay the odd one out.
+WHOLE, WHOLE_WEIGHT = "damaged_wall_v2", 5
 
 
 def variants():
@@ -845,7 +849,7 @@ def variants():
 def all_textures():
     t = {
         "hull_plate": hull_plate(), "hull_seam": hull_seam(), "inner_hull_plate": inner_hull_plate(),
-        "observation_glass": observation_glass(), "bulkhead": bulkhead(),
+        "observation_glass": observation_glass(), "hull_glass": hull_glass(), "bulkhead": bulkhead(),
         "deck_floor": deck_floor(), "station_corridor_floor": corridor_floor(), "station_corridor_floor_stripe": corridor_floor_stripe(),
         "quarters_carpet": quarters_carpet(), "kitchen_tile": kitchen_tile(), "gym_mat": gym_mat(), "garden_floor": garden_floor(),
         "worn_floor": worn_floor(), "hazard_floor": hazard_floor(), "deck_ceiling": deck_ceiling(),
@@ -953,10 +957,17 @@ def model_bench():
 
 
 def model_treadmill():
-    return {"parent": "minecraft:block/block", "textures": {"particle": tex("treadmill_side"), "belt": tex("treadmill_belt"), "side": tex("treadmill_side")},
-            "elements": [el((1, 0, 0), (15, 5, 16), sides("#side")),
-                         el((2, 5, 1), (14, 6, 15), {"up": "#belt", "down": "#side", **sides("#side", ("north", "south", "east", "west"))}),
-                         el((1, 6, 12), (3, 7, 15), sides("#side")), el((13, 6, 12), (15, 7, 15), sides("#side"))]}
+    """A low deck with the belt on top, two uprights at the front (north) carrying side rails and a tilted console."""
+    full = [0, 0, 16, 16]
+    return {"parent": "minecraft:block/block",
+            "textures": {"particle": tex("treadmill_side"), "belt": tex("treadmill_belt"), "side": tex("treadmill_side"), "panel": tex("console_front")},
+            "elements": [el((1, 0, 0), (15, 3, 16), sides("#side")),
+                         el((2, 3, 0.5), (14, 4, 15.5), {"up": "#belt", "down": "#side", **sides("#side", ("north", "south", "east", "west"))}),
+                         el((1, 3, 1), (2.5, 14, 2.5), sides("#side")), el((13.5, 3, 1), (15, 14, 2.5), sides("#side")),
+                         el((1, 11, 2.5), (2.5, 12, 9), sides("#side")), el((13.5, 11, 2.5), (15, 12, 9), sides("#side")),
+                         el((2.5, 12, 0.5), (13.5, 15, 3), {"north": "#side", "up": {"texture": "#panel", "uv": full},
+                                                           **sides("#side", ("south", "east", "west", "down"))},
+                            rotation={"angle": 22.5, "axis": "x", "origin": [8, 13.5, 1.75]})]}
 
 
 def model_weights():
@@ -984,14 +995,15 @@ def model_console():
     return {"parent": "minecraft:block/block",
             "textures": {"particle": tex("console_side"), "side": tex("console_side"), "top": tex("console_top"), "screen": tex("console_front")},
             "elements": [el((0, 0, 0), (16, 8, 16), {"up": "#top", "down": "#side", "north": "#side", "south": "#side", "east": "#side", "west": "#side"}),
-                         el((1, 8, 9), (15, 12, 15), {"north": {"texture": "#screen", "light_emission": 12}, **sides("#side", ("south", "east", "west", "up"))},
+                         # The screen face shows the whole drawn screen (it sits at 1..15 x 1..13 of the texture), not a strip of it.
+                         el((1, 8, 11), (15, 14, 14), {"north": {"texture": "#screen", "uv": [0, 1, 16, 13], "light_emission": 12}, **sides("#side", ("south", "east", "west", "up"))},
                             rotation={"angle": -22.5, "axis": "x", "origin": [8, 8, 12]})]}
 
 
 def model_broken_console():
     m = model_console()
     m["textures"]["screen"] = tex("broken_console_front")
-    m["elements"][1]["faces"]["north"] = {"texture": "#screen"}
+    m["elements"][1]["faces"]["north"] = {"texture": "#screen", "uv": [0, 1, 16, 13]}
     return m
 
 
@@ -1025,7 +1037,7 @@ def model_orb():
 
 DOOR_MODELS = ("bottom_left", "bottom_left_open", "bottom_right", "bottom_right_open",
                "top_left", "top_left_open", "top_right", "top_right_open")
-CUBES = ["hull_plate", "hull_seam", "inner_hull_plate", "observation_glass", "bulkhead", "deck_floor", "station_corridor_floor",
+CUBES = ["hull_plate", "hull_seam", "inner_hull_plate", "observation_glass", "hull_glass", "bulkhead", "deck_floor", "station_corridor_floor",
          "station_corridor_floor_stripe", "quarters_carpet", "kitchen_tile", "gym_mat", "garden_floor", "worn_floor", "hazard_floor",
          "deck_ceiling", "ceiling_light", "dead_ceiling_light", "wall_panel", "quarters_wall", "kitchen_wall", "gym_wall",
          "damaged_wall", "frost_wall", "scorched_wall", "frost_floor", "scorched_floor", "frost_ceiling", "scorched_ceiling", "stair_core", "dead_stair_core", "station_crate", "doorway_frame", "static_tear", "truss", "girder",
@@ -1065,10 +1077,11 @@ def all_models():
     m["glow_orb"] = model_orb()
     for name, count in PARTS.items():
         for part in range(count):
-            m[f"{name}_{part}"] = glowing_cube(f"{name}_{part}", 10 if name == "yellow_doorway" else 4)
+            m[f"{name}_{part}"] = hatch_model(part) if name == "station_hatch" else glowing_cube(f"{name}_{part}", 10)
     for part in DOOR_MODELS:
         m[f"station_door_{part}"] = {"parent": f"minecraft:block/door_{part}",
                                      "textures": {"bottom": tex("station_door_bottom"), "top": tex("station_door_top")}}
+    m["station_door_slid"] = {"textures": {"particle": tex("station_door_bottom")}}  # an open door, slid into the wall
     for shape, parent in (("", "stairs"), ("_inner", "inner_stairs"), ("_outer", "outer_stairs")):
         m[f"station_stairs{shape}"] = {"parent": f"minecraft:block/{parent}",
                                        "textures": {"bottom": tex("stair_steps"), "top": tex("stair_steps"), "side": tex("stair_steps")}}
@@ -1077,6 +1090,14 @@ def all_models():
         m[f"{name}_side"] = {"parent": "minecraft:block/fence_side", "textures": {"texture": tex(texture)}}
         m[f"{name}_inventory"] = {"parent": "minecraft:block/fence_inventory", "textures": {"texture": tex(texture)}}
     return m
+
+
+def hatch_model(part):
+    """The hatch sits in a Level 0 wall: only the north face is the hatch, the rest is that wall's wallpaper."""
+    wall = "noclip_backrooms:block/level0/wallpaper"
+    return {"parent": "minecraft:block/block", "textures": {"particle": tex(f"station_hatch_{part}"), "hatch": tex(f"station_hatch_{part}"), "wall": wall},
+            "elements": [el((0, 0, 0), (16, 16, 16), sides("#wall", ("south", "east", "west", "up", "down"))),
+                         el((0, 0, 0), (16, 16, 0), {"north": "#hatch"}, shade=False, light_emission=4)]}
 
 
 # Blockstates
@@ -1097,6 +1118,8 @@ def door_state(door):
                 for opened in (False, True):
                     y = y0 if not opened else (y0 + (90 if hinge == "left" else 270)) % 360
                     model = NS + f"{door}_{part}_{hinge}{'_open' if opened else ''}"
+                    if opened and door == "station_door":
+                        model, y = NS + "station_door_slid", 0  # slid away into the wall: nothing to draw
                     variants[f"facing={facing},half={half},hinge={hinge},open={str(opened).lower()}"] = {"model": model, **({"y": y} if y else {})}
     return {"variants": variants}
 
@@ -1132,16 +1155,16 @@ def fence_state(name):
                           {"when": {"south": "true"}, "apply": side(180)}, {"when": {"west": "true"}, "apply": side(270)}]}
 
 
-SIMPLE = ["crew_bed", "hydroponic_planter", "hanging_cables", "crew_table", "station_bench", "catwalk_grating", "tether_cable",
+SIMPLE = ["hydroponic_planter", "hanging_cables", "crew_table", "catwalk_grating", "tether_cable",
           "glow_orb", "singularity_core", "singularity_shell"] + CUBES
-FACING = ["crew_locker", "server_rack", "kitchen_counter", "stove", "treadmill", "weight_rack", "console", "broken_console"]
+FACING = ["station_bench", "crew_bed", "crew_locker", "server_rack", "kitchen_counter", "stove", "treadmill", "weight_rack", "console", "broken_console"]
 # Blocks whose models are written under another name than the block.
 ITEM_MODEL = {"station_stairs": "station_stairs", "safety_rail": "safety_rail_inventory", "rail_lamp": "rail_lamp_inventory",
               "station_door": "station_door_bottom_left", "station_hatch": "station_hatch_0", "yellow_doorway": "yellow_doorway_0",
               "plasma": "plasma_0", "station_crate": "station_crate"}
-FACING_MODEL = {"crew_locker": "crew_locker", "server_rack": "server_rack", "kitchen_counter": "kitchen_counter", "stove": "stove",
+FACING_MODEL = {"station_bench": "station_bench", "crew_bed": "crew_bed", "crew_locker": "crew_locker", "server_rack": "server_rack", "kitchen_counter": "kitchen_counter", "stove": "stove",
                 "treadmill": "treadmill", "weight_rack": "weight_rack", "console": "console", "broken_console": "broken_console"}
-UNBREAKABLE = {"hull_plate", "hull_seam", "inner_hull_plate", "observation_glass", "station_hatch", "yellow_doorway", "doorway_frame",
+UNBREAKABLE = {"hull_plate", "hull_seam", "inner_hull_plate", "observation_glass", "hull_glass", "station_hatch", "yellow_doorway", "doorway_frame",
                "static_tear", "singularity_core", "singularity_shell", "plasma"}
 
 
@@ -1153,12 +1176,14 @@ def all_blockstates():
     b["station_stairs"] = stairs_state("station_stairs")
     b["safety_rail"] = fence_state("safety_rail")
     b["rail_lamp"] = fence_state("rail_lamp")
-    for name, count in PARTS.items():
-        b[name] = {"variants": {f"part={p}": {"model": NS + f"{name}_{p}"} for p in range(count)}}
+    b["yellow_doorway"] = {"variants": {f"part={p}": {"model": NS + f"yellow_doorway_{p}"} for p in range(PARTS["yellow_doorway"])}}
+    b["station_hatch"] = {"variants": {f"facing={f},part={p}": {"model": NS + f"station_hatch_{p}", **({"y": y} if y else {})}
+                                       for f, y in FACING_Y.items() for p in range(PARTS["station_hatch"])}}
     b["plasma"] = {"variants": {f"heat={h}": {"model": NS + f"plasma_{h}"} for h in range(4)}}
     for name in VARIANTED:
         models = [name] + [f"{name}_v{n}" for n in range(1, VARIANTS + 1)]
-        b[name] = {"variants": {"": [{"model": NS + model, "y": y} for model in models for y in (0, 90, 180, 270)]}}
+        b[name] = {"variants": {"": [{"model": NS + model, "y": y, **({"weight": WHOLE_WEIGHT} if model == WHOLE else {})}
+                                     for model in models for y in (0, 90, 180, 270)]}}
     return b
 
 
@@ -1221,7 +1246,7 @@ def check(blockstates):
 # The shared files: language, mining tags, sounds
 
 LANG_EN = {
-    "hull_plate": "Hull Plate", "hull_seam": "Hull Seam", "inner_hull_plate": "Inner Hull Plate", "observation_glass": "Observation Glass",
+    "hull_plate": "Hull Plate", "hull_seam": "Hull Seam", "inner_hull_plate": "Inner Hull Plate", "observation_glass": "Observation Glass", "hull_glass": "Hull Glass",
     "bulkhead": "Bulkhead", "deck_floor": "Deck Floor", "station_corridor_floor": "Corridor Floor", "station_corridor_floor_stripe": "Marked Corridor Floor",
     "quarters_carpet": "Quarters Carpet", "kitchen_tile": "Galley Tile", "gym_mat": "Gym Mat", "garden_floor": "Hydroponic Moss",
     "worn_floor": "Worn Deck Floor", "hazard_floor": "Hazard Floor", "deck_ceiling": "Deck Ceiling", "ceiling_light": "Ceiling Light",
@@ -1237,7 +1262,7 @@ LANG_EN = {
     "singularity_core": "Singularity Core", "singularity_shell": "Singularity Shell", "plasma": "Plasma",
 }
 LANG_ZH = {
-    "hull_plate": "外殼板", "hull_seam": "外殼接縫", "inner_hull_plate": "內殼板", "observation_glass": "觀景玻璃",
+    "hull_plate": "外殼板", "hull_seam": "外殼接縫", "inner_hull_plate": "內殼板", "observation_glass": "觀景玻璃", "hull_glass": "外殼玻璃",
     "bulkhead": "隔艙壁", "deck_floor": "甲板地板", "station_corridor_floor": "走廊地板", "station_corridor_floor_stripe": "標線走廊地板",
     "quarters_carpet": "寢室地毯", "kitchen_tile": "廚房地磚", "gym_mat": "健身墊", "garden_floor": "水培苔蘚",
     "worn_floor": "磨損甲板", "hazard_floor": "警示地板", "deck_ceiling": "甲板天花板", "ceiling_light": "天花板燈",
@@ -1314,15 +1339,26 @@ def update_lang():
         path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf8")
 
 
+# Blocks not mined with a pickaxe: wood with an axe, moss with a hoe, cloth and carpet with anything (no tag, like wool).
+TOOL = {"crew_desk": "axe", "wall_frame": "axe", "hanging_vines": "axe", "garden_floor": "hoe",
+        "quarters_carpet": None, "gym_mat": None, "mat_stack": None}
+
+
 def update_tags(unbreakable_free):
-    path = DATA / "minecraft/tags/block/mineable/pickaxe.json"
-    data = json.loads(path.read_text(encoding="utf8"))
-    values = data["values"]
+    tags = {}
+    for tool in ("pickaxe", "axe", "hoe"):
+        path = DATA / f"minecraft/tags/block/mineable/{tool}.json"
+        tags[tool] = (path, json.loads(path.read_text(encoding="utf8")) if path.exists() else {"replace": False, "values": []})
     for name in unbreakable_free:
         entry = f"noclip_backrooms:{name}"
-        if entry not in values:
-            values.append(entry)
-    path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf8")
+        want = TOOL.get(name, "pickaxe")
+        for tool, (_, data) in tags.items():
+            if tool == want and entry not in data["values"]:
+                data["values"].append(entry)
+            elif tool != want and entry in data["values"]:
+                data["values"].remove(entry)
+    for path, data in tags.values():
+        path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf8")
 
 
 def update_sounds():

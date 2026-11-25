@@ -67,6 +67,7 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 			if (only("ways")) ways(context, game, arrival);
 			if (only("hatch")) hatch(context, game);
 			if (only("blocks")) blocks(game);
+			if (only("props")) props(context, game);
 		}
 	}
 
@@ -182,6 +183,10 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 		}
 	}
 
+	private static boolean isWindow(ZenithLayout.Kind kind) {
+		return kind == ZenithLayout.Kind.WINDOW || kind == ZenithLayout.Kind.WINDOW_CLEAR;
+	}
+
 	private static double pick0(int cell, double direction, double distance) {
 		return cell + 0.5 + direction * distance;
 	}
@@ -196,7 +201,7 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 			int x = (int) (478.5 * dx), y = (int) (478.5 * dy), z = (int) (478.5 * dz);
 			double distance = Math.hypot(Math.hypot(x - from.getX(), y - from.getY()), z - from.getZ());
 			final double px = x, py = y, pz = z;
-			if (distance >= best || done.stream().anyMatch(d -> Math.hypot(Math.hypot(d[0] - px, d[1] - py), d[2] - pz) < 40) || ZenithLayout.kind(ZenithLayout.cell(seed, x, y, z)) != ZenithLayout.Kind.WINDOW) continue;
+			if (distance >= best || done.stream().anyMatch(d -> Math.hypot(Math.hypot(d[0] - px, d[1] - py), d[2] - pz) < 40) || !isWindow(ZenithLayout.kind(ZenithLayout.cell(seed, x, y, z)))) continue;
 			int cx = (int) Math.round(473.5 * dx), cz = (int) Math.round(473.5 * dz), cy = (int) Math.round(473.5 * dy);
 			int fy = cy;
 			while (fy > cy - 6 && ZenithLayout.passable(ZenithLayout.cell(seed, cx, fy - 1, cz))) fy--;
@@ -209,7 +214,7 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 				int rx = (int) Math.floor(pick0(cx, hx, r)), rz = (int) Math.floor(pick0(cz, hz, r));
 				ZenithLayout.Kind kind = ZenithLayout.kind(ZenithLayout.cell(seed, rx, fy + 1, rz));
 				if (ZenithLayout.passable(ZenithLayout.cell(seed, rx, fy + 1, rz)) && ZenithLayout.passable(ZenithLayout.cell(seed, rx, fy, rz))) continue;
-				clear = kind == ZenithLayout.Kind.WINDOW && r > 2;
+				clear = isWindow(kind) && r > 2;
 				break;
 			}
 			if (!clear) continue;
@@ -511,6 +516,67 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 		check(found != null, "the hatch was not put in chunk " + where[0] + ", " + where[1]);
 	}
 
+	/** Close-ups of furniture set out in a row in the empty dark outside the station, all facing the camera (north), on lit floor. */
+	private void props(ClientGameTestContext context, TestSingleplayerContext game) {
+		int x0 = -6, y = 0, z0 = 900;
+		game.getServer().runOnServer(s -> {
+			ServerLevel level = station(s);
+			for (int x = x0 - 1; x <= x0 + 13; x++) {
+				for (int z = z0 - 5; z <= z0 + 1; z++) level.setBlock(new BlockPos(x, y - 1, z), ZenithBlocks.CEILING_LIGHT.defaultBlockState(), 2);
+				for (int dy = 0; dy < 4; dy++) level.setBlock(new BlockPos(x, y + dy, z0 + 1), ZenithBlocks.WALL_PANEL.defaultBlockState(), 2);
+				level.setBlock(new BlockPos(x, y + 3, z0), ZenithBlocks.DECK_CEILING.defaultBlockState(), 2);
+			}
+			Block[] row = {ZenithBlocks.CREW_DESK, ZenithBlocks.CONSOLE, ZenithBlocks.BROKEN_CONSOLE, ZenithBlocks.LAB_COAT, ZenithBlocks.CREW_BED,
+					ZenithBlocks.FRIDGE, ZenithBlocks.CREW_LOCKER};
+			for (int i = 0; i < row.length; i++) {
+				level.setBlock(new BlockPos(x0 + i, y, z0), row[i].defaultBlockState().setValue(ZenithFacingBlock.FACING, net.minecraft.core.Direction.NORTH), 2);
+			}
+			level.setBlock(new BlockPos(x0 + 8, y + 2, z0), ZenithBlocks.HANGING_CABLES.defaultBlockState(), 2);
+			level.setBlock(new BlockPos(x0 + 8, y + 1, z0), ZenithBlocks.HANGING_CABLES.defaultBlockState(), 2);
+			for (int i = 0; i < 2; i++) {
+				for (int half = 0; half < 2; half++) {
+					level.setBlock(new BlockPos(x0 + 10 + i, y + half, z0), ZenithChunkGenerator.state(ZenithLayout.of(ZenithLayout.Kind.DOOR, 0, (half << 1) | i)), 2);
+				}
+			}
+		});
+		shoot(context, game, x0 + 2.5, y + 0.6, z0 - 3.2, 0, 15, "level0p1_props_left");
+		shoot(context, game, x0 + 8.5, y + 0.6, z0 - 3.2, 0, 15, "level0p1_props_right");
+		shoot(context, game, x0 + 3.5, y + 0.6, z0 - 2.0, 25, 20, "level0p1_props_coat");
+		// Second row: gym pieces, a bench, clutter on a table and on the floor, and an open door that has slid away.
+		game.getServer().runOnServer(s -> {
+			ServerLevel level = station(s);
+			Block[] row = {ZenithBlocks.TREADMILL_BLOCK, ZenithBlocks.BENCH_PRESS, ZenithBlocks.STATION_BENCH};
+			for (int i = 0; i < 13; i++) {
+				level.setBlock(new BlockPos(x0 + i, y, z0), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
+				level.setBlock(new BlockPos(x0 + i, y + 1, z0), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
+				level.setBlock(new BlockPos(x0 + i, y + 2, z0), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 2);
+			}
+			for (int i = 0; i < row.length; i++) {
+				level.setBlock(new BlockPos(x0 + i, y, z0), row[i].defaultBlockState().setValue(ZenithFacingBlock.FACING, net.minecraft.core.Direction.NORTH), 2);
+			}
+			level.setBlock(new BlockPos(x0 + 4, y, z0), ZenithBlocks.CREW_TABLE.defaultBlockState(), 2);
+			level.setBlock(new BlockPos(x0 + 4, y + 1, z0), ZenithChunkGenerator.state(ZenithLayout.of(ZenithLayout.Kind.ITEMS)), 2);
+			level.setBlock(new BlockPos(x0 + 5, y, z0), ZenithBlocks.PERSONAL_ITEMS.defaultBlockState(), 2);
+			level.setBlock(new BlockPos(x0 + 6, y, z0), ZenithBlocks.DISH_STACK.defaultBlockState(), 2);
+			for (int i = 0; i < 2; i++) {
+				for (int half = 0; half < 2; half++) {
+					level.setBlock(new BlockPos(x0 + 10 + i, y + half, z0), ZenithChunkGenerator.state(ZenithLayout.of(ZenithLayout.Kind.DOOR, 0, (half << 1) | i)), 2);
+				}
+			}
+			level.setBlock(new BlockPos(x0 + 8, y, z0), ZenithChunkGenerator.state(ZenithLayout.of(ZenithLayout.Kind.DOOR, 0, 0)), 2);
+			level.setBlock(new BlockPos(x0 + 8, y + 1, z0), ZenithChunkGenerator.state(ZenithLayout.of(ZenithLayout.Kind.DOOR, 0, 2)), 2);
+			((ZenithDoorBlock) ZenithBlocks.STATION_DOOR_BLOCK).setOpen(null, level, level.getBlockState(new BlockPos(x0 + 10, y, z0)), new BlockPos(x0 + 10, y, z0), true);
+		});
+		shoot(context, game, x0 + 2.5, y + 0.6, z0 - 3.2, 0, 15, "level0p1_props_gym");
+		game.getServer().runCommand("gamemode survival @a"); // a spectator does not hold an automatic door open
+		shoot(context, game, x0 + 10.0, y + 0.6, z0 - 2.2, 0, 10, "level0p1_props_open_door");
+		game.getServer().runOnServer(s -> check(station(s).getBlockState(new BlockPos(x0 + 11, y, z0)).getValue(DoorBlock.OPEN), "the paired leaf did not open"));
+		game.getServer().runCommand("gamemode spectator @a");
+	}
+
+	private static final java.util.Set<Block> SALVAGED = java.util.Set.of(ZenithBlocks.HANGING_CABLES, ZenithBlocks.CONSOLE,
+			ZenithBlocks.BROKEN_CONSOLE, ZenithBlocks.SERVER_RACK);
+
 	/** Every block has a name and drops itself (the unbreakable ones have no drops). */
 	private void blocks(TestSingleplayerContext game) {
 		game.getServer().runOnServer(s -> {
@@ -519,6 +585,11 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 				check(Language.getInstance().has(block.getDescriptionId()), "no name for " + block);
 				if (block.getLootTable().isEmpty() || block instanceof DoorBlock) continue;
 				var drops = Block.getDrops(block.defaultBlockState(), level, new BlockPos(3, 3, 3), null);
+				// Wiring and electronics break down into materials instead (make_level0p1_props.SALVAGE).
+				if (SALVAGED.contains(block)) {
+					check(drops.stream().noneMatch(d -> d.is(block.asItem())), block + " drops itself instead of materials"); // a cable may yield nothing
+					continue;
+				}
 				check(drops.size() == 1 && drops.getFirst().is(block.asItem()), block + " does not drop itself");
 			}
 		});

@@ -1,6 +1,9 @@
 {
   "variants": {
-    "": {
+    "on_table=true": {
+      "model": "noclip_backrooms:block/level0p1/dish_stack_on_table"
+    },
+    "on_table=false": {
       "model": "noclip_backrooms:block/level0p1/dish_stack"
     }
   }
