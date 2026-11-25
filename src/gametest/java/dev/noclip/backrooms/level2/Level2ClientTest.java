@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.locale.Language;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -18,6 +19,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.vehicle.minecart.MinecartChest;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.LanternBlock;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.DoorBlock;
@@ -325,6 +327,23 @@ public final class Level2ClientTest implements FabricClientGameTest {
 		context.getInput().lookAt(lanternYaw, lanternPitch);
 		context.waitTicks(5);
 		context.takeScreenshot("level2_el3a_lantern");
+
+		// Which way the chest faces: the world must agree with the generator, and the photo is taken from its front.
+		Direction chestFacing = server.computeOnServer(s -> {
+			BlockPos at = new BlockPos(base[0], STAND, base[1]);
+			Direction placed = level2(s).getBlockState(at).getValue(ChestBlock.FACING);
+			check(placed == Level2ChunkGenerator.blockAt(seed, base[0], STAND, base[1]).getValue(ChestBlock.FACING),
+					"the EL3A chest faces " + placed + ", not the way the generator turned it");
+			return placed;
+		});
+		System.out.println("[Level2ClientTest] EL3A chest at " + base[0] + ", " + base[1] + " faces " + chestFacing);
+		double fx = base[0] + 0.5 + chestFacing.getStepX() * 2.5, fz = base[1] + 0.5 + chestFacing.getStepZ() * 2.5;
+		float chestYaw = chestFacing.getOpposite().toYRot();
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_2 run tp @s %.2f %d %.2f", fx, STAND, fz));
+		context.waitTicks(5);
+		context.getInput().lookAt(chestYaw, 40);
+		context.waitTicks(5);
+		context.takeScreenshot("level2_el3a_chest");
 
 		int[] rail = nearest(seed, from, tile -> tile.kind() == Kind.FLOOR, 0,
 				(x, z) -> Level2Layout.railAxis(seed, x, z) >= 0);

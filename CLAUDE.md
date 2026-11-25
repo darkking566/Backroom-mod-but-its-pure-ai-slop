@@ -321,6 +321,8 @@
   - 注意：資源包變大很多（Level 1 這份約 121 MB），模組 jar 與 git 倉庫會跟著變大
 - 使用者同意後，把 `main` 推送到 GitHub（`a3bb9fa` Level 1 寫實材質包與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
+- 實機確認 EL3A 儲物箱朝向：`Level2ClientTest` 檢查遊戲裡箱子的方向和生成器算的一樣，並從箱子正面拍照（`level2_el3a_chest`）；測試世界那處 EL3A 的箱子朝東，照片裡鎖扣朝鏡頭、工作台在後面；`runClientGameTest -Plevels=2` 通過。注意：朝向是每處隨機四選一，大約四分之一的 EL3A 箱子會朝西、正面貼著工作台（沒改）
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23
