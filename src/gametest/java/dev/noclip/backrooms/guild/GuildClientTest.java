@@ -78,13 +78,13 @@ public final class GuildClientTest implements FabricClientGameTest {
 			System.out.println("[guild] village start " + start + ", hall " + box[0] + "," + box[1] + "," + box[2] + " .. " + box[3] + "," + box[5]);
 
 			// Stand out front, down the path, and look at the hall.
-			BlockPos front = server.computeOnServer(s -> hall(s, start).at(12, 1, -14));
-			BlockPos door = server.computeOnServer(s -> hall(s, start).at(12, 1, 1));
+			BlockPos front = server.computeOnServer(s -> hall(s, start).at(14, 1, -26));
+			BlockPos door = server.computeOnServer(s -> hall(s, start).at(14, 1, 1));
 			server.runOnServer(s -> {
 				player(s).getAbilities().flying = true;
 				player(s).onUpdateAbilities();
 			});
-			server.runCommand(String.format("tp @a %d %d %d facing %d %d %d", front.getX(), front.getY() + 4, front.getZ(), door.getX(), door.getY() + 4, door.getZ()));
+			server.runCommand(String.format("tp @a %d %d %d facing %d %d %d", front.getX(), front.getY() + 6, front.getZ(), door.getX(), door.getY() + 8, door.getZ()));
 			server.waitFor(s -> s.overworld().isLoaded(door) && s.overworld().getBlockState(door).getBlock() instanceof DoorBlock, 600);
 			game.getConnection().waitForChunksRender();
 			context.waitTicks(40);
@@ -92,11 +92,11 @@ public final class GuildClientTest implements FabricClientGameTest {
 
 			// The hall: door, signal fire, the buyer's sign, the people.
 			check(server.computeOnServer(s -> {
-				BlockPos fire = hall(s, start).at(21, 12, 17);
+				BlockPos fire = hall(s, start).at(23, 15, 24);
 				var state = s.overworld().getBlockState(fire);
 				return state.is(Blocks.CAMPFIRE) && state.getValue(CampfireBlock.SIGNAL_FIRE);
 			}), "no signal fire on the chimney");
-			check(server.computeOnServer(s -> s.overworld().getBlockEntity(hall(s, start).at(2, 3, 5)) instanceof SignBlockEntity sign
+			check(server.computeOnServer(s -> s.overworld().getBlockEntity(hall(s, start).at(4, 3, 12)) instanceof SignBlockEntity sign
 					&& sign.getFrontText().getMessage(1, false).getContents() instanceof TranslatableContents t
 					&& t.getKey().equals("guild.noclip_backrooms.role.buyer")), "the buyer's sign has no text");
 			server.waitFor(s -> people(s, start).size() == 4, 400);
@@ -106,7 +106,7 @@ public final class GuildClientTest implements FabricClientGameTest {
 			int paved = server.computeOnServer(s -> {
 				int count = 0;
 				for (int z = -2; z >= -12; z--) {
-					for (int x = 12; x <= 13; x++) {
+					for (int x = 14; x <= 15; x++) {
 						BlockPos column = hall(s, start).at(x, 0, z);
 						BlockPos top = s.overworld().getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, column).below();
 						var state = s.overworld().getBlockState(top);
@@ -119,7 +119,7 @@ public final class GuildClientTest implements FabricClientGameTest {
 
 			// Inside, at the buyer's counter: right-click opens the shop.
 			Vec3 buyer = server.computeOnServer(s -> person(s, start, ShopRole.BUYER).getEyePosition());
-			BlockPos stand = server.computeOnServer(s -> hall(s, start).at(7, 1, 5));
+			BlockPos stand = server.computeOnServer(s -> hall(s, start).at(9, 1, 12));
 			server.runCommand(String.format("tp @a %d.5 %d %d.5 facing %.2f %.2f %.2f", stand.getX(), stand.getY(), stand.getZ(), buyer.x, buyer.y - 0.3 - EYE, buyer.z));
 			context.waitTicks(20);
 			game.getConnection().waitForChunksRender();
@@ -155,7 +155,7 @@ public final class GuildClientTest implements FabricClientGameTest {
 
 			// At the quartermaster's counter the supplier is across the hall: too far to trade with.
 			server.runOnServer(s -> {
-				BlockPos at = hall(s, start).at(18, 1, 5);
+				BlockPos at = hall(s, start).at(20, 1, 12);
 				player(s).teleportTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
 			});
 			int bandage = index(ShopRole.SUPPLIER, "bandage");
@@ -174,7 +174,7 @@ public final class GuildClientTest implements FabricClientGameTest {
 
 			// At the supplier's own counter: two bandages for 20.
 			server.runOnServer(s -> {
-				BlockPos at = hall(s, start).at(7, 1, 13);
+				BlockPos at = hall(s, start).at(9, 1, 20);
 				player(s).teleportTo(at.getX() + 0.5, at.getY(), at.getZ() + 0.5);
 			});
 			check(trade(server, ShopRole.SUPPLIER, bandage) == Shops.Outcome.DONE, "could not buy bandages at the supplier's counter");
@@ -202,13 +202,16 @@ public final class GuildClientTest implements FabricClientGameTest {
 				// On a lawn high in the air, so hills, trees and the sea stay out of the picture.
 				int x = start.getX() + 300 + style.ordinal() * 48, z = start.getZ() + 300, y = 180;
 				server.runCommand(String.format("tp @a %d %d %d 180 0", x, y + 1, z));
-				server.runCommand(String.format("fill %d %d %d %d %d %d minecraft:grass_block", x - 22, y, z - 30, x + 22, y, z + 24));
 				GuildPiece built = server.computeOnServer(s -> {
+					// Set block by block (that loads the chunks; /fill refuses chunks not loaded yet).
+					for (int bx = x - 24; bx <= x + 24; bx++) {
+						for (int bz = z - 36; bz <= z + 26; bz++) s.overworld().setBlockAndUpdate(new BlockPos(bx, y, bz), Blocks.GRASS_BLOCK.defaultBlockState());
+					}
 					ServerPlayer player = player(s);
 					player.teleportTo(x + 0.5, y + 1, z + 0.5);
 					return Guilds.place(player, style);
 				});
-				BlockPos eye = built.at(12, 7, -15), aim = built.at(12, 6, 9);
+				BlockPos eye = built.at(14, 9, -20), aim = built.at(14, 9, 10);
 				server.runOnServer(s -> {
 					player(s).getAbilities().flying = true;
 					player(s).onUpdateAbilities();

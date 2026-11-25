@@ -16,19 +16,20 @@ import net.minecraft.world.level.block.Blocks;
 public enum GuildPalette {
 	PLAINS(Blocks.POLISHED_DEEPSLATE, Blocks.POLISHED_ANDESITE, Blocks.STONE_BRICKS, Blocks.CRACKED_STONE_BRICKS, Blocks.MOSSY_STONE_BRICKS,
 			Blocks.POLISHED_DEEPSLATE, Blocks.DEEPSLATE_TILES, Blocks.DEEPSLATE_TILE_STAIRS, Blocks.STONE_BRICK_WALL, Blocks.POLISHED_DEEPSLATE,
-			Blocks.SMOOTH_STONE_SLAB, Blocks.POLISHED_ANDESITE_STAIRS),
+			Blocks.SMOOTH_STONE_SLAB, Blocks.POLISHED_ANDESITE_STAIRS, Blocks.DEEPSLATE_TILES, Blocks.DEEPSLATE_TILE_SLAB, Blocks.GRASS_BLOCK),
 	DESERT(Blocks.SANDSTONE, Blocks.SMOOTH_SANDSTONE, Blocks.CUT_SANDSTONE, Blocks.SANDSTONE, Blocks.CUT_SANDSTONE,
 			Blocks.CHISELED_SANDSTONE, Blocks.CUT_RED_SANDSTONE, Blocks.SMOOTH_RED_SANDSTONE_STAIRS, Blocks.SANDSTONE_WALL, Blocks.CUT_RED_SANDSTONE,
-			Blocks.SMOOTH_SANDSTONE_SLAB, Blocks.SMOOTH_SANDSTONE_STAIRS),
+			Blocks.SMOOTH_SANDSTONE_SLAB, Blocks.SMOOTH_SANDSTONE_STAIRS, Blocks.SMOOTH_RED_SANDSTONE, Blocks.SMOOTH_RED_SANDSTONE_SLAB, Blocks.SAND),
 	SAVANNA(Blocks.POLISHED_DEEPSLATE, Blocks.POLISHED_ANDESITE, Blocks.BRICKS, Blocks.BRICKS, Blocks.MUD_BRICKS,
 			Blocks.STONE_BRICKS, Blocks.DEEPSLATE_TILES, Blocks.DEEPSLATE_TILE_STAIRS, Blocks.BRICK_WALL, Blocks.POLISHED_DEEPSLATE,
-			Blocks.SMOOTH_STONE_SLAB, Blocks.POLISHED_ANDESITE_STAIRS),
+			Blocks.SMOOTH_STONE_SLAB, Blocks.POLISHED_ANDESITE_STAIRS, Blocks.DEEPSLATE_TILES, Blocks.DEEPSLATE_TILE_SLAB, Blocks.GRASS_BLOCK),
 	SNOWY(Blocks.POLISHED_BLACKSTONE, Blocks.POLISHED_DIORITE, Blocks.STONE_BRICKS, Blocks.CRACKED_STONE_BRICKS, Blocks.CALCITE,
 			Blocks.POLISHED_BLACKSTONE, Blocks.POLISHED_BLACKSTONE_BRICKS, Blocks.POLISHED_BLACKSTONE_BRICK_STAIRS, Blocks.POLISHED_BLACKSTONE_WALL,
-			Blocks.POLISHED_BLACKSTONE, Blocks.SMOOTH_STONE_SLAB, Blocks.POLISHED_ANDESITE_STAIRS),
+			Blocks.POLISHED_BLACKSTONE, Blocks.SMOOTH_STONE_SLAB, Blocks.POLISHED_ANDESITE_STAIRS, Blocks.POLISHED_BLACKSTONE_BRICKS,
+			Blocks.POLISHED_BLACKSTONE_BRICK_SLAB, Blocks.GRASS_BLOCK),
 	TAIGA(Blocks.POLISHED_DEEPSLATE, Blocks.POLISHED_ANDESITE, Blocks.TUFF_BRICKS, Blocks.MOSSY_STONE_BRICKS, Blocks.CHISELED_TUFF_BRICKS,
 			Blocks.POLISHED_TUFF, Blocks.DEEPSLATE_BRICKS, Blocks.DEEPSLATE_TILE_STAIRS, Blocks.TUFF_BRICK_WALL, Blocks.POLISHED_DEEPSLATE,
-			Blocks.SMOOTH_STONE_SLAB, Blocks.POLISHED_ANDESITE_STAIRS);
+			Blocks.SMOOTH_STONE_SLAB, Blocks.POLISHED_ANDESITE_STAIRS, Blocks.DEEPSLATE_TILES, Blocks.DEEPSLATE_TILE_SLAB, Blocks.GRASS_BLOCK);
 
 	/** The band at the foot of the walls and the front step; the floor inside. */
 	final Block foundation, floor;
@@ -37,10 +38,12 @@ public enum GuildPalette {
 	/** The corner and bay columns; the band at the top of the walls and the beams across the hall. */
 	final Block pillar, beam;
 	final Block roof, post, counter, tableSlab, chair;
+	/** The roof as a full block and as a slab (dormers, ridge caps); the ground of the flower beds (sand in the desert). */
+	final Block roofBlock, roofSlab, soil;
 	final Block door = Blocks.DARK_OAK_DOOR, wallSign = Blocks.DARK_OAK_WALL_SIGN, sign = Blocks.DARK_OAK_SIGN;
 
 	GuildPalette(Block foundation, Block floor, Block wall, Block worn, Block aged, Block pillar, Block beam, Block roof, Block post,
-			Block counter, Block tableSlab, Block chair) {
+			Block counter, Block tableSlab, Block chair, Block roofBlock, Block roofSlab, Block soil) {
 		this.foundation = foundation;
 		this.floor = floor;
 		this.wall = wall;
@@ -53,6 +56,9 @@ public enum GuildPalette {
 		this.counter = counter;
 		this.tableSlab = tableSlab;
 		this.chair = chair;
+		this.roofBlock = roofBlock;
+		this.roofSlab = roofSlab;
+		this.soil = soil;
 	}
 
 	/** The wall block at a cell: mostly plain, here and there a weathered stone (fixed by position, so chunks agree). */

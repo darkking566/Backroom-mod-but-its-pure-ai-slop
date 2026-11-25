@@ -300,6 +300,11 @@
   - 新增測試指令 `/backrooms guild place <plains|desert|savanna|snowy|taiga>`（`Guilds.place`、`GuildPiece.placeNow`、共用的 `GuildPiece.facingFront`）；生成時寫木牌字後，若是在已載入的世界裡蓋就通知玩家更新
   - `GuildClientTest` 最後在半空草地上把五種樣式各蓋一座拍正面；`runClientGameTest -Plevels=guild` 通過，合成圖 `docs/guild/styles.png`
 - 寫實材質包照規格書縮小：跑 `tools/resize_realistic.py`，789 張整格的面縮成 128×128、234 張道具縮成 64×64（含 `_n`、`_s`），資源包從 159 MB 變 18 MB；`make_level0_realistic.py`、`make_level0p1_realistic.py`、Gemini 的 `make_level2_realistic.py` 最後各加幾行，存完自動縮小，重跑也不會變回 512；`docs/look/README.md` 跟著改；`runClientGameTest -Plevels=look` 通過，截圖看過 Level 0 壁紙、天花板、地毯在 128 下仍清楚。Level 0.1、Level 2 的寫實材質這次沒進遊戲看
+- 使用者覺得公會「太簡單（簡單的斜屋頂）」，要精緻：`GuildPiece` 重畫（範圍變 30×27×24）
+  - 大廳：兩層樓立面（深色牆腳、一樓高窗、腰線、二樓小窗、頂線，側面只開二樓窗）、四坡屋頂（轉角用外角樓梯）、前後坡各兩個老虎窗、屋脊壓半磚、側面與後面一圈石階基座；兩根煙囪（一根狼煙、一根一般的煙）；內部挑高 8 格，橫樑上用鐵鍊吊燈
+  - 正面中央 8×8 塔樓：牆高 16、四坡尖頂、圓拱雙開門、門上公會名牌、高處兩面旗、門廊天花板與上層房間的燈；塔樓兩側石柱廊（吊燈、長椅）；前院兩塊花圃（沙漠是仙人掌、枯灌木）、四支燈柱
+  - 內部家具與商人的相對位置不變（用 `put` 平移到新的大廳位置）；調色盤加 `roofBlock`、`roofSlab`、`soil`；選址量高度的取樣點、`GuildClientTest` 的座標跟著改；測試的五種樣式改成先載入再一格一格鋪草地（`/fill` 遇到沒載入的區塊會失敗，房子地基一路長到地面）
+  - `runClientGameTest -Plevels=guild` 通過，看過村莊旁實際生成的、五種樣式與室內截圖，更新 `docs/guild/styles.png`、`docs/guild.md`
 
 ## 動作記錄（Antigravity）
 

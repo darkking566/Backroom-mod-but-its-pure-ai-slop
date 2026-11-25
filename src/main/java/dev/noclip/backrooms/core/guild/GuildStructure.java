@@ -75,7 +75,7 @@ public final class GuildStructure extends Structure {
 			int fz = vz + side.getStepZ() * distance + across.getStepZ() * lateral;
 			GuildPiece probe = GuildPiece.facingFront(fx, 0, fz, side, GuildPalette.PLAINS);
 			int minX = probe.getBoundingBox().minX(), minZ = probe.getBoundingBox().minZ();
-			int[][] spots = {{2, 2}, {23, 2}, {2, 17}, {23, 17}, {12, 9}, {12, 0}};
+			int[][] spots = {{4, 9}, {25, 9}, {4, 24}, {25, 24}, {14, 16}, {14, 1}};
 			int[] heights = new int[spots.length];
 			for (int i = 0; i < spots.length; i++) {
 				int x = probe.worldX(spots[i][0], spots[i][1]), z = probe.worldZ(spots[i][0], spots[i][1]);
