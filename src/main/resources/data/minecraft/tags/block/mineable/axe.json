@@ -31,6 +31,11 @@
     "noclip_backrooms:lumber_stack",
     "noclip_backrooms:crew_desk",
     "noclip_backrooms:wall_frame",
-    "noclip_backrooms:hanging_vines"
+    "noclip_backrooms:hanging_vines",
+    "noclip_backrooms:legend_floor",
+    "noclip_backrooms:legend_floor_line",
+    "noclip_backrooms:legend_ceiling",
+    "noclip_backrooms:pallet_stack",
+    "noclip_backrooms:gallery_wall"
   ]
 }

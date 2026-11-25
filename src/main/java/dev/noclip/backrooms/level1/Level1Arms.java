@@ -69,15 +69,19 @@ final class Level1Arms {
 			int bx = (int) Math.floor(player.getX() + Math.cos(angle) * dist);
 			int bz = (int) Math.floor(player.getZ() + Math.sin(angle) * dist);
 			if (!Level1Layout.tile(seed, bx, bz).walkable() || Marauders.nearSettlement(seed, bx, bz)) continue;
-			// Hang ~2.2 blocks above the floor so the 5 pale arms dangle right at head height!
-			int hangY = baseY + 2;
-			BlockPos pos = new BlockPos(bx, hangY, bz);
-			if (!level.isLoaded(pos) || !level.getBlockState(pos).isAir()) continue;
+			BlockPos foot = new BlockPos(bx, baseY, bz);
+			if (!level.isLoaded(foot) || !level.getBlockState(foot).isAir()) continue;
+			// Hang from the real ceiling (2..6 blocks up), so the pale arms dangle at head height in any room.
+			int ceiling = -1;
+			for (int y = baseY + 2; y <= baseY + 6 && ceiling < 0; y++) {
+				if (!level.getBlockState(new BlockPos(bx, y, bz)).isAir()) ceiling = y;
+			}
+			if (ceiling < 0) continue;
 			Arms mob = Monsters.ARMS.create(level, EntitySpawnReason.NATURAL);
 			if (mob == null) return;
-			mob.setPos(bx + 0.5, hangY, bz + 0.5);
-			mob.addTag(Arms.BLACKOUT_TAG);
+			mob.setPos(bx + 0.5, Math.max(baseY + 0.5, ceiling - mob.getBbHeight()), bz + 0.5);
 			level.addFreshEntity(mob);
+			mob.addTag(Arms.BLACKOUT_TAG); // after adding, or the load-time cleanup discards it at once
 			ACTIVE.add(mob.getUUID());
 			return;
 		}

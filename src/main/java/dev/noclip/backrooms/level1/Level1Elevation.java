@@ -25,7 +25,7 @@ public final class Level1Elevation {
 	private static final int VARIANT_SALT = 43;
 
 	/** All Y levels where blackout-controlled hall lamps may appear across all vertical profiles and landmarks. */
-	static final int[] LAMP_YS = {18, 25, 29, 37, 41, 43, 45, 47, 49, 53, 55};
+	static final int[] LAMP_YS = {18, 25, 29, 37, 39, 41, 43, 45, 47, 49, 53, 55};
 
 	public enum Profile {
 		/** Classic 5-block parking/warehouse ceiling (y = 38). */
@@ -86,6 +86,8 @@ public final class Level1Elevation {
 		int dx = Math.floorDiv(x, D), dz = Math.floorDiv(z, D);
 		Profile p = profile(seed, dx, dz);
 		if (p == Profile.STANDARD) return null;
+		// Corridor doorways (and the green sign over them) keep their standard shape in any hall.
+		if (tile == Tile.OPENING || tile == Tile.OPENING_SIGN) return null;
 
 		int lx = Math.floorMod(x, D), lz = Math.floorMod(z, D);
 		boolean extra = extraTier(seed, dx, dz);
@@ -125,12 +127,17 @@ public final class Level1Elevation {
 
 		// Staircase 1: rises from main floor (32) to first skywalk (40) along +Z at bx in [4, 5], lz in [19..26].
 		int bx = Math.floorMod(x, Level1Layout.BAY_X);
-		boolean inStair1X = lx >= 24 && lx <= 39 && (bx == 4 || bx == 5) && !isWarehouseShelf(seed, x, z);
+		boolean inStair1X = lx >= 24 && lx <= 39 && (bx == 4 || bx == 5) && !shelfInRun(seed, x, z, lz, 19, 28);
 		if (inStair1X && lz >= 19 && lz <= 26) {
 			int stepY = FLOOR + 1 + (lz - 19); // 33..40
 			if (y == stepY) return stairs(Direction.SOUTH);
 			if (y > FLOOR && y < stepY) return state(Level1Blocks.GARAGE_WALL);
 			if (y > stepY && y <= stepY + 3) return air();
+		}
+		// Landing from the top step onto the skywalk: floor, no railing, headroom.
+		if (inStair1X && (lz == 27 || lz == 28)) {
+			if (y == 40) return state(Level1Blocks.GARAGE_FLOOR);
+			if (y > 40 && y <= 43) return air();
 		}
 
 		// First skywalk tier at y = 40: a giant cross spanning the hall.
@@ -138,10 +145,10 @@ public final class Level1Elevation {
 				|| (lz >= 28 && lz <= 35 && lx >= 4 && lx <= 59);
 		boolean onSky1Edge = onSky1 && !((lx >= 29 && lx <= 34 && lz >= 5 && lz <= 58)
 				|| (lz >= 29 && lz <= 34 && lx >= 5 && lx <= 58));
-		boolean stair1Opening = inStair1X && lz >= 24 && lz <= 28;
-		if (onSky1 && !stair1Opening) {
+		boolean stair2Foot = extra && lx >= 28 && lx <= 35 && (bx == 4 || bx == 5) && lz == 36;
+		if (onSky1) {
 			if (y == 40) return state(Level1Blocks.GARAGE_FLOOR);
-			if (y == 41 && onSky1Edge) {
+			if (y == 41 && onSky1Edge && !stair2Foot) {
 				boolean alongX = lz == 28 || lz == 35 || lz == 4 || lz == 59;
 				return barrier(alongX ? Direction.Axis.X : Direction.Axis.Z);
 			}
@@ -158,12 +165,15 @@ public final class Level1Elevation {
 				if (y > 40 && y < stepY) return state(Level1Blocks.GARAGE_WALL);
 				if (y > stepY && y <= stepY + 3) return air();
 			}
+			if (inStair2X && (lz == 44 || lz == 45)) {
+				if (y == 47) return state(Level1Blocks.GARAGE_FLOOR);
+				if (y > 47 && y <= 50) return air();
+			}
 			boolean onSky2 = (lx >= 10 && lx <= 53 && lz >= 44 && lz <= 49)
 					|| (lz >= 10 && lz <= 53 && lx >= 12 && lx <= 17);
 			boolean onSky2Edge = onSky2 && !((lx >= 11 && lx <= 52 && lz >= 45 && lz <= 48)
 					|| (lz >= 11 && lz <= 52 && lx >= 13 && lx <= 16));
-			boolean stair2Opening = inStair2X && lz >= 41 && lz <= 45;
-			if (onSky2 && !stair2Opening) {
+			if (onSky2) {
 				if (y == 47) return state(Level1Blocks.GARAGE_FLOOR);
 				if (y == 48 && onSky2Edge) {
 					boolean alongX = lz == 44 || lz == 49 || lz == 10 || lz == 53;
@@ -497,6 +507,14 @@ public final class Level1Elevation {
 
 	private static boolean inBasin(int lx, int lz) {
 		return lx >= 12 && lx <= 51 && lz >= 12 && lz <= 51;
+	}
+
+	/** Whether a shelf stands anywhere along a staircase's run, which would cut it in two. */
+	private static boolean shelfInRun(long seed, int x, int z, int lz, int from, int to) {
+		for (int l = from; l <= to; l++) {
+			if (isWarehouseShelf(seed, x, z - lz + l)) return true;
+		}
+		return false;
 	}
 
 	private static boolean isWarehouseShelf(long seed, int x, int z) {

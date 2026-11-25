@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -32,6 +33,9 @@ final class Residents {
 	static final String TAG = "noclip_backrooms_resident";
 	private static final int NEAR = 64;
 	private static final Map<UUID, State> STATES = new HashMap<>();
+	/** When each settlement last had people moved in; Cornucopia's raiders wander off or die, so they come back slowly. */
+	private static final Map<Long, Integer> MOVED_IN = new HashMap<>();
+	private static final int RETURN_TICKS = 6000;
 	private static int heldOffUntil;
 
 	private Residents() {
@@ -45,6 +49,7 @@ final class Residents {
 	static void register() {
 		ServerTickEvents.END_SERVER_TICK.register(Residents::tick);
 		ServerTickEvents.END_SERVER_TICK.register(Residents::walk);
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> MOVED_IN.clear());
 	}
 
 	private static void tick(MinecraftServer server) {
@@ -138,6 +143,9 @@ final class Residents {
 		AABB area = new AABB(x0 + BasePlan.MIN_X, Level1ChunkGenerator.FLOOR_Y, z0 + BasePlan.MIN_Z,
 				x0 + BasePlan.MAX_X + 1, Level1ChunkGenerator.FLOOR_Y + 4, z0 + BasePlan.MAX_Z + 1);
 		if (!level.getEntitiesOfClass(Mob.class, area, mob -> mob.entityTags().contains(TAG)).isEmpty()) return 0;
+		int now = level.getServer().getTickCount();
+		Integer last = MOVED_IN.get(((long) dx << 32) ^ (dz & 0xffffffffL));
+		if (last != null && now >= last && now - last < RETURN_TICKS) return 0;
 		RandomSource random = level.getRandom();
 		int came = 0;
 		for (String who : people) {
@@ -167,6 +175,7 @@ final class Residents {
 				break;
 			}
 		}
+		if (came > 0) MOVED_IN.put(((long) dx << 32) ^ (dz & 0xffffffffL), now);
 		return came;
 	}
 
