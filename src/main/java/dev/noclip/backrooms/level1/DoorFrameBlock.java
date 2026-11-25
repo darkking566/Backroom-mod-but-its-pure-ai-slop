@@ -16,7 +16,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * A door frame standing on its own. Walking through it does nothing, unless you keep going back and forth
  * through the same frame: the fourth pass in a short while takes you somewhere else.
  */
-final class DoorFrameBlock extends ShapedBlock {
+final class DoorFrameBlock extends AxisPlacedBlock {
 	static final int PASSES = 4;
 	private static final int GAP = 4, FORGET = 30 * 20;
 
@@ -27,7 +27,7 @@ final class DoorFrameBlock extends ShapedBlock {
 	private final String level;
 
 	DoorFrameBlock(Properties properties, VoxelShape shape, String level) {
-		super(properties, shape);
+		super(properties, shape, false);
 		this.level = level;
 	}
 

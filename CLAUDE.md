@@ -357,6 +357,13 @@
   - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=placeFacing,checkBlocks,rooms,wikiSettlements` 通過，log 沒有缺模型
   - 沒做（審查報告其餘）：櫃檯、門框、出口門、日光燈、收費亭柵欄桿的擺放朝向
 - 使用者同意後，把 `main` 推送到 GitHub（`98c7a3c` 辦公桌與床的擺放朝向與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- Level 1 審查報告：櫃檯、門框、出口門、日光燈、柵欄桿的擺放朝向：
+  - 新增 `AxisPlacedBlock`（`axis` 屬性，預設 x＝原本模型的樣子，世界生成與舊存檔不變）；`ShapedBlock` 的選取框與碰撞箱也跟著 `axis` 轉
+  - 交易櫃檯、Tom 的櫃檯、獨立門框（上下半）、金屬出口門（上下半）、柵欄桿：玩家擺放時橫在面前（跟視線垂直）；日光燈、壞掉的日光燈：順著視線（`Level1LampBlock` 改繼承它，`lit` 照舊）
+  - 柵欄底座是六面同圖的方塊，不用轉，沒改
+  - 9 個方塊狀態加上 `axis`（日光燈是 `axis`×`lit`）；`tools/make_level1.py` 同步（沒重跑）
+  - `Level1ClientTest` 的 `placeFacing` 段加這 9 種，從兩個方向右鍵擺放並檢查
+  - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=placeFacing,checkBlocks,blackout,exits,wikiSettlements,views,leaveThroughDoor` 通過，log 沒有缺模型；看過日光燈與出口門截圖沒變；玩家擺放後的樣子沒拍照
 
 ## 動作記錄（Antigravity）
 

@@ -16,11 +16,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /** A settlement counter that sells for alloy: hold one, right-click, and what the counter stocks (its loot table) is handed over. */
-final class CounterBlock extends ShapedBlock {
+final class CounterBlock extends AxisPlacedBlock {
 	private final String deal;
 
 	CounterBlock(Properties properties, VoxelShape shape, String deal) {
-		super(properties, shape);
+		super(properties, shape, false);
 		this.deal = deal;
 	}
 

@@ -19,9 +19,9 @@ import net.minecraft.world.phys.Vec3;
  * A heavy push-bar door in the corridors. Until Level 2 exists it leads home, like the Level 0 exits:
  * to the player's respawn point, alive and with their items.
  */
-final class Level1DoorBlock extends Block {
+final class Level1DoorBlock extends AxisPlacedBlock {
 	Level1DoorBlock(Properties properties) {
-		super(properties);
+		super(properties, net.minecraft.world.phys.shapes.Shapes.block(), false);
 	}
 
 	@Override

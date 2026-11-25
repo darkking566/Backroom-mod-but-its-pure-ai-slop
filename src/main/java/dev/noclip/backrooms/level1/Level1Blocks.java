@@ -46,7 +46,7 @@ public final class Level1Blocks {
 	public static final Block GARAGE_PILLAR_MARKED = register("garage_pillar_marked", concrete(MapColor.STONE));
 	public static final Block GARAGE_CEILING = register("garage_ceiling", concrete(MapColor.STONE));
 	public static final Block GARAGE_LIGHT = register("garage_light", fixture().lightLevel(lit(15)), p -> new Level1LampBlock(p, LIGHT_SHAPE));
-	public static final Block BROKEN_GARAGE_LIGHT = register("broken_garage_light", fixture(), p -> new ShapedBlock(p, LIGHT_SHAPE));
+	public static final Block BROKEN_GARAGE_LIGHT = register("broken_garage_light", fixture(), p -> new AxisPlacedBlock(p, LIGHT_SHAPE, true));
 	public static final Block CEILING_PIPE = register("ceiling_pipe", pipe(), PipeBlock::new);
 	public static final Block LEAKING_CEILING_PIPE = register("leaking_ceiling_pipe", pipe(), LeakingPipeBlock::new);
 	public static final Block METAL_SHELF = register("metal_shelf", Properties.of()
@@ -144,7 +144,7 @@ public final class Level1Blocks {
 	public static final Block DOOR_FRAME = register("standalone_door_frame", exitProperties(MapColor.WOOD, SoundType.WOOD).noOcclusion().noCollision(),
 			p -> new DoorFrameBlock(p, FRAME_SHAPE, Level1Exit.DOOR_FRAME.level));
 	public static final Block DOOR_FRAME_TOP = register("standalone_door_frame_top", exitProperties(MapColor.WOOD, SoundType.WOOD).noOcclusion().noCollision(),
-			p -> new ShapedBlock(p, FRAME_SHAPE));
+			p -> new AxisPlacedBlock(p, FRAME_SHAPE, false));
 	public static final Block CONCRETE_STAIRS = register("concrete_stairs", concrete(MapColor.STONE),
 			p -> new ConcreteStairsBlock(GARAGE_FLOOR.defaultBlockState(), p));
 	public static final Block DARKNESS_BELOW = register("darkness_below", darkness(), p -> new DarknessBlock(p, Level1Exit.STAIRS_DOWN.level));
@@ -161,7 +161,7 @@ public final class Level1Blocks {
 			.mapColor(MapColor.COLOR_YELLOW).strength(2.0F).sound(SoundType.METAL));
 	public static final Block BARRIER_ARM = register("barrier_arm", Properties.of()
 			.mapColor(MapColor.COLOR_RED).strength(0.5F).sound(SoundType.METAL).noOcclusion().noCollision(),
-			p -> new ShapedBlock(p, ARM_SHAPE));
+			p -> new AxisPlacedBlock(p, ARM_SHAPE, false));
 	public static final Block GENERATOR = register("generator", Properties.of()
 			.mapColor(MapColor.COLOR_GREEN).strength(3.0F).sound(SoundType.METAL).noOcclusion(),
 			p -> new GeneratorBlock(p, GENERATOR_SHAPE));

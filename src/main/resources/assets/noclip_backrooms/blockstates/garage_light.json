@@ -1,10 +1,18 @@
 {
   "variants": {
-    "lit=true": {
+    "axis=x,lit=true": {
       "model": "noclip_backrooms:block/level1/garage_light"
     },
-    "lit=false": {
+    "axis=z,lit=true": {
+      "model": "noclip_backrooms:block/level1/garage_light",
+      "y": 90
+    },
+    "axis=x,lit=false": {
       "model": "noclip_backrooms:block/level1/garage_light_off"
+    },
+    "axis=z,lit=false": {
+      "model": "noclip_backrooms:block/level1/garage_light_off",
+      "y": 90
     }
   }
 }

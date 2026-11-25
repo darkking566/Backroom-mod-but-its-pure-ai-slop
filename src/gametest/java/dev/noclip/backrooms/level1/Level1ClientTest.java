@@ -1436,6 +1436,38 @@ public final class Level1ClientTest implements FabricClientGameTest {
 				});
 			}
 		}
+		// Long fixtures: across the view like a wall in front of the player, except ceiling lights, which run along it.
+		Object[][] axes = {{Level1Blocks.TRADE_COUNTER, false}, {Level1Blocks.TOM_COUNTER, false}, {Level1Blocks.DOOR_FRAME, false},
+				{Level1Blocks.DOOR_FRAME_TOP, false}, {Level1Blocks.METAL_EXIT_DOOR, false}, {Level1Blocks.METAL_EXIT_DOOR_TOP, false},
+				{Level1Blocks.BARRIER_ARM, false}, {Level1Blocks.GARAGE_LIGHT, true}, {Level1Blocks.BROKEN_GARAGE_LIGHT, true}};
+		for (Object[] c : axes) {
+			Block block = (Block) c[0];
+			boolean along = (Boolean) c[1];
+			String id = BuiltInRegistries.BLOCK.getKey(block).toString();
+			for (int yaw = 0; yaw < 180; yaw += 90) {
+				server.runCommand(clear);
+				server.runCommand("item replace entity @a weapon.mainhand with " + id);
+				server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f %d 60", x0 + 0.5, STAND, z0 + 0.5, yaw));
+				context.waitTicks(5);
+				context.getInput().lookAt(yaw, 60);
+				context.waitTicks(2);
+				context.getInput().pressMouse(1);
+				context.waitTicks(5);
+				final int look = yaw;
+				server.runOnServer(s -> {
+					ServerLevel level = level1(s);
+					Direction.Axis looking = Direction.fromYRot(look).getAxis();
+					Direction.Axis expected = along ? looking : (looking == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X);
+					BlockState placed = null;
+					for (BlockPos pos : BlockPos.betweenClosed(x0 - 4, STAND, z0 - 4, x0 + 4, STAND + 1, z0 + 4)) {
+						if (level.getBlockState(pos).is(block)) placed = level.getBlockState(pos);
+					}
+					check(placed != null, id + " was not placed looking " + Direction.fromYRot(look));
+					check(placed.getValue(AxisPlacedBlock.AXIS) == expected,
+							id + " placed looking " + Direction.fromYRot(look) + " lies along " + placed.getValue(AxisPlacedBlock.AXIS) + ", not " + expected);
+				});
+			}
+		}
 		server.runCommand(clear);
 		server.runCommand("gamemode spectator @a");
 		// Four hospital beds and four bedrolls, as placed looking north, east, south and west.

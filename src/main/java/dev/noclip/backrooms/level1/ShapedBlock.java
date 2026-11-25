@@ -27,6 +27,10 @@ class ShapedBlock extends Block {
 
 	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-		return state.hasProperty(BlockStateProperties.HORIZONTAL_FACING) ? turned.get(state.getValue(BlockStateProperties.HORIZONTAL_FACING)) : shape;
+		if (state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) return turned.get(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
+		if (state.hasProperty(BlockStateProperties.HORIZONTAL_AXIS) && state.getValue(BlockStateProperties.HORIZONTAL_AXIS) == Direction.Axis.Z) {
+			return turned.get(Direction.EAST);
+		}
+		return shape;
 	}
 }
