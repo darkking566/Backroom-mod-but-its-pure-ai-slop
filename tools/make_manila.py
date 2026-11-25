@@ -223,8 +223,15 @@ def write_assets():
         jamb = box_elem([0, 0, 6], [1.5, 16, 10], {"all": "#wood"})
         lintel = [box_elem([0, 14.5, 6], [16, 16, 10], {"all": "#wood"})] if half == "manila_door_top" else []
         top_max = 14.5 if half == "manila_door_top" else 16
-        closed_leaf = box_elem([1.5, 0, 6.8], [16, top_max, 9.2], {"all": "#leaf"})
-        open_leaf = box_elem([0, 0, 1], [2.4, top_max, 15], {"all": "#leaf"})
+        # The broad faces mirror each other so the knob stays away from the hinge from either side; open, the leaf
+        # swings on its hinge beside the jamb (reaching into the next block) instead of through it.
+        edge = {"texture": "#wood"}
+        closed_leaf = {"from": [1.5, 0, 6.8], "to": [16, top_max, 9.2],
+                       "faces": {"south": {"texture": "#leaf", "uv": [0, 0, 16, 16]}, "north": {"texture": "#leaf", "uv": [16, 0, 0, 16]},
+                                 "east": edge, "west": edge, "up": edge, "down": edge}}
+        open_leaf = {"from": [1.55, 0, 9.2], "to": [3.95, top_max, 23.7],
+                     "faces": {"west": {"texture": "#leaf", "uv": [0, 0, 16, 16]}, "east": {"texture": "#leaf", "uv": [16, 0, 0, 16]},
+                               "north": edge, "south": edge, "up": edge, "down": edge}}
         for suffix, leaf in (("", closed_leaf), ("_open", open_leaf)):
             write_json(ASSETS / f"models/block/{half}{suffix}.json", {
                 "parent": "minecraft:block/block",
@@ -289,14 +296,29 @@ def write_assets():
             },
             "elements": cab_elements,
         })
+        # single=true: a free-standing drawer unit for the staircase rooms, drawers on every side.
+        write_json(ASSETS / f"models/block/manila_cabinet_single{suffix}.json", {
+            "parent": "minecraft:block/block",
+            "textures": {
+                "particle": "noclip_backrooms:block/manila_wood",
+                "top": "noclip_backrooms:block/manila_table_top",
+                "wood": "noclip_backrooms:block/manila_wood",
+                "front": f"noclip_backrooms:block/{front_tex}",
+            },
+            "elements": [
+                box_elem([1, 13.5, 1], [15, 16, 15], {"all": "#wood", "up": "#top"}),
+                box_elem([2, 0, 2], [14, 13.5, 14], {"all": "#front", "up": "#wood", "down": "#wood"}),
+            ],
+        })
     cab_variants = {}
     for facing, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270)):
         for is_open in ("false", "true"):
-            suffix = "_open" if is_open == "true" else ""
-            entry = {"model": f"noclip_backrooms:block/manila_cabinet{suffix}"}
-            if y:
-                entry["y"] = y
-            cab_variants[f"facing={facing},open={is_open}"] = entry
+            for single in ("false", "true"):
+                suffix = ("_single" if single == "true" else "") + ("_open" if is_open == "true" else "")
+                entry = {"model": f"noclip_backrooms:block/manila_cabinet{suffix}"}
+                if y:
+                    entry["y"] = y
+                cab_variants[f"facing={facing},open={is_open},single={single}"] = entry
     write_json(ASSETS / "blockstates/manila_cabinet.json", {"variants": cab_variants})
 
     # 6. Chair (facing=north sits facing north, backrest on south side)

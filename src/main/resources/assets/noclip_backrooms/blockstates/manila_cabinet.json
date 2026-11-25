@@ -1,33 +1,63 @@
 {
   "variants": {
-    "facing=north,open=false": {
+    "facing=north,open=false,single=false": {
       "model": "noclip_backrooms:block/manila_cabinet"
     },
-    "facing=north,open=true": {
+    "facing=north,open=false,single=true": {
+      "model": "noclip_backrooms:block/manila_cabinet_single"
+    },
+    "facing=north,open=true,single=false": {
       "model": "noclip_backrooms:block/manila_cabinet_open"
     },
-    "facing=east,open=false": {
+    "facing=north,open=true,single=true": {
+      "model": "noclip_backrooms:block/manila_cabinet_single_open"
+    },
+    "facing=east,open=false,single=false": {
       "model": "noclip_backrooms:block/manila_cabinet",
       "y": 90
     },
-    "facing=east,open=true": {
+    "facing=east,open=false,single=true": {
+      "model": "noclip_backrooms:block/manila_cabinet_single",
+      "y": 90
+    },
+    "facing=east,open=true,single=false": {
       "model": "noclip_backrooms:block/manila_cabinet_open",
       "y": 90
     },
-    "facing=south,open=false": {
+    "facing=east,open=true,single=true": {
+      "model": "noclip_backrooms:block/manila_cabinet_single_open",
+      "y": 90
+    },
+    "facing=south,open=false,single=false": {
       "model": "noclip_backrooms:block/manila_cabinet",
       "y": 180
     },
-    "facing=south,open=true": {
+    "facing=south,open=false,single=true": {
+      "model": "noclip_backrooms:block/manila_cabinet_single",
+      "y": 180
+    },
+    "facing=south,open=true,single=false": {
       "model": "noclip_backrooms:block/manila_cabinet_open",
       "y": 180
     },
-    "facing=west,open=false": {
+    "facing=south,open=true,single=true": {
+      "model": "noclip_backrooms:block/manila_cabinet_single_open",
+      "y": 180
+    },
+    "facing=west,open=false,single=false": {
       "model": "noclip_backrooms:block/manila_cabinet",
       "y": 270
     },
-    "facing=west,open=true": {
+    "facing=west,open=false,single=true": {
+      "model": "noclip_backrooms:block/manila_cabinet_single",
+      "y": 270
+    },
+    "facing=west,open=true,single=false": {
       "model": "noclip_backrooms:block/manila_cabinet_open",
+      "y": 270
+    },
+    "facing=west,open=true,single=true": {
+      "model": "noclip_backrooms:block/manila_cabinet_single_open",
       "y": 270
     }
   }

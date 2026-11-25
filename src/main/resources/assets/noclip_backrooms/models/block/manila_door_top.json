@@ -82,23 +82,35 @@
         9.2
       ],
       "faces": {
-        "north": {
-          "texture": "#leaf"
-        },
         "south": {
-          "texture": "#leaf"
+          "texture": "#leaf",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "north": {
+          "texture": "#leaf",
+          "uv": [
+            16,
+            0,
+            0,
+            16
+          ]
         },
         "east": {
-          "texture": "#leaf"
+          "texture": "#wood"
         },
         "west": {
-          "texture": "#leaf"
+          "texture": "#wood"
         },
         "up": {
-          "texture": "#leaf"
+          "texture": "#wood"
         },
         "down": {
-          "texture": "#leaf"
+          "texture": "#wood"
         }
       }
     }

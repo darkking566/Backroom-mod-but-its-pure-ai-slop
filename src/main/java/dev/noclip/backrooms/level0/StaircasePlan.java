@@ -361,7 +361,8 @@ final class StaircasePlan {
 			if (lv == 8) return Level1Blocks.SUPPLY_CRATE.defaultBlockState();
 			return ModBlocks.MANILA_CABINET.defaultBlockState()
 					.setValue(ManilaCabinetBlock.FACING, c.worldDir(Direction.NORTH))
-					.setValue(ManilaCabinetBlock.OPENED, false);
+					.setValue(ManilaCabinetBlock.OPENED, false)
+						.setValue(ManilaCabinetBlock.SINGLE, true);
 		}
 		return Blocks.AIR.defaultBlockState();
 	}
@@ -428,7 +429,8 @@ final class StaircasePlan {
 			if (lu == 11 && lv == 14) {
 				return ModBlocks.MANILA_CABINET.defaultBlockState()
 						.setValue(ManilaCabinetBlock.FACING, c.worldDir(Direction.NORTH))
-						.setValue(ManilaCabinetBlock.OPENED, false);
+						.setValue(ManilaCabinetBlock.OPENED, false)
+						.setValue(ManilaCabinetBlock.SINGLE, true);
 			}
 			if (lu == 12 && lv == 14) return Level1Blocks.SUPPLY_CRATE.defaultBlockState();
 		}
@@ -476,8 +478,7 @@ final class StaircasePlan {
 		// Desk overlooking the glass window + supplies.
 		if (y == UPPER_FLOOR_Y + 1) {
 			if (lu == 15 && lv == 6) {
-				return ModBlocks.MANILA_TABLE.defaultBlockState()
-						.setValue(ManilaFurnitureBlock.FACING, c.worldDir(Direction.WEST));
+				return Level1Blocks.OFFICE_DESK.defaultBlockState();
 			}
 			if (lu == 14 && lv == 6) {
 				return ModBlocks.MANILA_CHAIR.defaultBlockState()
@@ -486,7 +487,8 @@ final class StaircasePlan {
 			if (lu == 15 && lv == 13) {
 				return ModBlocks.MANILA_CABINET.defaultBlockState()
 						.setValue(ManilaCabinetBlock.FACING, c.worldDir(Direction.WEST))
-						.setValue(ManilaCabinetBlock.OPENED, false);
+						.setValue(ManilaCabinetBlock.OPENED, false)
+						.setValue(ManilaCabinetBlock.SINGLE, true);
 			}
 			if (lu == 15 && lv == 14) return Level1Blocks.SUPPLY_CRATE.defaultBlockState();
 		}
@@ -541,8 +543,7 @@ final class StaircasePlan {
 		}
 		// Keep Void Stone immediately behind the closed door too (covered by alcove wall lu=10, lv=6!).
 		if (lu == 9 && lv == 12 && y == UPPER_FLOOR_Y + 1) {
-			return ModBlocks.MANILA_TABLE.defaultBlockState()
-					.setValue(ManilaFurnitureBlock.FACING, c.worldDir(Direction.NORTH));
+			return Level1Blocks.OFFICE_DESK.defaultBlockState();
 		}
 		if (lu == 9 && lv == 12 && y == UPPER_FLOOR_Y + 2) {
 			return ModBlocks.FIELD_NOTE.defaultBlockState()
@@ -605,11 +606,11 @@ final class StaircasePlan {
 			if (lu == 17 && lv == 11) {
 				return ModBlocks.MANILA_CABINET.defaultBlockState()
 						.setValue(ManilaCabinetBlock.FACING, c.worldDir(Direction.WEST))
-						.setValue(ManilaCabinetBlock.OPENED, false);
+						.setValue(ManilaCabinetBlock.OPENED, false)
+						.setValue(ManilaCabinetBlock.SINGLE, true);
 			}
 			if (lu == 17 && lv == 10) {
-				return ModBlocks.MANILA_TABLE.defaultBlockState()
-						.setValue(ManilaFurnitureBlock.FACING, c.worldDir(Direction.WEST));
+				return Level1Blocks.OFFICE_DESK.defaultBlockState();
 			}
 		}
 		if (y == dryFloor + 2 && lu == 17 && lv == 10) {

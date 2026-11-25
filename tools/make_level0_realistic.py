@@ -650,8 +650,9 @@ def light_panel(broken, tint=None):
 # ------------------------------------------------------------------------------------------ models
 
 def troffer(panel, glow):
-    """A light as a 60x120 cm fitting recessed into half of the block, the other half ordinary ceiling tiles, instead
-    of a whole glowing block. Same textures as before, plus the ceiling's; the grid strips match ceiling_tile_base."""
+    """A light as a square fitting recessed into the whole block, instead of a flat glowing block. Lamps have no facing,
+    so a half-block fitting striped every north-south strip and 2x2 panel; a whole one lines up whichever way they run.
+    Same textures as before, plus the ceiling's; the grid strips match ceiling_tile_base."""
     level0 = "noclip_backrooms:block/level0/"
 
     def face(texture, uv=None, cull=None):
@@ -662,7 +663,7 @@ def troffer(panel, glow):
             f["cullface"] = cull
         return f
 
-    diffuser = {"from": [0.5, 1.5, 0.5], "to": [15.5, 1.5, 8], "faces": {"down": face("#panel", [0, 0, 16, 16])}}
+    diffuser = {"from": [0.5, 1.5, 0.5], "to": [15.5, 1.5, 15.5], "faces": {"down": face("#panel", [0, 0, 16, 16])}}
     if glow:
         diffuser.update({"shade": False, "light_emission": 15})
     grid = [0, 7, 16, 8]
@@ -674,12 +675,11 @@ def troffer(panel, glow):
             # Above the ceiling line it is a ceiling block like its neighbours.
             {"from": [0, 0, 0], "to": [16, 16, 16],
              "faces": {side: face("#tile", cull=side) for side in ("north", "south", "west", "east", "up")}},
-            # Two ordinary tiles beside the fitting.
-            {"from": [0, 0, 8], "to": [16, 1.5, 16], "faces": {"down": face("#tile", [0, 0, 16, 8]), "north": face("#housing", [0, 0, 16, 1.5])}},
             # The fitting's frame round the opening, and its inside walls.
             {"from": [0, 0, 0], "to": [16, 1.5, 0.5], "faces": {"down": face("#housing", [0, 0, 16, 0.5]), "south": face("#housing", [0, 0, 16, 1.5])}},
-            {"from": [0, 0, 0.5], "to": [0.5, 1.5, 8], "faces": {"down": face("#housing", [0, 0, 0.5, 7.5]), "east": face("#housing", [0, 0, 7.5, 1.5])}},
-            {"from": [15.5, 0, 0.5], "to": [16, 1.5, 8], "faces": {"down": face("#housing", [0, 0, 0.5, 7.5]), "west": face("#housing", [0, 0, 7.5, 1.5])}},
+            {"from": [0, 0, 15.5], "to": [16, 1.5, 16], "faces": {"down": face("#housing", [0, 0, 16, 0.5]), "north": face("#housing", [0, 0, 16, 1.5])}},
+            {"from": [0, 0, 0.5], "to": [0.5, 1.5, 15.5], "faces": {"down": face("#housing", [0, 0, 0.5, 15]), "east": face("#housing", [0, 0, 15, 1.5])}},
+            {"from": [15.5, 0, 0.5], "to": [16, 1.5, 15.5], "faces": {"down": face("#housing", [0, 0, 0.5, 15]), "west": face("#housing", [0, 0, 15, 1.5])}},
             diffuser,
             # The ceiling grid, as on every ceiling tile.
             {"from": [0, -0.3, 0], "to": [16, 0, 0.75], "faces": {s: face("#grid", grid) for s in ("down", "north", "south")}},
