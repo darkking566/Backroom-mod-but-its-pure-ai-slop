@@ -162,7 +162,7 @@ public final class ZenithBlocks {
 			.noLootTable().sound(SoundType.WOOD).lightLevel(s -> 10), p -> new ZenithPortalBlock(p, LevelExitBlock.leave("0.1")));
 	/** The way in from Level 0: a white steel hatch set into a wall. */
 	public static final Block STATION_HATCH = register("station_hatch", Properties.of().mapColor(MapColor.SNOW).strength(-1.0F, 3600000.0F)
-			.noLootTable().sound(SoundType.METAL).lightLevel(s -> 4), p -> new ZenithPortalBlock(p, LevelExitBlock.to(Level0p1.KEY)));
+			.noLootTable().sound(SoundType.METAL).lightLevel(s -> 4), p -> new StationHatchBlock(p, LevelExitBlock.to(Level0p1.KEY)));
 	public static final Block DOORWAY_FRAME = register("doorway_frame", fixed(MapColor.COLOR_YELLOW));
 	public static final Block STATIC_TEAR = register("static_tear", Properties.of().mapColor(MapColor.COLOR_GRAY).strength(-1.0F, 3600000.0F)
 			.noLootTable().sound(SoundType.AMETHYST).lightLevel(s -> 9), p -> new LevelExitBlock(p, LevelExitBlock.cutOut("0.1")));

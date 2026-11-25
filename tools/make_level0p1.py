@@ -1065,7 +1065,7 @@ def all_models():
     m["glow_orb"] = model_orb()
     for name, count in PARTS.items():
         for part in range(count):
-            m[f"{name}_{part}"] = glowing_cube(f"{name}_{part}", 10 if name == "yellow_doorway" else 4)
+            m[f"{name}_{part}"] = hatch_model(part) if name == "station_hatch" else glowing_cube(f"{name}_{part}", 10)
     for part in DOOR_MODELS:
         m[f"station_door_{part}"] = {"parent": f"minecraft:block/door_{part}",
                                      "textures": {"bottom": tex("station_door_bottom"), "top": tex("station_door_top")}}
@@ -1077,6 +1077,14 @@ def all_models():
         m[f"{name}_side"] = {"parent": "minecraft:block/fence_side", "textures": {"texture": tex(texture)}}
         m[f"{name}_inventory"] = {"parent": "minecraft:block/fence_inventory", "textures": {"texture": tex(texture)}}
     return m
+
+
+def hatch_model(part):
+    """The hatch sits in a Level 0 wall: only the north face is the hatch, the rest is that wall's wallpaper."""
+    wall = "noclip_backrooms:block/level0/wallpaper"
+    return {"parent": "minecraft:block/block", "textures": {"particle": tex(f"station_hatch_{part}"), "hatch": tex(f"station_hatch_{part}"), "wall": wall},
+            "elements": [el((0, 0, 0), (16, 16, 16), sides("#wall", ("south", "east", "west", "up", "down"))),
+                         el((0, 0, 0), (16, 16, 0), {"north": "#hatch"}, shade=False, light_emission=4)]}
 
 
 # Blockstates
@@ -1153,8 +1161,9 @@ def all_blockstates():
     b["station_stairs"] = stairs_state("station_stairs")
     b["safety_rail"] = fence_state("safety_rail")
     b["rail_lamp"] = fence_state("rail_lamp")
-    for name, count in PARTS.items():
-        b[name] = {"variants": {f"part={p}": {"model": NS + f"{name}_{p}"} for p in range(count)}}
+    b["yellow_doorway"] = {"variants": {f"part={p}": {"model": NS + f"yellow_doorway_{p}"} for p in range(PARTS["yellow_doorway"])}}
+    b["station_hatch"] = {"variants": {f"facing={f},part={p}": {"model": NS + f"station_hatch_{p}", **({"y": y} if y else {})}
+                                       for f, y in FACING_Y.items() for p in range(PARTS["station_hatch"])}}
     b["plasma"] = {"variants": {f"heat={h}": {"model": NS + f"plasma_{h}"} for h in range(4)}}
     for name in VARIANTED:
         models = [name] + [f"{name}_v{n}" for n in range(1, VARIANTS + 1)]

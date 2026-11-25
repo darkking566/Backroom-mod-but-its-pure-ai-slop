@@ -175,6 +175,14 @@
   - 黑影幻覺：生出來後加標籤，讀檔時清掉；關伺服器時也清（`ShadowHallucination`），不會再被存進地圖
   - `gradlew build` 與 `runClientGameTest -Plevels=0` 通過；這三項沒有專門的測試（紅房間落點、關服清黑影都沒實機重現）
   - 注意：本機 JDK 是 `C:/Program Files/Java/jdk-25.0.4.1`（之前紀錄寫的 `jdk-25.0.5.0.3` 不存在）
+- 使用者同意後修 Level 0 審查報告的畫面問題：
+  - 天花板水管可以轉向：新增 `level1/PipeBlock`（`axis` 屬性，預設 x，停車場的水管全部不變），`ceiling_pipe`、`leaking_ceiling_pipe` 的方塊狀態加 `axis=z` 轉 90 度；Level 0 樓梯間依房間旋轉設定方向（`StaircasePlan.pipe`），不再斷成一截一截；`make_level1.py` 同步
+  - Level 0.1 白色艙門有面向：新增 `StationHatchBlock`（`facing`），`ZenithEntrance` 用原本算好的空氣那一面；模型只有正面是艙門、其餘是 Level 0 壁紙；`make_level0p1.py` 同步（只寫了艙門的模型與方塊狀態，沒重跑整支）
+  - 寫實材質包補上淺色、紅色、粗糙熄燈壁紙（含踢腳板）、9 種剝落露紅壁紙、乾燥與厚地毯、紅日光燈與 EXIT 燈（EXIT 燈也改成嵌燈），共 79 張貼圖；水漬、霉斑、地毯污漬在方塊邊緣前淡出（`fade_edges`）；踢腳板沿長度方向不變（轉角重疊處不閃）；資源包從約 58 MB 變約 87 MB
+  - 重跑 `make_level0_realistic.py` 會覆寫 `pack.mcmeta`，已把工具裡的描述改成跟現在的檔案一樣（Level 0 & Level 2）
+  - 驗證：`gradlew build` 通過；實機測試 Level 0、畫面風格（look）、Level 0.1 的 `hatch,ways`、Level 1 全部段落通過。Level 1 的 `secrets`（巡邏隊）與 `hounds` 各失敗過一次、重跑通過，改動前的程式單跑 `hounds` 也會過，判斷是偶發；Level 0.1 完整跑會停在本來就壞的 `blocks` 段（console 掉落物）
+  - 沒在遊戲畫面上逐一看過：艙門正面方向、樓梯間水管接起來的樣子、新貼圖在遊戲裡的樣子（只看了貼圖預覽 `docs/look/level0_realistic.png`）
+  - 沒做：寫實包嵌燈在南北向燈帶仍會變成斑馬條紋（燈沒有方向）、馬尼拉桌與門、EXIT 門不能轉向
 
 ## 動作記錄（Antigravity）
 

@@ -135,17 +135,22 @@ def shade(m, factor):
     m.color = m.color * np.asarray(factor, np.float32)[..., None]
 
 
+def fade_edges():
+    """1 in the middle, 0 at the block edge: stains fade out before it, so blocks meet without a cut-off stain."""
+    return smoothstep(6, 64, edge_distance())
+
+
 def big_stain(seed, cover):
     """One large stain with a ragged edge: a soft blob roughened by the photo stains."""
     rough = blur(np.roll(WATER, (seed * 131 % S, seed * 71 % S), (0, 1)), 3)
-    n = fbm(seed, base=2, octaves=4) + 0.35 * rough
+    n = (fbm(seed, base=2, octaves=4) + 0.35 * rough) * fade_edges()
     t = np.quantile(n, 1 - cover)
     return smoothstep(t - 0.03, t + 0.03, n)
 
 
 def region(seed, cover, soft=0.12, base=2):
     """A soft blob covering about `cover` of the texture."""
-    n = fbm(seed, base=base, octaves=4)
+    n = fbm(seed, base=base, octaves=4) * fade_edges()
     t = np.quantile(n, 1 - cover)
     return smoothstep(t - soft, t + soft, n)
 
@@ -274,6 +279,11 @@ def specks(seed, density, size=0.7):
 WALL = rgb(216, 196, 104)
 INK_LIGHT = rgb(240, 228, 166)
 INK_DARK = rgb(150, 128, 62)
+# (paper, light ink, dark ink, baseboard) for each wallpaper, after make_textures' palettes
+YELLOW = (WALL, INK_LIGHT, INK_DARK, rgb(150, 126, 80))
+PALE = (rgb(222, 216, 198), rgb(238, 234, 220), rgb(184, 178, 158), rgb(168, 160, 140))
+RED = (rgb(130, 36, 30), rgb(152, 52, 42), rgb(92, 20, 18), rgb(70, 22, 19))
+ROUGH = (rgb(166, 148, 82), rgb(184, 170, 120), rgb(116, 100, 50), rgb(96, 80, 48))  # the unlit rooms'
 
 
 def wallpaper_print():
@@ -310,13 +320,13 @@ def paper():
     return lum - blur(lum, 6), load_normal(maps["NormalDX"], 0.6), 1 - load(maps["Roughness"], gray=True)
 
 
-def wallpaper_base(seed):
+def wallpaper_base(seed, pal=YELLOW):
     light, dark = PRINT
     grain, normal, smooth = PAPER
     ink = 0.8 + 0.2 * fbm(seed + 1, base=16, octaves=3)
-    color = np.broadcast_to(WALL, (S, S, 3)).copy()
-    color = mix(color, INK_LIGHT, light * 0.85 * ink)
-    color = mix(color, INK_DARK, dark * 0.8 * ink)
+    color = np.broadcast_to(pal[0], (S, S, 3)).copy()
+    color = mix(color, pal[1], light * 0.85 * ink)
+    color = mix(color, pal[2], dark * 0.8 * ink)
     color *= (1 + grain * 1.8)[..., None]
     age = fbm(seed + 2, base=3)
     color *= (0.95 + 0.07 * age)[..., None]
@@ -340,8 +350,8 @@ def blister(m, seed, count, radius):
         shade(m, 1 + 0.2 * slope - 0.14 * np.exp(-((np.sqrt(d2) - 1) / 0.14) ** 2) * (Y > cy))
 
 
-def wallpaper_variant(i):
-    m = wallpaper_base(seed=10 * i)
+def wallpaper_variant(i, pal=YELLOW):
+    m = wallpaper_base(seed=10 * i, pal=pal)
     rng = np.random.default_rng(100 + i)
     if i == 1:  # water stains
         water_stain(m, big_stain(i, 0.22), fill=0.28, rim=0.3)
@@ -351,7 +361,7 @@ def wallpaper_variant(i):
     elif i == 3:  # long runs from a leak above
         streak = drips(i, 6, (0.5, 1.0), (2.5, 6), top=(0.0, 0.1))
         m.color = mix(m.color, m.color * rgb(170, 140, 96), streak * 0.35)
-        water_stain(m, np.roll(WATER, (0, rng.integers(S)), (0, 1)) * (1 - smoothstep(0.1, 0.35, T)), fill=0.22, rim=0.25)
+        water_stain(m, np.roll(WATER, (0, rng.integers(S)), (0, 1)) * (1 - smoothstep(0.1, 0.35, T)) * fade_edges(), fill=0.22, rim=0.25)
     elif i == 4:  # a dirty smear at hand height
         swipe = blur(rng.random((S, S)).astype(np.float32), (1.5, 16))
         swipe = smoothstep(0.5, 0.56, swipe / swipe.max()) * region(i + 50, 0.18, soft=0.1, base=3)
@@ -359,7 +369,7 @@ def wallpaper_variant(i):
     elif i == 5:  # a patch of newer paper, nailed up crooked
         x0, y0, w, h = 168, 150, 158, 132
         inside = ((X >= x0) & (X < x0 + w) & (Y >= y0) & (Y < y0 + h)).astype(np.float32)
-        patch = wallpaper_base(seed=777).roll(37, 23)
+        patch = wallpaper_base(seed=777, pal=pal).roll(37, 23)
         m.color = mix(m.color, patch.color * 1.035, inside)
         m.height = m.height + inside * 0.05
         rim_low = ((Y >= y0 + h) & (Y < y0 + h + 3) & (X >= x0) & (X < x0 + w + 3)) | ((X >= x0 + w) & (X < x0 + w + 3) & (Y >= y0) & (Y < y0 + h + 3))
@@ -386,8 +396,54 @@ def wallpaper_variant(i):
     return m
 
 
-def wallpaper_baseboard(stained):
-    m = wallpaper_base(seed=200)
+def peel(seed, shape, wobble=0.75):
+    """Yellow paper torn or peeling away from the red paper under it (the warning walls round a Red Room).
+    `shape` is positive where the paper is gone, in make_textures' 128-px coordinates."""
+    m = wallpaper_base(seed=900 + seed)
+    below = wallpaper_base(seed=950 + seed, pal=RED)
+    edge = fade_edges()
+    field = shape + (fbm(seed, base=6) - 0.5) * wobble * 0.6 + (fbm(seed + 9, base=48, octaves=2) - 0.5) * 0.12
+    field = field * edge - 0.6 * (1 - edge)
+    torn = smoothstep(0.04, 0.07, field)
+    shade(m, 1 - 0.22 * smoothstep(-0.28, 0.0, field))  # wet and darker round the tear
+    backing = smoothstep(-0.07, -0.02, field) * (1 - torn)
+    m.color = mix(m.color, rgb(214, 198, 158) * (1 + PAPER[0] * 2)[..., None], backing)
+    shade(below, 1 - 0.6 * (1 - smoothstep(0.06, 0.2, field)))  # in the shadow of the lifted edge
+    shade(below, 1 - 0.28 * smoothstep(0.3, 0.6, fbm(seed + 20, base=10)))  # old glue
+    m.color = mix(m.color, below.color, torn)
+    m.height = m.height - torn * 0.15 + backing * 0.2
+    return m
+
+
+def peeling_variants():
+    """The same nine tears as make_textures, at four times the size."""
+    x, y = X / 4, Y / 4
+
+    def blob(size, centre):
+        return 1 - np.hypot((x - centre[0]) / size[0], (y - centre[1]) / size[1])
+
+    def turned(angle):
+        dx, dy = x - 64, y - 64
+        return dx * np.cos(angle) + dy * np.sin(angle), -dx * np.sin(angle) + dy * np.cos(angle)
+
+    a, b = turned(0.8)
+    c, d = turned(1.15)
+    holes = [1 - np.hypot((x - hx) / r, (y - hy) / (r * 0.8)) for hx, hy, r in ((44, 46, 13), (82, 58, 10), (58, 86, 11), (90, 92, 7))]
+    return [
+        peel(200, blob((42, 50), (64, 64))),
+        peel(210, blob((24, 56), (48, 66))),
+        peel(220, blob((56, 26), (64, 48))),
+        peel(230, blob((22, 24), (78, 80))),
+        peel(240, 1 - np.hypot((x - 70) / 9, np.maximum(np.abs(y - 62) - 22, 0) / 10), 0.45),  # along a seam
+        peel(250, np.maximum.reduce(holes), 0.5),  # small tears
+        peel(260, blob((44, 18), (64, 36))),  # a sheet hanging from the top
+        peel(270, 1 - np.hypot(a / 52, b / 11), 0.45),  # a long tear
+        peel(280, np.maximum.reduce([1 - np.hypot(c / 40, (d - 9 * k) / 2.2) for k in (-1, 0, 1)]), 0.08),  # gouges
+    ]
+
+
+def wallpaper_baseboard(stained, pal=YELLOW):
+    m = wallpaper_base(seed=200, pal=pal)
     shade(m, 1 - 0.24 * smoothstep(0.70, 0.825, T))  # in the board's shadow (the board covers the bottom 2.8/16)
     wick = smoothstep(0.52, 0.82, T) * (0.6 + 0.4 * fbm(201, base=8))
     m.color = mix(m.color, m.color * rgb(226, 204, 158), wick * 0.4)
@@ -396,20 +452,16 @@ def wallpaper_baseboard(stained):
     return m
 
 
-def board():
-    """The baseboard, drawn tall: the model squeezes this whole texture into a strip 2.8/16 of a block high."""
+def board(base=YELLOW[3]):
+    """The baseboard, drawn tall: the model squeezes this whole texture into a strip 2.8/16 of a block high. Nothing
+    changes along its length: at inside corners two boards overlap, and any difference there flickers."""
     rng = np.random.default_rng(300)
     profile = np.where(T < 0.12, 0.93 + 0.14 * np.sin(np.pi * T / 0.12),
                        np.where(T < 0.16, 0.72, np.where(T < 0.88, 1 - 0.07 * (T - 0.16) / 0.72, 0.86 - 0.12 * smoothstep(0.88, 1, T))))
-    grain = blur(rng.random((S, S)).astype(np.float32), (10, 1.5))
+    grain = blur(rng.random((S, 1)).astype(np.float32), (1.5, 0)).repeat(S, 1)
     grain = (grain - grain.mean()) / grain.std()
-    scuffs = np.zeros((S, S), np.float32)
-    for _ in range(7):
-        cx, cy = rng.uniform(0, S), rng.uniform(0.25, 0.8) * S
-        scuffs = np.maximum(scuffs, np.exp(-(((X - cx) / rng.uniform(12, 40)) ** 2 + ((Y - cy) / rng.uniform(24, 60)) ** 2)))
-    dirt = smoothstep(0.78, 1.0, T) * fbm(301, base=8)
-    color = rgb(150, 126, 80) * (profile * (1 + 0.03 * grain))[..., None]
-    color = mix(color, rgb(80, 66, 44), np.clip(scuffs * 0.5 + dirt * 0.5, 0, 1))
+    color = base * (profile * (1 + 0.03 * grain))[..., None]
+    color = mix(color, base * 0.53, smoothstep(0.78, 1.0, T) * 0.25)  # dirt along the floor
     height = np.where(T < 0.12, 0.8 + 0.2 * np.sin(np.pi * T / 0.12), np.where(T < 0.16, 0.4, 0.7))
     return Material(color, height, smooth=0.45, porosity=0.1, bump=8)
 
@@ -419,11 +471,14 @@ def board():
 CARPET = rgb(150, 126, 82)
 
 
-def carpet_base(seed, shift=(0, 0)):
+DRY_CARPET = rgb(176, 150, 96)  # paler and trodden flat
+
+
+def carpet_base(seed, shift=(0, 0), tone=CARPET, contrast=1.5):
     maps = source("Carpet016", "2K-JPG")
     photo = crop_seamless(maps["Color"])
     lum = photo.mean(2)
-    color = CARPET * (lum / lum.mean())[..., None] ** 1.5 + (photo - photo.mean((0, 1))) * 0.35
+    color = tone * (lum / lum.mean())[..., None] ** contrast + (photo - photo.mean((0, 1))) * 0.35
     color *= (1 - 0.08 * DIRT)[..., None]
     color *= (0.93 + 0.10 * fbm(seed, base=3))[..., None]
     normal = crop_seamless(maps["NormalDX"])[..., :2] * 2 - 1
@@ -438,8 +493,8 @@ def wet(m, mask, darken=0.32, rim=0.12):
     m.smooth = np.maximum(m.smooth, 0.35 * mask)
 
 
-def carpet_variant(i):
-    m = carpet_base(seed=20 + i, shift=((i * 197) % S, (i * 311) % S))
+def carpet_variant(i, tone=CARPET, contrast=1.5):
+    m = carpet_base(seed=20 + i, shift=((i * 197) % S, (i * 311) % S), tone=tone, contrast=contrast)
     rng = np.random.default_rng(400 + i)
     if i == 2:  # big damp stains
         wet(m, region(i, 0.35, soft=0.08, base=3) * 0.9)
@@ -472,12 +527,12 @@ def carpet_variant(i):
     return m
 
 
-def carpet_edge():
+def carpet_edge(tone=CARPET):
     """A carpet block's side: the pile and its backing on top, the bare subfloor below."""
     rng = np.random.default_rng(500)
     fibres = blur(rng.random((S, S)).astype(np.float32), (5, 0.7))
     fibres = (fibres - fibres.min()) / (fibres.max() - fibres.min())
-    pile = CARPET * ((0.7 + 0.55 * fibres) * (1 - 0.4 * smoothstep(8, 58, Y)))[..., None]
+    pile = tone * ((0.7 + 0.55 * fibres) * (1 - 0.4 * smoothstep(8, 58, Y)))[..., None]
     floor = rgb(86, 82, 74) * (0.85 + 0.25 * fbm(501, base=6))[..., None]
     floor = mix(floor, rgb(52, 50, 46), specks(502, 0.004, 1.0))
     top = smoothstep(2, 6, Y + 4 * blur(rng.random((1, S)).astype(np.float32).repeat(S, 0), (0, 1.5)))
@@ -545,7 +600,7 @@ def painted_metal(color, seed):
     return Material(c, 0.5 + 0.01 * brushed, smooth=0.55, porosity=0.05, bump=10)
 
 
-def light_panel(broken):
+def light_panel(broken, tint=None):
     """A recessed fluorescent fitting behind a prismatic diffuser: two tubes, a few dead insects, dust."""
     rng = np.random.default_rng(700 + broken)
     tubes = np.clip(np.exp(-((T - 0.31) / 0.07) ** 2) + np.exp(-((T - 0.72) / 0.07) ** 2), 0, 1)
@@ -560,7 +615,7 @@ def light_panel(broken):
         glow = None
     else:
         level = (0.9 + 0.16 * tubes) * (0.93 + 0.07 * vignette) * (0.97 + 0.04 * prism)
-        color = np.clip(rgb(255, 250, 232) * level[..., None], 0, 1)
+        color = np.clip((rgb(255, 250, 232) if tint is None else tint) * level[..., None], 0, 1)
         glow = np.clip(level, 0, 1)
     m = Material(color, 0.5 + 0.02 * prism, smooth=0.75, porosity=0.0, glow=glow, bump=20)
 
@@ -637,7 +692,7 @@ def models():
     folder = PACK / "assets/noclip_backrooms/models/block/level0"
     folder.mkdir(parents=True, exist_ok=True)
     for name, panel, glow in (("fluorescent_light", "fluorescent_light", True), ("broken_fluorescent_light", "broken_fluorescent_light", False),
-                              ("red_fluorescent_light", "red_fluorescent_light", True)):
+                              ("red_fluorescent_light", "red_fluorescent_light", True), ("exit_light", "exit_light", True)):
         (folder / f"{name}.json").write_text(json.dumps(troffer(panel, glow), indent=2) + "\n", encoding="utf8")
 
 
@@ -646,7 +701,7 @@ def models():
 def pack_meta():
     PACK.mkdir(parents=True, exist_ok=True)
     meta = {"pack": {"description": {"translate": "pack.noclip_backrooms.realistic.description",
-                                     "fallback": "Photo-based textures (first sample: Level 0)"},
+                                     "fallback": "Photo-based textures (Level 0 & Level 2)"},
                      "min_format": 88, "max_format": 88}}
     (PACK / "pack.mcmeta").write_text(json.dumps(meta, indent=2) + "\n", encoding="utf8")
 
@@ -678,20 +733,37 @@ def main():
     textures["wallpaper_baseboard"] = wallpaper_baseboard(False)
     textures["wallpaper_baseboard_1"] = wallpaper_baseboard(True)
     textures["board"] = board()
+    for prefix, pal in (("pale_", PALE), ("red_", RED)):
+        textures[prefix + "wallpaper"] = wallpaper_variant(0, pal)
+        textures.update({f"{prefix}wallpaper_{i}": wallpaper_variant(i, pal) for i in range(1, 10)})
+        textures[prefix + "wallpaper_baseboard"] = wallpaper_baseboard(False, pal)
+        textures[prefix + "wallpaper_baseboard_1"] = wallpaper_baseboard(True, pal)
+        textures[prefix + "board"] = board(pal[3])
+    textures.update({"rough_wallpaper": wallpaper_variant(0, ROUGH), "rough_wallpaper_1": wallpaper_variant(1, ROUGH),
+                     "rough_wallpaper_baseboard": wallpaper_baseboard(True, ROUGH), "rough_board": board(ROUGH[3])})
+    textures.update({"peeling_red_wallpaper" + (f"_{i}" if i else ""): m for i, m in enumerate(peeling_variants())})
     textures["carpet"] = carpet_variant(0)
     textures.update({f"carpet_{i}": carpet_variant(i) for i in range(1, 10)})
     textures["carpet_edge"] = carpet_edge()
+    textures.update({"dry_carpet": carpet_variant(0, DRY_CARPET, 1.0), "dry_carpet_1": carpet_variant(1, DRY_CARPET, 1.0),
+                     "dry_carpet_edge": carpet_edge(DRY_CARPET)})
+    # Deeper pile: the same carpet, shaded harder; thick_carpet_2 is the rare damp one.
+    textures.update({"thick_carpet": carpet_variant(0, CARPET, 2.0), "thick_carpet_1": carpet_variant(1, CARPET, 2.0),
+                     "thick_carpet_2": carpet_variant(2, CARPET, 2.0), "thick_carpet_edge": carpet_edge()})
     textures.update({"ceiling_tile": ceiling_variant(0), "ceiling_tile_1": ceiling_variant(1), "ceiling_tile_2": ceiling_variant(2)})
     textures["ceiling_grid"] = painted_metal(rgb(196, 194, 184), 800)
     textures["light_housing"] = painted_metal(rgb(212, 208, 192), 801)
     textures["fluorescent_light"] = light_panel(broken=False)
     textures["broken_fluorescent_light"] = light_panel(broken=True)
+    textures["red_fluorescent_light"] = light_panel(broken=False, tint=rgb(236, 70, 56))
+    textures["exit_light"] = light_panel(broken=False, tint=rgb(150, 255, 176))
     for name, m in textures.items():
         save(name, m)
     models()
     pack_meta()
-    preview(["wallpaper", "wallpaper_1", "wallpaper_6", "wallpaper_baseboard", "board", "carpet", "carpet_2", "carpet_4",
-             "ceiling_tile", "ceiling_tile_1", "fluorescent_light", "broken_fluorescent_light"])
+    preview(["wallpaper", "wallpaper_1", "pale_wallpaper", "red_wallpaper", "rough_wallpaper", "peeling_red_wallpaper",
+             "peeling_red_wallpaper_7", "board", "carpet", "carpet_2", "dry_carpet", "thick_carpet", "ceiling_tile",
+             "ceiling_tile_1", "fluorescent_light", "red_fluorescent_light", "exit_light"])
     print(len(textures), "textures ->", OUT.relative_to(ROOT))
 
 

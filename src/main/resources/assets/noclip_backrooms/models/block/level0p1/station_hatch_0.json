@@ -2,7 +2,8 @@
   "parent": "minecraft:block/block",
   "textures": {
     "particle": "noclip_backrooms:block/level0p1/station_hatch_0",
-    "all": "noclip_backrooms:block/level0p1/station_hatch_0"
+    "hatch": "noclip_backrooms:block/level0p1/station_hatch_0",
+    "wall": "noclip_backrooms:block/level0/wallpaper"
   },
   "elements": [
     {
@@ -17,23 +18,37 @@
         16
       ],
       "faces": {
-        "north": {
-          "texture": "#all"
-        },
         "south": {
-          "texture": "#all"
+          "texture": "#wall"
         },
         "east": {
-          "texture": "#all"
+          "texture": "#wall"
         },
         "west": {
-          "texture": "#all"
+          "texture": "#wall"
         },
         "up": {
-          "texture": "#all"
+          "texture": "#wall"
         },
         "down": {
-          "texture": "#all"
+          "texture": "#wall"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        0
+      ],
+      "faces": {
+        "north": {
+          "texture": "#hatch"
         }
       },
       "shade": false,

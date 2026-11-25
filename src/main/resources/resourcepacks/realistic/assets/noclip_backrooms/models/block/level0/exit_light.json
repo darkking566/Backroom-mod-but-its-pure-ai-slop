@@ -1,0 +1,281 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level0/exit_light",
+    "panel": "noclip_backrooms:block/level0/exit_light",
+    "housing": "noclip_backrooms:block/level0/light_housing",
+    "tile": "noclip_backrooms:block/level0/ceiling_tile",
+    "grid": "noclip_backrooms:block/level0/ceiling_grid"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#tile",
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#tile",
+          "cullface": "south"
+        },
+        "west": {
+          "texture": "#tile",
+          "cullface": "west"
+        },
+        "east": {
+          "texture": "#tile",
+          "cullface": "east"
+        },
+        "up": {
+          "texture": "#tile",
+          "cullface": "up"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        8
+      ],
+      "to": [
+        16,
+        1.5,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#tile",
+          "uv": [
+            0,
+            0,
+            16,
+            8
+          ]
+        },
+        "north": {
+          "texture": "#housing",
+          "uv": [
+            0,
+            0,
+            16,
+            1.5
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        1.5,
+        0.5
+      ],
+      "faces": {
+        "down": {
+          "texture": "#housing",
+          "uv": [
+            0,
+            0,
+            16,
+            0.5
+          ]
+        },
+        "south": {
+          "texture": "#housing",
+          "uv": [
+            0,
+            0,
+            16,
+            1.5
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        0,
+        0.5
+      ],
+      "to": [
+        0.5,
+        1.5,
+        8
+      ],
+      "faces": {
+        "down": {
+          "texture": "#housing",
+          "uv": [
+            0,
+            0,
+            0.5,
+            7.5
+          ]
+        },
+        "east": {
+          "texture": "#housing",
+          "uv": [
+            0,
+            0,
+            7.5,
+            1.5
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        15.5,
+        0,
+        0.5
+      ],
+      "to": [
+        16,
+        1.5,
+        8
+      ],
+      "faces": {
+        "down": {
+          "texture": "#housing",
+          "uv": [
+            0,
+            0,
+            0.5,
+            7.5
+          ]
+        },
+        "west": {
+          "texture": "#housing",
+          "uv": [
+            0,
+            0,
+            7.5,
+            1.5
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        0.5,
+        1.5,
+        0.5
+      ],
+      "to": [
+        15.5,
+        1.5,
+        8
+      ],
+      "faces": {
+        "down": {
+          "texture": "#panel",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      },
+      "shade": false,
+      "light_emission": 15
+    },
+    {
+      "from": [
+        0,
+        -0.3,
+        0
+      ],
+      "to": [
+        16,
+        0,
+        0.75
+      ],
+      "faces": {
+        "down": {
+          "texture": "#grid",
+          "uv": [
+            0,
+            7,
+            16,
+            8
+          ]
+        },
+        "north": {
+          "texture": "#grid",
+          "uv": [
+            0,
+            7,
+            16,
+            8
+          ]
+        },
+        "south": {
+          "texture": "#grid",
+          "uv": [
+            0,
+            7,
+            16,
+            8
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        -0.3,
+        0.75
+      ],
+      "to": [
+        0.75,
+        0,
+        16
+      ],
+      "faces": {
+        "down": {
+          "texture": "#grid",
+          "uv": [
+            0,
+            7,
+            16,
+            8
+          ]
+        },
+        "west": {
+          "texture": "#grid",
+          "uv": [
+            0,
+            7,
+            16,
+            8
+          ]
+        },
+        "east": {
+          "texture": "#grid",
+          "uv": [
+            0,
+            7,
+            16,
+            8
+          ]
+        }
+      }
+    }
+  ]
+}
