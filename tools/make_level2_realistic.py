@@ -2,8 +2,8 @@
 
 Writes 512 px colour textures with labPBR _n / _s companions for every Level 2 texture into
 src/main/resources/resourcepacks/realistic/assets/noclip_backrooms/textures/block/level2/.
-Uses CC0 photo materials from ambientCG (cached in tools/.cache/ambientcg/) for concrete,
-brick, steel, rust, wood, frost, and water stains, plus photo-detailed high-resolution composites
+Uses CC0 photo materials from ambientCG (cached in tools/.cache/ambientcg/) for concrete (also the grain of the drawn brick walls),
+steel, rust, wood, frost, and water stains, plus photo-detailed high-resolution composites
 for doors, machines, props, lights, and wall decals so every UV and detail stays intact.
 
 Run: python tools/make_level2_realistic.py
@@ -12,6 +12,7 @@ import copy
 import io
 import json
 import re
+import time
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -131,7 +132,15 @@ def save(name, m):
     OUT.mkdir(parents=True, exist_ok=True)
 
     def write(suffix, a, mode):
-        Image.fromarray(np.clip(np.rint(a * 255), 0, 255).astype(np.uint8), mode).save(OUT / f"{name}{suffix}.png", optimize=True)
+        image = Image.fromarray(np.clip(np.rint(a * 255), 0, 255).astype(np.uint8), mode)
+        for attempt in range(5):
+            try:
+                image.save(OUT / f"{name}{suffix}.png", optimize=True)
+                break
+            except OSError:  # Windows now and then refuses the write (Errno 22) while something scans the file
+                if attempt == 4:
+                    raise
+                time.sleep(0.5)
 
     if m.alpha is not None:
         write("", np.dstack([np.clip(m.color, 0, 1), np.clip(m.alpha, 0, 1)]), "RGBA")
@@ -177,6 +186,28 @@ def load_pbr_substrate(asset, target_rgb=None, contrast=1.0, normal_strength=0.9
     norm = load_normal(maps["NormalDX"], normal_strength) if "NormalDX" in maps else None
     disp = load(maps["Displacement"], gray=True) if "Displacement" in maps else col.mean(axis=2)
     return Material(col, height=disp, normal=norm, smooth=smooth, f0=f0, porosity=porosity, bump=28.0)
+
+
+def brick_substrate(target_rgb, seed, contrast=1.0, mortar_rgb=None, default_smooth=0.14, porosity=0.65):
+    """Rectangular running-bond brick (8 courses, 4 bricks a row: the same layout as the 128 px base
+    texture), each brick with photo concrete grain and its own shade, set back behind recessed mortar.
+    Bricks075A was used before, but it is an irregular rubble-stone wall, wrong for tunnels and offices."""
+    m = load_pbr_substrate("Concrete034", target_rgb, contrast=contrast, normal_strength=0.7,
+                           default_smooth=default_smooth, porosity=porosity)
+    course, length = S // 8, S // 4
+    row = (Y // course).astype(int)
+    shifted = (X + (row % 2) * (length // 2)) % length
+    col = ((X + (row % 2) * (length // 2)) // length).astype(int) % 4
+    rng = np.random.default_rng(seed)
+    shade = rng.uniform(0.84, 1.1, (8, 4)).astype(np.float32)[row, col]
+    m.color = m.color * shade[..., None]
+    edge = np.minimum(np.minimum(Y % course, course - Y % course), np.minimum(shifted, length - shifted))
+    joint = 1 - smoothstep(2.5, 6.0, edge + fbm(seed + 1, base=16, octaves=3) * 2.5)
+    mortar = rgb(150, 142, 128) if mortar_rgb is None else mortar_rgb
+    m.color = mix(m.color, mortar * (0.85 + fbm(seed + 2, base=24, octaves=3)[..., None] * 0.3), joint)
+    m.height = m.height * 0.35 + 0.6 - joint * 0.45
+    m.porosity = np.maximum(m.porosity, joint * 0.8)
+    return m
 
 
 def apply_damp_patches(m, seed, coverage=0.45, puddle=False):
@@ -270,15 +301,15 @@ def build_authored_textures(WATER, MOULD):
     tex["utility_ceiling"] = ceil
 
     # Brick walls
-    muddy = load_pbr_substrate("Bricks075A", rgb(118, 86, 68), contrast=1.05, normal_strength=1.15, default_smooth=0.14, porosity=0.65)
+    muddy = brick_substrate(rgb(118, 86, 68), 271, contrast=1.05)
     grime = smoothstep(0.3, 0.95, T * 0.8 + fbm(41, base=4) * 0.35)
     muddy.color = mix(muddy.color, rgb(64, 52, 42), grime * 0.45)
     tex["muddy_brick_wall"] = muddy
 
-    black_b = load_pbr_substrate("Bricks075A", rgb(40, 40, 44), contrast=1.15, normal_strength=1.2, default_smooth=0.12, porosity=0.7)
+    black_b = brick_substrate(rgb(40, 40, 44), 272, contrast=1.15, mortar_rgb=rgb(62, 60, 58), default_smooth=0.12, porosity=0.7)
     tex["black_brick_wall"] = black_b
 
-    painted_b = load_pbr_substrate("Bricks075A", rgb(206, 206, 198), contrast=0.55, normal_strength=0.85, default_smooth=0.28, porosity=0.25)
+    painted_b = brick_substrate(rgb(206, 206, 198), 273, contrast=0.55, mortar_rgb=rgb(190, 188, 180), default_smooth=0.28, porosity=0.25)
     peel = smoothstep(0.72, 0.84, fbm(43, base=4))
     painted_b.color = mix(painted_b.color, rgb(144, 134, 122), peel * 0.6)
     tex["painted_brick_wall"] = painted_b
@@ -404,7 +435,7 @@ def composite_from_base(name, substrates):
             glow = s_img[..., 3]
         f0 = np.clip(s_img[..., 1] * 255, 8, 240)
         smooth = np.clip(s_img[..., 0] * 0.7 + smooth * 0.3, 0.05, 0.95)
-    elif name == "breaker_box":
+    if glow is None and name == "breaker_box":
         # Subtle status LED glow in breaker box upper-left
         led = ((photo_rgb[..., 0] > 0.55) & (photo_rgb[..., 1] < 0.3)) | ((photo_rgb[..., 1] > 0.5) & (photo_rgb[..., 0] < 0.35))
         if led.any():

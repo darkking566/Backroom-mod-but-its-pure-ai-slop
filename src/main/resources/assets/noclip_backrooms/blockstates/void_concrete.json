@@ -1,7 +1,21 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level2/void_concrete"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level2/void_concrete"
+      },
+      {
+        "model": "noclip_backrooms:block/level2/void_concrete",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level2/void_concrete",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level2/void_concrete",
+        "y": 270
+      }
+    ]
   }
 }

@@ -1,7 +1,21 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level2/cable_reel"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level2/cable_reel"
+      },
+      {
+        "model": "noclip_backrooms:block/level2/cable_reel",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level2/cable_reel",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level2/cable_reel",
+        "y": 270
+      }
+    ]
   }
 }

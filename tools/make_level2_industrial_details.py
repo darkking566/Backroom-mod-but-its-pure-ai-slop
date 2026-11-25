@@ -182,7 +182,15 @@ def make_snapped_cables_tex():
 
 
 def all_faces(tex):
-    return {f: {"texture": tex} for f in ("north", "south", "east", "west", "up", "down")}
+    # Explicit uv: without it a part smaller than a block shows only a cropped window of its texture.
+    return {f: {"texture": tex, "uv": [0, 0, 16, 16]} for f in ("north", "south", "east", "west", "up", "down")}
+
+
+def panel_faces(front, edge, face="north"):
+    """The whole picture on the face toward the room, and plain metal on the thin edges."""
+    faces = {f: {"texture": edge, "uv": [0, 0, 16, 16]} for f in ("north", "south", "east", "west", "up", "down")}
+    faces[face] = {"texture": front, "uv": [0, 0, 16, 16]}
+    return faces
 
 
 def write_json(path, obj):
@@ -248,14 +256,15 @@ def main():
     # Wall attachments (mounted against +Z wall, facing north by default)
     write_common(
         "breaker_box",
-        [{"from": [3, 2, 13], "to": [13, 14, 16], "faces": all_faces("#box")}],
-        {"particle": "noclip_backrooms:block/level2/breaker_box", "box": "noclip_backrooms:block/level2/breaker_box"},
+        [{"from": [3, 2, 13], "to": [13, 14, 16], "faces": panel_faces("#box", "#edge")}],
+        {"particle": "noclip_backrooms:block/level2/breaker_box", "box": "noclip_backrooms:block/level2/breaker_box",
+         "edge": "noclip_backrooms:block/level2/toolbox_metal"},
         facing_variants("breaker_box"),
     )
     write_common(
         "pressure_gauge",
         [
-            {"from": [4, 4, 14], "to": [12, 12, 16], "faces": all_faces("#gauge")},
+            {"from": [4, 4, 14], "to": [12, 12, 16], "faces": panel_faces("#gauge", "#pipe")},
             {"from": [7, 0, 14.5], "to": [9, 4, 15.5], "faces": all_faces("#pipe")},
         ],
         {
@@ -267,8 +276,9 @@ def main():
     )
     write_common(
         "hazard_sign",
-        [{"from": [2, 3, 15], "to": [14, 13, 16], "faces": all_faces("#sign")}],
-        {"particle": "noclip_backrooms:block/level2/hazard_sign", "sign": "noclip_backrooms:block/level2/hazard_sign"},
+        [{"from": [2, 3, 15], "to": [14, 13, 16], "faces": panel_faces("#sign", "#edge")}],
+        {"particle": "noclip_backrooms:block/level2/hazard_sign", "sign": "noclip_backrooms:block/level2/hazard_sign",
+         "edge": "noclip_backrooms:block/level2/toolbox_metal"},
         facing_variants("hazard_sign"),
     )
 
@@ -316,8 +326,9 @@ def main():
     # Ceiling details
     write_common(
         "ceiling_vent",
-        [{"from": [2, 14.5, 2], "to": [14, 16, 14], "faces": all_faces("#vent")}],
-        {"particle": "noclip_backrooms:block/level2/ceiling_vent", "vent": "noclip_backrooms:block/level2/ceiling_vent"},
+        [{"from": [2, 14.5, 2], "to": [14, 16, 14], "faces": panel_faces("#vent", "#edge", "down")}],
+        {"particle": "noclip_backrooms:block/level2/ceiling_vent", "vent": "noclip_backrooms:block/level2/ceiling_vent",
+         "edge": "noclip_backrooms:block/level2/toolbox_metal"},
         {"": {"model": "noclip_backrooms:block/level2/ceiling_vent"}},
     )
     write_common(

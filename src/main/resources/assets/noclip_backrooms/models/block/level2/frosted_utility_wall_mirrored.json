@@ -1,0 +1,83 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/level2/frosted_utility_wall",
+    "all": "noclip_backrooms:block/level2/frosted_utility_wall"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#all",
+          "uv": [
+            16,
+            0,
+            0,
+            16
+          ],
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#all",
+          "uv": [
+            16,
+            0,
+            0,
+            16
+          ],
+          "cullface": "south"
+        },
+        "east": {
+          "texture": "#all",
+          "uv": [
+            16,
+            0,
+            0,
+            16
+          ],
+          "cullface": "east"
+        },
+        "west": {
+          "texture": "#all",
+          "uv": [
+            16,
+            0,
+            0,
+            16
+          ],
+          "cullface": "west"
+        },
+        "up": {
+          "texture": "#all",
+          "uv": [
+            16,
+            0,
+            0,
+            16
+          ],
+          "cullface": "up"
+        },
+        "down": {
+          "texture": "#all",
+          "uv": [
+            16,
+            0,
+            0,
+            16
+          ],
+          "cullface": "down"
+        }
+      }
+    }
+  ]
+}

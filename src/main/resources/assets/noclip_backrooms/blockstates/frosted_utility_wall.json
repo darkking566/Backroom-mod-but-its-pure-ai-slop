@@ -1,7 +1,12 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level2/frosted_utility_wall"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level2/frosted_utility_wall"
+      },
+      {
+        "model": "noclip_backrooms:block/level2/frosted_utility_wall_mirrored"
+      }
+    ]
   }
 }

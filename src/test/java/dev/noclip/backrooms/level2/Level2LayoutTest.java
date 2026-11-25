@@ -247,4 +247,20 @@ class Level2LayoutTest {
 		assertTrue(reel > 0, "no cable reels appeared");
 		assertTrue(lumber > 0, "no lumber stacks appeared");
 	}
+
+	@Test
+	void wallDetailsHangOnSolidWall() {
+		int details = 0;
+		for (int x = -4 * SIZE; x < 4 * SIZE; x++) {
+			for (int z = -4 * SIZE; z < 4 * SIZE; z++) {
+				Level2Layout.WallDetail detail = Level2Layout.wallDetail(SEED, x, z);
+				if (detail == null || Level2Layout.tile(SEED, x, z).kind() != Kind.FLOOR) continue;
+				details++;
+				int wx = x - Level2Plan.DX[detail.dir()], wz = z - Level2Plan.DZ[detail.dir()];
+				assertEquals(Kind.WALL, Level2Layout.tile(SEED, wx, wz).kind(), "a wall detail with no wall behind it at " + x + ", " + z);
+				assertFalse(Level2Layout.isNoclipWall(SEED, wx, wz), "a wall detail hung on a noclip wall at " + x + ", " + z);
+			}
+		}
+		assertTrue(details > 0, "no wall details appeared");
+	}
 }

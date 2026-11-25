@@ -2,7 +2,8 @@
   "parent": "minecraft:block/block",
   "textures": {
     "particle": "noclip_backrooms:block/level2/hazard_sign",
-    "sign": "noclip_backrooms:block/level2/hazard_sign"
+    "sign": "noclip_backrooms:block/level2/hazard_sign",
+    "edge": "noclip_backrooms:block/level2/toolbox_metal"
   },
   "elements": [
     {
@@ -18,22 +19,58 @@
       ],
       "faces": {
         "north": {
-          "texture": "#sign"
+          "texture": "#sign",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "south": {
-          "texture": "#sign"
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "east": {
-          "texture": "#sign"
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "west": {
-          "texture": "#sign"
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "up": {
-          "texture": "#sign"
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         },
         "down": {
-          "texture": "#sign"
+          "texture": "#edge",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
         }
       }
     }

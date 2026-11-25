@@ -1,7 +1,21 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level2/debris_utility_floor"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level2/debris_utility_floor"
+      },
+      {
+        "model": "noclip_backrooms:block/level2/debris_utility_floor",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level2/debris_utility_floor",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level2/debris_utility_floor",
+        "y": 270
+      }
+    ]
   }
 }

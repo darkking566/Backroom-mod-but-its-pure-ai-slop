@@ -17,9 +17,14 @@ import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.LanternBlock;
+import net.minecraft.world.level.block.LecternBlock;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.PoweredRailBlock;
 import net.minecraft.world.level.block.RailBlock;
+import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
@@ -154,22 +159,28 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 	}
 
 	private static BlockState roomBlock(long seed, int x, int z, int h) {
-		if (h == 4) return light(seed, x, z);
 		int lx = Math.floorMod(x, Level2Plan.SIZE), lz = Math.floorMod(z, Level2Plan.SIZE);
 		Level2Plan plan = Level2Layout.plan(seed, x, z);
 		int r = plan.roomOf[Level2Plan.cell(lx / Level2Plan.CELL, lz / Level2Plan.CELL)];
-		if (r >= 0) {
-			Room room = plan.rooms.get(r);
-			int cx = (room.x0() + room.x1()) / 2, cz = (room.z0() + room.z1()) / 2;
-			if (room.kind() == RoomKind.EL3A) {
-				if (lx == cx && lz == cz) return h == 1 ? Blocks.CRAFTING_TABLE.defaultBlockState() : h == 2 ? Blocks.LANTERN.defaultBlockState() : air();
-				if (lx == cx + 1 && lz == cz && h == 1) return Blocks.CHEST.defaultBlockState();
-			} else if (room.kind() == RoomKind.MACCHINA) {
-				if (lx == cx && lz == cz) return h == 1 ? state(Level2Blocks.MACHINE_CABINET) : h == 2 ? Blocks.SOUL_LANTERN.defaultBlockState() : air();
-				if (lx == cx + 1 && lz == cz && h == 1) return Blocks.LECTERN.defaultBlockState();
-			}
+		if (r < 0) return h == 4 ? light(seed, x, z) : air();
+		Room room = plan.rooms.get(r);
+		int cx = (room.x0() + room.x1()) / 2, cz = (room.z0() + room.z1()) / 2;
+		// Each outpost turns its fittings its own way, so no two look stamped from one mould.
+		Direction face = Direction.from2DDataValue(Level2Layout.hash(seed, Math.floorDiv(x, Level2Plan.SIZE) * 64 + room.i(),
+				Math.floorDiv(z, Level2Plan.SIZE) * 64 + room.j(), 0x7A11) & 3);
+		if (room.kind() == RoomKind.EL3A) {
+			// Lanterns near the corners too, so the walls are not left in the dark around one lamp.
+			boolean corner = (lx == room.x0() + 2 || lx == room.x1() - 2) && (lz == room.z0() + 2 || lz == room.z1() - 2);
+			if (h == 4) return corner ? Blocks.LANTERN.defaultBlockState().setValue(LanternBlock.HANGING, true) : light(seed, x, z);
+			if (lx == cx && lz == cz) return h == 1 ? Blocks.CRAFTING_TABLE.defaultBlockState() : h == 2 ? Blocks.LANTERN.defaultBlockState() : air();
+			if (lx == cx + 1 && lz == cz && h == 1) return Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, face);
+		} else if (room.kind() == RoomKind.MACCHINA) {
+			if (h == 4) return light(seed, x, z);
+			if (lx == cx && lz == cz) return h == 1 ? Level2Blocks.MACHINE_CABINET.defaultBlockState().setValue(Level2FacingBlock.FACING, face)
+					: h == 2 ? Blocks.SOUL_LANTERN.defaultBlockState() : air();
+			if (lx == cx + 1 && lz == cz && h == 1) return Blocks.LECTERN.defaultBlockState().setValue(LecternBlock.FACING, face);
 		}
-		return air();
+		return h == 4 ? light(seed, x, z) : air();
 	}
 
 	private static BlockState roomAir(long seed, int x, int z, int h) {
@@ -182,7 +193,8 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 		if (kind == RoomKind.EL3A) return state(Level2Blocks.UTILITY_FLOOR);
 		if (kind == RoomKind.MACCHINA) return state(Level2Blocks.BLACK_BRICK_WALL);
 		int flooded = Level2Layout.floodedStage(seed, x, z);
-		if (flooded == 2) return Blocks.WATER.defaultBlockState();
+		// A half-sunk slab under water: wet feet, not a ditch to climb out of with a hound behind you.
+		if (flooded == 2) return Blocks.STONE_SLAB.defaultBlockState().setValue(SlabBlock.WATERLOGGED, true);
 		if (Level2Layout.isDrainGrate(seed, x, z)) return state(Level2Blocks.DRAIN_GRATE);
 		if (flooded == 1) return state(Level2Blocks.PUDDLED_UTILITY_FLOOR);
 		int ductAxis = Level2Layout.floorCableDuctAxis(seed, x, z);
@@ -306,6 +318,11 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 				for (int y = 0; y < HEIGHT; y++) {
 					BlockState state = block(seed, tile, wx, y, wz);
 					chunk.setBlockState(pos.set(x, y, z), state);
+					if (state.is(Blocks.CHEST)) {
+						ChestBlockEntity chest = new ChestBlockEntity(new BlockPos(wx, y, wz), state);
+						chest.setLootTable(Level2Bases.SUPPLIES, Level2Layout.hash(seed, wx, wz, 0x10C7));
+						chunk.setBlockEntity(chest);
+					}
 					oceanFloor.update(x, y, z, state);
 					surface.update(x, y, z, state);
 				}

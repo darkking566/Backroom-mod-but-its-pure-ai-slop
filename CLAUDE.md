@@ -249,6 +249,18 @@
   - 同時 Antigravity 有未提交的 Level 2 改動，build 包含了它們；只提交我的檔案
   - 還沒做（報告其餘）：家具朝向、貼圖撞衫與亂轉、Level 1 寫實包、區段建築與立體結構互撞、怪物／箱子／地標浮空的共用落點檢查
 
+- 照 Antigravity 的 Level 2 審查報告修正（先逐項對照程式確認真假）：
+  - 小物件貼圖被裁切：配電箱、壓力表、警告牌、通風口、斷電纜、工具箱、高架管橋都加上完整 `uv`；牆面掛件只有正面是圖案、薄邊改金屬（`make_level2_industrial_details.py`、`make_level2_props.py`、`make_level2_scene_variants.py`）
+  - 工具箱（只轉 180°，碰撞框不是正方形）、木材垛、電線盤、廢料堆每格隨機轉向；EL3A 儲物箱、Macchina 機櫃與講台依房間隨機朝向
+  - 一般牆、地板、天花板每格隨機轉向或鏡像（新增 `tools/make_level2_polish.py`，要在其他 `make_level2*.py` 之後跑；磚牆沒做，鏡像後磚縫對不上）；同一支工具幫 19 張後加貼圖補 `_n`／`_s`
+  - 寫實材質包的三種磚牆：Bricks075A 確認是亂石牆，改成照基礎貼圖排法的長方形順砌磚（`brick_substrate`，用已下載的 Concrete034 當表面紋理，沒有新下載）；配電箱燈號發光保留；寫檔偶爾 Errno 22 加重試
+  - EL3A 儲物箱與貨運礦車加戰利品表 `chests/level2_supplies.json`（內容同停車場補給箱）；EL3A 四角掛提燈
+  - 積水的一格深水改成含水石半磚，走得過去不卡
+  - 牆面掛件不再掛在錯位牆上，新增單元測試 `wallDetailsHangOnSolidWall`
+  - 判斷報告有誤沒改：物品欄圖示背對（物品欄看的是北面）、開門穿模（原版門在自己那格內轉）；`MapDump` 沒更新
+  - 驗證：Level 2 單元測試 11 項（強制重跑）與 `runClientGameTest -Plevels=2` 通過；截圖看到警告牌斜紋、長方形白漆磚；EL3A 截圖對著門，提燈與箱子朝向沒拍到；白漆磚的剝落花紋仍每格重複
+  - 等 Antigravity 同時在跑的實機測試結束後才跑自己的（第一次因 `build/run` 被占用失敗）
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23
