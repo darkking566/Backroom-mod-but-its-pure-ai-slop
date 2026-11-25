@@ -259,7 +259,8 @@ def main():
     clinic = json.loads((MODELS / "hospital_bed.json").read_text(encoding="utf8"))
     clinic["textures"].update({"particle": NS + "clinic_sheet", "sheet": NS + "clinic_sheet"})
     ml.write_json(MODELS / "clinic_bed.json", clinic)
-    ml.write_json(STATES / "clinic_bed.json", {"variants": {"": {"model": NS + "clinic_bed"}}})
+    ml.write_json(STATES / "clinic_bed.json", {"variants": {f"facing={f}": ({"model": NS + "clinic_bed", "y": y} if y else {"model": NS + "clinic_bed"})
+                                                           for f, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}})
 
     column("booth_drawer", "booth_drawer", "booth_wall")
     column("booth_drawer_open", "booth_drawer_open", "booth_wall")

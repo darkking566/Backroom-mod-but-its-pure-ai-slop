@@ -2318,7 +2318,7 @@ def all_blockstates():
                                           {"model": NS + "garage_wall_2", "weight": 3}, {"model": NS + "garage_wall_3", "weight": 3}]}}
     for name in ("garage_pillar", "garage_pillar_base", "garage_pillar_marked",
                  "broken_garage_light", "supply_crate", "broken_bare_bulb", "green_bare_bulb", "metal_exit_door",
-                 "metal_exit_door_top", "office_desk", "flickering_wallpaper"):
+                 "metal_exit_door_top", "flickering_wallpaper"):
         b[name] = single(name)
     for name in ("ceiling_pipe", "leaking_ceiling_pipe"):
         b[name] = {"variants": {"axis=x": {"model": NS + name}, "axis=z": {"model": NS + name, "y": 90}}}
@@ -2350,7 +2350,10 @@ def all_blockstates():
     for name in ("booth_wall", "booth_roof", "barrier_base", "barrier_arm", "fuel_drum", "caged_lamp", "eyed_crate", "shut_eyed_crate"):
         b[name] = single(name)
     b["booth_drawer"] = {"variants": {"empty=false": {"model": NS + "booth_drawer"}, "empty=true": {"model": NS + "booth_drawer_open"}}}
-    for name in ("first_light_sign", "blink_sign", "floodlight", "cot", "bedroll", "supply_locker", "barrel_fire", "tarp", "gallery_wall", "hospital_bed", "debris_pile", "sunken_chair", "floor_painting", "trader_sign", "clinic_sign", "tom_sign", "signup_sign", "justice_sign", "trade_counter", "tom_counter", "signup_booth", "sealed_door", "natural_lock"):
+    for name in ("office_desk", "cot", "bedroll", "hospital_bed"):
+        b[name] = {"variants": {f"facing={f}": ({"model": NS + name, "y": y} if y else {"model": NS + name})
+                                for f, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}}
+    for name in ("first_light_sign", "blink_sign", "floodlight", "supply_locker", "barrel_fire", "tarp", "gallery_wall", "debris_pile", "sunken_chair", "floor_painting", "trader_sign", "clinic_sign", "tom_sign", "signup_sign", "justice_sign", "trade_counter", "tom_counter", "signup_booth", "sealed_door", "natural_lock"):
         b[name] = single(name)
     b["jersey_barrier"] = {"variants": {"axis=x": {"model": NS + "jersey_barrier"}, "axis=z": {"model": NS + "jersey_barrier", "y": 90}}}
     # The same turns as an end rod: the smear lies against the block it was dabbed on.
@@ -2364,7 +2367,8 @@ def all_blockstates():
     b["gallery_wall"] = {"variants": {"": [{"model": NS + "gallery_wall", "weight": 2}, {"model": NS + "gallery_wall_1", "weight": 1},
                                            {"model": NS + "gallery_wall_2", "weight": 1}]}}
     b["pipe_gauge"] = {"variants": {f"facing={f}": {"model": NS + "pipe_gauge", **turn} for f, turn in turns.items()}}
-    b["clinic_bed"] = {"variants": {"": {"model": NS + "hospital_bed"}}}
+    b["clinic_bed"] = {"variants": {f"facing={f}": ({"model": NS + "hospital_bed", "y": y} if y else {"model": NS + "hospital_bed"})
+                                    for f, y in (("north", 0), ("east", 90), ("south", 180), ("west", 270))}}
     for taken in ("false", "true"):
         model = "settlement_marker" + ("_taken" if taken == "true" else "")
         for f, turn in turns.items():

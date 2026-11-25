@@ -349,6 +349,13 @@
   - `Level1ClientTest` 新增 `pipeFit` 段：2 個種子、20 個管線區，每根天花板水管（所有高度）上面要是實心、每個儀表背後要是實心；改之前 14 個儀表懸空，改之後 0 個（93355 根水管、3256 個儀表）
   - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=pipeFit,sectors` 通過；沒在遊戲畫面上看過管線區
 - 使用者同意後，把 `main` 推送到 GitHub（`c5b45e6` 管線區儀表不懸空與這筆紀錄）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- Level 1 審查報告：玩家擺放辦公桌與床的朝向：
+  - 辦公桌、病床、診所病床、行軍床、睡袋加 `facing`（`OldComputerBlock` 多一個「從玩家視線轉幾個 90 度」的參數；`RestBlock`、`ClinicBedBlock` 改繼承它）；預設朝北＝原本模型的樣子，世界生成與舊存檔不變
+  - 玩家擺放：辦公桌面向玩家；病床、診所病床、行軍床順著玩家看的方向擺、枕頭在遠端；睡袋同樣枕頭在遠端；選取框與碰撞箱跟著轉
+  - 5 個方塊狀態改成四個方向；`tools/make_level1.py`、`make_level1_texture_fixes.py` 同步（沒重跑）
+  - `Level1ClientTest` 新增 `placeFacing` 段：創造模式真的從四個方向右鍵擺放這 5 種，檢查朝向；四個方向的病床與睡袋拍照，枕頭方向都對
+  - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=1 -Psections=placeFacing,checkBlocks,rooms,wikiSettlements` 通過，log 沒有缺模型
+  - 沒做（審查報告其餘）：櫃檯、門框、出口門、日光燈、收費亭柵欄桿的擺放朝向
 
 ## 動作記錄（Antigravity）
 

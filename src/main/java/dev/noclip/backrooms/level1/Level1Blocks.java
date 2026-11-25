@@ -89,7 +89,7 @@ public final class Level1Blocks {
 	public static final Block CUBICLE_PANEL = register("cubicle_panel", Properties.of()
 			.mapColor(MapColor.COLOR_GRAY).strength(0.6F).sound(SoundType.WOOL).noOcclusion(), CubiclePanelBlock::new);
 	public static final Block OFFICE_DESK = register("office_desk", Properties.of()
-			.mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD).noOcclusion(), p -> new ShapedBlock(p, DESK_SHAPE));
+			.mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD).noOcclusion(), p -> new OldComputerBlock(p, DESK_SHAPE));
 	public static final Block OLD_COMPUTER = register("old_computer", Properties.of()
 			.mapColor(MapColor.SAND).strength(1.0F).sound(SoundType.METAL).noOcclusion(), p -> new OldComputerBlock(p, COMPUTER_SHAPE));
 
@@ -293,13 +293,14 @@ public final class Level1Blocks {
 			.mapColor(MapColor.TERRACOTTA_ORANGE).instabreak().sound(SoundType.GRASS).noOcclusion(), p -> new ShapedBlock(p, Block.box(4, 0, 4, 12, 6, 12)));
 	public static final Block HOSPITAL_BED = register("hospital_bed", Properties.of()
 			.mapColor(MapColor.METAL).strength(0.8F).sound(SoundType.METAL).noOcclusion(),
-			p -> new ShapedBlock(p, Block.box(0, 0, 1, 16, 11, 15)));
+			// Beds run east-west with the pillow west: one turn puts the pillow at the far end of where the player looks.
+			p -> new OldComputerBlock(p, Block.box(0, 0, 1, 16, 11, 15), 1));
 	public static final Block COT = register("cot", Properties.of()
 			.mapColor(MapColor.COLOR_GREEN).strength(0.8F).sound(SoundType.WOOL).noOcclusion(),
-			p -> new RestBlock(p, Block.box(0, 0, 1, 16, 8, 15), "first_light"));
+			p -> new RestBlock(p, Block.box(0, 0, 1, 16, 8, 15), 1, "first_light"));
 	public static final Block BEDROLL = register("bedroll", Properties.of()
 			.mapColor(MapColor.COLOR_BROWN).strength(0.5F).sound(SoundType.WOOL).noOcclusion(),
-			p -> new RestBlock(p, Block.box(1, 0, 1, 15, 3, 15), "blink"));
+			p -> new RestBlock(p, Block.box(1, 0, 1, 15, 3, 15), 0, "blink"));  // pillow north
 	public static final Block SUPPLY_LOCKER = register("supply_locker", Properties.of()
 			.mapColor(MapColor.METAL).strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion(),
 			p -> new LockerBlock(p, Block.box(1, 0, 2, 15, 16, 14)));

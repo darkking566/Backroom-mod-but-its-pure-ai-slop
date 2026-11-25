@@ -83,6 +83,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			if (only("rooms")) rooms(context, game, seed);
 			if (only("hounds")) hounds(context, game, seed);
 			if (only("shepherdSnake")) shepherdSnake(context, game, seed);
+			if (only("placeFacing")) placeFacing(context, game);
 			if (only("checkBlocks")) checkBlocks(context, game);
 			if (only("leaveThroughDoor")) leaveThroughDoor(context, game, seed);
 		}
@@ -1392,6 +1393,61 @@ public final class Level1ClientTest implements FabricClientGameTest {
 				check(Language.getInstance().has(block.getDescriptionId()), "no name for " + block);
 			}
 		});
+	}
+
+	/**
+	 * A desk a player puts down faces them; a bed runs along the way they look with its pillow at the far end (a bedroll
+	 * the same). Placed with a real right-click from each of the four sides, then the four bed turns photographed.
+	 */
+	private static void placeFacing(ClientGameTestContext context, TestSingleplayerContext game) {
+		var server = game.getServer();
+		BlockPos at = server.computeOnServer(s -> player(s).blockPosition());
+		int x0 = at.getX(), z0 = at.getZ();
+		String clear = String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run fill %d %d %d %d %d %d minecraft:air", x0 - 6, STAND, z0 - 6, x0 + 6, STAND + 3, z0 + 6);
+		server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run fill %d %d %d %d %d %d noclip_backrooms:garage_floor",
+				x0 - 6, STAND - 1, z0 - 6, x0 + 6, STAND - 1, z0 + 6));
+		server.runCommand("gamemode creative @a");
+		Object[][] cases = {{Level1Blocks.OFFICE_DESK, 2}, {Level1Blocks.HOSPITAL_BED, 1}, {Level1Blocks.CLINIC_BED, 1}, {Level1Blocks.COT, 1}, {Level1Blocks.BEDROLL, 0}};
+		for (Object[] c : cases) {
+			Block block = (Block) c[0];
+			int turns = (Integer) c[1];
+			String id = BuiltInRegistries.BLOCK.getKey(block).toString();
+			for (int yaw = 0; yaw < 360; yaw += 90) {
+				server.runCommand(clear);
+				server.runCommand("item replace entity @a weapon.mainhand with " + id);
+				server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f %d 60", x0 + 0.5, STAND, z0 + 0.5, yaw));
+				context.waitTicks(5);
+				context.getInput().lookAt(yaw, 60);
+				context.waitTicks(2);
+				context.getInput().pressMouse(1);
+				context.waitTicks(5);
+				final int look = yaw;
+				server.runOnServer(s -> {
+					ServerLevel level = level1(s);
+					Direction expected = Direction.fromYRot(look);
+					for (int i = 0; i < turns; i++) expected = expected.getClockWise();
+					BlockState placed = null;
+					for (BlockPos pos : BlockPos.betweenClosed(x0 - 4, STAND, z0 - 4, x0 + 4, STAND + 1, z0 + 4)) {
+						if (level.getBlockState(pos).is(block)) placed = level.getBlockState(pos);
+					}
+					check(placed != null, id + " was not placed looking " + Direction.fromYRot(look));
+					check(placed.getValue(OldComputerBlock.FACING) == expected,
+							id + " placed looking " + Direction.fromYRot(look) + " faces " + placed.getValue(OldComputerBlock.FACING) + ", not " + expected);
+				});
+			}
+		}
+		server.runCommand(clear);
+		server.runCommand("gamemode spectator @a");
+		// Four hospital beds and four bedrolls, as placed looking north, east, south and west.
+		String[] facings = {"east", "south", "west", "north"};
+		for (int i = 0; i < 4; i++) {
+			server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run setblock %d %d %d noclip_backrooms:hospital_bed[facing=%s]", x0 - 3 + 2 * i, STAND, z0, facings[i]));
+			server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run setblock %d %d %d noclip_backrooms:bedroll[facing=%s]", x0 - 3 + 2 * i, STAND, z0 + 2,
+					new String[] {"north", "east", "south", "west"}[i]));
+		}
+		server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run setblock %d %d %d minecraft:sea_lantern", x0, STAND + 3, z0 + 1));
+		shoot(context, game, x0 + 0.5, STAND + 2.6, z0 - 2.5, 0, 55, "level1_place_facing");
+		server.runCommand(clear);
 	}
 
 	/** The nearest exit door, from both of its sides, then out with a right-click. */
