@@ -211,6 +211,10 @@ Wiki 說各團隊會留下彩色布料，掛著物資和一張紙條，指引你
   - **大廳路邊小場景（約 50% 非深谷／非地標／非據點大廳）**：拋錨事故點（`HALL_BREAKDOWN_SPOT`，廢棄汽車／廂型車＋錐筒＋油桶＋探照燈＋補給箱）與大廳販賣機休息角（`HALL_VENDING_BREAK_CORNER`，販賣機＋電視桌＋木椅＋導線柱配電箱）。
   - **廢棄車輛搜刮**：右鍵 `abandoned_car`／`abandoned_van` 可撬開車內置物箱搜刮 1 次（持久化記錄不重複拿取），有 75% 機率安全找到杏仁水、合金、繃帶、磷粉（偶爾撬棍／C.L.I.P.P. 卡），25% 機率觸發車載防盜警報，拿到 1 塊合金但驚動半徑 28 格內敵對怪物。
   - **自動販賣機投幣**：手持 1 塊 `alloy` 右鍵 `vending_machine` 可換取 1 瓶杏仁水（另有 15% 機率附帶 1 個繃帶）。
+- **稀有伏筆與彩蛋興趣點（`Level1EasterEggs.java`，每 `4×4` 大廳巨集區域最多 1 座，位於無柱安全口袋 `lx 28..34, lz 51..57`）**：
+  - **Level Fun 派對塗鴉暗門彩蛋（`PARTYGOER_DOOR_EGG`）**：洋紅／琥珀霓虹與黑白格地板框出 `fun_door`（接通 `LevelExits -> "fun"`，目前顯示尚未開放），內有辦公桌與老電視、異常金庫箱、補給箱、流浪者殘骸與工程錐筒。
+  - **異常裂隙研究封印室（`ANOMALY_RIFT_ARCHIVE`）**：`sealed_vault_wall` 與 `glitched_wall_seam` 封存的虛空石裂隙室，中央擺放可用的 3×3 `anomaly_altar`（異常祭壇）與 `crystal_vein_node`，側邊附異常金庫箱、電腦桌、配電箱、殘骸與紐澤西護欄。
+  - **深層中繼站／虛空門扉前哨（`VOID_RELAY_POST`）**：青色霓虹與封印牆框出 `hub_door`（接通 `LevelExits -> "hub"`），虛空石走道兩側擺放中繼投遞箱（`relay_dropoff_box`）、上鎖軍械箱、紅色異常結晶叢、流浪者殘骸與油桶。
 
 ## 這一版不做
 

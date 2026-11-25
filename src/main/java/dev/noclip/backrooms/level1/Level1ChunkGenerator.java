@@ -72,7 +72,9 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 		BlockState sectorPoi = Level1SectorPois.block(seed, x, y, z);
 		if (sectorPoi != null) return sectorPoi;
 		BlockState vignette = Level1Vignettes.block(seed, x, y, z);
-		return vignette != null ? vignette : arch;
+		if (vignette != null) return vignette;
+		BlockState easterEgg = Level1EasterEggs.block(seed, x, y, z);
+		return easterEgg != null ? easterEgg : arch;
 	}
 
 	private static BlockState plainBlock(long seed, Tile tile, Ceiling ceiling, HallPlan.Cell exit, HallPlan.PropCell prop,

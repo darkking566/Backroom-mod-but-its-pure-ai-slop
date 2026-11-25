@@ -75,6 +75,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			if (only("elevationPois")) elevationPois(context, game, seed);
 			if (only("sectorPois")) sectorPois(context, game, seed);
 			if (only("vignettes")) vignettes(context, game, seed);
+			if (only("easterEggs")) easterEggs(context, game, seed);
 			if (only("exits")) exits(context, game, seed);
 			if (only("events")) events(context, game, seed);
 			if (only("settlements")) settlements(context, game, seed);
@@ -1718,6 +1719,94 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			}
 		}
 		throw new AssertionError("no vignette " + kind + " within ring 24");
+	}
+
+	/** Rare region-scoped foreshadowing & easter-egg POIs (Batch 4) and foreshadowing door refusal check. */
+	private static void easterEggs(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
+		var server = game.getServer();
+		server.runCommand("gamemode spectator @a");
+
+		// 1) Partygoer / Level Fun foreshadowing door
+		Level1EasterEggs.Egg party = findEasterEgg(seed, Level1EasterEggs.Kind.PARTYGOER_DOOR_EGG);
+		int px = party.dx() * 64 + party.minLx(), pz = party.dz() * 64 + party.minLz();
+		shoot(context, game, px + 3.5, STAND + 1.1, pz - 0.8, 0, 14, "level1_poi_egg_party");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			BlockState door = level.getBlockState(new BlockPos(party.focalX(), party.focalY(), party.focalZ()));
+			check(BuiltInRegistries.BLOCK.getKey(door.getBlock()).getPath().equals("fun_door"), "fun_door missing");
+			check(door.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_AXIS) == Direction.Axis.Z,
+					"fun_door axis wrong: " + door);
+			BlockState top = level.getBlockState(new BlockPos(party.focalX(), party.focalY() + 1, party.focalZ()));
+			check(BuiltInRegistries.BLOCK.getKey(top.getBlock()).getPath().equals("fun_door_top"), "fun_door_top missing");
+			check(level.getBlockState(new BlockPos(party.lootX(), party.lootY(), party.lootZ()))
+					.is(dev.noclip.backrooms.props.BackroomsProps.ANOMALY_VAULT_CHEST), "party vault chest missing");
+			check(level.getBlockState(new BlockPos(px + 5, STAND, pz + 3))
+					.is(dev.noclip.backrooms.props.BackroomsProps.WANDERER_REMAINS), "party wanderer remains missing");
+		});
+		// Right-clicking the foreshadowing door triggers LevelExits refusal
+		int refusalsBefore = server.computeOnServer(s -> LevelExits.refusals());
+		server.runCommand("gamemode survival @a");
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f 0 15",
+				px + 3.5, STAND, pz + 4.5));
+		context.waitTicks(5);
+		context.getInput().lookAt(0, 15);
+		context.waitTicks(2);
+		context.getInput().pressMouse(1);
+		context.waitTicks(5);
+		int refusalsAfter = server.computeOnServer(s -> LevelExits.refusals());
+		check(refusalsAfter > refusalsBefore, "fun_door right-click did not increment LevelExits.refusals() (" + refusalsBefore + " -> " + refusalsAfter + ")");
+		server.runCommand("gamemode spectator @a");
+
+		// 2) Anomaly Rift Archive
+		Level1EasterEggs.Egg rift = findEasterEgg(seed, Level1EasterEggs.Kind.ANOMALY_RIFT_ARCHIVE);
+		int rx = rift.dx() * 64 + rift.minLx(), rz = rift.dz() * 64 + rift.minLz();
+		shoot(context, game, rx + 3.5, STAND + 1.1, rz - 0.8, 0, 14, "level1_poi_egg_rift");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			check(level.getBlockState(new BlockPos(rift.focalX(), rift.focalY(), rift.focalZ()))
+					.is(dev.noclip.backrooms.props.BackroomsProps.ANOMALY_ALTAR), "rift altar missing");
+			check(level.getBlockState(new BlockPos(rx + 3, STAND, rz + 5))
+					.is(dev.noclip.backrooms.props.BackroomsProps.CRYSTAL_VEIN_NODE), "rift crystal vein missing");
+			check(level.getBlockState(new BlockPos(rift.lootX(), rift.lootY(), rift.lootZ()))
+					.is(dev.noclip.backrooms.props.BackroomsProps.ANOMALY_VAULT_CHEST), "rift vault chest missing");
+			check(level.getBlockState(new BlockPos(rx + 5, STAND, rz + 3))
+					.is(dev.noclip.backrooms.props.BackroomsProps.INDUSTRIAL_FUSE_BOX), "rift fuse box missing");
+		});
+
+		// 3) Void Relay Post
+		Level1EasterEggs.Egg relay = findEasterEgg(seed, Level1EasterEggs.Kind.VOID_RELAY_POST);
+		int vx = relay.dx() * 64 + relay.minLx(), vz = relay.dz() * 64 + relay.minLz();
+		shoot(context, game, vx + 3.5, STAND + 1.1, vz - 0.8, 0, 14, "level1_poi_egg_relay");
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			BlockState door = level.getBlockState(new BlockPos(relay.focalX(), relay.focalY(), relay.focalZ()));
+			check(BuiltInRegistries.BLOCK.getKey(door.getBlock()).getPath().equals("hub_door"), "hub_door missing");
+			check(door.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_AXIS) == Direction.Axis.Z,
+					"hub_door axis wrong: " + door);
+			BlockState top = level.getBlockState(new BlockPos(relay.focalX(), relay.focalY() + 1, relay.focalZ()));
+			check(BuiltInRegistries.BLOCK.getKey(top.getBlock()).getPath().equals("hub_door_top"), "hub_door_top missing");
+			check(level.getBlockState(new BlockPos(relay.lootX(), relay.lootY(), relay.lootZ()))
+					.is(dev.noclip.backrooms.props.BackroomsProps.LOCKED_ARMORY_CRATE), "relay armory crate missing");
+			check(level.getBlockState(new BlockPos(vx + 1, STAND, vz + 5))
+					.is(dev.noclip.backrooms.props.BackroomsProps.RELAY_DROPOFF_BOX), "relay dropoff box missing");
+			check(level.getBlockState(new BlockPos(vx + 1, STAND, vz + 3))
+					.is(dev.noclip.backrooms.props.BackroomsProps.RED_ANOMALY_CLUSTER), "relay red anomaly cluster missing");
+		});
+	}
+
+	private static Level1EasterEggs.Egg findEasterEgg(long seed, Level1EasterEggs.Kind kind) {
+		for (int ring = 1; ring <= 32; ring++) {
+			for (int dx = -ring; dx <= ring; dx++) {
+				for (int dz = -ring; dz <= ring; dz++) {
+					if (Math.max(Math.abs(dx), Math.abs(dz)) != ring) continue;
+					Level1EasterEggs.Egg e = Level1EasterEggs.egg(seed, dx, dz);
+					if (e != null && e.kind() == kind) {
+						return e;
+					}
+				}
+			}
+		}
+		throw new AssertionError("no easter egg " + kind + " within ring 32");
 	}
 
 	private static void checkBlocks(ClientGameTestContext context, TestSingleplayerContext game) {
