@@ -1,0 +1,91 @@
+package dev.noclip.backrooms.level4;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import dev.noclip.backrooms.level4.Level4Layout.Kind;
+import dev.noclip.backrooms.level4.Level4Layout.Tile;
+import dev.noclip.backrooms.level4.Level4Plan.Edge;
+import dev.noclip.backrooms.level4.Level4Plan.PlacedExit;
+import dev.noclip.backrooms.level4.Level4Plan.ZoneKind;
+import java.util.EnumSet;
+import java.util.Set;
+import org.junit.jupiter.api.Test;
+
+final class Level4LayoutTest {
+	@Test
+	void everyWalkableCellInARegionReachesEveryOther() {
+		for (long seed = 1; seed <= 12; seed++) {
+			for (int rx = -1; rx <= 1; rx++) {
+				for (int rz = -1; rz <= 1; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					boolean[] seen = new boolean[Level4Plan.N * Level4Plan.N];
+					int[] queue = new int[Level4Plan.N * Level4Plan.N];
+					int start = -1, walkableCount = 0;
+					for (int c = 0; c < Level4Plan.N * Level4Plan.N; c++) {
+						if (plan.zones[c] != ZoneKind.SOLID_CORE) {
+							walkableCount++;
+							if (start < 0) start = c;
+						}
+					}
+					int head = 0, tail = 0;
+					queue[tail++] = start;
+					seen[start] = true;
+					while (head < tail) {
+						int c = queue[head++];
+						int i = c % Level4Plan.N, j = c / Level4Plan.N;
+						for (int d = 0; d < 4; d++) {
+							Edge e = plan.edge(c, d);
+							if (e != Edge.OPEN && e != Edge.DOOR) continue;
+							int a = i + Level4Plan.DX[d], b = j + Level4Plan.DZ[d];
+							if (!plan.walkable(a, b)) continue;
+							int nc = Level4Plan.cell(a, b);
+							if (!seen[nc]) {
+								seen[nc] = true;
+								queue[tail++] = nc;
+							}
+						}
+					}
+					assertEquals(walkableCount, tail, "disconnected cell in seed=" + seed + " region " + rx + "," + rz);
+				}
+			}
+		}
+	}
+
+	@Test
+	void allThreeFactionsAtriumAndExitsAppear() {
+		Set<ZoneKind> zonesSeen = EnumSet.noneOf(ZoneKind.class);
+		Set<Level4Exit> exitsSeen = EnumSet.noneOf(Level4Exit.class);
+		for (long seed = 10; seed <= 14; seed++) {
+			for (int rx = -2; rx <= 2; rx++) {
+				for (int rz = -2; rz <= 2; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					for (ZoneKind z : plan.zones) zonesSeen.add(z);
+					for (PlacedExit pe : plan.exits) exitsSeen.add(pe.exit());
+				}
+			}
+		}
+		assertTrue(zonesSeen.contains(ZoneKind.OPEN_OFFICE));
+		assertTrue(zonesSeen.contains(ZoneKind.SUITE));
+		assertTrue(zonesSeen.contains(ZoneKind.ATRIUM));
+		assertTrue(zonesSeen.contains(ZoneKind.DARK_WING));
+		assertTrue(zonesSeen.contains(ZoneKind.OMEGA_BASE));
+		assertTrue(zonesSeen.contains(ZoneKind.AMOR_CAMP));
+		assertTrue(zonesSeen.contains(ZoneKind.TBD_ROOM));
+		assertTrue(exitsSeen.contains(Level4Exit.ELEVATOR_3));
+		assertTrue(exitsSeen.contains(Level4Exit.OMEGA_STAIRS_5));
+		assertTrue(exitsSeen.contains(Level4Exit.OMEGA_STAIRS_6));
+		assertTrue(exitsSeen.contains(Level4Exit.BASEMENT_71));
+		assertTrue(exitsSeen.contains(Level4Exit.WHITE_DOOR_4P3));
+	}
+
+	@Test
+	void landingIsAlwaysWalkableAndOutsideOmega() {
+		for (long seed = 1; seed <= 30; seed++) {
+			int[] spot = Level4Layout.landing(seed, (int) seed * 113, (int) -seed * 89);
+			Tile tile = Level4Layout.tile(seed, spot[0], spot[1]);
+			assertEquals(Kind.AIR, tile.kind(), "landing blocked at " + spot[0] + "," + spot[1]);
+			assertTrue(tile.zone() == ZoneKind.OPEN_OFFICE || tile.zone() == ZoneKind.SUITE);
+		}
+	}
+}

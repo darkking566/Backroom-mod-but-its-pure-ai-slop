@@ -574,5 +574,115 @@
         "pitch": 1.6
       }
     ]
+  },
+  "level4.rain": {
+    "subtitle": "subtitles.noclip_backrooms.level4.rain",
+    "sounds": [
+      {
+        "name": "minecraft:weather.rain",
+        "type": "event",
+        "volume": 0.35,
+        "pitch": 0.9
+      }
+    ]
+  },
+  "level4.hum": {
+    "subtitle": "subtitles.noclip_backrooms.level4.hum",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.ambient",
+        "type": "event",
+        "volume": 0.3,
+        "pitch": 0.55
+      }
+    ]
+  },
+  "level4.water_fill": {
+    "subtitle": "subtitles.noclip_backrooms.level4.water_fill",
+    "sounds": [
+      {
+        "name": "minecraft:item.bottle.fill",
+        "type": "event",
+        "volume": 0.9,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "level4.water_drink": {
+    "subtitle": "subtitles.noclip_backrooms.level4.water_drink",
+    "sounds": [
+      {
+        "name": "minecraft:entity.generic.drink",
+        "type": "event",
+        "volume": 0.9,
+        "pitch": 1.0
+      }
+    ]
+  },
+  "level4.vending": {
+    "subtitle": "subtitles.noclip_backrooms.level4.vending",
+    "sounds": [
+      {
+        "name": "minecraft:block.dispenser.dispense",
+        "type": "event",
+        "volume": 0.85,
+        "pitch": 0.9
+      }
+    ]
+  },
+  "level4.window_knock": {
+    "subtitle": "subtitles.noclip_backrooms.level4.window_knock",
+    "sounds": [
+      {
+        "name": "minecraft:block.glass.hit",
+        "type": "event",
+        "volume": 0.8,
+        "pitch": 0.7
+      }
+    ]
+  },
+  "level4.photocopier": {
+    "subtitle": "subtitles.noclip_backrooms.level4.photocopier",
+    "sounds": [
+      {
+        "name": "minecraft:block.piston.extend",
+        "type": "event",
+        "volume": 0.65,
+        "pitch": 1.4
+      }
+    ]
+  },
+  "level4.phone_ring": {
+    "subtitle": "subtitles.noclip_backrooms.level4.phone_ring",
+    "sounds": [
+      {
+        "name": "minecraft:block.note_block.bell",
+        "type": "event",
+        "volume": 0.7,
+        "pitch": 1.35
+      }
+    ]
+  },
+  "level4.vanish": {
+    "subtitle": "subtitles.noclip_backrooms.level4.vanish",
+    "sounds": [
+      {
+        "name": "minecraft:block.beacon.deactivate",
+        "type": "event",
+        "volume": 0.6,
+        "pitch": 0.7
+      }
+    ]
+  },
+  "level4.elevator": {
+    "subtitle": "subtitles.noclip_backrooms.level4.elevator",
+    "sounds": [
+      {
+        "name": "minecraft:block.iron_door.open",
+        "type": "event",
+        "volume": 0.7,
+        "pitch": 1.15
+      }
+    ]
   }
 }

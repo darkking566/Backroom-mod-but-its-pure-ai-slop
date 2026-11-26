@@ -1,0 +1,78 @@
+{
+  "textures": {
+    "sign": "noclip_backrooms:block/level4/office_exit_sign",
+    "frame": "noclip_backrooms:block/level4/omega_wall",
+    "particle": "noclip_backrooms:block/level4/office_exit_sign"
+  },
+  "elements": [
+    {
+      "from": [
+        3,
+        10,
+        14
+      ],
+      "to": [
+        13,
+        15,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#sign",
+          "light_emission": 10
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#frame"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#frame"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            5
+          ],
+          "texture": "#frame"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            10,
+            2
+          ],
+          "texture": "#frame"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            10,
+            2
+          ],
+          "texture": "#frame"
+        }
+      }
+    }
+  ]
+}

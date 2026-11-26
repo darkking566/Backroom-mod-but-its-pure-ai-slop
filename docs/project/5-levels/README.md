@@ -78,7 +78,7 @@
 | [`level1`](level1/README.md) | Level 1：宜居地帶／停車場（Habitable Zone） | `1` | Wikidot / Fandom / 狐霖後室 | 已實作（詳見既有 README） |
 | [`level2`](level2/README.md) | Level 2：廢棄維修通道（Abandoned Utility Halls；Fandom 叫 Pipe Dreams） | `2` | Wikidot（照片與文字）／Fandom | 已實作（從 Level 1 往下的樓梯進入） |
 | [`level3`](level3/README.md) | Level 3：發電站（Electrical Station） | `3` | Wikidot（照片與文字） | 已實作（從 Level 2 噴了「3」的門進入） |
-| [`level4`](level4/README.md) | Level 4：廢棄辦公室（Abandoned Office） | `4` | Wikidot / Fandom 共通 | 未開放 |
+| [`level4`](level4/README.md) | Level 4：廢棄辦公室（Abandoned Office） | `4` | 中文維基 / Wikidot | 已實作（第一版，從 Level 2 門與 Level 3 電梯進入） |
 | [`level5`](level5/README.md) | Level 5：恐怖旅館（Terror Hotel） | `5` | Wikidot / Fandom 共通 | 未開放 |
 | [`level6`](level6/README.md) | Level 6：熄燈（Lights Out） | `6` | Wikidot / Fandom 共通 | 未開放 |
 | [`level7`](level7/README.md) | Level 7：深海恐懼症（Thalassophobia） | `7` | Wikidot / Fandom 共通 | 未開放 |

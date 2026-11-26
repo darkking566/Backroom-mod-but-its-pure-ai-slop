@@ -201,7 +201,23 @@
 
 ---
 
-## 七、玻璃系列
+## 七、第 4 層　廢棄辦公室（Abandoned Office）
+
+杏仁水最大產區、稀疏現代辦公雜物與三大陣營。
+
+| 東西 | 敲掉／互動掉落 | 備註 |
+|---|---|---|
+| 辦公室冷水機（`office_water_cooler`）、杏仁水噴水池（`almond_fountain_pool`） | 持空玻璃瓶右鍵取 `almond_water`（每座限裝 **2 瓶**） | 冷水機敲掉掉本身 |
+| 辦公室自動販賣機（`office_vending`） | 投 `lost_coin`／`alloy` 換取 `almond_water` 與繃帶 | 敲掉掉本身 |
+| T.B.D. 奇物陳列架（`tbd_curio_shelf`） | 右鍵摸取隨機奇物（`broken_nw_compass`／`calendar_1998`／`blank_stamp`／`unlabeled_tape`／`rain_glass_orb`）或稀有 `brass_crucifix` | 敲掉掉本身 |
+| 辦公室影印機（`office_photocopier`） | 右鍵觸發吐出 `damp_paper_scrap`、`paper`、`lost_coin` 或書本 | 敲掉掉本身 |
+| 神愛之繁生菌類培養箱（`amor_planter`）與後室菌類 | 菌類培養與交易取得 `purified_almond_essence`、`toxic_spore_sac` | 需持 `brass_crucifix` 或 `faded_icon_frame` 才能和平交易 |
+| 稀疏辦公穿模／完整家具（`Level4Props`） | 延用第 0 層拆解規則（辦公椅、折疊桌、老電腦、檔案櫃、玻璃隔間、紙箱山） | 避開據點與中庭 |
+| 塗黑安全窗／未塗黑陷阱窗（`office_blacked_window`／`office_trap_window`） | 打不壞（避免挖穿外牆）；可用黑色染料／墨囊／木炭塗黑化解陷阱 | — |
+
+---
+
+## 八、玻璃系列
 
 | 玻璃 | 哪裡有 | 稀有度 |
 |---|---|---|
@@ -213,13 +229,13 @@
 | 聖所彩繪玻璃 | 第 3 層聖所 | 稀有 |
 | 各種異常玻璃（例如會映出別層的鏡面玻璃） | Level 13 玻璃瘋狂（之後做） | 很稀有 |
 
-## 八、之後的樓層（先記著）
+## 九、之後的樓層（先記著）
 
 - **Level 13 玻璃瘋狂**：整層都是玻璃，稀有玻璃的主要來源。
 - **Level 39 魔法森林**：魔法木材、發光孢子、魔力結晶這類魔法材料，配合 Gemini 的魔法武器（[weapons-magic-and-chests.md](weapons-magic-and-chests.md)）。
 - 做到這些樓層時，照這份的格式補一節。
 
-## 九、做的順序
+## 十、做的順序
 
 1. 第 0 層：新物件（電腦、手機、沙發、玻璃隔間、完好辦公椅）請 Gemini 先做模型；同時我把 Gemini 已做好的 24 種穿模家具裡屬於第 0 層的先擺進去。
 2. 第 1、2、3 層：先補「新規則」的掉落表，再擺 Gemini 的穿模家具。

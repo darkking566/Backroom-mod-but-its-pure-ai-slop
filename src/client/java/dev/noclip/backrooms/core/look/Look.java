@@ -55,7 +55,8 @@ public final class Look {
 	 * get a lighter touch.
 	 */
 	record Mood(int start, int end, float falloff) {
-		static final Mood LEVEL_0 = new Mood(5, 28, 0.32F), LEVEL_3 = new Mood(6, 30, 0.18F), DEFAULT = new Mood(9, 44, 0.15F);
+		static final Mood LEVEL_0 = new Mood(5, 28, 0.32F), LEVEL_3 = new Mood(6, 30, 0.18F),
+				LEVEL_4 = new Mood(10, 48, 0.14F), DEFAULT = new Mood(9, 44, 0.15F);
 		// Zenith Station is seen across: the singularity is some 180 blocks from the ring windows, the sea of rooms 60 out.
 		static final Mood ZENITH = new Mood(24, 320, 0.15F);
 		// Base Gamma's mall and halls are lit like day: light carries, the far end of the atrium shows.
@@ -66,6 +67,7 @@ public final class Look {
 				case "level_0" -> LEVEL_0;
 				case "level_0.1" -> ZENITH;
 				case "level_3" -> LEVEL_3;
+				case "level_4" -> LEVEL_4;
 				default -> DEFAULT;
 			};
 		}

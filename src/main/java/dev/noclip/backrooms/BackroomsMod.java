@@ -13,6 +13,7 @@ import dev.noclip.backrooms.level0p1.Level0p1;
 import dev.noclip.backrooms.level1.Level1;
 import dev.noclip.backrooms.level2.Level2;
 import dev.noclip.backrooms.level3.Level3;
+import dev.noclip.backrooms.level4.Level4;
 import dev.noclip.backrooms.monsters.Monsters;
 import dev.noclip.backrooms.core.guild.Contracts;
 import dev.noclip.backrooms.core.rpg.SurvivalXp;
@@ -72,5 +73,6 @@ public final class BackroomsMod implements ModInitializer {
 		Level1.register();
 		Level2.register();
 		Level3.register();
+		Level4.register();
 	}
 }

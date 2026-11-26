@@ -1,0 +1,49 @@
+{
+  "variants": {
+    "facing=north,bottles=0": {
+      "model": "noclip_backrooms:block/level4/office_water_cooler_0"
+    },
+    "facing=north,bottles=1": {
+      "model": "noclip_backrooms:block/level4/office_water_cooler_1"
+    },
+    "facing=north,bottles=2": {
+      "model": "noclip_backrooms:block/level4/office_water_cooler_2"
+    },
+    "facing=east,bottles=0": {
+      "model": "noclip_backrooms:block/level4/office_water_cooler_0",
+      "y": 90
+    },
+    "facing=east,bottles=1": {
+      "model": "noclip_backrooms:block/level4/office_water_cooler_1",
+      "y": 90
+    },
+    "facing=east,bottles=2": {
+      "model": "noclip_backrooms:block/level4/office_water_cooler_2",
+      "y": 90
+    },
+    "facing=south,bottles=0": {
+      "model": "noclip_backrooms:block/level4/office_water_cooler_0",
+      "y": 180
+    },
+    "facing=south,bottles=1": {
+      "model": "noclip_backrooms:block/level4/office_water_cooler_1",
+      "y": 180
+    },
+    "facing=south,bottles=2": {
+      "model": "noclip_backrooms:block/level4/office_water_cooler_2",
+      "y": 180
+    },
+    "facing=west,bottles=0": {
+      "model": "noclip_backrooms:block/level4/office_water_cooler_0",
+      "y": 270
+    },
+    "facing=west,bottles=1": {
+      "model": "noclip_backrooms:block/level4/office_water_cooler_1",
+      "y": 270
+    },
+    "facing=west,bottles=2": {
+      "model": "noclip_backrooms:block/level4/office_water_cooler_2",
+      "y": 270
+    }
+  }
+}

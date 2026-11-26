@@ -1,0 +1,145 @@
+{
+  "textures": {
+    "body": "noclip_backrooms:block/level4/cooler_body",
+    "jug": "noclip_backrooms:block/level4/cooler_jug_half",
+    "particle": "noclip_backrooms:block/level4/cooler_body"
+  },
+  "elements": [
+    {
+      "from": [
+        3,
+        0,
+        3
+      ],
+      "to": [
+        13,
+        11,
+        13
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#body"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#body"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#body"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#body"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#body"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#body"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        11,
+        4
+      ],
+      "to": [
+        12,
+        16,
+        12
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#jug"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#jug"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#jug"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#jug"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#jug"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#jug"
+        }
+      }
+    }
+  ]
+}

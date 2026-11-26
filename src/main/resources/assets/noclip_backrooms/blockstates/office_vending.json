@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "noclip_backrooms:block/level4/office_vending"
+    },
+    "facing=east": {
+      "model": "noclip_backrooms:block/level4/office_vending",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "noclip_backrooms:block/level4/office_vending",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "noclip_backrooms:block/level4/office_vending",
+      "y": 270
+    }
+  }
+}

@@ -44,6 +44,10 @@
     "noclip_backrooms:prop_sofa_noclipped",
     "noclip_backrooms:prop_cardboard_pile",
     "noclip_backrooms:prop_standing_mirror",
-    "noclip_backrooms:prop_curtain_heap"
+    "noclip_backrooms:prop_curtain_heap",
+    "noclip_backrooms:office_fire_door",
+    "noclip_backrooms:amor_planter",
+    "noclip_backrooms:tbd_curio_shelf",
+    "noclip_backrooms:office_desk_phone"
   ]
 }

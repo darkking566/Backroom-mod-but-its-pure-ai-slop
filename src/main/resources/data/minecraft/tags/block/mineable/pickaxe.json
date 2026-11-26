@@ -224,6 +224,26 @@
     "noclip_backrooms:prop_electric_fan",
     "noclip_backrooms:prop_microwave",
     "noclip_backrooms:prop_floor_lamp",
-    "noclip_backrooms:prop_wall_first_aid_kit"
+    "noclip_backrooms:prop_wall_first_aid_kit",
+    "noclip_backrooms:office_drywall",
+    "noclip_backrooms:office_drywall_upper",
+    "noclip_backrooms:office_pillar",
+    "noclip_backrooms:office_pillar_upper",
+    "noclip_backrooms:office_radiator_wall",
+    "noclip_backrooms:office_acoustic_ceiling",
+    "noclip_backrooms:office_ceiling_vent",
+    "noclip_backrooms:office_troffer_lit",
+    "noclip_backrooms:office_troffer_dim",
+    "noclip_backrooms:office_troffer_flicker",
+    "noclip_backrooms:office_troffer_broken",
+    "noclip_backrooms:office_glass_wall",
+    "noclip_backrooms:office_exit_sign",
+    "noclip_backrooms:office_water_cooler",
+    "noclip_backrooms:almond_fountain_basin",
+    "noclip_backrooms:office_vending",
+    "noclip_backrooms:omega_locker",
+    "noclip_backrooms:omega_barricade",
+    "noclip_backrooms:office_breaker",
+    "noclip_backrooms:office_photocopier"
   ]
 }

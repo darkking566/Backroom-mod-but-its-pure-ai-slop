@@ -852,3 +852,14 @@
     - 新增 12 種方塊與對應資源（由 `tools/make_level0_overhaul_assets.py` 產出 128px 基礎與 512px labPBR `_n`／`_s` 寫實貼圖、模型、blockstates 與物品定義，並補齊 `en_us.json`／`zh_tw.json` 全部方塊名與模糊／高感知線索提示）
     - 每張 `300×300` Stage 確定性配置 8 處異常出口（必出：1980 阿帕拉契山莊海報 `POSTER_161` 撕下／打掉→Level 161、蒸氣地柵 `STEAM_GRATE_2`→Level 2、油污維修口 `OIL_VENT_1`→Level 1；再輪替抽出 5 種：小方窗→188、翹起地毯→27、空心灰泥牆→194、巨型落地鏡→0.5、霓虹保齡球門→499、翻新白門→0.2、懸空門→193、裂紋玻璃門→13、餐館門→68、紅光偽 EXIT→!），搭配 3 種動態誘餌（綠光招手人影→14 冷漠病院、閃爍綠光走廊→0.01、深水涉行→0.11），全數統一經 `core/LevelExits` 導流
   - **驗證**：更新 `MazeTest`、`ZonePoiPlanTest`、`ExitsTest` 與 `Level0ClientTest`（新增 `checkOverhaulFeatures` 實測撕 1980 海報接 `LevelExits("161")`、Pitfalls 下層梯井、配電箱解鎖密室、多米諾熄燈與方案 C 邊界回繞）；執行 `.\gradlew.bat build --no-daemon`（全部 122 項單元測試 0 失敗）與 `.\gradlew.bat runClientGameTest -Plevels=0 --no-daemon` 全部通過、日誌零缺模型／缺貼圖錯誤，並逐一檢視實機截圖確認 5 格淨高、海報、下層梯井、M.E.G. 隔離站、深淵前哨與紅室／昏暗區 3D 物件渲染正常；僅留於本機工作目錄（未提交、未推送）
+- 完成 **Level 4（廢棄辦公室 / Abandoned Office）** 首版完整實作與雙組實機驗證（Antigravity）：
+  - **規劃、空間尺度與區域架構**（`level4/Level4Plan.java`、`Level4Layout.java`、`Level4ChunkGenerator.java`、`Level4Travel.java`、維度/生物群系 JSON）：
+    - 112×112 格區域網格（16×16 格 `7×7` 單元，一般辦公室淨高 4 格、挑高雙層雨窗中庭淨高 8 格並含 `ATRIUM_ARCH` 門楣與中央 3×3 杏仁水噴泉、無燈暗區 `DARK_WING`、實心建築核與玻璃隔間套房），接入 `LevelExits.open("4", Level4Travel::enter)` 打通 Level 2 出口門與 Level 3 電梯進階路線；修復中庭東南鄰格牆高至 8 格並修正 `amor_planter` 高度使培養菌貼合無懸空
+  - **材質、模型、寫實包與 7 件專屬 3D 物品**（`tools/make_level4.py`、`make_level4_realistic.py`、`make_level4_items.py`、`Level4Blocks.java`、`Level4Items.java`、`Look.Mood.LEVEL_4`）：
+    - 新增 43 種方塊與雙套 128px 基礎／寫實貼圖（含 labPBR `_n`/`_s`、四態燈具與髒舊變體），補齊 `en_us`/`zh_tw`/`sounds.json`/挖掘標籤與 `docs/project/3-crafting/by-level.md`、`5-levels/level4/README.md`
+    - 新增 7 件專屬 3D 模型物品：宗教護符 `brass_crucifix`（黃銅十字架）、`faded_icon_frame`（褪色聖像框）與 T.B.D. 古怪藏品 `broken_nw_compass`、`calendar_1998`、`blank_stamp`、`unlabeled_tape`、`rain_glass_orb`（右鍵播雨聲）
+  - **三大勢力、Entity 2 陷阱窗、供水上限、會消失野生出口與事件生態**（`Level4Bases.java`、`Level4WaterSourceBlock.java`、`Level4Windows.java`、`Level4VanishingExits.java`、`Level4Monsters.java`、`Level4Events.java`、`Level4Props.java`）：
+    - 飲水機與杏仁水噴泉（`Level4WaterSourceBlock`）持空玻璃瓶裝水或空手啜飲各限裝 **2 瓶**
+    - M.E.G. Base Omega（醫療員、警衛、商人、安全重生地行軍床、合金交換置物櫃、自動販賣機、拆解台）；T.B.D.（6 位隱居囤積者＋藏品櫃）；Amor Incrementum（蘑菇培養室、未持十字架/聖像框主動敵對，持護符轉為和睦並可用硬幣/合金交換淨化杏仁精華）
+    - Entity 2 明亮陷阱窗敲窗誘引並可用黑染料/墨囊/木炭塗黑化解；野生異常出口（Level 71/4.3/11/2/13 及非 Omega 5/6 樓梯）移開視線約 4 秒後消失並封成牆面（Omega 5/6 樓梯與 Level 3 電梯永久保留）；配電箱復電、影印機、拔線桌機電話、凹陷地毯椅聲、雨聲/停雨徵兆與稀疏獵犬/鈍人/瞬閃笑魘
+  - **驗證**：新增 `Level4LayoutTest`（3 項）與 `Level4ClientTest`（進入 Level 4、雙模式 6 張實機截圖、飲水機 2 瓶上限、Amor 敵對→手持黃銅十字架交易消耗 1 枚遺失硬幣、墨囊塗黑陷阱窗、野生出口失視後消失、翻譯完整性）；執行 `.\gradlew.bat build --no-daemon`（27 套件 / 125 項測試 0 失敗 0 錯誤 0 跳過）、`.\gradlew.bat runClientGameTest -Plevels=4 --no-daemon`（不開光影）與 `.\gradlew.bat runClientGameTest -Plevels=4 -Pshaders --no-daemon`（開 Iris＋Complementary 光影）全數通過並逐一檢視無/有光影實機截圖正常；僅留於本機工作目錄（未提交、未推送）

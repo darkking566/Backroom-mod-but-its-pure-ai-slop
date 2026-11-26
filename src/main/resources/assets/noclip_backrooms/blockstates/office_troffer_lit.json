@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "noclip_backrooms:block/level4/office_troffer_lit"
+    },
+    "axis=z": {
+      "model": "noclip_backrooms:block/level4/office_troffer_lit",
+      "y": 90
+    }
+  }
+}
