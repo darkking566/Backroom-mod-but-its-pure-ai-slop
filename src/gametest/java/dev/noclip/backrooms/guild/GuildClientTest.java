@@ -41,7 +41,7 @@ import net.minecraft.world.phys.Vec3;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * The overworld base (docs/guild.md) in a real world with villages: finds a guild, checks a village starts at the same
+ * The overworld base (docs/project/1-gameplay/outpost.md) in a real world with villages: finds a guild, checks a village starts at the same
  * place and the guild stands outside it, walks the path, checks the hall (door, signal fire, sign text, the four
  * people), opens the buyer's shop by right-clicking, and trades: selling, banking coins, buying, being too far, short
  * of credits or of a material, and keeping the account through death. Run alone with

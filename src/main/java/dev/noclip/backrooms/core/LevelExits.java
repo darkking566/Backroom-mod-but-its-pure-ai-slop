@@ -106,7 +106,7 @@ public final class LevelExits {
 
 	/**
 	 * Where a level should put a player who is arriving, as {x, z}. Through an exit it is a stretch of the level far
-	 * from the exit, so that coming back to a level is coming to a new part of it, as in 狐霖's Backrooms (docs/FLOORS.md);
+	 * from the exit, so that coming back to a level is coming to a new part of it, as in 狐霖's Backrooms (docs/project/1-gameplay/README.md);
 	 * it depends only on where the exit is and where it leads, so whoever takes the same exit lands together.
 	 * Otherwise (falling in from the Overworld, commands) it is where the player stands.
 	 */

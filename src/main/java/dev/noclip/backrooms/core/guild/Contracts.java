@@ -25,7 +25,7 @@ import net.minecraft.world.level.Level;
 
 /**
  * M.E.G. contracts, handed out by the commander at the surface outpost (the guild): go back into the Backrooms of your
- * own accord, reach a level, and come back alive to be paid (docs/HORROR_ESCAPE_PLAN.md). Accepting one sends the player
+ * own accord, reach a level, and come back alive to be paid (docs/project/1-gameplay/README.md). Accepting one sends the player
  * straight into Level 0; reaching the level marks it done; walking out alive pays into the account; coming home without
  * it is a failed contract. One at a time; kept through death.
  */

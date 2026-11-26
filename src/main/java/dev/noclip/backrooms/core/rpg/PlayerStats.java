@@ -21,7 +21,7 @@ public record PlayerStats(
 		float sanity
 ) {
 	/*
-	 * Horror direction (docs/HORROR_ESCAPE_PLAN.md, 2026-11-25): levels make you steadier, not stronger. Max health and
+	 * Horror direction (docs/project/1-gameplay/README.md, 2026-11-25): levels make you steadier, not stronger. Max health and
 	 * max sanity grow every five levels on their own; points only speed up recovery (with diminishing returns), and
 	 * strength adds little. In the Backrooms the player's health is cut in half (PlayerRpg).
 	 */

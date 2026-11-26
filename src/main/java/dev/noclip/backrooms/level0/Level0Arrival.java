@@ -20,7 +20,7 @@ public final class Level0Arrival {
 	public static boolean arrive(ServerPlayer player) {
 		ServerLevel level0 = player.level().getServer().getLevel(LEVEL_0);
 		if (level0 == null) return false;
-		// Through an exit, a fresh stretch of Level 0 (docs/FLOORS.md); falling in from the Overworld, under the player.
+		// Through an exit, a fresh stretch of Level 0 (docs/project/1-gameplay/README.md); falling in from the Overworld, under the player.
 		int[] at = dev.noclip.backrooms.core.LevelExits.anchor(player);
 		int cx = Math.floorDiv(at[0], CELL), cz = Math.floorDiv(at[1], CELL);
 		for (int ring = 0; ring < RINGS; ring++) {

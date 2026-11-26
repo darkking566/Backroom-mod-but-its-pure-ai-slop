@@ -48,7 +48,7 @@ public final class BackroomsMod implements ModInitializer {
 		Economy.register();
 		Shops.register();
 		Guilds.register();
-		// The horror direction (docs/HORROR_ESCAPE_PLAN.md): trips in and out, being pulled back, contracts, experience.
+		// The horror direction (docs/project/1-gameplay/README.md): trips in and out, being pulled back, contracts, experience.
 		Trips.register();
 		Pull.register();
 		Contracts.register();

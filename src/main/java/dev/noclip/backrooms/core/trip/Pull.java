@@ -40,7 +40,7 @@ import net.minecraft.world.level.LightLayer;
 
 /**
  * Mode 1 + Mode 2 Horror Loop: Overworld Backrooms Seepage &amp; Wretch Reality-Rejection
- * (docs/HORROR_ESCAPE_PLAN.md).
+ * (docs/project/1-gameplay/README.md).
  *
  * <p>Replaces passive forced teleportation with escalating Overworld dread:
  * <ul>

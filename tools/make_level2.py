@@ -3,7 +3,7 @@
     py tools/make_level2.py
 
 Uses the drawing helpers and the labPBR writer of make_textures.py and a few of make_level1.py (Pillow, NumPy).
-Textures go to textures/block/level2/, models to models/block/level2/. Also writes docs/levels/level2/textures.png.
+Textures go to textures/block/level2/, models to models/block/level2/. Also writes docs/project/5-levels/level2/textures.png.
 Looks follow the photos on the Wikidot Level 2 page: chalky concrete and old brick, cream-wrapped and pale green
 pipes, rusty steel and red valves, cable trays, white steel doors with embossed panels.
 """
@@ -937,7 +937,7 @@ def preview(textures):
         for dx in (0, SIZE):
             for dy in (0, SIZE):
                 sheet.paste(tile, (gap + i % columns * (side + gap) + dx, gap + i // columns * (side + gap) + dy))
-    out = mt.ROOT / "docs/levels/level2/textures.png"
+    out = mt.ROOT / "docs/project/5-levels/level2/textures.png"
     out.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(out, optimize=True)
 

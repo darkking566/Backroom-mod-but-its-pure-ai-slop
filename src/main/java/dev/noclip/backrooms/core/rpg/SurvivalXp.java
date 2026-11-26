@@ -12,7 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.monster.Monster;
 
 /**
- * Experience for surviving rather than killing (docs/HORROR_ESCAPE_PLAN.md): a level not yet seen this trip, shaking off
+ * Experience for surviving rather than killing (docs/project/1-gameplay/README.md): a level not yet seen this trip, shaking off
  * something that was hunting you. Settling at a base and walking out alive are paid by core.trip.Trips, contracts by
  * core.guild.Contracts; killing pays little (PlayerRpg).
  */

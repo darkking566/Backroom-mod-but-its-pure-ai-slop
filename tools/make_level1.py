@@ -3,7 +3,7 @@
     python tools/make_level1.py
 
 Uses the drawing helpers and the labPBR writer of make_textures.py (Pillow and NumPy).
-Textures go to textures/block/level1/, models to models/block/level1/. Also writes docs/levels/level1/textures.png.
+Textures go to textures/block/level1/, models to models/block/level1/. Also writes docs/project/5-levels/level1/textures.png.
 Level 0 files are not touched.
 """
 
@@ -2428,7 +2428,7 @@ def preview(textures):
         for dx in (0, SIZE):
             for dy in (0, SIZE):
                 sheet.paste(tile, (gap + i % columns * (side + gap) + dx, gap + i // columns * (side + gap) + dy))
-    sheet.save(mt.ROOT / "docs/levels/level1/textures.png", optimize=True)
+    sheet.save(mt.ROOT / "docs/project/5-levels/level1/textures.png", optimize=True)
 
 
 def check(blockstates):

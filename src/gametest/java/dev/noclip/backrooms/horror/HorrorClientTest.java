@@ -26,7 +26,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelData;
 
 /**
- * The horror direction (docs/HORROR_ESCAPE_PLAN.md) end to end:
+ * The horror direction (docs/project/1-gameplay/README.md) end to end:
  * <ol>
  * <li>half health everywhere, and a heart and 10 sanity every five levels;</li>
  * <li>eating well heals a quarter as fast in the Backrooms;</li>

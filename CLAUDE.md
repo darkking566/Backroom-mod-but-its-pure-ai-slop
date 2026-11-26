@@ -474,6 +474,13 @@
   - 改寫 `docs/HORROR_ESCAPE_PLAN.md` 的「怎麼再回去」：兩股力量共用同一個 5 遊戲日的週期——第 1～2 天正常、第 3～5 天排斥發作（只在主世界）；期限前到前哨繳交調查配額 → M.E.G. 治療（排斥歸零）、補給、新週期；違約 → 前哨關閉醫療兌換委託、隔天早上強制再部署到更深的樓層、欠款加到下一期；進去改成 M.E.G. 派遣（取代裂縫）；三種藥只能壓症狀、不能代替配額；根治解藥是長期目標；地表滲透建議留當症狀；寫了 Claude 的看法、要注意的死亡螺旋與待討論
   - 規則表、核心流程、分工跟著改；只改文件，程式還沒動（配額、派遣、強制再部署待做，裂縫待拿掉）
 - 使用者對配額循環的決定（`docs/HORROR_ESCAPE_PLAN.md` 標【定】）：後室裡時間停止、只在主世界扣倒數；違約隨機丟；欠款每期複利 20%；不要主世界地面變地毯；多人一起交、人數越多配額與內容物越多；要求全部擬定好才開工。Claude 把其餘細節寫成【建議】待確認（睡覺算時間、任一隊員在主世界就扣、5 天週期、配額 100 點每期漲 30%、人數加成每人 +60%、必交項目、用收購價表算點數、有欠款時配額不漲、帳戶點數 2:1 還欠款、付點數派遣到去過的樓層）；只改文件
+- 使用者要求所有企劃書放進他建立的 `docs/project/`，跟他原本放的舊企劃書（網頁版 Gemini 寫的 `backrooms_mod_design_spec.md`）合併，分成遊戲玩法、玩家能力值、合成（要網狀圖）、怪物、樓層，多餘的刪掉、整理 `docs/`：
+  - 先把從沒進過 git 的舊企劃書提交一次（`946957fa`），留底後再拆進各章
+  - 新結構：`docs/project/README.md`（總目錄、標示說明、專案總覽、工程規範、分工與協作、里程碑）、`1-gameplay/`（故事背景、核心循環、時間與配額、層數與雙軸難度、死亡、安頓撤離、前哨、經濟與任務；`outpost.md` 是原 `docs/guild.md`，圖在 `images/`）、`2-player/`（三條資源、四項能力值現況與原企劃想加的、等級經驗、介面、隱藏能力值與流派）、`3-crafting/`（原 `docs/crafting/` 改檔名、原 `docs/levels/MATERIALS.md` 變 `by-level.md` 並加入舊企劃書第 6 節 Level 0 物資表、物品預覽圖 `items/`）、`4-monsters/`（新寫的 18 種怪物數值、行為、出沒、掉落表；原合成企劃第 02 份變 `planned.md`）、`5-levels/`（原 `docs/levels/`，開頭加已做好的樓層與舊企劃書第 4.3 節樓層架構）；`docs/` 底下只剩 `project/` 和 `look/`
+  - 新增 `tools/make_recipe_docs.py`：從遊戲資料（工作站配方、原版工作台配方、怪物掉落、中文語言檔）產生 `3-crafting/recipes.md`（360 條配方依工作站分、482 樣物品的來源與用途索引）與網狀圖 `3-crafting/recipe-graph.svg`（來源在左、越做越深往右、線依工作站上色；向量圖可放大可搜尋，PNG 版字太小看不清楚所以改 SVG）
+  - 刪除已合併的 `docs/HORROR_ESCAPE_PLAN.md`、`FLOORS.md`、`GAMEPLAY_SYSTEM_PLAN.md`、`PROJECT_PLAN_FOR_CLAUDE.md`、`PROJECT_PLAN_REPLY_FROM_CLAUDE.md`、舊企劃書，以及沒人引用、已被 `docs/look/items/` 取代的 `docs/look/trial/`、`trial_materials.png`（都在 git 紀錄裡）
+  - 改路徑：程式註解、測試註解、產生工具的輸出路徑（`make_textures.py`、`make_level1/2/3/0p1.py`、`make_economy_items.py`、`render_docs_items.java`、`resize_realistic.py`）、`AGENTS.md`（改指向 `docs/project/`、貼圖尺寸改成 128／64）、根目錄 `README.md` 的資料夾地圖、`NEXT.md`、`docs/look/` 的連結；`CLAUDE.md` 是歷史紀錄沒改。檢查過所有文件的相對連結都點得到
+  - `gradlew build` 通過
 
 ## 動作記錄（Antigravity）
 

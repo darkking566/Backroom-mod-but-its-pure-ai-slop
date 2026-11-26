@@ -15,7 +15,7 @@ src/main/java/dev/noclip/backrooms/
 ├─ core/                    好幾層都會用到的機制
 │  └─ LevelExits.java       出口登記處：每個出口寫著通往哪一層，這裡決定通不通
 │     （客戶端的 src/client/.../core/look/ 是畫面風格：寫實材質包與攝影機濾鏡，見 docs/look/README.md）
-├─ core/floors/             第幾層（狐霖式層數）、換 Level 時的標題、走出口落在全新的一片；見 docs/FLOORS.md
+├─ core/floors/             第幾層（狐霖式層數）、換 Level 時的標題、走出口落在全新的一片；見 docs/project/1-gameplay/README.md
 ├─ level0/                  Level 0「大廳」（入口檔 Level0.java）
 ├─ level1/                  Level 1「停車場」（入口檔 Level1.java）
 ├─ core/people/             人物（居民、巡邏隊、施工影子）：Person、People 登記八種造型；模型 `monsters/people.json`、貼圖 `textures/entity/people/`、Blender 原檔 `art/people/`，由 `tools/make_people.py` 與 `tools/blender_people.py` 產生
@@ -55,9 +55,13 @@ tools/make_hound.py         獵犬的發光眼睛貼圖與生怪蛋
 
 art/monsters/hound/         怪物的原始檔（Blender .blend、.glb、預覽圖、交接說明），不會打包進模組
 
-docs/levels/level0/         Level 0 的截圖與貼圖預覽
-docs/levels/level1/         Level 1 的說明（README.md）與貼圖預覽
-docs/levels/level2/  level3/ Level 2、3 的說明與貼圖預覽（其他樓層的企劃也在 docs/levels/，總覽見 docs/levels/README.md）
+docs/project/               全部企劃書（總目錄 docs/project/README.md）
+  1-gameplay/               遊戲玩法（故事、循環、配額、層數、死亡與撤離、前哨）
+  2-player/                 玩家能力值（RPG）
+  3-crafting/               合成（工作站、材料、武器、全部配方表與網狀圖、物品預覽圖）
+  4-monsters/               怪物
+  5-levels/                 樓層：316 層的索引；每層一個資料夾（已做好的 0、0.1、1、2、3 有說明、截圖與貼圖預覽）
+docs/look/                  畫面規範（貼圖尺寸、光影設定、每層流程、寫實物品）
 ```
 
 **每一層自己管自己**：方塊、物品、音效、維度、地形、事件都放在那一層的資料夾，那層的入口檔負責全部註冊。所以擴充 Level 0 只會動到 `level0/` 和 Level 0 的資源資料夾，不會碰到別層。

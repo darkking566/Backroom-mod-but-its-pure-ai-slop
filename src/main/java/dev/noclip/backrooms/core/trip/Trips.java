@@ -32,7 +32,7 @@ import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * A trip into the Backrooms and back (docs/HORROR_ESCAPE_PLAN.md):
+ * A trip into the Backrooms and back (docs/project/1-gameplay/README.md):
  * <ul>
  * <li>settling at a base (a cot in a settlement) makes it where the player wakes up, for the rest of the trip;</li>
  * <li>from there the people of the base, whichever group runs it (M.E.G. or another), can take them home

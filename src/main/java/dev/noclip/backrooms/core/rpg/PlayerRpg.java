@@ -57,7 +57,7 @@ public final class PlayerRpg {
 	private static final Identifier MOD_VIT_HP = BackroomsMod.id("rpg_vitality_health");
 	private static final Identifier MOD_VIT_TOUGH = BackroomsMod.id("rpg_vitality_toughness");
 	private static final Identifier MOD_BACKROOMS_HP = BackroomsMod.id("backrooms_frailty");
-	/** Half of the player's base 20 health, everywhere (docs/HORROR_ESCAPE_PLAN.md). */
+	/** Half of the player's base 20 health, everywhere (docs/project/1-gameplay/README.md). */
 	public static final double FRAILTY = -10.0;
 	/** In the Backrooms, eating well heals at a quarter of the usual speed (mixin.FoodDataBackroomsRegen). */
 	public static final float BACKROOMS_FOOD_REGEN = 0.25F;
@@ -103,7 +103,7 @@ public final class PlayerRpg {
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
 			if (!(source.getEntity() instanceof ServerPlayer killer)) return;
 			if (!(entity instanceof Monster)) return;
-			// Killing is not the way to grow (docs/HORROR_ESCAPE_PLAN.md): most experience comes from surviving (SurvivalXp).
+			// Killing is not the way to grow (docs/project/1-gameplay/README.md): most experience comes from surviving (SurvivalXp).
 			int reward;
 			if (entity instanceof BeastOfLevel5 || entity instanceof dev.noclip.backrooms.monsters.shepherdsnake.ShepherdSnake) {
 				reward = 150;

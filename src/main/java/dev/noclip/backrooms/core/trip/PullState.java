@@ -8,7 +8,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 
 /**
- * Per-player Overworld "Wretch Rejection & Backrooms Seepage" state (docs/HORROR_ESCAPE_PLAN.md).
+ * Per-player Overworld "Wretch Rejection & Backrooms Seepage" state (docs/project/1-gameplay/README.md).
  *
  * <p>After escaping alive from the Backrooms, the player carries a reality-rejection mark:
  * <ul>

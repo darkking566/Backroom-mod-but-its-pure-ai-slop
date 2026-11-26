@@ -16,7 +16,7 @@ import net.minecraft.world.phys.Vec3;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * The floor count of docs/FLOORS.md on a short trip: into Level 0 (floor 1), through an exit to Level 1 (floor 2, far
+ * The floor count of docs/project/1-gameplay/README.md on a short trip: into Level 0 (floor 1), through an exit to Level 1 (floor 2, far
  * from the exit), back to Level 0 (floor 3, a fresh stretch far from where the trip began), then home (the trip ends).
  * Screenshots of the title, the floor at the top left and the level above the inventory. Run alone with
  * gradlew runClientGameTest -Plevels=floors
