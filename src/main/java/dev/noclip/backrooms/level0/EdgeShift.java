@@ -267,6 +267,12 @@ final class EdgeShift {
 				state.bumpEpoch(c.cx(), c.cz());
 				state.setCooldown(c.cx(), c.cz(), now + Maze.shiftCooldownTicks(c.zone()));
 				applyCellShift(level, seed, c.cx(), c.cz(), state);
+				if (random.nextInt(3) == 0) {
+					level.playSound(null, c.cx() * Maze.CELL + Maze.CENTER, Level0ChunkGenerator.FLOOR_Y + 2,
+							c.cz() * Maze.CELL + Maze.CENTER,
+							net.minecraft.sounds.SoundEvents.WOODEN_DOOR_CLOSE,
+							net.minecraft.sounds.SoundSource.AMBIENT, 0.45F, 0.62F);
+				}
 				return true;
 			}
 		}
@@ -424,6 +430,9 @@ final class EdgeShift {
 				|| state.is(ModBlocks.EXIT_DOOR_TOP)
 				|| state.is(ModBlocks.EXIT_SIGN)
 				|| state.is(ModBlocks.EXIT_LIGHT)
+				|| state.is(ModBlocks.LOCKED_UTILITY_DOOR)
+				|| state.getBlock() instanceof AnomalyExitBlock
+				|| state.getBlock() instanceof AnomalyPortalDoorBlock
 				|| state.is(KEEP);
 	}
 

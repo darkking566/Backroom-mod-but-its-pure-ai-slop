@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "opened=false": {
+      "model": "noclip_backrooms:block/level0/hollow_wall"
+    },
+    "opened=true": {
+      "model": "noclip_backrooms:block/level0/hollow_wall_open"
+    }
+  }
+}

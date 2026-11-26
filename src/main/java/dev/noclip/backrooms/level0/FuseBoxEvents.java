@@ -70,13 +70,19 @@ final class FuseBoxEvents {
 		boolean restore = forceRestore != null ? forceRestore : level.getRandom().nextInt(10) < 7;
 		if (restore) {
 			int lit = setNearbyLights(level, pos, RESTORE_RADIUS_XZ, true);
+			int unlocked = unlockNearbyUtilityDoors(level, pos, RESTORE_RADIUS_XZ);
 			level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
 					pos.getX() + 0.5, pos.getY() + 0.6, pos.getZ() + 0.5,
 					18, 0.35, 0.35, 0.35, 0.08);
 			level.playSound(null, pos, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.75F, 0.85F);
-			player.sendOverlayMessage(lit > 0
-					? Component.translatable("message.noclip_backrooms.fuse_box.restored", lit)
-					: Component.translatable("message.noclip_backrooms.fuse_box.already_lit"));
+			if (unlocked > 0) {
+				level.playSound(null, pos, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 0.85F, 0.78F);
+				player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level0.event.utility_unlocked"));
+			} else {
+				player.sendOverlayMessage(lit > 0
+						? Component.translatable("message.noclip_backrooms.fuse_box.restored", lit)
+						: Component.translatable("message.noclip_backrooms.fuse_box.already_lit"));
+			}
 		} else {
 			setNearbyLights(level, pos, TRIP_RADIUS_XZ, false);
 			level.sendParticles(ParticleTypes.SMOKE,
@@ -97,6 +103,25 @@ final class FuseBoxEvents {
 	static boolean isOnCooldown(ServerLevel level, BlockPos pos) {
 		FuseState state = level.getDataStorage().computeIfAbsent(FuseState.TYPE);
 		return !state.isReady(pos, level.getServer().getTickCount());
+	}
+
+	private static int unlockNearbyUtilityDoors(ServerLevel level, BlockPos center, int radiusXz) {
+		int opened = 0;
+		BlockPos.MutableBlockPos cursor = new BlockPos.MutableBlockPos();
+		for (int dx = -radiusXz; dx <= radiusXz; dx++) {
+			for (int dz = -radiusXz; dz <= radiusXz; dz++) {
+				for (int dy = -2; dy <= 4; dy++) {
+					cursor.set(center.getX() + dx, center.getY() + dy, center.getZ() + dz);
+					BlockState target = level.getBlockState(cursor);
+					if (target.is(ModBlocks.LOCKED_UTILITY_DOOR)
+							&& !target.getValue(Level0EventBlocks.LockedUtilityDoorBlock.OPEN)) {
+						level.setBlockAndUpdate(cursor, target.setValue(Level0EventBlocks.LockedUtilityDoorBlock.OPEN, true));
+						opened++;
+					}
+				}
+			}
+		}
+		return opened;
 	}
 
 	private static int setNearbyLights(ServerLevel level, BlockPos center, int radiusXz, boolean turnOn) {

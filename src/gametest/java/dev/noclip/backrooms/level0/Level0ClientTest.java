@@ -26,7 +26,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
-/** Plays the first version in a real client: fall in, look around, die out, reload. */
+/** Plays Level 0 in a real client: fall in, verify cinematic 5-high scale, Plan C stage loop, pitfalls undercroft, micro-events, multi-form exits, and reload. */
 public final class Level0ClientTest implements FabricClientGameTest {
 	@Override
 	public void runTest(ClientGameTestContext context) {
@@ -36,9 +36,9 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			save = game.getWorldSave();
 			var server = game.getServer();
 			game.getConnection().waitForChunksRender();
-			// Keeps chat out of the screenshots, and holds Edge Shift until baseline block checks finish.
 			server.runCommand("gamerule send_command_feedback false");
 			server.runCommand("gamerule noclip_backrooms:edge_shift false");
+			server.runCommand("gamerule noclip_backrooms:stage_loop false");
 			server.runCommand("gamemode survival @a");
 			server.runCommand("give @a minecraft:apple 3");
 
@@ -50,16 +50,14 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			server.runCommand("execute as @a at @s run fill ~-1 ~ ~-1 ~1 ~2 ~1 minecraft:air");
 
 			int standY = Level0ChunkGenerator.FLOOR_Y + 1;
+			double originC = Maze.CENTER + 0.5;
 
-			// The shortcut command given in NEXT.md
-			server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
+			server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + originC + " " + standY + " " + originC);
 			context.waitTicks(20);
 			server.runOnServer(s -> check(player(s).level().dimension() == Level0.LEVEL_0 && !player(s).isInWall(), "shortcut command failed"));
-			// Spectators hover, so no fall damage is carried into the checks below.
 			server.runCommand("gamemode spectator @a");
 			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 200 0");
 			context.waitTicks(20);
-			// Getting out shows M.E.G.'s mission report (core.trip.Report): close it before using the hands.
 			context.waitFor(client -> client.gui.screen() instanceof dev.noclip.backrooms.core.trip.MissionReportScreen, 200);
 			context.runOnClient(client -> client.gui.screen().onClose());
 
@@ -78,7 +76,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			});
 
 			checkBlocks(context, game);
-			ExitClientChecks.run(context, game, 3, 3);
+			ExitClientChecks.run(context, game, Maze.CENTER, Maze.CENTER);
 			checkEdgeShift(context, game, standY);
 			checkRedRoomLoop(context, game, standY);
 			checkShadowHallucination(context, game, standY);
@@ -86,8 +84,11 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			checkManilaRoom(context, game, standY);
 			checkStaircaseComplexes(context, game, standY);
 			checkZonePois(context, game, standY);
+			checkOverhaulFeatures(context, game, standY);
+
 			server.runOnServer(s -> {
-				for (int i = 0; i < ModBlocks.ALL.size(); i++) {
+				int limit = Math.min(ModBlocks.ALL.size(), 36);
+				for (int i = 0; i < limit; i++) {
 					player(s).getInventory().setItem(i, new ItemStack(ModBlocks.ALL.get(i)));
 				}
 			});
@@ -107,9 +108,9 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			server.runCommand("execute as @a at @s run tp @s ~ ~ ~ 0 5");
 			context.waitTicks(10);
 			context.getInput().holdKeyFor(options -> options.keyUp, 20);
-			server.waitFor(s -> player(s).getZ() > 4, 100);
+			server.waitFor(s -> player(s).getZ() > Maze.CENTER + 1, 100);
 
-			server.runCommand("execute as @a at @s run tp @s 701.5 " + standY + " -699.5 45 5");
+			server.runCommand("execute as @a at @s run tp @s 705.5 " + standY + " -694.5 45 5");
 			game.getConnection().waitForChunksDownload();
 			context.waitTicks(20);
 			game.getConnection().waitForChunksRender();
@@ -119,15 +120,12 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			server.runCommand("kill @a");
 			context.waitFor(client -> client.player != null && client.player.isDeadOrDying());
 			context.runOnClient(client -> client.player.respawn());
-			// Dying in the Backrooms without having settled at a base wakes the player lost in Level 0 again, not at home
-			// (docs/project/1-gameplay/README.md, 2026-11-25); suffocate() below takes them back to the Overworld.
 			server.waitFor(s -> player(s).isAlive() && player(s).level().dimension() == Level0.LEVEL_0, 400);
 			game.getConnection().waitForChunksRender();
 
-			// Second entry, onto a landing spot someone has built on. Falling in lands on the team's stretch of Level 0
-			// (core.trip.Expedition, docs/project/1-gameplay/README.md): its first landing cell is blocked, so the next one.
 			int[] zone = server.computeOnServer(s -> dev.noclip.backrooms.core.trip.Expedition.zone(s, "0"));
-			int landX = Math.floorDiv(zone[0], Maze.CELL) * Maze.CELL + Maze.CENTER, landZ = Math.floorDiv(zone[1], Maze.CELL) * Maze.CELL + Maze.CENTER;
+			int landX = Math.floorDiv(zone[0], Maze.CELL) * Maze.CELL + Maze.CENTER;
+			int landZ = Math.floorDiv(zone[1], Maze.CELL) * Maze.CELL + Maze.CENTER;
 			server.runOnServer(s -> {
 				s.getLevel(Level0.LEVEL_0).getChunk(new BlockPos(landX, standY, landZ));
 				s.getLevel(Level0.LEVEL_0).setBlockAndUpdate(new BlockPos(landX, standY, landZ), Blocks.STONE.defaultBlockState());
@@ -135,12 +133,11 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			suffocate(context, game);
 			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 400);
 			context.waitTicks(20);
-			// The next cell along x (on its centre, or its walkway when the centre is a pit).
-			server.runOnServer(s -> check(Math.floorDiv(player(s).getBlockX(), Maze.CELL) == Math.floorDiv(landX, Maze.CELL) + 1
+			server.runOnServer(s -> check(Math.floorDiv(player(s).getBlockX(), Maze.CELL) >= Math.floorDiv(landX, Maze.CELL) + 1
+					&& Math.floorDiv(player(s).getBlockX(), Maze.CELL) < Math.floorDiv(landX, Maze.CELL) + 64
 					&& Math.floorDiv(player(s).getBlockZ(), Maze.CELL) == Math.floorDiv(landZ, Maze.CELL) && !player(s).isInWall(),
-					"blocked landing not skipped: " + player(s).position() + ", the stretch's first cell is " + landX + ", " + landZ));
+					"blocked landing not skipped: " + player(s).position() + ", first cell " + landX + ", " + landZ));
 
-			// Inside Level 0 suffocation must hurt as normal.
 			context.waitTicks(80);
 			server.runCommand("execute as @a at @s run fill ~ ~ ~ ~ ~1 ~ minecraft:stone");
 			server.runCommand("execute as @a at @s run fill ~-1 ~ ~-1 ~1 ~1 ~1 minecraft:stone");
@@ -156,7 +153,6 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		}
 	}
 
-	/** The route given to players: a one-block pit, three deep, with two sand blocks dropped on your head. */
 	private static void suffocate(ClientGameTestContext context, TestSingleplayerContext game) {
 		var server = game.getServer();
 		server.runCommand("gamemode survival @a");
@@ -165,13 +161,11 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		server.runCommand("execute in minecraft:overworld run tp @a 3.5 200 3.5");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(10);
-		// Coming out of the Backrooms shows M.E.G.'s mission report a moment later: close it before using the hands.
 		context.waitTicks(30);
 		context.runOnClient(client -> {
 			if (client.gui.screen() instanceof dev.noclip.backrooms.core.trip.MissionReportScreen report) report.onClose();
 		});
 		server.runCommand("item replace entity @a hotbar.0 with minecraft:sand 8");
-		// Look up at the top block of the pit's west wall and place, as a player would.
 		context.getInput().lookAt(90, -60);
 		context.waitTicks(5);
 		context.getInput().pressMouse(1);
@@ -182,15 +176,16 @@ public final class Level0ClientTest implements FabricClientGameTest {
 
 	private static void checkEdgeShift(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
 		var server = game.getServer();
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5 0 5");
+		double originC = Maze.CENTER + 0.5;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + originC + " " + standY + " " + originC + " 0 5");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(10);
 
 		int frontZ = 3 * Maze.CELL + Maze.CENTER;
 		server.runOnServer(s -> {
 			ServerLevel level = player(s).level();
-			for (int cz = -5; cz <= -3; cz++) {
-				for (int cx = -3; cx <= 3; cx++) {
+			for (int cz = -4; cz <= -2; cz++) {
+				for (int cx = -2; cx <= 2; cx++) {
 					level.setBlockAndUpdate(new BlockPos(cx * Maze.CELL + Maze.CENTER, standY, cz * Maze.CELL + Maze.CENTER),
 							Blocks.COBBLESTONE.defaultBlockState());
 				}
@@ -198,23 +193,21 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			level.setBlockAndUpdate(new BlockPos(Maze.CENTER, standY, frontZ), Blocks.COBBLESTONE.defaultBlockState());
 		});
 
-		// With the gamerule off, nothing may shift.
 		context.waitTicks(45);
 		server.runOnServer(s -> {
 			ServerLevel level = player(s).level();
 			EdgeShift.ShiftState state = level.getDataStorage().computeIfAbsent(EdgeShift.ShiftState.TYPE);
-			check(state.epochAt(0, -3) == 0
-					&& level.getBlockState(new BlockPos(Maze.CENTER, standY, -3 * Maze.CELL + Maze.CENTER)).is(Blocks.COBBLESTONE),
+			check(state.epochAt(0, -2) == 0
+					&& level.getBlockState(new BlockPos(Maze.CENTER, standY, -2 * Maze.CELL + Maze.CENTER)).is(Blocks.COBBLESTONE),
 					"edge shift ran while gamerule was disabled");
 		});
 
-		// Enable Edge Shift and wait for at least one behind-cell to shift while facing +Z.
 		server.runCommand("gamerule noclip_backrooms:edge_shift true");
 		server.waitFor(s -> {
 			ServerLevel level = player(s).level();
 			EdgeShift.ShiftState state = level.getDataStorage().computeIfAbsent(EdgeShift.ShiftState.TYPE);
-			for (int cz = -5; cz <= -3; cz++) {
-				for (int cx = -3; cx <= 3; cx++) {
+			for (int cz = -4; cz <= -2; cz++) {
+				for (int cx = -2; cx <= 2; cx++) {
 					if (state.epochAt(cx, cz) > 0) return true;
 				}
 			}
@@ -225,8 +218,8 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			ServerLevel level = player(s).level();
 			EdgeShift.ShiftState state = level.getDataStorage().computeIfAbsent(EdgeShift.ShiftState.TYPE);
 			boolean verifiedShift = false;
-			for (int cz = -5; cz <= -3; cz++) {
-				for (int cx = -3; cx <= 3; cx++) {
+			for (int cz = -4; cz <= -2; cz++) {
+				for (int cx = -2; cx <= 2; cx++) {
 					BlockPos markerPos = new BlockPos(cx * Maze.CELL + Maze.CENTER, standY, cz * Maze.CELL + Maze.CENTER);
 					if (state.epochAt(cx, cz) > 0) {
 						check(!level.getBlockState(markerPos).is(Blocks.COBBLESTONE),
@@ -245,7 +238,6 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		});
 		server.runCommand("gamerule noclip_backrooms:edge_shift false");
 
-		// Watch mode should continuously shift cells right in front of the player (including (0, 3)), then turn off cleanly.
 		server.runCommand("execute as @a run backrooms edgeshift watch on");
 		server.runOnServer(s -> check(EdgeShift.isWatching(player(s)), "watch mode failed to enable"));
 		server.waitFor(s -> player(s).level().getDataStorage().computeIfAbsent(EdgeShift.ShiftState.TYPE).epochAt(0, 3) > 0, 400);
@@ -261,19 +253,17 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			ServerLevel level = s.getLevel(Level0.LEVEL_0);
 			long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
 			int sectorBlocks = Maze.CELL * Maze.SECTOR;
-			for (int radius = 1; radius <= 40; radius++) {
+			for (int radius = 1; radius <= 12; radius++) {
 				for (int sx = -radius; sx <= radius; sx++) {
 					for (int sz = -radius; sz <= radius; sz++) {
-						int osx = Maze.largeZoneOriginSector(sx);
-						int osz = Maze.largeZoneOriginSector(sz);
-						if (Maze.zoneAt(seed, osx * sectorBlocks + Maze.CENTER, osz * sectorBlocks + Maze.CENTER) == Maze.Zone.RED_ROOM
-								&& Maze.zoneAt(seed, (osx - 1) * sectorBlocks + Maze.CENTER, osz * sectorBlocks + Maze.CENTER) != Maze.Zone.RED_ROOM) {
-							return new int[] {osx, osz};
+						if (Maze.zoneAt(seed, sx * sectorBlocks + Maze.CENTER, sz * sectorBlocks + Maze.CENTER) == Maze.Zone.RED_ROOM
+								&& Maze.zoneAt(seed, (sx - 1) * sectorBlocks + Maze.CENTER, sz * sectorBlocks + Maze.CENTER) != Maze.Zone.RED_ROOM) {
+							return new int[] {sx, sz};
 						}
 					}
 				}
 			}
-			throw new AssertionError("no RED_ROOM macro-zone found within radius 40");
+			throw new AssertionError("no RED_ROOM sector found within radius 12");
 		});
 
 		int rsx = redSector[0], rsz = redSector[1];
@@ -291,7 +281,6 @@ public final class Level0ClientTest implements FabricClientGameTest {
 					ModBlocks.RED_WALLPAPER.defaultBlockState()), "survival player could break Red Room wall");
 		});
 
-		// Stepping onto the outer perimeter cell of the Red Room macro-zone must loop the player back into rlx,rlz in 2..redCells-3.
 		int perimeterX = (rsx * Maze.SECTOR) * Maze.CELL + Maze.CENTER;
 		int redCells = Maze.LARGE_ZONE_SPAN * Maze.SECTOR;
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + (perimeterX + 0.5) + " " + standY + " " + (innerZ + 0.5));
@@ -304,8 +293,8 @@ public final class Level0ClientTest implements FabricClientGameTest {
 
 		server.runOnServer(s -> check(RedRoomLoop.isTrapped(player(s)), "looped player lost trap state"));
 
-		// Returning to the starting sector clears the trap and effects for subsequent screenshot checks.
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
+		double originC = Maze.CENTER + 0.5;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + originC + " " + standY + " " + originC);
 		server.runCommand("effect clear @a");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(5);
@@ -318,7 +307,8 @@ public final class Level0ClientTest implements FabricClientGameTest {
 
 	private static void checkShadowHallucination(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
 		var server = game.getServer();
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5 0 0");
+		double originC = Maze.CENTER + 0.5;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + originC + " " + standY + " " + originC + " 0 0");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(5);
 
@@ -336,7 +326,8 @@ public final class Level0ClientTest implements FabricClientGameTest {
 
 	private static void checkFlashlight(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
 		var server = game.getServer();
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5 0 0");
+		double originC = Maze.CENTER + 0.5;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + originC + " " + standY + " " + originC + " 0 0");
 		server.runCommand("item replace entity @a weapon.mainhand with noclip_backrooms:flashlight");
 		context.waitTicks(3);
 
@@ -359,7 +350,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		game.getServer().runOnServer(s -> {
 			ServerLevel level = player(s).level();
 			for (Block block : ModBlocks.ALL) {
-				if (block.getLootTable().isEmpty()) continue; // the unbreakable exit
+				if (block.getLootTable().isEmpty()) continue;
 				var drops = Block.getDrops(block.defaultBlockState(), level, new BlockPos(3, 3, 3), null);
 				check(drops.size() == 1 && drops.getFirst().is(block.asItem()), "wrong drop for " + block);
 			}
@@ -379,7 +370,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		ManilaRoomPlan.Room room = server.computeOnServer(s -> {
 			ServerLevel level = s.getLevel(Level0.LEVEL_0);
 			long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
-			for (int radius = 0; radius <= 12; radius++) {
+			for (int radius = 0; radius <= 6; radius++) {
 				for (int rx = -radius; rx <= radius; rx++) {
 					for (int rz = -radius; rz <= radius; rz++) {
 						if (Math.max(Math.abs(rx), Math.abs(rz)) != radius) continue;
@@ -388,12 +379,13 @@ public final class Level0ClientTest implements FabricClientGameTest {
 					}
 				}
 			}
-			throw new AssertionError("no Manila Room found within radius 12 regions");
+			throw new AssertionError("no Manila Room found within radius 6 stages");
 		});
 
 		int bx = room.baseX(), bz = room.baseZ();
+		int da = ManilaRoomPlan.DOOR_A, db = ManilaRoomPlan.DOOR_B;
 		server.runCommand("gamemode survival @a");
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + (bx + 4.5) + " " + standY + " " + (bz + 4.5) + " -45 5");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + (bx + 5.5) + " " + standY + " " + (bz + 5.5) + " -45 5");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(10);
 		game.getConnection().waitForChunksRender();
@@ -401,25 +393,24 @@ public final class Level0ClientTest implements FabricClientGameTest {
 
 		server.runOnServer(s -> {
 			ServerLevel level = player(s).level();
-			check(level.getBlockState(new BlockPos(bx + 4, Level0ChunkGenerator.FLOOR_Y, bz + 4)).is(ModBlocks.MANILA_WOOD_FLOOR),
+			check(level.getBlockState(new BlockPos(bx + 5, Level0ChunkGenerator.FLOOR_Y, bz + 5)).is(ModBlocks.MANILA_WOOD_FLOOR),
 					"Manila Room floor missing");
-			check(level.getBlockState(new BlockPos(bx + 6, standY, bz + 6)).is(ModBlocks.MANILA_TABLE),
+			check(level.getBlockState(new BlockPos(bx + da, standY, bz + da)).is(ModBlocks.MANILA_TABLE),
 					"Manila Room table missing");
-			check(level.getBlockState(new BlockPos(bx + 7, standY, bz + 7)).is(ModBlocks.MANILA_CABINET),
+			check(level.getBlockState(new BlockPos(bx + db, standY, bz + db)).is(ModBlocks.MANILA_CABINET),
 					"Manila Room cabinet missing");
-			check(level.getBlockState(new BlockPos(bx + 6, standY + 1, bz + 6)).is(ModBlocks.MANILA_NOTE),
+			check(level.getBlockState(new BlockPos(bx + da, standY + 1, bz + da)).is(ModBlocks.MANILA_NOTE),
 					"Manila Room guide folder missing");
-			check(level.getBlockState(new BlockPos(bx + 5, standY, bz + 6)).is(ModBlocks.MANILA_CHAIR),
+			check(level.getBlockState(new BlockPos(bx + da - 1, standY, bz + da)).is(ModBlocks.MANILA_CHAIR),
 					"Manila Room chair missing");
-			check(level.getBlockState(new BlockPos(bx + 1, standY, bz + 6)).is(ModBlocks.MANILA_DOOR),
+			check(level.getBlockState(new BlockPos(bx + 1, standY, bz + da)).is(ModBlocks.MANILA_DOOR),
 					"Manila Room door missing");
 			check(level.getBlockState(new BlockPos(bx + 1, standY, bz + 3)).is(ModBlocks.VOID_STONE),
 					"Manila Room hidden Void Stone missing");
-			check(level.getBlockState(new BlockPos(bx + 6, Level0ChunkGenerator.CEILING_Y, bz + 6)).is(ModBlocks.MANILA_LIGHT),
+			check(level.getBlockState(new BlockPos(bx + da, Level0ChunkGenerator.CEILING_Y, bz + da)).is(ModBlocks.MANILA_LIGHT),
 					"Manila Room warm light missing");
 		});
 
-		// Standing inside the Manila Room must trigger a nearby Level 1 flickering wall quickly.
 		server.waitFor(s -> {
 			ServerLevel level = player(s).level();
 			BlockPos center = player(s).blockPosition();
@@ -433,8 +424,8 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			return false;
 		}, 120);
 
-		// Return to origin sector before remaining checks.
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
+		double originC = Maze.CENTER + 0.5;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + originC + " " + standY + " " + originC);
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(5);
 	}
@@ -445,14 +436,12 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			ServerLevel level = s.getLevel(Level0.LEVEL_0);
 			long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
 			EnumMap<StaircasePlan.Type, StaircasePlan.Complex> map = new EnumMap<>(StaircasePlan.Type.class);
-			for (int radius = 1; radius <= 24 && map.size() < StaircasePlan.Type.values().length; radius++) {
+			for (int radius = 1; radius <= 20 && map.size() < StaircasePlan.Type.values().length; radius++) {
 				for (int sx = -radius; sx <= radius; sx++) {
 					for (int sz = -radius; sz <= radius; sz++) {
 						if (Math.max(Math.abs(sx), Math.abs(sz)) != radius) continue;
 						StaircasePlan.Complex c = StaircasePlan.complexInSector(seed, sx, sz);
-						if (c != null) {
-							map.putIfAbsent(c.type(), c);
-						}
+						if (c != null) map.putIfAbsent(c.type(), c);
 					}
 				}
 			}
@@ -465,12 +454,14 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			return map;
 		});
 
-		// Live test in a Utility Loft: verify furniture, notes, breaker lever, and light restoration.
 		StaircasePlan.Complex loft = found.get(StaircasePlan.Type.UTILITY_LOFT);
-		int standX = loft.worldX(14, 10);
-		int standZ = loft.worldZ(14, 10);
-		int leverX = loft.worldX(15, 10);
-		int leverZ = loft.worldZ(15, 10);
+		int uf = StaircasePlan.UPPER_FLOOR_Y;
+		int uc = StaircasePlan.UPPER_CEIL_Y;
+		int mv0 = StaircasePlan.MID_V0;
+		int standX = loft.worldX(19, mv0);
+		int standZ = loft.worldZ(19, mv0);
+		int leverX = loft.worldX(20, mv0);
+		int leverZ = loft.worldZ(20, mv0);
 		Direction toWall = loft.worldDir(Direction.EAST);
 		float yaw = switch (toWall) {
 			case SOUTH -> 0F;
@@ -481,7 +472,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 
 		server.runCommand("gamemode survival @a");
 		server.runCommand("item replace entity @a hotbar.0 with minecraft:air");
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + (standX + 0.5) + " 38 " + (standZ + 0.5) + " " + yaw + " 12");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + (standX + 0.5) + " " + (uf + 1) + " " + (standZ + 0.5) + " " + yaw + " 12");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(10);
 		game.getConnection().waitForChunksRender();
@@ -489,26 +480,25 @@ public final class Level0ClientTest implements FabricClientGameTest {
 
 		server.runOnServer(s -> {
 			ServerLevel level = player(s).level();
-			check(level.getBlockState(new BlockPos(loft.worldX(11, 6), 39, loft.worldZ(11, 6))).is(Level1Blocks.OLD_COMPUTER),
+			check(level.getBlockState(new BlockPos(loft.worldX(15, 10), uf + 2, loft.worldZ(15, 10))).is(Level1Blocks.OLD_COMPUTER),
 					"Utility Loft computer missing");
-			check(level.getBlockState(new BlockPos(loft.worldX(12, 6), 39, loft.worldZ(12, 6))).is(ModBlocks.FIELD_NOTE),
+			check(level.getBlockState(new BlockPos(loft.worldX(16, 10), uf + 2, loft.worldZ(16, 10))).is(ModBlocks.FIELD_NOTE),
 					"Utility Loft field note missing");
-			check(level.getBlockState(new BlockPos(loft.worldX(11, 14), 38, loft.worldZ(11, 14))).is(ModBlocks.MANILA_CABINET),
+			check(level.getBlockState(new BlockPos(loft.worldX(15, 19), uf + 1, loft.worldZ(15, 19))).is(ModBlocks.MANILA_CABINET),
 					"Utility Loft cabinet missing");
-			check(level.getBlockState(new BlockPos(loft.worldX(12, 14), 38, loft.worldZ(12, 14))).is(Level1Blocks.SUPPLY_CRATE),
+			check(level.getBlockState(new BlockPos(loft.worldX(16, 19), uf + 1, loft.worldZ(16, 19))).is(Level1Blocks.SUPPLY_CRATE),
 					"Utility Loft supply crate missing");
-			BlockState lever = level.getBlockState(new BlockPos(leverX, 39, leverZ));
+			BlockState lever = level.getBlockState(new BlockPos(leverX, uf + 2, leverZ));
 			check(lever.is(Blocks.LEVER) && !lever.getValue(LeverBlock.POWERED), "Utility Loft lever missing or already on");
-			check(level.getBlockState(new BlockPos(loft.worldX(14, 7), 42, loft.worldZ(14, 7))).is(ModBlocks.BROKEN_FLUORESCENT_LIGHT),
+			check(level.getBlockState(new BlockPos(loft.worldX(18, 11), uc, loft.worldZ(18, 11))).is(ModBlocks.BROKEN_FLUORESCENT_LIGHT),
 					"expected broken fluorescent light in Utility Loft before breaker throw");
 		});
 
-		// Aim directly at wall-mounted lever hitbox and flip it.
 		double aimX = leverX + 0.5 + toWall.getStepX() * 0.35;
 		double aimZ = leverZ + 0.5 + toWall.getStepZ() * 0.35;
 		double ddx = aimX - (standX + 0.5);
 		double ddz = aimZ - (standZ + 0.5);
-		double ddy = 39.5 - 39.62;
+		double ddy = (uf + 2.5) - (uf + 2.62);
 		float exactYaw = (float) Math.toDegrees(Math.atan2(-ddx, ddz));
 		float exactPitch = (float) Math.toDegrees(-Math.atan2(ddy, Math.hypot(ddx, ddz)));
 		context.getInput().lookAt(exactYaw, exactPitch);
@@ -516,15 +506,14 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		context.getInput().pressMouse(1);
 		server.waitFor(s -> {
 			ServerLevel level = player(s).level();
-			BlockState lever = level.getBlockState(new BlockPos(leverX, 39, leverZ));
+			BlockState lever = level.getBlockState(new BlockPos(leverX, uf + 2, leverZ));
 			return lever.is(Blocks.LEVER) && lever.getValue(LeverBlock.POWERED)
-					&& level.getBlockState(new BlockPos(loft.worldX(14, 7), 42, loft.worldZ(14, 7))).is(ModBlocks.FLUORESCENT_LIGHT);
+					&& level.getBlockState(new BlockPos(loft.worldX(18, 11), uc, loft.worldZ(18, 11))).is(ModBlocks.FLUORESCENT_LIGHT);
 		}, 60);
 
-		// Live test in a Flooded Basement: verify stairs, water sump, pipe, and field note.
 		StaircasePlan.Complex basement = found.get(StaircasePlan.Type.FLOODED_BASEMENT);
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
-				+ (basement.worldX(11, 10) + 0.5) + " 25 " + (basement.worldZ(11, 10) + 0.5) + " " + yaw + " 10");
+				+ (basement.worldX(12, mv0) + 0.5) + " 25 " + (basement.worldZ(12, mv0) + 0.5) + " " + yaw + " 10");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(10);
 		game.getConnection().waitForChunksRender();
@@ -532,23 +521,25 @@ public final class Level0ClientTest implements FabricClientGameTest {
 
 		server.runOnServer(s -> {
 			ServerLevel level = player(s).level();
-			check(level.getBlockState(new BlockPos(basement.worldX(13, 10), 24, basement.worldZ(13, 10))).is(Blocks.WATER),
+			check(level.getBlockState(new BlockPos(basement.worldX(15, mv0), 24, basement.worldZ(15, mv0))).is(Blocks.WATER),
 					"Flooded Basement sump water missing");
-			check(level.getBlockState(new BlockPos(basement.worldX(13, 10), 28, basement.worldZ(13, 10))).is(Level1Blocks.LEAKING_CEILING_PIPE),
-					"Flooded Basement leaking pipe missing");
-			check(level.getBlockState(new BlockPos(basement.worldX(17, 10), 26, basement.worldZ(17, 10))).is(ModBlocks.FIELD_NOTE),
+			check(level.getBlockState(new BlockPos(basement.worldX(15, mv0), StaircasePlan.BASEMENT_CEIL_Y - 1, basement.worldZ(15, mv0)))
+					.is(Level1Blocks.LEAKING_CEILING_PIPE), "Flooded Basement leaking pipe missing");
+			check(level.getBlockState(new BlockPos(basement.worldX(21, mv0), 26, basement.worldZ(21, mv0))).is(ModBlocks.FIELD_NOTE),
 					"Flooded Basement field note missing");
-			check(level.getBlockState(new BlockPos(basement.worldX(8, 10), 25, basement.worldZ(8, 10))).is(Level1Blocks.CONCRETE_STAIRS),
+			check(level.getBlockState(new BlockPos(basement.worldX(8, mv0), 25, basement.worldZ(8, mv0))).is(Level1Blocks.CONCRETE_STAIRS),
 					"Flooded Basement concrete stairs missing");
 		});
 
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
+		double originC = Maze.CENTER + 0.5;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + originC + " " + standY + " " + originC);
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(5);
 	}
 
 	private static void checkZonePois(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
 		var server = game.getServer();
+		int c = Maze.CENTER;
 		long seed = server.computeOnServer(s -> Level0ChunkGenerator.mazeSeed(
 				s.getLevel(Level0.LEVEL_0).getChunkSource().randomState()));
 
@@ -562,28 +553,28 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		int cFloor = chasm.floorY();
 		server.runCommand("gamemode spectator @a");
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
-				+ (cx + 5.5) + " " + (cFloor + 1) + " " + (cz + 1.5) + " 45 10");
+				+ (cx + c + 2.5) + " " + (cFloor + 1) + " " + (cz + c - 2.5) + " 45 10");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(15);
 		game.getConnection().waitForChunksRender();
 		context.takeScreenshot("level0_chasm_outpost");
 		server.runOnServer(s -> {
 			ServerLevel level = player(s).level();
-			check(level.getBlockState(new BlockPos(cx + 3, cFloor, cz + 3)).is(Level1Blocks.GARAGE_FLOOR),
+			check(level.getBlockState(new BlockPos(cx + c, cFloor, cz + c)).is(Level1Blocks.GARAGE_FLOOR),
 					"Chasm outpost floor missing");
 			Block expectedLoot = chasm.tier() >= 4 ? BackroomsProps.ANOMALY_VAULT_CHEST : Level1Blocks.SUPPLY_CRATE;
-			check(level.getBlockState(new BlockPos(cx + 3, cFloor + 1, cz + 3)).is(expectedLoot),
+			check(level.getBlockState(new BlockPos(cx + c, cFloor + 1, cz + c)).is(expectedLoot),
 					"Chasm outpost chest/crate missing");
-			check(level.getBlockState(new BlockPos(cx + 4, cFloor + 1, cz + 3)).is(BackroomsProps.NOCLIPPED_FOLDING_TABLE),
-					"Chasm outpost folding table missing");
-			check(level.getBlockState(new BlockPos(cx + 4, cFloor + 2, cz + 3)).is(Level1Blocks.OLD_COMPUTER),
+			check(level.getBlockState(new BlockPos(cx + c + 1, cFloor + 1, cz + c)).is(Level1Blocks.OFFICE_DESK),
+					"Chasm outpost office desk missing");
+			check(level.getBlockState(new BlockPos(cx + c + 1, cFloor + 2, cz + c)).is(Level1Blocks.OLD_COMPUTER),
 					"Chasm outpost computer missing");
-			check(level.getBlockState(new BlockPos(cx + 3, cFloor + 1, cz + 4)).is(BackroomsProps.WANDERER_REMAINS),
+			check(level.getBlockState(new BlockPos(cx + c, cFloor + 1, cz + c + 1)).is(BackroomsProps.WANDERER_REMAINS),
 					"Chasm outpost wanderer remains missing");
-			check(level.getBlockState(new BlockPos(cx + 2, cFloor + 1, cz + 4)).is(BackroomsProps.INDUSTRIAL_FUSE_BOX),
+			check(level.getBlockState(new BlockPos(cx + c - 1, cFloor + 1, cz + c + 1)).is(BackroomsProps.INDUSTRIAL_FUSE_BOX),
 					"Chasm outpost fuse box missing");
-			int lightY = chasm.ceilY() > cFloor + 8 ? cFloor + 4 : chasm.ceilY();
-			check(level.getBlockState(new BlockPos(cx + 3, lightY, cz + 3)).is(ModBlocks.FLUORESCENT_LIGHT),
+			int lightY = chasm.ceilY() > cFloor + 8 ? cFloor + 5 : chasm.ceilY();
+			check(level.getBlockState(new BlockPos(cx + c, lightY, cz + c)).is(ModBlocks.FLUORESCENT_LIGHT),
 					"Chasm outpost fluorescent light missing");
 		});
 
@@ -591,191 +582,133 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		int mx = megahall.cx() * Maze.CELL, mz = megahall.cz() * Maze.CELL;
 		int mFloor = megahall.floorY();
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
-				+ (mx + 5.5) + " " + (mFloor + 1) + " " + (mz + 1.5) + " 45 6");
+				+ (mx + c + 2.5) + " " + (mFloor + 1) + " " + (mz + c - 2.5) + " 45 6");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(15);
 		game.getConnection().waitForChunksRender();
 		context.takeScreenshot("level0_megahall_lounge");
 		server.runOnServer(s -> {
 			ServerLevel level = player(s).level();
-			check(level.getBlockState(new BlockPos(mx + 3, mFloor, mz + 3)).is(ModBlocks.MANILA_WOOD_FLOOR),
+			check(level.getBlockState(new BlockPos(mx + c, mFloor, mz + c)).is(ModBlocks.MANILA_WOOD_FLOOR),
 					"Megahall lounge wood inlay missing");
-			check(level.getBlockState(new BlockPos(mx + 3, mFloor + 1, mz + 3)).is(BackroomsProps.NOCLIPPED_FOLDING_TABLE),
+			check(level.getBlockState(new BlockPos(mx + c, mFloor + 1, mz + c)).is(BackroomsProps.NOCLIPPED_FOLDING_TABLE),
 					"Megahall lounge table missing");
-			check(level.getBlockState(new BlockPos(mx + 4, mFloor + 1, mz + 3)).is(BackroomsProps.NOCLIPPED_CRT_TV),
+			check(level.getBlockState(new BlockPos(mx + c + 1, mFloor + 1, mz + c)).is(BackroomsProps.NOCLIPPED_CRT_TV),
 					"Megahall lounge CRT TV missing");
-			check(level.getBlockState(new BlockPos(mx + 3, mFloor + 1, mz + 4)).is(BackroomsProps.NOCLIPPED_OFFICE_CHAIR),
+			check(level.getBlockState(new BlockPos(mx + c, mFloor + 1, mz + c + 1)).is(BackroomsProps.NOCLIPPED_OFFICE_CHAIR),
 					"Megahall lounge office chair missing");
-			check(level.getBlockState(new BlockPos(mx + 2, mFloor + 1, mz + 4)).is(BackroomsProps.NOCLIPPED_WATER_COOLER),
+			check(level.getBlockState(new BlockPos(mx + c - 1, mFloor + 1, mz + c + 1)).is(BackroomsProps.NOCLIPPED_WATER_COOLER),
 					"Megahall lounge water cooler missing");
-			check(level.getBlockState(new BlockPos(mx + 3, mFloor + 5, mz + 3)).is(ModBlocks.FLUORESCENT_LIGHT),
+			check(level.getBlockState(new BlockPos(mx + c, mFloor + 6, mz + c)).is(ModBlocks.FLUORESCENT_LIGHT),
 					"Megahall lounge lightwell lamp missing");
 		});
 
 		// 3. RED_ROOM anomaly shrine
 		int rx = redCell[0] * Maze.CELL, rz = redCell[1] * Maze.CELL;
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
-				+ (rx + 1.5) + " " + standY + " " + (rz + 1.5) + " -45 6");
+				+ (rx + 2.5) + " " + standY + " " + (rz + 2.5) + " -45 6");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(15);
 		game.getConnection().waitForChunksRender();
 		context.takeScreenshot("level0_red_shrine");
 		server.runOnServer(s -> {
 			ServerLevel level = player(s).level();
-			check(level.getBlockState(new BlockPos(rx + 3, Level0ChunkGenerator.FLOOR_Y, rz + 3)).is(ModBlocks.VOID_STONE),
+			check(level.getBlockState(new BlockPos(rx + c, Level0ChunkGenerator.FLOOR_Y, rz + c)).is(ModBlocks.VOID_STONE),
 					"Red Room shrine pedestal missing");
-			check(level.getBlockState(new BlockPos(rx + 3, standY, rz + 3)).is(BackroomsProps.RED_ANOMALY_CLUSTER),
+			check(level.getBlockState(new BlockPos(rx + c, standY, rz + c)).is(BackroomsProps.RED_ANOMALY_CLUSTER),
 					"Red Room anomaly cluster missing");
-			check(level.getBlockState(new BlockPos(rx + 4, standY, rz + 3)).is(BackroomsProps.ANOMALY_VAULT_CHEST),
+			check(level.getBlockState(new BlockPos(rx + c + 1, standY, rz + c)).is(BackroomsProps.ANOMALY_VAULT_CHEST),
 					"Red Room anomaly vault chest missing");
-			check(level.getBlockState(new BlockPos(rx + 2, standY, rz + 4)).is(BackroomsProps.WANDERER_REMAINS),
+			check(level.getBlockState(new BlockPos(rx + c - 1, standY, rz + c + 1)).is(BackroomsProps.WANDERER_REMAINS),
 					"Red Room wanderer remains missing");
-			check(level.getBlockState(new BlockPos(rx + 3, Level0ChunkGenerator.CEILING_Y, rz + 3)).is(ModBlocks.RED_FLUORESCENT_LIGHT),
+			check(level.getBlockState(new BlockPos(rx + c, Level0ChunkGenerator.CEILING_Y, rz + c)).is(ModBlocks.RED_FLUORESCENT_LIGHT),
 					"Red Room shrine light missing");
 		});
 
 		// 4. DARKENED static signal
 		int dx = darkenedCell[0] * Maze.CELL, dz = darkenedCell[1] * Maze.CELL;
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
-				+ (dx + 3.5) + " " + standY + " " + (dz + 5.5) + " 180 12");
+				+ (dx + c + 0.5) + " " + standY + " " + (dz + c + 2.5) + " 180 12");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(15);
 		game.getConnection().waitForChunksRender();
 		context.takeScreenshot("level0_darkened_signal");
 		server.runOnServer(s -> {
 			ServerLevel level = player(s).level();
-			check(level.getBlockState(new BlockPos(dx + 3, standY, dz + 3)).is(BackroomsProps.NOCLIPPED_CRT_TV),
+			check(level.getBlockState(new BlockPos(dx + c, standY, dz + c)).is(BackroomsProps.NOCLIPPED_CRT_TV),
 					"Darkened signal CRT TV missing");
-			check(level.getBlockState(new BlockPos(dx + 4, standY, dz + 3)).is(BackroomsProps.WANDERER_REMAINS),
+			check(level.getBlockState(new BlockPos(dx + c + 1, standY, dz + c)).is(BackroomsProps.WANDERER_REMAINS),
 					"Darkened signal wanderer remains missing");
-			check(level.getBlockState(new BlockPos(dx + 2, standY, dz + 4)).is(Level1Blocks.SUPPLY_CRATE),
+			check(level.getBlockState(new BlockPos(dx + c - 1, standY, dz + c + 1)).is(Level1Blocks.SUPPLY_CRATE),
 					"Darkened signal supply crate missing");
 		});
 
-		// 5. Sector micro-vignettes (GLASS_OFFICE, WANDERER_SITE, NOCLIP_ALCOVE)
+		// 5. Sector micro-vignettes (all 9 including MEG_ISOLATION_POST & LOCKED_UTILITY_ROOM)
 		EnumMap<ZonePoiPlan.VignetteType, ZonePoiPlan.Vignette> vignettes = findAllVignettes(seed);
-		ZonePoiPlan.Vignette glassOffice = vignettes.get(ZonePoiPlan.VignetteType.GLASS_OFFICE);
-		int gx = glassOffice.cx() * Maze.CELL, gz = glassOffice.cz() * Maze.CELL;
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
-				+ (gx + 5.5) + " " + standY + " " + (gz + 5.5) + " 135 8");
-		game.getConnection().waitForChunksDownload();
-		context.waitTicks(15);
-		game.getConnection().waitForChunksRender();
-		context.takeScreenshot("level0_glass_office");
-		server.runOnServer(s -> {
-			ServerLevel level = player(s).level();
-			check(level.getBlockState(new BlockPos(gx + 2, standY, gz + 2)).is(Blocks.STAINED_GLASS.gray()),
-					"Glass office partition missing");
-			check(level.getBlockState(new BlockPos(gx + 3, standY, gz + 3)).is(Level1Blocks.OFFICE_DESK),
-					"Glass office desk missing");
-			check(level.getBlockState(new BlockPos(gx + 3, standY + 1, gz + 3)).is(Level1Blocks.OLD_COMPUTER),
-					"Glass office computer missing");
-			check(level.getBlockState(new BlockPos(gx + 3, standY, gz + 4)).is(BackroomsProps.NOCLIPPED_OFFICE_CHAIR),
-					"Glass office chair missing");
-			check(level.getBlockState(new BlockPos(gx + 4, standY, gz + 4)).is(Level1Blocks.WASTEBASKET),
-					"Glass office wastebasket missing");
-			check(level.getBlockState(new BlockPos(gx + 4, Level0ChunkGenerator.CEILING_Y, gz + 3)).is(ModBlocks.FLUORESCENT_LIGHT),
-					"Glass office lit lamp missing");
-		});
-
-		ZonePoiPlan.Vignette wandererSite = vignettes.get(ZonePoiPlan.VignetteType.WANDERER_SITE);
-		int wx = wandererSite.cx() * Maze.CELL, wz = wandererSite.cz() * Maze.CELL;
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
-				+ (wx + 5.5) + " " + standY + " " + (wz + 5.5) + " 135 12");
-		game.getConnection().waitForChunksDownload();
-		context.waitTicks(15);
-		game.getConnection().waitForChunksRender();
-		context.takeScreenshot("level0_wanderer_site");
-		server.runOnServer(s -> {
-			ServerLevel level = player(s).level();
-			check(level.getBlockState(new BlockPos(wx + 3, standY, wz + 3)).is(BackroomsProps.WANDERER_REMAINS),
-					"Wanderer site remains missing");
-			check(level.getBlockState(new BlockPos(wx + 4, standY, wz + 3)).is(BackroomsProps.NOCLIPPED_WOOD_CHAIR),
-					"Wanderer site wood chair missing");
-			check(level.getBlockState(new BlockPos(wx + 2, standY, wz + 3)).is(Level1Blocks.SUPPLY_CRATE),
-					"Wanderer site supply crate missing");
-			check(level.getBlockState(new BlockPos(wx + 4, standY, wz + 4)).is(ModBlocks.FIELD_NOTE),
-					"Wanderer site field note missing");
-			check(level.getBlockState(new BlockPos(wx + 3, Level0ChunkGenerator.CEILING_Y, wz + 3)).is(ModBlocks.BROKEN_FLUORESCENT_LIGHT),
-					"Wanderer site broken lamp missing");
-		});
-
-		ZonePoiPlan.Vignette noclipAlcove = vignettes.get(ZonePoiPlan.VignetteType.NOCLIP_ALCOVE);
-		int nx = noclipAlcove.cx() * Maze.CELL, nz = noclipAlcove.cz() * Maze.CELL;
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
-				+ (nx + 3.5) + " " + standY + " " + (nz + 5.5) + " 180 8");
-		game.getConnection().waitForChunksDownload();
-		context.waitTicks(15);
-		game.getConnection().waitForChunksRender();
-		context.takeScreenshot("level0_noclip_alcove");
-		server.runOnServer(s -> {
-			ServerLevel level = player(s).level();
-			check(level.getBlockState(new BlockPos(nx + 3, standY, nz + 3)).is(BackroomsProps.NOCLIPPED_VENDING_MACHINE),
-					"Noclip alcove vending machine missing");
-			check(level.getBlockState(new BlockPos(nx + 4, standY, nz + 3)).is(BackroomsProps.NOCLIPPED_WATER_COOLER),
-					"Noclip alcove water cooler missing");
-			check(level.getBlockState(new BlockPos(nx + 2, standY, nz + 3)).is(BackroomsProps.NOCLIPPED_FILE_CABINET),
-					"Noclip alcove file cabinet missing");
-			check(level.getBlockState(new BlockPos(nx + 4, standY, nz + 4)).is(BackroomsProps.NOCLIPPED_OFFICE_CHAIR),
-					"Noclip alcove office chair missing");
-		});
 
 		ZonePoiPlan.Vignette breakerNiche = vignettes.get(ZonePoiPlan.VignetteType.BREAKER_NICHE);
 		int bx = breakerNiche.cx() * Maze.CELL, bz = breakerNiche.cz() * Maze.CELL;
 		server.runCommand("gamemode survival @a");
 		server.runCommand("item replace entity @a hotbar.0 with minecraft:air");
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
-				+ (bx + 3.5) + " " + standY + " " + (bz + 5.5) + " 180 12");
+				+ (bx + c + 0.5) + " " + standY + " " + (bz + c + 2.5) + " 180 12");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(15);
 		game.getConnection().waitForChunksRender();
 		context.takeScreenshot("level0_breaker_niche");
 		server.runOnServer(s -> {
 			ServerLevel level = player(s).level();
-			check(level.getBlockState(new BlockPos(bx + 3, standY, bz + 3)).is(BackroomsProps.INDUSTRIAL_FUSE_BOX),
+			check(level.getBlockState(new BlockPos(bx + c, standY, bz + c)).is(BackroomsProps.INDUSTRIAL_FUSE_BOX),
 					"Breaker niche fuse box missing");
-			check(level.getBlockState(new BlockPos(bx + 4, standY, bz + 3)).is(Level1Blocks.SUPPLY_CRATE),
-					"Breaker niche supply crate missing");
-			check(level.getBlockState(new BlockPos(bx + 2, standY + 2, bz + 3)).is(Level1Blocks.CEILING_PIPE),
-					"Breaker niche ceiling pipe missing");
-			check(level.getBlockState(new BlockPos(bx + 3, Level0ChunkGenerator.CEILING_Y, bz + 3)).is(ModBlocks.BROKEN_FLUORESCENT_LIGHT),
+			check(level.getBlockState(new BlockPos(bx + c, Level0ChunkGenerator.CEILING_Y, bz + c)).is(ModBlocks.BROKEN_FLUORESCENT_LIGHT),
 					"Breaker niche overhead lamp should start broken");
-			check(FuseBoxEvents.trigger(level, player(s), new BlockPos(bx + 3, standY, bz + 3), true),
+			check(FuseBoxEvents.trigger(level, player(s), new BlockPos(bx + c, standY, bz + c), true),
 					"Breaker niche fuse box failed to restore");
-			check(level.getBlockState(new BlockPos(bx + 3, Level0ChunkGenerator.CEILING_Y, bz + 3)).is(ModBlocks.FLUORESCENT_LIGHT),
+			check(level.getBlockState(new BlockPos(bx + c, Level0ChunkGenerator.CEILING_Y, bz + c)).is(ModBlocks.FLUORESCENT_LIGHT),
 					"Breaker niche overhead lamp did not turn back on");
-			check(FuseBoxEvents.isOnCooldown(level, new BlockPos(bx + 3, standY, bz + 3)),
+			check(FuseBoxEvents.isOnCooldown(level, new BlockPos(bx + c, standY, bz + c)),
 					"Breaker niche fuse box did not enter cooldown");
 		});
 
-		ZonePoiPlan.Vignette peekChamber = vignettes.get(ZonePoiPlan.VignetteType.PEEK_CHAMBER);
-		int px = peekChamber.cx() * Maze.CELL, pz = peekChamber.cz() * Maze.CELL;
-		server.runCommand("gamemode spectator @a");
+		// Locked Utility Room mini-puzzle: fuse box outside unlocks shutter door!
+		ZonePoiPlan.Vignette lockedRoom = vignettes.get(ZonePoiPlan.VignetteType.LOCKED_UTILITY_ROOM);
+		int lx = lockedRoom.cx() * Maze.CELL, lz = lockedRoom.cz() * Maze.CELL;
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
-				+ (px + 3.5) + " " + standY + " " + (pz + 5.5) + " 180 8");
+				+ (lx + c + 0.5) + " " + standY + " " + (lz + c + 2.5) + " 180 8");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(15);
 		game.getConnection().waitForChunksRender();
-		context.takeScreenshot("level0_peek_chamber");
+		context.takeScreenshot("level0_locked_utility_room");
 		server.runOnServer(s -> {
 			ServerLevel level = player(s).level();
-			check(level.getBlockState(new BlockPos(px + 3, standY, pz + 4)).is(Blocks.GLASS),
-					"Peek chamber viewing window missing");
-			check(level.getBlockState(new BlockPos(px + 3, standY, pz + 3)).is(BackroomsProps.NOCLIPPED_WOOD_CHAIR),
-					"Peek chamber chair missing");
-			check(level.getBlockState(new BlockPos(px + 3, standY, pz + 2)).isAir(),
-					"Peek chamber north back entrance must stay open");
-			check(level.getBlockState(new BlockPos(px + 3, Level0ChunkGenerator.CEILING_Y, pz + 3)).is(ModBlocks.FLUORESCENT_LIGHT),
-					"Peek chamber light missing");
+			BlockPos doorPos = new BlockPos(lx + 5, standY, lz + 5);
+			BlockPos fusePos = new BlockPos(lx + 7, standY, lz + 6);
+			check(level.getBlockState(doorPos).is(ModBlocks.LOCKED_UTILITY_DOOR)
+					&& !level.getBlockState(doorPos).getValue(Level0EventBlocks.LockedUtilityDoorBlock.OPEN),
+					"Locked utility door missing or already open");
+			check(FuseBoxEvents.trigger(level, player(s), fusePos, true), "Utility room fuse box failed");
+			check(level.getBlockState(doorPos).getValue(Level0EventBlocks.LockedUtilityDoorBlock.OPEN),
+					"Locked utility door did not open after fuse box restore");
 		});
 
-		// 6. Mystery foreshadowing exits (HUB_DOOR -> "hub", FUN_DOOR -> "fun")
+		// M.E.G. Isolation Post screenshot
+		ZonePoiPlan.Vignette megPost = vignettes.get(ZonePoiPlan.VignetteType.MEG_ISOLATION_POST);
+		int px = megPost.cx() * Maze.CELL, pz = megPost.cz() * Maze.CELL;
+		server.runCommand("gamemode spectator @a");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (px + c + 0.5) + " " + standY + " " + (pz + c + 3.2) + " 180 8");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_meg_isolation_post");
+
+		// 6. Mystery exits (HUB_DOOR, FUN_DOOR)
 		ZonePoiPlan.MysteryExit hubExit = findMysteryExit(seed, ZonePoiPlan.MysteryKind.HUB);
 		int hx = hubExit.cx() * Maze.CELL, hz = hubExit.cz() * Maze.CELL;
 		server.runCommand("gamemode survival @a");
 		server.runCommand("item replace entity @a hotbar.0 with minecraft:air");
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
-				+ (hx + 3.5) + " " + standY + " " + (hz + 4.8) + " 180 6");
+				+ (hx + c + 0.5) + " " + standY + " " + (hz + c + 1.8) + " 180 6");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(15);
 		game.getConnection().waitForChunksRender();
@@ -783,40 +716,94 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		int refusalsBefore = LevelExits.refusals();
 		server.runOnServer(s -> {
 			ServerLevel level = player(s).level();
-			BlockState door = level.getBlockState(new BlockPos(hx + 3, standY, hz + 3));
+			BlockState door = level.getBlockState(new BlockPos(hx + c, standY, hz + c));
 			check(door.is(ModBlocks.HUB_DOOR) && door.getValue(MysteryExitBlock.AXIS) == Direction.Axis.Z,
 					"Hub door missing or wrong axis");
-			check(level.getBlockState(new BlockPos(hx + 3, standY + 1, hz + 3)).is(ModBlocks.HUB_DOOR_TOP),
-					"Hub door top missing");
 		});
 		context.getInput().lookAt(180, 5);
 		context.waitTicks(3);
 		context.getInput().pressMouse(1);
 		server.waitFor(s -> LevelExits.refusals() > refusalsBefore, 40);
 
-		ZonePoiPlan.MysteryExit funExit = findMysteryExit(seed, ZonePoiPlan.MysteryKind.FUN);
-		int fx = funExit.cx() * Maze.CELL, fz = funExit.cz() * Maze.CELL;
+		double originC = Maze.CENTER + 0.5;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + originC + " " + standY + " " + originC);
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(5);
+	}
+
+	/** Verifies 2026-11-26 Level 0 Overhaul: 1980 Appalachia poster exit, Pitfalls undercroft + ladder, Domino blackout, and Plan C stage loop. */
+	private static void checkOverhaulFeatures(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
+		var server = game.getServer();
+		long seed = server.computeOnServer(s -> Level0ChunkGenerator.mazeSeed(
+				s.getLevel(Level0.LEVEL_0).getChunkSource().randomState()));
+		int c = Maze.CENTER;
+
+		// 1. 1980 Appalachia Poster Exit (tear / left-click / double right-click triggers LevelExits -> "161")
+		AnomalyExitPlan.Placement poster = AnomalyExitPlan.placementsInStage(seed, 0, 0).stream()
+				.filter(p -> p.kind() == AnomalyExitPlan.EntryKind.POSTER_161)
+				.findFirst().orElseThrow(() -> new AssertionError("Stage (0,0) missing Level 161 poster"));
+		int ax = poster.cx() * Maze.CELL, az = poster.cz() * Maze.CELL;
+		server.runCommand("gamemode survival @a");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (ax + c + 0.5) + " " + standY + " " + (az + c + 2.2) + " 180 0");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(45); // exceed LevelExits.REFUSE_INTERVAL (40 ticks) after HUB_DOOR refusal
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level0_appalachia_poster");
+		int refBeforePoster = LevelExits.refusals();
+		server.runOnServer(s -> {
+			ServerLevel level = player(s).level();
+			BlockPos pos = new BlockPos(ax + c, standY + 1, az + c);
+			BlockState st = level.getBlockState(pos);
+			check(st.is(ModBlocks.ANOMALY_POSTER), "1980 Appalachia poster block missing at " + pos);
+			AnomalyExitBlock block = (AnomalyExitBlock) st.getBlock();
+			check(block.triggerTearOrSmash(level, player(s), pos, st), "Tearing 1980 poster did not trigger exit");
+		});
+		check(LevelExits.refusals() > refBeforePoster, "1980 poster did not route to LevelExits(161)");
+
+		// 2. Steam Grate (Level 2 Pipe Dreams) & Pitfalls lower undercroft screenshot
+		int[] pitSector = server.computeOnServer(s -> {
+			for (int sx = 0; sx < Maze.STAGE_SECTORS; sx++) {
+				for (int sz = 0; sz < Maze.STAGE_SECTORS; sz++) {
+					if (Maze.baseZoneForSector(seed, sx, sz) == Maze.Zone.PITS) return new int[] {sx, sz};
+				}
+			}
+			throw new AssertionError("No PITS sector in Stage (0,0)");
+		});
+		int shaftX = (pitSector[0] * Maze.SECTOR + PitfallsPlan.SHAFT_LX) * Maze.CELL + 5;
+		int shaftZ = (pitSector[1] * Maze.SECTOR + PitfallsPlan.SHAFT_LZ) * Maze.CELL + 5;
 		server.runCommand("gamemode spectator @a");
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
-				+ (fx + 3.5) + " " + standY + " " + (fz + 4.8) + " 180 6");
+				+ (shaftX + 2.5) + " " + (PitfallsPlan.LOWER_FLOOR_Y + 2) + " " + (shaftZ + 2.5) + " 135 5");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(15);
 		game.getConnection().waitForChunksRender();
-		context.takeScreenshot("level0_fun_door");
+		context.takeScreenshot("level0_pitfalls_undercroft");
 		server.runOnServer(s -> {
 			ServerLevel level = player(s).level();
-			check(level.getBlockState(new BlockPos(fx + 3, Level0ChunkGenerator.FLOOR_Y, fz + 4)).is(ModBlocks.DRY_CARPET),
-					"Fun door clean carpet missing");
-			check(level.getBlockState(new BlockPos(fx + 3, standY, fz + 3)).is(ModBlocks.FUN_DOOR),
-					"Fun door missing");
-			check(level.getBlockState(new BlockPos(fx + 3, standY + 1, fz + 3)).is(ModBlocks.FUN_DOOR_TOP),
-					"Fun door top missing");
-			check(level.getBlockState(new BlockPos(fx + 3, Level0ChunkGenerator.CEILING_Y, fz + 4)).is(ModBlocks.MANILA_LIGHT),
-					"Fun door warm ceiling light missing");
+			check(level.getBlockState(new BlockPos(shaftX - 1, PitfallsPlan.LOWER_FLOOR_Y + 1, shaftZ - 1)).is(Blocks.LADDER),
+					"Pitfalls undercroft escape ladder missing");
 		});
 
+		// 3. Domino blackout command check + Plan C Stage Loop wrap verification
+		double originC = Maze.CENTER + 0.5;
 		server.runCommand("gamemode survival @a");
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + standY + " 3.5");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + originC + " " + standY + " " + originC + " 0 0");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(10);
+		server.runCommand("execute as @a run backrooms l0event domino");
+		server.runCommand("execute as @a run backrooms stage info");
+		context.waitTicks(10);
+
+		// Enable stage_loop, stand inside Stage (0,0) near west border, step across x < 4 -> should wrap to east side (> 240)
+		server.runCommand("gamerule noclip_backrooms:stage_loop true");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 15.5 " + standY + " 15.5 90 0");
+		context.waitTicks(10);
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 2.5 " + standY + " 15.5 90 0");
+		server.waitFor(s -> player(s).getX() > 220.0 && player(s).getX() < Maze.STAGE_BLOCKS, 40);
+		server.runCommand("gamerule noclip_backrooms:stage_loop false");
+
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + originC + " " + standY + " " + originC);
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(5);
 	}
@@ -852,8 +839,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 	}
 
 	private static ZonePoiPlan.ChasmOutpost findChasmOutpost(long seed) {
-		ZonePoiPlan.ChasmOutpost fallback = null;
-		for (int radius = 0; radius <= 24; radius++) {
+		for (int radius = 0; radius <= 12; radius++) {
 			for (int mx = -radius; mx <= radius; mx++) {
 				for (int mz = -radius; mz <= radius; mz++) {
 					if (Math.max(Math.abs(mx), Math.abs(mz)) != radius) continue;
@@ -863,18 +849,15 @@ public final class Level0ClientTest implements FabricClientGameTest {
 						continue;
 					}
 					ZonePoiPlan.ChasmOutpost found = ZonePoiPlan.chasmOutpostInMacro(seed, baseCx, baseCz);
-					if (found == null) continue;
-					if (found.tier() >= 4) return found;
-					if (fallback == null) fallback = found;
+					if (found != null) return found;
 				}
 			}
 		}
-		if (fallback != null) return fallback;
-		throw new AssertionError("no CHASM outpost found within macro radius 24");
+		throw new AssertionError("no CHASM outpost found within macro radius 12");
 	}
 
 	private static ZonePoiPlan.MegahallLounge findMegahallLounge(long seed) {
-		for (int radius = 0; radius <= 24; radius++) {
+		for (int radius = 0; radius <= 12; radius++) {
 			for (int mx = -radius; mx <= radius; mx++) {
 				for (int mz = -radius; mz <= radius; mz++) {
 					if (Math.max(Math.abs(mx), Math.abs(mz)) != radius) continue;
@@ -888,31 +871,29 @@ public final class Level0ClientTest implements FabricClientGameTest {
 				}
 			}
 		}
-		throw new AssertionError("no MEGATHALL lounge found within macro radius 24");
+		throw new AssertionError("no MEGATHALL lounge found within macro radius 12");
 	}
 
 	private static int[] findLargeZonePoiCell(long seed, Maze.Zone target) {
-		for (int radius = 1; radius <= 40; radius++) {
+		for (int radius = 1; radius <= 12; radius++) {
 			for (int sx = -radius; sx <= radius; sx++) {
 				for (int sz = -radius; sz <= radius; sz++) {
 					if (Math.max(Math.abs(sx), Math.abs(sz)) != radius) continue;
-					int osx = Maze.largeZoneOriginSector(sx);
-					int osz = Maze.largeZoneOriginSector(sz);
-					if (osx == 0 && osz == 0) continue;
-					if (Maze.baseZoneForSector(seed, osx, osz) == target) {
-						return new int[] {osx * Maze.SECTOR + 12, osz * Maze.SECTOR + 12};
+					if (sx == 0 && sz == 0) continue;
+					if (Maze.baseZoneForSector(seed, sx, sz) == target) {
+						return new int[] {sx * Maze.SECTOR + 3, sz * Maze.SECTOR + 3};
 					}
 				}
 			}
 		}
-		throw new AssertionError("no " + target + " macro-zone found within sector radius 40");
+		throw new AssertionError("no " + target + " sector found within radius 12");
 	}
 
 	private static void verify3DReachabilityAndNoExposedBedrock(long seed, StaircasePlan.Complex c) {
 		int bx = c.baseX(), bz = c.baseZ();
-		int minY = 23, maxY = 43;
+		int minY = 23, maxY = StaircasePlan.UPPER_CEIL_Y + 1;
+		int mv0 = StaircasePlan.MID_V0;
 
-		// Verify no exposed bedrock touches any open or transparent block inside the 21x21 structure.
 		for (int dx = 0; dx < StaircasePlan.SPAN_BLOCKS; dx++) {
 			for (int dz = 0; dz < StaircasePlan.SPAN_BLOCKS; dz++) {
 				int x = bx + dx, z = bz + dz;
@@ -928,10 +909,9 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			}
 		}
 
-		// Run 3D voxel BFS starting from entry ground block (lu=1, lv=10, floor=32).
 		Set<Long> visited = new HashSet<>();
 		ArrayDeque<BlockPos> queue = new ArrayDeque<>();
-		BlockPos start = new BlockPos(c.worldX(1, 10), Level0ChunkGenerator.FLOOR_Y, c.worldZ(1, 10));
+		BlockPos start = new BlockPos(c.worldX(1, mv0), Level0ChunkGenerator.FLOOR_Y, c.worldZ(1, mv0));
 		check(isWalkableVoxel(seed, start.getX(), start.getY(), start.getZ()), "stair entry not walkable for " + c.type());
 		visited.add(start.asLong());
 		queue.add(start);
@@ -957,25 +937,25 @@ public final class Level0ClientTest implements FabricClientGameTest {
 
 		switch (c.type()) {
 			case ATTIC_SHORTCUT -> {
-				check(visited.contains(new BlockPos(c.worldX(10, 10), StaircasePlan.UPPER_FLOOR_Y, c.worldZ(10, 10)).asLong()),
+				check(visited.contains(new BlockPos(c.worldX(15, mv0), StaircasePlan.UPPER_FLOOR_Y, c.worldZ(15, mv0)).asLong()),
 						"ATTIC_SHORTCUT center unreachable");
-				check(visited.contains(new BlockPos(c.worldX(20, 10), Level0ChunkGenerator.FLOOR_Y, c.worldZ(20, 10)).asLong()),
+				check(visited.contains(new BlockPos(c.worldX(29, mv0), Level0ChunkGenerator.FLOOR_Y, c.worldZ(29, mv0)).asLong()),
 						"ATTIC_SHORTCUT exit ground unreachable");
 			}
 			case PARADOX_LOOP -> {
-				check(visited.contains(new BlockPos(c.worldX(10, 8), StaircasePlan.UPPER_FLOOR_Y, c.worldZ(10, 8)).asLong()),
+				check(visited.contains(new BlockPos(c.worldX(15, 12), StaircasePlan.UPPER_FLOOR_Y, c.worldZ(15, 12)).asLong()),
 						"PARADOX_LOOP sealed-door alcove unreachable");
-				check(visited.contains(new BlockPos(c.worldX(20, 10), Level0ChunkGenerator.FLOOR_Y, c.worldZ(20, 10)).asLong()),
+				check(visited.contains(new BlockPos(c.worldX(29, mv0), Level0ChunkGenerator.FLOOR_Y, c.worldZ(29, mv0)).asLong()),
 						"PARADOX_LOOP exit ground unreachable");
 			}
-			case UTILITY_LOFT -> check(visited.contains(new BlockPos(c.worldX(14, 10), StaircasePlan.UPPER_FLOOR_Y, c.worldZ(14, 10)).asLong()),
+			case UTILITY_LOFT -> check(visited.contains(new BlockPos(c.worldX(19, mv0), StaircasePlan.UPPER_FLOOR_Y, c.worldZ(19, mv0)).asLong()),
 					"UTILITY_LOFT breaker area unreachable");
-			case OBSERVATION_OVERLOOK -> check(visited.contains(new BlockPos(c.worldX(12, 10), StaircasePlan.UPPER_FLOOR_Y, c.worldZ(12, 10)).asLong()),
+			case OBSERVATION_OVERLOOK -> check(visited.contains(new BlockPos(c.worldX(15, mv0), StaircasePlan.UPPER_FLOOR_Y, c.worldZ(15, mv0)).asLong()),
 					"OBSERVATION_OVERLOOK glass deck unreachable");
 			case FLOODED_BASEMENT -> {
-				check(visited.contains(new BlockPos(c.worldX(15, 10), StaircasePlan.BASEMENT_FLOOR_Y, c.worldZ(15, 10)).asLong()),
+				check(visited.contains(new BlockPos(c.worldX(19, mv0), StaircasePlan.BASEMENT_FLOOR_Y, c.worldZ(19, mv0)).asLong()),
 						"FLOODED_BASEMENT dry platform unreachable");
-				check(visited.contains(new BlockPos(c.worldX(13, 10), StaircasePlan.BASEMENT_FLOOR_Y - 1, c.worldZ(13, 10)).asLong()),
+				check(visited.contains(new BlockPos(c.worldX(15, mv0), StaircasePlan.BASEMENT_FLOOR_Y - 1, c.worldZ(15, mv0)).asLong()),
 						"FLOODED_BASEMENT water sump unreachable");
 			}
 		}

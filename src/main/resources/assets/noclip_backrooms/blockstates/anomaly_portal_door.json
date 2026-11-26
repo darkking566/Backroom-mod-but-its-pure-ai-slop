@@ -1,0 +1,196 @@
+{
+  "variants": {
+    "facing=north,half=lower,kind=bowling": {
+      "model": "noclip_backrooms:block/level0/portal_door_bowling_lower",
+      "y": 0
+    },
+    "facing=east,half=lower,kind=bowling": {
+      "model": "noclip_backrooms:block/level0/portal_door_bowling_lower",
+      "y": 90
+    },
+    "facing=south,half=lower,kind=bowling": {
+      "model": "noclip_backrooms:block/level0/portal_door_bowling_lower",
+      "y": 180
+    },
+    "facing=west,half=lower,kind=bowling": {
+      "model": "noclip_backrooms:block/level0/portal_door_bowling_lower",
+      "y": 270
+    },
+    "facing=north,half=upper,kind=bowling": {
+      "model": "noclip_backrooms:block/level0/portal_door_bowling_upper",
+      "y": 0
+    },
+    "facing=east,half=upper,kind=bowling": {
+      "model": "noclip_backrooms:block/level0/portal_door_bowling_upper",
+      "y": 90
+    },
+    "facing=south,half=upper,kind=bowling": {
+      "model": "noclip_backrooms:block/level0/portal_door_bowling_upper",
+      "y": 180
+    },
+    "facing=west,half=upper,kind=bowling": {
+      "model": "noclip_backrooms:block/level0/portal_door_bowling_upper",
+      "y": 270
+    },
+    "facing=north,half=lower,kind=remodel": {
+      "model": "noclip_backrooms:block/level0/portal_door_remodel_lower",
+      "y": 0
+    },
+    "facing=east,half=lower,kind=remodel": {
+      "model": "noclip_backrooms:block/level0/portal_door_remodel_lower",
+      "y": 90
+    },
+    "facing=south,half=lower,kind=remodel": {
+      "model": "noclip_backrooms:block/level0/portal_door_remodel_lower",
+      "y": 180
+    },
+    "facing=west,half=lower,kind=remodel": {
+      "model": "noclip_backrooms:block/level0/portal_door_remodel_lower",
+      "y": 270
+    },
+    "facing=north,half=upper,kind=remodel": {
+      "model": "noclip_backrooms:block/level0/portal_door_remodel_upper",
+      "y": 0
+    },
+    "facing=east,half=upper,kind=remodel": {
+      "model": "noclip_backrooms:block/level0/portal_door_remodel_upper",
+      "y": 90
+    },
+    "facing=south,half=upper,kind=remodel": {
+      "model": "noclip_backrooms:block/level0/portal_door_remodel_upper",
+      "y": 180
+    },
+    "facing=west,half=upper,kind=remodel": {
+      "model": "noclip_backrooms:block/level0/portal_door_remodel_upper",
+      "y": 270
+    },
+    "facing=north,half=lower,kind=floating": {
+      "model": "noclip_backrooms:block/level0/portal_door_floating_lower",
+      "y": 0
+    },
+    "facing=east,half=lower,kind=floating": {
+      "model": "noclip_backrooms:block/level0/portal_door_floating_lower",
+      "y": 90
+    },
+    "facing=south,half=lower,kind=floating": {
+      "model": "noclip_backrooms:block/level0/portal_door_floating_lower",
+      "y": 180
+    },
+    "facing=west,half=lower,kind=floating": {
+      "model": "noclip_backrooms:block/level0/portal_door_floating_lower",
+      "y": 270
+    },
+    "facing=north,half=upper,kind=floating": {
+      "model": "noclip_backrooms:block/level0/portal_door_floating_upper",
+      "y": 0
+    },
+    "facing=east,half=upper,kind=floating": {
+      "model": "noclip_backrooms:block/level0/portal_door_floating_upper",
+      "y": 90
+    },
+    "facing=south,half=upper,kind=floating": {
+      "model": "noclip_backrooms:block/level0/portal_door_floating_upper",
+      "y": 180
+    },
+    "facing=west,half=upper,kind=floating": {
+      "model": "noclip_backrooms:block/level0/portal_door_floating_upper",
+      "y": 270
+    },
+    "facing=north,half=lower,kind=glass": {
+      "model": "noclip_backrooms:block/level0/portal_door_glass_lower",
+      "y": 0
+    },
+    "facing=east,half=lower,kind=glass": {
+      "model": "noclip_backrooms:block/level0/portal_door_glass_lower",
+      "y": 90
+    },
+    "facing=south,half=lower,kind=glass": {
+      "model": "noclip_backrooms:block/level0/portal_door_glass_lower",
+      "y": 180
+    },
+    "facing=west,half=lower,kind=glass": {
+      "model": "noclip_backrooms:block/level0/portal_door_glass_lower",
+      "y": 270
+    },
+    "facing=north,half=upper,kind=glass": {
+      "model": "noclip_backrooms:block/level0/portal_door_glass_upper",
+      "y": 0
+    },
+    "facing=east,half=upper,kind=glass": {
+      "model": "noclip_backrooms:block/level0/portal_door_glass_upper",
+      "y": 90
+    },
+    "facing=south,half=upper,kind=glass": {
+      "model": "noclip_backrooms:block/level0/portal_door_glass_upper",
+      "y": 180
+    },
+    "facing=west,half=upper,kind=glass": {
+      "model": "noclip_backrooms:block/level0/portal_door_glass_upper",
+      "y": 270
+    },
+    "facing=north,half=lower,kind=diner": {
+      "model": "noclip_backrooms:block/level0/portal_door_diner_lower",
+      "y": 0
+    },
+    "facing=east,half=lower,kind=diner": {
+      "model": "noclip_backrooms:block/level0/portal_door_diner_lower",
+      "y": 90
+    },
+    "facing=south,half=lower,kind=diner": {
+      "model": "noclip_backrooms:block/level0/portal_door_diner_lower",
+      "y": 180
+    },
+    "facing=west,half=lower,kind=diner": {
+      "model": "noclip_backrooms:block/level0/portal_door_diner_lower",
+      "y": 270
+    },
+    "facing=north,half=upper,kind=diner": {
+      "model": "noclip_backrooms:block/level0/portal_door_diner_upper",
+      "y": 0
+    },
+    "facing=east,half=upper,kind=diner": {
+      "model": "noclip_backrooms:block/level0/portal_door_diner_upper",
+      "y": 90
+    },
+    "facing=south,half=upper,kind=diner": {
+      "model": "noclip_backrooms:block/level0/portal_door_diner_upper",
+      "y": 180
+    },
+    "facing=west,half=upper,kind=diner": {
+      "model": "noclip_backrooms:block/level0/portal_door_diner_upper",
+      "y": 270
+    },
+    "facing=north,half=lower,kind=fake_exit": {
+      "model": "noclip_backrooms:block/level0/portal_door_fake_exit_lower",
+      "y": 0
+    },
+    "facing=east,half=lower,kind=fake_exit": {
+      "model": "noclip_backrooms:block/level0/portal_door_fake_exit_lower",
+      "y": 90
+    },
+    "facing=south,half=lower,kind=fake_exit": {
+      "model": "noclip_backrooms:block/level0/portal_door_fake_exit_lower",
+      "y": 180
+    },
+    "facing=west,half=lower,kind=fake_exit": {
+      "model": "noclip_backrooms:block/level0/portal_door_fake_exit_lower",
+      "y": 270
+    },
+    "facing=north,half=upper,kind=fake_exit": {
+      "model": "noclip_backrooms:block/level0/portal_door_fake_exit_upper",
+      "y": 0
+    },
+    "facing=east,half=upper,kind=fake_exit": {
+      "model": "noclip_backrooms:block/level0/portal_door_fake_exit_upper",
+      "y": 90
+    },
+    "facing=south,half=upper,kind=fake_exit": {
+      "model": "noclip_backrooms:block/level0/portal_door_fake_exit_upper",
+      "y": 180
+    },
+    "facing=west,half=upper,kind=fake_exit": {
+      "model": "noclip_backrooms:block/level0/portal_door_fake_exit_upper",
+      "y": 270
+    }
+  }
+}

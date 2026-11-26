@@ -88,6 +88,49 @@ final class ModBlocks {
 			.mapColor(MapColor.SAND).strength(0.2F).sound(SoundType.WOOL).noOcclusion().noCollision().noLootTable(),
 			FieldNoteBlock::new);
 
+	// Level 0 Overhaul: micro-event interactive blocks (noLootTable so players cannot farm structural gimmicks)
+	static final Block LOOSE_CEILING_TILE = register("loose_ceiling_tile", Properties.of()
+			.mapColor(MapColor.SAND).strength(0.8F).sound(SoundType.STONE).noOcclusion().noLootTable(),
+			Level0EventBlocks.LooseCeilingTileBlock::new);
+	static final Block HOLLOW_WALL = register("hollow_wall", Properties.of()
+			.mapColor(MapColor.COLOR_YELLOW).strength(1.5F).sound(SoundType.WOOD).noLootTable(),
+			Level0EventBlocks.HollowWallBlock::new);
+	static final Block GRAFFITI_WALL = register("graffiti_wall", Properties.of()
+			.mapColor(MapColor.COLOR_YELLOW).strength(2.0F).sound(SoundType.WOOD).noLootTable(),
+			Level0EventBlocks.GraffitiWallBlock::new);
+	static final Block LOCKED_UTILITY_DOOR = register("locked_utility_door", Properties.of()
+			.mapColor(MapColor.COLOR_GRAY).strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noOcclusion().noLootTable(),
+			Level0EventBlocks.LockedUtilityDoorBlock::new);
+
+	// Level 0 Overhaul: multi-form non-door anomalous exits (vague clue -> interact/tear/cross -> LevelExits)
+	static final Block ANOMALY_POSTER = register("anomaly_poster", Properties.of()
+			.mapColor(MapColor.SAND).strength(0.3F).sound(SoundType.WOOL).noOcclusion().noCollision().noLootTable(),
+			p -> new AnomalyExitBlock(p, AnomalyExitBlock.Form.POSTER_161));
+	static final Block ANOMALY_WINDOW = register("anomaly_window", Properties.of()
+			.mapColor(MapColor.COLOR_LIGHT_GRAY).strength(-1.0F, 3600000.0F).sound(SoundType.GLASS).noOcclusion().noLootTable()
+			.lightLevel(s -> 6),
+			p -> new AnomalyExitBlock(p, AnomalyExitBlock.Form.WINDOW_188));
+	static final Block STEAM_GRATE = register("steam_grate", Properties.of()
+			.mapColor(MapColor.METAL).strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noLootTable(),
+			p -> new AnomalyExitBlock(p, AnomalyExitBlock.Form.STEAM_GRATE_2));
+	static final Block OIL_VENT_HATCH = register("oil_vent_hatch", Properties.of()
+			.mapColor(MapColor.METAL).strength(-1.0F, 3600000.0F).sound(SoundType.METAL).noLootTable(),
+			p -> new AnomalyExitBlock(p, AnomalyExitBlock.Form.OIL_VENT_1));
+	static final Block PEELING_CARPET_EXIT = register("peeling_carpet_exit", Properties.of()
+			.mapColor(MapColor.WOOD).strength(0.6F).sound(SoundType.WOOL).noLootTable(),
+			p -> new AnomalyExitBlock(p, AnomalyExitBlock.Form.CARPET_27));
+	static final Block HOLLOW_PLASTER_EXIT = register("hollow_plaster_exit", Properties.of()
+			.mapColor(MapColor.COLOR_LIGHT_GRAY).strength(0.8F).sound(SoundType.STONE).noLootTable(),
+			p -> new AnomalyExitBlock(p, AnomalyExitBlock.Form.PLASTER_194));
+	static final Block GIANT_MIRROR_EXIT = register("giant_mirror_exit", Properties.of()
+			.mapColor(MapColor.QUARTZ).strength(-1.0F, 3600000.0F).sound(SoundType.GLASS).noOcclusion().noLootTable()
+			.lightLevel(s -> 4),
+			p -> new AnomalyExitBlock(p, AnomalyExitBlock.Form.MIRROR_0P5));
+	static final Block ANOMALY_PORTAL_DOOR = register("anomaly_portal_door", Properties.of()
+			.mapColor(MapColor.COLOR_GRAY).strength(-1.0F, 3600000.0F).sound(SoundType.WOOD).noOcclusion().noLootTable()
+			.lightLevel(AnomalyPortalDoorBlock::lightFor),
+			AnomalyPortalDoorBlock::new);
+
 	private ModBlocks() {
 	}
 

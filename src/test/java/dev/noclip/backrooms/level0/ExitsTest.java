@@ -107,7 +107,11 @@ class ExitsTest {
 			for (int x = Exits.REGION; x < Exits.REGION * 2; x++) {
 				for (int z = Exits.REGION; z < Exits.REGION * 2; z++) {
 					int at = x + z * size;
-					if (floorY[at] != Byte.MIN_VALUE) assertTrue(walked[at] <= MAX_WALK, "too far from an exit: " + walked[at] + " blocks, seed " + seed);
+					if (floorY[at] != Byte.MIN_VALUE) {
+						int wx = origin + x, wz = origin + z;
+						assertTrue(walked[at] <= MAX_WALK, "too far from an exit: " + walked[at] + " blocks at ("
+								+ wx + ", " + wz + ") zone=" + Maze.zoneAt(seed, wx, wz) + " floorY=" + floorY[at] + ", seed " + seed);
+					}
 				}
 			}
 		}

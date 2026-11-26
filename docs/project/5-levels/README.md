@@ -8,7 +8,7 @@
 
 | Level | 名稱 | 誰做的 | 說明 |
 | --- | --- | --- | --- |
-| 0 | 大廳（The Lobby） | 朋友 | [level0/README.md](level0/README.md) |
+| 0 | 大廳（The Lobby） | 朋友（2026-11-26 改版企劃已定案） | [level0/README.md](level0/README.md) |
 | 0.1 | 天頂站（Zenith Station） | Claude，之後 Gemini 修 | [level0p1/README.md](level0p1/README.md) |
 | 1 | 宜居地帶／停車場（Habitable Zone） | Claude，之後朋友和 Gemini 加內容 | [level1/README.md](level1/README.md) |
 | 2 | 廢棄維修通道（Abandoned Utility Halls） | Claude，之後 Gemini 加內容 | [level2/README.md](level2/README.md) |
@@ -37,6 +37,29 @@
 
 - **特殊樓層的解鎖條件**：鑰匙卡（消耗品）、多階密碼門駭客器 1～4 階（永久升級）、完成該層的機關任務（例如修發電機）、或特定商人任務。見 [遊戲玩法：出口](../1-gameplay/README.md#出口)。
 - **雙軸難度**（層數＋離降落點的距離）見 [遊戲玩法：層數與難度](../1-gameplay/README.md#在後室裡層數與難度)。
+
+## 通用樓層設計標準（2026-11-26 定案）【定】
+
+除了地形外觀與怪物生態，**之後每一層（包含既有樓層翻新）都必須一併規劃以下兩套體驗系統**，避免樓層淪為重複空殼：
+
+### 1. 每層專屬「微小事件系統」
+- 每一層開工企劃時，都必須設計屬於該層主題的**微小事件表**（目標每層至少 8～12 種），不能只靠靜態建築與怪物追逐撐場面。
+- 四大事件軸線：
+  1. **搜刮與環境檢定**：檢查天花板、敲擊空心牆、翻找特定家具、檢視異常物件；串聯玩家四維能力值（力量／敏捷／感知／智力）給予額外提示、避免失誤或開出隱藏分支。
+  2. **突發環境演出**：走到一半突然發生的視聽異常（例如骨牌式熄燈、無源電話響起、背後多出腳步聲、機器自啟、滴水與跳電），打破漫長探索的單調感。
+  3. **空間異常與微謎題**：短迴圈走廊、局部空間移位、需要附近扳電箱／找保險絲／繞通風口才能進去的微型密室。
+  4. **理智與偽裝干擾**：低理智時出現誤導性線索、變形的牆面塗鴉、異常倒影或失真無線電，與拍立得取證、生體掃描器等道具形成互動。
+
+### 2. 多樣化「非門異常出口」演算法（模糊線索 → 動作觸發）
+參考《狐霖的後室 RPG》與 Backrooms Wikidot／Fandom 設定，各樓層的跨層出口**不要只用「一扇門右鍵傳送」呈現**，改採統一的環境物件演算法：
+- **載體多樣化**：海報／掛畫、牆上小窗戶、地下井蓋／格柵／通風管道、地板坑洞與下層通道、異色／翹起的地毯、裂開或空心的牆壁、巨型鏡子、特殊燈光走廊、異常階梯／電梯、桌邊物件與少數主題門框。
+- **模糊線索敘事**：出口不直白標示「前往 Level XXX」，而是靠**視覺特徵＋靠近／右鍵觀察的 1～2 句模糊環境線索**暗示目的地（例如一張泛黃海報模糊描繪著 1980 年代濃霧裡的山莊與松林，玩家**撕下或打掉**海報即被傳送至 Level 161「阿帕拉契的荒涼」；地板格柵透出滾燙蒸氣與金屬震動即暗示 Level 2「管道夢境」）。**感知**較高的玩家可讀到更清楚的細節提示。
+- **動作觸發類型**：
+  - `破壞／撕除`：左鍵打掉或右鍵撕下海報、掀開地毯砸穿地板、敲破空心牆面；
+  - `鑽入／跨越`：走進閃爍牆、推開牆上窗戶跨出、掀開鐵格柵下井、蹲下鑽通風口、跳入特定坑洞；
+  - `凝視／跟隨`：盯著異常大鏡數秒、追隨遠處一閃而過的異常剪影、沿著燈光變色的長廊直走到底；
+  - `特定動作／條件`：來回穿門數次、墊高推開半空門、對特定裝置互動。
+- **統一接線與密度控制**：全部出口透過 `core/LevelExits.use(player, key)` 觸發；目標樓層未開放時仍保留現場物件與模糊線索，觸發後提示空間尚未成型且不傳送，待目標層實作並呼叫 `LevelExits.open(...)` 後自動全面接通。每一層依樓層類型配置「主線必出出口（如 Level 0 → Level 1）」＋「每趟高密度探索區內隨機抽樣數條支線／異質出口」，確保玩家每次出勤都能撞見意料之外的分流。
 
 ## 資料夾命名規則
 - **一般主樓層**：`level<編號>`（例：`level0`、`level37`、`level999`）
@@ -94,7 +117,7 @@
 | 資料夾 / 套件 | 樓層名稱 | 出口鍵 | 來源 | 狀態 |
 |---|---|---|---|---|
 | [`level12`](level12/README.md) | Level 12：矩陣（Matrix） | `12` | Wikidot / Fandom | 未開放 |
-| [`level14`](level14/README.md) | Level 14：天堂（Paradise） | `14` | Wikidot / Fandom | 未開放 |
+| [`level14`](level14/README.md) | Level 14：天堂（Paradise；狐霖的後室設定為「冷漠病院／孤冷醫院」） | `14` | Wikidot / Fandom / 狐霖後室 | 未開放 |
 | [`level18`](level18/README.md) | Level 18：回憶（Memories） | `18` | Wikidot / Fandom 共通 | 未開放 |
 | [`level20`](level20/README.md) | Level 20：倉庫（The Warehouse） | `20` | Fandom / 經典 Wikidot | 未開放 |
 | [`level33`](level33/README.md) | Level 33：無盡購物中心（The Infinite Mall） | `33` | Wikidot / Fandom 共通 | 未開放 |
@@ -489,6 +512,7 @@ Fandom 從 Level 12 左右開始，同一個編號的內容就跟 Wikidot 完全
 | `level180_fd` | Level 180：田園小屋（Cottagecore） | `180` | [Fandom 100～199](https://backrooms.fandom.com/wiki/Backrooms_Wiki:Levels_100-199) | 未開放 |  |
 | `level200` | Level 200：共鳴（Resonance） | `200` | [Fandom](https://backrooms.fandom.com/wiki/Level_200) | 未開放 | 聲音會不停迴盪的巨大峽谷群 |
 | `level330` | Level 330：溫吞旅館（Lukewarm Hotel） | `330` | [Fandom](https://backrooms.fandom.com/wiki/Level_330) | 未開放 | 第一批把這個名字放在 Level -33 |
+| `level499` | Level 499：無盡的保齡球館（The Mother of All Bowling Alleys） | `499` | Wikidot / Fandom / 狐霖後室 | 未開放 | 霓虹燈與無盡球道、酒吧與街機，狐霖熱門補給層（Level 0／1 可連通） |
 | `level_pi` | Level π：圓周率層（3.14159265358...） | `π` | [Fandom](https://backrooms.fandom.com/wiki/Level_Pi) | 未開放 | 夾在 Level 3 和 4 之間；到處是彩色加油站，關於它的句子都會押韻 |
 
 ## 候補（不算在總數裡）

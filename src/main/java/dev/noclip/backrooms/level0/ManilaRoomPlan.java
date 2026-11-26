@@ -3,17 +3,22 @@ package dev.noclip.backrooms.level0;
 import net.minecraft.core.Direction;
 
 /**
- * Spatial layout for Level 0's ultra-rare Manila Room:
- * a 2x2-cell (14x14-block) thick-walled sanctuary with an 8x8 wooden-floored interior,
+ * Spatial layout for Level 0's Manila Room scaled to CELL=10 & 5-block ceiling height:
+ * a 2x2-cell (20x20-block) thick-walled sanctuary with a spacious 14x14 wooden-floored interior,
  * four recessed double wooden doors, hidden Void Stone inside the walls, a central octagonal
  * table with two chairs, an under-table supply cabinet, and a Manila Mary Foundation guide note.
+ *
+ * Plan C rarity: aligned with 5x5 Stages (300x300 blocks) with RARITY_MOD = 2 (~50% of Stages
+ * contain a Manila Room so players realistically discover it during an expedition).
  */
 final class ManilaRoomPlan {
-	static final int REGION_SECTORS = 16; // 16x16 sectors = 896x896 blocks
+	static final int REGION_SECTORS = Maze.STAGE_SECTORS; // 5x5 sectors = 300x300 blocks (1 Stage)
 	static final int SPAN_CELLS = 2;
-	static final int SPAN_BLOCKS = SPAN_CELLS * Maze.CELL; // 14 blocks
+	static final int SPAN_BLOCKS = SPAN_CELLS * Maze.CELL; // 20 blocks
+	static final int DOOR_A = 9;
+	static final int DOOR_B = 10;
 	private static final int MANILA_SALT = 87;
-	private static final int RARITY_MOD = 4; // 1 in 4 regions (~1 per 1800x1800 blocks)
+	private static final int RARITY_MOD = 2; // ~50% of Stages contain a Manila Room
 
 	record Room(int cx0, int cz0) {
 		int baseX() {
@@ -25,11 +30,11 @@ final class ManilaRoomPlan {
 		}
 
 		int centerX() {
-			return baseX() + 7;
+			return baseX() + SPAN_BLOCKS / 2;
 		}
 
 		int centerZ() {
-			return baseZ() + 7;
+			return baseZ() + SPAN_BLOCKS / 2;
 		}
 
 		boolean containsCell(int cx, int cz) {
@@ -47,24 +52,24 @@ final class ManilaRoomPlan {
 
 		boolean isInteriorBlock(int x, int z) {
 			int dx = x - baseX(), dz = z - baseZ();
-			return dx >= 3 && dx <= 10 && dz >= 3 && dz <= 10;
+			return dx >= 3 && dx <= SPAN_BLOCKS - 4 && dz >= 3 && dz <= SPAN_BLOCKS - 4;
 		}
 
 		boolean isDoorwayTunnel(int dx, int dz) {
-			return ((dx >= 0 && dx <= 2 || dx >= 11 && dx <= 13) && (dz == 6 || dz == 7))
-					|| ((dz >= 0 && dz <= 2 || dz >= 11 && dz <= 13) && (dx == 6 || dx == 7));
+			return ((dx >= 0 && dx <= 2 || dx >= SPAN_BLOCKS - 3 && dx < SPAN_BLOCKS) && (dz == DOOR_A || dz == DOOR_B))
+					|| ((dz >= 0 && dz <= 2 || dz >= SPAN_BLOCKS - 3 && dz < SPAN_BLOCKS) && (dx == DOOR_A || dx == DOOR_B));
 		}
 
 		boolean isNeighborDoorClear(int x, int z) {
 			int dx = x - baseX(), dz = z - baseZ();
-			return (dx == SPAN_BLOCKS && (dz == 6 || dz == 7))
-					|| (dz == SPAN_BLOCKS && (dx == 6 || dx == 7));
+			return (dx == SPAN_BLOCKS && (dz == DOOR_A || dz == DOOR_B))
+					|| (dz == SPAN_BLOCKS && (dx == DOOR_A || dx == DOOR_B));
 		}
 
 		boolean isWall(int x, int z, boolean topLayer) {
 			int dx = x - baseX(), dz = z - baseZ();
 			if (dx < 0 || dx >= SPAN_BLOCKS || dz < 0 || dz >= SPAN_BLOCKS) return false;
-			if (dx <= 2 || dx >= 11 || dz <= 2 || dz >= 11) {
+			if (dx <= 2 || dx >= SPAN_BLOCKS - 3 || dz <= 2 || dz >= SPAN_BLOCKS - 3) {
 				if (isDoorwayTunnel(dx, dz)) return topLayer;
 				return true;
 			}
@@ -73,9 +78,9 @@ final class ManilaRoomPlan {
 
 		boolean isCoreVoidLayer(int dx, int dz) {
 			if (isDoorwayTunnel(dx, dz)) return false;
-			boolean inXWall = dx == 1 || dx == 12;
-			boolean inZWall = dz == 1 || dz == 12;
-			boolean insideShell = dx >= 1 && dx <= 12 && dz >= 1 && dz <= 12;
+			boolean inXWall = dx == 1 || dx == SPAN_BLOCKS - 2;
+			boolean inZWall = dz == 1 || dz == SPAN_BLOCKS - 2;
+			boolean insideShell = dx >= 1 && dx <= SPAN_BLOCKS - 2 && dz >= 1 && dz <= SPAN_BLOCKS - 2;
 			return insideShell && (inXWall || inZWall);
 		}
 	}
@@ -83,7 +88,6 @@ final class ManilaRoomPlan {
 	private ManilaRoomPlan() {
 	}
 
-	/** Returns the Manila Room covering or neighboring (cx, cz), or null if none in its region. */
 	static Room roomForCell(long seed, int cx, int cz) {
 		int sx = Math.floorDiv(cx, Maze.SECTOR);
 		int sz = Math.floorDiv(cz, Maze.SECTOR);
@@ -94,7 +98,6 @@ final class ManilaRoomPlan {
 		return null;
 	}
 
-	/** Returns the Manila Room whose 14x14 footprint contains (x, z), or null. */
 	static Room roomAtBlock(long seed, int x, int z) {
 		int cx = Math.floorDiv(x, Maze.CELL);
 		int cz = Math.floorDiv(z, Maze.CELL);
@@ -103,7 +106,6 @@ final class ManilaRoomPlan {
 		return null;
 	}
 
-	/** Returns the Manila Room in the region of (x, z) if (x, z) is within radiusBlocks of its center, or null. */
 	static Room nearbyRoom(long seed, int x, int z, int radiusBlocks) {
 		int sx = Math.floorDiv(Math.floorDiv(x, Maze.CELL), Maze.SECTOR);
 		int sz = Math.floorDiv(Math.floorDiv(z, Maze.CELL), Maze.SECTOR);
@@ -146,28 +148,25 @@ final class ManilaRoomPlan {
 			int pick = (start + i) % total;
 			int sx = rx * REGION_SECTORS + (pick % REGION_SECTORS);
 			int sz = rz * REGION_SECTORS + (pick / REGION_SECTORS);
-			if (Math.abs(sx) <= 2 && Math.abs(sz) <= 2) continue;
+			if (sx == 0 && sz == 0) continue;
 
 			Maze.Zone zone = Maze.baseZoneForSector(seed, sx, sz);
 			if (zone != Maze.Zone.CLASSIC && zone != Maze.Zone.CUBICLES && zone != Maze.Zone.CORRIDORS) {
 				continue;
 			}
-			int lx = 2 + Math.floorMod(hash(seed, sx, sz, MANILA_SALT + 2), 3);
-			int lz = 2 + Math.floorMod(hash(seed, sx, sz, MANILA_SALT + 3), 3);
+			int lx = 2 + Math.floorMod(hash(seed, sx, sz, MANILA_SALT + 2), 2);
+			int lz = 2 + Math.floorMod(hash(seed, sx, sz, MANILA_SALT + 3), 2);
 			return new Room(sx * Maze.SECTOR + lx, sz * Maze.SECTOR + lz);
 		}
 		return null;
 	}
 
-	/** Door leaf direction in one of the four recessed doorways, or null if not a door block. */
 	static Direction doorFacing(Room room, int dx, int dz) {
-		// North & South doorways (dz == 1, dz == 12): left leaf (dx==6) faces NORTH, right leaf (dx==7) faces SOUTH.
-		if ((dz == 1 || dz == 12) && (dx == 6 || dx == 7)) {
-			return dx == 6 ? Direction.NORTH : Direction.SOUTH;
+		if ((dz == 1 || dz == SPAN_BLOCKS - 2) && (dx == DOOR_A || dx == DOOR_B)) {
+			return dx == DOOR_A ? Direction.NORTH : Direction.SOUTH;
 		}
-		// West & East doorways (dx == 1, dx == 12): top leaf (dz==6) faces EAST, bottom leaf (dz==7) faces WEST.
-		if ((dx == 1 || dx == 12) && (dz == 6 || dz == 7)) {
-			return dz == 6 ? Direction.EAST : Direction.WEST;
+		if ((dx == 1 || dx == SPAN_BLOCKS - 2) && (dz == DOOR_A || dz == DOOR_B)) {
+			return dz == DOOR_A ? Direction.EAST : Direction.WEST;
 		}
 		return null;
 	}

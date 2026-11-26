@@ -108,12 +108,13 @@ final class Level0Props {
 	static boolean isProtectedRegion(int chunkMinX, int chunkMinZ) {
 		int chunkMaxX = chunkMinX + 15;
 		int chunkMaxZ = chunkMinZ + 15;
-		// Keep [-32..31] x [-32..31] completely untouched (landing cells, EdgeShift test ring, generator checks)
+		// Keep origin [-32..31] x [-32..31] baseline generator test square untouched, while letting outer parts of the
+		// 300x300 starting Stage populate richly with furniture clusters and lone props!
 		if (chunkMaxX >= -32 && chunkMinX <= 31 && chunkMaxZ >= -32 && chunkMinZ <= 31) {
 			return true;
 		}
-		// Keep far client test teleport point (701, -700) clear
-		return chunkMaxX >= 694 && chunkMinX <= 708 && chunkMaxZ >= -708 && chunkMinZ <= -692;
+		// Keep far client test teleport point (701..708, -708..-692) clear
+		return chunkMaxX >= 694 && chunkMinX <= 712 && chunkMaxZ >= -708 && chunkMinZ <= -688;
 	}
 
 	static ClusterTheme chooseClusterTheme(Maze.Zone zone, long h) {

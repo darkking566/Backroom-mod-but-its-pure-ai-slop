@@ -34,6 +34,8 @@ public final class Level0 {
 		StaircaseBreaker.register();
 		FuseBoxEvents.register();
 		Level0Props.register();
+		StageLoop.register();
+		Level0MicroEvents.register();
 		// How you arrive here through an exit from another level (see core.LevelExits).
 		LevelExits.open("0", Level0Arrival::arrive);
 	}

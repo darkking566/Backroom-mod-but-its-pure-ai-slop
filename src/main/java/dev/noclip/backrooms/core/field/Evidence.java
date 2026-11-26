@@ -200,8 +200,10 @@ public final class Evidence {
 		/** Detects notable Backrooms scenes in frame when no creature is the primary subject. */
 		private static SceneShot detectScene(ServerLevel level, ServerPlayer player) {
 			if (!Home.inBackrooms(level.dimension())) return null;
-			// 1. Live blackout moment in Level 1 or Level 0.1
-			if ((level.dimension() == Level1.LEVEL_1 && Blackouts.isBlackout())
+			// 1. Live blackout moment in Level 0 (domino blackout), Level 1, or Level 0.1
+			if ((level.dimension() == dev.noclip.backrooms.level0.Level0.LEVEL_0
+					&& dev.noclip.backrooms.level0.Level0MicroEvents.isDominoBlackout(player))
+					|| (level.dimension() == Level1.LEVEL_1 && Blackouts.isBlackout())
 					|| (level.dimension() == Level0p1.LEVEL_0_1 && ZenithBlackouts.isBlackout())) {
 				return new SceneShot("blackout_moment", 85, 4.0);
 			}

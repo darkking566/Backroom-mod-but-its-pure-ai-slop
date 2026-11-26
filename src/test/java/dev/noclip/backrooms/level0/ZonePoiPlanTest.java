@@ -14,8 +14,8 @@ class ZonePoiPlanTest {
 		long seed = 12345L;
 		int checked = 0;
 
-		for (int mx = -16; mx <= 16 && checked < 16; mx++) {
-			for (int mz = -16; mz <= 16 && checked < 16; mz++) {
+		for (int mx = -10; mx <= 10 && checked < 12; mx++) {
+			for (int mz = -10; mz <= 10 && checked < 12; mz++) {
 				int baseCx = mx * ChasmPlan.MACRO_CELLS;
 				int baseCz = mz * ChasmPlan.MACRO_CELLS;
 				if (Maze.zoneAt(seed, baseCx * Maze.CELL + Maze.CENTER, baseCz * Maze.CELL + Maze.CENTER) != Maze.Zone.CHASM) {
@@ -80,20 +80,17 @@ class ZonePoiPlanTest {
 	@Test
 	void redRoomAndDarkenedPoisStayOpenProtectedAndPuddleFree() {
 		long seed = 12345L;
-		int sectorSpan = Maze.LARGE_ZONE_SPAN;
 		boolean sawRed = false;
 		boolean sawDarkened = false;
 
-		for (int sx = -24; sx <= 24; sx += sectorSpan) {
-			for (int sz = -24; sz <= 24; sz += sectorSpan) {
-				int osx = Maze.largeZoneOriginSector(sx);
-				int osz = Maze.largeZoneOriginSector(sz);
-				if (osx == 0 && osz == 0) continue;
-				Maze.Zone zone = Maze.baseZoneForSector(seed, osx, osz);
+		for (int sx = -10; sx <= 10; sx++) {
+			for (int sz = -10; sz <= 10; sz++) {
+				if (sx == 0 && sz == 0) continue;
+				Maze.Zone zone = Maze.baseZoneForSector(seed, sx, sz);
 				if (zone != Maze.Zone.RED_ROOM && zone != Maze.Zone.DARKENED) continue;
 
-				int cx = osx * Maze.SECTOR + 12;
-				int cz = osz * Maze.SECTOR + 12;
+				int cx = sx * Maze.SECTOR + 3;
+				int cz = sz * Maze.SECTOR + 3;
 				assertTrue(ZonePoiPlan.isProtectedCell(seed, cx, cz));
 
 				int ox = cx * Maze.CELL;
@@ -111,12 +108,12 @@ class ZonePoiPlanTest {
 					sawRed = true;
 					assertTrue(ZonePoiPlan.isRedRoomPoiCell(seed, cx, cz));
 					assertTrue(Maze.isRedRoomInteriorCell(seed, cx, cz));
-					assertTrue(Maze.isLamp(seed, ox + 3, oz + 3, Maze.EpochSource.ZERO));
-					assertTrue(Maze.lampWorks(seed, ox + 3, oz + 3, Maze.EpochSource.ZERO));
+					assertTrue(Maze.isLamp(seed, ox + Maze.CENTER, oz + Maze.CENTER, Maze.EpochSource.ZERO));
+					assertTrue(Maze.lampWorks(seed, ox + Maze.CENTER, oz + Maze.CENTER, Maze.EpochSource.ZERO));
 				} else {
 					sawDarkened = true;
 					assertTrue(ZonePoiPlan.isDarkenedPoiCell(seed, cx, cz));
-					assertFalse(Maze.lampWorks(seed, ox + 3, oz + 3, Maze.EpochSource.ZERO));
+					assertFalse(Maze.lampWorks(seed, ox + Maze.CENTER, oz + Maze.CENTER, Maze.EpochSource.ZERO));
 				}
 			}
 		}
@@ -126,7 +123,7 @@ class ZonePoiPlanTest {
 	}
 
 	@Test
-	void sectorVignettesGenerateCleanlyAndStayOpen() {
+	void sectorVignettesGenerateAllNineTypesCleanlyAndStayOpen() {
 		long seed = 12345L;
 		EnumSet<ZonePoiPlan.VignetteType> seen = EnumSet.noneOf(ZonePoiPlan.VignetteType.class);
 

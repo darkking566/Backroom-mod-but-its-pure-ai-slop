@@ -1,5 +1,14 @@
 {
   "values": [
-    "noclip_backrooms:station_hatch"
+    "noclip_backrooms:station_hatch",
+    "noclip_backrooms:anomaly_poster",
+    "noclip_backrooms:anomaly_window",
+    "noclip_backrooms:steam_grate",
+    "noclip_backrooms:oil_vent_hatch",
+    "noclip_backrooms:peeling_carpet_exit",
+    "noclip_backrooms:hollow_plaster_exit",
+    "noclip_backrooms:giant_mirror_exit",
+    "noclip_backrooms:anomaly_portal_door",
+    "noclip_backrooms:locked_utility_door"
   ]
 }
