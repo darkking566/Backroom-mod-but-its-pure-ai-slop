@@ -470,6 +470,9 @@
   - `docs/HORROR_ESCAPE_PLAN.md` 兩處還寫著我舊版的「拉力、睡覺」，改成現在的現實排斥；程式位置表補上 `SeepageData`、`BackroomsRiftBlock`
   - `gradlew build` 與 `runClientGameTest -Plevels=0,horror` 通過
   - 推送前抓 GitHub，合併朋友新推的停車場地標與事件 4 批（`02551469`～`22407106`）；只有 `CLAUDE.md` 衝突（兩邊的 Antigravity 紀錄都保留）；合併後 `gradlew build` 與 `runClientGameTest -Plevels=1,horror -Psections=settlements,leaveThroughDoor,easterEggs,vignettes` 通過；使用者同意後把 `main` 推送到 GitHub（我的恐怖系統、EXIT 門變稀有、這次的修正，Gemini 的現實排斥）；沒有強制推送、沒有改寫歷史
+- 使用者覺得「回到主世界後怎麼逼玩家回後室」還沒解決（朋友覺得可以接受），要求把企劃書裡的發光裂縫那一套換成《致命公司》式的 M.E.G. 配額，並和 Gemini 提的悲屍化倒數（《深海迷航》＋後室 wiki 悲屍化）融合：
+  - 改寫 `docs/HORROR_ESCAPE_PLAN.md` 的「怎麼再回去」：兩股力量共用同一個 5 遊戲日的週期——第 1～2 天正常、第 3～5 天排斥發作（只在主世界）；期限前到前哨繳交調查配額 → M.E.G. 治療（排斥歸零）、補給、新週期；違約 → 前哨關閉醫療兌換委託、隔天早上強制再部署到更深的樓層、欠款加到下一期；進去改成 M.E.G. 派遣（取代裂縫）；三種藥只能壓症狀、不能代替配額；根治解藥是長期目標；地表滲透建議留當症狀；寫了 Claude 的看法、要注意的死亡螺旋與待討論
+  - 規則表、核心流程、分工跟著改；只改文件，程式還沒動（配額、派遣、強制再部署待做，裂縫待拿掉）
 
 ## 動作記錄（Antigravity）
 
