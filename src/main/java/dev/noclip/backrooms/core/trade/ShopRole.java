@@ -13,7 +13,9 @@ public enum ShopRole {
 	QUARTERMASTER("quartermaster", "meg_patrol"),
 	MASTER("master", "colonist"),
 	/** Mason, in the tunnels under Base Gamma: gas masks. */
-	MASON("mason", "aiko");
+	MASON("mason", "aiko"),
+	/** The institute's medic, in the medical wing (open once the team has met a quota): treatment and medicine. */
+	MEDIC("medic", "medic");
 
 	private final String id, look;
 
@@ -29,6 +31,14 @@ public enum ShopRole {
 	/** The look of core.people this role wears. */
 	public String look() {
 		return look;
+	}
+
+	/**
+	 * How many quotas the team must have met before this role serves them at the institute: the medic's wing opens at
+	 * one, the armoury at three. (The same roles elsewhere, in the Backrooms' bases, serve anyone.)
+	 */
+	public int clearance() {
+		return this == MEDIC ? 1 : this == QUARTERMASTER ? 3 : 0;
 	}
 
 	/** The entity tag marking someone as this role. */

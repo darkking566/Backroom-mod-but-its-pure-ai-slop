@@ -59,6 +59,9 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			server.runCommand("gamemode spectator @a");
 			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 200 0");
 			context.waitTicks(20);
+			// Getting out shows M.E.G.'s mission report (core.trip.Report): close it before using the hands.
+			context.waitFor(client -> client.gui.screen() instanceof dev.noclip.backrooms.core.trip.MissionReportScreen, 200);
+			context.runOnClient(client -> client.gui.screen().onClose());
 
 			suffocate(context, game);
 			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 400);
@@ -121,13 +124,21 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			server.waitFor(s -> player(s).isAlive() && player(s).level().dimension() == Level0.LEVEL_0, 400);
 			game.getConnection().waitForChunksRender();
 
-			// Second entry, onto a landing spot someone has built on.
-			server.runOnServer(s -> s.getLevel(Level0.LEVEL_0)
-					.setBlockAndUpdate(new BlockPos(3, standY, 3), Blocks.STONE.defaultBlockState()));
+			// Second entry, onto a landing spot someone has built on. Falling in lands on the team's stretch of Level 0
+			// (core.trip.Expedition, docs/project/1-gameplay/README.md): its first landing cell is blocked, so the next one.
+			int[] zone = server.computeOnServer(s -> dev.noclip.backrooms.core.trip.Expedition.zone(s, "0"));
+			int landX = Math.floorDiv(zone[0], Maze.CELL) * Maze.CELL + Maze.CENTER, landZ = Math.floorDiv(zone[1], Maze.CELL) * Maze.CELL + Maze.CENTER;
+			server.runOnServer(s -> {
+				s.getLevel(Level0.LEVEL_0).getChunk(new BlockPos(landX, standY, landZ));
+				s.getLevel(Level0.LEVEL_0).setBlockAndUpdate(new BlockPos(landX, standY, landZ), Blocks.STONE.defaultBlockState());
+			});
 			suffocate(context, game);
 			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 400);
 			context.waitTicks(20);
-			server.runOnServer(s -> check(player(s).getBlockX() == 10 && !player(s).isInWall(), "blocked landing not skipped: " + player(s).position()));
+			// The next cell along x (on its centre, or its walkway when the centre is a pit).
+			server.runOnServer(s -> check(Math.floorDiv(player(s).getBlockX(), Maze.CELL) == Math.floorDiv(landX, Maze.CELL) + 1
+					&& Math.floorDiv(player(s).getBlockZ(), Maze.CELL) == Math.floorDiv(landZ, Maze.CELL) && !player(s).isInWall(),
+					"blocked landing not skipped: " + player(s).position() + ", the stretch's first cell is " + landX + ", " + landZ));
 
 			// Inside Level 0 suffocation must hurt as normal.
 			context.waitTicks(80);
@@ -154,6 +165,11 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		server.runCommand("execute in minecraft:overworld run tp @a 3.5 200 3.5");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(10);
+		// Coming out of the Backrooms shows M.E.G.'s mission report a moment later: close it before using the hands.
+		context.waitTicks(30);
+		context.runOnClient(client -> {
+			if (client.gui.screen() instanceof dev.noclip.backrooms.core.trip.MissionReportScreen report) report.onClose();
+		});
 		server.runCommand("item replace entity @a hotbar.0 with minecraft:sand 8");
 		// Look up at the top block of the pit's west wall and place, as a player would.
 		context.getInput().lookAt(90, -60);

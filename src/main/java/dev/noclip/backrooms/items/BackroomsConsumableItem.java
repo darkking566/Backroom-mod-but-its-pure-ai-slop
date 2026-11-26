@@ -311,17 +311,11 @@ public final class BackroomsConsumableItem extends Item {
 				player.getCooldowns().addCooldown(stack, 30);
 			}
 			case HOMEWARD_ANCHOR -> {
-				if (player instanceof ServerPlayer sp) {
-					ServerLevel overworld = server.getServer().overworld();
-					BlockPos spawn = overworld.getRespawnData().pos();
-					overworld.getChunk(spawn);
+				// A pickup call like any other (core.trip.Extraction): hold out where you drove the anchor in, then M.E.G.
+				// takes you to the institute. Only spent if the call went out.
+				if (player instanceof ServerPlayer sp && dev.noclip.backrooms.core.trip.Extraction.start(sp, sp.position(), 6.0)) {
 					server.sendParticles(ParticleTypes.PORTAL, sp.getX(), sp.getY() + 1.0, sp.getZ(), 45, 0.6, 1.0, 0.6, 0.12);
-					sp.stopRiding();
-					sp.teleportTo(overworld, spawn.getX() + 0.5, spawn.getY() + 1.0, spawn.getZ() + 0.5, Set.of(), sp.getYRot(), 0, true);
-					sp.setDeltaMovement(Vec3.ZERO);
-					sp.resetFallDistance();
-					overworld.playSound(null, spawn.getX() + 0.5, spawn.getY() + 1.0, spawn.getZ() + 0.5,
-							SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0F, 1.2F);
+					server.playSound(null, sp.getX(), sp.getY(), sp.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0F, 1.2F);
 					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.homeward_anchor.used"));
 					if (!sp.isCreative()) stack.shrink(1);
 					sp.getCooldowns().addCooldown(stack, 60);

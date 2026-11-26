@@ -1,0 +1,10 @@
+{
+  "type": "noclip_backrooms:frontrooms",
+  "generator": {
+    "type": "noclip_backrooms:frontrooms",
+    "biome_source": {
+      "type": "minecraft:fixed",
+      "biome": "noclip_backrooms:frontrooms"
+    }
+  }
+}

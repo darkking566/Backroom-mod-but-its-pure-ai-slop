@@ -1,0 +1,78 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/frontrooms/warning_sign",
+    "s": "noclip_backrooms:block/frontrooms/warning_sign",
+    "b": "noclip_backrooms:block/frontrooms/institute_concrete"
+  },
+  "elements": [
+    {
+      "from": [
+        1,
+        2,
+        15
+      ],
+      "to": [
+        15,
+        14,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#s",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#b",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#b",
+          "uv": [
+            0,
+            0,
+            1,
+            12
+          ]
+        },
+        "west": {
+          "texture": "#b",
+          "uv": [
+            0,
+            0,
+            1,
+            12
+          ]
+        },
+        "up": {
+          "texture": "#b",
+          "uv": [
+            0,
+            0,
+            16,
+            1
+          ]
+        },
+        "down": {
+          "texture": "#b",
+          "uv": [
+            0,
+            0,
+            16,
+            1
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -164,12 +164,39 @@ def report():
     return img
 
 
+def radio():
+    """A battered M.E.G. walkie-talkie: grey-green body, a stubby antenna, a speaker grille and a red-lit channel window."""
+    rnd = random.Random(31)
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    px = img.load()
+    for y in range(2, 12):
+        for x in (20, 21):
+            px[x, y] = (40, 40, 42, 255) if x == 20 else (70, 70, 74, 255)
+    px[20, 1] = px[21, 1] = (30, 30, 32, 255)
+    for y in range(10, 30):
+        for x in range(10, 24):
+            v = rnd.randint(-6, 6)
+            edge = x in (10, 23) or y in (10, 29)
+            px[x, y] = (52 + v, 62 + v, 52 + v, 255) if edge else (92 + v, 104 + v, 88 + v, 255)
+    for y in range(13, 17):
+        for x in range(13, 21):
+            px[x, y] = (200, 50, 40, 255) if (x + y) % 3 else (240, 110, 90, 255)
+    for y in range(19, 27):
+        for x in range(12, 22):
+            if (x + y) % 2 == 0:
+                px[x, y] = (40, 46, 40, 255)
+    for y in range(12, 22):
+        px[9, y] = (60, 60, 62, 255)
+    return img
+
+
 if __name__ == "__main__":
     save("lost_coin", coin())
     save("static_tape", tape())
     save("meg_squad_report", report())
-    sheet = Image.new("RGBA", (S * 3 * 4 + 16, S * 4 + 8), (40, 40, 40, 255))
-    for i, name in enumerate(("lost_coin", "static_tape", "meg_squad_report")):
+    save("meg_radio", radio())
+    sheet = Image.new("RGBA", (S * 4 * 4 + 20, S * 4 + 8), (40, 40, 40, 255))
+    for i, name in enumerate(("lost_coin", "static_tape", "meg_squad_report", "meg_radio")):
         icon = Image.open(ASSETS / "textures/item/core" / f"{name}.png").resize((S * 4, S * 4), Image.NEAREST)
         sheet.alpha_composite(icon, (4 + i * (S * 4 + 4), 4))
     out = ROOT / "docs/project/1-gameplay/images/items.png"

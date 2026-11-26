@@ -116,6 +116,11 @@ public final class QuotaData extends SavedData {
 		return missing * QuotaMath.MISSING_ITEM_POINTS;
 	}
 
+	/** How many quotas the team has met: the institute's clearance. */
+	public int paid() {
+		return paid;
+	}
+
 	public boolean active() {
 		return active;
 	}

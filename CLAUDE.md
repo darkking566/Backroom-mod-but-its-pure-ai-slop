@@ -520,6 +520,27 @@
   - 合成台 Shift 點成品時背包只放得下一部分，會用掉整份材料、放不下的那部分消失：改成放不下整份就不動（`BackroomsStationMenu.fits`）
   - `HorrorClientTest` 加：同一層換床不再給經驗、背包只剩 1 格空間時 Shift 點成品不拿也不扣材料（先把修正拿掉跑過，確認測試會失敗）；`gradlew build` 與 `runClientGameTest -Plevels=horror` 通過
   - 沒驗證：真的重開世界後重生（自動測試沒辦法重開同一個世界），只靠讀程式判斷舊身體記得死的維度
+- 使用者決定（Claude 問的四題）：Gemini 新企劃裡的按趟加工與武器數值平衡也由 Claude 做；前室外面用原版自然地形；血量砍半只對進過後室的人；舊存檔的石造公會整個拆掉。寫進 `docs/project/1-gameplay/README.md`
+- 前室與流程第一大批（照「流程與前室總部定案」與 Gemini 寫的前室企劃）：
+  - 新增維度 `noclip_backrooms:frontrooms`（`frontrooms/`：`Frontrooms`、`FrontroomsTerrain` 純函式地形、`FrontroomsChunkGenerator`、`InstituteLayout` 三層平面圖純資料、`Institute` 運作、`FrontroomsBlocks`／`BlastDoorBlock`／`DoorLampBlock`／`InstituteBlocks` 22 個新方塊）；維度類型與生態域照原版主世界與森林改（沒有怪物、沒有熔岩湖）；`tools/make_frontrooms.py` 產生 128 像素貼圖（含 `_n`／`_s`）、模型、方塊狀態、物品模型
+  - 研究所：大廳、收購與補給窗口、置物櫃室、工作區、檢疫隔離室；醫療翼（1 期）、軍械庫與車間（3 期）、B1 傳送廳（5 期，樓梯下去，傳送台可直接派遣）、B2 機密檔案室（3 階以上駭客器開艙口，6 份檔案）；氣密門與紅綠燈依配額期數同步；建築打不壞、只有工作區可以蓋；人員五位固定在位置、不見會補；圍牆外跑出去會被帶回
+  - 新增 `core/Home`（家在哪：前室與主世界算家、後室不算；`entered` 看玩家層數紀錄判斷進過後室）；把 `Pull`、`PlayerRpg`、`Contracts`、`Quota`、`Look`、`QuotaClient`、`PullClient` 裡「主世界才算家」「我們的命名空間就是後室」的判斷改成用它（前室也是 `noclip_backrooms` 命名空間）
+  - 撤離接應倒數 `core/trip/Extraction`（30～60 秒、上方倒數條、離開取消、每 2 秒引怪、兩波獵犬）；據點、朋友的 Level 0 EXIT 門、停車場出口門、Gemini 的歸鄉錨釘都改成呼叫接應；管理員 `/backrooms extract now`
+  - 死亡：後室沒安頓 → 這一趟的落點（`Trips.ENTRY`），層數回 1；前室或主世界死掉（進過後室）→ 東西收進置物櫃（`core/locker/Lockers`，54 格＋遺物），掉回 Level 0；沒進過照原版
+  - 隊伍落點 `core/trip/Expedition`：從外面掉進同一層的人落在同一片（`LevelExits.fallInto`、朋友的 `Noclip` 沙子入口都改用它），全隊離開後室 30 秒後關掉
+  - 任務報告 `core/trip/Report`＋`MissionReportPayload`＋客戶端 `MissionReportScreen`（關掉後顯示黃色「任務開始第 N 天」）；原本回到主世界就顯示的天數標題拿掉
+  - 配額：家改成前室或主世界、只算進過後室的人；`Quota.clearance`、`onClearance`、`deployOptions`、Level 1 以後要 5 期才能派遣；沒進過的人收不到配額狀態
+  - 醫官 `ShopRole.MEDIC`（`shops/medic.json`、`Treatment` 治療 40 點）；醫官與軍需官在研究所要交滿 1／3 期才服務（`Shops.Outcome.WING_LOCKED`）；補給商加原版基礎材料
+  - M.E.G. 無線電 `core/radio/Radio`（物品 `meg_radio`，第一次回研究所發一台；12 句失蹤小隊通訊、配額與天數；第 4 層以後、理智低於三成或附近有竊皮者時四成是假的）；管理員 `/backrooms radio [fake]`
+  - 血量砍半只對進過後室的人（`PlayerRpg`，第一次到達後室時重新套用）
+  - 舊公會：刪掉 `structure_set/guilds.json`（不再生成），`core/guild/GuildRemoval` 在舊存檔載入時拆掉（地板變草、小路變草、箱子東西掉出來、商人消失）
+  - 舊存檔裡進過後室又在主世界的人，登入時被帶進前室
+  - 撞名：我原本的 `emergency_light` 跟 Level 2 的方塊同名，蓋掉了它的方塊狀態與名稱；已還原，改叫 `institute_emergency_light`
+  - 修朋友的測試：Level 0 的 EXIT 門與第二次掉進來的落點檢查（現在落在隊伍的那一片）、停車場出口門、`suffocate` 先關掉任務報告；`GuildClientTest` 改成檢查村莊旁不再有公會、拆除後只剩草地
+  - 新增單元測試 `frontrooms/InstituteLayoutTest`（每期配額開對的翼區、樓梯一階一格下到 B1、B1 走得到傳送台與艙口、B2 只在艙口下面、地形平整與圍牆）、實機測試 `frontrooms/FrontroomsClientTest`（`-Plevels=frontrooms`，9 張截圖）；`HorrorClientTest` 改成新規則（新人 20 血、接應倒數、研究所、任務報告、無線電、前室死掉進置物櫃）
+  - 發現：重生事件裡新身體的附加資料有時還沒複製過來（看起來跟模組初始化順序有關），所以重生時判斷「進過後室」改看舊身體
+  - 驗證：`gradlew build`、`runClientGameTest -Plevels=frontrooms,horror,guild,floors,0` 與 Level 1 的 `leaveThroughDoor,settlements,wikiSettlements` 都通過；看過大廳、置物櫃、圍牆、研究所外觀、前室全景、醫療翼、軍械庫、B1、B2 截圖
+  - 還沒做（同一批企劃）：現場取證、野戰工事、空間標記與侵蝕、每趟異常詞綴、研究所按趟加工結算、武器數值平衡、B1 異常預告、雙結局
 
 ## 動作記錄（Antigravity）
 

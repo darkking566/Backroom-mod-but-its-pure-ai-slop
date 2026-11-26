@@ -57,7 +57,7 @@ public final class PlayerRpg {
 	private static final Identifier MOD_VIT_HP = BackroomsMod.id("rpg_vitality_health");
 	private static final Identifier MOD_VIT_TOUGH = BackroomsMod.id("rpg_vitality_toughness");
 	private static final Identifier MOD_BACKROOMS_HP = BackroomsMod.id("backrooms_frailty");
-	/** Half of the player's base 20 health, everywhere (docs/project/1-gameplay/README.md). */
+	/** Half of the player's base 20 health, everywhere, once they have been in the Backrooms (docs/project/1-gameplay/README.md). */
 	public static final double FRAILTY = -10.0;
 	/** In the Backrooms, eating well heals at a quarter of the usual speed (mixin.FoodDataBackroomsRegen). */
 	public static final float BACKROOMS_FOOD_REGEN = 0.25F;
@@ -86,6 +86,8 @@ public final class PlayerRpg {
 		});
 
 		ServerPlayerEvents.JOIN.register(player -> applyAttributes(player, get(player)));
+		// The first fall into the Backrooms halves their health from then on.
+		dev.noclip.backrooms.core.floors.Floors.onArrive((player, level, run, newLevel) -> applyAttributes(player, get(player)));
 		ServerPlayerEvents.LEAVE.register(player -> LAST_HURT.remove(player.getUUID()));
 		ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damageTaken, blocked) -> {
 			if (entity instanceof ServerPlayer player && damageTaken > 0.0F) {
@@ -164,7 +166,9 @@ public final class PlayerRpg {
 		updateModifier(player, Attributes.MOVEMENT_SPEED, MOD_AGI_MOVE, stats.moveSpeedBonus(), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 		updateModifier(player, Attributes.ATTACK_SPEED, MOD_AGI_ATK, stats.attackSpeedBonus(), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 		updateModifier(player, Attributes.MAX_HEALTH, MOD_VIT_HP, stats.maxHealthBonus(), AttributeModifier.Operation.ADD_VALUE);
-		updateModifier(player, Attributes.MAX_HEALTH, MOD_BACKROOMS_HP, FRAILTY, AttributeModifier.Operation.ADD_VALUE);
+		// Only once they have been in the Backrooms: until then the Overworld is played as it is.
+		updateModifier(player, Attributes.MAX_HEALTH, MOD_BACKROOMS_HP, dev.noclip.backrooms.core.Home.entered(player) ? FRAILTY : 0.0,
+				AttributeModifier.Operation.ADD_VALUE);
 		updateModifier(player, Attributes.ARMOR_TOUGHNESS, MOD_VIT_TOUGH, 0.0, AttributeModifier.Operation.ADD_VALUE);
 		if (player.getHealth() > player.getMaxHealth()) {
 			player.setHealth(player.getMaxHealth());
@@ -172,7 +176,7 @@ public final class PlayerRpg {
 	}
 
 	public static boolean inBackrooms(ServerPlayer player) {
-		return player.level().dimension().identifier().getNamespace().equals(BackroomsMod.MOD_ID);
+		return dev.noclip.backrooms.core.Home.inBackrooms(player.level().dimension());
 	}
 
 	private static void updateModifier(ServerPlayer player, Holder<Attribute> attribute, Identifier id, double amount, AttributeModifier.Operation op) {
@@ -199,7 +203,7 @@ public final class PlayerRpg {
 				player.heal(stats.healthRegenPerSec() * 0.5F);
 			}
 
-			boolean inBackrooms = level.dimension().identifier().getNamespace().equals(BackroomsMod.MOD_ID);
+			boolean inBackrooms = dev.noclip.backrooms.core.Home.inBackrooms(level.dimension());
 			float delta;
 			if (!inBackrooms) {
 				int rejectionStage = dev.noclip.backrooms.core.trip.Pull.stage(player);
@@ -214,7 +218,7 @@ public final class PlayerRpg {
 					delta = rejectDrain * (1.0F - stats.sanityDrainResistance());
 				} else {
 					// Overworld safe base steadily restores sanity, accelerated by SAN stat.
-					float baseRec = level.dimension() == Level.OVERWORLD ? 0.85F : 0.25F;
+					float baseRec = dev.noclip.backrooms.core.Home.isHome(level.dimension()) ? 0.85F : 0.25F;
 					delta = (baseRec + stats.passiveSanityRegenPerSec() * 0.5F) * stats.sanityRegenMultiplier();
 				}
 			} else {

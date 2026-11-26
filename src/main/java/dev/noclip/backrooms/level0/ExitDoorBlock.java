@@ -20,7 +20,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Using either half of an exit door in Level 0 sends the player to their respawn point, alive and with their items.
+ * Using either half of an exit door in Level 0 calls M.E.G. for a pickup: hold out beside it, and they take the player
+ * to the institute in the Frontrooms, alive and with their items.
  * The sign above shares the block for its facing only. AXIS is the way the door faces; world generation keeps x.
  */
 final class ExitDoorBlock extends Block {
@@ -60,17 +61,8 @@ final class ExitDoorBlock extends Block {
 		// A double click queues this twice.
 		if (player.level().dimension() != Level0.LEVEL_0) return;
 
-		// false: do not spend a respawn anchor charge.
-		TeleportTransition destination = player.findRespawnPositionAndUseSpawnBlock(false, TeleportTransition.PLAY_PORTAL_SOUND);
-		if (destination.newLevel().dimension() == Level0.LEVEL_0) {
-			// A spawn point set in here by command would make every door lead straight back in.
-			ServerLevel overworld = player.level().getServer().overworld();
-			Vec3 spawn = Vec3.atBottomCenterOf(player.adjustSpawnLocation(overworld, overworld.getRespawnData().pos()));
-			destination = new TeleportTransition(overworld, spawn, Vec3.ZERO, 0, 0, TeleportTransition.PLAY_PORTAL_SOUND);
-		}
-
-		player.stopRiding();
-		player.resetFallDistance();
-		player.teleport(destination);
+		// Every known way out is watched by M.E.G. (docs/project/1-gameplay/README.md): the door is a pickup point. Hold out
+		// beside it until they come, and they take you to the institute in the Frontrooms (core.trip.Extraction, core.Home).
+		dev.noclip.backrooms.core.trip.Extraction.start(player, player.position(), 6.0);
 	}
 }

@@ -1,0 +1,172 @@
+{
+  "variants": {
+    "axis=x,half=lower,open=false,requires=0": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower"
+    },
+    "axis=x,half=lower,open=false,requires=1": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower"
+    },
+    "axis=x,half=lower,open=false,requires=2": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower"
+    },
+    "axis=x,half=lower,open=false,requires=3": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower"
+    },
+    "axis=x,half=lower,open=false,requires=4": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower"
+    },
+    "axis=x,half=lower,open=false,requires=5": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower"
+    },
+    "axis=x,half=lower,open=true,requires=0": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower_open"
+    },
+    "axis=x,half=lower,open=true,requires=1": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower_open"
+    },
+    "axis=x,half=lower,open=true,requires=2": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower_open"
+    },
+    "axis=x,half=lower,open=true,requires=3": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower_open"
+    },
+    "axis=x,half=lower,open=true,requires=4": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower_open"
+    },
+    "axis=x,half=lower,open=true,requires=5": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower_open"
+    },
+    "axis=x,half=upper,open=false,requires=0": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper"
+    },
+    "axis=x,half=upper,open=false,requires=1": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper"
+    },
+    "axis=x,half=upper,open=false,requires=2": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper"
+    },
+    "axis=x,half=upper,open=false,requires=3": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper"
+    },
+    "axis=x,half=upper,open=false,requires=4": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper"
+    },
+    "axis=x,half=upper,open=false,requires=5": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper"
+    },
+    "axis=x,half=upper,open=true,requires=0": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper_open"
+    },
+    "axis=x,half=upper,open=true,requires=1": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper_open"
+    },
+    "axis=x,half=upper,open=true,requires=2": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper_open"
+    },
+    "axis=x,half=upper,open=true,requires=3": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper_open"
+    },
+    "axis=x,half=upper,open=true,requires=4": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper_open"
+    },
+    "axis=x,half=upper,open=true,requires=5": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper_open"
+    },
+    "axis=z,half=lower,open=false,requires=0": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower",
+      "y": 90
+    },
+    "axis=z,half=lower,open=false,requires=1": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower",
+      "y": 90
+    },
+    "axis=z,half=lower,open=false,requires=2": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower",
+      "y": 90
+    },
+    "axis=z,half=lower,open=false,requires=3": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower",
+      "y": 90
+    },
+    "axis=z,half=lower,open=false,requires=4": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower",
+      "y": 90
+    },
+    "axis=z,half=lower,open=false,requires=5": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower",
+      "y": 90
+    },
+    "axis=z,half=lower,open=true,requires=0": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower_open",
+      "y": 90
+    },
+    "axis=z,half=lower,open=true,requires=1": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower_open",
+      "y": 90
+    },
+    "axis=z,half=lower,open=true,requires=2": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower_open",
+      "y": 90
+    },
+    "axis=z,half=lower,open=true,requires=3": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower_open",
+      "y": 90
+    },
+    "axis=z,half=lower,open=true,requires=4": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower_open",
+      "y": 90
+    },
+    "axis=z,half=lower,open=true,requires=5": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_lower_open",
+      "y": 90
+    },
+    "axis=z,half=upper,open=false,requires=0": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper",
+      "y": 90
+    },
+    "axis=z,half=upper,open=false,requires=1": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper",
+      "y": 90
+    },
+    "axis=z,half=upper,open=false,requires=2": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper",
+      "y": 90
+    },
+    "axis=z,half=upper,open=false,requires=3": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper",
+      "y": 90
+    },
+    "axis=z,half=upper,open=false,requires=4": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper",
+      "y": 90
+    },
+    "axis=z,half=upper,open=false,requires=5": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper",
+      "y": 90
+    },
+    "axis=z,half=upper,open=true,requires=0": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper_open",
+      "y": 90
+    },
+    "axis=z,half=upper,open=true,requires=1": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper_open",
+      "y": 90
+    },
+    "axis=z,half=upper,open=true,requires=2": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper_open",
+      "y": 90
+    },
+    "axis=z,half=upper,open=true,requires=3": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper_open",
+      "y": 90
+    },
+    "axis=z,half=upper,open=true,requires=4": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper_open",
+      "y": 90
+    },
+    "axis=z,half=upper,open=true,requires=5": {
+      "model": "noclip_backrooms:block/frontrooms/blast_door_upper_open",
+      "y": 90
+    }
+  }
+}

@@ -42,8 +42,10 @@ final class Noclip {
 		// Several hits can be queued before the first teleport runs.
 		if (player.level().dimension() != Level.OVERWORLD) return;
 
-		int cellX = Math.floorDiv(player.getBlockX(), Maze.CELL);
-		int cellZ = Math.floorDiv(player.getBlockZ(), Maze.CELL);
+		// The team's stretch of Level 0 (core.trip.Expedition): whoever falls in while others are inside lands near them.
+		int[] zone = dev.noclip.backrooms.core.trip.Expedition.zone(player.level().getServer(), "0");
+		int cellX = Math.floorDiv(zone[0], Maze.CELL);
+		int cellZ = Math.floorDiv(zone[1], Maze.CELL);
 
 		// Prefer cell centres; if a centre is blocked skip to the next cell, and if it is an open pit step onto the walkway.
 		for (int i = 0; i < LANDING_ATTEMPTS; i++) {

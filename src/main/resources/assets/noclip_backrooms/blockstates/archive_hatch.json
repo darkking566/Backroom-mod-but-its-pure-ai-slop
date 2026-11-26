@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "open=false": {
+      "model": "noclip_backrooms:block/frontrooms/archive_hatch"
+    },
+    "open=true": {
+      "model": "noclip_backrooms:block/frontrooms/archive_hatch_open"
+    }
+  }
+}

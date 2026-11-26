@@ -3,6 +3,7 @@ package dev.noclip.backrooms.core.quota;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import dev.noclip.backrooms.BackroomsMod;
+import dev.noclip.backrooms.core.Home;
 import dev.noclip.backrooms.core.LevelExits;
 import dev.noclip.backrooms.core.economy.Wallet;
 import dev.noclip.backrooms.core.floors.Floors;
@@ -14,7 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
@@ -44,7 +44,8 @@ import net.minecraft.world.level.Level;
 
 /**
  * The M.E.G. quota cycle (docs/project/1-gameplay/README.md): the Wretch countdown of the body and the quota of the
- * employer, on one clock that runs only while someone of the team is in the Overworld (the Backrooms have no time).
+ * employer, on one clock that runs only while someone of the team is out of the Backrooms (the Backrooms have no time):
+ * at the institute in the Frontrooms, or in the Overworld. The team is everyone who has been in the Backrooms.
  *
  * <ul>
  * <li>It starts the first time anyone walks out of the Backrooms alive. Each new day of home time shows "Day N of the
@@ -56,7 +57,8 @@ import net.minecraft.world.level.Level;
  * <li>At the deadline anything unpaid becomes debt with 20% on top (and again at every deadline after); the outpost is
  * closed to the team (all but the buyer) until the debt is paid, the rejection stays at its worst, and the next
  * morning M.E.G. drops whoever is home into a random level.</li>
- * <li>The commander sends people in: Level 0 free, levels the team has been to for credits.</li>
+ * <li>The commander sends people in: Level 0 free, levels the team has been to for credits (past Level 1 only once the
+ * institute's B1 is open, at five quotas met). Each quota met opens more of the institute (the frontrooms package).</li>
  * </ul>
  */
 public final class Quota {
@@ -71,6 +73,10 @@ public final class Quota {
 	static final Map<String, Long> DEPLOY_PRICE = Map.of("0", 0L, "0.1", 80L, "1", 50L, "2", 120L, "3", 250L);
 	static final long DEFAULT_DEPLOY_PRICE = 400L;
 	static final double NEAR_COMMANDER = 8.0;
+	/** Quotas met before M.E.G. sends anyone past these levels (the institute's B1, with its transport pads). */
+	public static final int DEEP_CLEARANCE = 5;
+	static final java.util.Set<String> SHALLOW = java.util.Set.of("0", "0.1", "1");
+	private static final List<java.util.function.ObjIntConsumer<MinecraftServer>> CLEARANCE = new ArrayList<>();
 
 	/** Overworld clock at the last tick someone was home; -1 while nobody is (the clock is not ours to count then). */
 	private static long lastClock = -1;
@@ -83,10 +89,6 @@ public final class Quota {
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> lastClock = -1);
 		ServerTickEvents.END_SERVER_TICK.register(Quota::tick);
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> send(handler.player, data(server)));
-		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register((player, from, to) -> {
-			QuotaData d = data(player.level().getServer());
-			if (to.dimension() == Level.OVERWORLD && d.active) showDay(player, d);
-		});
 		Floors.onArrive((player, level, run, newLevel) -> {
 			QuotaData d = data(player.level().getServer());
 			if (d.visited.add(level)) d.changed();
@@ -122,7 +124,9 @@ public final class Quota {
 		}
 
 		boolean grew = false;
-		for (ServerPlayer player : server.getPlayerList().getPlayers()) grew |= d.seen.add(player.getUUID().toString());
+		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+			if (Home.entered(player)) grew |= d.seen.add(player.getUUID().toString());
+		}
 		if (grew && d.seen.size() > d.team) {
 			d.team = d.seen.size();
 			d.required = Math.max(d.required, QuotaMath.quota(d.paid, d.team));
@@ -145,11 +149,11 @@ public final class Quota {
 		if (server.getTickCount() % 20 == 0) sendAll(server, d);
 	}
 
-	/** Players who count as home: in the Overworld, alive, not spectating. */
+	/** The team out of the Backrooms: everyone who has been in, alive and not spectating, at the institute or outside. */
 	static List<ServerPlayer> home(MinecraftServer server) {
 		List<ServerPlayer> home = new ArrayList<>();
 		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-			if (player.level().dimension() == Level.OVERWORLD && player.isAlive() && !player.isSpectator()) home.add(player);
+			if (Home.isHome(player.level().dimension()) && Home.entered(player) && player.isAlive() && !player.isSpectator()) home.add(player);
 		}
 		return home;
 	}
@@ -174,7 +178,9 @@ public final class Quota {
 		d.delivered = 0;
 		d.lastDay = 0;
 		d.seen.clear();
-		for (ServerPlayer player : server.getPlayerList().getPlayers()) d.seen.add(player.getUUID().toString());
+		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+			if (Home.entered(player)) d.seen.add(player.getUUID().toString());
+		}
 		d.team = Math.max(1, d.seen.size());
 		d.required = QuotaMath.quota(d.paid, d.team);
 		d.items.clear();
@@ -260,8 +266,11 @@ public final class Quota {
 	/** The quota is met: treatment for everyone, a care package for whoever is home, and the next cycle. */
 	static void pay(MinecraftServer server, QuotaData d) {
 		d.paid++;
+		for (var listener : CLEARANCE) listener.accept(server, d.paid);
 		d.cycle++;
-		for (ServerPlayer player : server.getPlayerList().getPlayers()) treat(player);
+		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+			if (Home.entered(player)) treat(player);
+		}
 		for (ServerPlayer player : home(server)) carePackage(player);
 		startCycle(server, d);
 		broadcast(server, Component.translatable("message.noclip_backrooms.quota.met", d.required).withStyle(ChatFormatting.GREEN));
@@ -322,6 +331,16 @@ public final class Quota {
 
 	// ------------------------------------------------------------------ what the rest of the mod asks
 
+	/** How many quotas the team has met: what the institute has opened to them. */
+	public static int clearance(MinecraftServer server) {
+		return data(server).paid;
+	}
+
+	/** Told whenever the team meets a quota, with the new clearance. */
+	public static void onClearance(java.util.function.ObjIntConsumer<MinecraftServer> listener) {
+		CLEARANCE.add(listener);
+	}
+
 	/** Whether the outpost is closed to the team: they owe M.E.G. (only the buyer still takes things). */
 	public static boolean locked(MinecraftServer server) {
 		QuotaData d = data(server);
@@ -333,6 +352,12 @@ public final class Quota {
 		QuotaData d = data(server);
 		if (!d.active) return 0.0F;
 		return d.debt > 0 ? 100.0F : QuotaMath.rejection(d.homeTicks);
+	}
+
+	/** "Day N of the mission" now, for someone just back (after their report). */
+	public static void showDay(ServerPlayer player) {
+		QuotaData d = data(player.level().getServer());
+		if (d.active) showDay(player, d);
 	}
 
 	/** For the GM command: moves the cycle's clock to where the rejection is this bad (and starts the cycle if needed). */
@@ -375,13 +400,16 @@ public final class Quota {
 				d.debt > 0, needs);
 	}
 
+	/** Only the team sees the cycle: someone who has never been in the Backrooms plays the Overworld as it is. */
 	static void send(ServerPlayer player, QuotaData d) {
-		ServerPlayNetworking.send(player, status(player.level().getServer(), d));
+		ServerPlayNetworking.send(player, Home.entered(player) ? status(player.level().getServer(), d) : QuotaStatusPayload.NONE);
 	}
 
 	static void sendAll(MinecraftServer server, QuotaData d) {
 		QuotaStatusPayload status = status(server, d);
-		for (ServerPlayer player : server.getPlayerList().getPlayers()) ServerPlayNetworking.send(player, status);
+		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+			ServerPlayNetworking.send(player, Home.entered(player) ? status : QuotaStatusPayload.NONE);
+		}
 	}
 
 	// ------------------------------------------------------------------ the commander
@@ -403,6 +431,17 @@ public final class Quota {
 						.append(" ").append(button("message.noclip_backrooms.quota.pay_button", "/meg quota paydebt", ChatFormatting.GOLD)));
 			}
 		}
+		int next = d.paid < 1 ? 1 : d.paid < 3 ? 3 : d.paid < DEEP_CLEARANCE ? DEEP_CLEARANCE : -1;
+		player.sendSystemMessage(next < 0
+				? Component.translatable("message.noclip_backrooms.quota.clearance_full", d.paid).withStyle(ChatFormatting.AQUA)
+				: Component.translatable("message.noclip_backrooms.quota.clearance", d.paid, next,
+						Component.translatable("institute.noclip_backrooms.wing." + next)).withStyle(ChatFormatting.AQUA));
+		deployOptions(player);
+	}
+
+	/** The levels M.E.G. would send this player to, as buttons (the commander and B1's transport pads). */
+	public static void deployOptions(ServerPlayer player) {
+		QuotaData d = data(player.level().getServer());
 		MutableComponent line = Component.translatable("message.noclip_backrooms.quota.deploy_header").withStyle(ChatFormatting.GRAY);
 		for (String level : deployable(d)) {
 			long price = DEPLOY_PRICE.getOrDefault(level, DEFAULT_DEPLOY_PRICE);
@@ -410,15 +449,21 @@ public final class Quota {
 					"/meg deploy " + level, ChatFormatting.AQUA, level, price));
 		}
 		player.sendSystemMessage(line);
+		if (d.paid < DEEP_CLEARANCE) {
+			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.quota.deploy_deep_locked", DEEP_CLEARANCE).withStyle(ChatFormatting.DARK_GRAY));
+		}
 	}
 
-	/** Levels M.E.G. can send the team to: Level 0, and open levels they have been to. */
+	/** Levels M.E.G. can send the team to: Level 0, and open levels they have been to (deep ones from B1 only). */
 	static List<String> deployable(QuotaData d) {
 		List<String> list = new ArrayList<>();
 		if (LevelExits.isOpen("0")) list.add("0");
 		List<String> been = new ArrayList<>(d.visited);
 		Collections.sort(been);
-		for (String level : been) if (!level.equals("0") && LevelExits.isOpen(level)) list.add(level);
+		for (String level : been) {
+			if (level.equals("0") || !LevelExits.isOpen(level)) continue;
+			if (SHALLOW.contains(level) || d.paid >= DEEP_CLEARANCE) list.add(level);
+		}
 		return list;
 	}
 
@@ -426,6 +471,17 @@ public final class Quota {
 		return Component.translatable(key, args).withStyle(style -> style.withColor(colour)
 				.withClickEvent(new ClickEvent.RunCommand(command))
 				.withHoverEvent(new HoverEvent.ShowText(Component.literal(command))));
+	}
+
+	/** B1's transport pads (the Frontrooms say where they are). */
+	private static java.util.function.Predicate<ServerPlayer> pads = player -> false;
+
+	public static void setPads(java.util.function.Predicate<ServerPlayer> onPad) {
+		pads = onPad;
+	}
+
+	static boolean atPad(ServerPlayer player) {
+		return pads.test(player);
 	}
 
 	static boolean nearCommander(ServerPlayer player) {
@@ -437,8 +493,8 @@ public final class Quota {
 	public static boolean deploy(ServerPlayer player, String level, boolean checkCommander) {
 		MinecraftServer server = player.level().getServer();
 		QuotaData d = data(server);
-		String refusal = player.level().dimension() != Level.OVERWORLD ? "message.noclip_backrooms.quota.deploy_not_home"
-				: checkCommander && !nearCommander(player) ? "message.noclip_backrooms.quota.deploy_no_commander"
+		String refusal = !Home.isHome(player.level().dimension()) ? "message.noclip_backrooms.quota.deploy_not_home"
+				: checkCommander && !nearCommander(player) && !atPad(player) ? "message.noclip_backrooms.quota.deploy_no_commander"
 				: !deployable(d).contains(level) ? "message.noclip_backrooms.quota.deploy_unknown" : null;
 		long price = DEPLOY_PRICE.getOrDefault(level, DEFAULT_DEPLOY_PRICE);
 		if (refusal == null && price > 0 && !Wallet.take(player, price)) refusal = "message.noclip_backrooms.quota.deploy_no_credits";

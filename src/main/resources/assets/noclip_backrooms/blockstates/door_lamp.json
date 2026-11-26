@@ -1,0 +1,40 @@
+{
+  "variants": {
+    "requires=0,unlocked=false": {
+      "model": "noclip_backrooms:block/frontrooms/door_lamp_red"
+    },
+    "requires=0,unlocked=true": {
+      "model": "noclip_backrooms:block/frontrooms/door_lamp_green"
+    },
+    "requires=1,unlocked=false": {
+      "model": "noclip_backrooms:block/frontrooms/door_lamp_red"
+    },
+    "requires=1,unlocked=true": {
+      "model": "noclip_backrooms:block/frontrooms/door_lamp_green"
+    },
+    "requires=2,unlocked=false": {
+      "model": "noclip_backrooms:block/frontrooms/door_lamp_red"
+    },
+    "requires=2,unlocked=true": {
+      "model": "noclip_backrooms:block/frontrooms/door_lamp_green"
+    },
+    "requires=3,unlocked=false": {
+      "model": "noclip_backrooms:block/frontrooms/door_lamp_red"
+    },
+    "requires=3,unlocked=true": {
+      "model": "noclip_backrooms:block/frontrooms/door_lamp_green"
+    },
+    "requires=4,unlocked=false": {
+      "model": "noclip_backrooms:block/frontrooms/door_lamp_red"
+    },
+    "requires=4,unlocked=true": {
+      "model": "noclip_backrooms:block/frontrooms/door_lamp_green"
+    },
+    "requires=5,unlocked=false": {
+      "model": "noclip_backrooms:block/frontrooms/door_lamp_red"
+    },
+    "requires=5,unlocked=true": {
+      "model": "noclip_backrooms:block/frontrooms/door_lamp_green"
+    }
+  }
+}

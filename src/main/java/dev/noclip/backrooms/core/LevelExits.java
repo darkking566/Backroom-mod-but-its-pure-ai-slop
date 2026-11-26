@@ -104,7 +104,13 @@ public final class LevelExits {
 		server.schedule(new TickTask(server.getTickCount(), () -> {
 			if (player.isRemoved() || player.hasDisconnected() || !player.isAlive()) return;
 			if (player.level().dimension() != from) return;
-			arrival.arrive(player);
+			// The team's stretch of that level (core.trip.Expedition): whoever falls in after the first lands near them.
+			ANCHORS.put(player.getUUID(), dev.noclip.backrooms.core.trip.Expedition.zone(server, level));
+			try {
+				arrival.arrive(player);
+			} finally {
+				ANCHORS.remove(player.getUUID());
+			}
 		}));
 		return true;
 	}
@@ -113,7 +119,8 @@ public final class LevelExits {
 	 * Where a level should put a player who is arriving, as {x, z}. Through an exit it is a stretch of the level far
 	 * from the exit, so that coming back to a level is coming to a new part of it, as in 狐霖's Backrooms (docs/project/1-gameplay/README.md);
 	 * it depends only on where the exit is and where it leads, so whoever takes the same exit lands together.
-	 * Otherwise (falling in from the Overworld, commands) it is where the player stands.
+	 * Falling in from outside (core.trip.Expedition) it is the team's stretch of that level; otherwise (commands) it is
+	 * where the player stands.
 	 */
 	public static int[] anchor(ServerPlayer player) {
 		int[] at = ANCHORS.get(player.getUUID());

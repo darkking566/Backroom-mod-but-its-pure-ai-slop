@@ -1,0 +1,74 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/frontrooms/electric_fence",
+    "f": "noclip_backrooms:block/frontrooms/electric_fence"
+  },
+  "elements": [
+    {
+      "from": [
+        0.8,
+        0,
+        8
+      ],
+      "to": [
+        15.2,
+        16,
+        8
+      ],
+      "faces": {
+        "north": {
+          "texture": "#f",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#f",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        8,
+        0,
+        0.8
+      ],
+      "to": [
+        8,
+        16,
+        15.2
+      ],
+      "faces": {
+        "east": {
+          "texture": "#f",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#f",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    }
+  ],
+  "ambientocclusion": false
+}

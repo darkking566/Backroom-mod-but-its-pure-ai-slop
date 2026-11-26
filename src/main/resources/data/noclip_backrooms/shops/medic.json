@@ -1,0 +1,44 @@
+{
+  "sells": [
+    {
+      "item": "noclip_backrooms:sterile_bandage",
+      "count": 2,
+      "price": 35
+    },
+    {
+      "item": "noclip_backrooms:rough_bandage",
+      "count": 3,
+      "price": 20
+    },
+    {
+      "item": "noclip_backrooms:bandage",
+      "count": 2,
+      "price": 18
+    },
+    {
+      "item": "noclip_backrooms:improvised_calming_tea",
+      "count": 2,
+      "price": 40
+    },
+    {
+      "item": "noclip_backrooms:almond_water",
+      "count": 2,
+      "price": 36
+    },
+    {
+      "item": "noclip_backrooms:expired_painkillers",
+      "count": 2,
+      "price": 30
+    },
+    {
+      "item": "noclip_backrooms:reality_stabilizer_t1",
+      "count": 1,
+      "price": 140
+    },
+    {
+      "item": "noclip_backrooms:reality_serum_t2",
+      "count": 1,
+      "price": 360
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "side": "noclip_backrooms:block/frontrooms/institute_concrete",
+    "end": "noclip_backrooms:block/frontrooms/archive_hatch"
+  }
+}

@@ -37,7 +37,7 @@ public final class QuotaClient {
 
 	private static void hud(GuiGraphicsExtractor graphics, DeltaTracker delta) {
 		Minecraft client = Minecraft.getInstance();
-		if (!status.active() || client.player == null || client.player.level().dimension() != Level.OVERWORLD) return;
+		if (!status.active() || client.player == null || !dev.noclip.backrooms.core.Home.isHome(client.player.level().dimension())) return;
 		int x = 6, y = 6;
 		graphics.text(client.font, Component.translatable("hud.noclip_backrooms.quota.day", status.day(), QuotaMath.CYCLE_DAYS,
 				status.daysLeft()), x, y, DAY, true);

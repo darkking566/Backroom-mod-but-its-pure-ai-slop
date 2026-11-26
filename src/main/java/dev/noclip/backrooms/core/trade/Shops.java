@@ -48,7 +48,7 @@ public final class Shops {
 	private static Map<ShopRole, List<ShopOffer>> offers;
 
 	public enum Outcome {
-		DONE, NO_CREDITS, NO_GOODS, TOO_FAR, NO_SUCH_OFFER, LOCKED
+		DONE, NO_CREDITS, NO_GOODS, TOO_FAR, NO_SUCH_OFFER, LOCKED, WING_LOCKED
 	}
 
 	private Shops() {
@@ -72,6 +72,7 @@ public final class Shops {
 			if (role == ShopRole.MASTER) {
 				dev.noclip.backrooms.core.guild.Contracts.talk(serverPlayer);
 			} else {
+				if (role == ShopRole.MEDIC) Treatment.offer(serverPlayer);
 				ServerPlayNetworking.send(serverPlayer, new ShopOpenPayload(role.id(), offers(role)));
 			}
 			return InteractionResult.SUCCESS;
@@ -143,6 +144,9 @@ public final class Shops {
 		boolean near = !player.level().getEntitiesOfClass(Person.class, player.getBoundingBox().inflate(REACH),
 				p -> p.entityTags().contains(role.tag())).isEmpty();
 		if (!near) return Outcome.TOO_FAR;
+		// At the institute, the medic and the quartermaster only serve a team that has met enough quotas.
+		if (role.clearance() > 0 && player.level().dimension() == dev.noclip.backrooms.core.Home.FRONTROOMS
+				&& dev.noclip.backrooms.core.quota.Quota.clearance(player.level().getServer()) < role.clearance()) return Outcome.WING_LOCKED;
 		// A team in debt to M.E.G. finds the outpost closed, all but the buyer (selling is how the debt gets paid).
 		if (role != ShopRole.BUYER && dev.noclip.backrooms.core.quota.Quota.locked(player.level().getServer())) return Outcome.LOCKED;
 		ShopOffer offer = list.get(index);
