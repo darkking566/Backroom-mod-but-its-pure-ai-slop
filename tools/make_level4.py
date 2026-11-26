@@ -403,6 +403,10 @@ def all_textures():
     t["desk_wood"] = flat((138, 104, 70), smooth=0.28, f0=12, porosity=45)
     t["desk_phone"] = flat((44, 46, 52), smooth=0.45, f0=18, porosity=10)
     paint(t["desk_phone"], 1 - step(3, 4.5, np.hypot(X - 88, Y - 42)), (236, 48, 48), glow=0.85)
+    t["almond_bottle_body"] = flat((226, 214, 182), smooth=0.72, f0=18, porosity=5)
+    paint(t["almond_bottle_body"], box(0, 40, 128, 86, 0.5), (236, 232, 218), height=0.3, smooth=0.35)
+    paint(t["almond_bottle_body"], box(0, 48, 128, 62, 0.5), (64, 128, 176), height=0.4, smooth=0.4)
+    t["almond_bottle_cap"] = metal((176, 182, 188), 0.65)
     return t
 
 
@@ -744,6 +748,17 @@ def all_models():
             box_el(4, 11, 4, 12, 14, 11, "#phone"),
         ]
     }
+    m["almond_bottle_cluster"] = {
+        "textures": {"body": NS + "almond_bottle_body", "cap": NS + "almond_bottle_cap", "particle": NS + "almond_bottle_body"},
+        "elements": [
+            box_el(4, 0, 4, 7, 7, 7, "#body"),
+            box_el(4.7, 7, 4.7, 6.3, 8.5, 6.3, "#cap"),
+            box_el(9, 0, 5, 12, 6.5, 8, "#body"),
+            box_el(9.7, 6.5, 5.7, 11.3, 8.0, 7.3, "#cap"),
+            box_el(6, 0, 9, 9.5, 7.5, 12.5, "#body"),
+            box_el(7.0, 7.5, 10.0, 8.5, 9.0, 11.5, "#cap"),
+        ]
+    }
     return m
 
 
@@ -793,6 +808,9 @@ def all_blockstates():
     for fc in ("office_radiator_wall", "office_exit_sign", "office_vending", "omega_cot", "omega_locker",
                "omega_barricade", "tbd_curio_shelf", "tbd_hoard_crate", "office_breaker", "office_photocopier", "office_desk_phone"):
         b[fc] = facing_state(fc)
+    b["almond_bottle_cluster"] = {"variants": {"": [
+        {"model": NS + "almond_bottle_cluster", **({"y": y} if y else {})} for y in (0, 90, 180, 270)
+    ]}}
     b["office_fire_door"] = door_blockstate()
     for ex in ("office_elevator", "office_stairwell_5", "office_stairwell_6", "office_basement_71",
                "office_door_4p3", "office_door_11", "office_door_13"):
@@ -862,12 +880,13 @@ def preview(textures):
 
 
 def loot_table(name):
+    drop = "noclip_backrooms:almond_water" if name == "almond_bottle_cluster" else f"noclip_backrooms:{name}"
     return {
         "type": "minecraft:block",
         "pools": [{
             "rolls": 1.0,
             "conditions": [{"condition": "minecraft:survives_explosion"}],
-            "entries": [{"type": "minecraft:item", "name": f"noclip_backrooms:{name}"}]
+            "entries": [{"type": "minecraft:item", "name": drop}]
         }],
         "random_sequence": f"noclip_backrooms:blocks/{name}"
     }

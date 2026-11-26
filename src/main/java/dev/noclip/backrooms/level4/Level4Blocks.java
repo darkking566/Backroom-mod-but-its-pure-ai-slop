@@ -152,6 +152,8 @@ public final class Level4Blocks {
 	public static final Block OFFICE_DESK_PHONE = register("office_desk_phone", Properties.of().mapColor(MapColor.WOOD)
 			.strength(1.5F).sound(SoundType.WOOD).noOcclusion(),
 			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(1, 0, 2, 15, 14, 14)));
+	public static final Block ALMOND_BOTTLE_CLUSTER = register("almond_bottle_cluster", Properties.of().mapColor(MapColor.SAND)
+			.strength(0.2F).sound(SoundType.GLASS).noOcclusion(), AlmondBottleClusterBlock::new);
 
 	private Level4Blocks() {
 	}
@@ -187,5 +189,52 @@ public final class Level4Blocks {
 		Registry.register(BuiltInRegistries.ITEM, itemKey, new BlockItem(block, new Item.Properties().setId(itemKey).useBlockDescriptionPrefix()));
 		ALL.add(block);
 		return block;
+	}
+
+	private static final class AlmondBottleClusterBlock extends Block {
+		private static final VoxelShape SHAPE = Block.box(3, 0, 3, 13, 9, 13);
+
+		AlmondBottleClusterBlock(Properties properties) {
+			super(properties);
+		}
+
+		@Override
+		protected VoxelShape getShape(net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.BlockGetter level,
+				net.minecraft.core.BlockPos pos, net.minecraft.world.phys.shapes.CollisionContext context) {
+			return SHAPE;
+		}
+
+		@Override
+		protected net.minecraft.world.InteractionResult useWithoutItem(net.minecraft.world.level.block.state.BlockState state,
+				net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos,
+				net.minecraft.world.entity.player.Player player, net.minecraft.world.phys.BlockHitResult hit) {
+			return collect(level, pos, player);
+		}
+
+		@Override
+		protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
+				net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.Level level,
+				net.minecraft.core.BlockPos pos, net.minecraft.world.entity.player.Player player,
+				net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+			return collect(level, pos, player);
+		}
+
+		private static net.minecraft.world.InteractionResult collect(net.minecraft.world.level.Level level,
+				net.minecraft.core.BlockPos pos, net.minecraft.world.entity.player.Player player) {
+			if (!level.isClientSide() && player instanceof net.minecraft.server.level.ServerPlayer sp) {
+				var rng = level.getRandom();
+				level.setBlock(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+				var water = new net.minecraft.world.item.ItemStack(dev.noclip.backrooms.level1.Level1Items.ALMOND_WATER, 1 + rng.nextInt(2));
+				if (!sp.getInventory().add(water)) sp.drop(water, false);
+				if (rng.nextInt(100) < 35) {
+					var bottle = new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.GLASS_BOTTLE);
+					if (!sp.getInventory().add(bottle)) sp.drop(bottle, false);
+				}
+				level.playSound(null, pos, net.minecraft.sounds.SoundEvents.ITEM_PICKUP,
+						net.minecraft.sounds.SoundSource.PLAYERS, 0.85F, 1.05F);
+				sp.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("message.noclip_backrooms.level4.almond_pickup"));
+			}
+			return net.minecraft.world.InteractionResult.SUCCESS;
+		}
 	}
 }

@@ -69,6 +69,7 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			if (TestFilter.section("windows")) trapWindows(context, game, seed, arrival);
 			if (TestFilter.section("vanish")) vanishingExits(context, game, seed, arrival);
 			if (TestFilter.section("wanderers")) wanderers(context, game, seed, arrival);
+			if (TestFilter.section("extras")) extras(context, game, seed, arrival);
 			if (TestFilter.section("blocks")) checkBlocks(game);
 		}
 	}
@@ -426,6 +427,82 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		server.runCommand("gamemode spectator @a");
 	}
 
+	private static void extras(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
+		var server = game.getServer();
+		server.runCommand("gamemode survival @a");
+
+		// 1. Scattered Almond Water bottle cluster pickup
+		server.runOnServer(s -> {
+			ServerPlayer p = player(s);
+			p.getInventory().clearContent();
+			p.teleportTo(from.getX() + 0.5, STAND, from.getZ() + 0.5);
+			BlockPos clusterPos = new BlockPos(from.getX(), STAND, from.getZ() + 1);
+			level4(s).setBlock(clusterPos, Level4Blocks.ALMOND_BOTTLE_CLUSTER.defaultBlockState(), 3);
+			BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(clusterPos), Direction.NORTH, clusterPos, false);
+			p.gameMode.useItemOn(p, level4(s), ItemStack.EMPTY, InteractionHand.MAIN_HAND, hit);
+			check(level4(s).getBlockState(clusterPos).isAir(), "almond_bottle_cluster should vanish after pickup");
+			int water = 0;
+			for (int i = 0; i < p.getInventory().getContainerSize(); i++) {
+				ItemStack st = p.getInventory().getItem(i);
+				if (st.is(Level1Items.ALMOND_WATER)) water += st.getCount();
+			}
+			check(water >= 1, "expected at least 1 Almond Water from cluster, got " + water);
+		});
+
+		// 2. Client-only Smiler rumor: active on client, zero server Smiler entities
+		context.runOnClient(client -> check(Level4Client.triggerRumorForTest(client), "expected client-only rumor Smiler to spawn"));
+		context.runOnClient(client -> check(Level4Client.hasActiveRumor(), "expected active rumor Smiler on client"));
+		server.runOnServer(s -> {
+			var smilers = level4(s).getEntities(dev.noclip.backrooms.monsters.Monsters.SMILER,
+					new AABB(player(s).blockPosition()).inflate(32), e -> true);
+			check(smilers.isEmpty(), "Smiler rumor must remain 100% client-only with zero server entities");
+		});
+		context.runOnClient(Level4Client::clearForTest);
+
+		// 3. Settled at M.E.G. Base Omega -> returning from Level 2 brings player back to settled Omega Base
+		int[] omega = findZone(seed, from, ZoneKind.OMEGA_BASE);
+		check(omega != null, "no OMEGA_BASE found near arrival");
+		int[] cot = null;
+		for (int dx = -20; dx <= 20 && cot == null; dx++) {
+			for (int dz = -20; dz <= 20; dz++) {
+				if (Level4Layout.tile(seed, omega[0] + dx, omega[1] + dz).kind() == Kind.OMEGA_COT) {
+					cot = new int[] {omega[0] + dx, omega[1] + dz};
+					break;
+				}
+			}
+		}
+		check(cot != null, "no OMEGA_COT found inside Omega Base");
+		int cotX = cot[0], cotZ = cot[1];
+		BlockPos[] settledPos = new BlockPos[1];
+		server.runOnServer(s -> {
+			ServerPlayer p = player(s);
+			p.teleportTo(cotX + 1.5, STAND, cotZ + 0.5);
+		});
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(10);
+		server.runOnServer(s -> {
+			ServerPlayer p = player(s);
+			BlockPos cotPos = new BlockPos(cotX, STAND, cotZ);
+			BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(cotPos), Direction.EAST, cotPos, false);
+			p.gameMode.useItemOn(p, level4(s), ItemStack.EMPTY, InteractionHand.MAIN_HAND, hit);
+			settledPos[0] = p.blockPosition();
+		});
+
+		server.runCommand("execute in noclip_backrooms:level_2 run tp @a 2.5 33 2.5");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		server.runOnServer(s -> LevelExits.use(player(s), "4"));
+		server.waitFor(s -> player(s).level().dimension() == Level4.LEVEL_4, 100);
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		server.runOnServer(s -> {
+			BlockPos returned = player(s).blockPosition();
+			check(returned.closerThan(settledPos[0], 8.0),
+					"expected return to settled Omega Base near " + settledPos[0] + ", got " + returned);
+		});
+		server.runCommand("gamemode spectator @a");
+	}
+
 	private static void checkBlocks(TestSingleplayerContext game) {
 		game.getServer().runOnServer(s -> {
 			Language lang = Language.getInstance();
@@ -443,7 +520,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					"wanderer_tip_exits", "wanderer_tip_amor", "wanderer_tip_tbd", "wanderer_tip_barter",
 					"wanderer_barter_coin", "wanderer_barter_alloy", "wanderer_barter_paper", "wanderer_barter_done",
 					"amor_offered", "tbd_hoard_refuse",
-					"window_lure", "window_rain_lure", "window_grab", "window_touch_grab"}) {
+					"window_lure", "window_rain_lure", "window_grab", "window_touch_grab",
+					"almond_pickup", "returned_omega"}) {
 				check(lang.has("message.noclip_backrooms.level4." + msg), "missing wanderer message: " + msg);
 			}
 		});

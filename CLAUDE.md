@@ -900,3 +900,8 @@
   - `Level4Exit.java`、`Level4Plan.java`、`Level4Layout.java`、`Level4ChunkGenerator.java`：將原本貼在牆上的平面出口升級為可實際走入的 3D 結構——**電梯廂**（`ELEVATOR_3`，3×2 內凹照明電梯間）、**向上安全梯間**（`OMEGA_STAIRS_5`/`6` 與野外 `STAIRS_5`/`6`，磨製安山岩階梯往上通往出口門）與**極稀少向下地下室階梯**（`BASEMENT_71`，機率調降至 8%，石磚階梯往下沉入地下轉角），並保證同一格單元最多只放一座出口結構
   - `Level4VanishingExits.java`：改為背對超過 4 秒後有 **55% 機率** 觸發，且完全靜音、無煙霧粒子與字幕提示，連同整座樓梯／地下室階梯結構一併還原回辦公牆面與地毯
   - 更新 `Level4LayoutTest.physicalExitStructuresHaveValidFootprints` 與 `Level4ClientTest`（`views` 加拍電梯／樓梯間／地下室視角，`vanishingExits` 配合 3D 結構座標與 `setChanceForTest(100)` 驗證消失）；`.\gradlew.bat test --tests "dev.noclip.backrooms.level4.*" --no-daemon`、`.\gradlew.bat cleanTest build --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=4 --no-daemon` 全部通過（僅提交本項 Level 4 改動，未推送）
+- Level 4 還原原文第 5 項——散落杏仁水、安頓後輕鬆返回 Omega 基地與純客戶端笑魘幻影（Antigravity）：
+  - 新增 `almond_bottle_cluster`（散落的杏仁水瓶，`Level4Blocks.java`、`Level4Props.java`、`tools/make_level4.py`、`make_level4_realistic.py`）：於約 30% 開放式辦公區／套房區塊隨機散落 3D 瓶群，右鍵直接撿取 1～2 瓶杏仁水（並有機會附贈空玻璃瓶），打破亦掉落 `almond_water`
+  - `Level4Travel.java`：從其他樓層進入 Level 4 時，若玩家曾於 M.E.G. Omega 基地行軍床安頓（重生點在 `Level4.LEVEL_4`），直接傳送回已安頓基地旁並顯示提示，還原「很容易返回」
+  - `Level4Monsters.java` 調降實戰刷怪頻率並移除伺服器笑魘；新增 `src/client/java/dev/noclip/backrooms/level4/Level4Client.java`（於 `BackroomsClient.java` 註冊），於暗處以負 ID 生成 100% 純客戶端本地笑魘幻影（走近或盯視即煙散，伺服器零實體、隊友無法證實）
+  - 補齊雙語翻譯、`docs/project/5-levels/level4/README.md` 與 `Level4ClientTest.extras`（實測散落瓶群撿取、純客戶端笑魘零伺服器實體、以及於 Omega 行軍床安頓後從 Level 2 返回直接落回基地）；`.\gradlew.bat cleanTest build --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=4 --no-daemon` 全部通過（僅提交本項 Level 4 改動，未推送）

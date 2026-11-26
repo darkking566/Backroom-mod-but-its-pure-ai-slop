@@ -3,16 +3,9 @@ package dev.noclip.backrooms.level4;
 import dev.noclip.backrooms.level4.Level4Layout.Kind;
 import dev.noclip.backrooms.level4.Level4Plan.ZoneKind;
 import dev.noclip.backrooms.monsters.Monsters;
-import dev.noclip.backrooms.monsters.smiler.Smiler;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -27,15 +20,13 @@ import net.minecraft.world.phys.AABB;
 
 /**
  * Sparse Level 4 entity ecology: Wiki notes Level 4 is nearly devoid of entities, with Hounds and Dullers being
- * the only confirmed species, plus an unverified Smiler sighting rumor. Spawns are rare, banned inside M.E.G. Base
- * Omega, and strongly biased toward dark wings.
+ * the only confirmed species. Spawns are very rare, banned inside M.E.G. Base Omega, and biased toward dark wings.
+ * The unverified Smiler sighting rumor is handled 100% client-side in {@code Level4Client} so teammates cannot verify it.
  */
 final class Level4Monsters {
 	static final String TAG = "noclip_backrooms_level4_monster";
-	static final String RUMOR_SMILER_TAG = "noclip_backrooms_level4_rumor_smiler";
-	private static final int INTERVAL = 20 * 28;
-	private static final int MAX_NEAR = 2, NEAR = 56, MIN_DIST = 18, MAX_DIST = 34;
-	private static final Map<UUID, Integer> RUMOR_SMILERS = new HashMap<>();
+	private static final int INTERVAL = 20 * 45;
+	private static final int MAX_NEAR = 1, NEAR = 64, MIN_DIST = 18, MAX_DIST = 34;
 	private static int heldOffUntil;
 
 	private Level4Monsters() {
@@ -43,10 +34,7 @@ final class Level4Monsters {
 
 	static void register() {
 		ServerTickEvents.END_SERVER_TICK.register(Level4Monsters::tick);
-		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
-			RUMOR_SMILERS.clear();
-			heldOffUntil = 0;
-		});
+		ServerLifecycleEvents.SERVER_STARTED.register(server -> heldOffUntil = 0);
 	}
 
 	static void holdOff(MinecraftServer server, int ticks) {
@@ -58,10 +46,6 @@ final class Level4Monsters {
 		ServerLevel level = server.getLevel(Level4.LEVEL_4);
 		if (level == null) return;
 
-		if (now % 10 == 0 && !RUMOR_SMILERS.isEmpty()) {
-			tickRumorSmilers(level, now);
-		}
-
 		if (now % INTERVAL != 0 || now < heldOffUntil || level.getDifficulty() == Difficulty.PEACEFUL) return;
 		RandomSource rng = level.getRandom();
 		long seed = Level4ChunkGenerator.planSeed(level.getChunkSource().randomState());
@@ -72,13 +56,10 @@ final class Level4Monsters {
 			if (countNear(level, player) >= MAX_NEAR) continue;
 
 			int light = level.getBrightness(LightLayer.BLOCK, player.blockPosition());
-			int chance = light < 4 ? 24 : 7;
+			int chance = light < 4 ? 14 : 3;
 			if (rng.nextInt(100) >= chance) continue;
 
-			int roll = rng.nextInt(100);
-			if (roll < 5 && light == 0) {
-				spawnRumorSmiler(level, seed, player, now);
-			} else if (roll < 55) {
+			if (rng.nextInt(100) < 55) {
 				spawnEntity(level, seed, player, Monsters.DULLER);
 			} else {
 				spawnEntity(level, seed, player, Monsters.HOUND);
@@ -117,32 +98,5 @@ final class Level4Monsters {
 		}
 		mob.discard();
 		return null;
-	}
-
-	private static void spawnRumorSmiler(ServerLevel level, long seed, ServerPlayer player, int now) {
-		Smiler smiler = spawnEntity(level, seed, player, Monsters.SMILER);
-		if (smiler == null) return;
-		smiler.setNoAi(true);
-		smiler.addTag(RUMOR_SMILER_TAG);
-		RUMOR_SMILERS.put(smiler.getUUID(), now + 80);
-		player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.smiler_rumor"));
-	}
-
-	private static void tickRumorSmilers(ServerLevel level, int now) {
-		Iterator<Map.Entry<UUID, Integer>> it = RUMOR_SMILERS.entrySet().iterator();
-		while (it.hasNext()) {
-			Map.Entry<UUID, Integer> e = it.next();
-			Entity entity = level.getEntity(e.getKey());
-			if (entity == null || !entity.isAlive()) {
-				it.remove();
-				continue;
-			}
-			boolean approached = level.players().stream().anyMatch(p -> !p.isSpectator() && p.distanceTo(entity) < 7.0);
-			if (now >= e.getValue() || approached) {
-				level.sendParticles(ParticleTypes.SMOKE, entity.getX(), entity.getY() + 1.1, entity.getZ(), 12, 0.3, 0.5, 0.3, 0.02);
-				entity.discard();
-				it.remove();
-			}
-		}
 	}
 }

@@ -31,7 +31,7 @@ MATERIAL = [
     (("elevator", "breaker", "locker", "vending", "cooler_body", "photocopier", "hatch"), "steel"),
     (("drywall", "pillar", "radiator", "acoustic_ceiling", "ceiling_vent", "omega_wall", "omega_barricade", "almond_fountain_basin"), "concrete"),
 ]
-PLAIN = ("troffer", "window", "glass_wall", "exit_sign", "cooler_jug", "almond_liquid",
+PLAIN = ("troffer", "window", "glass_wall", "exit_sign", "cooler_jug", "almond_liquid", "almond_bottle",
          "amor_mushroom", "amor_substrate", "desk_phone", "omega_sign",
          "stairwell", "door_4p3", "door_11", "door_13", "basement_71")
 

@@ -61,25 +61,42 @@ final class Level4Props {
 		}
 
 		// Sparse abandoned office leftovers (~24% of chunks get 1 small prop or leftover desk)
-		if (roll >= 24) {
-			if (placed) chunk.markUnsaved();
-			return;
+		if (roll < 24) {
+			Block prop = pickOfficeProp(h >>> 8);
+			int startIdx = Math.floorMod((int) (h >>> 16), 196);
+			int facingBase = Math.floorMod((int) (h >>> 24), 4);
+			for (int attempt = 0; attempt < 24; attempt++) {
+				int cell = (startIdx + attempt * 13) % 196;
+				int x = minX + 1 + (cell % 14);
+				int z = minZ + 1 + (cell / 14);
+				var tile = Level4Layout.tile(seed, x, z);
+				if (tile.kind() != Kind.AIR || (tile.zone() != ZoneKind.OPEN_OFFICE && tile.zone() != ZoneKind.SUITE)) continue;
+				BlockPos pos = new BlockPos(x, Level4ChunkGenerator.FLOOR_Y + 1, z);
+				Direction facing = HORIZONTALS[(facingBase + attempt) & 3];
+				if (canPlace(chunk, minX, minZ, pos, prop, facing)) {
+					place(chunk, pos, prop, facing);
+					placed = true;
+					break;
+				}
+			}
 		}
-		Block prop = pickOfficeProp(h >>> 8);
-		int startIdx = Math.floorMod((int) (h >>> 16), 196);
-		int facingBase = Math.floorMod((int) (h >>> 24), 4);
-		for (int attempt = 0; attempt < 24; attempt++) {
-			int cell = (startIdx + attempt * 13) % 196;
-			int x = minX + 1 + (cell % 14);
-			int z = minZ + 1 + (cell / 14);
-			var tile = Level4Layout.tile(seed, x, z);
-			if (tile.kind() != Kind.AIR || (tile.zone() != ZoneKind.OPEN_OFFICE && tile.zone() != ZoneKind.SUITE)) continue;
-			BlockPos pos = new BlockPos(x, Level4ChunkGenerator.FLOOR_Y + 1, z);
-			Direction facing = HORIZONTALS[(facingBase + attempt) & 3];
-			if (canPlace(chunk, minX, minZ, pos, prop, facing)) {
-				place(chunk, pos, prop, facing);
-				placed = true;
-				break;
+
+		// Scattered Almond Water bottle clusters (~30% of chunks in open office / suites)
+		int waterRoll = Math.floorMod((int) (h >>> 32), 100);
+		if (waterRoll < 30) {
+			int wStart = Math.floorMod((int) (h >>> 40), 196);
+			for (int attempt = 0; attempt < 18; attempt++) {
+				int cell = (wStart + attempt * 17) % 196;
+				int x = minX + 1 + (cell % 14);
+				int z = minZ + 1 + (cell / 14);
+				var tile = Level4Layout.tile(seed, x, z);
+				if (tile.kind() != Kind.AIR || (tile.zone() != ZoneKind.OPEN_OFFICE && tile.zone() != ZoneKind.SUITE)) continue;
+				BlockPos pos = new BlockPos(x, Level4ChunkGenerator.FLOOR_Y + 1, z);
+				if (canPlace(chunk, minX, minZ, pos, Level4Blocks.ALMOND_BOTTLE_CLUSTER, Direction.NORTH)) {
+					chunk.setBlockState(pos, Level4Blocks.ALMOND_BOTTLE_CLUSTER.defaultBlockState(), 0);
+					placed = true;
+					break;
+				}
 			}
 		}
 		if (placed) chunk.markUnsaved();
