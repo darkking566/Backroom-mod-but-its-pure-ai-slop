@@ -495,6 +495,12 @@
   - 中途發現測試世界關掉日夜循環，主世界時鐘不動，原本「用時鐘的差」會讓倒數永遠不走：改成每一刻都算＋時鐘跳動另外加
   - 驗證：`gradlew build`、`runClientGameTest -Plevels=horror,guild,floors,0,3` 與 Level 1 的 `settlements,wikiSettlements,leaveThroughDoor` 都通過；`docs/project/1-gameplay/README.md` 把【建議】改成【已做】並寫上實際數字
 - 使用者要求推上 GitHub：抓 GitHub 合併朋友新推的 Level 3 Gamma 基地（`b729e8c9` 等 3 個）；衝突在 `Level3RestBlock`（兩邊都改成走 `Trips.settle`，只差註解，用朋友的）與 `CLAUDE.md`（兩邊紀錄都保留）；朋友新加的 `docs/levels/level3/POI.md` 與 Gamma 截圖被 git 自動放到新位置 `docs/project/5-levels/level3/`，裡面指向已併入的 `docs/HORROR_ESCAPE_PLAN.md` 的連結改成遊戲玩法章；合併後 `gradlew build` 與 `runClientGameTest -Plevels=3,horror` 通過；使用者同意後把 `main` 推送到 GitHub（企劃書整理、配額循環、合併）；沒有強制推送、沒有改寫歷史
+- 使用者和 Claude 討論整條遊戲流程後定案，寫進 `docs/project/1-gameplay/README.md` 新的「流程定案」一節（只寫企劃，程式還沒動）：
+  - 安頓撤離、綠色 EXIT 門、停車場出口門、歸鄉錨釘全部送到 M.E.G. 研究所（離出生點最近的前哨，沒生成就用找結構的方式找到再生成）
+  - 死亡：後室有安頓→據點；後室沒安頓→這一趟的落點、層數回到 1；主世界死掉（進過後室的人）→一片新的 Level 0，東西收進研究所置物櫃；沒進過後室的人照原版
+  - 多人掉進同一層同一片落點區，隊伍都出來後下次是全新的一片；沒進過後室的人不算進配額、不會被丟回去
+  - 被慢慢拉進後室的那三種機制先不加
+  - 要做：任務報告畫面、研究所跟著配額升級（第 1 期醫療室、第 3 期軍械庫、第 5 期深層派遣）、M.E.G. 無線電、個人置物櫃
 - （朋友那邊的紀錄）使用者要求先做 Gamma 基地大型結構（照 `docs/levels/level3/POI.md` 的 D 節）：
   - 新增 `level3/GammaPlan`（每 4×4 張迷宮圖一座，由種子決定）、`GammaLayout`（60×48×48 固定樣板：地下隧道 y=1、三層商場 y=9／16／23 與挑空中庭、住宅部＋檢查站 y=32、行政部 y=39；東側 12 格是存儲設施）、`GammaCheckpointBlock`（金屬探測門：身上有武器不給進，出去不檢查）；`Level3Plan` 加 `HallKind.GAMMA`（只開正門，正門前固定寬走道，那張圖的路標整張圖都指向正門），`Level3ChunkGenerator.gamma` 把樣板轉成方塊；沒有 Gamma 的圖完全不變
   - 新方塊 `daylight_panel`（模擬日光）、`checkpoint_door`（`tools/make_level3_gamma.py`）；12 個人形各在位置上只生一次（`Level3Bases.populateGamma`），新角色梅森（`ShopRole.MASON`、`shops/mason.json`，賣防毒面具與杏仁水）；溫泉每秒回 1.5 理智；打 Gamma 的人會被狙擊；行軍床改用 `Trips.settle`（可撤離）；原本的 `BASE` 大廳改稱「外圍哨站」；Gamma 裡攝影機濾鏡較亮（`Look.Mood.GAMMA`）
