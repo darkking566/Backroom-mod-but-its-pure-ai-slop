@@ -133,25 +133,68 @@ public final class Level4ClientTest implements FabricClientGameTest {
 
 	private static void factions(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
 		var server = game.getServer();
-		int[] amor = findZone(seed, from, ZoneKind.AMOR_CAMP);
-		check(amor != null, "no Amor Incrementum camp found");
+		// 1. M.E.G. Base Omega: 10 personnel, >= 4 active guards that fight monsters
+		int[] omega = findZone(seed, from, ZoneKind.OMEGA_BASE);
+		check(omega != null, "no M.E.G. Base Omega found");
 		server.runCommand("gamemode survival @a");
-		server.runOnServer(s -> player(s).teleportTo(amor[0] + 0.5, STAND, amor[1] + 0.5));
+		server.runOnServer(s -> player(s).teleportTo(omega[0] + 0.5, STAND, omega[1] + 0.5));
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(20);
-		server.runOnServer(s -> Level4Bases.populateNear(level4(s), seed, player(s)));
-		// Without religious relic, player takes damage from cultists within ~3 seconds
+		server.runOnServer(s -> {
+			ServerPlayer p = player(s);
+			Level4Bases.populateNear(level4(s), seed, p);
+			var staff = level4(s).getEntitiesOfClass(Person.class, new AABB(p.blockPosition()).inflate(28),
+					e -> e.entityTags().contains(Level4Bases.STAFF_TAG));
+			check(staff.size() == 10, "expected 10 Omega personnel, got " + staff.size());
+			var guards = level4(s).getEntitiesOfClass(Person.class, new AABB(p.blockPosition()).inflate(28),
+					e -> e.entityTags().contains(Level4Bases.OMEGA_GUARD_TAG));
+			check(guards.size() >= 4, "expected >= 4 Omega guards, got " + guards.size());
+			Person guard = guards.getFirst();
+			var hound = dev.noclip.backrooms.monsters.Monsters.HOUND.create(level4(s), net.minecraft.world.entity.EntitySpawnReason.NATURAL);
+			check(hound != null, "failed to create test hound");
+			hound.snapTo(guard.getX() + 3.0, STAND, guard.getZ(), 0, 0);
+			hound.addTag("noclip_backrooms_level4_guard_test_hound");
+			level4(s).addFreshEntity(hound);
+		});
+		context.waitTicks(60);
+		server.runOnServer(s -> {
+			var hounds = level4(s).getEntities(dev.noclip.backrooms.monsters.Monsters.HOUND,
+					new AABB(player(s).blockPosition()).inflate(32),
+					e -> e.entityTags().contains("noclip_backrooms_level4_guard_test_hound"));
+			boolean damagedOrDead = hounds.isEmpty() || hounds.getFirst().getHealth() < hounds.getFirst().getMaxHealth();
+			check(damagedOrDead, "Omega guard did not engage nearby monster");
+			hounds.forEach(net.minecraft.world.entity.Entity::discard);
+		});
+
+		// 2. Amor Incrementum: 10 fightable members, hostile without relic, trade + direct relic offering
+		int[] amor = findZone(seed, from, ZoneKind.AMOR_CAMP);
+		check(amor != null, "no Amor Incrementum camp found");
+		server.runOnServer(s -> {
+			ServerPlayer p = player(s);
+			p.setHealth(p.getMaxHealth());
+			p.teleportTo(amor[0] + 0.5, STAND, amor[1] + 0.5);
+		});
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(20);
+		server.runOnServer(s -> {
+			ServerPlayer p = player(s);
+			Level4Bases.populateNear(level4(s), seed, p);
+			var cultists = level4(s).getEntitiesOfClass(Person.class, new AABB(p.blockPosition()).inflate(18),
+					e -> e.entityTags().contains(Level4Bases.AMOR_TAG));
+			check(cultists.size() == 10, "expected 10 Amor members, got " + cultists.size());
+			check(!cultists.getFirst().isInvulnerable(), "Amor members should be fightable");
+		});
 		float beforeHp = server.computeOnServer(s -> player(s).getHealth());
 		context.waitTicks(65);
 		float afterHp = server.computeOnServer(s -> player(s).getHealth());
 		check(afterHp < beforeHp, "Amor Incrementum did not attack outsider without religious relic");
 
-		// Holding Brass Crucifix pacifies them and allows trade
 		server.runOnServer(s -> {
 			ServerPlayer p = player(s);
+			p.getInventory().clearContent();
 			p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Level4Items.BRASS_CRUCIFIX));
 			p.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Economy.LOST_COIN, 2));
-			var cultists = level4(s).getEntitiesOfClass(Person.class, new AABB(p.blockPosition()).inflate(10),
+			var cultists = level4(s).getEntitiesOfClass(Person.class, new AABB(p.blockPosition()).inflate(18),
 					e -> e.entityTags().contains(Level4Bases.AMOR_TAG));
 			check(!cultists.isEmpty(), "expected Amor cultist nearby");
 			var res = net.fabricmc.fabric.api.event.player.UseEntityCallback.EVENT.invoker()
@@ -162,6 +205,47 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		server.runOnServer(s -> {
 			ServerPlayer p = player(s);
 			check(p.getOffhandItem().getCount() == 1, "expected Amor trade to consume 1 lost_coin");
+			p.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
+			p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Level4Items.FADED_ICON_FRAME));
+			var cultists = level4(s).getEntitiesOfClass(Person.class, new AABB(p.blockPosition()).inflate(18),
+					e -> e.entityTags().contains(Level4Bases.AMOR_TAG));
+			var offerRes = net.fabricmc.fabric.api.event.player.UseEntityCallback.EVENT.invoker()
+					.interact(p, level4(s), InteractionHand.MAIN_HAND, cultists.getFirst(), null);
+			check(offerRes == net.minecraft.world.InteractionResult.SUCCESS, "expected direct relic offer to succeed");
+			check(!p.getMainHandItem().is(Level4Items.FADED_ICON_FRAME), "expected direct relic offer to consume faded_icon_frame");
+		});
+
+		// 3. T.B.D.: 6 members, refuse hoard crate, only sell useless curios
+		int[] tbd = findZone(seed, from, ZoneKind.TBD_ROOM);
+		check(tbd != null, "no T.B.D. room found");
+		server.runOnServer(s -> player(s).teleportTo(tbd[0] + 0.5, STAND, tbd[1] + 0.5));
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(20);
+		server.runOnServer(s -> {
+			ServerPlayer p = player(s);
+			Level4Bases.populateNear(level4(s), seed, p);
+			var members = level4(s).getEntitiesOfClass(Person.class, new AABB(p.blockPosition()).inflate(18),
+					e -> e.entityTags().contains(Level4Bases.TBD_TAG));
+			check(members.size() == 6, "expected 6 T.B.D. members, got " + members.size());
+			int[] crate = findKind(seed, p.blockPosition(), Kind.TBD_HOARD);
+			check(crate != null, "expected T.B.D. hoard crate");
+			BlockPos cratePos = new BlockPos(crate[0], STAND, crate[1]);
+			BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(cratePos), Direction.SOUTH, cratePos, false);
+			var crateRes = p.gameMode.useItemOn(p, level4(s), ItemStack.EMPTY, InteractionHand.MAIN_HAND, hit);
+			check(crateRes == net.minecraft.world.InteractionResult.SUCCESS, "expected hoard crate interact");
+
+			p.getInventory().clearContent();
+			p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Economy.LOST_COIN, 2));
+			var buyRes = net.fabricmc.fabric.api.event.player.UseEntityCallback.EVENT.invoker()
+					.interact(p, level4(s), InteractionHand.MAIN_HAND, members.getFirst(), null);
+			check(buyRes == net.minecraft.world.InteractionResult.SUCCESS, "expected T.B.D. trade to succeed");
+			check(p.getMainHandItem().getCount() == 1, "expected T.B.D. trade to consume 1 lost_coin");
+			boolean gotCurio = false;
+			for (int i = 0; i < p.getInventory().getContainerSize(); i++) {
+				ItemStack st = p.getInventory().getItem(i);
+				if (!st.isEmpty() && Level4Items.CURIOS.contains(st.getItem())) gotCurio = true;
+			}
+			check(gotCurio, "expected T.B.D. to sell only useless curios");
 		});
 		server.runCommand("gamemode spectator @a");
 	}
@@ -299,7 +383,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			}
 			for (String msg : new String[] {"wanderer_tip_omega", "wanderer_tip_atrium", "wanderer_tip_windows",
 					"wanderer_tip_exits", "wanderer_tip_amor", "wanderer_tip_tbd", "wanderer_tip_barter",
-					"wanderer_barter_coin", "wanderer_barter_alloy", "wanderer_barter_paper", "wanderer_barter_done"}) {
+					"wanderer_barter_coin", "wanderer_barter_alloy", "wanderer_barter_paper", "wanderer_barter_done",
+					"amor_offered", "tbd_hoard_refuse"}) {
 				check(lang.has("message.noclip_backrooms.level4." + msg), "missing wanderer message: " + msg);
 			}
 		});

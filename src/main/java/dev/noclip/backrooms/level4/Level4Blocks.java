@@ -108,8 +108,28 @@ public final class Level4Blocks {
 			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(0, 0, 2, 16, 14, 14)));
 	public static final Block AMOR_PLANTER = register("amor_planter", Properties.of().mapColor(MapColor.WOOD)
 			.strength(1.5F).sound(SoundType.WOOD).noOcclusion(), Block::new);
+	public static final Block AMOR_PLANTER_L1 = register("amor_planter_l1", Properties.of().mapColor(MapColor.WOOD)
+			.strength(1.5F).sound(SoundType.WOOD).noOcclusion(), Block::new);
 	public static final Block AMOR_MUSHROOM = register("amor_mushroom", Properties.of().mapColor(MapColor.COLOR_YELLOW)
 			.strength(0.2F).sound(SoundType.FUNGUS).noCollision().noOcclusion().lightLevel(s -> 5),
+			p -> new Block(p) {
+				@Override
+				protected VoxelShape getShape(net.minecraft.world.level.block.state.BlockState s, net.minecraft.world.level.BlockGetter l,
+						net.minecraft.core.BlockPos pos, net.minecraft.world.phys.shapes.CollisionContext ctx) {
+					return MUSHROOM_SHAPE;
+				}
+			});
+	public static final Block AMOR_MUSHROOM_MOSS = register("amor_mushroom_moss", Properties.of().mapColor(MapColor.COLOR_CYAN)
+			.strength(0.2F).sound(SoundType.FUNGUS).noCollision().noOcclusion().lightLevel(s -> 4),
+			p -> new Block(p) {
+				@Override
+				protected VoxelShape getShape(net.minecraft.world.level.block.state.BlockState s, net.minecraft.world.level.BlockGetter l,
+						net.minecraft.core.BlockPos pos, net.minecraft.world.phys.shapes.CollisionContext ctx) {
+					return MUSHROOM_SHAPE;
+				}
+			});
+	public static final Block AMOR_MUSHROOM_VEIL = register("amor_mushroom_veil", Properties.of().mapColor(MapColor.COLOR_PURPLE)
+			.strength(0.2F).sound(SoundType.FUNGUS).noCollision().noOcclusion().lightLevel(s -> 6),
 			p -> new Block(p) {
 				@Override
 				protected VoxelShape getShape(net.minecraft.world.level.block.state.BlockState s, net.minecraft.world.level.BlockGetter l,
@@ -120,6 +140,9 @@ public final class Level4Blocks {
 	public static final Block TBD_CURIO_SHELF = register("tbd_curio_shelf", Properties.of().mapColor(MapColor.WOOD)
 			.strength(2.0F).sound(SoundType.WOOD).noOcclusion(),
 			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(1, 0, 3, 15, 16, 13)));
+	public static final Block TBD_HOARD_CRATE = register("tbd_hoard_crate", Properties.of().mapColor(MapColor.WOOD)
+			.strength(2.5F).sound(SoundType.WOOD).noOcclusion(),
+			p -> new Level4FacingBlock(p, Level4FacingBlock.full()));
 	public static final Block OFFICE_BREAKER = register("office_breaker", Properties.of().mapColor(MapColor.METAL)
 			.strength(2.5F).sound(SoundType.METAL).noOcclusion(),
 			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(2, 2, 12, 14, 14, 16)));

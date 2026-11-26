@@ -27,7 +27,7 @@ S = 512
 MATERIAL = [
     (("carpet",), "carpet"),
     (("cot",), "fabric"),
-    (("desk_wood", "fire_door", "tbd_shelf", "amor_planter"), "wood"),
+    (("desk_wood", "fire_door", "tbd_shelf", "tbd_hoard", "amor_planter"), "wood"),
     (("elevator", "breaker", "locker", "vending", "cooler_body", "photocopier", "hatch"), "steel"),
     (("drywall", "pillar", "radiator", "acoustic_ceiling", "ceiling_vent", "omega_wall", "omega_barricade", "almond_fountain_basin"), "concrete"),
 ]

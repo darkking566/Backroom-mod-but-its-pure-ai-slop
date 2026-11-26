@@ -211,8 +211,8 @@ final class Level4Events {
 		int rx0 = Math.floorDiv(x, Level4Plan.SIZE), rz0 = Math.floorDiv(z, Level4Plan.SIZE);
 		int[] best = null;
 		double bestDist = Double.MAX_VALUE;
-		for (int dx = -2; dx <= 2; dx++) {
-			for (int dz = -2; dz <= 2; dz++) {
+		for (int dx = -3; dx <= 3; dx++) {
+			for (int dz = -3; dz <= 3; dz++) {
 				Level4Plan plan = Level4Plan.of(seed, rx0 + dx, rz0 + dz);
 				for (RoomBox room : plan.rooms) {
 					if (room.kind() != ZoneKind.OMEGA_BASE) continue;

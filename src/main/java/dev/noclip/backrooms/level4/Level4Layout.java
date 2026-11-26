@@ -40,7 +40,10 @@ final class Level4Layout {
 		OMEGA_LOCKER,
 		OMEGA_BARRICADE,
 		AMOR_PLANTER,
+		AMOR_PLANTER_L1,
+		AMOR_PLANTER_VEIL,
 		TBD_SHELF,
+		TBD_HOARD,
 		BREAKER,
 		PHOTOCOPIER,
 		DESK_PHONE
@@ -231,33 +234,68 @@ final class Level4Layout {
 		}
 
 		if (zone == ZoneKind.OMEGA_BASE && room != null) {
-			if (i == room.i() && j == room.j() + 1 && cx == 2 && (cz == 2 || cz == 4)) {
+			int i0 = room.i(), j0 = room.j(), i1 = i0 + room.w() - 1, j1 = j0 + room.h() - 1;
+			// 4 checkpoint gate barricades inside cardinal doorways
+			if (i == room.cx() && j == j0 && cz == 2 && (cx == 2 || cx == 4)) {
+				return new Tile(Kind.OMEGA_BARRICADE, zone, Level4Plan.NORTH, ceilH, null, false);
+			}
+			if (i == room.cx() && j == j1 && cz == 4 && (cx == 2 || cx == 4)) {
+				return new Tile(Kind.OMEGA_BARRICADE, zone, Level4Plan.SOUTH, ceilH, null, false);
+			}
+			if (i == i0 && j == room.cz() && cx == 2 && (cz == 2 || cz == 4)) {
+				return new Tile(Kind.OMEGA_BARRICADE, zone, Level4Plan.WEST, ceilH, null, false);
+			}
+			if (i == i1 && j == room.cz() && cx == 4 && (cz == 2 || cz == 4)) {
+				return new Tile(Kind.OMEGA_BARRICADE, zone, Level4Plan.EAST, ceilH, null, false);
+			}
+			// West barracks (6 squad cots)
+			if (i == i0 && j >= j0 + 1 && j <= j0 + 3 && cx == 2 && (cz == 2 || cz == 4)) {
 				return new Tile(Kind.OMEGA_COT, zone, Level4Plan.EAST, ceilH, null, false);
 			}
-			if (i == room.i() + 2 && j == room.j() + 1 && cx == 5 && (cz == 2 || cz == 4)) {
+			// South medical bay (2 medical cots + water cooler)
+			if (j == j1 && (i == i0 + 1 || i == i0 + 3) && cx == 3 && cz == 4) {
+				return new Tile(Kind.OMEGA_COT, zone, Level4Plan.NORTH, ceilH, null, false);
+			}
+			if (j == j1 && i == i0 + 1 && cx == 5 && cz == 4) {
+				return new Tile(Kind.WATER_COOLER, zone, Level4Plan.NORTH, ceilH, null, false);
+			}
+			// East armory & supply wing (6 supply lockers)
+			if (i == i1 && j >= j0 + 1 && j <= j0 + 3 && cx == 5 && (cz == 2 || cz == 4)) {
 				return new Tile(Kind.OMEGA_LOCKER, zone, Level4Plan.WEST, ceilH, null, false);
 			}
-			if (i == room.cx() && j == room.cz() && cx == 2 && cz == 2) {
-				return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
-			}
-			if (i == room.cx() && j == room.cz() && cx == 5 && cz == 2) {
-				return new Tile(Kind.VENDING, zone, Level4Plan.WEST, ceilH, null, false);
-			}
-			// Protective barricades just inside the north/south Omega doorways
-			if (i == room.cx() && j == room.j() && cz == 2 && (cx == 2 || cx == 4)) {
-				return new Tile(Kind.OMEGA_BARRICADE, zone, Level4Plan.NORTH, ceilH, null, false);
+			// Central command & hub
+			if (i == room.cx() && j == room.cz()) {
+				if (cx == 2 && cz == 2) return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
+				if (cx == 5 && cz == 2) return new Tile(Kind.VENDING, zone, Level4Plan.WEST, ceilH, null, false);
+				if (cx == 2 && cz == 5) return new Tile(Kind.DESK_PHONE, zone, Level4Plan.NORTH, ceilH, null, false);
+				if (cx == 5 && cz == 5) return new Tile(Kind.VENDING, zone, Level4Plan.WEST, ceilH, null, false);
 			}
 		}
 
 		if (zone == ZoneKind.AMOR_CAMP && room != null) {
-			if (cx == 2 && cz == 2 || cx == 5 && cz == 5) {
-				return new Tile(Kind.AMOR_PLANTER, zone, Level4Plan.NORTH, ceilH, null, false);
+			if (i == room.cx() && j == room.cz()) {
+				if (cx == 3 && cz == 3) {
+					return new Tile(Kind.AMOR_PLANTER_VEIL, zone, Level4Plan.NORTH, ceilH, null, false);
+				}
+			} else if ((cx == 2 && cz == 2) || (cx == 5 && cz == 5)) {
+				int mod = Math.floorMod(i + j, 3);
+				Kind planter = switch (mod) {
+					case 1 -> Kind.AMOR_PLANTER_L1;
+					case 2 -> Kind.AMOR_PLANTER_VEIL;
+					default -> Kind.AMOR_PLANTER;
+				};
+				return new Tile(planter, zone, Level4Plan.NORTH, ceilH, null, false);
 			}
 		}
 
 		if (zone == ZoneKind.TBD_ROOM && room != null) {
-			if ((cx == 2 || cx == 5) && cz == 2) {
+			int i0 = room.i(), j0 = room.j();
+			if (cx == 3 && cz == 2 && ((i == i0 && j == j0) || (i == i0 + 1 && j == j0 + 1) || (i == i0 && j == j0 + 2))) {
 				return new Tile(Kind.TBD_SHELF, zone, Level4Plan.SOUTH, ceilH, null, false);
+			}
+			if ((cx == 1 || cx == 5) && (cz == 1 || cz == 5)) {
+				int dir = cx == 1 ? Level4Plan.EAST : Level4Plan.WEST;
+				return new Tile(Kind.TBD_HOARD, zone, dir, ceilH, null, false);
 			}
 		}
 

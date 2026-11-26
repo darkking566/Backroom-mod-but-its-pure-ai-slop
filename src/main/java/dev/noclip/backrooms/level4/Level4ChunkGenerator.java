@@ -83,7 +83,8 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 		if (!tile.walkable() && tile.kind() != Kind.PILLAR && tile.kind() != Kind.GLASS_WALL && tile.kind() != Kind.FOUNTAIN_POOL
 				&& tile.kind() != Kind.FOUNTAIN_BASIN && tile.kind() != Kind.WATER_COOLER && tile.kind() != Kind.VENDING
 				&& tile.kind() != Kind.OMEGA_COT && tile.kind() != Kind.OMEGA_LOCKER && tile.kind() != Kind.OMEGA_BARRICADE
-				&& tile.kind() != Kind.AMOR_PLANTER && tile.kind() != Kind.TBD_SHELF && tile.kind() != Kind.BREAKER
+				&& tile.kind() != Kind.AMOR_PLANTER && tile.kind() != Kind.AMOR_PLANTER_L1 && tile.kind() != Kind.AMOR_PLANTER_VEIL
+				&& tile.kind() != Kind.TBD_SHELF && tile.kind() != Kind.TBD_HOARD && tile.kind() != Kind.BREAKER
 				&& tile.kind() != Kind.PHOTOCOPIER && tile.kind() != Kind.DESK_PHONE) {
 			return Level4Blocks.OFFICE_ACOUSTIC_CEILING.defaultBlockState();
 		}
@@ -179,8 +180,21 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 				if (h == 2) yield Level4Blocks.AMOR_MUSHROOM.defaultBlockState();
 				yield Blocks.AIR.defaultBlockState();
 			}
+			case AMOR_PLANTER_L1 -> {
+				if (h == 1) yield Level4Blocks.AMOR_PLANTER_L1.defaultBlockState();
+				if (h == 2) yield Level4Blocks.AMOR_MUSHROOM_MOSS.defaultBlockState();
+				yield Blocks.AIR.defaultBlockState();
+			}
+			case AMOR_PLANTER_VEIL -> {
+				if (h == 1) yield Level4Blocks.AMOR_PLANTER.defaultBlockState();
+				if (h == 2) yield Level4Blocks.AMOR_MUSHROOM_VEIL.defaultBlockState();
+				yield Blocks.AIR.defaultBlockState();
+			}
 			case TBD_SHELF -> h == 1
 					? Level4Blocks.TBD_CURIO_SHELF.defaultBlockState().setValue(Level4FacingBlock.FACING, dir)
+					: Blocks.AIR.defaultBlockState();
+			case TBD_HOARD -> (h == 1 || h == 2)
+					? Level4Blocks.TBD_HOARD_CRATE.defaultBlockState().setValue(Level4FacingBlock.FACING, dir)
 					: Blocks.AIR.defaultBlockState();
 			case BREAKER -> h == 2
 					? Level4Blocks.OFFICE_BREAKER.defaultBlockState().setValue(Level4FacingBlock.FACING, dir)

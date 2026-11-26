@@ -42,19 +42,22 @@ final class Level4Props {
 		boolean placed = false;
 
 		// Place workstations inside Omega Base if this chunk overlaps its center
-		for (int x = minX + 2; x <= minX + 13; x += 3) {
-			for (int z = minZ + 2; z <= minZ + 13; z += 3) {
+		int benchesPlaced = 0;
+		for (int x = minX + 2; x <= minX + 13; x += 4) {
+			for (int z = minZ + 2; z <= minZ + 13; z += 4) {
 				var tile = Level4Layout.tile(seed, x, z);
 				if (tile.zone() == ZoneKind.OMEGA_BASE && tile.kind() == Kind.AIR) {
+					Block bench = benchesPlaced == 0 ? BackroomsProps.SALVAGE_BENCH : BackroomsProps.WORKSHOP_BENCH;
 					BlockPos pos = new BlockPos(x, Level4ChunkGenerator.FLOOR_Y + 1, z);
-					if (canPlace(chunk, minX, minZ, pos, BackroomsProps.SALVAGE_BENCH, Direction.SOUTH)) {
-						place(chunk, pos, BackroomsProps.SALVAGE_BENCH, Direction.SOUTH);
+					if (canPlace(chunk, minX, minZ, pos, bench, Direction.SOUTH)) {
+						place(chunk, pos, bench, Direction.SOUTH);
 						placed = true;
-						break;
+						benchesPlaced++;
+						if (benchesPlaced >= 2) break;
 					}
 				}
 			}
-			if (placed) break;
+			if (benchesPlaced >= 2) break;
 		}
 
 		// Sparse abandoned office leftovers (~24% of chunks get 1 small prop or leftover desk)

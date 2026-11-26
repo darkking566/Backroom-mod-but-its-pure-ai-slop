@@ -365,9 +365,22 @@ def all_textures():
     t["amor_planter_side"] = flat((116, 94, 68), smooth=0.16, f0=10, porosity=80)
     t["amor_substrate"] = flat((162, 146, 84), smooth=0.08, f0=8, porosity=200)
     paint(t["amor_substrate"], step(0.1, 0.7, clouds(4420, 5)), (96, 88, 64), height=0.5)
+    t["amor_substrate_l1"] = l1.concrete((122, 126, 128), 4421, smooth=0.12, porosity=120)
+    paint(t["amor_substrate_l1"], step(0.18, 0.72, clouds(4422, 5)), (86, 118, 108), height=0.4)
     t["tbd_shelf"] = flat((122, 92, 62), smooth=0.24, f0=10, porosity=60)
     paint(t["tbd_shelf"], box(12, 18, 52, 54, 0.5), (178, 138, 72), height=0.8)
     paint(t["tbd_shelf"], box(68, 22, 112, 54, 0.5), (72, 126, 134), height=0.8)
+    t["tbd_hoard_side"] = flat((112, 84, 56), smooth=0.18, f0=10, porosity=70)
+    paint(t["tbd_hoard_side"], box(0, 0, 128, 14, 0.5), (84, 60, 38), height=0.8)
+    paint(t["tbd_hoard_side"], box(0, 114, 128, 128, 0.5), (84, 60, 38), height=0.8)
+    paint(t["tbd_hoard_side"], box(14, 58, 114, 70, 0.5), (92, 68, 44), height=0.5)
+    t["tbd_hoard_front"] = flat((96, 72, 48), smooth=0.18, f0=10, porosity=70)
+    paint(t["tbd_hoard_front"], box(8, 8, 120, 120, 0.5), (62, 48, 34), height=-0.8)
+    paint(t["tbd_hoard_front"], box(18, 72, 42, 112, 0.5), (218, 212, 178), height=0.7, smooth=0.65)
+    paint(t["tbd_hoard_front"], box(48, 76, 74, 112, 0.5), (168, 62, 54), height=0.7, smooth=0.5)
+    paint(t["tbd_hoard_front"], box(80, 68, 108, 112, 0.5), (82, 132, 168), height=0.7, smooth=0.6)
+    paint(t["tbd_hoard_front"], box(22, 22, 62, 58, 0.5), (146, 152, 158), height=0.7, smooth=0.5)
+    paint(t["tbd_hoard_front"], box(70, 26, 108, 58, 0.5), (186, 156, 86), height=0.7, smooth=0.45)
 
     t["office_breaker"] = metal((144, 148, 152), 0.45)
     paint(t["office_breaker"], box(20, 16, 108, 112, 0.5), (118, 124, 128), height=0.8)
@@ -413,6 +426,36 @@ def save_cutout_glass():
     for suf in ("_n", "_s"):
         (TEXTURES / f"amor_mushroom_tmp{suf}.png").replace(TEXTURES / f"amor_mushroom{suf}.png")
     (TEXTURES / "amor_mushroom_tmp.png").unlink(missing_ok=True)
+
+    # Level 1 concrete wall-moss fungus (cutout RGBA)
+    moss = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
+    dm = ImageDraw.Draw(moss)
+    for sx, h, r in [(30, 36, 14), (56, 54, 20), (84, 46, 17), (104, 32, 12)]:
+        dm.rectangle([sx - 3, SIZE - h, sx + 3, SIZE - 1], fill=(154, 178, 172, 255))
+        dm.ellipse([sx - r, SIZE - h - r // 2, sx + r, SIZE - h + r // 2], fill=(92, 178, 158, 255))
+        dm.ellipse([sx - r // 2, SIZE - h - r // 3, sx + r // 2, SIZE - h + r // 4], fill=(144, 218, 198, 255))
+    moss.save(TEXTURES / "amor_mushroom_moss.png", optimize=True)
+    mm = flat((92, 178, 158), smooth=0.30, f0=12, porosity=70)
+    mm.glow[:] = 0.28
+    mt.save("amor_mushroom_moss_tmp", mm)
+    for suf in ("_n", "_s"):
+        (TEXTURES / f"amor_mushroom_moss_tmp{suf}.png").replace(TEXTURES / f"amor_mushroom_moss{suf}.png")
+    (TEXTURES / "amor_mushroom_moss_tmp.png").unlink(missing_ok=True)
+
+    # Level 0 wallpaper veil fungus (cutout RGBA)
+    veil = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
+    dv = ImageDraw.Draw(veil)
+    for sx, h, r in [(38, 60, 18), (68, 78, 24), (96, 52, 16)]:
+        dv.rectangle([sx - 3, SIZE - h, sx + 3, SIZE - 1], fill=(224, 214, 232, 255))
+        dv.ellipse([sx - r, SIZE - h - r // 2, sx + r, SIZE - h + r // 2], fill=(176, 134, 208, 255))
+        dv.ellipse([sx - r // 2, SIZE - h - r // 3, sx + r // 2, SIZE - h + r // 4], fill=(232, 212, 246, 255))
+    veil.save(TEXTURES / "amor_mushroom_veil.png", optimize=True)
+    mv = flat((176, 134, 208), smooth=0.40, f0=14, porosity=40)
+    mv.glow[:] = 0.45
+    mt.save("amor_mushroom_veil_tmp", mv)
+    for suf in ("_n", "_s"):
+        (TEXTURES / f"amor_mushroom_veil_tmp{suf}.png").replace(TEXTURES / f"amor_mushroom_veil{suf}.png")
+    (TEXTURES / "amor_mushroom_veil_tmp.png").unlink(missing_ok=True)
 
 
 def save_flicker_troffer():
@@ -647,10 +690,30 @@ def all_models():
             }
         }]
     }
+    m["amor_planter_l1"] = {
+        "textures": {"side": NS + "amor_planter_side", "top": NS + "amor_substrate_l1", "particle": NS + "amor_substrate_l1"},
+        "elements": [{
+            "from": [0, 0, 0], "to": [16, 16, 16],
+            "faces": {
+                "up": {"uv": [0, 0, 16, 16], "texture": "#top"},
+                "down": {"uv": [0, 0, 16, 16], "texture": "#side"},
+                "north": {"uv": [0, 0, 16, 16], "texture": "#side"},
+                "south": {"uv": [0, 0, 16, 16], "texture": "#side"},
+                "east": {"uv": [0, 0, 16, 16], "texture": "#side"},
+                "west": {"uv": [0, 0, 16, 16], "texture": "#side"},
+            }
+        }]
+    }
     m["amor_mushroom"] = {"parent": "minecraft:block/cross", "textures": {"cross": NS + "amor_mushroom"}}
+    m["amor_mushroom_moss"] = {"parent": "minecraft:block/cross", "textures": {"cross": NS + "amor_mushroom_moss"}}
+    m["amor_mushroom_veil"] = {"parent": "minecraft:block/cross", "textures": {"cross": NS + "amor_mushroom_veil"}}
     m["tbd_curio_shelf"] = {
         "textures": {"tex": NS + "tbd_shelf", "particle": NS + "tbd_shelf"},
         "elements": [box_el(1, 0, 3, 15, 16, 13, "#tex")]
+    }
+    m["tbd_hoard_crate"] = {
+        "textures": {"front": NS + "tbd_hoard_front", "side": NS + "tbd_hoard_side", "particle": NS + "tbd_hoard_side"},
+        "elements": [box_el(0, 0, 0, 16, 16, 16, "#side", front="north", front_tex="#front")]
     }
     m["office_breaker"] = {
         "textures": {"front": NS + "office_breaker", "side": NS + "omega_wall", "particle": NS + "office_breaker"},
@@ -711,12 +774,13 @@ def all_blockstates():
     ]}}
     for c in ("office_damp_carpet", "office_pillar", "office_pillar_upper", "office_ceiling_vent", "office_blacked_window",
               "office_trap_window", "office_rain_window", "office_glass_wall", "omega_wall",
-              "omega_sign", "almond_fountain_basin", "amor_planter", "amor_mushroom", "office_hatch_2"):
+              "omega_sign", "almond_fountain_basin", "amor_planter", "amor_planter_l1",
+              "amor_mushroom", "amor_mushroom_moss", "amor_mushroom_veil", "office_hatch_2"):
         b[c] = simple(c)
     for ax in ("office_troffer_lit", "office_troffer_dim", "office_troffer_flicker", "office_troffer_broken"):
         b[ax] = axis_state(ax)
     for fc in ("office_radiator_wall", "office_exit_sign", "office_vending", "omega_cot", "omega_locker",
-               "omega_barricade", "tbd_curio_shelf", "office_breaker", "office_photocopier", "office_desk_phone"):
+               "omega_barricade", "tbd_curio_shelf", "tbd_hoard_crate", "office_breaker", "office_photocopier", "office_desk_phone"):
         b[fc] = facing_state(fc)
     b["office_fire_door"] = door_blockstate()
     for ex in ("office_elevator", "office_stairwell_5", "office_stairwell_6", "office_basement_71",
@@ -740,7 +804,7 @@ NO_LOOT = {
     "office_door_4p3", "office_door_11", "office_door_13", "office_hatch_2",
     "office_blacked_window", "office_trap_window", "office_rain_window",
     "omega_wall", "omega_sign", "almond_fountain_basin", "almond_fountain_pool",
-    "amor_mushroom"
+    "amor_mushroom", "amor_mushroom_moss", "amor_mushroom_veil"
 }
 
 

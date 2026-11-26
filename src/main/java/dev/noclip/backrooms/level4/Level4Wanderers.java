@@ -153,6 +153,9 @@ final class Level4Wanderers {
 			if (!sp.getAbilities().instabuild) held.shrink(1);
 			giveItem(sp, new ItemStack(Level1Items.ALMOND_WATER));
 			giveItem(sp, new ItemStack(Items.GLASS_BOTTLE));
+			if (sp.level().getRandom().nextInt(100) < 12) {
+				giveItem(sp, new ItemStack(Level4Items.FADED_ICON_FRAME));
+			}
 			sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.wanderer_barter_coin"));
 		} else if (held.is(Level1Items.ALLOY)) {
 			if (!sp.getAbilities().instabuild) held.shrink(1);

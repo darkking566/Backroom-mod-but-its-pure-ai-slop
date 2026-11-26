@@ -100,4 +100,53 @@ final class Level4LayoutTest {
 		assertTrue(!Level4Wanderers.isWanderZone(ZoneKind.DARK_WING));
 		assertTrue(!Level4Wanderers.isWanderZone(ZoneKind.SOLID_CORE));
 	}
+
+	@Test
+	void factionSizesAndDistinctFixturesMatchWiki() {
+		boolean omegaOk = false, amorOk = false, tbdOk = false;
+		Set<Kind> amorKinds = EnumSet.noneOf(Kind.class);
+		Set<Kind> tbdKinds = EnumSet.noneOf(Kind.class);
+		for (long seed = 10; seed <= 16; seed++) {
+			for (int rx = -2; rx <= 2; rx++) {
+				for (int rz = -2; rz <= 2; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					for (Level4Plan.RoomBox room : plan.rooms) {
+						int x0 = rx * Level4Plan.SIZE + room.i() * Level4Plan.CELL;
+						int z0 = rz * Level4Plan.SIZE + room.j() * Level4Plan.CELL;
+						int x1 = x0 + room.w() * Level4Plan.CELL;
+						int z1 = z0 + room.h() * Level4Plan.CELL;
+						if (room.kind() == ZoneKind.OMEGA_BASE) {
+							assertEquals(5, room.w());
+							assertEquals(5, room.h());
+							omegaOk = true;
+						} else if (room.kind() == ZoneKind.AMOR_CAMP) {
+							assertEquals(3, room.w());
+							assertEquals(3, room.h());
+							for (int x = x0; x < x1; x++) {
+								for (int z = z0; z < z1; z++) {
+									amorKinds.add(Level4Layout.tile(seed, x, z).kind());
+								}
+							}
+							amorOk = true;
+						} else if (room.kind() == ZoneKind.TBD_ROOM) {
+							assertEquals(2, room.w());
+							assertEquals(3, room.h());
+							for (int x = x0; x < x1; x++) {
+								for (int z = z0; z < z1; z++) {
+									tbdKinds.add(Level4Layout.tile(seed, x, z).kind());
+								}
+							}
+							tbdOk = true;
+						}
+					}
+				}
+			}
+		}
+		assertTrue(omegaOk && amorOk && tbdOk);
+		assertTrue(amorKinds.contains(Kind.AMOR_PLANTER));
+		assertTrue(amorKinds.contains(Kind.AMOR_PLANTER_L1));
+		assertTrue(amorKinds.contains(Kind.AMOR_PLANTER_VEIL));
+		assertTrue(tbdKinds.contains(Kind.TBD_SHELF));
+		assertTrue(tbdKinds.contains(Kind.TBD_HOARD));
+	}
 }

@@ -17,7 +17,7 @@ final class Level4Plan {
 	static final int NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3;
 	static final int[] DX = {0, 1, 0, -1}, DZ = {-1, 0, 1, 0};
 	private static final int PLAN_SALT = 401, EDGE_SALT = 402, OMEGA_SALT = 409;
-	private static final int OMEGA_SPREAD = 2;
+	private static final int OMEGA_SPREAD = 3;
 	private static final ConcurrentHashMap<Key, Level4Plan> CACHE = new ConcurrentHashMap<>();
 
 	enum ZoneKind {
@@ -84,10 +84,10 @@ final class Level4Plan {
 		Arrays.fill(edges, Edge.OPEN);
 
 		this.hasOmega = isOmegaRegion(seed, rx, rz);
-		boolean omegaPlaced = hasOmega && placeBox(rng, 3, 3, ZoneKind.OMEGA_BASE, 5, 5);
+		boolean omegaPlaced = hasOmega && placeBox(rng, 5, 5, ZoneKind.OMEGA_BASE, 5, 5);
 		this.hasAtrium = rng.nextInt(100) < 55 && placeBox(rng, 3, 3, ZoneKind.ATRIUM, -1, -1);
-		this.hasAmor = !hasOmega && rng.nextInt(100) < 34 && placeBox(rng, 2, 2, ZoneKind.AMOR_CAMP, -1, -1);
-		this.hasTbd = rng.nextInt(100) < 34 && placeBox(rng, 2, 2, ZoneKind.TBD_ROOM, -1, -1);
+		this.hasAmor = !hasOmega && rng.nextInt(100) < 24 && placeBox(rng, 3, 3, ZoneKind.AMOR_CAMP, -1, -1);
+		this.hasTbd = rng.nextInt(100) < 28 && placeBox(rng, 2, 3, ZoneKind.TBD_ROOM, -1, -1);
 		if (rng.nextInt(100) < 42) placeBox(rng, 3, 3, ZoneKind.DARK_WING, -1, -1);
 
 		// Add 1..2 structural solid cores inside the open office for elevators, exits, and window walls
