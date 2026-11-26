@@ -394,6 +394,18 @@ public final class Level3ClientTest implements FabricClientGameTest {
 			use(level, player(s), detector);
 			check(player(s).getZ() < z0 + 9, "let through with a sword");
 		});
+		// Nor hidden in a bundle, or in a bundle in a shulker box.
+		for (String hidden : new String[] {
+				"minecraft:bundle[minecraft:bundle_contents=[{id:'minecraft:iron_sword'}]]",
+				"minecraft:shulker_box[minecraft:container=[{slot:0,item:{id:'minecraft:bundle',components:{'minecraft:bundle_contents':[{id:'minecraft:iron_sword'}]}}}]]"}) {
+			server.runCommand("clear @a");
+			server.runCommand("give @a " + hidden);
+			server.runOnServer(s -> {
+				check(!player(s).getInventory().isEmpty(), "nothing given: " + hidden);
+				use(level3(s), player(s), detector);
+				check(player(s).getZ() < z0 + 9, "let through with " + hidden);
+			});
+		}
 		server.runCommand("clear @a");
 		server.runOnServer(s -> {
 			use(level3(s), player(s), detector);
@@ -430,6 +442,23 @@ public final class Level3ClientTest implements FabricClientGameTest {
 			}
 			check(level.getEntitiesOfClass(Person.class, box, p -> ShopRole.of(p) == ShopRole.MASON).size() == 1, "no Mason");
 		});
+
+		// The sniper: swing at anyone of Gamma and you are shot (resistance, or the shot would kill the test player).
+		server.runCommand("gamemode survival @a");
+		server.runCommand("effect give @a minecraft:resistance 10 3");
+		context.waitTicks(10);
+		server.runOnServer(s -> {
+			ServerLevel level = level3(s);
+			AABB box = new AABB(x0, 0, z0, x0 + GammaLayout.W, Level3ChunkGenerator.HEIGHT, z0 + GammaLayout.D);
+			Person person = level.getEntitiesOfClass(Person.class, box,
+					p -> p.entityTags().stream().anyMatch(tag -> tag.startsWith("noclip_backrooms_gamma_"))).getFirst();
+			float health = player(s).getHealth();
+			var result = net.fabricmc.fabric.api.event.player.AttackEntityCallback.EVENT.invoker()
+					.interact(player(s), level, net.minecraft.world.InteractionHand.MAIN_HAND, person, null);
+			check(result == net.minecraft.world.InteractionResult.FAIL, "the attack went through");
+			check(player(s).getHealth() < health, "no sniper shot");
+		});
+		server.runCommand("effect clear @a");
 
 		// Settling in a room: a cot sets the respawn and offers the way home.
 		int[] cot = find(GammaLayout.Thing.COT);

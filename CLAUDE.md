@@ -515,6 +515,7 @@
   - `HorrorClientTest` 加：同一層換床不再給經驗、背包只剩 1 格空間時 Shift 點成品不拿也不扣材料（先把修正拿掉跑過，確認測試會失敗）；`gradlew build` 與 `runClientGameTest -Plevels=horror` 通過
   - 沒驗證：真的重開世界後重生（自動測試沒辦法重開同一個世界），只靠讀程式判斷舊身體記得死的維度
 - 使用者同意後，把 `main` 推送到 GitHub（審查三項修正 `1cd12754`）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- 修 Gamma 探測門漏洞：武器藏在收納袋或界伏盒（含巢狀）裡也會被擋；`gamma` 實機測試段加藏武器兩例與狙擊手（打 Gamma 的人會中槍）；拿掉修正跑過一次確認會失敗，修好後 `gradlew build runClientGameTest -Plevels=3 -Psections=gamma` 通過。注意：狙擊傷害 14 大於現在的血量 10，一槍就死（沒改）
 
 ## 動作記錄（Antigravity）
 
