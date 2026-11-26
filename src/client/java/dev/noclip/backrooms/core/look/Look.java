@@ -101,7 +101,7 @@ public final class Look {
 	/** Whether the filter shows now: on, in a Backrooms level, and looking through the player's own eyes. */
 	public static boolean active(Minecraft client) {
 		return enabled && client.level != null && client.player != null && client.getCameraEntity() == client.player
-				&& client.level.dimension().identifier().getNamespace().equals(BackroomsMod.MOD_ID);
+				&& dev.noclip.backrooms.core.Home.inBackrooms(client.level.dimension());
 	}
 
 	/** Called with the fog the game worked out for this frame: in the Backrooms, through the camera, it turns black and close. */

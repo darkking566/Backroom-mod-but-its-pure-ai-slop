@@ -54,6 +54,17 @@ public final class BackroomsMod implements ModInitializer {
 		Contracts.register();
 		SurvivalXp.register();
 		dev.noclip.backrooms.core.quota.Quota.register();
+		dev.noclip.backrooms.core.locker.Lockers.register();
+		dev.noclip.backrooms.core.trip.Expedition.register();
+		dev.noclip.backrooms.core.trip.Extraction.register();
+		dev.noclip.backrooms.core.trip.Report.register();
+		dev.noclip.backrooms.core.trip.Anomalies.register();
+		dev.noclip.backrooms.core.field.FieldKit.register();
+		dev.noclip.backrooms.core.locker.Processing.register();
+		dev.noclip.backrooms.core.radio.Radio.register();
+		dev.noclip.backrooms.core.trade.Treatment.register();
+		dev.noclip.backrooms.core.guild.GuildRemoval.register();
+		dev.noclip.backrooms.frontrooms.Frontrooms.register();
 		Level0.register();
 		Level0p1.register();
 		Level1.register();

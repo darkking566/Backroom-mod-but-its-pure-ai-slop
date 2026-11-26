@@ -110,7 +110,7 @@ public final class Pull {
 
 	/** Current rejection stage (0..4) in the Overworld; 0 outside the Overworld. */
 	public static int stage(ServerPlayer player) {
-		if (player.level().dimension() != Level.OVERWORLD) return 0;
+		if (!dev.noclip.backrooms.core.Home.isHome(player.level().dimension()) || !dev.noclip.backrooms.core.Home.entered(player)) return 0;
 		return of(player).stage();
 	}
 
@@ -204,7 +204,7 @@ public final class Pull {
 
 		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 			PullState state = of(player);
-			if (player.level().dimension() != Level.OVERWORLD) {
+			if (!dev.noclip.backrooms.core.Home.isHome(player.level().dimension()) || !dev.noclip.backrooms.core.Home.entered(player)) {
 				// Inside the Backrooms: rejection eases off gradually and Overworld HP penalty clears
 				if (state.pull() > 0.0F) {
 					set(player, state.withPull(Math.max(0.0F, state.pull() - 0.5F)));
@@ -271,7 +271,7 @@ public final class Pull {
 	private static void syncHealthPenalty(ServerPlayer player, PullState state) {
 		AttributeInstance maxHp = player.getAttribute(Attributes.MAX_HEALTH);
 		if (maxHp == null) return;
-		boolean penalize = player.level().dimension() == Level.OVERWORLD
+		boolean penalize = dev.noclip.backrooms.core.Home.isHome(player.level().dimension())
 				&& !player.isCreative() && !player.isSpectator()
 				&& state.stage() >= 4;
 		if (penalize) {

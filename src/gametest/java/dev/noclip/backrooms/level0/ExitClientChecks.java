@@ -82,15 +82,21 @@ final class ExitClientChecks {
 			context.getInput().lookAt(yaw, lowerHalf ? 62 : 5);
 			context.waitTicks(3);
 			context.getInput().pressMouse(1);
-			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
+			// The door calls M.E.G. for a pickup (core.trip.Extraction); it arrives at once here, and takes the player to the
+			// institute in the Frontrooms, whatever their spawn point.
+			server.waitFor(s -> dev.noclip.backrooms.core.trip.Extraction.running(player(s)), 40);
+			server.runCommand("execute as @a run backrooms extract now");
+			server.waitFor(s -> player(s).level().dimension() == dev.noclip.backrooms.core.Home.FRONTROOMS, 200);
 
 			// Long enough to notice being dropped straight back in by Noclip.
 			context.waitTicks(60);
+			context.runOnClient(client -> client.gui.setScreen(null));
 			server.runOnServer(s -> {
 				ServerPlayer player = player(s);
-				check(player.level().dimension() == Level.OVERWORLD, "bounced back into Level 0");
+				check(player.level().dimension() == dev.noclip.backrooms.core.Home.FRONTROOMS, "bounced back into Level 0");
 				check(!player.isInWall(), "arrived inside a block");
-				if (ownSpawn) check(player.blockPosition().closerThan(new BlockPos(40, -60, 40), 4), "ignored the player's spawn point: " + player.position());
+				check(player.position().distanceTo(dev.noclip.backrooms.frontrooms.Institute.arrival()) < 4,
+						"not taken to the institute: " + player.position());
 				check(player.getHealth() == player.getMaxHealth(), "hurt on the way out");
 				check(player.getInventory().getItem(0).is(Items.COBBLESTONE) && player.getInventory().getItem(0).getCount() == 5,
 						"held item used or lost");

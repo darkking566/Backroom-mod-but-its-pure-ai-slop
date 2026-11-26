@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "noclip_backrooms:block/frontrooms/warning_sign"
+    },
+    "facing=east": {
+      "model": "noclip_backrooms:block/frontrooms/warning_sign",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "noclip_backrooms:block/frontrooms/warning_sign",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "noclip_backrooms:block/frontrooms/warning_sign",
+      "y": 270
+    }
+  }
+}

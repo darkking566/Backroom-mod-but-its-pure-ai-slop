@@ -12,6 +12,23 @@
     {"item": "noclip_backrooms:phosphor_flare", "count": 4, "price": 30},
     {"item": "noclip_backrooms:lockpick_set", "count": 1, "price": 45},
     {"item": "noclip_backrooms:improvised_crowbar", "count": 1, "price": 60},
-    {"item": "minecraft:sand", "count": 8, "price": 4}
+    {"item": "minecraft:sand", "count": 8, "price": 4},
+    {"item": "minecraft:coal", "count": 8, "price": 16},
+    {"item": "minecraft:iron_ingot", "count": 4, "price": 40},
+    {"item": "minecraft:copper_ingot", "count": 8, "price": 28},
+    {"item": "minecraft:redstone", "count": 8, "price": 30},
+    {"item": "minecraft:glass", "count": 8, "price": 12},
+    {"item": "minecraft:string", "count": 8, "price": 10},
+    {"item": "minecraft:wheat_seeds", "count": 8, "price": 4},
+    {"item": "minecraft:oak_sapling", "count": 4, "price": 6},
+    {"item": "noclip_backrooms:meg_radio", "count": 1, "price": 60},
+    {"item": "noclip_backrooms:chalk", "count": 1, "price": 10},
+    {"item": "noclip_backrooms:glow_stick", "count": 4, "price": 20},
+    {"item": "noclip_backrooms:guide_line", "count": 1, "price": 40},
+    {"item": "noclip_backrooms:barricade_planks", "count": 4, "price": 30},
+    {"item": "noclip_backrooms:tripwire_alarm", "count": 2, "price": 30},
+    {"item": "noclip_backrooms:emergency_lamp", "count": 1, "price": 35},
+    {"item": "noclip_backrooms:meg_camera", "count": 1, "price": 120},
+    {"item": "noclip_backrooms:mapping_beacon", "count": 1, "price": 150}
   ]
 }

@@ -8,6 +8,10 @@ import dev.noclip.backrooms.core.rpg.PlayerRpg;
 import dev.noclip.backrooms.core.trip.Pull;
 import dev.noclip.backrooms.core.trip.PullState;
 import dev.noclip.backrooms.core.trip.Trips;
+import dev.noclip.backrooms.core.Home;
+import dev.noclip.backrooms.core.trip.Extraction;
+import dev.noclip.backrooms.core.trip.MissionReportScreen;
+import dev.noclip.backrooms.frontrooms.Institute;
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.people.Person;
 import dev.noclip.backrooms.core.quota.Quota;
@@ -58,8 +62,10 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			server.runCommand("gamemode survival @a");
 			server.runCommand("effect give @a resistance infinite 4 true");
 
-			// 1. Half health everywhere; levels add to it.
-			check(maxHealth(server) == 10.0F, "Overworld max health is not 10: " + maxHealth(server));
+			// 1. Someone who has never been in plays the Overworld as it is; from the first fall on, half health
+			//    everywhere; levels add to it.
+			check(maxHealth(server) == 20.0F, "a newcomer's max health is not 20: " + maxHealth(server));
+			check(!QuotaClient.status().active(), "a newcomer sees the M.E.G. cycle");
 			float home = regen(context, server);
 			check(home >= 1.5F, "eating well healed only " + home + " in 10 seconds at home");
 			toLevel0(server);
@@ -102,6 +108,8 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			die(context, server);
 			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 200);
 			check(server.computeOnServer(s -> Floors.of(player(s)).floor()) == 1, "waking up lost is not a new trip at floor 1");
+			check(server.computeOnServer(s -> player(s).blockPosition().closerThan(new BlockPos(3, STAND_Y, 3), 3)),
+					"waking up lost is not where this trip came in: " + server.computeOnServer(s -> player(s).blockPosition()));
 			check(server.computeOnServer(s -> player(s).getInventory().getItem(0).isEmpty()), "the player kept their things after dying");
 			check(server.computeOnServer(s -> !Quota.data(s).active()), "waking up in the Overworld after dying counted as getting out");
 			server.runCommand("effect give @a resistance infinite 4 true");
@@ -122,13 +130,47 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			server.runCommand("effect give @a resistance infinite 4 true");
 			int levelBefore = server.computeOnServer(s -> PlayerRpg.get(player(s)).level());
 			int xpBefore = server.computeOnServer(s -> PlayerRpg.get(player(s)).xp());
-			check(server.computeOnServer(s -> Trips.extract(player(s))), "M.E.G. would not take a settled player home from their base");
-			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
+			check(server.computeOnServer(s -> Trips.extract(player(s))), "no pickup for a settled player at their base");
+			// The pickup takes holding out (core.trip.Extraction); wandering off calls it off.
+			check(server.computeOnServer(s -> Extraction.running(player(s))), "calling for a pickup did not start the countdown");
+			check(server.computeOnServer(s -> Extraction.seconds(1)) == 30 && server.computeOnServer(s -> Extraction.seconds(9)) == 60,
+					"the countdown is not 30 to 60 seconds");
+			context.waitTicks(40);
+			context.takeScreenshot("horror_extraction_countdown");
+			server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + (base.getX() + 20) + " " + STAND_Y + " " + base.getZ());
+			server.waitFor(s -> !Extraction.running(player(s)), 40);
+			server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + base.getX() + " " + STAND_Y + " " + base.getZ());
+			check(server.computeOnServer(s -> Trips.extract(player(s))), "no second pickup call");
+			server.runCommand("execute as @a run backrooms extract now");
+			server.waitFor(s -> player(s).level().dimension() == Home.FRONTROOMS, 200);
+			check(server.computeOnServer(s -> player(s).position().distanceTo(Institute.arrival()) < 3), "not brought to the institute's lobby");
+			// The mission report, then the day in yellow.
+			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
+			context.waitTicks(10);
+			context.takeScreenshot("horror_mission_report");
+			context.runOnClient(client -> client.gui.screen().onClose());
+			context.waitTicks(15);
+			context.takeScreenshot("horror_back_at_the_institute");
+			check(server.computeOnServer(s -> dev.noclip.backrooms.core.radio.Radio.carries(player(s))), "M.E.G. issued no radio");
 			check(server.computeOnServer(s -> !Trips.settled(player(s))), "home, the player still wakes up in the Backrooms");
 			check(server.computeOnServer(s -> Floors.of(player(s)).floor()) == 0, "the trip did not end at home");
 			check(server.computeOnServer(s -> Quota.data(s).active()), "getting out did not start the M.E.G. cycle");
 			check(server.computeOnServer(s -> PlayerRpg.get(player(s)).level()) > levelBefore
 					|| server.computeOnServer(s -> PlayerRpg.get(player(s)).xp()) > xpBefore, "no experience for getting out alive");
+
+			// 5b. Dying outside the Backrooms once in: M.E.G. keeps what was carried in the locker; back into Level 0.
+			server.runCommand("effect give @a resistance infinite 4 true");
+			server.runCommand("item replace entity @a hotbar.1 with minecraft:compass 1");
+			die(context, server);
+			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 200);
+			check(server.computeOnServer(s -> dev.noclip.backrooms.core.locker.Lockers.count(player(s), Items.COMPASS)) == 1,
+					"what the player carried is not in their locker");
+			check(server.computeOnServer(s -> dev.noclip.backrooms.core.trip.Expedition.open(s, "0")), "no team stretch of Level 0 opened");
+			server.runCommand("effect give @a resistance infinite 4 true");
+			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 120 0");
+			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
+			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
+			context.runOnClient(client -> client.gui.screen().onClose());
 
 			// 6. The M.E.G. cycle (docs/project/1-gameplay/README.md): day 1 on getting out, the clock runs only at home,
 			//    a night slept through counts, the rejection follows the days, a serum only holds it back, selling to the
@@ -149,6 +191,8 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			check(server.computeOnServer(s -> Quota.data(s).homeTicks()) <= inside + 2, "time in the Backrooms counted");
 			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 120 0");
 			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
+			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
+			context.runOnClient(client -> client.gui.screen().onClose());
 			context.waitTicks(5);
 			long clockBefore = server.computeOnServer(s -> s.overworld().getOverworldClockTime());
 			server.runCommand("time add 24000");
@@ -211,6 +255,8 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			// Paying the debt from the account, two credits a point, opens the outpost again.
 			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 120 0");
 			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
+			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
+			context.runOnClient(client -> client.gui.screen().onClose());
 			long debt = server.computeOnServer(s -> Quota.data(s).debt());
 			server.runOnServer(s -> Wallet.set(player(s), debt * QuotaMath.CREDITS_PER_DEBT_POINT));
 			check(server.computeOnServer(s -> Quota.payDebt(player(s))), "could not pay the debt from the account");
@@ -230,6 +276,8 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			check(server.computeOnServer(s -> player(s).getAttached(Contracts.ACTIVE).reached()), "reaching Level 1 did not count");
 			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 120 0");
 			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
+			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
+			context.runOnClient(client -> client.gui.screen().onClose());
 			// An M.E.G. order: its value goes into the quota (what does not fit is paid out), half of it again as a bonus.
 			long reward = Contracts.Contract.SURVEY.reward;
 			long expected = credits + reward / 2 + Math.max(0, reward - room);

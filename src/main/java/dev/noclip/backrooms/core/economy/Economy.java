@@ -24,6 +24,8 @@ public final class Economy {
 	public static final Item STATIC_TAPE = register("static_tape", p -> new CoinItem(p.stacksTo(16), 40));
 	/** What M.E.G.'s missing squad left behind: found in crates, handed in at the outpost (core.quota). */
 	public static final Item MEG_SQUAD_REPORT = register("meg_squad_report", p -> new Item(p.stacksTo(16)));
+	/** M.E.G.'s walkie-talkie: carried into the Backrooms, it picks up the broadcasts (core.radio.Radio). */
+	public static final Item MEG_RADIO = register("meg_radio", p -> new Item(p.stacksTo(1)));
 
 	private Economy() {
 	}
@@ -35,6 +37,7 @@ public final class Economy {
 			output.accept(LOST_COIN);
 			output.accept(STATIC_TAPE);
 			output.accept(MEG_SQUAD_REPORT);
+			output.accept(MEG_RADIO);
 		});
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(
 				Commands.literal("backrooms")

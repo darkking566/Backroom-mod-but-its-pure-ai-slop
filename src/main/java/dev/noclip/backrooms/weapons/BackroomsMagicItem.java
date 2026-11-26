@@ -68,6 +68,11 @@ public final class BackroomsMagicItem extends Item {
 	}
 
 	private final int tier;
+
+	/** The weapon's tier (1-4), for the horror balance (core.combat.WeaponBalance). */
+	public int tier() {
+		return tier;
+	}
 	private final Spell spell;
 	private final String costItemId;
 	private final int cooldownTicks;

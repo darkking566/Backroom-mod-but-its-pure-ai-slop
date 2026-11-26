@@ -16,8 +16,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * A heavy push-bar door in the corridors. Until Level 2 exists it leads home, like the Level 0 exits:
- * to the player's respawn point, alive and with their items.
+ * A heavy push-bar door in the corridors: a way out M.E.G. watches. Using it calls them for a pickup (hold out beside
+ * it), and they take the player to the institute in the Frontrooms, alive and with their items.
  */
 final class Level1DoorBlock extends AxisPlacedBlock {
 	Level1DoorBlock(Properties properties) {
@@ -41,19 +41,7 @@ final class Level1DoorBlock extends AxisPlacedBlock {
 		// A double click queues this twice.
 		if (player.level().dimension() != Level1.LEVEL_1) return;
 
-		// false: do not spend a respawn anchor charge.
-		TeleportTransition destination = player.findRespawnPositionAndUseSpawnBlock(false, TeleportTransition.PLAY_PORTAL_SOUND);
-		var target = destination.newLevel().dimension();
-		if (target == Level0.LEVEL_0) {
-			// A spawn point in Level 0 would make the way out lead straight back in. One in Level 1 is a settlement
-			// someone chose to call home, so the door takes them there.
-			ServerLevel overworld = player.level().getServer().overworld();
-			Vec3 spawn = Vec3.atBottomCenterOf(player.adjustSpawnLocation(overworld, overworld.getRespawnData().pos()));
-			destination = new TeleportTransition(overworld, spawn, Vec3.ZERO, 0, 0, TeleportTransition.PLAY_PORTAL_SOUND);
-		}
-
-		player.stopRiding();
-		player.resetFallDistance();
-		player.teleport(destination);
+		// A pickup point, like every way out M.E.G. knows of (core.trip.Extraction): hold out here, then the institute.
+		dev.noclip.backrooms.core.trip.Extraction.start(player, player.position(), 6.0);
 	}
 }

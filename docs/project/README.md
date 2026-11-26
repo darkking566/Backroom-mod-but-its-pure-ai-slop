@@ -9,7 +9,7 @@
 
 | 章 | 內容 |
 | --- | --- |
-| [1 遊戲玩法](1-gameplay/README.md) | 故事背景、核心循環、時間與配額、層數與難度、死亡、安頓與撤離、主世界前哨、經濟與任務；附件 [outpost.md](1-gameplay/outpost.md)（前哨建築與商人） |
+| [1 遊戲玩法](1-gameplay/README.md) | 故事背景、核心循環、獨立維度「前室」科技研究所、後室創新玩法、時間與配額、層數與難度、死亡、撤離接應、經濟與雙結局；附件 [outpost.md](1-gameplay/outpost.md)（舊石造公會遷移參考與商店規格） |
 | [2 玩家能力值](2-player/README.md) | 血量、飽食、理智、四項能力值、等級與經驗、幻覺、介面、之後的隱藏能力值與流派 |
 | [3 合成](3-crafting/README.md) | 工作站、全部資源、工具、武器、裝備怎麼做；[全部配方與物品索引](3-crafting/recipes.md)、[合成網狀圖](3-crafting/recipe-graph.svg) |
 | [4 怪物](4-monsters/README.md) | 已做的 18 種怪物的數值、行為、出沒、掉落；[規劃中的怪物、Boss、寶箱](4-monsters/planned.md) |

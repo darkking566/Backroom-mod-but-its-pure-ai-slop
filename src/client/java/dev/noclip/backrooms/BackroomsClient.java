@@ -80,6 +80,8 @@ public final class BackroomsClient implements ClientModInitializer {
 		RpgClient.register();
 		PullClient.register();
 		dev.noclip.backrooms.core.quota.QuotaClient.register();
+		dev.noclip.backrooms.core.trip.MissionReportScreen.register();
+		dev.noclip.backrooms.core.trip.AnomalyClient.register();
 		for (StationType station : StationType.values()) {
 			MenuScreens.register(BackroomsCrafting.menuType(station), BackroomsStationScreen::new);
 		}

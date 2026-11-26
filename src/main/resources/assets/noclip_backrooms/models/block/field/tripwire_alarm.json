@@ -1,0 +1,42 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "noclip_backrooms:block/field/tripwire_alarm",
+    "a": "noclip_backrooms:block/field/tripwire_alarm"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        7.9
+      ],
+      "to": [
+        16,
+        16,
+        8.1
+      ],
+      "faces": {
+        "north": {
+          "texture": "#a",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#a",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

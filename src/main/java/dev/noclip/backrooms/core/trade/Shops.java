@@ -48,7 +48,7 @@ public final class Shops {
 	private static Map<ShopRole, List<ShopOffer>> offers;
 
 	public enum Outcome {
-		DONE, NO_CREDITS, NO_GOODS, TOO_FAR, NO_SUCH_OFFER, LOCKED
+		DONE, NO_CREDITS, NO_GOODS, TOO_FAR, NO_SUCH_OFFER, LOCKED, WING_LOCKED
 	}
 
 	private Shops() {
@@ -72,6 +72,7 @@ public final class Shops {
 			if (role == ShopRole.MASTER) {
 				dev.noclip.backrooms.core.guild.Contracts.talk(serverPlayer);
 			} else {
+				if (role == ShopRole.MEDIC) Treatment.offer(serverPlayer);
 				ServerPlayNetworking.send(serverPlayer, new ShopOpenPayload(role.id(), offers(role)));
 			}
 			return InteractionResult.SUCCESS;
@@ -143,11 +144,33 @@ public final class Shops {
 		boolean near = !player.level().getEntitiesOfClass(Person.class, player.getBoundingBox().inflate(REACH),
 				p -> p.entityTags().contains(role.tag())).isEmpty();
 		if (!near) return Outcome.TOO_FAR;
+		// At the institute, the medic and the quartermaster only serve a team that has met enough quotas.
+		if (role.clearance() > 0 && player.level().dimension() == dev.noclip.backrooms.core.Home.FRONTROOMS
+				&& dev.noclip.backrooms.core.quota.Quota.clearance(player.level().getServer()) < role.clearance()) return Outcome.WING_LOCKED;
 		// A team in debt to M.E.G. finds the outpost closed, all but the buyer (selling is how the debt gets paid).
 		if (role != ShopRole.BUYER && dev.noclip.backrooms.core.quota.Quota.locked(player.level().getServer())) return Outcome.LOCKED;
 		ShopOffer offer = list.get(index);
 		Inventory inventory = player.getInventory();
 		long price = (long) offer.price() * times;
+		if (offer.fromPlayer() && dev.noclip.backrooms.core.field.Evidence.valued(offer.goods().getItem())) {
+			// Photos and tapes: each is worth what is in it (core.field.Evidence).
+			long total = 0;
+			int sold = 0;
+			for (int n = 0; n < times; n++) {
+				int slot = -1;
+				for (int i = 0; i < inventory.getContainerSize() && slot < 0; i++) if (inventory.getItem(i).is(offer.goods().getItem())) slot = i;
+				if (slot < 0) break;
+				ItemStack stack = inventory.getItem(slot).copy();
+				inventory.removeItem(slot, 1);
+				total += dev.noclip.backrooms.core.field.Evidence.value(player.level().getServer(), stack);
+				dev.noclip.backrooms.core.field.Evidence.sold(player.level().getServer(), player, stack);
+				sold++;
+			}
+			if (sold == 0) return Outcome.NO_GOODS;
+			long credits = dev.noclip.backrooms.core.quota.Quota.onSold(player, offer.goods().getItem(), sold, total);
+			if (credits > 0) Wallet.add(player, credits);
+			return Outcome.DONE;
+		}
 		if (offer.fromPlayer()) {
 			int needed = offer.goods().getCount() * times;
 			if (count(inventory, offer.goods()) < needed) return Outcome.NO_GOODS;

@@ -38,10 +38,12 @@ public final class QuotaData extends SavedData {
 	int lastDay;
 	/** Levels the team has been to: M.E.G. can send them straight there, for a price. */
 	final Set<String> visited = new HashSet<>();
+	/** Levels the team has mapped with a beacon (core.field.Evidence): M.E.G. sends people there for nothing. */
+	final Set<String> mapped = new HashSet<>();
 
 	private record Saved(boolean active, int cycle, int paid, long homeTicks, long required, long delivered, long debt, int team,
 			List<String> seen, Map<String, Integer> items, Map<String, Integer> handed, long redeployAt, int lastDay,
-			List<String> visited) {
+			List<String> visited, List<String> mapped) {
 	}
 
 	private static final Codec<Saved> SAVED = RecordCodecBuilder.create(i -> i.group(
@@ -58,7 +60,8 @@ public final class QuotaData extends SavedData {
 			Codec.unboundedMap(Codec.STRING, Codec.INT).optionalFieldOf("handed", Map.of()).forGetter(Saved::handed),
 			Codec.LONG.optionalFieldOf("redeploy_at", -1L).forGetter(Saved::redeployAt),
 			Codec.INT.optionalFieldOf("last_day", 0).forGetter(Saved::lastDay),
-			Codec.STRING.listOf().optionalFieldOf("visited", List.of()).forGetter(Saved::visited)).apply(i, Saved::new));
+			Codec.STRING.listOf().optionalFieldOf("visited", List.of()).forGetter(Saved::visited),
+			Codec.STRING.listOf().optionalFieldOf("mapped", List.of()).forGetter(Saved::mapped)).apply(i, Saved::new));
 
 	private static final Codec<QuotaData> CODEC = SAVED.xmap(QuotaData::fromSaved, QuotaData::toSaved);
 
@@ -88,12 +91,22 @@ public final class QuotaData extends SavedData {
 		d.redeployAt = s.redeployAt;
 		d.lastDay = s.lastDay;
 		d.visited.addAll(s.visited);
+		d.mapped.addAll(s.mapped);
 		return d;
 	}
 
 	private Saved toSaved() {
 		return new Saved(active, cycle, paid, homeTicks, required, delivered, debt, team, new ArrayList<>(seen), new LinkedHashMap<>(items),
-				new LinkedHashMap<>(handed), redeployAt, lastDay, new ArrayList<>(visited));
+				new LinkedHashMap<>(handed), redeployAt, lastDay, new ArrayList<>(visited), new ArrayList<>(mapped));
+	}
+
+	public boolean mapped(String level) {
+		return mapped.contains(level);
+	}
+
+	/** A level mapped with a beacon: from now on M.E.G. sends people there for nothing. */
+	public void map(String level) {
+		if (mapped.add(level)) setDirty();
 	}
 
 	void changed() {
@@ -114,6 +127,11 @@ public final class QuotaData extends SavedData {
 		long missing = 0;
 		for (var e : items.entrySet()) missing += Math.max(0, e.getValue() - handed.getOrDefault(e.getKey(), 0));
 		return missing * QuotaMath.MISSING_ITEM_POINTS;
+	}
+
+	/** How many quotas the team has met: the institute's clearance. */
+	public int paid() {
+		return paid;
 	}
 
 	public boolean active() {

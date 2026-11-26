@@ -4,7 +4,8 @@
 	"package": "dev.noclip.backrooms.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"FoodDataBackroomsRegen"
+		"FoodDataBackroomsRegen",
+		"LivingEntityWeaponBalance"
 	],
 	"injectors": {
 		"defaultRequire": 1

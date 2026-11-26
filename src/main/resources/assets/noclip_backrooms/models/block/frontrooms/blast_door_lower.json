@@ -1,0 +1,78 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "noclip_backrooms:block/frontrooms/blast_door_lower",
+    "d": "noclip_backrooms:block/frontrooms/blast_door_lower",
+    "e": "noclip_backrooms:block/frontrooms/institute_wall"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        5
+      ],
+      "to": [
+        16,
+        16,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#d",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#d",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#e",
+          "uv": [
+            5,
+            0,
+            11,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#e",
+          "uv": [
+            5,
+            0,
+            11,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#e",
+          "uv": [
+            0,
+            5,
+            16,
+            11
+          ]
+        },
+        "down": {
+          "texture": "#e",
+          "uv": [
+            0,
+            5,
+            16,
+            11
+          ]
+        }
+      }
+    }
+  ]
+}

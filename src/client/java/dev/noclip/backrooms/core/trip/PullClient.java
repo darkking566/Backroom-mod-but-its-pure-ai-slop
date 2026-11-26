@@ -47,13 +47,13 @@ public final class PullClient {
 
 	public static int stage() {
 		Minecraft client = Minecraft.getInstance();
-		if (client.player == null || client.level == null || client.level.dimension() != Level.OVERWORLD) return 0;
+		if (client.player == null || client.level == null || !dev.noclip.backrooms.core.Home.isHome(client.level.dimension())) return 0;
 		return state().stage();
 	}
 
 	private static void tick(Minecraft client) {
 		if (client.player == null || client.level == null || client.isPaused()) return;
-		if (client.level.dimension() != Level.OVERWORLD) {
+		if (!dev.noclip.backrooms.core.Home.isHome(client.level.dimension())) {
 			flicker = 0;
 			return;
 		}
@@ -90,7 +90,7 @@ public final class PullClient {
 
 	private static void extract(GuiGraphicsExtractor graphics, DeltaTracker delta) {
 		Minecraft client = Minecraft.getInstance();
-		if (client.player == null || client.level == null || client.level.dimension() != Level.OVERWORLD) return;
+		if (client.player == null || client.level == null || !dev.noclip.backrooms.core.Home.isHome(client.level.dimension())) return;
 		float pull = pull();
 		if (pull < Pull.STAGE_1) return;
 		float strength = Mth.clamp((pull - Pull.STAGE_1) / (Pull.FALL - Pull.STAGE_1), 0.0F, 1.0F);

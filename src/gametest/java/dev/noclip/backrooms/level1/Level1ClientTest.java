@@ -1993,11 +1993,15 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		context.getInput().lookAt(90, 20);
 		context.waitTicks(3);
 		context.getInput().pressMouse(1);
-		server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
+		// A pickup point (core.trip.Extraction): the pickup comes at once here and takes the player to the institute.
+		server.waitFor(s -> dev.noclip.backrooms.core.trip.Extraction.running(player(s)), 40);
+		server.runCommand("execute as @a run backrooms extract now");
+		server.waitFor(s -> player(s).level().dimension() == dev.noclip.backrooms.core.Home.FRONTROOMS, 200);
 		context.waitTicks(40);
+		context.runOnClient(client -> client.gui.setScreen(null));
 		server.runOnServer(s -> {
 			ServerPlayer player = player(s);
-			check(player.level().dimension() == Level.OVERWORLD, "bounced back");
+			check(player.level().dimension() == dev.noclip.backrooms.core.Home.FRONTROOMS, "bounced back");
 			check(!player.isInWall(), "arrived inside a block");
 			check(player.getInventory().getItem(0).getCount() == 5, "held item used or lost");
 		});

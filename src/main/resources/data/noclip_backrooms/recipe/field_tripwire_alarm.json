@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "N N",
+    "SSS"
+  ],
+  "key": {
+    "N": "minecraft:iron_nugget",
+    "S": "minecraft:string"
+  },
+  "result": {
+    "id": "noclip_backrooms:tripwire_alarm",
+    "count": 2
+  }
+}

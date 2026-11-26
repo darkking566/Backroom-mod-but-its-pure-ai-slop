@@ -122,7 +122,7 @@ public final class Contracts {
 		Contract contract = Contract.byId(id);
 		String refusal = contract == null ? "message.noclip_backrooms.contract.unknown"
 				: player.hasAttached(ACTIVE) ? "message.noclip_backrooms.contract.already"
-				: player.level().dimension() != Level.OVERWORLD ? "message.noclip_backrooms.contract.not_home"
+				: !dev.noclip.backrooms.core.Home.isHome(player.level().dimension()) ? "message.noclip_backrooms.contract.not_home"
 				: !nearCommander(player) ? "message.noclip_backrooms.contract.no_commander"
 				: dev.noclip.backrooms.core.quota.Quota.locked(player.level().getServer()) ? "message.noclip_backrooms.contract.locked" : null;
 		if (refusal != null) {

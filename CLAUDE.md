@@ -495,6 +495,12 @@
   - 中途發現測試世界關掉日夜循環，主世界時鐘不動，原本「用時鐘的差」會讓倒數永遠不走：改成每一刻都算＋時鐘跳動另外加
   - 驗證：`gradlew build`、`runClientGameTest -Plevels=horror,guild,floors,0,3` 與 Level 1 的 `settlements,wikiSettlements,leaveThroughDoor` 都通過；`docs/project/1-gameplay/README.md` 把【建議】改成【已做】並寫上實際數字
 - 使用者要求推上 GitHub：抓 GitHub 合併朋友新推的 Level 3 Gamma 基地（`b729e8c9` 等 3 個）；衝突在 `Level3RestBlock`（兩邊都改成走 `Trips.settle`，只差註解，用朋友的）與 `CLAUDE.md`（兩邊紀錄都保留）；朋友新加的 `docs/levels/level3/POI.md` 與 Gamma 截圖被 git 自動放到新位置 `docs/project/5-levels/level3/`，裡面指向已併入的 `docs/HORROR_ESCAPE_PLAN.md` 的連結改成遊戲玩法章；合併後 `gradlew build` 與 `runClientGameTest -Plevels=3,horror` 通過；使用者同意後把 `main` 推送到 GitHub（企劃書整理、配額循環、合併）；沒有強制推送、沒有改寫歷史
+- 使用者和 Claude 討論整條遊戲流程後定案，寫進 `docs/project/1-gameplay/README.md` 新的「流程定案」一節（只寫企劃，程式還沒動）：
+  - 安頓撤離、綠色 EXIT 門、停車場出口門、歸鄉錨釘全部送到 M.E.G. 研究所（離出生點最近的前哨，沒生成就用找結構的方式找到再生成）
+  - 死亡：後室有安頓→據點；後室沒安頓→這一趟的落點、層數回到 1；主世界死掉（進過後室的人）→一片新的 Level 0，東西收進研究所置物櫃；沒進過後室的人照原版
+  - 多人掉進同一層同一片落點區，隊伍都出來後下次是全新的一片；沒進過後室的人不算進配額、不會被丟回去
+  - 被慢慢拉進後室的那三種機制先不加
+  - 要做：任務報告畫面、研究所跟著配額升級（第 1 期醫療室、第 3 期軍械庫、第 5 期深層派遣）、M.E.G. 無線電、個人置物櫃
 - （朋友那邊的紀錄）使用者要求先做 Gamma 基地大型結構（照 `docs/levels/level3/POI.md` 的 D 節）：
   - 新增 `level3/GammaPlan`（每 4×4 張迷宮圖一座，由種子決定）、`GammaLayout`（60×48×48 固定樣板：地下隧道 y=1、三層商場 y=9／16／23 與挑空中庭、住宅部＋檢查站 y=32、行政部 y=39；東側 12 格是存儲設施）、`GammaCheckpointBlock`（金屬探測門：身上有武器不給進，出去不檢查）；`Level3Plan` 加 `HallKind.GAMMA`（只開正門，正門前固定寬走道，那張圖的路標整張圖都指向正門），`Level3ChunkGenerator.gamma` 把樣板轉成方塊；沒有 Gamma 的圖完全不變
   - 新方塊 `daylight_panel`（模擬日光）、`checkpoint_door`（`tools/make_level3_gamma.py`）；12 個人形各在位置上只生一次（`Level3Bases.populateGamma`），新角色梅森（`ShopRole.MASON`、`shops/mason.json`，賣防毒面具與杏仁水）；溫泉每秒回 1.5 理智；打 Gamma 的人會被狙擊；行軍床改用 `Trips.settle`（可撤離）；原本的 `BASE` 大廳改稱「外圍哨站」；Gamma 裡攝影機濾鏡較亮（`Look.Mood.GAMMA`）
@@ -516,6 +522,38 @@
   - 沒驗證：真的重開世界後重生（自動測試沒辦法重開同一個世界），只靠讀程式判斷舊身體記得死的維度
 - 使用者同意後，把 `main` 推送到 GitHub（審查三項修正 `1cd12754`）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 - 修 Gamma 探測門漏洞：武器藏在收納袋或界伏盒（含巢狀）裡也會被擋；`gamma` 實機測試段加藏武器兩例與狙擊手（打 Gamma 的人會中槍）；拿掉修正跑過一次確認會失敗，修好後 `gradlew build runClientGameTest -Plevels=3 -Psections=gamma` 通過。注意：狙擊傷害 14 大於現在的血量 10，一槍就死（使用者決定維持）
+- 使用者決定（Claude 問的四題）：Gemini 新企劃裡的按趟加工與武器數值平衡也由 Claude 做；前室外面用原版自然地形；血量砍半只對進過後室的人；舊存檔的石造公會整個拆掉。寫進 `docs/project/1-gameplay/README.md`
+- 前室與流程第一大批（照「流程與前室總部定案」與 Gemini 寫的前室企劃）：
+  - 新增維度 `noclip_backrooms:frontrooms`（`frontrooms/`：`Frontrooms`、`FrontroomsTerrain` 純函式地形、`FrontroomsChunkGenerator`、`InstituteLayout` 三層平面圖純資料、`Institute` 運作、`FrontroomsBlocks`／`BlastDoorBlock`／`DoorLampBlock`／`InstituteBlocks` 22 個新方塊）；維度類型與生態域照原版主世界與森林改（沒有怪物、沒有熔岩湖）；`tools/make_frontrooms.py` 產生 128 像素貼圖（含 `_n`／`_s`）、模型、方塊狀態、物品模型
+  - 研究所：大廳、收購與補給窗口、置物櫃室、工作區、檢疫隔離室；醫療翼（1 期）、軍械庫與車間（3 期）、B1 傳送廳（5 期，樓梯下去，傳送台可直接派遣）、B2 機密檔案室（3 階以上駭客器開艙口，6 份檔案）；氣密門與紅綠燈依配額期數同步；建築打不壞、只有工作區可以蓋；人員五位固定在位置、不見會補；圍牆外跑出去會被帶回
+  - 新增 `core/Home`（家在哪：前室與主世界算家、後室不算；`entered` 看玩家層數紀錄判斷進過後室）；把 `Pull`、`PlayerRpg`、`Contracts`、`Quota`、`Look`、`QuotaClient`、`PullClient` 裡「主世界才算家」「我們的命名空間就是後室」的判斷改成用它（前室也是 `noclip_backrooms` 命名空間）
+  - 撤離接應倒數 `core/trip/Extraction`（30～60 秒、上方倒數條、離開取消、每 2 秒引怪、兩波獵犬）；據點、朋友的 Level 0 EXIT 門、停車場出口門、Gemini 的歸鄉錨釘都改成呼叫接應；管理員 `/backrooms extract now`
+  - 死亡：後室沒安頓 → 這一趟的落點（`Trips.ENTRY`），層數回 1；前室或主世界死掉（進過後室）→ 東西收進置物櫃（`core/locker/Lockers`，54 格＋遺物），掉回 Level 0；沒進過照原版
+  - 隊伍落點 `core/trip/Expedition`：從外面掉進同一層的人落在同一片（`LevelExits.fallInto`、朋友的 `Noclip` 沙子入口都改用它），全隊離開後室 30 秒後關掉
+  - 任務報告 `core/trip/Report`＋`MissionReportPayload`＋客戶端 `MissionReportScreen`（關掉後顯示黃色「任務開始第 N 天」）；原本回到主世界就顯示的天數標題拿掉
+  - 配額：家改成前室或主世界、只算進過後室的人；`Quota.clearance`、`onClearance`、`deployOptions`、Level 1 以後要 5 期才能派遣；沒進過的人收不到配額狀態
+  - 醫官 `ShopRole.MEDIC`（`shops/medic.json`、`Treatment` 治療 40 點）；醫官與軍需官在研究所要交滿 1／3 期才服務（`Shops.Outcome.WING_LOCKED`）；補給商加原版基礎材料
+  - M.E.G. 無線電 `core/radio/Radio`（物品 `meg_radio`，第一次回研究所發一台；12 句失蹤小隊通訊、配額與天數；第 4 層以後、理智低於三成或附近有竊皮者時四成是假的）；管理員 `/backrooms radio [fake]`
+  - 血量砍半只對進過後室的人（`PlayerRpg`，第一次到達後室時重新套用）
+  - 舊公會：刪掉 `structure_set/guilds.json`（不再生成），`core/guild/GuildRemoval` 在舊存檔載入時拆掉（地板變草、小路變草、箱子東西掉出來、商人消失）
+  - 舊存檔裡進過後室又在主世界的人，登入時被帶進前室
+  - 撞名：我原本的 `emergency_light` 跟 Level 2 的方塊同名，蓋掉了它的方塊狀態與名稱；已還原，改叫 `institute_emergency_light`
+  - 修朋友的測試：Level 0 的 EXIT 門與第二次掉進來的落點檢查（現在落在隊伍的那一片）、停車場出口門、`suffocate` 先關掉任務報告；`GuildClientTest` 改成檢查村莊旁不再有公會、拆除後只剩草地
+  - 新增單元測試 `frontrooms/InstituteLayoutTest`（每期配額開對的翼區、樓梯一階一格下到 B1、B1 走得到傳送台與艙口、B2 只在艙口下面、地形平整與圍牆）、實機測試 `frontrooms/FrontroomsClientTest`（`-Plevels=frontrooms`，9 張截圖）；`HorrorClientTest` 改成新規則（新人 20 血、接應倒數、研究所、任務報告、無線電、前室死掉進置物櫃）
+  - 發現：重生事件裡新身體的附加資料有時還沒複製過來（看起來跟模組初始化順序有關），所以重生時判斷「進過後室」改看舊身體
+  - 驗證：`gradlew build`、`runClientGameTest -Plevels=frontrooms,horror,guild,floors,0` 與 Level 1 的 `leaveThroughDoor,settlements,wikiSettlements` 都通過；看過大廳、置物櫃、圍牆、研究所外觀、前室全景、醫療翼、軍械庫、B1、B2 截圖
+  - 還沒做（同一批企劃）：現場取證、野戰工事、空間標記與侵蝕、每趟異常詞綴、研究所按趟加工結算、武器數值平衡、B1 異常預告、雙結局
+- 後室進階玩法第二大批（照 Gemini 的企劃，數字與做法寫進 `docs/project/1-gameplay/README.md` 各節的「已做」）：
+  - 每趟異常詞綴 `core/trip/Anomalies`（＋`AnomalyPayload`、客戶端 `AnomalyClient`）：全隊從外面掉進新的一片時抽一條（存在 `Expedition` 裡），靜電過載（附近燈爆、手電筒耗電加倍、電器零件掉落加倍）、絕對沉寂（走動與敲方塊引怪、怪物多掉）、紅霧滲透（紅霧畫面、每秒多扣 1 理智）、偽裝活躍（四分之一沒開過的補給箱是竊皮者）；指揮官在交滿 5 期後預告下一趟；管理員 `/backrooms anomaly set <詞綴>`
+  - 野戰工具包 `core/field/`（`FieldKit`、`FieldBlocks`、`Evidence`、`Drift`）：拍立得（照片價值依怪物、距離、本期拍照目標）、空間測繪信標（離落點 300 格外、掃描 20 秒引怪、拓撲磁帶賣掉後該層免派遣費）、封門木板（怪物撞 5 秒才破）、絆線警報器（告訴附近玩家方位與距離）、便攜應急燈（3 分鐘、附近回理智）、粉筆（地板與牆、箭頭／✕／EXIT）、螢光棒、導引紅線；空間侵蝕（理智低或離標記太遠時箭頭被轉、螢光棒熄，深層出現舊箭頭）
+  - 照片與磁帶照物品上的價值賣給收購商（`Shops` 特別處理）；`QuotaData` 記測繪過的層（存檔多一個欄位）；補給商賣全套工具與無線電；原版工作台配方 8 條；`tools/make_field_items.py` 畫 10 個 32 像素圖示與方塊貼圖、模型
+  - 研究所按趟加工 `core/locker/Processing`：蹲下右鍵垃圾回收機、蒸餾桶、研究終端、晶體複製機投料，下次活著回來依層數結算進置物櫃並列在任務報告（`Report.onReport` 改成會拿到這一趟的層數）
+  - 武器平衡 `core/combat/WeaponBalance`＋server mixin `LivingEntityWeaponBalance`：後室武器打模組怪物時依階級打折（一般怪 90%～55%、Boss 80%～160%、撤離倒數中高階再 ×1.5）；Gemini 的三種武器類別各加一個 `tier()` 讀取方法，沒改他的數值
+  - 修 Gemini 的 `BackroomsCraftingTest`：配方的 `#標籤` 不是單一物品，檢查時跳過
+  - 新增實機測試 `field/FieldClientTest`（`-Plevels=field`：紅霧扣理智、偽裝箱、沉寂引怪、粉筆、螢光棒、紅線、應急燈、絆線、獵犬撞破木板、拍照與賣照片、信標距離限制與磁帶、測繪後免派遣費、武器平衡比例、回收機兩層深的成果）；任務報告的長行改成自動換行
+  - 測試時修掉的：靜電會把玩家自己的應急燈炸掉（改成不炸工具包的燈）；絕對沉寂原本看伺服器端玩家速度（玩家是客戶端在動，改看每秒位置變化）；拍立得的取景太窄（改成視線穿過生物或 25 度內）
+  - 驗證：`gradlew build`、`runClientGameTest -Plevels=field,frontrooms,horror,floors,guild`、`-Plevels=0`、`-Plevels=2,3`、Level 1 的 `monsters,hounds,leaveThroughDoor,settlements` 都通過；看過紅霧、粉筆與螢光棒、拍照、信標、含加工成果的任務報告截圖
+  - 沒做：拍「停電瞬間」「紅室祭壇」這類場景照、紅霧讓紅室變多（地形已先生成）、人影是竊皮者與識破工具、研究瓶解鎖配方、雙結局
 
 ## 動作記錄（Antigravity）
 
@@ -779,3 +817,9 @@
   - 資源與測試：新增 `tools/make_level3_bases.py` 產出 5 個新方塊資源，更新 `make_level3_realistic.py` 產出全數 92 張寫實材質（經 `resize_realistic.py` 縮至 128/64），更新雙語翻譯；`Level3LayoutTest.allFourFactionBasesTurnUp` 與 `Level3ClientTest.bases` 通過，`.\gradlew.bat build --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=3 --no-daemon` 全數通過並實機檢視 4 座據點截圖；僅於本機 `main` 提交（未推送）
 - 使用者要求規劃 Level 3 的 POI：下載中文維基 `latest:level-3` 整頁原文讀過，新增 `docs/levels/level3/POI.md`（大廳變化、鐵柵後的景、走道小場景、Gamma 基地本體、勢力據點加料五類，含分批與待決定事項）；`docs/levels/level3/README.md` 第 4 批加一行指向它；只寫企劃，沒改程式
 - 使用者決定 Level 3 的 Gamma 基地做成大型結構：`docs/levels/level3/POI.md` 的 D 節寫成規格（維度 48 格高不改、往下挖：行政 y=40～46、住宅＋檢查站 y=33～39、三層公共部中庭 y=9～31、隧道 y=1～7；48×48 格＋旁邊 12×48 的存儲設施；每 4×4 張迷宮圖一座；遠處路標寫方向與距離；現有 `BASE` 大廳改叫外圍哨站、Level 11 的門保留；`GammaPlan`／`GammaLayout` 做法、驗收、舊存檔影響）；只寫企劃，沒改程式
+- 依使用者拍板決策更新企劃書（`docs/project/1-gameplay/README.md`、`outpost.md`、`2-player/README.md`、`3-crafting/README.md`、`docs/project/README.md`，只改企劃，沒動程式）（Antigravity）：
+  - **獨立維度「前室（`frontrooms`）」與大型科技感 M.E.G. 研究所**（取代主世界村莊旁石造公會）：採**方案 A**（原版主世界開局；未進後室者照原版；卡牆進 Level 0 後所有撤離統一因悲屍化檢疫送往跑不出去的前室科技研究所，直到達成雙結局才重返原版主世界）；前室分區為「研究所本體保護區（不可拆防套利，含實體防爆氣密門分期開門：第 1 期醫療隔離翼、第 3 期軍械庫與加工車間、第 5 期 B1 深層傳送廳與異常預告廣播、隱藏 B2 機密檔案室）」＋「大門外半徑 80～120 格無村莊有限自然隔離區（可自由建造與農作）」；原主世界村莊旁石造公會（`guild`）定案直接停用並由前室研究所取代（`outpost.md` 註明停用並保留作遷移參考）
+  - **原版物資供應與按趟結算加工**：前室有限範圍下的原版材料採「戶外木頭農作＋研究所補給站兌換＋垃圾回收機與深層礦坑／異界樓層」三軌補足；研究所加工與研究設施改為「出門前投料、撤離回前室依本趟層數結算」，解決與 5 天倒數的衝突
+  - **後室進階創新玩法與雙結局主線定案**：納入撤離 30～60 秒接應倒數、高風險現場取證（拍立得閃光拍照＋離落點 ≥300 格空間測繪信標）、野戰臨時工事（封門木板／絆線警報器／應急燈／電箱切電）、會受侵蝕誤導的空間標記系統（粉筆／螢光棒／導引紅線）、失真無線電＋竊皮者滲透、每趟隨機樓層異常現象（單趟詞綴）、武器「反制／控場為主、高火力專供 Boss 與撤離防守」平衡定位，以及雙結局（結局 A 根治解約／結局 B 撬開 B2 揭露前室隔離真相並真逃脫）
+- 依使用者要求抓取並無衝突合併遠端 `origin/main`（`1cd12754` 等 5 個提交）後，正常推送 `main` 至 GitHub（無強制覆蓋、無改寫歷史）（Antigravity）
+- 依使用者要求先抓取 `origin/main` 確認無新提交後，將本地 `main`（含 Claude 已提交並通過驗證的 `3a3e9004` 前室研究所與 `3a64dd80` 後室進階玩法）正常推送至 GitHub（無強制覆蓋、無改寫歷史）（Antigravity）
