@@ -44,6 +44,10 @@ final class Level4Windows {
 	}
 
 	static boolean isTrapWindow(BlockState state) {
+		return state.is(Level4Blocks.OFFICE_TRAP_WINDOW);
+	}
+
+	static boolean isPaintableWindow(BlockState state) {
 		return state.is(Level4Blocks.OFFICE_TRAP_WINDOW) || state.is(Level4Blocks.OFFICE_RAIN_WINDOW);
 	}
 
@@ -59,12 +63,14 @@ final class Level4Windows {
 			}
 			if (world.dimension() != Level4.LEVEL_4) return InteractionResult.PASS;
 			BlockPos pos = hit.getBlockPos();
-			if (!isTrapWindow(world.getBlockState(pos))) return InteractionResult.PASS;
+			BlockState state = world.getBlockState(pos);
+			if (!isPaintableWindow(state)) return InteractionResult.PASS;
 			ItemStack held = sp.getMainHandItem();
 			Identifier blackDye = Identifier.withDefaultNamespace("black_dye");
 			boolean canPaint = held.is(BuiltInRegistries.ITEM.getValue(blackDye))
 					|| held.is(Items.INK_SAC) || held.is(Items.CHARCOAL);
 			if (!canPaint) {
+				if (!isTrapWindow(state)) return InteractionResult.PASS;
 				if (!sp.isCreative() && !sp.isSpectator()) {
 					grabPlayer((ServerLevel) world, sp, pos, true);
 				} else {
@@ -76,7 +82,7 @@ final class Level4Windows {
 			// Paint the whole vertical un-blacked window column black at once
 			for (int dy = -2; dy <= 2; dy++) {
 				BlockPos p = pos.offset(0, dy, 0);
-				if (isTrapWindow(world.getBlockState(p))) {
+				if (isPaintableWindow(world.getBlockState(p))) {
 					world.setBlock(p, Level4Blocks.OFFICE_BLACKED_WINDOW.defaultBlockState(), 3);
 				}
 			}
@@ -102,10 +108,7 @@ final class Level4Windows {
 
 			if (now >= NEXT_WARN.getOrDefault(player.getUUID(), 0)) {
 				NEXT_WARN.put(player.getUUID(), now + WARN_COOLDOWN);
-				boolean rain = level.getBlockState(window).is(Level4Blocks.OFFICE_RAIN_WINDOW);
-				player.sendOverlayMessage(Component.translatable(
-						rain ? "message.noclip_backrooms.level4.window_rain_lure"
-								: "message.noclip_backrooms.level4.window_lure"));
+				player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.window_lure"));
 				level.playSound(null, window, Level4Sounds.WINDOW_KNOCK, SoundSource.HOSTILE, 0.75F, 0.75F);
 				PlayerRpg.drainSanity(player, 2.5F);
 				level.sendParticles(ParticleTypes.ASH, center.x, center.y, center.z, 6, 0.35, 0.5, 0.35, 0.01);

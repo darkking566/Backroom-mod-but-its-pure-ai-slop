@@ -427,6 +427,64 @@ def save_cutout_glass():
         (TEXTURES / f"office_glass_wall_tmp{suf}.png").replace(TEXTURES / f"office_glass_wall{suf}.png")
     (TEXTURES / "office_glass_wall_tmp.png").unlink(missing_ok=True)
 
+    # Translucent exterior rain-view window (4-frame vertical strip) + translucent Entity 2 trap window
+    frames = []
+    n_frames = []
+    s_frames = []
+    base_n = Image.open(TEXTURES / "office_glass_wall_n.png").convert("RGBA")
+    base_s = Image.open(TEXTURES / "office_glass_wall_s.png").convert("RGBA")
+    for frame in range(4):
+        f_img = Image.new("RGBA", (SIZE, SIZE), (188, 212, 224, 44))
+        fd = ImageDraw.Draw(f_img)
+        # Subtle falling diagonal rain streaks on the pane
+        shift = frame * 32
+        for sx_base in (18, 42, 68, 94, 112):
+            for sy_base in (-24, 16, 56, 96):
+                y0 = (sy_base + shift) % (SIZE + 32) - 24
+                x0 = (sx_base - y0 // 4) % (SIZE - 16) + 8
+                fd.line([(x0, y0), (x0 - 4, y0 + 18)], fill=(224, 238, 246, 118), width=2)
+        # Crisp dark aluminum mullion border
+        fd.rectangle([0, 0, SIZE - 1, 4], fill=(74, 80, 88, 255))
+        fd.rectangle([0, SIZE - 5, SIZE - 1, SIZE - 1], fill=(74, 80, 88, 255))
+        fd.rectangle([0, 0, 4, SIZE - 1], fill=(74, 80, 88, 255))
+        fd.rectangle([SIZE - 5, 0, SIZE - 1, SIZE - 1], fill=(74, 80, 88, 255))
+        frames.append(f_img)
+        n_frames.append(base_n)
+        s_frames.append(base_s)
+    strip = Image.new("RGBA", (SIZE, SIZE * 4))
+    strip_n = Image.new("RGBA", (SIZE, SIZE * 4))
+    strip_s = Image.new("RGBA", (SIZE, SIZE * 4))
+    for idx in range(4):
+        strip.paste(frames[idx], (0, idx * SIZE))
+        strip_n.paste(n_frames[idx], (0, idx * SIZE))
+        strip_s.paste(s_frames[idx], (0, idx * SIZE))
+    strip.save(TEXTURES / "office_rain_window.png", optimize=True)
+    strip_n.save(TEXTURES / "office_rain_window_n.png", optimize=True)
+    strip_s.save(TEXTURES / "office_rain_window_s.png", optimize=True)
+    write_json(TEXTURES / "office_rain_window.png.mcmeta", {"animation": {"frametime": 3, "interpolate": True}})
+
+    # Translucent Entity 2 trap window: pale eerie glare with unmistakable beckoning silhouette
+    trap_img = Image.new("RGBA", (SIZE, SIZE), (238, 244, 248, 140))
+    td = ImageDraw.Draw(trap_img)
+    td.rectangle([8, 8, 20, 120], fill=(208, 186, 160, 175))
+    td.rectangle([108, 8, 120, 120], fill=(208, 186, 160, 175))
+    # Dark Entity 2 head, shoulders, raised beckoning arm
+    td.ellipse([52, 36, 76, 62], fill=(26, 30, 36, 235))
+    td.rectangle([46, 62, 82, 120], fill=(26, 30, 36, 235))
+    td.line([(76, 74), (86, 40)], fill=(26, 30, 36, 235), width=8)
+    td.ellipse([80, 32, 92, 44], fill=(26, 30, 36, 235))
+    td.rectangle([0, 0, SIZE - 1, 5], fill=(88, 78, 72, 255))
+    td.rectangle([0, SIZE - 6, SIZE - 1, SIZE - 1], fill=(88, 78, 72, 255))
+    td.rectangle([0, 0, 5, SIZE - 1], fill=(88, 78, 72, 255))
+    td.rectangle([SIZE - 6, 0, SIZE - 1, SIZE - 1], fill=(88, 78, 72, 255))
+    trap_img.save(TEXTURES / "office_trap_window.png", optimize=True)
+    mt_trap = flat((238, 244, 248), smooth=0.82, f0=18, porosity=0)
+    mt_trap.glow[:] = 0.45
+    mt.save("office_trap_window_tmp", mt_trap)
+    for suf in ("_n", "_s"):
+        (TEXTURES / f"office_trap_window_tmp{suf}.png").replace(TEXTURES / f"office_trap_window{suf}.png")
+    (TEXTURES / "office_trap_window_tmp.png").unlink(missing_ok=True)
+
     # Amor mushroom cluster (cutout RGBA)
     shroom = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
     d = ImageDraw.Draw(shroom)

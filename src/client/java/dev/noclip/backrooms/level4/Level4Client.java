@@ -72,6 +72,10 @@ public final class Level4Client {
 			lastDimension = level.dimension();
 			cooldownTicks = 400;
 		}
+		level.setRainLevel(1.0F);
+		if (level.getGameTime() % 2 == 0) {
+			spawnWindowRainParticles(level, player);
+		}
 
 		if (activeSmiler != null) {
 			facePlayer(activeSmiler, player);
@@ -147,5 +151,19 @@ public final class Level4Client {
 		activeSmiler = null;
 		ttlTicks = 0;
 		staredTicks = 0;
+	}
+
+	private static void spawnWindowRainParticles(ClientLevel level, LocalPlayer player) {
+		RandomSource rng = level.getRandom();
+		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+		for (int i = 0; i < 14; i++) {
+			int x = player.getBlockX() + rng.nextInt(25) - 12;
+			int z = player.getBlockZ() + rng.nextInt(25) - 12;
+			int y = Level4ChunkGenerator.FLOOR_Y + 4 + rng.nextInt(10);
+			pos.set(x, y, z);
+			if (!level.isLoaded(pos) || !level.getBlockState(pos).isAir() || !level.canSeeSky(pos)) continue;
+			level.addParticle(ParticleTypes.FALLING_WATER, x + rng.nextDouble(), y + rng.nextDouble(), z + rng.nextDouble(),
+					0.0, -0.35, 0.0);
+		}
 	}
 }

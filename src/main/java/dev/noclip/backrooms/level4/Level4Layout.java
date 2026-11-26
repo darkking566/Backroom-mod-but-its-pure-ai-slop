@@ -20,6 +20,7 @@ final class Level4Layout {
 
 	enum Kind {
 		AIR,
+		OUTSIDE_AIR,
 		ATRIUM_ARCH,
 		PILLAR,
 		DRYWALL,
@@ -119,6 +120,9 @@ final class Level4Layout {
 		if (zone == ZoneKind.SOLID_CORE) {
 			return new Tile(Kind.DRYWALL, zone, Level4Plan.NORTH, ceilH, null, false);
 		}
+		if (zone == ZoneKind.OUTSIDE) {
+			return outsideTile(seed, plan, i, j, cx, cz, x, z);
+		}
 
 		ExitStruct es = exitStructure(seed, x, z);
 		if (es != null) {
@@ -152,24 +156,33 @@ final class Level4Layout {
 			return edgeTile(seed, plan, i, j, Level4Plan.WEST, cz, zone, ceilH);
 		}
 
-		// Also check South/East region boundary edges on the far side (cx==6 when i==N-1, cz==6 when j==N-1)
-		if (i == N - 1 && cx == CELL - 1) {
-			Edge e = plan.edge(c, Level4Plan.EAST);
-			if (e == Edge.WALL && cz >= 2 && cz <= 4) {
-				return new Tile(windowKind(seed, x, z, zone), zone, Level4Plan.WEST, ceilH, null, false);
-			}
-			if (e == Edge.WALL) return new Tile(Kind.DRYWALL, zone, Level4Plan.WEST, ceilH, null, false);
-		}
-		if (j == N - 1 && cz == CELL - 1) {
-			Edge e = plan.edge(c, Level4Plan.SOUTH);
-			if (e == Edge.WALL && cx >= 2 && cx <= 4) {
-				return new Tile(windowKind(seed, x, z, zone), zone, Level4Plan.NORTH, ceilH, null, false);
-			}
-			if (e == Edge.WALL) return new Tile(Kind.DRYWALL, zone, Level4Plan.NORTH, ceilH, null, false);
-		}
-
 		// Interior fixtures by zone
 		return interiorTile(seed, plan, i, j, cx, cz, zone, ceilH);
+	}
+
+	private static Tile outsideTile(long seed, Level4Plan plan, int i, int j, int cx, int cz, int x, int z) {
+		boolean northIndoor = j > 0 && plan.zones[Level4Plan.cell(i, j - 1)] != ZoneKind.OUTSIDE;
+		boolean westIndoor = i > 0 && plan.zones[Level4Plan.cell(i - 1, j)] != ZoneKind.OUTSIDE;
+		boolean nwIndoor = i > 0 && j > 0 && plan.zones[Level4Plan.cell(i - 1, j - 1)] != ZoneKind.OUTSIDE;
+		if (cx == 0 && cz == 0 && (northIndoor || westIndoor || nwIndoor)) {
+			boolean nearAtrium = (northIndoor && plan.zones[Level4Plan.cell(i, j - 1)] == ZoneKind.ATRIUM)
+					|| (westIndoor && plan.zones[Level4Plan.cell(i - 1, j)] == ZoneKind.ATRIUM)
+					|| (nwIndoor && plan.zones[Level4Plan.cell(i - 1, j - 1)] == ZoneKind.ATRIUM);
+			return new Tile(Kind.PILLAR, ZoneKind.OUTSIDE, Level4Plan.NORTH, nearAtrium ? ATRIUM_HEIGHT : OPEN_HEIGHT, null, false);
+		}
+		if (cz == 0 && northIndoor) {
+			ZoneKind nz = plan.zones[Level4Plan.cell(i, j - 1)];
+			int ceil = nz == ZoneKind.ATRIUM ? ATRIUM_HEIGHT : OPEN_HEIGHT;
+			Kind wk = (cx >= 1 && cx <= 5) ? exteriorWindowKind(seed, plan, i, j - 1, x, z) : Kind.DRYWALL;
+			return new Tile(wk, ZoneKind.OUTSIDE, Level4Plan.NORTH, ceil, null, false);
+		}
+		if (cx == 0 && westIndoor) {
+			ZoneKind wz = plan.zones[Level4Plan.cell(i - 1, j)];
+			int ceil = wz == ZoneKind.ATRIUM ? ATRIUM_HEIGHT : OPEN_HEIGHT;
+			Kind wk = (cz >= 1 && cz <= 5) ? exteriorWindowKind(seed, plan, i - 1, j, x, z) : Kind.DRYWALL;
+			return new Tile(wk, ZoneKind.OUTSIDE, Level4Plan.WEST, ceil, null, false);
+		}
+		return new Tile(Kind.OUTSIDE_AIR, ZoneKind.OUTSIDE, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
 	}
 
 	private static boolean onEdgeCenter(int cx, int cz, int d) {
@@ -230,16 +243,18 @@ final class Level4Layout {
 		if (e == Edge.GLASS_WALL) {
 			return new Tile(Kind.GLASS_WALL, zone, facingInto, edgeCeil, null, false);
 		}
-		// Solid wall edge: Omega sign/wall, or windows facing Atrium/Open bays
+		// Solid wall edge: Omega sign/wall, or real exterior windows facing the misty rain canyon
 		if (omegaWall) {
 			boolean sign = (along == 2 || along == 4) && isOmegaGateAdjacent(plan, i, j, dir);
 			return new Tile(sign ? Kind.OMEGA_SIGN : Kind.OMEGA_WALL, zone, facingInto, edgeCeil, null, false);
 		}
-		boolean showWindows = (along >= 2 && along <= 5 && along != 3)
-				&& (atriumBorder || neighbor == ZoneKind.SOLID_CORE || i == 0 || j == 0);
-		if (showWindows) {
-			return new Tile(windowKind(seed, i * CELL + along, j * CELL, atriumBorder ? ZoneKind.ATRIUM : neighbor),
-					zone, facingInto, edgeCeil, null, false);
+		if (neighbor == ZoneKind.OUTSIDE) {
+			if (along >= 1 && along <= 5) {
+				int wx = dir == Level4Plan.NORTH ? i * CELL + along : i * CELL;
+				int wz = dir == Level4Plan.NORTH ? j * CELL : j * CELL + along;
+				return new Tile(exteriorWindowKind(seed, plan, i, j, wx, wz), zone, facingInto, edgeCeil, null, false);
+			}
+			return new Tile(Kind.DRYWALL, zone, facingInto, edgeCeil, null, false);
 		}
 		return new Tile(Kind.DRYWALL, zone, facingInto, edgeCeil, null, false);
 	}
@@ -250,16 +265,44 @@ final class Level4Layout {
 				&& plan.zones[Level4Plan.cell(i + Level4Plan.DX[dir], j + Level4Plan.DZ[dir])] == ZoneKind.OMEGA_BASE);
 	}
 
-	private static Kind windowKind(long seed, int x, int z, ZoneKind zone) {
+	private static Kind exteriorWindowKind(long seed, Level4Plan plan, int roomI, int roomJ, int x, int z) {
+		if (plan.nearHumanBase(roomI, roomJ)) return Kind.WINDOW_BLACKED;
 		int r = Math.floorMod(hash(seed, x, z, 421), 100);
-		if (zone == ZoneKind.ATRIUM) {
-			if (r < 76) return Kind.WINDOW_BLACKED;
-			if (r < 92) return Kind.WINDOW_RAIN;
-			return Kind.WINDOW_TRAP;
+		return r < 18 ? Kind.WINDOW_TRAP : Kind.WINDOW_RAIN;
+	}
+
+	/** Whether (x, z) lies on the outer facade skin of the main 12x12 skyscraper (rendered vertically). */
+	static boolean isExteriorSkin(long seed, int x, int z) {
+		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
+		Level4Plan plan = Level4Plan.of(seed, rx, rz);
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		int i = lx / CELL, j = lz / CELL;
+		int cx = lx % CELL, cz = lz % CELL;
+		if (Level4Plan.isSkybridgeCell(i, j)) return false;
+		if (i == Level4Plan.MARGIN && cx == 0) return true;
+		if (j == Level4Plan.MARGIN && cz == 0) return true;
+		if (i == N - Level4Plan.MARGIN && cx == 0 && j >= Level4Plan.MARGIN && j < N - Level4Plan.MARGIN) return true;
+		if (j == N - Level4Plan.MARGIN && cz == 0 && i >= Level4Plan.MARGIN && i < N - Level4Plan.MARGIN) return true;
+		return false;
+	}
+
+	/** Whether (x, z) is part of a skybridge spanning the canyon between towers. */
+	static boolean isSkybridge(long seed, int x, int z) {
+		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
+		Level4Plan plan = Level4Plan.of(seed, rx, rz);
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		int i = lx / CELL, j = lz / CELL;
+		int cx = lx % CELL, cz = lz % CELL;
+		if (Level4Plan.isSkybridgeCell(i, j) && plan.zones[Level4Plan.cell(i, j)] != ZoneKind.OUTSIDE) return true;
+		if (cz == 0 && j > 0 && Level4Plan.isSkybridgeCell(i, j - 1)
+				&& plan.zones[Level4Plan.cell(i, j - 1)] != ZoneKind.OUTSIDE && Level4Plan.isSkybridgeCell(i, j)) {
+			return true;
 		}
-		if (r < 88) return Kind.WINDOW_BLACKED;
-		if (r < 96) return Kind.WINDOW_TRAP;
-		return Kind.WINDOW_RAIN;
+		if (cx == 0 && i > 0 && Level4Plan.isSkybridgeCell(i - 1, j)
+				&& plan.zones[Level4Plan.cell(i - 1, j)] != ZoneKind.OUTSIDE && Level4Plan.isSkybridgeCell(i, j)) {
+			return true;
+		}
+		return false;
 	}
 
 	private static Tile interiorTile(long seed, Level4Plan plan, int i, int j, int cx, int cz, ZoneKind zone, int ceilH) {

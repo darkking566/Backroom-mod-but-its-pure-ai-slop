@@ -116,12 +116,20 @@ def composite(name, subs):
         s_arr[..., 0] = np.clip(s_arr[..., 0] * 0.65 + (smooth_val * 255.0) * 0.35 + d * 40.0, 0, 255)
 
     out_rgb = np.clip(np.rint(rgb * 255.0), 0, 255).astype("uint8")
-    if alpha is not None:
-        Image.fromarray(np.dstack([out_rgb, alpha]), "RGBA").save(OUT / f"{name}.png", optimize=True)
-    else:
-        Image.fromarray(out_rgb, "RGB").save(OUT / f"{name}.png", optimize=True)
-    Image.fromarray(np.clip(np.rint(n_arr), 0, 255).astype("uint8"), "RGBA").save(OUT / f"{name}_n.png", optimize=True)
-    Image.fromarray(np.clip(np.rint(s_arr), 0, 255).astype("uint8"), "RGBA").save(OUT / f"{name}_s.png", optimize=True)
+    import time
+    for attempt in range(4):
+        try:
+            if alpha is not None:
+                Image.fromarray(np.dstack([out_rgb, alpha]), "RGBA").save(OUT / f"{name}.png", optimize=True)
+            else:
+                Image.fromarray(out_rgb, "RGB").save(OUT / f"{name}.png", optimize=True)
+            Image.fromarray(np.clip(np.rint(n_arr), 0, 255).astype("uint8"), "RGBA").save(OUT / f"{name}_n.png", optimize=True)
+            Image.fromarray(np.clip(np.rint(s_arr), 0, 255).astype("uint8"), "RGBA").save(OUT / f"{name}_s.png", optimize=True)
+            break
+        except OSError:
+            if attempt == 3:
+                raise
+            time.sleep(0.15)
     return out_rgb
 
 
@@ -160,11 +168,35 @@ def main():
         tag = kind(name) or "plain"
         counts[tag] = counts.get(tag, 0) + 1
 
+    for f in sorted(OUT.glob("office_rain_window*.png")):
+        f.unlink(missing_ok=True)
     preview(preview_tiles)
     print(f"{len(names)} Level 4 textures (+ _n/_s) -> {OUT.relative_to(ROOT)}", counts)
 
 
+def resize_level4_only():
+    import time
+    import resize_realistic  # noqa: E402
+    seen = resize_realistic.kinds()
+    resized = 0
+    for f in sorted(OUT.glob("*.png")):
+        m = f.stem
+        base = m[:-2] if m.endswith(("_n", "_s")) else m
+        key = f"block/level4/{base}"
+        whole = seen.get(key)
+        size = resize_realistic.SURFACE if (not whole or True in whole) else resize_realistic.PROP
+        for attempt in range(3):
+            try:
+                if resize_realistic.resize(f, size, False):
+                    resized += 1
+                break
+            except OSError:
+                if attempt == 2:
+                    raise
+                time.sleep(0.15)
+    print(f"Resized {resized} Level 4 realistic PNGs (Level 0 untouched)")
+
+
 if __name__ == "__main__":
     main()
-    import resize_realistic  # noqa: E402
-    resize_realistic.main()
+    resize_level4_only()

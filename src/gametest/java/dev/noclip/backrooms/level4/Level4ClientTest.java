@@ -107,6 +107,9 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		if (stairs5 != null) shoot(context, game, stairs5[2] + 0.5, STAND, stairs5[3] + 0.5, stairs5[4], -8, false, "level4_stairwell");
 		int[] base71 = findExitView(seed, from, Level4Exit.BASEMENT_71);
 		if (base71 != null) shoot(context, game, base71[2] + 0.5, STAND, base71[3] + 0.5, base71[4], 18, false, "level4_basement");
+
+		int[] rainView = findRainWindowView(seed, from);
+		if (rainView != null) shoot(context, game, rainView[0] + 0.5, STAND, rainView[1] + 0.5, rainView[2], 2, false, "level4_rain_window_view");
 	}
 
 	private static void waterSources(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
@@ -262,17 +265,20 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		var server = game.getServer();
 		server.runOnServer(s -> {
 			check(Level4Windows.isTrapWindow(Level4Blocks.OFFICE_TRAP_WINDOW.defaultBlockState()), "trap window should be trap");
-			check(Level4Windows.isTrapWindow(Level4Blocks.OFFICE_RAIN_WINDOW.defaultBlockState()), "rain window should be trap");
+			check(!Level4Windows.isTrapWindow(Level4Blocks.OFFICE_RAIN_WINDOW.defaultBlockState()), "rain window should be safe");
 			check(!Level4Windows.isTrapWindow(Level4Blocks.OFFICE_BLACKED_WINDOW.defaultBlockState()), "blacked window should be safe");
 		});
 
 		int[] win = findKind(seed, from, Kind.WINDOW_TRAP);
 		check(win != null, "no OFFICE_TRAP_WINDOW found");
+		int[] trapStand = indoorStandNextTo(seed, win[0], win[1]);
+		double standX = trapStand != null ? trapStand[0] + 0.5 : win[0] + 0.5;
+		double standZ = trapStand != null ? trapStand[1] + 0.5 : win[1] + 1.8;
 		server.runCommand("gamemode survival @a");
 		server.runOnServer(s -> {
 			ServerPlayer p = player(s);
 			p.setHealth(p.getMaxHealth());
-			p.teleportTo(win[0] + 0.5, STAND, win[1] + 1.8);
+			p.teleportTo(standX, STAND, standZ);
 			p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 			double dx = win[0] + 0.5 - p.getX(), dz = win[1] + 0.5 - p.getZ();
 			float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
@@ -298,15 +304,16 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			check(level4(s).getBlockState(pos).is(Level4Blocks.OFFICE_BLACKED_WINDOW), "trap window was not painted black");
 		});
 
-		// Also verify un-blacked rain window is an Entity 2 trap and paintable with Charcoal
-		int[] atrium = findZone(seed, from, ZoneKind.ATRIUM);
-		BlockPos searchOrigin = atrium != null ? new BlockPos(atrium[0], STAND, atrium[1]) : from;
-		int[] rainWin = findKind(seed, searchOrigin, Kind.WINDOW_RAIN);
+		// Verify open rain window is safe to view empty-handed, yet still paintable with Charcoal
+		int[] rainWin = findKind(seed, from, Kind.WINDOW_RAIN);
 		check(rainWin != null, "no OFFICE_RAIN_WINDOW found");
+		int[] rainStand = indoorStandNextTo(seed, rainWin[0], rainWin[1]);
+		double rStandX = rainStand != null ? rainStand[0] + 0.5 : rainWin[0] + 0.5;
+		double rStandZ = rainStand != null ? rainStand[1] + 0.5 : rainWin[1] + 1.8;
 		server.runOnServer(s -> {
 			ServerPlayer p = player(s);
 			p.setHealth(p.getMaxHealth());
-			p.teleportTo(rainWin[0] + 0.5, STAND, rainWin[1] + 1.8);
+			p.teleportTo(rStandX, STAND, rStandZ);
 			p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 		});
 		game.getConnection().waitForChunksDownload();
@@ -318,7 +325,7 @@ public final class Level4ClientTest implements FabricClientGameTest {
 				float hpBefore = p.getHealth();
 				BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(pos), Direction.SOUTH, pos, false);
 				p.gameMode.useItemOn(p, level4(s), ItemStack.EMPTY, InteractionHand.MAIN_HAND, hit);
-				check(p.getHealth() < hpBefore, "expected empty-hand touch on rain window to hurt player");
+				check(p.getHealth() == hpBefore, "expected empty-hand touch on rain window to be safe");
 
 				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.CHARCOAL));
 				p.gameMode.useItemOn(p, level4(s), p.getMainHandItem(), InteractionHand.MAIN_HAND, hit);
@@ -547,13 +554,37 @@ public final class Level4ClientTest implements FabricClientGameTest {
 	}
 
 	private static int[] findKind(long seed, BlockPos from, Kind target) {
-		for (int r = 0; r < 140; r += 2) {
+		for (int r = 0; r < 180; r += 1) {
 			for (int dx = -r; dx <= r; dx++) {
 				for (int dz = -r; dz <= r; dz++) {
 					if (Math.abs(dx) != r && Math.abs(dz) != r) continue;
 					int x = from.getX() + dx, z = from.getZ() + dz;
 					if (Level4Layout.tile(seed, x, z).kind() == target) return new int[] {x, z};
 				}
+			}
+		}
+		return null;
+	}
+
+	private static int[] indoorStandNextTo(long seed, int wx, int wz) {
+		int[][] dirs = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+		for (int[] d : dirs) {
+			int sx = wx + d[0], sz = wz + d[1];
+			if (Level4Layout.tile(seed, sx, sz).kind() == Kind.AIR) return new int[] {sx, sz};
+		}
+		return null;
+	}
+
+	private static int[] findRainWindowView(long seed, BlockPos from) {
+		int[] win = findKind(seed, from, Kind.WINDOW_RAIN);
+		if (win == null) return null;
+		int[][] dirs = {{0, 2, 180}, {0, -2, 0}, {2, 0, 90}, {-2, 0, 270}};
+		for (int[] d : dirs) {
+			int sx = win[0] + d[0], sz = win[1] + d[1];
+			int midX = win[0] + d[0] / 2, midZ = win[1] + d[1] / 2;
+			if (Level4Layout.tile(seed, sx, sz).kind() == Kind.AIR
+					&& Level4Layout.tile(seed, midX, midZ).kind() == Kind.AIR) {
+				return new int[] {sx, sz, d[2]};
 			}
 		}
 		return null;

@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 final class Level4Plan {
 	static final int N = 16, CELL = 7, SIZE = N * CELL;
+	static final int MARGIN = 2;
 	static final int NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3;
 	static final int[] DX = {0, 1, 0, -1}, DZ = {-1, 0, 1, 0};
 	private static final int PLAN_SALT = 401, EDGE_SALT = 402, OMEGA_SALT = 409;
@@ -36,7 +37,9 @@ final class Level4Plan {
 		/** T.B.D. cluttered storage room (sells useless curios). */
 		TBD_ROOM,
 		/** Solid structural drywall core (houses elevators, exits, and windowed perimeter bays). */
-		SOLID_CORE
+		SOLID_CORE,
+		/** Open outdoor misty rain canyon separating office skyscrapers. */
+		OUTSIDE
 	}
 
 	enum Edge {
@@ -83,19 +86,43 @@ final class Level4Plan {
 		Arrays.fill(roomId, -1);
 		Arrays.fill(edges, Edge.OPEN);
 
+		// Carve a 2-cell outdoor misty canyon around the 12x12 skyscraper core, keeping 2 skybridges per side
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++) {
+				if (i < MARGIN || i >= N - MARGIN || j < MARGIN || j >= N - MARGIN) {
+					zones[cell(i, j)] = ZoneKind.OUTSIDE;
+				}
+			}
+		}
+		for (int k : edgeOpenings(seed, rx, rz, EAST)) {
+			zones[cell(N - 2, k)] = ZoneKind.OPEN_OFFICE;
+			zones[cell(N - 1, k)] = ZoneKind.OPEN_OFFICE;
+		}
+		for (int k : edgeOpenings(seed, rx - 1, rz, EAST)) {
+			zones[cell(0, k)] = ZoneKind.OPEN_OFFICE;
+			zones[cell(1, k)] = ZoneKind.OPEN_OFFICE;
+		}
+		for (int k : edgeOpenings(seed, rx, rz, SOUTH)) {
+			zones[cell(k, N - 2)] = ZoneKind.OPEN_OFFICE;
+			zones[cell(k, N - 1)] = ZoneKind.OPEN_OFFICE;
+		}
+		for (int k : edgeOpenings(seed, rx, rz - 1, SOUTH)) {
+			zones[cell(k, 0)] = ZoneKind.OPEN_OFFICE;
+			zones[cell(k, 1)] = ZoneKind.OPEN_OFFICE;
+		}
+
 		this.hasOmega = isOmegaRegion(seed, rx, rz);
 		boolean omegaPlaced = hasOmega && placeBox(rng, 5, 5, ZoneKind.OMEGA_BASE, 5, 5);
-		this.hasAtrium = rng.nextInt(100) < 55 && placeBox(rng, 3, 3, ZoneKind.ATRIUM, -1, -1);
+		this.hasAtrium = rng.nextInt(100) < 55 && placeExteriorAtrium(rng);
 		this.hasAmor = !hasOmega && rng.nextInt(100) < 24 && placeBox(rng, 3, 3, ZoneKind.AMOR_CAMP, -1, -1);
 		this.hasTbd = rng.nextInt(100) < 28 && placeBox(rng, 2, 3, ZoneKind.TBD_ROOM, -1, -1);
 		if (rng.nextInt(100) < 42) placeBox(rng, 3, 3, ZoneKind.DARK_WING, -1, -1);
 
-		// Add 1..2 structural solid cores inside the open office for elevators, exits, and window walls
-		int cores = 2 + rng.nextInt(2);
-		for (int k = 0; k < cores; k++) placeBox(rng, 1 + rng.nextInt(2), 1, ZoneKind.SOLID_CORE, -1, -1);
+		// Add 2 structural solid cores inside the open office tower
+		for (int k = 0; k < 2; k++) placeBox(rng, 1 + rng.nextInt(2), 1, ZoneKind.SOLID_CORE, -1, -1);
 
-		// Carve 3..5 enclosed office suites / meeting rooms / breakrooms
-		int suites = 3 + rng.nextInt(3);
+		// Carve 3..4 enclosed office suites / meeting rooms / breakrooms
+		int suites = 3 + rng.nextInt(2);
 		for (int k = 0; k < suites; k++) {
 			int w = 1 + rng.nextInt(2), h = 1 + rng.nextInt(2);
 			placeBox(rng, w, h, ZoneKind.SUITE, -1, -1);
@@ -126,7 +153,27 @@ final class Level4Plan {
 	}
 
 	boolean walkable(int i, int j) {
-		return inside(i, j) && zones[cell(i, j)] != ZoneKind.SOLID_CORE;
+		return inside(i, j) && zones[cell(i, j)] != ZoneKind.SOLID_CORE && zones[cell(i, j)] != ZoneKind.OUTSIDE;
+	}
+
+	static boolean isSkybridgeCell(int i, int j) {
+		return i < MARGIN || i >= N - MARGIN || j < MARGIN || j >= N - MARGIN;
+	}
+
+	boolean nearHumanBase(int i, int j) {
+		for (RoomBox room : rooms) {
+			int pad = switch (room.kind()) {
+				case OMEGA_BASE -> 3;
+				case AMOR_CAMP, TBD_ROOM -> 2;
+				default -> -1;
+			};
+			if (pad < 0) continue;
+			if (i >= room.i() - pad && i < room.i() + room.w() + pad
+					&& j >= room.j() - pad && j < room.j() + room.h() + pad) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	Edge edge(int c, int d) {
@@ -139,11 +186,51 @@ final class Level4Plan {
 		if (inside(i, j)) edges[cell(i, j) * 4 + opposite(d)] = e;
 	}
 
+	private boolean placeExteriorAtrium(SplittableRandom rng) {
+		int[][] candidates = {
+				{MARGIN, MARGIN + 1}, {MARGIN, N - MARGIN - 4},
+				{N - MARGIN - 3, MARGIN + 1}, {N - MARGIN - 3, N - MARGIN - 4},
+				{MARGIN + 1, MARGIN}, {N - MARGIN - 4, MARGIN},
+				{MARGIN + 1, N - MARGIN - 3}, {N - MARGIN - 4, N - MARGIN - 3}
+		};
+		for (int attempt = 0; attempt < 8; attempt++) {
+			int[] pick = candidates[rng.nextInt(candidates.length)];
+			int i = pick[0], j = pick[1];
+			if (!freeIndoor(i, j, 3, 3)) continue;
+			int id = rooms.size();
+			rooms.add(new RoomBox(i, j, 3, 3, ZoneKind.ATRIUM));
+			for (int a = i; a < i + 3; a++) {
+				for (int b = j; b < j + 3; b++) {
+					int c = cell(a, b);
+					zones[c] = ZoneKind.ATRIUM;
+					roomId[c] = id;
+				}
+			}
+			return true;
+		}
+		return placeBox(rng, 3, 3, ZoneKind.ATRIUM, -1, -1);
+	}
+
+	private boolean freeIndoor(int i, int j, int w, int h) {
+		for (int a = i - 1; a <= i + w; a++) {
+			for (int b = j - 1; b <= j + h; b++) {
+				if (!inside(a, b)) return false;
+				ZoneKind z = zones[cell(a, b)];
+				if (a >= i && a < i + w && b >= j && b < j + h) {
+					if (z != ZoneKind.OPEN_OFFICE || isSkybridgeCell(a, b)) return false;
+				} else if (z != ZoneKind.OPEN_OFFICE && z != ZoneKind.OUTSIDE) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	private boolean placeBox(SplittableRandom rng, int w, int h, ZoneKind kind, int fixedI, int fixedJ) {
 		int tries = fixedI >= 0 ? 1 : 40;
 		for (int attempt = 0; attempt < tries; attempt++) {
-			int i = fixedI >= 0 ? fixedI : 1 + rng.nextInt(N - 1 - w);
-			int j = fixedJ >= 0 ? fixedJ : 1 + rng.nextInt(N - 1 - h);
+			int i = fixedI >= 0 ? fixedI : (MARGIN + 1) + rng.nextInt((N - MARGIN - 1) - (MARGIN + 1) - w + 1);
+			int j = fixedJ >= 0 ? fixedJ : (MARGIN + 1) + rng.nextInt((N - MARGIN - 1) - (MARGIN + 1) - h + 1);
 			if (!free(i - 1, j - 1, w + 2, h + 2)) continue;
 			int id = rooms.size();
 			rooms.add(new RoomBox(i, j, w, h, kind));
@@ -170,19 +257,15 @@ final class Level4Plan {
 	}
 
 	private void buildEdges(SplittableRandom rng, long seed, int rx, int rz) {
-		// Region outer boundaries are walls except for 2 deterministic open corridors per side
+		// Region outer boundaries are walls except for the 2 skybridges per side
 		for (int i = 0; i < N; i++) {
-			edges[cell(i, 0) * 4 + NORTH] = Edge.WALL;
-			edges[cell(i, N - 1) * 4 + SOUTH] = Edge.WALL;
-			edges[cell(0, i) * 4 + WEST] = Edge.WALL;
-			edges[cell(N - 1, i) * 4 + EAST] = Edge.WALL;
+			edges[cell(i, 0) * 4 + NORTH] = zones[cell(i, 0)] == ZoneKind.OUTSIDE ? Edge.WALL : Edge.OPEN;
+			edges[cell(i, N - 1) * 4 + SOUTH] = zones[cell(i, N - 1)] == ZoneKind.OUTSIDE ? Edge.WALL : Edge.OPEN;
+			edges[cell(0, i) * 4 + WEST] = zones[cell(0, i)] == ZoneKind.OUTSIDE ? Edge.WALL : Edge.OPEN;
+			edges[cell(N - 1, i) * 4 + EAST] = zones[cell(N - 1, i)] == ZoneKind.OUTSIDE ? Edge.WALL : Edge.OPEN;
 		}
-		for (int k : edgeOpenings(seed, rx, rz, EAST)) edges[cell(N - 1, k) * 4 + EAST] = Edge.OPEN;
-		for (int k : edgeOpenings(seed, rx - 1, rz, EAST)) edges[cell(0, k) * 4 + WEST] = Edge.OPEN;
-		for (int k : edgeOpenings(seed, rx, rz, SOUTH)) edges[cell(k, N - 1) * 4 + SOUTH] = Edge.OPEN;
-		for (int k : edgeOpenings(seed, rx, rz - 1, SOUTH)) edges[cell(k, 0) * 4 + NORTH] = Edge.OPEN;
 
-		// Walls around rooms, cores, and factions
+		// Walls around rooms, cores, factions, and outdoor canyon perimeter
 		for (int c = 0; c < N * N; c++) {
 			int i = c % N, j = c / N;
 			ZoneKind z = zones[c];
@@ -191,12 +274,16 @@ final class Level4Plan {
 				if (!inside(a, b)) continue;
 				int nc = cell(a, b);
 				ZoneKind nz = zones[nc];
-				if (z == ZoneKind.SOLID_CORE || nz == ZoneKind.SOLID_CORE) {
+				if (z == ZoneKind.OUTSIDE && nz == ZoneKind.OUTSIDE) {
+					setEdge(c, d, Edge.OPEN);
+				} else if (z == ZoneKind.OUTSIDE || nz == ZoneKind.OUTSIDE) {
+					setEdge(c, d, Edge.WALL);
+				} else if (z == ZoneKind.SOLID_CORE || nz == ZoneKind.SOLID_CORE) {
 					setEdge(c, d, Edge.WALL);
 				} else if (roomId[c] != roomId[nc]) {
 					boolean glass = (z == ZoneKind.SUITE || nz == ZoneKind.SUITE) && rng.nextInt(100) < 45;
 					setEdge(c, d, glass ? Edge.GLASS_WALL : Edge.WALL);
-				} else if (z == ZoneKind.OPEN_OFFICE && rng.nextInt(100) < 6) {
+				} else if (z == ZoneKind.OPEN_OFFICE && !isSkybridgeCell(i, j) && !isSkybridgeCell(a, b) && rng.nextInt(100) < 6) {
 					// Occasional partial drywall/glass divider in open office
 					setEdge(c, d, rng.nextBoolean() ? Edge.GLASS_WALL : Edge.WALL);
 				}
@@ -215,19 +302,11 @@ final class Level4Plan {
 				continue;
 			}
 			if (room.kind() == ZoneKind.ATRIUM) {
-				// Wide open archways into the atrium
-				for (int a = room.i(); a < room.i() + room.w(); a++) {
-					if (a == room.cx()) {
-						setEdge(cell(a, room.j()), NORTH, Edge.OPEN);
-						setEdge(cell(a, room.j() + room.h() - 1), SOUTH, Edge.OPEN);
-					}
-				}
-				for (int b = room.j(); b < room.j() + room.h(); b++) {
-					if (b == room.cz()) {
-						setEdge(cell(room.i(), b), WEST, Edge.OPEN);
-						setEdge(cell(room.i() + room.w() - 1, b), EAST, Edge.OPEN);
-					}
-				}
+				// Wide open archways into the atrium (only toward indoor walkable neighbors)
+				if (walkable(room.cx(), room.j() - 1)) setEdge(cell(room.cx(), room.j()), NORTH, Edge.OPEN);
+				if (walkable(room.cx(), room.j() + room.h())) setEdge(cell(room.cx(), room.j() + room.h() - 1), SOUTH, Edge.OPEN);
+				if (walkable(room.i() - 1, room.cz())) setEdge(cell(room.i(), room.cz()), WEST, Edge.OPEN);
+				if (walkable(room.i() + room.w(), room.cz())) setEdge(cell(room.i() + room.w() - 1, room.cz()), EAST, Edge.OPEN);
 				continue;
 			}
 			if (room.kind() == ZoneKind.DARK_WING) {
@@ -255,8 +334,8 @@ final class Level4Plan {
 
 	private static int[] edgeOpenings(long seed, int rx, int rz, int side) {
 		SplittableRandom rng = new SplittableRandom(Level4Layout.hash(seed, rx, rz, EDGE_SALT + side));
-		int a = 1 + rng.nextInt(5);
-		int b = 9 + rng.nextInt(5);
+		int a = 3 + rng.nextInt(4);
+		int b = 9 + rng.nextInt(4);
 		return new int[] {a, b};
 	}
 
@@ -268,7 +347,7 @@ final class Level4Plan {
 			Arrays.fill(comp, -1);
 			int nextComp = 0;
 			for (int start = 0; start < N * N; start++) {
-				if (zones[start] == ZoneKind.SOLID_CORE || comp[start] >= 0) continue;
+				if (zones[start] == ZoneKind.SOLID_CORE || zones[start] == ZoneKind.OUTSIDE || comp[start] >= 0) continue;
 				int head = 0, tail = 0;
 				queue[tail++] = start;
 				comp[start] = nextComp;
@@ -324,13 +403,15 @@ final class Level4Plan {
 
 		List<int[]> wallSpots = new ArrayList<>();
 		List<Integer> floorSpots = new ArrayList<>();
-		for (int i = 1; i < N - 1; i++) {
-			for (int j = 1; j < N - 1; j++) {
+		for (int i = MARGIN + 1; i < N - MARGIN - 1; i++) {
+			for (int j = MARGIN + 1; j < N - MARGIN - 1; j++) {
 				int c = cell(i, j);
 				ZoneKind z = zones[c];
 				if (z != ZoneKind.OPEN_OFFICE && z != ZoneKind.SUITE && z != ZoneKind.DARK_WING) continue;
 				floorSpots.add(c);
 				for (int d = 0; d < 4; d++) {
+					int ni = i + DX[d], nj = j + DZ[d];
+					if (inside(ni, nj) && zones[cell(ni, nj)] == ZoneKind.OUTSIDE) continue;
 					if (edge(c, d) == Edge.WALL) wallSpots.add(new int[] {c, d});
 				}
 			}

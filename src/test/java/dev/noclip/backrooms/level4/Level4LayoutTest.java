@@ -23,7 +23,7 @@ final class Level4LayoutTest {
 					int[] queue = new int[Level4Plan.N * Level4Plan.N];
 					int start = -1, walkableCount = 0;
 					for (int c = 0; c < Level4Plan.N * Level4Plan.N; c++) {
-						if (plan.zones[c] != ZoneKind.SOLID_CORE) {
+						if (plan.zones[c] != ZoneKind.SOLID_CORE && plan.zones[c] != ZoneKind.OUTSIDE) {
 							walkableCount++;
 							if (start < 0) start = c;
 						}
@@ -99,6 +99,7 @@ final class Level4LayoutTest {
 		assertTrue(!Level4Wanderers.isWanderZone(ZoneKind.TBD_ROOM));
 		assertTrue(!Level4Wanderers.isWanderZone(ZoneKind.DARK_WING));
 		assertTrue(!Level4Wanderers.isWanderZone(ZoneKind.SOLID_CORE));
+		assertTrue(!Level4Wanderers.isWanderZone(ZoneKind.OUTSIDE));
 	}
 
 	@Test
@@ -151,26 +152,52 @@ final class Level4LayoutTest {
 	}
 
 	@Test
-	void mostWindowsAreBlackedOut() {
-		int blacked = 0, total = 0;
+	void windowsBlackedNearBasesAndMostlyOpenRainOutside() {
+		int wildRain = 0, wildTrap = 0, wildBlacked = 0, baseBlacked = 0, baseNonBlacked = 0;
+		boolean sawOutside = false;
 		for (long seed = 1; seed <= 8; seed++) {
 			for (int rx = -1; rx <= 1; rx++) {
 				for (int rz = -1; rz <= 1; rz++) {
-					int x0 = rx * Level4Plan.SIZE, z0 = rz * Level4Plan.SIZE;
-					for (int x = x0; x < x0 + Level4Plan.SIZE; x++) {
-						for (int z = z0; z < z0 + Level4Plan.SIZE; z++) {
-							Kind k = Level4Layout.tile(seed, x, z).kind();
-							if (k == Kind.WINDOW_BLACKED || k == Kind.WINDOW_TRAP || k == Kind.WINDOW_RAIN) {
-								total++;
-								if (k == Kind.WINDOW_BLACKED) blacked++;
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					for (int i = 0; i < Level4Plan.N; i++) {
+						for (int j = 0; j < Level4Plan.N; j++) {
+							int c = Level4Plan.cell(i, j);
+							if (plan.zones[c] == ZoneKind.OUTSIDE) sawOutside = true;
+							int wxBase = rx * Level4Plan.SIZE + i * Level4Plan.CELL;
+							int wzBase = rz * Level4Plan.SIZE + j * Level4Plan.CELL;
+							for (int cx = 0; cx < Level4Plan.CELL; cx++) {
+								for (int cz = 0; cz < Level4Plan.CELL; cz++) {
+									Tile t = Level4Layout.tile(seed, wxBase + cx, wzBase + cz);
+									Kind k = t.kind();
+									if (k != Kind.WINDOW_BLACKED && k != Kind.WINDOW_TRAP && k != Kind.WINDOW_RAIN) continue;
+									int refI = i, refJ = j;
+									if (plan.zones[c] == ZoneKind.OUTSIDE) {
+										if (cz == 0 && j > 0 && plan.zones[Level4Plan.cell(i, j - 1)] != ZoneKind.OUTSIDE) refJ = j - 1;
+										else if (cx == 0 && i > 0 && plan.zones[Level4Plan.cell(i - 1, j)] != ZoneKind.OUTSIDE) refI = i - 1;
+									}
+									if (plan.nearHumanBase(refI, refJ)) {
+										if (k == Kind.WINDOW_BLACKED) baseBlacked++;
+										else baseNonBlacked++;
+									} else {
+										if (k == Kind.WINDOW_RAIN) wildRain++;
+										else if (k == Kind.WINDOW_TRAP) wildTrap++;
+										else wildBlacked++;
+									}
+								}
 							}
 						}
 					}
 				}
 			}
 		}
-		assertTrue(total > 0, "expected windows in Level 4");
-		assertTrue(blacked * 100 >= total * 70, "expected >= 70% blacked-out windows, got " + blacked + "/" + total);
+		int wildTotal = wildRain + wildTrap + wildBlacked;
+		assertTrue(sawOutside, "expected outdoor misty canyon cells");
+		assertTrue(baseBlacked > 0 && baseNonBlacked == 0,
+				"expected all windows near human bases blacked out, got blacked=" + baseBlacked + " non=" + baseNonBlacked);
+		assertTrue(wildTotal > 0 && wildRain * 100 >= wildTotal * 65,
+				"expected mostly transparent rain windows outside bases, got rain=" + wildRain + "/" + wildTotal);
+		assertTrue(wildTrap > 0 && wildTrap * 100 <= wildTotal * 35,
+				"expected ~18% Entity 2 trap windows outside bases, got trap=" + wildTrap + "/" + wildTotal);
 	}
 
 	@Test

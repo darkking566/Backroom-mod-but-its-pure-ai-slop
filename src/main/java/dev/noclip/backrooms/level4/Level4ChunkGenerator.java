@@ -37,7 +37,9 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 			.xmap(Level4ChunkGenerator::new, generator -> generator.biomeSource);
 
 	static final int FLOOR_Y = Level4Layout.FLOOR_Y;
-	static final int HEIGHT = 48;
+	static final int MIN_Y = -64;
+	static final int HEIGHT = 192;
+	static final int MAX_Y = MIN_Y + HEIGHT - 1;
 
 	private Level4ChunkGenerator(BiomeSource biomeSource) {
 		super(biomeSource);
@@ -52,18 +54,62 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 		return randomState.getOrCreateRandomFactory(Level4.id("level_4_plan")).at(0, 0, 0).nextLong();
 	}
 
+	private static int towerTopY(long seed, int x, int z) {
+		int rx = Math.floorDiv(x, Level4Plan.SIZE);
+		int rz = Math.floorDiv(z, Level4Plan.SIZE);
+		return 82 + Math.floorMod((int) Level4Layout.hash(seed, rx, rz, 499), 34);
+	}
+
 	static BlockState blockAt(long seed, int x, int y, int z) {
-		if (y <= 0 || y >= HEIGHT - 2) return Blocks.BEDROCK.defaultBlockState();
 		Level4Layout.ExitStruct es = Level4Layout.exitStructure(seed, x, z);
-		if (es != null) return exitStructureBlock(es, y);
-		if (y < FLOOR_Y) return Blocks.CONCRETE.gray().defaultBlockState();
 		Tile tile = Level4Layout.tile(seed, x, z);
+		boolean skybridge = Level4Layout.isSkybridge(seed, x, z);
+		boolean exterior = Level4Layout.isExteriorSkin(seed, x, z);
+		int topY = towerTopY(seed, x, z);
+		return blockAtColumn(seed, x, y, z, tile, es, skybridge, exterior, topY);
+	}
+
+	private static BlockState blockAtColumn(long seed, int x, int y, int z, Tile tile,
+			Level4Layout.ExitStruct es, boolean skybridge, boolean exterior, int topY) {
+		if (y <= MIN_Y || y >= MAX_Y) return Blocks.BEDROCK.defaultBlockState();
+		if (tile.kind() == Kind.OUTSIDE_AIR) return Blocks.AIR.defaultBlockState();
+
+		if (skybridge) {
+			int roofY = FLOOR_Y + tile.ceilingHeight() + 1;
+			if (y == FLOOR_Y - 1 || y == roofY + 1) return Blocks.CONCRETE.gray().defaultBlockState();
+			if (y < FLOOR_Y || y > roofY + 1) return Blocks.AIR.defaultBlockState();
+			if (y == FLOOR_Y) return floor(seed, x, z, tile);
+			if (y == roofY) return ceiling(seed, x, z, tile);
+			return columnBlock(tile, y - FLOOR_Y);
+		}
+
+		if (es != null && y >= FLOOR_Y - 3 && y <= FLOOR_Y + 6) {
+			return exitStructureBlock(es, y);
+		}
+
+		if (y > topY + 1) return Blocks.AIR.defaultBlockState();
+		if (y == topY + 1) return exterior ? Blocks.CONCRETE.lightGray().defaultBlockState() : Blocks.AIR.defaultBlockState();
+		if (y == topY) return Blocks.CONCRETE.gray().defaultBlockState();
+
 		int roofY = FLOOR_Y + tile.ceilingHeight() + 1;
-		if (y > roofY) return Blocks.CONCRETE.gray().defaultBlockState();
-		if (y == FLOOR_Y) return floor(seed, x, z, tile);
-		if (y == roofY) return ceiling(seed, x, z, tile);
-		int h = y - FLOOR_Y;
-		return columnBlock(tile, h);
+		if (y >= FLOOR_Y && y <= roofY) {
+			if (y == FLOOR_Y) return floor(seed, x, z, tile);
+			if (y == roofY) return ceiling(seed, x, z, tile);
+			return columnBlock(tile, y - FLOOR_Y);
+		}
+
+		if (exterior) {
+			int story = Math.floorDiv(y - FLOOR_Y, 5);
+			int sh = Math.floorMod(y - FLOOR_Y, 5);
+			if (tile.kind() == Kind.PILLAR) return Blocks.CONCRETE.lightGray().defaultBlockState();
+			if (sh == 0 || sh == 4) return Blocks.CONCRETE.gray().defaultBlockState();
+			if (sh == 1) return Blocks.CONCRETE.lightGray().defaultBlockState();
+			int cellX = Math.floorDiv(x, Level4Plan.CELL);
+			int cellZ = Math.floorDiv(z, Level4Plan.CELL);
+			boolean lit = Math.floorMod(Level4Layout.hash(seed, cellX + story * 31, cellZ - story * 17, 497), 100) < 14;
+			return (lit ? Level4Blocks.OFFICE_TROFFER_DIM : Level4Blocks.OFFICE_BLACKED_WINDOW).defaultBlockState();
+		}
+		return Blocks.CONCRETE.gray().defaultBlockState();
 	}
 
 	private static BlockState floor(long seed, int x, int z, Tile tile) {
@@ -124,7 +170,7 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 	private static BlockState columnBlock(Tile tile, int h) {
 		Direction dir = dirFrom(tile.dir());
 		return switch (tile.kind()) {
-			case AIR -> Blocks.AIR.defaultBlockState();
+			case AIR, OUTSIDE_AIR -> Blocks.AIR.defaultBlockState();
 			case ATRIUM_ARCH -> h <= Level4Layout.OPEN_HEIGHT
 					? Blocks.AIR.defaultBlockState()
 					: Level4Blocks.OFFICE_DRYWALL_UPPER.defaultBlockState();
@@ -354,9 +400,16 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		int minX = chunk.getPos().getMinBlockX(), minZ = chunk.getPos().getMinBlockZ();
 		for (int x = 0; x < 16; x++) {
+			int wx = minX + x;
 			for (int z = 0; z < 16; z++) {
-				for (int y = 0; y < HEIGHT; y++) {
-					BlockState state = blockAt(seed, minX + x, y, minZ + z);
+				int wz = minZ + z;
+				Level4Layout.ExitStruct es = Level4Layout.exitStructure(seed, wx, wz);
+				Tile tile = Level4Layout.tile(seed, wx, wz);
+				boolean skybridge = Level4Layout.isSkybridge(seed, wx, wz);
+				boolean exterior = Level4Layout.isExteriorSkin(seed, wx, wz);
+				int topY = towerTopY(seed, wx, wz);
+				for (int y = MIN_Y; y <= MAX_Y; y++) {
+					BlockState state = blockAtColumn(seed, wx, y, wz, tile, es, skybridge, exterior, topY);
 					chunk.setBlockState(pos.set(x, y, z), state);
 					oceanFloor.update(x, y, z, state);
 					surface.update(x, y, z, state);
@@ -370,13 +423,20 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 	public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor heightAccessor, RandomState randomState) {
 		long seed = planSeed(randomState);
 		BlockState[] states = new BlockState[HEIGHT];
-		for (int y = 0; y < HEIGHT; y++) states[y] = blockAt(seed, x, y, z);
-		return new NoiseColumn(0, states);
+		Level4Layout.ExitStruct es = Level4Layout.exitStructure(seed, x, z);
+		Tile tile = Level4Layout.tile(seed, x, z);
+		boolean skybridge = Level4Layout.isSkybridge(seed, x, z);
+		boolean exterior = Level4Layout.isExteriorSkin(seed, x, z);
+		int topY = towerTopY(seed, x, z);
+		for (int i = 0; i < HEIGHT; i++) {
+			states[i] = blockAtColumn(seed, x, MIN_Y + i, z, tile, es, skybridge, exterior, topY);
+		}
+		return new NoiseColumn(MIN_Y, states);
 	}
 
 	@Override
 	public int getBaseHeight(int x, int z, Heightmap.Types type, LevelHeightAccessor heightAccessor, RandomState randomState) {
-		return HEIGHT;
+		return FLOOR_Y + Level4Layout.OPEN_HEIGHT + 2;
 	}
 
 	@Override
@@ -398,7 +458,7 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 
 	@Override
 	public int getMinY() {
-		return 0;
+		return MIN_Y;
 	}
 
 	@Override

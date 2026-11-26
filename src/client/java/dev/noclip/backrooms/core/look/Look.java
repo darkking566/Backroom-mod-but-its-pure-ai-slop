@@ -56,7 +56,7 @@ public final class Look {
 	 */
 	record Mood(int start, int end, float falloff) {
 		static final Mood LEVEL_0 = new Mood(5, 28, 0.32F), LEVEL_3 = new Mood(6, 30, 0.18F),
-				LEVEL_4 = new Mood(10, 48, 0.14F), DEFAULT = new Mood(9, 44, 0.15F);
+				LEVEL_4 = new Mood(16, 62, 0.08F), DEFAULT = new Mood(9, 44, 0.15F);
 		// Zenith Station is seen across: the singularity is some 180 blocks from the ring windows, the sea of rooms 60 out.
 		static final Mood ZENITH = new Mood(24, 320, 0.15F);
 		// Base Gamma's mall and halls are lit like day: light carries, the far end of the atrium shows.
@@ -113,7 +113,11 @@ public final class Look {
 		Mood mood = mood(client);
 		fog.environmentalStart = Math.min(fog.environmentalStart, mood.start());
 		fog.environmentalEnd = Math.min(fog.environmentalEnd, mood.end());
-		fog.color.set(0.018F, 0.016F, 0.011F, 1.0F);
+		if (mood == Mood.LEVEL_4) {
+			fog.color.set(0.80F, 0.84F, 0.87F, 1.0F);
+		} else {
+			fog.color.set(0.018F, 0.016F, 0.011F, 1.0F);
+		}
 	}
 
 	/** Called before the lightmap is drawn: in the Backrooms, through the camera, light falls off fast. */
