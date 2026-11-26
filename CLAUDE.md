@@ -555,6 +555,8 @@
   - 驗證：`gradlew build`、`runClientGameTest -Plevels=field,frontrooms,horror,floors,guild`、`-Plevels=0`、`-Plevels=2,3`、Level 1 的 `monsters,hounds,leaveThroughDoor,settlements` 都通過；看過紅霧、粉筆與螢光棒、拍照、信標、含加工成果的任務報告截圖
   - 沒做：拍「停電瞬間」「紅室祭壇」這類場景照、紅霧讓紅室變多（地形已先生成）、人影是竊皮者與識破工具、研究瓶解鎖配方、雙結局
 - 使用者同意後推送：先合併朋友新推的 7 個提交（前室研究所、撤離接應、死亡新規則、後室進階玩法），只有 `CLAUDE.md` 衝突（兩邊紀錄都保留）；合併後 `gradlew build` 與 `runClientGameTest -Plevels=3 -Psections=gamma` 通過，推送 `main`（Gamma 探測門看得到收納袋與界伏盒裡的武器、狙擊手測試）；沒有強制推送、沒有改寫歷史
+- 使用者回報電腦前有看不見的方塊：世界生成只放方塊狀態、沒建方塊實體，靠方塊實體畫的家具（辦公椅、檔案櫃等 Blender 道具）全部隱形。改成後室區塊載入時補建缺少的方塊實體（`BackroomsProps.register`，舊存檔的區塊也會補）；Level 0 玻璃辦公室測試加檢查客戶端有收到（修前會失敗）；`gradlew build runClientGameTest -Plevels=0` 通過，截圖看到檔案櫃與椅子。其他樓層沒重跑
+- 使用者同意後推送：合併朋友新推的 2 個提交（場景照片、模仿者與生物掃描器、紅霧、研究瓶解鎖、雙結局），沒有衝突；合併後 `gradlew build runClientGameTest -Plevels=0` 通過，把 `main` 推送到 GitHub（地形生成的家具補建方塊實體 `d1ff5605`）；朋友這批的其他實機測試沒有重跑；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 

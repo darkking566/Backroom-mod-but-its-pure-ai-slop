@@ -645,6 +645,19 @@ public final class Level0ClientTest implements FabricClientGameTest {
 
 		// 5. Sector micro-vignettes (all 9 including MEG_ISOLATION_POST & LOCKED_UTILITY_ROOM)
 		EnumMap<ZonePoiPlan.VignetteType, ZonePoiPlan.Vignette> vignettes = findAllVignettes(seed);
+		ZonePoiPlan.Vignette glassOffice = vignettes.get(ZonePoiPlan.VignetteType.GLASS_OFFICE);
+		int gx = glassOffice.cx() * Maze.CELL, gz = glassOffice.cz() * Maze.CELL;
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+				+ (gx + c + 2.5) + " " + standY + " " + (gz + c + 2.5) + " 135 8");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+		game.getConnection().waitForChunksRender();
+		// These two draw only through their block entity, which the client must have been sent.
+		context.runOnClient(client -> {
+			for (BlockPos pos : new BlockPos[] {new BlockPos(gx + c, standY, gz + c + 1), new BlockPos(gx + c + 1, standY, gz + c)}) {
+				check(client.level.getChunkAt(pos).getBlockEntities().containsKey(pos), "Generated prop is invisible at " + pos);
+			}
+		});
 
 		ZonePoiPlan.Vignette breakerNiche = vignettes.get(ZonePoiPlan.VignetteType.BREAKER_NICHE);
 		int bx = breakerNiche.cx() * Maze.CELL, bz = breakerNiche.cz() * Maze.CELL;
