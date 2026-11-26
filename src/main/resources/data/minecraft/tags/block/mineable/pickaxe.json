@@ -224,6 +224,15 @@
     "noclip_backrooms:prop_electric_fan",
     "noclip_backrooms:prop_microwave",
     "noclip_backrooms:prop_floor_lamp",
-    "noclip_backrooms:prop_wall_first_aid_kit"
+    "noclip_backrooms:prop_wall_first_aid_kit",
+    "noclip_backrooms:film_school_chair",
+    "noclip_backrooms:film_bistro_set",
+    "noclip_backrooms:film_tv_tray",
+    "noclip_backrooms:film_entertainment_center",
+    "noclip_backrooms:film_checkout_counter",
+    "noclip_backrooms:film_chair_pile",
+    "noclip_backrooms:film_fax_machine",
+    "noclip_backrooms:film_tv_vcr",
+    "noclip_backrooms:film_tv_wall"
   ]
 }

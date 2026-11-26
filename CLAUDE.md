@@ -557,6 +557,16 @@
 - 使用者同意後推送：先合併朋友新推的 7 個提交（前室研究所、撤離接應、死亡新規則、後室進階玩法），只有 `CLAUDE.md` 衝突（兩邊紀錄都保留）；合併後 `gradlew build` 與 `runClientGameTest -Plevels=3 -Psections=gamma` 通過，推送 `main`（Gamma 探測門看得到收納袋與界伏盒裡的武器、狙擊手測試）；沒有強制推送、沒有改寫歷史
 - 使用者回報電腦前有看不見的方塊：世界生成只放方塊狀態、沒建方塊實體，靠方塊實體畫的家具（辦公椅、檔案櫃等 Blender 道具）全部隱形。改成後室區塊載入時補建缺少的方塊實體（`BackroomsProps.register`，舊存檔的區塊也會補）；Level 0 玻璃辦公室測試加檢查客戶端有收到（修前會失敗）；`gradlew build runClientGameTest -Plevels=0` 通過，截圖看到檔案櫃與椅子。其他樓層沒重跑
 - 使用者同意後推送：合併朋友新推的 2 個提交（場景照片、模仿者與生物掃描器、紅霧、研究瓶解鎖、雙結局），沒有衝突；合併後 `gradlew build runClientGameTest -Plevels=0` 通過，把 `main` 推送到 GitHub（地形生成的家具補建方塊實體 `d1ff5605`）；朋友這批的其他實機測試沒有重跑；沒有強制推送、沒有改寫歷史
+- 使用者要求把電影版（A24《Backrooms》2026）第 0 層的物件全部做出來（加 Steam 版的錄影帶，只能撿和賣）；分工：Claude 做物件、Gemini 擺放；一開始就用 Blender：
+  - 第一版單色模型使用者覺得「很塑膠、太光滑反光」：改成每個物件的表面用 CC0 照片打底（ambientCG，新下載 Fabric030、Fabric061、Leather026、Plastic006、Plastic010、Cardboard004、Wood049、Wood066、Paper001、PaintedMetal004、Chipboard004 到 `tools/.cache/`），加污漬、泛黃、掉漆、鏽斑，烘焙顏色與環境光遮蔽成一張貼圖，霧面不反光
+  - 使用者要「更像電影」：讀了電影的美術報導，下載電影劇照與截圖（只在暫存區看，沒放進專案）對照，重做成電影裡的樣子：90 年代膨鬆捲手沙發與躺椅（椅背掛粉紅／黃色價格牌）、孔雀藍拉扣旋轉椅、梯背椅、八角餐桌組、地毯捲、黃銅吊燈、金色寶座、船舵、紙板人形、特價吊牌與布條、頂到天花板的家具山與椅子山等；店名與招牌沒照抄
+  - 新增 `tools/film/`：`film_list.py`（68 個物件的 id、大小、掛法、材料、中英文名稱、掉落、錄影帶標籤，唯一來源）、`prints.py`（布料花紋、水彩畫、招牌字）、`realistic.py`（照片材質與烘焙）、`make_film_props.py`（Blender 建模）、`make_film_icons.py`（物品欄圖示）、`make_film_data.py`（寫進遊戲資源）；`tools/film/prints/` 是中間產物，加進 `.gitignore`
+  - 新增 `level0/film/`：`FilmProps`（68 個方塊與物品「VHS 錄影帶」，註冊進 Gemini 的家具方塊實體，創造模式分頁）、`FilmPropBlock`（單格物件：地板、矮、平放可走過、掛牆、吊頂）；多格物件直接用 Gemini 的 `MultiPartPropBlock`；客戶端 `FilmLook`（讀模型，資源包重載時清掉）
+  - 動到別人的檔案：Gemini 的 `BlenderPropRenderer` 加一段（`film_` 開頭的物件畫有貼圖的模型、以方塊中心為原點）；`BackroomsMod`、`BackroomsClient` 各加一行；語言檔、`mineable/axe`、`mineable/pickaxe`、收購商 `shops/buyer.json`（錄影帶每卷 8 點）
+  - 資源：模型 `models/film/`、貼圖 `textures/film/`、圖示 `textures/item/film/`、方塊狀態、物品定義、68 個掉落表（家具拆成破布、泡棉、彈簧、木條、廢金屬等；錄影帶有 12 種標籤）；新增資源約 27 MB（大型堆疊物件的貼圖到 1024）
+  - 企劃：`docs/project/5-levels/level0/README.md` 新增第八節（物件清單、掉落、錄影帶、八種擺法與哪些還沒做、展示間區規格、其他區偶爾出現的規則、給 Gemini 的擺放說明），附圖 `docs/project/5-levels/level0/film/`；`CREDITS.md` 加照片材質出處
+  - 新增實機測試 `level0/film/FilmClientTest`（`-Plevels=film`）：68 個物件都有方塊實體、模型、貼圖；逐排拍照（攝影機濾鏡開／關）與一個展示角近照；小堆錄影帶掉 6～10 卷且都有標籤；從沙發的另一格打掉整組消失並掉破布；收購商收錄影帶
+  - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=film` 通過；截圖看過物件在第 0 層裡的樣子。還沒做：穿模、倒放、地毯吞沒、藍色膠帶門框（要物件另外支援）；擺進生成器是 Gemini 的
 
 ## 動作記錄（Antigravity）
 

@@ -1,0 +1,218 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 3,
+        "max": 5
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:vhs_tape",
+          "functions": [
+            {
+              "function": "minecraft:set_lore",
+              "mode": "append",
+              "lore": [
+                {
+                  "translate": "item.noclip_backrooms.vhs_tape.label.0",
+                  "color": "gray",
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:vhs_tape",
+          "functions": [
+            {
+              "function": "minecraft:set_lore",
+              "mode": "append",
+              "lore": [
+                {
+                  "translate": "item.noclip_backrooms.vhs_tape.label.1",
+                  "color": "gray",
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:vhs_tape",
+          "functions": [
+            {
+              "function": "minecraft:set_lore",
+              "mode": "append",
+              "lore": [
+                {
+                  "translate": "item.noclip_backrooms.vhs_tape.label.2",
+                  "color": "gray",
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:vhs_tape",
+          "functions": [
+            {
+              "function": "minecraft:set_lore",
+              "mode": "append",
+              "lore": [
+                {
+                  "translate": "item.noclip_backrooms.vhs_tape.label.3",
+                  "color": "gray",
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:vhs_tape",
+          "functions": [
+            {
+              "function": "minecraft:set_lore",
+              "mode": "append",
+              "lore": [
+                {
+                  "translate": "item.noclip_backrooms.vhs_tape.label.4",
+                  "color": "gray",
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:vhs_tape",
+          "functions": [
+            {
+              "function": "minecraft:set_lore",
+              "mode": "append",
+              "lore": [
+                {
+                  "translate": "item.noclip_backrooms.vhs_tape.label.5",
+                  "color": "gray",
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:vhs_tape",
+          "functions": [
+            {
+              "function": "minecraft:set_lore",
+              "mode": "append",
+              "lore": [
+                {
+                  "translate": "item.noclip_backrooms.vhs_tape.label.6",
+                  "color": "gray",
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:vhs_tape",
+          "functions": [
+            {
+              "function": "minecraft:set_lore",
+              "mode": "append",
+              "lore": [
+                {
+                  "translate": "item.noclip_backrooms.vhs_tape.label.7",
+                  "color": "gray",
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:vhs_tape",
+          "functions": [
+            {
+              "function": "minecraft:set_lore",
+              "mode": "append",
+              "lore": [
+                {
+                  "translate": "item.noclip_backrooms.vhs_tape.label.8",
+                  "color": "gray",
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:vhs_tape",
+          "functions": [
+            {
+              "function": "minecraft:set_lore",
+              "mode": "append",
+              "lore": [
+                {
+                  "translate": "item.noclip_backrooms.vhs_tape.label.9",
+                  "color": "gray",
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:vhs_tape",
+          "functions": [
+            {
+              "function": "minecraft:set_lore",
+              "mode": "append",
+              "lore": [
+                {
+                  "translate": "item.noclip_backrooms.vhs_tape.label.10",
+                  "color": "gray",
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:vhs_tape",
+          "functions": [
+            {
+              "function": "minecraft:set_lore",
+              "mode": "append",
+              "lore": [
+                {
+                  "translate": "item.noclip_backrooms.vhs_tape.label.11",
+                  "color": "gray",
+                  "italic": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
