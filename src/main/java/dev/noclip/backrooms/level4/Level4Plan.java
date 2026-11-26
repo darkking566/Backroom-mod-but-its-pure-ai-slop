@@ -308,12 +308,17 @@ final class Level4Plan {
 	}
 
 	private void placeExits(SplittableRandom rng, boolean omegaPlaced) {
+		java.util.Set<Integer> usedCells = new java.util.HashSet<>();
 		if (omegaPlaced) {
 			for (RoomBox room : rooms) {
 				if (room.kind() != ZoneKind.OMEGA_BASE) continue;
 				// Permanent Level 5 & Level 6 stairwells inside Omega Base's corners
-				exits.add(new PlacedExit(cell(room.i(), room.j()), NORTH, Level4Exit.OMEGA_STAIRS_5, true));
-				exits.add(new PlacedExit(cell(room.i() + room.w() - 1, room.j()), NORTH, Level4Exit.OMEGA_STAIRS_6, true));
+				int c5 = cell(room.i(), room.j());
+				int c6 = cell(room.i() + room.w() - 1, room.j());
+				exits.add(new PlacedExit(c5, NORTH, Level4Exit.OMEGA_STAIRS_5, true));
+				exits.add(new PlacedExit(c6, NORTH, Level4Exit.OMEGA_STAIRS_6, true));
+				usedCells.add(c5);
+				usedCells.add(c6);
 			}
 		}
 
@@ -336,13 +341,21 @@ final class Level4Plan {
 			if (ex == Level4Exit.OMEGA_STAIRS_5 || ex == Level4Exit.OMEGA_STAIRS_6) continue;
 			if (rng.nextDouble() >= ex.chance) continue;
 			if (ex == Level4Exit.HATCH_2) {
-				if (!floorSpots.isEmpty()) {
+				while (!floorSpots.isEmpty()) {
 					int c = floorSpots.remove(rng.nextInt(floorSpots.size()));
-					exits.add(new PlacedExit(c, NORTH, ex, false));
+					if (usedCells.add(c)) {
+						exits.add(new PlacedExit(c, NORTH, ex, false));
+						break;
+					}
 				}
-			} else if (!wallSpots.isEmpty()) {
-				int[] spot = wallSpots.remove(rng.nextInt(wallSpots.size()));
-				exits.add(new PlacedExit(spot[0], spot[1], ex, !ex.vanishing));
+			} else {
+				while (!wallSpots.isEmpty()) {
+					int[] spot = wallSpots.remove(rng.nextInt(wallSpots.size()));
+					if (usedCells.add(spot[0])) {
+						exits.add(new PlacedExit(spot[0], spot[1], ex, !ex.vanishing));
+						break;
+					}
+				}
 			}
 		}
 	}

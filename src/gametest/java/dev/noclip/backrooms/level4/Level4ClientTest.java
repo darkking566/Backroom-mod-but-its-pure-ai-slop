@@ -99,6 +99,13 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		if (tbd != null) shoot(context, game, tbd[0] + 0.5, STAND, tbd[1] + 2.2, 180, 6, true, "level4_tbd_room");
 		int[] dark = findZone(seed, from, ZoneKind.DARK_WING);
 		if (dark != null) shoot(context, game, dark[0] + 0.5, STAND, dark[1] + 0.5, -35, 4, false, "level4_dark_wing");
+
+		int[] elev = findExitView(seed, from, Level4Exit.ELEVATOR_3);
+		if (elev != null) shoot(context, game, elev[2] + 0.5, STAND, elev[3] + 0.5, elev[4], 5, false, "level4_elevator");
+		int[] stairs5 = findExitView(seed, from, Level4Exit.OMEGA_STAIRS_5);
+		if (stairs5 != null) shoot(context, game, stairs5[2] + 0.5, STAND, stairs5[3] + 0.5, stairs5[4], -8, false, "level4_stairwell");
+		int[] base71 = findExitView(seed, from, Level4Exit.BASEMENT_71);
+		if (base71 != null) shoot(context, game, base71[2] + 0.5, STAND, base71[3] + 0.5, base71[4], 18, false, "level4_basement");
 	}
 
 	private static void waterSources(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
@@ -324,19 +331,25 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		var server = game.getServer();
 		int[] found = findVanishingExit(seed, from);
 		check(found != null, "no vanishing exit found near arrival");
-		server.runOnServer(s -> Level4VanishingExits.holdOff(s, 0));
+		server.runOnServer(s -> {
+			Level4VanishingExits.setChanceForTest(100);
+			Level4VanishingExits.holdOff(s, 0);
+		});
 		server.runCommand("gamemode survival @a");
-		BlockPos exitPos = new BlockPos(found[0], STAND, found[1]);
-		server.runOnServer(s -> player(s).teleportTo(found[2] + 0.5, STAND, found[3] + 0.5));
+		BlockPos exitPos = new BlockPos(found[0], found[1], found[2]);
+		server.runOnServer(s -> player(s).teleportTo(found[3] + 0.5, STAND, found[4] + 0.5));
 		game.getConnection().waitForChunksDownload();
 		// Look at exit
-		server.runCommand("rotate @p " + found[4] + " 0");
+		server.runCommand("rotate @p " + found[5] + " 0");
 		context.waitTicks(20);
 		// Turn away for > 4 seconds
-		server.runCommand("rotate @p " + ((found[4] + 180) % 360) + " 0");
+		server.runCommand("rotate @p " + ((found[5] + 180) % 360) + " 0");
 		context.waitTicks(110);
-		server.runOnServer(s -> check(!(level4(s).getBlockState(exitPos).getBlock() instanceof Level4ExitBlock),
-				"wild vanishing exit did not vanish after looking away at " + exitPos));
+		server.runOnServer(s -> {
+			check(!(level4(s).getBlockState(exitPos).getBlock() instanceof Level4ExitBlock),
+					"wild vanishing exit did not vanish after looking away at " + exitPos);
+			Level4VanishingExits.setChanceForTest(55);
+		});
 		server.runCommand("gamemode spectator @a");
 	}
 
@@ -468,6 +481,21 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		return null;
 	}
 
+	private static int[] findExitView(long seed, BlockPos from, Level4Exit target) {
+		int rx0 = Math.floorDiv(from.getX(), Level4Plan.SIZE), rz0 = Math.floorDiv(from.getZ(), Level4Plan.SIZE);
+		for (int dx = -2; dx <= 2; dx++) {
+			for (int dz = -2; dz <= 2; dz++) {
+				Level4Plan plan = Level4Plan.of(seed, rx0 + dx, rz0 + dz);
+				for (PlacedExit pe : plan.exits) {
+					if (pe.exit() != target) continue;
+					int[] view = exitViewFromPlaced(seed, rx0 + dx, rz0 + dz, pe);
+					if (view != null) return view;
+				}
+			}
+		}
+		return null;
+	}
+
 	private static int[] findVanishingExit(long seed, BlockPos from) {
 		int rx0 = Math.floorDiv(from.getX(), Level4Plan.SIZE), rz0 = Math.floorDiv(from.getZ(), Level4Plan.SIZE);
 		for (int dx = -2; dx <= 2; dx++) {
@@ -475,33 +503,55 @@ public final class Level4ClientTest implements FabricClientGameTest {
 				Level4Plan plan = Level4Plan.of(seed, rx0 + dx, rz0 + dz);
 				for (PlacedExit pe : plan.exits) {
 					if (!pe.exit().vanishing || pe.exit() == Level4Exit.HATCH_2) continue;
-					int cx = pe.cell() % Level4Plan.N, cz = pe.cell() / Level4Plan.N;
-					int baseX = (rx0 + dx) * Level4Plan.SIZE + cx * Level4Plan.CELL;
-					int baseZ = (rz0 + dz) * Level4Plan.SIZE + cz * Level4Plan.CELL;
-					int ex = switch (pe.dir()) {
-						case Level4Plan.WEST -> baseX;
-						case Level4Plan.EAST -> baseX + Level4Plan.CELL - 1;
-						default -> baseX + 3;
-					};
-					int ez = switch (pe.dir()) {
-						case Level4Plan.NORTH -> baseZ;
-						case Level4Plan.SOUTH -> baseZ + Level4Plan.CELL - 1;
-						default -> baseZ + 3;
-					};
-					int sx = baseX + 3, sz = baseZ + 3;
-					if (Level4Layout.tile(seed, ex, ez).kind() != Kind.EXIT_DOOR) continue;
-					if (Level4Layout.tile(seed, sx, sz).kind() != Kind.AIR) continue;
-					int yaw = switch (pe.dir()) {
-						case Level4Plan.NORTH -> 180;
-						case Level4Plan.SOUTH -> 0;
-						case Level4Plan.EAST -> 270;
-						default -> 90;
-					};
-					return new int[] {ex, ez, sx, sz, yaw};
+					int[] view = exitViewFromPlaced(seed, rx0 + dx, rz0 + dz, pe);
+					if (view != null) return view;
 				}
 			}
 		}
 		return null;
+	}
+
+	/** Returns {ex, ey, ez, standX, standZ, yaw} for an exit, accounting for 3D stairwell/basement offsets. */
+	private static int[] exitViewFromPlaced(long seed, int rx, int rz, PlacedExit pe) {
+		int cx = pe.cell() % Level4Plan.N, cz = pe.cell() / Level4Plan.N;
+		int baseX = rx * Level4Plan.SIZE + cx * Level4Plan.CELL;
+		int baseZ = rz * Level4Plan.SIZE + cz * Level4Plan.CELL;
+		int doorDepth = (pe.exit() == Level4Exit.ELEVATOR_3 || pe.exit() == Level4Exit.BASEMENT_71 || !pe.exit().hasStructure()) ? 0 : 1;
+		int ex = switch (pe.dir()) {
+			case Level4Plan.WEST -> baseX + doorDepth;
+			case Level4Plan.EAST -> baseX + Level4Plan.CELL - 1 - doorDepth;
+			default -> baseX + 3;
+		};
+		int ez = switch (pe.dir()) {
+			case Level4Plan.NORTH -> baseZ + doorDepth;
+			case Level4Plan.SOUTH -> baseZ + Level4Plan.CELL - 1 - doorDepth;
+			default -> baseZ + 3;
+		};
+		int ey = switch (pe.exit()) {
+			case STAIRS_5, OMEGA_STAIRS_5, STAIRS_6, OMEGA_STAIRS_6 -> Level4ChunkGenerator.FLOOR_Y + 3;
+			case BASEMENT_71 -> Level4ChunkGenerator.FLOOR_Y - 1;
+			default -> STAND;
+		};
+		int standDepth = pe.exit().hasStructure() ? 4 : 3;
+		int sx = switch (pe.dir()) {
+			case Level4Plan.WEST -> baseX + standDepth;
+			case Level4Plan.EAST -> baseX + Level4Plan.CELL - 1 - standDepth;
+			default -> baseX + 3;
+		};
+		int sz = switch (pe.dir()) {
+			case Level4Plan.NORTH -> baseZ + standDepth;
+			case Level4Plan.SOUTH -> baseZ + Level4Plan.CELL - 1 - standDepth;
+			default -> baseZ + 3;
+		};
+		if (Level4Layout.tile(seed, ex, ez).kind() != Kind.EXIT_DOOR) return null;
+		if (Level4Layout.tile(seed, sx, sz).kind() != Kind.AIR) return null;
+		int yaw = switch (pe.dir()) {
+			case Level4Plan.NORTH -> 180;
+			case Level4Plan.SOUTH -> 0;
+			case Level4Plan.EAST -> 270;
+			default -> 90;
+		};
+		return new int[] {ex, ey, ez, sx, sz, yaw};
 	}
 
 	private static void shoot(ClientGameTestContext context, TestSingleplayerContext game, double x, double y, double z, float yaw, float pitch, boolean populate, String name) {

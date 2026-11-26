@@ -17,6 +17,7 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
@@ -53,6 +54,8 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 
 	static BlockState blockAt(long seed, int x, int y, int z) {
 		if (y <= 0 || y >= HEIGHT - 2) return Blocks.BEDROCK.defaultBlockState();
+		Level4Layout.ExitStruct es = Level4Layout.exitStructure(seed, x, z);
+		if (es != null) return exitStructureBlock(es, y);
 		if (y < FLOOR_Y) return Blocks.CONCRETE.gray().defaultBlockState();
 		Tile tile = Level4Layout.tile(seed, x, z);
 		int roofY = FLOOR_Y + tile.ceilingHeight() + 1;
@@ -155,7 +158,7 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 				}
 				yield (tile.zone() == ZoneKind.OMEGA_BASE ? Level4Blocks.OMEGA_WALL : Level4Blocks.OFFICE_DRYWALL_UPPER).defaultBlockState();
 			}
-			case EXIT_HATCH -> Blocks.AIR.defaultBlockState();
+			case EXIT_STRUCTURE, EXIT_HATCH -> Blocks.AIR.defaultBlockState();
 			case WATER_COOLER -> h == 1
 					? Level4Blocks.OFFICE_WATER_COOLER.defaultBlockState().setValue(Level4WaterSourceBlock.FACING, dir).setValue(Level4WaterSourceBlock.BOTTLES, 2)
 					: Blocks.AIR.defaultBlockState();
@@ -206,6 +209,112 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 					? Level4Blocks.OFFICE_DESK_PHONE.defaultBlockState().setValue(Level4FacingBlock.FACING, dir)
 					: Blocks.AIR.defaultBlockState();
 		};
+	}
+
+	private static BlockState exitStructureBlock(Level4Layout.ExitStruct es, int y) {
+		Direction intoWall = dirFrom(es.dir());
+		Direction intoRoom = intoWall.getOpposite();
+		Block wallLow = es.zone() == ZoneKind.OMEGA_BASE ? Level4Blocks.OMEGA_WALL : Level4Blocks.OFFICE_DRYWALL;
+		Block wallUp = es.zone() == ZoneKind.OMEGA_BASE ? Level4Blocks.OMEGA_WALL : Level4Blocks.OFFICE_DRYWALL_UPPER;
+		int d = es.depth(), a = es.along();
+
+		if (es.exit() == Level4Exit.ELEVATOR_3) {
+			if (y < FLOOR_Y || y > FLOOR_Y + Level4Layout.OPEN_HEIGHT + 1) return Blocks.CONCRETE.gray().defaultBlockState();
+			if (y == FLOOR_Y + Level4Layout.OPEN_HEIGHT + 1) return Level4Blocks.OFFICE_ACOUSTIC_CEILING.defaultBlockState();
+			if (d == 0) {
+				if (y == FLOOR_Y) return Blocks.POLISHED_ANDESITE.defaultBlockState();
+				if (a == 3 && (y == FLOOR_Y + 1 || y == FLOOR_Y + 2)) {
+					return Level4Blocks.OFFICE_ELEVATOR.defaultBlockState()
+							.setValue(Level4ExitBlock.PART, y - (FLOOR_Y + 1))
+							.setValue(Level4ExitBlock.FACING, intoRoom);
+				}
+				return Level4Blocks.OMEGA_WALL.defaultBlockState();
+			}
+			// depth == 1: walk-in elevator cabin
+			if (y == FLOOR_Y) return Blocks.POLISHED_ANDESITE.defaultBlockState();
+			if (a == 2 || a == 4) {
+				return (y == FLOOR_Y + 4 ? wallUp : Level4Blocks.OMEGA_WALL).defaultBlockState();
+			}
+			if (y == FLOOR_Y + 3) {
+				return Level4Blocks.OFFICE_TROFFER_LIT.defaultBlockState().setValue(Level4AxisBlock.AXIS, intoWall.getAxis());
+			}
+			if (y == FLOOR_Y + 4) return wallUp.defaultBlockState();
+			return Blocks.AIR.defaultBlockState();
+		}
+
+		if (es.exit() == Level4Exit.BASEMENT_71) {
+			if (y < FLOOR_Y - 3 || y > FLOOR_Y + Level4Layout.OPEN_HEIGHT + 1) return Blocks.CONCRETE.gray().defaultBlockState();
+			if (y == FLOOR_Y + Level4Layout.OPEN_HEIGHT + 1) return Level4Blocks.OFFICE_ACOUSTIC_CEILING.defaultBlockState();
+			if (d == 0) {
+				if (a == 3 && (y == FLOOR_Y - 1 || y == FLOOR_Y)) {
+					return Level4Blocks.OFFICE_BASEMENT_71.defaultBlockState()
+							.setValue(Level4ExitBlock.PART, y - (FLOOR_Y - 1))
+							.setValue(Level4ExitBlock.FACING, intoRoom);
+				}
+				if (y <= FLOOR_Y) return Blocks.STONE_BRICKS.defaultBlockState();
+				return (y == FLOOR_Y + 1 ? wallLow : wallUp).defaultBlockState();
+			}
+			if (d == 1) {
+				if (a == 2 || a == 4) {
+					if (y <= FLOOR_Y) return Blocks.STONE_BRICKS.defaultBlockState();
+					return (y == FLOOR_Y + 1 ? wallLow : wallUp).defaultBlockState();
+				}
+				if (y <= FLOOR_Y - 2) return Blocks.STONE_BRICKS.defaultBlockState();
+				if (y == FLOOR_Y + 3) {
+					return Level4Blocks.OFFICE_TROFFER_DIM.defaultBlockState().setValue(Level4AxisBlock.AXIS, intoWall.getAxis());
+				}
+				if (y == FLOOR_Y + 4) return wallUp.defaultBlockState();
+				return Blocks.AIR.defaultBlockState();
+			}
+			if (d == 2) {
+				if (a == 2 || a == 4) {
+					if (y <= FLOOR_Y) return Blocks.STONE_BRICKS.defaultBlockState();
+					return (y == FLOOR_Y + 1 ? wallLow : wallUp).defaultBlockState();
+				}
+				if (y <= FLOOR_Y - 2) return Blocks.STONE_BRICKS.defaultBlockState();
+				if (y == FLOOR_Y - 1) return Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, intoRoom);
+				return Blocks.AIR.defaultBlockState();
+			}
+			// d == 3, a == 3: descending entry step
+			if (y < FLOOR_Y) return Blocks.CONCRETE.gray().defaultBlockState();
+			if (y == FLOOR_Y) return Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, intoRoom);
+			return Blocks.AIR.defaultBlockState();
+		}
+
+		// Ascending office stairwell (Level 5 / Level 6)
+		if (y < FLOOR_Y || y > FLOOR_Y + 6) return Blocks.CONCRETE.gray().defaultBlockState();
+		if (d == 0) {
+			if (y == FLOOR_Y) return Blocks.POLISHED_ANDESITE.defaultBlockState();
+			return (y == FLOOR_Y + 1 ? wallLow : wallUp).defaultBlockState();
+		}
+		if (d == 1) {
+			if (y == FLOOR_Y) return Blocks.POLISHED_ANDESITE.defaultBlockState();
+			if (a == 2 || a == 4) return (y == FLOOR_Y + 1 ? wallLow : wallUp).defaultBlockState();
+			if (y == FLOOR_Y + 1 || y == FLOOR_Y + 2) return Blocks.POLISHED_ANDESITE.defaultBlockState();
+			if (y == FLOOR_Y + 3 || y == FLOOR_Y + 4) {
+				return exitBlock(es.exit()).defaultBlockState()
+						.setValue(Level4ExitBlock.PART, y - (FLOOR_Y + 3))
+						.setValue(Level4ExitBlock.FACING, intoRoom);
+			}
+			return wallUp.defaultBlockState();
+		}
+		if (d == 2) {
+			if (y == FLOOR_Y) return Blocks.POLISHED_ANDESITE.defaultBlockState();
+			if (a == 2 || a == 4) return (y == FLOOR_Y + 1 ? wallLow : wallUp).defaultBlockState();
+			if (y == FLOOR_Y + 1) return Blocks.POLISHED_ANDESITE.defaultBlockState();
+			if (y == FLOOR_Y + 2) return Blocks.POLISHED_ANDESITE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, intoWall);
+			if (y == FLOOR_Y + 5) {
+				return Level4Blocks.OFFICE_TROFFER_LIT.defaultBlockState().setValue(Level4AxisBlock.AXIS, intoWall.getAxis());
+			}
+			if (y == FLOOR_Y + 6) return Level4Blocks.OFFICE_ACOUSTIC_CEILING.defaultBlockState();
+			return Blocks.AIR.defaultBlockState();
+		}
+		// d == 3, a == 3: ascending entry step
+		if (y == FLOOR_Y) return Level4Blocks.OFFICE_CARPET.defaultBlockState();
+		if (y == FLOOR_Y + 1) return Blocks.POLISHED_ANDESITE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, intoWall);
+		if (y == FLOOR_Y + 5) return Level4Blocks.OFFICE_ACOUSTIC_CEILING.defaultBlockState();
+		if (y == FLOOR_Y + 6) return Blocks.CONCRETE.gray().defaultBlockState();
+		return Blocks.AIR.defaultBlockState();
 	}
 
 	private static BlockState windowColumn(Block window, int h, Direction facing) {

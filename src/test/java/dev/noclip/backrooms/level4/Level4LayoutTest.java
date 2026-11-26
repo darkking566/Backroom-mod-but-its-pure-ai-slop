@@ -172,4 +172,40 @@ final class Level4LayoutTest {
 		assertTrue(total > 0, "expected windows in Level 4");
 		assertTrue(blacked * 100 >= total * 70, "expected >= 70% blacked-out windows, got " + blacked + "/" + total);
 	}
+
+	@Test
+	void physicalExitStructuresHaveValidFootprints() {
+		Set<Level4Exit> seenStructs = EnumSet.noneOf(Level4Exit.class);
+		for (long seed = 10; seed <= 16; seed++) {
+			for (int rx = -2; rx <= 2; rx++) {
+				for (int rz = -2; rz <= 2; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					for (PlacedExit pe : plan.exits) {
+						if (!pe.exit().hasStructure()) continue;
+						int cx = pe.cell() % Level4Plan.N, cz = pe.cell() / Level4Plan.N;
+						int baseX = rx * Level4Plan.SIZE + cx * Level4Plan.CELL;
+						int baseZ = rz * Level4Plan.SIZE + cz * Level4Plan.CELL;
+						int doors = 0, structs = 0;
+						for (int x = baseX; x < baseX + Level4Plan.CELL; x++) {
+							for (int z = baseZ; z < baseZ + Level4Plan.CELL; z++) {
+								Level4Layout.ExitStruct es = Level4Layout.exitStructure(seed, x, z);
+								if (es == null) continue;
+								Tile t = Level4Layout.tile(seed, x, z);
+								if (t.kind() == Kind.EXIT_DOOR) doors++;
+								else if (t.kind() == Kind.EXIT_STRUCTURE) structs++;
+							}
+						}
+						assertEquals(1, doors, "expected 1 exit door column for " + pe.exit());
+						assertTrue(structs >= 5, "expected multi-block structure for " + pe.exit());
+						seenStructs.add(pe.exit());
+					}
+				}
+			}
+		}
+		assertTrue(seenStructs.contains(Level4Exit.ELEVATOR_3));
+		assertTrue(seenStructs.contains(Level4Exit.OMEGA_STAIRS_5));
+		assertTrue(seenStructs.contains(Level4Exit.OMEGA_STAIRS_6));
+		assertTrue(seenStructs.contains(Level4Exit.STAIRS_5));
+		assertTrue(seenStructs.contains(Level4Exit.BASEMENT_71));
+	}
 }

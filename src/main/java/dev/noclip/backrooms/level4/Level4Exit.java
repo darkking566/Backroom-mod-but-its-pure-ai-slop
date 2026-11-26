@@ -12,7 +12,7 @@ public enum Level4Exit {
 	OMEGA_STAIRS_6("6", false, 0.0),
 	STAIRS_5("5", true, 0.20),
 	STAIRS_6("6", true, 0.20),
-	BASEMENT_71("71", true, 0.14),
+	BASEMENT_71("71", true, 0.08),
 	WHITE_DOOR_4P3("4.3", true, 0.16),
 	CITY_DOOR_11("11", true, 0.12),
 	HATCH_2("2", true, 0.15),
@@ -27,5 +27,11 @@ public enum Level4Exit {
 		this.level = level;
 		this.vanishing = vanishing;
 		this.chance = chance;
+	}
+
+	/** Whether this exit builds a multi-block walkable cabin, stairwell, or basement staircase. */
+	boolean hasStructure() {
+		return this == ELEVATOR_3 || this == OMEGA_STAIRS_5 || this == OMEGA_STAIRS_6
+				|| this == STAIRS_5 || this == STAIRS_6 || this == BASEMENT_71;
 	}
 }

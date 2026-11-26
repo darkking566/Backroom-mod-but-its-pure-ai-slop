@@ -31,6 +31,7 @@ final class Level4Layout {
 		WINDOW_RAIN,
 		FIRE_DOOR,
 		EXIT_DOOR,
+		EXIT_STRUCTURE,
 		EXIT_HATCH,
 		WATER_COOLER,
 		FOUNTAIN_BASIN,
@@ -47,6 +48,9 @@ final class Level4Layout {
 		BREAKER,
 		PHOTOCOPIER,
 		DESK_PHONE
+	}
+
+	record ExitStruct(Level4Exit exit, ZoneKind zone, int dir, int depth, int along) {
 	}
 
 	record Tile(Kind kind, ZoneKind zone, int dir, int ceilingHeight, Level4Exit exit, boolean exitSign) {
@@ -71,6 +75,37 @@ final class Level4Layout {
 		return Level4Plan.of(seed, Math.floorDiv(x, SIZE), Math.floorDiv(z, SIZE));
 	}
 
+	static ExitStruct exitStructure(long seed, int x, int z) {
+		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
+		Level4Plan plan = Level4Plan.of(seed, rx, rz);
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		int i = lx / CELL, j = lz / CELL;
+		int cx = lx % CELL, cz = lz % CELL;
+		int c = Level4Plan.cell(i, j);
+		for (PlacedExit pe : plan.exits) {
+			if (pe.cell() != c || !pe.exit().hasStructure()) continue;
+			int depth = switch (pe.dir()) {
+				case Level4Plan.NORTH -> cz;
+				case Level4Plan.SOUTH -> (CELL - 1) - cz;
+				case Level4Plan.WEST -> cx;
+				default -> (CELL - 1) - cx;
+			};
+			int along = (pe.dir() == Level4Plan.NORTH || pe.dir() == Level4Plan.SOUTH) ? cx : cz;
+			if (pe.exit() == Level4Exit.ELEVATOR_3) {
+				if (along >= 2 && along <= 4 && depth >= 0 && depth <= 1) {
+					return new ExitStruct(pe.exit(), plan.zones[c], pe.dir(), depth, along);
+				}
+			} else {
+				boolean inFootprint = (along >= 2 && along <= 4 && depth >= 0 && depth <= 2)
+						|| (along == 3 && depth == 3);
+				if (inFootprint) {
+					return new ExitStruct(pe.exit(), plan.zones[c], pe.dir(), depth, along);
+				}
+			}
+		}
+		return null;
+	}
+
 	static Tile tile(long seed, int x, int z) {
 		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
 		Level4Plan plan = Level4Plan.of(seed, rx, rz);
@@ -83,6 +118,13 @@ final class Level4Layout {
 
 		if (zone == ZoneKind.SOLID_CORE) {
 			return new Tile(Kind.DRYWALL, zone, Level4Plan.NORTH, ceilH, null, false);
+		}
+
+		ExitStruct es = exitStructure(seed, x, z);
+		if (es != null) {
+			int doorDepth = (es.exit() == Level4Exit.ELEVATOR_3 || es.exit() == Level4Exit.BASEMENT_71) ? 0 : 1;
+			Kind k = (es.along() == 3 && es.depth() == doorDepth) ? Kind.EXIT_DOOR : Kind.EXIT_STRUCTURE;
+			return new Tile(k, zone, Level4Plan.opposite(es.dir()), ceilH, es.exit(), false);
 		}
 
 		// Exits attached to cell walls or floor

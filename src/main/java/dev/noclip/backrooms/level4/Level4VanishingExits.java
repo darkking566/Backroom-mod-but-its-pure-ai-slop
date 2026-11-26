@@ -6,26 +6,27 @@ import java.util.Map;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 /**
  * Wiki mechanic: "As with many other exits in the Backrooms, once you lose sight of an exit, they may vanish unexpectedly."
  * Wild vanishing exits ({@link Level4Exit#vanishing}) observed by a wanderer are tracked; once every nearby
- * player looks away for ~4 seconds, the exit dissolves quietly into solid drywall (or carpet for floor hatches).
+ * player looks away for ~4 seconds, there is a 55% chance the entire exit (including its stairwell or basement
+ * staircase) dissolves silently into ordinary office drywall and carpet with no sound or prompt.
  * M.E.G. Base Omega stairwells and Level 3 elevators are permanent and never vanish.
  */
 final class Level4VanishingExits {
 	private static final int CHECK_INTERVAL = 10;
 	private static final int VANISH_TICKS = 80;
 	private static final int SCAN_RADIUS = 18;
+	private static final int DEFAULT_VANISH_CHANCE = 55;
 	private static final Map<BlockPos, Integer> UNSEEN_TICKS = new HashMap<>();
+	private static int vanishChance = DEFAULT_VANISH_CHANCE;
 	private static int heldOffUntil;
 
 	private Level4VanishingExits() {
@@ -35,12 +36,17 @@ final class Level4VanishingExits {
 		ServerTickEvents.END_SERVER_TICK.register(Level4VanishingExits::tick);
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			UNSEEN_TICKS.clear();
+			vanishChance = DEFAULT_VANISH_CHANCE;
 			heldOffUntil = 0;
 		});
 	}
 
 	static void holdOff(MinecraftServer server, int ticks) {
 		heldOffUntil = server.getTickCount() + ticks;
+	}
+
+	static void setChanceForTest(int percent) {
+		vanishChance = percent;
 	}
 
 	private static void tick(MinecraftServer server) {
@@ -60,17 +66,17 @@ final class Level4VanishingExits {
 				for (int dz = -SCAN_RADIUS; dz <= SCAN_RADIUS; dz++) {
 					int x = player.getBlockX() + dx, z = player.getBlockZ() + dz;
 					if (Level4Layout.inOmegaBase(seed, x, z)) continue;
-					scan.set(x, Level4ChunkGenerator.FLOOR_Y + 1, z);
-					BlockState st = level.getBlockState(scan);
-					if (!(st.getBlock() instanceof Level4ExitBlock eb) || !eb.exit.vanishing) {
-						scan.set(x, Level4ChunkGenerator.FLOOR_Y, z);
-						st = level.getBlockState(scan);
-						if (!(st.getBlock() instanceof Level4ExitBlock eb2) || !eb2.exit.vanishing) continue;
-					}
-					Vec3 toExit = Vec3.atCenterOf(scan).subtract(eye);
-					double dist = toExit.length();
-					if (dist > 1.2 && dist < SCAN_RADIUS && look.dot(toExit.normalize()) > 0.65) {
-						UNSEEN_TICKS.putIfAbsent(scan.immutable(), 0);
+					for (int y = Level4ChunkGenerator.FLOOR_Y - 1; y <= Level4ChunkGenerator.FLOOR_Y + 3; y++) {
+						scan.set(x, y, z);
+						if (!level.isLoaded(scan)) continue;
+						BlockState st = level.getBlockState(scan);
+						if (!(st.getBlock() instanceof Level4ExitBlock eb) || !eb.exit.vanishing) continue;
+						if (!eb.hatch && st.getValue(Level4ExitBlock.PART) != 0) continue;
+						Vec3 toExit = Vec3.atCenterOf(scan).subtract(eye);
+						double dist = toExit.length();
+						if (dist > 1.2 && dist < SCAN_RADIUS && look.dot(toExit.normalize()) > 0.65) {
+							UNSEEN_TICKS.putIfAbsent(scan.immutable(), 0);
+						}
 					}
 				}
 			}
@@ -111,7 +117,9 @@ final class Level4VanishingExits {
 			} else {
 				int next = entry.getValue() + CHECK_INTERVAL;
 				if (next >= VANISH_TICKS) {
-					dissolve(level, pos, eb.hatch);
+					if (level.getRandom().nextInt(100) < vanishChance) {
+						dissolve(level, seed, pos, eb);
+					}
 					it.remove();
 				} else {
 					entry.setValue(next);
@@ -120,21 +128,40 @@ final class Level4VanishingExits {
 		}
 	}
 
-	private static void dissolve(ServerLevel level, BlockPos pos, boolean hatch) {
-		if (hatch) {
+	private static void dissolve(ServerLevel level, long seed, BlockPos pos, Level4ExitBlock eb) {
+		if (eb.hatch) {
 			level.setBlock(pos, Level4Blocks.OFFICE_CARPET.defaultBlockState(), 3);
-		} else {
-			level.setBlock(pos, Level4Blocks.OFFICE_DRYWALL.defaultBlockState(), 3);
-			if (level.getBlockState(pos.above()).getBlock() instanceof Level4ExitBlock) {
-				level.setBlock(pos.above(), Level4Blocks.OFFICE_DRYWALL_UPPER.defaultBlockState(), 3);
-			}
+			return;
 		}
-		level.playSound(null, pos, Level4Sounds.VANISH, SoundSource.BLOCKS, 0.7F, 0.8F);
-		level.sendParticles(ParticleTypes.SMOKE, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 14, 0.35, 0.5, 0.35, 0.02);
-		for (ServerPlayer player : level.players()) {
-			if (player.distanceToSqr(Vec3.atCenterOf(pos)) <= 24 * 24) {
-				player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.exit_vanished"));
+		if (eb.exit.hasStructure()) {
+			int cellX = Math.floorDiv(pos.getX(), Level4Plan.CELL) * Level4Plan.CELL;
+			int cellZ = Math.floorDiv(pos.getZ(), Level4Plan.CELL) * Level4Plan.CELL;
+			BlockPos.MutableBlockPos p = new BlockPos.MutableBlockPos();
+			for (int x = cellX; x < cellX + Level4Plan.CELL; x++) {
+				for (int z = cellZ; z < cellZ + Level4Plan.CELL; z++) {
+					Level4Layout.ExitStruct es = Level4Layout.exitStructure(seed, x, z);
+					if (es == null || es.exit() != eb.exit) continue;
+					for (int y = Level4ChunkGenerator.FLOOR_Y - 3; y <= Level4ChunkGenerator.FLOOR_Y - 1; y++) {
+						level.setBlock(p.set(x, y, z), Blocks.CONCRETE.gray().defaultBlockState(), 3);
+					}
+					boolean backWall = es.depth() == 0;
+					level.setBlock(p.set(x, Level4ChunkGenerator.FLOOR_Y, z),
+							(backWall ? Level4Blocks.OFFICE_DRYWALL : Level4Blocks.OFFICE_CARPET).defaultBlockState(), 3);
+					for (int y = Level4ChunkGenerator.FLOOR_Y + 1; y <= Level4ChunkGenerator.FLOOR_Y + 4; y++) {
+						BlockState fill = backWall
+								? (y == Level4ChunkGenerator.FLOOR_Y + 1 ? Level4Blocks.OFFICE_DRYWALL : Level4Blocks.OFFICE_DRYWALL_UPPER).defaultBlockState()
+								: Blocks.AIR.defaultBlockState();
+						level.setBlock(p.set(x, y, z), fill, 3);
+					}
+					level.setBlock(p.set(x, Level4ChunkGenerator.FLOOR_Y + 5, z), Level4Blocks.OFFICE_ACOUSTIC_CEILING.defaultBlockState(), 3);
+					level.setBlock(p.set(x, Level4ChunkGenerator.FLOOR_Y + 6, z), Blocks.CONCRETE.gray().defaultBlockState(), 3);
+				}
 			}
+			return;
+		}
+		level.setBlock(pos, Level4Blocks.OFFICE_DRYWALL.defaultBlockState(), 3);
+		if (level.getBlockState(pos.above()).getBlock() instanceof Level4ExitBlock) {
+			level.setBlock(pos.above(), Level4Blocks.OFFICE_DRYWALL_UPPER.defaultBlockState(), 3);
 		}
 	}
 }
