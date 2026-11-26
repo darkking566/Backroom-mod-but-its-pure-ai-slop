@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import dev.noclip.backrooms.level3.Level3Halls.Piece;
 import dev.noclip.backrooms.level3.Level3Layout.Kind;
 import dev.noclip.backrooms.level3.Level3Layout.Tile;
+import dev.noclip.backrooms.props.BackroomsProps;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.BlockPos;
@@ -17,6 +18,7 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
@@ -100,7 +102,13 @@ final class Level3ChunkGenerator extends ChunkGenerator {
 		}
 
 		private BlockState floor() {
-			if (tile.kind() == Kind.HALL && tile.hall().kind() == Level3Plan.HallKind.BASE) return state(Level3Blocks.MEG_WALL);
+			if (tile.kind() == Kind.HALL) {
+				return switch (tile.hall().kind()) {
+					case BASE, BNTG_STORAGE -> state(Level3Blocks.MEG_WALL);
+					case SCYLLA_COLONY -> state(Level3Blocks.CINDER_BLOCK_WALL);
+					default -> state(Level3Blocks.DUSTY_FLOOR);
+				};
+			}
 			return state(Level3Blocks.DUSTY_FLOOR);
 		}
 
@@ -176,6 +184,7 @@ final class Level3ChunkGenerator extends ChunkGenerator {
 			Block block = switch (Level3Layout.light(seed, x, z)) {
 				case NONE -> null;
 				case FLUORESCENT -> Level3Blocks.STATION_LIGHT;
+				case DIM_FLUORESCENT -> Level3Blocks.DIM_STATION_LIGHT;
 				case FLICKERING -> Level3Blocks.FLICKERING_STATION_LIGHT;
 				case BROKEN -> Level3Blocks.BROKEN_STATION_LIGHT;
 				case BULB -> Level3Blocks.CAGE_BULB;
@@ -217,8 +226,9 @@ final class Level3ChunkGenerator extends ChunkGenerator {
 			return switch (tile.hall().kind()) {
 				case SANCTUM -> sanctumWall(h);
 				case BASE -> h == 3 && along() % 4 == 2 ? state(Level3Blocks.MEG_SIGN) : state(Level3Blocks.MEG_WALL);
-				case GENERATOR, BOILER -> state(Level3Blocks.CINDER_BLOCK_WALL);
-				case ASSEMBLY -> state(Level3Blocks.CINDER_BLOCK_WALL);
+				case BNTG_STORAGE -> state(Level3Blocks.MEG_WALL);
+				case BLUE_SALVATION -> state(Level3Blocks.FOJ_WHITE_WALL);
+				case GENERATOR, BOILER, ASSEMBLY, SCYLLA_COLONY -> state(Level3Blocks.CINDER_BLOCK_WALL);
 				case CAR -> state(Level3Blocks.RED_BRICK_WALL);
 			};
 		}
@@ -249,6 +259,8 @@ final class Level3ChunkGenerator extends ChunkGenerator {
 				case FLICKERING_LIGHT -> axis(Level3Blocks.FLICKERING_STATION_LIGHT);
 				case BULB -> axis(Level3Blocks.CAGE_BULB);
 				case BRIGHT_LIGHT -> axis(Level3Blocks.FLOODLIGHT);
+				case BLUE_LIGHT -> axis(Level3Blocks.BLUE_STATION_LIGHT);
+				case DEAD_LIGHT -> axis(Level3Blocks.BROKEN_STATION_LIGHT);
 				case CABLE_TRAY -> axis(Level3Blocks.CABLE_TRAY);
 				case SLUDGE_PIPE -> axis(Level3Blocks.CEILING_SLUDGE_PIPE);
 				case WIRE -> state(Level3Blocks.LIVE_WIRE);
@@ -271,6 +283,15 @@ final class Level3ChunkGenerator extends ChunkGenerator {
 				case COT -> Level3Blocks.COT.defaultBlockState().setValue(Level3FacingBlock.FACING, facing);
 				case SUPPLY_CRATE -> state(Level3Blocks.SUPPLY_CRATE);
 				case TABLE -> state(Level3Blocks.TABLE);
+				case CAMERA -> Level3Blocks.SECURITY_CAMERA.defaultBlockState().setValue(Level3FacingBlock.FACING, facing);
+				case JERRY_MURAL -> Level3Blocks.JERRY_MURAL.defaultBlockState().setValue(Level3FacingBlock.FACING, facing);
+				case UEC_APPARATUS -> Level3Blocks.UEC_APPARATUS.defaultBlockState().setValue(Level3FacingBlock.FACING, facing);
+				case SALVAGE_BENCH -> BackroomsProps.SALVAGE_BENCH.defaultBlockState().trySetValue(BlockStateProperties.HORIZONTAL_FACING, facing);
+				case WORKSHOP_BENCH -> BackroomsProps.WORKSHOP_BENCH.defaultBlockState().trySetValue(BlockStateProperties.HORIZONTAL_FACING, facing);
+				case ARMORY_CRATE -> BackroomsProps.LOCKED_ARMORY_CRATE.defaultBlockState().trySetValue(BlockStateProperties.HORIZONTAL_FACING, facing);
+				case VAULT_CHEST -> BackroomsProps.ANOMALY_VAULT_CHEST.defaultBlockState().trySetValue(BlockStateProperties.HORIZONTAL_FACING, facing);
+				case LECTERN -> Blocks.LECTERN.defaultBlockState().trySetValue(BlockStateProperties.HORIZONTAL_FACING, facing);
+				case BARS -> axis(Level3Blocks.WHITE_BARS);
 			};
 		}
 

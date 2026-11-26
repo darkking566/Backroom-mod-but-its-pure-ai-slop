@@ -725,3 +725,20 @@
     - `ANOMALY_RIFT_ARCHIVE`：`sealed_vault_wall`／`glitched_wall_seam` 與虛空石圍出封印裂隙室，內設 `anomaly_altar`、`crystal_vein_node`、異常金庫箱、老電腦桌、工業配電箱與殘骸
     - `VOID_RELAY_POST`：複用 `hub_door`／`hub_door_top`（`HORIZONTAL_AXIS=Z` 朝北）與青色霓虹、虛空石走道、中繼投遞箱、上鎖軍械箱、紅色異常結晶叢與殘骸
   - 驗證：新增單元測試 `Level1EasterEggsTest`（3 項）與實機測試 `Level1ClientTest.easterEggs`（含 3 張實機截圖與 `fun_door` 右鍵觸發 `LevelExits.refusals()` 實測）；執行 `.\gradlew.bat build --no-daemon`（97 項單元測試全過、0 失敗 0 錯誤）與全 4 批合併實機測試 `.\gradlew.bat runClientGameTest "-Plevels=1" "-Psections=elevationPois,sectorPois,vignettes,easterEggs,sectorFit,pipeFit" --no-daemon` 全部通過並逐一檢查 3 張實機截圖正常；更新 `docs/levels/level1/README.md` 並僅於本機 `main` 提交（未推送）
+### 2026-11-26
+- Level 3 照中文維基 [`latest:level-3`](https://backrooms-wiki-cn.wikidot.com/latest:level-3) 規劃完整升級藍圖並完成 **Batch 1（寫實材質包、四態燈具、牆地變體與黑暗氣氛）**（Antigravity）：
+  - 規劃：`docs/levels/level3/README.md` 補齊 `docs/look/SOP.md` 畫面規格表與 5 批升級藍圖（保留既有骨架與出口相容）
+  - 四態燈具與髒舊變體：`Level3Blocks.DIM_STATION_LIGHT`（快壞的日光燈，`fixture(7)`）、`Level3Layout` 調整電路比例（亮 42%／快壞 15%／閃 13%／壞 30%，`DEAD` 比例不變）、`Level3ChunkGenerator` 接入；新增 `tools/make_level3_polish.py` 產出 `light_lens_dim`（兩端發黑老化燈管）與紅磚／褐磚／空心磚／釉面磁磚 4 變體（不鏡像）、積灰地板 3 款×4 向、天花板 3 款×0/180 變體
+  - 寫實材質包：新增 `tools/make_level3_realistic.py` 產出 Level 3 全數 86 張靜態寫實貼圖與 labPBR `_n`／`_s`（紅磚、褐磚沿用 `make_level2_realistic.brick_substrate` 順砌長方磚＋`Concrete034` 細紋；其餘依材質搭既有 CC0 照片；經 `tools/resize_realistic.py` 縮至整格面 128×128、道具 64×64），並產出對照圖 `docs/look/level3_realistic.png`；更新 `pack.mcmeta`、雙語語言檔與 `docs/look/README.md`
+  - 黑暗氣氛與測試修復：`Look.Mood.LEVEL_3(6, 30, 0.18F)`；`Level3Events.spawnPack` 抽樣次數 40→120 與 `Level3ClientTest.hounds` 改先找離安全區 ≥52 格的 `FLOOR` 再測生怪（修復連兩次偶發抽不到空地的失敗）
+  - 驗證：`.\gradlew.bat build --no-daemon`、`.\gradlew.bat runClientGameTest -Plevels=3 --no-daemon`（不開光影）與 `.\gradlew.bat runClientGameTest -Plevels=3 -Pshaders --no-daemon`（開 Iris＋Complementary 光影）全數通過且日誌零缺模型／缺貼圖錯誤；合成並檢視雙組對照圖 `docs/look/level3_ingame.jpg`；僅於本機 `main` 提交（未推送）
+- Level 3 **Batch 2（高智能多實體生態與聖所全域庇護）**（Antigravity）：
+  - 無面靈敵意模式：`Faceling` 新增 `setHostile(boolean)`／`isHostile()`（預設 false，保留其他樓層溫和交易行為；true 時主動鎖定玩家攻擊且維持 `STATE_AGGRO`）
+  - 多實體生態：`level3/Level3Monsters.java`（於 `Level3.register()` 註冊），接入敵對武裝無面靈（持石劍／斧／鎬與 35% 盾牌、不掉落免費裝備）、死亡飛蛾（2～3 隻成群）、笑魇（暗處）、肢團（可鑽窄／矮道）、竊皮者與悲尸；組裝線大廳提高無面靈與飛蛾群出沒機率；所有怪物生成避開 Base Gamma 與聖所 24 格緩衝
+  - 聖所全域庇護：`Level3Events.scareOff` 改為對所有 `Monster` 與 `Faceling` 生效，靠近天使雕像 14 格內一律驚懼消散
+  - 驗證：`Level3ClientTest` 擴充 `angel`（同時驗證驅離獵犬／死亡飛蛾／無面靈）與新增 `monsters`（驗證 6 種實體生成與無面靈敵意武裝）；`.\gradlew.bat build --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=3 --no-daemon` 全數通過；僅於本機 `main` 提交（未推送）
+- Level 3 **Batch 3（四大據點升級與新據點實裝）**（Antigravity）：
+  - 新增 5 個據點方塊：`security_camera`（監視器）、`foj_white_wall`（白色乾牆）、`jerry_mural`（藍鸚鵡壁畫）、`blue_station_light`（藍色日光燈）、`uec_apparatus`（U.E.C. 實驗裝置）；`Level3RestBlock` 讓 Gamma 基地行軍床右鍵可設為後室重生點（`settlement.noclip_backrooms.base_gamma`）
+  - 擴充 `Level3Plan`、`Level3Halls`、`Level3ChunkGenerator` 與 `MapDump`：升級 `BASE`（監視器、安檢鐵柵、行軍床、拆解台／鍛造台），新增 `BNTG_STORAGE`（貨箱、當舖櫃檯、講台展櫃）、`BLUE_SALVATION`（白牆、藍燈、鸚鵡壁畫、殘破發電機與電線）、`SCYLLA_COLONY`（極暗實驗室、裝置、上鎖軍械箱與異常金庫箱）
+  - 新增 `Level3Bases.java`（於 `Level3.register()` 註冊）：Gamma 基地生成 `M.E.G. Quartermaster`／`Medic`（帶 `ShopRole` 交易標籤）、B.N.T.G. 倉庫生成 `Pawnshop Trader`／`Archivist`、錫拉殖民地生成敵對 `U.E.C. Operative`（`EntityTypes.PILLAGER`），並附踏入據點一次性提示訊息；`Level3Events.nearSafety` 納入 `BNTG_STORAGE` 與 `BLUE_SALVATION`
+  - 資源與測試：新增 `tools/make_level3_bases.py` 產出 5 個新方塊資源，更新 `make_level3_realistic.py` 產出全數 92 張寫實材質（經 `resize_realistic.py` 縮至 128/64），更新雙語翻譯；`Level3LayoutTest.allFourFactionBasesTurnUp` 與 `Level3ClientTest.bases` 通過，`.\gradlew.bat build --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=3 --no-daemon` 全數通過並實機檢視 4 座據點截圖；僅於本機 `main` 提交（未推送）

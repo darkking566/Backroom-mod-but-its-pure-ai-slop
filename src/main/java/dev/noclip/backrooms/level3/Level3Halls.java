@@ -13,9 +13,10 @@ final class Level3Halls {
 	static final int HEIGHT = 6;
 
 	enum Thing {
-		AIR, LIGHT, FLICKERING_LIGHT, BULB, BRIGHT_LIGHT, CABLE_TRAY, SLUDGE_PIPE, WIRE, SLUDGE,
+		AIR, LIGHT, FLICKERING_LIGHT, BULB, BRIGHT_LIGHT, BLUE_LIGHT, DEAD_LIGHT, CABLE_TRAY, SLUDGE_PIPE, WIRE, SLUDGE,
 		GENERATOR, SWITCHGEAR, BOILER, BOILER_VALVE, CONVEYOR, CRATE, PRESS, CHAIN, HOOK,
-		PILLAR_BASE, PILLAR, PILLAR_TOP, PEDESTAL, ANGEL, CAR, COT, SUPPLY_CRATE, TABLE
+		PILLAR_BASE, PILLAR, PILLAR_TOP, PEDESTAL, ANGEL, CAR, COT, SUPPLY_CRATE, TABLE,
+		CAMERA, JERRY_MURAL, UEC_APPARATUS, SALVAGE_BENCH, WORKSHOP_BENCH, ARMORY_CRATE, VAULT_CHEST, LECTERN, BARS
 	}
 
 	/** One block's worth: what, facing which way (plan direction), and which part of something bigger. */
@@ -48,6 +49,9 @@ final class Level3Halls {
 			case SANCTUM -> sanctum(seed, u, v, h, w, d, x, z, gap);
 			case CAR -> car(u, v, h, w, d);
 			case BASE -> base(seed, u, v, h, w, d, x, z, gap);
+			case BNTG_STORAGE -> bntgStorage(u, v, h, w, d, gap);
+			case BLUE_SALVATION -> blueSalvation(seed, u, v, h, w, d, x, z, gap);
+			case SCYLLA_COLONY -> scyllaColony(u, v, h, w, d, gap);
 		};
 	}
 
@@ -126,10 +130,59 @@ final class Level3Halls {
 
 	private static Piece base(long seed, int u, int v, int h, int w, int d, int x, int z, boolean gap) {
 		if (h == HEIGHT) return u % 4 == 1 && v % 4 == 1 ? Piece.of(Thing.BRIGHT_LIGHT) : Piece.AIR;
-		if (h != 1 || gap) return Piece.AIR;
+		if (h == 4 && !gap && ((u == 0 && v == 1) || (u == w - 1 && v == d - 2))) {
+			return new Piece(Thing.CAMERA, u == 0 ? Level3Plan.EAST : Level3Plan.WEST, 0);
+		}
+		if (gap) return Piece.AIR;
+		if (h <= 2 && (u == 2 || u == w - 3) && (v == 1 || v == d - 2)) return Piece.of(Thing.BARS);
+		if (h != 1) return Piece.AIR;
 		if (u == w - 1 && v % 3 == 1 && v < d - 1) return new Piece(Thing.COT, Level3Plan.WEST, 0);
 		if (u <= 2 && v >= d - 3) return Piece.of(Thing.SUPPLY_CRATE);
+		if (u == 0 && v == 1) return new Piece(Thing.SALVAGE_BENCH, Level3Plan.EAST, 0);
+		if (u == 0 && v == 3) return new Piece(Thing.WORKSHOP_BENCH, Level3Plan.EAST, 0);
 		if (u >= w / 2 - 1 && u <= w / 2 && v == d / 2 + 2) return Piece.of(Thing.TABLE);
+		return Piece.AIR;
+	}
+
+	private static Piece bntgStorage(int u, int v, int h, int w, int d, boolean gap) {
+		if (h == HEIGHT) return u % 4 == 1 && v % 3 == 1 ? Piece.of(Thing.BRIGHT_LIGHT) : Piece.AIR;
+		if (gap) return Piece.AIR;
+		if ((v == 0 || v == d - 1) && u >= 1 && u <= w - 2 && u % 2 == 1) {
+			if (h == 1) return Piece.of(u % 4 == 1 ? Thing.SUPPLY_CRATE : Thing.CRATE);
+			if (h == 2 && u % 4 == 3) return Piece.of(Thing.CRATE);
+		}
+		if (h == 1 && u >= w / 2 - 1 && u <= w / 2 && v == d / 2) return Piece.of(Thing.TABLE);
+		if (h == 1 && u == w - 2 && v == d / 2) return new Piece(Thing.LECTERN, Level3Plan.WEST, 0);
+		return Piece.AIR;
+	}
+
+	private static Piece blueSalvation(long seed, int u, int v, int h, int w, int d, int x, int z, boolean gap) {
+		if (h == HEIGHT) return v % 3 == 1 ? Piece.of(Thing.CABLE_TRAY) : ceiling(u, v, Thing.BLUE_LIGHT);
+		if (h == 2 && !gap) {
+			if (v == 0 && u % 2 == 1) return new Piece(Thing.JERRY_MURAL, Level3Plan.SOUTH, 0);
+			if (v == d - 1 && u % 2 == 1) return new Piece(Thing.JERRY_MURAL, Level3Plan.NORTH, 0);
+			if (u == 0 && v % 2 == 1) return new Piece(Thing.JERRY_MURAL, Level3Plan.EAST, 0);
+			if (u == w - 1 && v % 2 == 1) return new Piece(Thing.JERRY_MURAL, Level3Plan.WEST, 0);
+		}
+		if (gap || h != 1) return Piece.AIR;
+		if (u >= w / 2 - 1 && u <= w / 2 && v >= d / 2 - 1 && v <= d / 2) return new Piece(Thing.GENERATOR, 0, 0);
+		if (u == 1 && v == 1) return Piece.of(Thing.TABLE);
+		if (u == w - 2 && v == d - 2) return Piece.of(Thing.CRATE);
+		if (Level3Layout.roll(seed, x, 4, z) < 12) return Piece.of(Thing.WIRE);
+		return Piece.AIR;
+	}
+
+	private static Piece scyllaColony(int u, int v, int h, int w, int d, boolean gap) {
+		if (h == HEIGHT) {
+			if (u == 1 && v == 1) return Piece.of(Thing.BULB);
+			return ceiling(u, v, Thing.DEAD_LIGHT);
+		}
+		if (gap) return Piece.AIR;
+		if (h <= 2 && u == w / 2 && (v == 1 || v == d - 2)) return Piece.of(Thing.BARS);
+		if (h != 1) return Piece.AIR;
+		if ((u == 2 || u == w - 3) && v == d / 2) return new Piece(Thing.UEC_APPARATUS, u == 2 ? Level3Plan.EAST : Level3Plan.WEST, 0);
+		if (u == w - 2 && v == 1) return new Piece(Thing.ARMORY_CRATE, Level3Plan.WEST, 0);
+		if (u == w - 2 && v == d - 2) return new Piece(Thing.VAULT_CHEST, Level3Plan.WEST, 0);
 		return Piece.AIR;
 	}
 }

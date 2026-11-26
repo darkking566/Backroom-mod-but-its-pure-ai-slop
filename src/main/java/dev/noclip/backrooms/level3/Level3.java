@@ -33,5 +33,7 @@ public final class Level3 {
 		// How you arrive here through an exit from another level (see core.LevelExits): Level 2's doors marked "3".
 		LevelExits.open("3", Level3Travel::enter);
 		Level3Events.register();
+		Level3Monsters.register();
+		Level3Bases.register();
 	}
 }

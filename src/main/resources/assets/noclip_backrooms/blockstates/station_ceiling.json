@@ -1,7 +1,27 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level3/station_ceiling"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level3/station_ceiling"
+      },
+      {
+        "model": "noclip_backrooms:block/level3/station_ceiling",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level3/station_ceiling_1"
+      },
+      {
+        "model": "noclip_backrooms:block/level3/station_ceiling_1",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level3/station_ceiling_2"
+      },
+      {
+        "model": "noclip_backrooms:block/level3/station_ceiling_2",
+        "y": 180
+      }
+    ]
   }
 }

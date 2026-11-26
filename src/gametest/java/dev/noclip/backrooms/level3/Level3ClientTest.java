@@ -1,11 +1,14 @@
 package dev.noclip.backrooms.level3;
 
 import dev.noclip.backrooms.core.LevelExits;
+import dev.noclip.backrooms.core.people.Person;
+import dev.noclip.backrooms.core.trade.ShopRole;
 import dev.noclip.backrooms.level3.Level3Layout.Kind;
 import dev.noclip.backrooms.level3.Level3Layout.Profile;
 import dev.noclip.backrooms.level3.Level3Layout.Tile;
 import dev.noclip.backrooms.level3.Level3Plan.HallKind;
 import dev.noclip.backrooms.monsters.Monsters;
+import dev.noclip.backrooms.monsters.faceling.Faceling;
 import java.util.Locale;
 import java.util.function.Predicate;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
@@ -18,8 +21,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.monster.illager.Pillager;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -37,7 +42,10 @@ public final class Level3ClientTest implements FabricClientGameTest {
 			server.runCommand("gamerule send_command_feedback false");
 			server.runCommand("gamerule noclip_backrooms:edge_shift false");
 			server.runCommand("gamemode survival @a");
-			server.runOnServer(s -> Level3Events.holdOffHounds(s, 20 * 60 * 20));
+			server.runOnServer(s -> {
+				Level3Events.holdOffHounds(s, 20 * 60 * 20);
+				Level3Monsters.holdOff(s, 20 * 60 * 20);
+			});
 
 			enterFromLevel2(context, game);
 			long seed = server.computeOnServer(s -> Level3ChunkGenerator.planSeed(level3(s).getChunkSource().randomState()));
@@ -60,6 +68,8 @@ public final class Level3ClientTest implements FabricClientGameTest {
 			paranoia(context, game, seed, arrival);
 			angel(context, game, seed, arrival);
 			hounds(context, game, seed, arrival);
+			monsters(context, game, seed, arrival);
+			bases(context, game, seed, arrival);
 			checkBlocks(game);
 		}
 	}
@@ -250,13 +260,25 @@ public final class Level3ClientTest implements FabricClientGameTest {
 			var hound = Monsters.HOUND.create(level3(s), EntitySpawnReason.COMMAND);
 			hound.snapTo(angel.x + 4, STAND, angel.z + 1, 0, 0);
 			level3(s).addFreshEntity(hound);
+			var moth = Monsters.DEATHMOTH.create(level3(s), EntitySpawnReason.COMMAND);
+			moth.snapTo(angel.x - 4, STAND, angel.z + 1, 0, 0);
+			level3(s).addFreshEntity(moth);
+			var faceling = Monsters.FACELING.create(level3(s), EntitySpawnReason.COMMAND);
+			faceling.snapTo(angel.x + 1, STAND, angel.z - 4, 0, 0);
+			faceling.setHostile(true);
+			level3(s).addFreshEntity(faceling);
 		});
-		server.waitFor(s -> level3(s).getEntities(Monsters.HOUND, h -> h.position().distanceTo(angel) < 20).isEmpty(), 80);
+		server.waitFor(s -> level3(s).getEntities(Monsters.HOUND, h -> h.position().distanceTo(angel) < 20).isEmpty()
+				&& level3(s).getEntities(Monsters.DEATHMOTH, m -> m.position().distanceTo(angel) < 20).isEmpty()
+				&& level3(s).getEntities(Monsters.FACELING, f -> f.position().distanceTo(angel) < 20).isEmpty(), 80);
 	}
 
 	private static void hounds(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
 		var server = game.getServer();
-		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_3 run tp @s %.1f %d %.1f", from.getX() + 0.5, STAND, from.getZ() + 0.5));
+		int[] spot = nearest(seed, from, t -> t.kind() == Kind.FLOOR && t.clearance() >= 3,
+				(x, z) -> Level3Events.hallsNear(seed, x, z, 52).stream()
+						.noneMatch(p -> p.hall().kind() == HallKind.SANCTUM || p.hall().kind() == HallKind.BASE));
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_3 run tp @s %.1f %d %.1f", spot[0] + 0.5, STAND, spot[1] + 0.5));
 		server.runCommand("gamemode survival @a");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(20);
@@ -264,6 +286,70 @@ public final class Level3ClientTest implements FabricClientGameTest {
 		check(came >= 2, "a pack of " + came + " hounds");
 		server.runCommand("kill @e[tag=" + Level3Events.HOUND_TAG + "]");
 		server.runCommand("gamemode spectator @a");
+	}
+
+	private static void monsters(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
+		var server = game.getServer();
+		int[] spot = nearest(seed, from, t -> t.kind() == Kind.FLOOR && t.clearance() >= 3,
+				(x, z) -> Level3Events.hallsNear(seed, x, z, 52).stream()
+						.noneMatch(p -> p.hall().kind() == HallKind.SANCTUM || p.hall().kind() == HallKind.BASE));
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_3 run tp @s %.1f %d %.1f", spot[0] + 0.5, STAND, spot[1] + 0.5));
+		server.runCommand("gamemode survival @a");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(20);
+		server.runOnServer(s -> {
+			for (Level3Monsters.Entry entry : Level3Monsters.POOL) {
+				var mob = Level3Monsters.spawnOne(player(s), entry.type());
+				check(mob != null, "failed to spawn " + entry.type().getDescriptionId());
+				if (mob instanceof Faceling faceling) {
+					check(faceling.isHostile(), "Level 3 faceling is not hostile");
+					check(!faceling.getMainHandItem().isEmpty(), "Level 3 faceling is unarmed");
+				}
+			}
+		});
+		server.runCommand("kill @e[tag=" + Level3Monsters.TAG + "]");
+		server.runCommand("gamemode spectator @a");
+	}
+
+	private static void bases(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
+		var server = game.getServer();
+		for (HallKind kind : new HallKind[] {HallKind.BASE, HallKind.BNTG_STORAGE, HallKind.SCYLLA_COLONY}) {
+			int[] at = nearest(seed, from, t -> t.kind() == Kind.HALL && t.hall().kind() == kind && t.hx() == 2 && t.hz() == 2, (x, z) -> true);
+			server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_3 run tp @s %.1f %d %.1f", at[0] + 0.5, STAND, at[1] + 0.5));
+			server.runCommand("gamemode survival @a");
+			game.getConnection().waitForChunksDownload();
+			context.waitTicks(15);
+			server.runOnServer(s -> {
+				ServerLevel level = level3(s);
+				Level3Bases.populateNear(level, seed, player(s));
+				AABB box = new AABB(player(s).blockPosition()).inflate(24);
+				if (kind == HallKind.BASE) {
+					var staff = level.getEntitiesOfClass(Person.class, box, p -> p.entityTags().contains(Level3Bases.STAFF_TAG));
+					check(staff.size() >= 2, "Base Gamma missing staff");
+					check(staff.stream().anyMatch(p -> ShopRole.of(p) == ShopRole.QUARTERMASTER), "Base Gamma missing Quartermaster");
+					BlockPos cot = null;
+					for (int dx = -16; dx <= 16 && cot == null; dx++) {
+						for (int dz = -16; dz <= 16 && cot == null; dz++) {
+							BlockPos p = player(s).blockPosition().offset(dx, 0, dz);
+							if (level.getBlockState(p).is(Level3Blocks.COT)) cot = p;
+						}
+					}
+					check(cot != null, "Base Gamma missing cot");
+					level.getBlockState(cot).useWithoutItem(level, player(s),
+							new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(cot), net.minecraft.core.Direction.UP, cot, false));
+					check(player(s).getRespawnConfig() != null && player(s).getRespawnConfig().respawnData().dimension() == Level3.LEVEL_3,
+							"cot did not set Level 3 respawn");
+				} else if (kind == HallKind.BNTG_STORAGE) {
+					var staff = level.getEntitiesOfClass(Person.class, box, p -> p.entityTags().contains(Level3Bases.STAFF_TAG));
+					check(staff.stream().anyMatch(p -> ShopRole.of(p) == ShopRole.BUYER), "B.N.T.G. Storage missing Buyer");
+				} else {
+					var ops = level.getEntitiesOfClass(Pillager.class, box, p -> p.entityTags().contains(Level3Bases.UEC_TAG));
+					check(ops.size() >= 2, "Scylla Colony missing U.E.C. operatives");
+				}
+			});
+			server.runCommand("gamemode spectator @a");
+		}
+		server.runCommand("kill @e[tag=" + Level3Bases.UEC_TAG + "]");
 	}
 
 	private static void checkBlocks(TestSingleplayerContext game) {

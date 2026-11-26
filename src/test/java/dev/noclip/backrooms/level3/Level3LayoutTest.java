@@ -152,4 +152,16 @@ class Level3LayoutTest {
 			assertTrue(tile.clearance() >= 3 && !Level3Layout.hotspot(SEED, spot[0], spot[1]));
 		}
 	}
+
+	/** All four faction outposts (Base Gamma, B.N.T.G. Storage, Blue Salvation, Scylla Colony) turn up. */
+	@Test
+	void allFourFactionBasesTurnUp() {
+		Set<Level3Plan.HallKind> found = EnumSet.noneOf(Level3Plan.HallKind.class);
+		for (int rx = -5; rx <= 5; rx++) {
+			for (int rz = -5; rz <= 5; rz++) {
+				for (Level3Plan.Hall hall : Level3Plan.of(SEED, rx, rz).halls) found.add(hall.kind());
+			}
+		}
+		assertEquals(EnumSet.allOf(Level3Plan.HallKind.class), found);
+	}
 }

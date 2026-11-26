@@ -39,6 +39,9 @@ class MapDump {
 						case SANCTUM -> 0xd0b070;
 						case CAR -> 0xc04040;
 						case BASE -> 0x4060c0;
+						case BNTG_STORAGE -> 0x40b0b0;
+						case BLUE_SALVATION -> 0x60a0ff;
+						case SCYLLA_COLONY -> 0x802050;
 					};
 					case HALL_WALL -> 0x101010;
 					case HALL_GAP -> 0xffffff;

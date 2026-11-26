@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "noclip_backrooms:block/level3/security_camera"
+    },
+    "facing=west": {
+      "model": "noclip_backrooms:block/level3/security_camera",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "noclip_backrooms:block/level3/security_camera",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "noclip_backrooms:block/level3/security_camera",
+      "y": 270
+    }
+  }
+}

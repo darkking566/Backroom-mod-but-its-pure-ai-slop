@@ -3,6 +3,7 @@ package dev.noclip.backrooms.level3;
 import dev.noclip.backrooms.level3.Level3Plan.Hall;
 import dev.noclip.backrooms.level3.Level3Plan.HallKind;
 import dev.noclip.backrooms.monsters.Monsters;
+import dev.noclip.backrooms.monsters.faceling.Faceling;
 import dev.noclip.backrooms.monsters.hound.Hound;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,9 +24,12 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -180,14 +184,14 @@ final class Level3Events {
 				random.nextBoolean() ? Level3Sounds.CRACKLE : Level3Sounds.HUM, SoundSource.AMBIENT, 0.5F + random.nextFloat() * 0.3F, 0.7F + random.nextFloat() * 0.4F);
 	}
 
-	/** Hounds that come in sight of a sanctum's angel are afraid, and leave. */
+	/** Entities that come in sight of a sanctum's angel are afraid, and leave. */
 	private static void scareOff(ServerLevel level, long seed) {
-		for (Hound hound : level.getEntities(Monsters.HOUND, hound -> true)) {
-			for (Placed placed : hallsNear(seed, hound.getBlockX(), hound.getBlockZ(), ANGEL_REACH)) {
+		for (Mob mob : level.getEntities(EntityTypeTest.forClass(Mob.class), m -> m.isAlive() && (m instanceof Monster || m instanceof Faceling))) {
+			for (Placed placed : hallsNear(seed, mob.getBlockX(), mob.getBlockZ(), ANGEL_REACH)) {
 				if (placed.hall().kind() != HallKind.SANCTUM) continue;
-				if (hound.position().distanceTo(placed.angel()) > ANGEL_REACH) continue;
-				level.sendParticles(ParticleTypes.POOF, hound.getX(), hound.getY() + 0.5, hound.getZ(), 10, 0.3, 0.3, 0.3, 0.02);
-				hound.discard();
+				if (mob.position().distanceTo(placed.angel()) > ANGEL_REACH) continue;
+				level.sendParticles(ParticleTypes.POOF, mob.getX(), mob.getY() + 0.5, mob.getZ(), 10, 0.3, 0.3, 0.3, 0.02);
+				mob.discard();
 				break;
 			}
 		}
@@ -199,7 +203,7 @@ final class Level3Events {
 		long seed = Level3ChunkGenerator.planSeed(level.getChunkSource().randomState());
 		if (level.getEntitiesOfClass(Hound.class, new AABB(player.blockPosition()).inflate(NEAR)).size() >= MAX_NEAR) return 0;
 		RandomSource random = level.getRandom();
-		for (int attempt = 0; attempt < 40; attempt++) {
+		for (int attempt = 0; attempt < 120; attempt++) {
 			double angle = random.nextDouble() * Math.PI * 2, distance = NEAREST + random.nextDouble() * (FARTHEST - NEAREST);
 			int x = (int) Math.floor(player.getX() + Math.cos(angle) * distance), z = (int) Math.floor(player.getZ() + Math.sin(angle) * distance);
 			Level3Layout.Tile tile = Level3Layout.tile(seed, x, z);
@@ -221,9 +225,12 @@ final class Level3Events {
 		return 0;
 	}
 
-	private static boolean nearSafety(long seed, int x, int z) {
+	static boolean nearSafety(long seed, int x, int z) {
 		for (Placed placed : hallsNear(seed, x, z, SANCTUM_KEEP_CLEAR)) {
-			if (placed.hall().kind() == HallKind.SANCTUM || placed.hall().kind() == HallKind.BASE) return true;
+			HallKind kind = placed.hall().kind();
+			if (kind == HallKind.SANCTUM || kind == HallKind.BASE || kind == HallKind.BNTG_STORAGE || kind == HallKind.BLUE_SALVATION) {
+				return true;
+			}
 		}
 		return false;
 	}

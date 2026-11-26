@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "noclip_backrooms:block/level3/jerry_mural"
+    },
+    "facing=west": {
+      "model": "noclip_backrooms:block/level3/jerry_mural",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "noclip_backrooms:block/level3/jerry_mural",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "noclip_backrooms:block/level3/jerry_mural",
+      "y": 270
+    }
+  }
+}
