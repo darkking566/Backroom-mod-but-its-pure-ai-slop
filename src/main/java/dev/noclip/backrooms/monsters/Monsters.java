@@ -18,6 +18,7 @@ import dev.noclip.backrooms.monsters.shepherdsnake.ShepherdSnake;
 import dev.noclip.backrooms.monsters.shriek.Shriek;
 import dev.noclip.backrooms.monsters.skinstealer.SkinStealer;
 import dev.noclip.backrooms.monsters.smiler.Smiler;
+import dev.noclip.backrooms.monsters.windowentity.WindowEntity;
 import dev.noclip.backrooms.monsters.wretch.Wretch;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -93,6 +94,9 @@ public final class Monsters {
 	public static final EntityType<BeastOfLevel5> BEAST_LEVEL5 = register("beast_level5",
 			EntityType.Builder.of(BeastOfLevel5::new, MobCategory.MONSTER).sized(0.95F, 2.65F).eyeHeight(2.38F).clientTrackingRange(16));
 	public static final Item BEAST_LEVEL5_SPAWN_EGG = registerEgg("beast_level5_spawn_egg", BEAST_LEVEL5);
+	public static final EntityType<WindowEntity> WINDOW_ENTITY = register("window_entity",
+			EntityType.Builder.of(WindowEntity::new, MobCategory.MONSTER).sized(0.75F, 2.15F).eyeHeight(1.88F).clientTrackingRange(12));
+	public static final Item WINDOW_ENTITY_SPAWN_EGG = registerEgg("window_entity_spawn_egg", WINDOW_ENTITY);
 
 	public static final SoundEvent HOUND_GROWL = sound("hound.growl");
 	public static final SoundEvent HOUND_ROAR = sound("hound.roar");
@@ -121,6 +125,7 @@ public final class Monsters {
 		FabricDefaultAttributeRegistry.register(BONE_THIEF, BoneThief.createAttributes());
 		FabricDefaultAttributeRegistry.register(PARTYPOOPER, Partypooper.createAttributes());
 		FabricDefaultAttributeRegistry.register(BEAST_LEVEL5, BeastOfLevel5.createAttributes());
+		FabricDefaultAttributeRegistry.register(WINDOW_ENTITY, WindowEntity.createAttributes());
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.SPAWN_EGGS).register(output -> {
 			output.accept(HOUND_SPAWN_EGG);
 			output.accept(SMILER_SPAWN_EGG);
@@ -140,6 +145,7 @@ public final class Monsters {
 			output.accept(BONE_THIEF_SPAWN_EGG);
 			output.accept(PARTYPOOPER_SPAWN_EGG);
 			output.accept(BEAST_LEVEL5_SPAWN_EGG);
+			output.accept(WINDOW_ENTITY_SPAWN_EGG);
 		});
 	}
 

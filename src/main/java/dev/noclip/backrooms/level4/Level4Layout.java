@@ -173,13 +173,13 @@ final class Level4Layout {
 		if (cz == 0 && northIndoor) {
 			ZoneKind nz = plan.zones[Level4Plan.cell(i, j - 1)];
 			int ceil = nz == ZoneKind.ATRIUM ? ATRIUM_HEIGHT : OPEN_HEIGHT;
-			Kind wk = (cx >= 1 && cx <= 5) ? exteriorWindowKind(seed, plan, i, j - 1, x, z) : Kind.DRYWALL;
+			Kind wk = (cx >= 1 && cx <= 5) ? exteriorWindowKind(seed, plan, i, j - 1, Level4Plan.SOUTH, cx, x, z) : Kind.DRYWALL;
 			return new Tile(wk, ZoneKind.OUTSIDE, Level4Plan.NORTH, ceil, null, false);
 		}
 		if (cx == 0 && westIndoor) {
 			ZoneKind wz = plan.zones[Level4Plan.cell(i - 1, j)];
 			int ceil = wz == ZoneKind.ATRIUM ? ATRIUM_HEIGHT : OPEN_HEIGHT;
-			Kind wk = (cz >= 1 && cz <= 5) ? exteriorWindowKind(seed, plan, i - 1, j, x, z) : Kind.DRYWALL;
+			Kind wk = (cz >= 1 && cz <= 5) ? exteriorWindowKind(seed, plan, i - 1, j, Level4Plan.EAST, cz, x, z) : Kind.DRYWALL;
 			return new Tile(wk, ZoneKind.OUTSIDE, Level4Plan.WEST, ceil, null, false);
 		}
 		return new Tile(Kind.OUTSIDE_AIR, ZoneKind.OUTSIDE, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
@@ -252,7 +252,7 @@ final class Level4Layout {
 			if (along >= 1 && along <= 5) {
 				int wx = dir == Level4Plan.NORTH ? i * CELL + along : i * CELL;
 				int wz = dir == Level4Plan.NORTH ? j * CELL : j * CELL + along;
-				return new Tile(exteriorWindowKind(seed, plan, i, j, wx, wz), zone, facingInto, edgeCeil, null, false);
+				return new Tile(exteriorWindowKind(seed, plan, i, j, dir, along, wx, wz), zone, facingInto, edgeCeil, null, false);
 			}
 			return new Tile(Kind.DRYWALL, zone, facingInto, edgeCeil, null, false);
 		}
@@ -265,10 +265,12 @@ final class Level4Layout {
 				&& plan.zones[Level4Plan.cell(i + Level4Plan.DX[dir], j + Level4Plan.DZ[dir])] == ZoneKind.OMEGA_BASE);
 	}
 
-	private static Kind exteriorWindowKind(long seed, Level4Plan plan, int roomI, int roomJ, int x, int z) {
+	private static Kind exteriorWindowKind(long seed, Level4Plan plan, int roomI, int roomJ, int dir, int along, int x, int z) {
 		if (plan.nearHumanBase(roomI, roomJ)) return Kind.WINDOW_BLACKED;
-		int r = Math.floorMod(hash(seed, x, z, 421), 100);
-		return r < 18 ? Kind.WINDOW_TRAP : Kind.WINDOW_RAIN;
+		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
+		int bayHash = Math.floorMod(hash(seed, rx * 31 + roomI, rz * 31 + roomJ, 421 + dir), 100);
+		if (bayHash < 24 && along >= 2 && along <= 4) return Kind.WINDOW_TRAP;
+		return Kind.WINDOW_RAIN;
 	}
 
 	/** Whether (x, z) lies on the outer facade skin of the main 12x12 skyscraper (rendered vertically). */

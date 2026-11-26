@@ -286,7 +286,14 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			p.setYHeadRot(yaw);
 		});
 		game.getConnection().waitForChunksDownload();
-		context.waitTicks(12);
+		server.runOnServer(s -> Level4Windows.spawnNearbyWindowEntities(level4(s), player(s)));
+		context.waitTicks(22);
+		server.runOnServer(s -> {
+			var windows = level4(s).getEntitiesOfClass(
+					dev.noclip.backrooms.monsters.windowentity.WindowEntity.class,
+					new AABB(new BlockPos(win[0], STAND + 1, win[1])).inflate(6.0));
+			check(!windows.isEmpty(), "expected 3D WindowEntity outside trap window at " + win[0] + "," + win[1]);
+		});
 		game.getConnection().waitForChunksRender();
 		context.takeScreenshot("level4_trap_window");
 
@@ -518,6 +525,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 				check(lang.has(key), "missing translation: " + key);
 			}
 			check(lang.has("level.noclip_backrooms.4"), "missing level 4 name");
+			check(lang.has("entity.noclip_backrooms.window_entity"), "missing window_entity name");
+			check(lang.has("item.noclip_backrooms.window_entity_spawn_egg"), "missing window_entity_spawn_egg name");
 			check(lang.has(Level4Items.BRASS_CRUCIFIX.getDescriptionId()), "missing crucifix name");
 			check(lang.has(Level4Items.RAIN_GLASS_ORB.getDescriptionId()), "missing rain orb name");
 			for (String role : new String[] {"drifter", "barterer", "scout", "cartographer", "restless"}) {

@@ -1,13 +1,17 @@
 package dev.noclip.backrooms.level4;
 
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
+import dev.noclip.backrooms.monsters.Monsters;
+import dev.noclip.backrooms.monsters.windowentity.WindowEntity;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -21,9 +25,11 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -53,6 +59,9 @@ final class Level4Windows {
 
 	static void register() {
 		ServerTickEvents.END_SERVER_TICK.register(Level4Windows::tick);
+		ServerEntityEvents.ENTITY_LOAD.register((entity, level) -> {
+			if (entity.entityTags().contains(WindowEntity.LEVEL4_WINDOW_TAG)) entity.discard();
+		});
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			NEXT_GRAB.clear();
 			NEXT_WARN.clear();
@@ -79,12 +88,19 @@ final class Level4Windows {
 				return InteractionResult.SUCCESS;
 			}
 			if (!sp.getAbilities().instabuild) held.shrink(1);
-			// Paint the whole vertical un-blacked window column black at once
-			for (int dy = -2; dy <= 2; dy++) {
-				BlockPos p = pos.offset(0, dy, 0);
-				if (isPaintableWindow(world.getBlockState(p))) {
-					world.setBlock(p, Level4Blocks.OFFICE_BLACKED_WINDOW.defaultBlockState(), 3);
+			// Paint the whole connected trap/rain window bay black at once and banish any bound WindowEntity
+			for (int dx = -2; dx <= 2; dx++) {
+				for (int dz = -2; dz <= 2; dz++) {
+					for (int dy = -2; dy <= 2; dy++) {
+						BlockPos p = pos.offset(dx, dy, dz);
+						if (isPaintableWindow(world.getBlockState(p))) {
+							world.setBlock(p, Level4Blocks.OFFICE_BLACKED_WINDOW.defaultBlockState(), 3);
+						}
+					}
 				}
+			}
+			for (WindowEntity we : ((ServerLevel) world).getEntitiesOfClass(WindowEntity.class, new AABB(pos).inflate(5.5))) {
+				we.triggerBanish();
 			}
 			world.playSound(null, pos, SoundEvents.SLIME_BLOCK_PLACE, SoundSource.BLOCKS, 0.85F, 0.8F);
 			PlayerRpg.grantXp(sp, 15);
@@ -99,6 +115,9 @@ final class Level4Windows {
 		ServerLevel level = server.getLevel(Level4.LEVEL_4);
 		if (level == null) return;
 		for (ServerPlayer player : level.players()) {
+			if (now % 20 == 0) {
+				spawnNearbyWindowEntities(level, player);
+			}
 			if (player.isCreative() || player.isSpectator()) continue;
 			BlockPos window = nearestTrapWindow(level, player);
 			if (window == null) continue;
@@ -140,9 +159,56 @@ final class Level4Windows {
 		level.sendParticles(ParticleTypes.SMOKE, center.x, center.y, center.z, 12, 0.3, 0.4, 0.3, 0.02);
 		level.playSound(null, window, Level4Sounds.WINDOW_KNOCK, SoundSource.HOSTILE, 1.0F, 0.45F);
 		level.playSound(null, window, SoundEvents.GLASS_BREAK, SoundSource.HOSTILE, 0.55F, 0.65F);
+		for (WindowEntity we : level.getEntitiesOfClass(WindowEntity.class, new AABB(window).inflate(4.5))) {
+			we.triggerLunge();
+		}
 		player.sendOverlayMessage(Component.translatable(
 				onTouch ? "message.noclip_backrooms.level4.window_touch_grab"
 						: "message.noclip_backrooms.level4.window_grab"));
+	}
+
+	static void spawnNearbyWindowEntities(ServerLevel level, ServerPlayer player) {
+		long seed = Level4ChunkGenerator.planSeed(level.getChunkSource().randomState());
+		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+		int y = Level4ChunkGenerator.FLOOR_Y + 2;
+		int px = player.getBlockX(), pz = player.getBlockZ();
+		for (int x = px - 22; x <= px + 22; x++) {
+			for (int z = pz - 22; z <= pz + 22; z++) {
+				int cx = Math.floorMod(x, Level4Plan.CELL);
+				int cz = Math.floorMod(z, Level4Plan.CELL);
+				if (cx != 3 && cz != 3) continue;
+				pos.set(x, y, z);
+				if (!level.isLoaded(pos) || !level.getBlockState(pos).is(Level4Blocks.OFFICE_TRAP_WINDOW)) continue;
+				Direction outDir = outsideDir(level, seed, pos);
+				if (outDir == null) continue;
+				double sx = x + 0.5 + outDir.getStepX() * 1.15;
+				double sz = z + 0.5 + outDir.getStepZ() * 1.15;
+				double sy = Level4ChunkGenerator.FLOOR_Y + 1.05;
+				AABB check = new AABB(sx - 2.5, sy - 2.0, sz - 2.5, sx + 2.5, sy + 2.5, sz + 2.5);
+				if (!level.getEntitiesOfClass(WindowEntity.class, check).isEmpty()) continue;
+				WindowEntity entity = Monsters.WINDOW_ENTITY.create(level, EntitySpawnReason.NATURAL);
+				if (entity == null) continue;
+				entity.snapTo(sx, sy, sz, outDir.getOpposite().toYRot(), 0.0F);
+				entity.bindToWindow(pos, outDir.getOpposite());
+				level.addFreshEntity(entity);
+				entity.addTag(WindowEntity.LEVEL4_WINDOW_TAG);
+			}
+		}
+	}
+
+	private static Direction outsideDir(ServerLevel level, long seed, BlockPos pos) {
+		for (Direction d : new Direction[] {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST}) {
+			BlockPos out = pos.relative(d);
+			BlockPos in = pos.relative(d.getOpposite());
+			if (level.isLoaded(out) && level.isLoaded(in)
+					&& level.getBlockState(out).isAir()
+					&& level.getBlockState(in).isAir()
+					&& Level4Layout.tile(seed, out.getX(), out.getZ()).kind() == Level4Layout.Kind.OUTSIDE_AIR
+					&& Level4Layout.tile(seed, in.getX(), in.getZ()).kind() == Level4Layout.Kind.AIR) {
+				return d;
+			}
+		}
+		return null;
 	}
 
 	static BlockPos nearestTrapWindow(ServerLevel level, ServerPlayer player) {

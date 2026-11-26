@@ -58,6 +58,8 @@ import dev.noclip.backrooms.monsters.skinstealer.SkinStealerModel;
 import dev.noclip.backrooms.monsters.skinstealer.SkinStealerRenderer;
 import dev.noclip.backrooms.monsters.smiler.SmilerModel;
 import dev.noclip.backrooms.monsters.smiler.SmilerRenderer;
+import dev.noclip.backrooms.monsters.windowentity.WindowEntityModel;
+import dev.noclip.backrooms.monsters.windowentity.WindowEntityRenderer;
 import dev.noclip.backrooms.monsters.wretch.WretchModel;
 import dev.noclip.backrooms.monsters.wretch.WretchRenderer;
 import net.fabricmc.api.ClientModInitializer;
@@ -128,6 +130,8 @@ public final class BackroomsClient implements ClientModInitializer {
 		EntityRendererRegistry.register(Monsters.PARTYPOOPER, PartypooperRenderer::new);
 		ModelLayerRegistry.registerModelLayer(BeastOfLevel5Model.LAYER, BeastOfLevel5Model.RIG::layer);
 		EntityRendererRegistry.register(Monsters.BEAST_LEVEL5, BeastOfLevel5Renderer::new);
+		ModelLayerRegistry.registerModelLayer(WindowEntityModel.LAYER, WindowEntityModel.RIG::layer);
+		EntityRendererRegistry.register(Monsters.WINDOW_ENTITY, WindowEntityRenderer::new);
 		ModelLayerRegistry.registerModelLayer(RobotModel.LAYER, RobotModel.RIG::layer);
 		for (Robot.Kind kind : Robot.Kind.values()) EntityRendererRegistry.register(Robots.type(kind), context -> new RobotRenderer(context, kind));
 		ModelLayerRegistry.registerModelLayer(PersonModel.LAYER, PersonModel.RIG::layer);

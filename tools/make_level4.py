@@ -463,23 +463,19 @@ def save_cutout_glass():
     strip_s.save(TEXTURES / "office_rain_window_s.png", optimize=True)
     write_json(TEXTURES / "office_rain_window.png.mcmeta", {"animation": {"frametime": 3, "interpolate": True}})
 
-    # Translucent Entity 2 trap window: pale eerie glare with unmistakable beckoning silhouette
-    trap_img = Image.new("RGBA", (SIZE, SIZE), (238, 244, 248, 140))
+    # Clean translucent Entity 2 trap window: pale misty glass pane (no 2D stick figure; 3D WindowEntity spawns outside)
+    trap_img = Image.new("RGBA", (SIZE, SIZE), (210, 224, 232, 52))
     td = ImageDraw.Draw(trap_img)
-    td.rectangle([8, 8, 20, 120], fill=(208, 186, 160, 175))
-    td.rectangle([108, 8, 120, 120], fill=(208, 186, 160, 175))
-    # Dark Entity 2 head, shoulders, raised beckoning arm
-    td.ellipse([52, 36, 76, 62], fill=(26, 30, 36, 235))
-    td.rectangle([46, 62, 82, 120], fill=(26, 30, 36, 235))
-    td.line([(76, 74), (86, 40)], fill=(26, 30, 36, 235), width=8)
-    td.ellipse([80, 32, 92, 44], fill=(26, 30, 36, 235))
-    td.rectangle([0, 0, SIZE - 1, 5], fill=(88, 78, 72, 255))
-    td.rectangle([0, SIZE - 6, SIZE - 1, SIZE - 1], fill=(88, 78, 72, 255))
-    td.rectangle([0, 0, 5, SIZE - 1], fill=(88, 78, 72, 255))
-    td.rectangle([SIZE - 6, 0, SIZE - 1, SIZE - 1], fill=(88, 78, 72, 255))
+    # Subtle corner condensation frost
+    for cx, cy in ((10, 10), (SIZE - 11, 10), (10, SIZE - 11), (SIZE - 11, SIZE - 11)):
+        td.ellipse([cx - 12, cy - 12, cx + 12, cy + 12], fill=(226, 236, 242, 34))
+    td.rectangle([0, 0, SIZE - 1, 4], fill=(74, 80, 88, 255))
+    td.rectangle([0, SIZE - 5, SIZE - 1, SIZE - 1], fill=(74, 80, 88, 255))
+    td.rectangle([0, 0, 4, SIZE - 1], fill=(74, 80, 88, 255))
+    td.rectangle([SIZE - 5, 0, SIZE - 1, SIZE - 1], fill=(74, 80, 88, 255))
     trap_img.save(TEXTURES / "office_trap_window.png", optimize=True)
-    mt_trap = flat((238, 244, 248), smooth=0.82, f0=18, porosity=0)
-    mt_trap.glow[:] = 0.45
+    mt_trap = flat((210, 224, 232), smooth=0.88, f0=20, porosity=0)
+    mt_trap.glow[:] = 0.15
     mt.save("office_trap_window_tmp", mt_trap)
     for suf in ("_n", "_s"):
         (TEXTURES / f"office_trap_window_tmp{suf}.png").replace(TEXTURES / f"office_trap_window{suf}.png")
