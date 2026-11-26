@@ -567,6 +567,8 @@
   - 企劃：`docs/project/5-levels/level0/README.md` 新增第八節（物件清單、掉落、錄影帶、八種擺法與哪些還沒做、展示間區規格、其他區偶爾出現的規則、給 Gemini 的擺放說明），附圖 `docs/project/5-levels/level0/film/`；`CREDITS.md` 加照片材質出處
   - 新增實機測試 `level0/film/FilmClientTest`（`-Plevels=film`）：68 個物件都有方塊實體、模型、貼圖；逐排拍照（攝影機濾鏡開／關）與一個展示角近照；小堆錄影帶掉 6～10 卷且都有標籤；從沙發的另一格打掉整組消失並掉破布；收購商收錄影帶
   - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=film` 通過；截圖看過物件在第 0 層裡的樣子。還沒做：穿模、倒放、地毯吞沒、藍色膠帶門框（要物件另外支援）；擺進生成器是 Gemini 的
+- 使用者定下新方向（只改企劃，程式沒動）：第 0 層以電影版為主；分工改成朋友做新樓層、Claude 專心做物件建模、Gemini 做物品分布與擺放；建模順序是先把每一層（主要樓層）會敲掉變成資源的物品做完（第 0 層先，部分物件如辦公椅移到 Level 4），之後才做武器、醫療等；合成表等建模都定了再整個重做（先想每層物品敲掉變成什麼、同時列醫療與武器等成品，最後才想怎麼組成）。寫進 `docs/project/README.md`（分工）、`AGENTS.md`（分工一行）、`docs/project/3-crafting/README.md`（重做方向）、`docs/project/5-levels/level0/README.md`（第八節第 6 點：哪些換成電影版、哪些由 Claude 重做、手機待決定）
+- 使用者同意後，把 `main` 推送到 GitHub（電影版物件 `3139b0bc` 與新方向）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
