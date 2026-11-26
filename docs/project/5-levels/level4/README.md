@@ -32,7 +32,7 @@
 | 空置現代辦公大樓，幾乎沒有家具，地毯留有曾有桌椅的凹陷 | `OPEN_OFFICE` 大跨距柱列空間、`SUITE` 玻璃隔間與防火門、`office_carpet_dent`（4 種壓痕變體）與 `Level4Props` 稀疏殘留辦公物件 |
 | 大多數窗戶被塗黑；未塗黑的窗戶是陷阱（Entity 2） | `office_blacked_window`（安全）／`office_rain_window` vs `office_trap_window`（`Level4Windows`：靠近敲玻璃警告、過近拉扯傷血並致暗；可用黑染料／墨囊／木炭塗黑化解） |
 | 冷水器、自動販賣機與儲存杏仁水的噴水池 | `office_water_cooler` 與中庭 `almond_fountain_pool`：持空玻璃瓶右鍵可裝 **最多 2 瓶** 杏仁水（空手右鍵可直接飲用一次）；`office_vending` 投 `lost_coin`／`alloy` 吐杏仁水 |
-| 接近實體絕跡：僅獵犬、鈍人，以及未證實的笑魘目擊傳聞 | `Level4Monsters`：極低機率於暗處刷新 `HOUND` 與 `DULLER`（4 格高足以容納鈍人），極罕見在純黑角落閃現 4 秒即消失的 `SMILER` 傳聞彩蛋；Omega 基地禁生怪 |
+| 接近實體絕跡：僅獵犬、鈍人，以及未證實的笑魘目擊傳聞；因安全而有許多人在此游蕩、會面與尋求補給 | `Level4Monsters`：極低機率於暗處刷新 `HOUND` 與 `DULLER`（4 格高足以容納鈍人），極罕見在純黑角落閃現 4 秒即消失的 `SMILER` 傳聞彩蛋；`Level4Wanderers`：於開放式辦公區、隔間套房與中庭生成最多 5 位會自行漫步的友善流浪者 NPC，靠近時轉向玩家，右鍵可詢問最近 Omega 基地／中庭方向與樓層情報（附微幅回理智），並能以遺失舊幣、合金或紙張以物易物換取杏仁水、空玻璃瓶與繃帶；Omega 基地禁生怪 |
 | **M.E.G. Omega 基地**（第二大主基地、守備嚴密、近 Level 5／6 入口） | 每 `2×2` 區域必有一座安全基地：防彈牆與護欄、行軍床（`Trips.settle` 安頓重生）、置物櫃、拆解台、守衛／醫護（免費滿血回理智）／軍需官／補給員，基地內常駐 Level 5 與 Level 6 樓梯 |
 | **神愛之繁生（Amor Incrementum）**（崇拜農業異教徒、敵對，持宗教物品才交易） | 菌類培養溫室（Level 0/1 基質培養基＋發光菌類）。平常靠近會主動追打驅逐；手持專屬 3D 宗教聖物 **`brass_crucifix`（黃銅十字架）** 或 **`faded_icon_frame`（褪色聖像畫）** 立刻轉為平和並可交易純化杏仁精華／杏仁水 |
 | **T.B.D.（懸而未決）**（6 人小團體、不理人、只賣沒用的奇特物品） | 堆物間成員無視玩家，右鍵可向其購買 5 款專屬 3D 奇物（`broken_nw_compass`、`calendar_1998`、`blank_stamp`、`unlabeled_tape`、`rain_glass_orb`） |

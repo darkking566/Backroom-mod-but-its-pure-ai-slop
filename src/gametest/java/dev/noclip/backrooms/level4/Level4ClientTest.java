@@ -49,6 +49,7 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			server.runCommand("gamemode survival @a");
 			server.runOnServer(s -> {
 				Level4Monsters.holdOff(s, 20 * 60 * 20);
+				Level4Wanderers.holdOff(s, 20 * 60 * 20);
 				Level4VanishingExits.holdOff(s, 20 * 60 * 20);
 			});
 
@@ -67,6 +68,7 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			if (TestFilter.section("factions")) factions(context, game, seed, arrival);
 			if (TestFilter.section("windows")) trapWindows(context, game, seed, arrival);
 			if (TestFilter.section("vanish")) vanishingExits(context, game, seed, arrival);
+			if (TestFilter.section("wanderers")) wanderers(context, game, seed, arrival);
 			if (TestFilter.section("blocks")) checkBlocks(game);
 		}
 	}
@@ -209,6 +211,79 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		server.runCommand("gamemode spectator @a");
 	}
 
+	private static void wanderers(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
+		var server = game.getServer();
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerPlayer p = player(s);
+			p.teleportTo(from.getX() + 0.5, STAND, from.getZ() + 0.5);
+		});
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(15);
+
+		java.util.UUID[] firstId = new java.util.UUID[1];
+		Vec3[] startPos = new Vec3[1];
+		server.runOnServer(s -> {
+			ServerPlayer p = player(s);
+			int count = Level4Wanderers.spawnNear(level4(s), seed, p, 3);
+			check(count >= 1, "expected at least 1 roaming wanderer to spawn near arrival");
+			var list = level4(s).getEntitiesOfClass(Person.class, new AABB(p.blockPosition()).inflate(48),
+					e -> e.entityTags().contains(Level4Wanderers.TAG));
+			check(!list.isEmpty(), "expected spawned wanderer with tag");
+			Person w = list.getFirst();
+			firstId[0] = w.getUUID();
+			startPos[0] = w.position();
+			Tile tile = Level4Layout.tile(seed, w.getBlockX(), w.getBlockZ());
+			check(Level4Wanderers.isWanderZone(tile.zone()), "wanderer spawned outside wander zone: " + tile.zone());
+			p.teleportTo(w.getX() + 3.0, STAND, w.getZ() + 3.0);
+		});
+		game.getConnection().waitForChunksDownload();
+		server.runOnServer(s -> {
+			Person w = (Person) level4(s).getEntity(firstId[0]);
+			ServerPlayer p = player(s);
+			double dx = w.getX() - p.getX(), dz = w.getZ() - p.getZ();
+			float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
+			p.setYRot(yaw);
+			p.setYHeadRot(yaw);
+		});
+		context.waitTicks(12);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level4_wanderers");
+
+		// Move player away (>4.5 blocks) so wanderer is not paused facing player, then wait for it to stroll
+		server.runOnServer(s -> player(s).teleportTo(from.getX() + 0.5, STAND, from.getZ() + 0.5));
+		context.waitTicks(140);
+		server.runOnServer(s -> {
+			Person w = (Person) level4(s).getEntity(firstId[0]);
+			check(w != null && w.isAlive(), "wanderer disappeared prematurely");
+			double moved = w.position().subtract(startPos[0]).horizontalDistance();
+			check(moved > 0.3, "expected wanderer to stroll at least 0.3 blocks, moved=" + moved);
+
+			// Test chat & barter interaction
+			ServerPlayer p = player(s);
+			p.teleportTo(w.getX() + 1.2, STAND, w.getZ() + 1.2);
+			p.getInventory().clearContent();
+			p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+			var chatRes = net.fabricmc.fabric.api.event.player.UseEntityCallback.EVENT.invoker()
+					.interact(p, level4(s), InteractionHand.MAIN_HAND, w, null);
+			check(chatRes == net.minecraft.world.InteractionResult.SUCCESS, "expected wanderer chat to succeed");
+
+			p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Economy.LOST_COIN, 2));
+			var tradeRes = net.fabricmc.fabric.api.event.player.UseEntityCallback.EVENT.invoker()
+					.interact(p, level4(s), InteractionHand.MAIN_HAND, w, null);
+			check(tradeRes == net.minecraft.world.InteractionResult.SUCCESS, "expected wanderer barter to succeed");
+			check(p.getMainHandItem().getCount() == 1, "expected wanderer barter to consume 1 lost_coin");
+			int almond = 0, bottles = 0;
+			for (int i = 0; i < p.getInventory().getContainerSize(); i++) {
+				ItemStack st = p.getInventory().getItem(i);
+				if (st.is(Level1Items.ALMOND_WATER)) almond += st.getCount();
+				if (st.is(Items.GLASS_BOTTLE)) bottles += st.getCount();
+			}
+			check(almond >= 1 && bottles >= 1, "expected Almond Water and Glass Bottle from wanderer barter");
+		});
+		server.runCommand("gamemode spectator @a");
+	}
+
 	private static void checkBlocks(TestSingleplayerContext game) {
 		game.getServer().runOnServer(s -> {
 			Language lang = Language.getInstance();
@@ -219,6 +294,14 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			check(lang.has("level.noclip_backrooms.4"), "missing level 4 name");
 			check(lang.has(Level4Items.BRASS_CRUCIFIX.getDescriptionId()), "missing crucifix name");
 			check(lang.has(Level4Items.RAIN_GLASS_ORB.getDescriptionId()), "missing rain orb name");
+			for (String role : new String[] {"drifter", "barterer", "scout", "cartographer", "restless"}) {
+				check(lang.has("entity.noclip_backrooms.level4_wanderer." + role), "missing wanderer role: " + role);
+			}
+			for (String msg : new String[] {"wanderer_tip_omega", "wanderer_tip_atrium", "wanderer_tip_windows",
+					"wanderer_tip_exits", "wanderer_tip_amor", "wanderer_tip_tbd", "wanderer_tip_barter",
+					"wanderer_barter_coin", "wanderer_barter_alloy", "wanderer_barter_paper", "wanderer_barter_done"}) {
+				check(lang.has("message.noclip_backrooms.level4." + msg), "missing wanderer message: " + msg);
+			}
 		});
 	}
 

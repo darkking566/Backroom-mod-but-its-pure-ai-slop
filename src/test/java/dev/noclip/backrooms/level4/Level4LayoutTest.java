@@ -88,4 +88,16 @@ final class Level4LayoutTest {
 			assertTrue(tile.zone() == ZoneKind.OPEN_OFFICE || tile.zone() == ZoneKind.SUITE);
 		}
 	}
+
+	@Test
+	void wanderZonesOnlyAllowOpenSpacesAndAtrium() {
+		assertTrue(Level4Wanderers.isWanderZone(ZoneKind.OPEN_OFFICE));
+		assertTrue(Level4Wanderers.isWanderZone(ZoneKind.SUITE));
+		assertTrue(Level4Wanderers.isWanderZone(ZoneKind.ATRIUM));
+		assertTrue(!Level4Wanderers.isWanderZone(ZoneKind.OMEGA_BASE));
+		assertTrue(!Level4Wanderers.isWanderZone(ZoneKind.AMOR_CAMP));
+		assertTrue(!Level4Wanderers.isWanderZone(ZoneKind.TBD_ROOM));
+		assertTrue(!Level4Wanderers.isWanderZone(ZoneKind.DARK_WING));
+		assertTrue(!Level4Wanderers.isWanderZone(ZoneKind.SOLID_CORE));
+	}
 }

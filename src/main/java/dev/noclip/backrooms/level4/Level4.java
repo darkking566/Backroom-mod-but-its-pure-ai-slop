@@ -33,6 +33,7 @@ public final class Level4 {
 		// Opens entrances already pointing to "4" (Level 2 marked doors and Level 3 elevators).
 		LevelExits.open("4", Level4Travel::enter);
 		Level4Bases.register();
+		Level4Wanderers.register();
 		Level4Windows.register();
 		Level4VanishingExits.register();
 		Level4Monsters.register();

@@ -207,7 +207,7 @@ final class Level4Events {
 		return null;
 	}
 
-	private static int[] nearestOmega(long seed, int x, int z) {
+	static int[] nearestOmega(long seed, int x, int z) {
 		int rx0 = Math.floorDiv(x, Level4Plan.SIZE), rz0 = Math.floorDiv(z, Level4Plan.SIZE);
 		int[] best = null;
 		double bestDist = Double.MAX_VALUE;
@@ -229,7 +229,7 @@ final class Level4Events {
 		return best;
 	}
 
-	private static String compass(int dx, int dz) {
+	static String compass(int dx, int dz) {
 		if (Math.abs(dx) > Math.abs(dz) * 2) return dx > 0 ? "E" : "W";
 		if (Math.abs(dz) > Math.abs(dx) * 2) return dz > 0 ? "S" : "N";
 		return (dz < 0 ? "N" : "S") + (dx > 0 ? "E" : "W");
