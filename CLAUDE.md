@@ -462,6 +462,13 @@
   - 改朋友的 `level0/Exits`：新增 `RARITY = 8`、`hasExit`，大約每 8 區（560×560 格）才有一扇門（原本每區一扇）；照著改朋友的 `ExitsTest`（「每區都有門」改成「有門的區約佔八分之一、每扇門都在牆上且兩邊有路」，走得到門的測試改成挑有門的區）；`ExitClientChecks` 沒改（它在半徑 30 區內找各種區域的門，應該還找得到）
   - 撤離的文字改成「這裡的人知道回地面的路」「[請他們帶我回家]」（不再只說 M.E.G.）；`Trips` 說明跟著改；`docs/HORROR_ESCAPE_PLAN.md`、`docs/levels/level0/README.md` 記下兩個決定
   - **還沒測試**：改完時 Gemini 已在同一個資料夾動工（`core/trip` 的現實排斥與滲透、新的裂隙方塊、消耗品），他寫到一半的程式讓整個專案編譯失敗，照協作規則先停手；只提交自己的檔案，等 Gemini 做完再跑 `gradlew build` 與 `runClientGameTest -Plevels=0,horror`
+  - （後來補測）Gemini 做完後，`gradlew build` 與 `runClientGameTest -Plevels=0,horror` 都通過，朋友的 `ExitClientChecks` 照樣找得到各區的門
+- 使用者要求看過 Gemini 的現實排斥（`2c656c74`）再推上 GitHub。看過 `Pull`、`PullState`、`SeepageData`、`BackroomsRiftBlock`、血清與測試，修兩個跟它自己說明不符的地方（改 Gemini 的 `SeepageData`）：
+  - 用血清還原滲透的地面、關裂縫時，原本只處理「已載入的區塊」，但不管有沒有處理都把紀錄刪掉：人在遠處用血清，那些地毯和舊裂縫就永遠留著。改成讀方塊時順便載入那個區塊再還原
+  - 裂縫原本只要地面上有兩格空氣就開，會開在玩家屋裡或洞穴裡（裂縫打不壞）；改成要看得到天空（企劃書寫的是「家外空地」）
+  - 沒改、只回報：白名單有石頭、砂岩，玩家用這兩種方塊蓋的地板也會被滲透（會照原樣還原）；回到後室再出來時，舊的滲透地毯和裂縫不會自動清掉（要靠血清）；其他玩家走進裂縫也會掉進 Level 0
+  - `docs/HORROR_ESCAPE_PLAN.md` 兩處還寫著我舊版的「拉力、睡覺」，改成現在的現實排斥；程式位置表補上 `SeepageData`、`BackroomsRiftBlock`
+  - `gradlew build` 與 `runClientGameTest -Plevels=0,horror` 通過
 
 ## 動作記錄（Antigravity）
 

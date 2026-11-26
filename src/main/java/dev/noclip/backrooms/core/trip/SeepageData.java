@@ -182,6 +182,8 @@ public final class SeepageData extends SavedData {
 				BlockState below = overworld.getBlockState(pos.below());
 				if (below.getCollisionShape(overworld, pos.below()).isEmpty()) continue;
 				if (!overworld.getBlockState(pos).isAir() || !overworld.getBlockState(pos.above()).isAir()) continue;
+				// Outdoors only: never inside the player's house or a cave.
+				if (!overworld.canSeeSky(pos)) continue;
 
 				overworld.setBlock(pos, BackroomsProps.BACKROOMS_RIFT.defaultBlockState(), Block.UPDATE_ALL);
 				rifts.put(id, pos.asLong());
@@ -207,7 +209,9 @@ public final class SeepageData extends SavedData {
 		for (SeepedBlock sb : owned) {
 			if (restored >= maxCount) break;
 			BlockPos pos = BlockPos.of(sb.pos);
-			if (overworld.isLoaded(pos) && overworld.getBlockState(pos).is(carpet)) {
+			// Reading the block loads its chunk if the player is far away: the record is dropped below, so this is the
+			// only chance to put the ground back.
+			if (overworld.getBlockState(pos).is(carpet)) {
 				overworld.setBlock(pos, sb.original, Block.UPDATE_ALL);
 			}
 			blocks.remove(sb.pos);
@@ -228,7 +232,8 @@ public final class SeepageData extends SavedData {
 		Long packed = rifts.remove(owner.toString());
 		if (packed == null) return false;
 		BlockPos pos = BlockPos.of(packed);
-		if (overworld.isLoaded(pos) && overworld.getBlockState(pos).is(BackroomsProps.BACKROOMS_RIFT)) {
+		// Loads the chunk if needed, so no rift is ever left behind once its record is gone.
+		if (overworld.getBlockState(pos).is(BackroomsProps.BACKROOMS_RIFT)) {
 			overworld.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
 		}
 		setDirty();

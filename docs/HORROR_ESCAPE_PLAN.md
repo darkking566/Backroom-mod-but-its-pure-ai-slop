@@ -107,7 +107,7 @@
 
 ## 還沒想好的
 
-- 拉力、睡覺、委託的數字都是先訂的，玩過再調。
+- 排斥升溫速度、滲透與裂縫的頻率、委託的數字都是先訂的，玩過再調。
 - 委託只有三份「到某一層再回來」，之後可以加「帶回某樣東西」「找到某個人」等。
 
 ## 分工
@@ -126,7 +126,7 @@
 | 怪物重傷退回黑暗 | `src/main/java/dev/noclip/backrooms/monsters/Retreat.java` |
 | 後室裡吃飽回血變慢 | `src/main/java/dev/noclip/backrooms/mixin/FoodDataBackroomsRegen.java` |
 | 死亡、安頓、撤離 | `src/main/java/dev/noclip/backrooms/core/trip/Trips.java` |
-| 被拉回後室（拉力、睡覺、寬限期）與預兆 | `src/main/java/dev/noclip/backrooms/core/trip/Pull.java`、`src/client/java/dev/noclip/backrooms/core/trip/PullClient.java` |
+| 現實排斥（四階段、寬限期）、滲透與裂縫、預兆 | `src/main/java/dev/noclip/backrooms/core/trip/Pull.java`、`SeepageData.java`、`src/main/java/dev/noclip/backrooms/props/BackroomsRiftBlock.java`、`src/client/java/dev/noclip/backrooms/core/trip/PullClient.java` |
 | 委託 | `src/main/java/dev/noclip/backrooms/core/guild/Contracts.java` |
 | 活下來的經驗 | `src/main/java/dev/noclip/backrooms/core/rpg/SurvivalXp.java` |
 | 單元測試 | `src/test/java/dev/noclip/backrooms/core/rpg/PlayerStatsTest.java` |
