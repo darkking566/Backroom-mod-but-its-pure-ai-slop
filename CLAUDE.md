@@ -514,6 +514,7 @@
   - 合成台 Shift 點成品時背包只放得下一部分，會用掉整份材料、放不下的那部分消失：改成放不下整份就不動（`BackroomsStationMenu.fits`）
   - `HorrorClientTest` 加：同一層換床不再給經驗、背包只剩 1 格空間時 Shift 點成品不拿也不扣材料（先把修正拿掉跑過，確認測試會失敗）；`gradlew build` 與 `runClientGameTest -Plevels=horror` 通過
   - 沒驗證：真的重開世界後重生（自動測試沒辦法重開同一個世界），只靠讀程式判斷舊身體記得死的維度
+- 使用者同意後，把 `main` 推送到 GitHub（審查三項修正 `1cd12754`）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
