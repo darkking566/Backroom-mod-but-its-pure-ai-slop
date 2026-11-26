@@ -211,12 +211,12 @@ final class Level4Layout {
 	private static Kind windowKind(long seed, int x, int z, ZoneKind zone) {
 		int r = Math.floorMod(hash(seed, x, z, 421), 100);
 		if (zone == ZoneKind.ATRIUM) {
-			if (r < 55) return Kind.WINDOW_RAIN;
-			if (r < 90) return Kind.WINDOW_BLACKED;
+			if (r < 76) return Kind.WINDOW_BLACKED;
+			if (r < 92) return Kind.WINDOW_RAIN;
 			return Kind.WINDOW_TRAP;
 		}
-		if (r < 85) return Kind.WINDOW_BLACKED;
-		if (r < 95) return Kind.WINDOW_TRAP;
+		if (r < 88) return Kind.WINDOW_BLACKED;
+		if (r < 96) return Kind.WINDOW_TRAP;
 		return Kind.WINDOW_RAIN;
 	}
 

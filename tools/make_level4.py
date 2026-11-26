@@ -211,14 +211,25 @@ def window_tex(kind):
         # Soft overexposed blind edges
         blinds = box(8, 8, 22, 120, 1) + box(106, 8, 120, 120, 1)
         paint(m, np.clip(blinds, 0, 1), (206, 178, 148), height=0.6, smooth=0.25, glow=0.1)
+        # Eerie dark Entity 2 silhouette behind the glare: head, shoulders, raised beckoning hand
+        head = 1 - step(10, 13, np.hypot((X - 64) * 1.15, Y - 48))
+        torso = (1 - step(14, 19, np.abs(X - 64))) * step(58, 66, Y) * (1 - step(112, 120, Y))
+        arm = box(74, 42, 86, 82, 2.5)
+        palm = 1 - step(6, 9, np.hypot(X - 81, Y - 38))
+        sil = np.clip(np.maximum.reduce([head, torso, arm, palm]), 0, 1)
+        paint(m, sil, (34, 38, 46), smooth=0.75, glow=0.05)
         frame = np.maximum(1 - step(5, 7, np.minimum(X, SIZE - X)), 1 - step(5, 7, np.minimum(Y, SIZE - Y)))
         paint(m, frame, (96, 84, 76), height=1.5, smooth=0.4, glow=0.0)
         return m
-    # rain
+    # rain (also an un-blacked Entity 2 trap with a faint ghostly silhouette/handprint)
     m = flat((34, 44, 54), smooth=0.88, f0=24, porosity=0)
     m.glow[:] = 0.08
     rain = step(0.6, 0.92, np.sin((X * 0.4 + Y * 0.18 + noise(405, 32) * 3)) * 0.5 + 0.5)
     tint(m, rain * 0.35, (1.35, 1.45, 1.55))
+    ghost_head = 1 - step(9, 14, np.hypot((X - 58) * 1.1, Y - 56))
+    ghost_hand = 1 - step(5, 8, np.hypot(X - 78, Y - 66))
+    ghost = np.clip(np.maximum(ghost_head * 0.45, ghost_hand * 0.65), 0, 1)
+    paint(m, ghost, (132, 154, 174), smooth=0.85, glow=0.16)
     frame = np.maximum(1 - step(5, 7, np.minimum(X, SIZE - X)), 1 - step(5, 7, np.minimum(Y, SIZE - Y)))
     paint(m, frame, (78, 84, 92), height=1.5, smooth=0.45, f0=80, glow=0.0)
     return m

@@ -149,4 +149,27 @@ final class Level4LayoutTest {
 		assertTrue(tbdKinds.contains(Kind.TBD_SHELF));
 		assertTrue(tbdKinds.contains(Kind.TBD_HOARD));
 	}
+
+	@Test
+	void mostWindowsAreBlackedOut() {
+		int blacked = 0, total = 0;
+		for (long seed = 1; seed <= 8; seed++) {
+			for (int rx = -1; rx <= 1; rx++) {
+				for (int rz = -1; rz <= 1; rz++) {
+					int x0 = rx * Level4Plan.SIZE, z0 = rz * Level4Plan.SIZE;
+					for (int x = x0; x < x0 + Level4Plan.SIZE; x++) {
+						for (int z = z0; z < z0 + Level4Plan.SIZE; z++) {
+							Kind k = Level4Layout.tile(seed, x, z).kind();
+							if (k == Kind.WINDOW_BLACKED || k == Kind.WINDOW_TRAP || k == Kind.WINDOW_RAIN) {
+								total++;
+								if (k == Kind.WINDOW_BLACKED) blacked++;
+							}
+						}
+					}
+				}
+			}
+		}
+		assertTrue(total > 0, "expected windows in Level 4");
+		assertTrue(blacked * 100 >= total * 70, "expected >= 70% blacked-out windows, got " + blacked + "/" + total);
+	}
 }

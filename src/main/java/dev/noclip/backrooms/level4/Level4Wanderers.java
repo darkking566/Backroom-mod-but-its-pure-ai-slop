@@ -402,7 +402,7 @@ final class Level4Wanderers {
 			for (int dz = -3; dz <= 3; dz++) {
 				for (int dy = 0; dy <= 2; dy++) {
 					pos.set(at.getX() + dx, at.getY() + dy, at.getZ() + dz);
-					if (level.isLoaded(pos) && level.getBlockState(pos).is(Level4Blocks.OFFICE_TRAP_WINDOW)) {
+					if (level.isLoaded(pos) && Level4Windows.isTrapWindow(level.getBlockState(pos))) {
 						return true;
 					}
 				}

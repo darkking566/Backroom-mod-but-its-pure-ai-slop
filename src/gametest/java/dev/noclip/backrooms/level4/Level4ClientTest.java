@@ -252,24 +252,69 @@ public final class Level4ClientTest implements FabricClientGameTest {
 
 	private static void trapWindows(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
 		var server = game.getServer();
+		server.runOnServer(s -> {
+			check(Level4Windows.isTrapWindow(Level4Blocks.OFFICE_TRAP_WINDOW.defaultBlockState()), "trap window should be trap");
+			check(Level4Windows.isTrapWindow(Level4Blocks.OFFICE_RAIN_WINDOW.defaultBlockState()), "rain window should be trap");
+			check(!Level4Windows.isTrapWindow(Level4Blocks.OFFICE_BLACKED_WINDOW.defaultBlockState()), "blacked window should be safe");
+		});
+
 		int[] win = findKind(seed, from, Kind.WINDOW_TRAP);
-		if (win == null) return;
+		check(win != null, "no OFFICE_TRAP_WINDOW found");
 		server.runCommand("gamemode survival @a");
 		server.runOnServer(s -> {
 			ServerPlayer p = player(s);
 			p.setHealth(p.getMaxHealth());
-			p.teleportTo(win[0] + 0.5, STAND, win[1] + 1.4);
-			p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.INK_SAC));
+			p.teleportTo(win[0] + 0.5, STAND, win[1] + 1.8);
+			p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+			double dx = win[0] + 0.5 - p.getX(), dz = win[1] + 0.5 - p.getZ();
+			float yaw = (float) Math.toDegrees(Math.atan2(-dx, dz));
+			p.setYRot(yaw);
+			p.setYHeadRot(yaw);
 		});
 		game.getConnection().waitForChunksDownload();
-		context.waitTicks(15);
+		context.waitTicks(12);
+		game.getConnection().waitForChunksRender();
+		context.takeScreenshot("level4_trap_window");
+
 		server.runOnServer(s -> {
 			ServerPlayer p = player(s);
 			BlockPos pos = new BlockPos(win[0], STAND + 1, win[1]);
-			if (level4(s).getBlockState(pos).is(Level4Blocks.OFFICE_TRAP_WINDOW)) {
+			check(level4(s).getBlockState(pos).is(Level4Blocks.OFFICE_TRAP_WINDOW), "expected trap window at " + pos);
+			float hpBefore = p.getHealth();
+			BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(pos), Direction.SOUTH, pos, false);
+			p.gameMode.useItemOn(p, level4(s), ItemStack.EMPTY, InteractionHand.MAIN_HAND, hit);
+			check(p.getHealth() < hpBefore, "expected empty-hand touch on trap window to hurt player");
+
+			p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.INK_SAC));
+			p.gameMode.useItemOn(p, level4(s), p.getMainHandItem(), InteractionHand.MAIN_HAND, hit);
+			check(level4(s).getBlockState(pos).is(Level4Blocks.OFFICE_BLACKED_WINDOW), "trap window was not painted black");
+		});
+
+		// Also verify un-blacked rain window is an Entity 2 trap and paintable with Charcoal
+		int[] atrium = findZone(seed, from, ZoneKind.ATRIUM);
+		BlockPos searchOrigin = atrium != null ? new BlockPos(atrium[0], STAND, atrium[1]) : from;
+		int[] rainWin = findKind(seed, searchOrigin, Kind.WINDOW_RAIN);
+		check(rainWin != null, "no OFFICE_RAIN_WINDOW found");
+		server.runOnServer(s -> {
+			ServerPlayer p = player(s);
+			p.setHealth(p.getMaxHealth());
+			p.teleportTo(rainWin[0] + 0.5, STAND, rainWin[1] + 1.8);
+			p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+		});
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(12);
+		server.runOnServer(s -> {
+			ServerPlayer p = player(s);
+			BlockPos pos = new BlockPos(rainWin[0], STAND + 1, rainWin[1]);
+			if (level4(s).getBlockState(pos).is(Level4Blocks.OFFICE_RAIN_WINDOW)) {
+				float hpBefore = p.getHealth();
 				BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(pos), Direction.SOUTH, pos, false);
+				p.gameMode.useItemOn(p, level4(s), ItemStack.EMPTY, InteractionHand.MAIN_HAND, hit);
+				check(p.getHealth() < hpBefore, "expected empty-hand touch on rain window to hurt player");
+
+				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.CHARCOAL));
 				p.gameMode.useItemOn(p, level4(s), p.getMainHandItem(), InteractionHand.MAIN_HAND, hit);
-				check(level4(s).getBlockState(pos).is(Level4Blocks.OFFICE_BLACKED_WINDOW), "trap window was not painted black");
+				check(level4(s).getBlockState(pos).is(Level4Blocks.OFFICE_BLACKED_WINDOW), "rain window was not painted black");
 			}
 		});
 		server.runCommand("gamemode spectator @a");
@@ -384,7 +429,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			for (String msg : new String[] {"wanderer_tip_omega", "wanderer_tip_atrium", "wanderer_tip_windows",
 					"wanderer_tip_exits", "wanderer_tip_amor", "wanderer_tip_tbd", "wanderer_tip_barter",
 					"wanderer_barter_coin", "wanderer_barter_alloy", "wanderer_barter_paper", "wanderer_barter_done",
-					"amor_offered", "tbd_hoard_refuse"}) {
+					"amor_offered", "tbd_hoard_refuse",
+					"window_lure", "window_rain_lure", "window_grab", "window_touch_grab"}) {
 				check(lang.has("message.noclip_backrooms.level4." + msg), "missing wanderer message: " + msg);
 			}
 		});
