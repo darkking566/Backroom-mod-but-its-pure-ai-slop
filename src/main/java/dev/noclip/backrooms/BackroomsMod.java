@@ -53,6 +53,7 @@ public final class BackroomsMod implements ModInitializer {
 		Pull.register();
 		Contracts.register();
 		SurvivalXp.register();
+		dev.noclip.backrooms.core.quota.Quota.register();
 		Level0.register();
 		Level0p1.register();
 		Level1.register();

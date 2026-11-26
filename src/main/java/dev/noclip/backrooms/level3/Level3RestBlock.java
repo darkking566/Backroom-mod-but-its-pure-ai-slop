@@ -30,7 +30,8 @@ final class Level3RestBlock extends Level3FacingBlock {
 	protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 		if (!(player instanceof ServerPlayer serverPlayer)) return InteractionResult.SUCCESS;
 		LevelData.RespawnData spot = LevelData.RespawnData.of(level.dimension(), serverPlayer.blockPosition(), serverPlayer.getYRot(), 0);
-		serverPlayer.setRespawnPosition(new ServerPlayer.RespawnConfig(spot, true), false);
+		// Through core.trip.Trips: remembers the home spawn and offers extraction, like the cots on Level 1.
+		dev.noclip.backrooms.core.trip.Trips.settle(serverPlayer, spot);
 		level.playSound(null, pos, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 0.8F, 0.8F);
 		serverPlayer.sendOverlayMessage(Component.translatable("message.noclip_backrooms.settled",
 				Component.translatable("settlement.noclip_backrooms." + settlement)));

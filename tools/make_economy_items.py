@@ -125,11 +125,51 @@ def tape():
     return img
 
 
+def report():
+    """A water-stained manila folder with a red M.E.G. stamp and a torn page sticking out."""
+    rnd = random.Random(23)
+    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
+    px = img.load()
+    # The page sticking out of the top, ruled lines.
+    for y in range(5, 12):
+        for x in range(9, 25):
+            v = rnd.randint(-8, 6)
+            px[x, y] = (226 + v, 222 + v, 204 + v, 255) if y % 2 or x < 11 else (150 + v, 150 + v, 160 + v, 255)
+    # The folder, its tab and a darker back edge.
+    for y in range(9, 28):
+        for x in range(4, 28):
+            v = rnd.randint(-9, 7)
+            edge = x in (4, 27) or y in (9, 27)
+            px[x, y] = (122 + v, 96 + v, 54 + v, 255) if edge else (196 + v, 160 + v, 98 + v, 255)
+    for y in range(7, 10):
+        for x in range(5, 14):
+            px[x, y] = (186, 150, 90, 255)
+    # A water stain.
+    for y in range(18, 27):
+        for x in range(16, 27):
+            if (x - 21) ** 2 + (y - 23) ** 2 < 20 and rnd.random() < 0.8:
+                r, g, b, a = px[x, y]
+                px[x, y] = (r - 34, g - 30, b - 22, 255)
+    # The red stamp: a box with "MEG" as three marks.
+    for x in range(8, 22):
+        for y in (14, 21):
+            px[x, y] = (170, 34, 30, 255)
+    for y in range(14, 22):
+        for x in (8, 21):
+            px[x, y] = (170, 34, 30, 255)
+    for x0 in (10, 14, 18):
+        for y in range(16, 20):
+            px[x0, y] = (170, 34, 30, 255)
+            px[x0 + 1, y if y in (16, 19) else 16] = (170, 34, 30, 255)
+    return img
+
+
 if __name__ == "__main__":
     save("lost_coin", coin())
     save("static_tape", tape())
-    sheet = Image.new("RGBA", (S * 2 * 4 + 12, S * 4 + 8), (40, 40, 40, 255))
-    for i, name in enumerate(("lost_coin", "static_tape")):
+    save("meg_squad_report", report())
+    sheet = Image.new("RGBA", (S * 3 * 4 + 16, S * 4 + 8), (40, 40, 40, 255))
+    for i, name in enumerate(("lost_coin", "static_tape", "meg_squad_report")):
         icon = Image.open(ASSETS / "textures/item/core" / f"{name}.png").resize((S * 4, S * 4), Image.NEAREST)
         sheet.alpha_composite(icon, (4 + i * (S * 4 + 4), 4))
     out = ROOT / "docs/project/1-gameplay/images/items.png"

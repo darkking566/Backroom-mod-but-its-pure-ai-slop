@@ -481,6 +481,19 @@
   - 刪除已合併的 `docs/HORROR_ESCAPE_PLAN.md`、`FLOORS.md`、`GAMEPLAY_SYSTEM_PLAN.md`、`PROJECT_PLAN_FOR_CLAUDE.md`、`PROJECT_PLAN_REPLY_FROM_CLAUDE.md`、舊企劃書，以及沒人引用、已被 `docs/look/items/` 取代的 `docs/look/trial/`、`trial_materials.png`（都在 git 紀錄裡）
   - 改路徑：程式註解、測試註解、產生工具的輸出路徑（`make_textures.py`、`make_level1/2/3/0p1.py`、`make_economy_items.py`、`render_docs_items.java`、`resize_realistic.py`）、`AGENTS.md`（改指向 `docs/project/`、貼圖尺寸改成 128／64）、根目錄 `README.md` 的資料夾地圖、`NEXT.md`、`docs/look/` 的連結；`CLAUDE.md` 是歷史紀錄沒改。檢查過所有文件的相對連結都點得到
   - `gradlew build` 通過
+- 抓 GitHub 合併朋友新推的 Level 3 三批（寫實材質、怪物生態、四個據點，`410641c9` 等）：只有 Level 3 說明檔衝突（我搬了位置、朋友改了內容），內容用朋友的、路徑用新的，朋友說明裡的相對連結跟著改；`gradlew build` 通過（`c240c0b1`）
+  - 朋友新增的 Level 3 安頓床（`Level3RestBlock`）原本直接設重生點，改成走 `Trips.settle`（記下家裡的重生點、出現「[請他們帶我回家]」），跟停車場的床一樣
+- 使用者要求開始做配額循環（企劃書的【建議】全部照建議），並加上「主世界倒數以天計算，每到新的一天在畫面中央用黃字大大顯示任務開始第幾天」：
+  - 新增 `core/quota/`：`QuotaMath`（純計算：天數、排斥度、配額 100 每期 ×1.3、人數 ×(1＋0.6×(人數−1))、必交件數、欠款 ×1.2 無條件進位）、`QuotaData`（存在主世界的隊伍狀態，整個伺服器一隊）、`Quota`（時鐘、配額、欠款、違約、隔天日出強制再部署到隨機開放樓層、派遣、指揮官的說明與按鈕、指令 `/meg deploy <層>`、`/meg quota`、`/meg quota paydebt`，管理員 `/backrooms quota start|day <n>|reset`）、`QuotaStatusPayload`；客戶端 `QuotaClient`（主世界左上角顯示第幾天、配額、必交、欠款）
+  - 時鐘：只要有隊員在主世界、每一刻都算（日夜循環關掉也算），時鐘跳動（睡覺、/time add）算跳過的時間；人在後室時暫停；有人第一次活著回到地面時第一期才開始（`Trips.cameHome` 改呼叫 `Quota.onHome`）
+  - 每到新的一天、以及回到主世界時，畫面中央用黃色粗體大字「任務開始第 N 天」，副標題是配額與剩幾天（最後一天、欠款時換字）
+  - 交配額＝賣給收購商：`Shops` 賣出時先還欠款、再算配額，剩下才進帳戶，必交項目賣出時自動算；違約時除了收購商都回 `LOCKED`（新的結果）；`Contracts` 的完成報酬改成算進配額＋一半當帳戶獎勵，違約時不能接，指揮官說話時先列出配額、派遣與還債按鈕
+  - 改 Gemini 的 `Pull`：排斥度改成跟著週期的天數（`Quota.rejection`：第 1～2 天 0、第 3～5 天升到 100、欠款時 100），藥和杏仁藥水只暫時壓症狀；拿掉地表滲透和裂縫（伺服器開啟時把舊存檔裡滲成地毯的地面、開著的裂縫恢復原狀，`SeepageData.restoreEverything`）；拿掉 `/backrooms rejection seep`，`set` 改成移動週期的時鐘
+  - 新道具「M.E.G. 失蹤小隊報告」（`meg_squad_report`，`Economy` 登記、`tools/make_economy_items.py` 畫圖示），放進停車場補給箱、有眼睛的箱子、Level 2 儲物箱、Level 3 M.E.G. 補給箱（約一成）；收購商補上 11 種（怪物樣本與小隊報告）
+  - `core/LevelExits` 加 `openLevels()`；語言檔加約 35 條；指揮官台詞改成講配額與派遣
+  - 測試：新增單元測試 `QuotaMathTest`；`HorrorClientTest` 的第 6 段改成整個週期：第一次回家開始第 1 天、在家才算時間、後室不算、/time add 算、第 4 天有排斥、藥不動時鐘、在收購商旁邊真的賣東西交配額與必交項目、交滿換下一期（配額 130、補給包）、期限到變欠款（＋20%）、前哨關閉、排斥最重、日出被丟進後室、用帳戶 2:1 還清；第 7 段委託改檢查算進配額。截圖看過黃色大字與左上角
+  - 中途發現測試世界關掉日夜循環，主世界時鐘不動，原本「用時鐘的差」會讓倒數永遠不走：改成每一刻都算＋時鐘跳動另外加
+  - 驗證：`gradlew build`、`runClientGameTest -Plevels=horror,guild,floors,0,3` 與 Level 1 的 `settlements,wikiSettlements,leaveThroughDoor` 都通過；`docs/project/1-gameplay/README.md` 把【建議】改成【已做】並寫上實際數字
 
 ## 動作記錄（Antigravity）
 

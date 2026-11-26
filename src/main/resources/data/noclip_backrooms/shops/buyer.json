@@ -22,6 +22,17 @@
     {"item": "noclip_backrooms:red_room_shard", "count": 1, "price": 30},
     {"item": "noclip_backrooms:anomaly_crystal", "count": 1, "price": 45},
     {"item": "noclip_backrooms:reality_fragment", "count": 1, "price": 60},
+    {"item": "noclip_backrooms:hound_matted_hair", "count": 1, "price": 12},
+    {"item": "noclip_backrooms:shadow_mote", "count": 1, "price": 15},
+    {"item": "noclip_backrooms:tangled_knuckle", "count": 1, "price": 18},
+    {"item": "noclip_backrooms:ash_residue", "count": 1, "price": 20},
+    {"item": "noclip_backrooms:withered_heart", "count": 1, "price": 30},
+    {"item": "noclip_backrooms:black_filament", "count": 1, "price": 15},
+    {"item": "noclip_backrooms:acid_sac", "count": 1, "price": 25},
+    {"item": "noclip_backrooms:moth_wing_scale", "count": 1, "price": 15},
+    {"item": "noclip_backrooms:faceless_membrane", "count": 1, "price": 25},
+    {"item": "noclip_backrooms:thick_disguise_hide", "count": 1, "price": 25},
+    {"item": "noclip_backrooms:meg_squad_report", "count": 1, "price": 50},
     {"item": "noclip_backrooms:core_alpha_fang", "count": 1, "price": 400}
   ]
 }

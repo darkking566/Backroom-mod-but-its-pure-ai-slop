@@ -34,6 +34,11 @@ public final class LevelExits {
 		OPEN.put(level, arrival);
 	}
 
+	/** Every level someone can be sent to right now. */
+	public static java.util.Set<String> openLevels() {
+		return java.util.Set.copyOf(OPEN.keySet());
+	}
+
 	public static boolean isOpen(String level) {
 		return OPEN.containsKey(level);
 	}

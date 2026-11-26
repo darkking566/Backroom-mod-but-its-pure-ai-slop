@@ -87,6 +87,10 @@ public final class Pull {
 
 	public static void register() {
 		ServerTickEvents.END_SERVER_TICK.register(Pull::tick);
+		// The seepage and the rift are gone (2026-11-26, docs/project/1-gameplay/README.md): put back any ground an older
+		// version turned into carpet, and close its rifts.
+		net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTED.register(server ->
+				SeepageData.get(server.overworld()).restoreEverything(server.overworld()));
 		PlayerBlockBreakEvents.AFTER.register((level, player, pos, state, be) -> {
 			if (level instanceof ServerLevel sl && sl.dimension() == Level.OVERWORLD) {
 				SeepageData.get(sl).pruneIfBroken(sl, pos);
@@ -172,11 +176,15 @@ public final class Pull {
 				.withStyle(ChatFormatting.LIGHT_PURPLE));
 	}
 
-	/** Minor temporary relief when drinking Almond Elixir / Aged Almond Reserve. */
+	/**
+	 * Minor temporary relief when drinking Almond Elixir / Aged Almond Reserve: the symptoms ease for a while (a quarter of
+	 * {@code extraTicks}). Like the serums it only holds the symptoms back; the cycle's clock and quota do not change.
+	 */
 	public static void applyMinorRelief(ServerPlayer player, float severityDrop, long extraTicks) {
 		PullState before = of(player);
-		if (!before.marked() && before.pull() <= 0.0F) return;
-		PullState after = before.applyMinorRelief(now(player.level().getServer()), severityDrop, extraTicks);
+		if (before.pull() <= 0.0F) return;
+		long now = now(player.level().getServer());
+		PullState after = before.withGraceUntil(Math.max(before.graceUntil(), now + extraTicks / 4)).withPull(0.0F);
 		set(player, after);
 		if (before.stage() > after.stage()) {
 			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.rejection.minor_relief")
@@ -211,25 +219,10 @@ public final class Pull {
 			}
 
 			int prevStage = state.stage();
-			if (!state.marked() && state.pull() <= 0.0F) {
-				syncHealthPenalty(player, state);
-				continue;
-			}
-
-			// During 2-day escape buffer or serum relief window, severity stays safely suppressed
-			if (now < state.graceUntil()) {
-				if (state.pull() > 0.0F) {
-					set(player, state.withPull(Math.max(0.0F, state.pull() - 2.0F)));
-				} else {
-					syncHealthPenalty(player, state);
-				}
-				continue;
-			}
-
-			// Rejection escalates in the Overworld — NEVER passively teleports the player!
-			float rate = rate(player);
-			float nextPull = Math.min(FALL, state.pull() + rate);
-			PullState next = nextPull != state.pull() ? state.withPull(nextPull) : state;
+			// The rejection follows the team's M.E.G. cycle (core.quota.Quota): nothing on days 1-2, worse through days
+			// 3-5, the worst while the team is in debt. A serum or stabiliser only holds the symptoms back for a while.
+			float target = now < state.graceUntil() ? 0.0F : dev.noclip.backrooms.core.quota.Quota.rejection(server);
+			PullState next = target != state.pull() ? state.withPull(target) : state;
 			if (next != state) {
 				set(player, next);
 			} else {
@@ -247,35 +240,7 @@ public final class Pull {
 	}
 
 	private static void applyStageEffects(ServerLevel overworld, ServerPlayer player, int stage, int tickCount) {
-		SeepageData seepage = SeepageData.get(overworld);
-
-		// 1. Reversible natural-ground seepage into damp yellow Backrooms carpet (never touches buildings/chests!)
-		int seepIntervalTicks = switch (stage) {
-			case 1 -> 900;  // every 45s
-			case 2 -> 500;  // every 25s
-			case 3 -> 300;  // every 15s
-			default -> 200; // every 10s
-		};
-		if (tickCount % seepIntervalTicks == 0) {
-			int tries = stage >= 3 ? 2 : 1;
-			for (int i = 0; i < tries; i++) {
-				seepage.trySeepNear(overworld, player.getUUID(), player.blockPosition(), 4, 16, player.getRandom());
-			}
-		}
-
-		// 2. At Stage 2+, open an outdoor glowing Backrooms Rift so the player can choose to step back in
-		if (stage >= 2 && tickCount % 100 == 0) {
-			BlockPos prev = seepage.riftFor(player.getUUID());
-			BlockPos active = seepage.ensureRiftNear(overworld, player.getUUID(), player.blockPosition(), player.getRandom());
-			if (active != null && (prev == null || !prev.equals(active))) {
-				overworld.playSound(null, active.getX() + 0.5, active.getY() + 0.5, active.getZ() + 0.5,
-						SoundEvents.PORTAL_TRIGGER, SoundSource.AMBIENT, 0.7F, 0.65F);
-				player.sendSystemMessage(Component.translatable("message.noclip_backrooms.rift.opened",
-						active.getX(), active.getY(), active.getZ()).withStyle(ChatFormatting.YELLOW));
-			}
-		}
-
-		// 3. Wretch physiological symptoms (hunger / weakness / stage-4 darkness pulse)
+		// Wretch physiological symptoms (the seepage and the rift of an earlier version are gone) (hunger / weakness / stage-4 darkness pulse)
 		if (stage == 1 && tickCount % 600 == 0) {
 			player.addEffect(new MobEffectInstance(MobEffects.HUNGER, 140, 0, true, false, true));
 		} else if (stage == 2 && tickCount % 400 == 0) {
@@ -388,8 +353,9 @@ public final class Pull {
 												.executes(ctx -> {
 													ServerPlayer p = ctx.getSource().getPlayerOrException();
 													float val = FloatArgumentType.getFloat(ctx, "severity");
-													PullState cur = of(p);
-													set(p, new PullState(val, 0L, val > 0.0F || cur.marked(), cur.tolerance()));
+													// The rejection comes from the cycle's clock: move the clock to where it is this bad.
+													dev.noclip.backrooms.core.quota.Quota.setRejection(ctx.getSource().getServer(), val);
+													set(p, of(p).withGraceUntil(0L));
 													ctx.getSource().sendSuccess(() -> Component.literal("Set rejection severity to " + val), false);
 													return 1;
 												})))
@@ -399,19 +365,6 @@ public final class Pull {
 									ServerLevel ow = ctx.getSource().getServer().overworld();
 									int restored = SeepageData.get(ow).clearAllFor(ow, p.getUUID(), p.blockPosition());
 									ctx.getSource().sendSuccess(() -> Component.literal("Cleared rejection & restored " + restored + " seeped blocks."), false);
-									return 1;
-								}))
-								.then(Commands.literal("seep").executes(ctx -> {
-									ServerPlayer p = ctx.getSource().getPlayerOrException();
-									ServerLevel ow = ctx.getSource().getServer().overworld();
-									SeepageData data = SeepageData.get(ow);
-									int placed = 0;
-									for (int i = 0; i < 6; i++) {
-										if (data.trySeepNear(ow, p.getUUID(), p.blockPosition(), 3, 14, p.getRandom()) != null) placed++;
-									}
-									BlockPos rift = data.ensureRiftNear(ow, p.getUUID(), p.blockPosition(), p.getRandom());
-									int count = placed;
-									ctx.getSource().sendSuccess(() -> Component.literal("Seeped " + count + " blocks; rift=" + (rift == null ? "none" : rift.toShortString())), false);
 									return 1;
 								})))));
 	}

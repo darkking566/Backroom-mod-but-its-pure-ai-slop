@@ -48,7 +48,7 @@ public final class Shops {
 	private static Map<ShopRole, List<ShopOffer>> offers;
 
 	public enum Outcome {
-		DONE, NO_CREDITS, NO_GOODS, TOO_FAR, NO_SUCH_OFFER
+		DONE, NO_CREDITS, NO_GOODS, TOO_FAR, NO_SUCH_OFFER, LOCKED
 	}
 
 	private Shops() {
@@ -143,6 +143,8 @@ public final class Shops {
 		boolean near = !player.level().getEntitiesOfClass(Person.class, player.getBoundingBox().inflate(REACH),
 				p -> p.entityTags().contains(role.tag())).isEmpty();
 		if (!near) return Outcome.TOO_FAR;
+		// A team in debt to M.E.G. finds the outpost closed, all but the buyer (selling is how the debt gets paid).
+		if (role != ShopRole.BUYER && dev.noclip.backrooms.core.quota.Quota.locked(player.level().getServer())) return Outcome.LOCKED;
 		ShopOffer offer = list.get(index);
 		Inventory inventory = player.getInventory();
 		long price = (long) offer.price() * times;
@@ -150,7 +152,9 @@ public final class Shops {
 			int needed = offer.goods().getCount() * times;
 			if (count(inventory, offer.goods()) < needed) return Outcome.NO_GOODS;
 			remove(inventory, offer.goods(), needed);
-			Wallet.add(player, price);
+			// Selling to the buyer is handing things in to M.E.G.: debt first, then the quota; only the rest is paid out.
+			long credits = dev.noclip.backrooms.core.quota.Quota.onSold(player, offer.goods().getItem(), needed, price);
+			if (credits > 0) Wallet.add(player, credits);
 			return Outcome.DONE;
 		}
 		if (Wallet.of(player) < price) return Outcome.NO_CREDITS;

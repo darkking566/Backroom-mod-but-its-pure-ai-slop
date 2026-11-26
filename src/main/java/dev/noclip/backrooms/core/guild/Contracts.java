@@ -94,6 +94,9 @@ public final class Contracts {
 	/** What the commander says when spoken to: who they are, and the contracts on offer (or the one in hand). */
 	public static void talk(ServerPlayer player) {
 		for (int i = 1; i <= 3; i++) player.sendSystemMessage(Component.translatable("guild.noclip_backrooms.master." + i));
+		// The cycle, sending people in, paying debt (core.quota.Quota).
+		dev.noclip.backrooms.core.quota.Quota.talk(player);
+		if (dev.noclip.backrooms.core.quota.Quota.locked(player.level().getServer())) return;
 		Active active = player.getAttached(ACTIVE);
 		Contract current = active == null ? null : Contract.byId(active.id());
 		if (current != null) {
@@ -120,7 +123,8 @@ public final class Contracts {
 		String refusal = contract == null ? "message.noclip_backrooms.contract.unknown"
 				: player.hasAttached(ACTIVE) ? "message.noclip_backrooms.contract.already"
 				: player.level().dimension() != Level.OVERWORLD ? "message.noclip_backrooms.contract.not_home"
-				: !nearCommander(player) ? "message.noclip_backrooms.contract.no_commander" : null;
+				: !nearCommander(player) ? "message.noclip_backrooms.contract.no_commander"
+				: dev.noclip.backrooms.core.quota.Quota.locked(player.level().getServer()) ? "message.noclip_backrooms.contract.locked" : null;
 		if (refusal != null) {
 			player.sendSystemMessage(Component.translatable(refusal));
 			return false;
@@ -149,9 +153,12 @@ public final class Contracts {
 		player.removeAttached(ACTIVE);
 		if (contract == null) return;
 		if (active.reached()) {
-			Wallet.add(player, contract.reward);
+			// An M.E.G. order: its value goes into the quota (or the debt), and half of it again into the account as a bonus.
+			long left = dev.noclip.backrooms.core.quota.Quota.addPoints(player, contract.reward);
+			long bonus = contract.reward / 2 + left;
+			Wallet.add(player, bonus);
 			PlayerRpg.grantXp(player, (int) (contract.reward / 5));
-			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.contract.paid", contract.title(), contract.reward)
+			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.contract.paid", contract.title(), contract.reward - left, bonus)
 					.withStyle(ChatFormatting.GREEN));
 		} else {
 			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.contract.failed", contract.title())

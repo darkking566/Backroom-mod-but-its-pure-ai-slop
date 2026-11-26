@@ -149,7 +149,8 @@ public final class Trips {
 	/** Out of the Backrooms alive, however they got out. */
 	private static void cameHome(ServerPlayer player, FloorRun run) {
 		restoreHome(player);
-		Pull.grace(player);
+		// The first time anyone gets out, the team's M.E.G. cycle starts (the days at home count from then on).
+		dev.noclip.backrooms.core.quota.Quota.onHome(player);
 		PlayerRpg.grantXp(player, ESCAPE_XP + ESCAPE_XP_PER_FLOOR * run.floor());
 		player.sendSystemMessage(Component.translatable("message.noclip_backrooms.trip.home", run.floor()).withStyle(ChatFormatting.GRAY));
 	}

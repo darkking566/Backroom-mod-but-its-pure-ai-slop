@@ -7,13 +7,20 @@ import dev.noclip.backrooms.core.guild.Contracts;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
 import dev.noclip.backrooms.core.trip.Pull;
 import dev.noclip.backrooms.core.trip.PullState;
-import dev.noclip.backrooms.core.trip.SeepageData;
 import dev.noclip.backrooms.core.trip.Trips;
+import dev.noclip.backrooms.core.people.People;
+import dev.noclip.backrooms.core.people.Person;
+import dev.noclip.backrooms.core.quota.Quota;
+import dev.noclip.backrooms.core.quota.QuotaClient;
+import dev.noclip.backrooms.core.quota.QuotaMath;
+import dev.noclip.backrooms.core.trade.ShopRole;
+import dev.noclip.backrooms.core.trade.Shops;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import dev.noclip.backrooms.level0.Level0;
 import dev.noclip.backrooms.level1.Level1;
 import dev.noclip.backrooms.monsters.Monsters;
 import dev.noclip.backrooms.monsters.hound.Hound;
-import dev.noclip.backrooms.props.BackroomsProps;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
@@ -96,7 +103,7 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 200);
 			check(server.computeOnServer(s -> Floors.of(player(s)).floor()) == 1, "waking up lost is not a new trip at floor 1");
 			check(server.computeOnServer(s -> player(s).getInventory().getItem(0).isEmpty()), "the player kept their things after dying");
-			check(server.computeOnServer(s -> !Pull.inGrace(player(s))), "waking up in the Overworld after dying counted as getting out");
+			check(server.computeOnServer(s -> !Quota.data(s).active()), "waking up in the Overworld after dying counted as getting out");
 			server.runCommand("effect give @a resistance infinite 4 true");
 
 			// 5. Settled: wake at the base; M.E.G. takes them home from there.
@@ -113,61 +120,103 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
 			check(server.computeOnServer(s -> !Trips.settled(player(s))), "home, the player still wakes up in the Backrooms");
 			check(server.computeOnServer(s -> Floors.of(player(s)).floor()) == 0, "the trip did not end at home");
-			check(server.computeOnServer(s -> Pull.inGrace(player(s))), "no day of peace after getting out");
+			check(server.computeOnServer(s -> Quota.data(s).active()), "getting out did not start the M.E.G. cycle");
 			check(server.computeOnServer(s -> PlayerRpg.get(player(s)).level()) > levelBefore
 					|| server.computeOnServer(s -> PlayerRpg.get(player(s)).xp()) > xpBefore, "no experience for getting out alive");
 
-			// 6. Mode 1 + Mode 2 (Wretch Rejection & Reversible Overworld Seepage):
-			//    - 2-day buffer holds off escalation;
-			//    - Stage 2+ NEVER forcibly teleports the player, instead seeps natural ground & opens a glowing Rift;
-			//    - Tier 2 Serum restores all seeped ground and seals the Rift;
-			//    - Stepping into the Rift intentionally enters Level 0.
-			long graceUntil = server.computeOnServer(s -> Pull.of(player(s)).graceUntil());
-			server.runOnServer(s -> Pull.set(player(s), new PullState(92.0F, graceUntil, true, 0)));
-			server.runCommand("title @a clear");
-			context.waitTicks(30);
-			context.takeScreenshot("horror_pull_warning");
-			server.runCommand("item replace entity @a hotbar.1 with noclip_backrooms:scrap_metal 4");
-			check(server.computeOnServer(s -> Pull.relics(player(s))) == 1, "scrap metal from the Backrooms does not count");
-			// Even at severity 99.9 after buffer expires, player is NOT passively teleported away!
-			server.runOnServer(s -> Pull.set(player(s), new PullState(99.9F, 0L, true, 0)));
+			// 6. The M.E.G. cycle (docs/project/1-gameplay/README.md): day 1 on getting out, the clock runs only at home,
+			//    a night slept through counts, the rejection follows the days, a serum only holds it back, selling to the
+			//    buyer hands things in, meeting the quota pays out, missing it means debt, a closed outpost and a drop
+			//    into the Backrooms at dawn.
+			check(server.computeOnServer(s -> QuotaMath.day(Quota.data(s).homeTicks())) == 1, "the cycle did not start on day 1");
+			check(server.computeOnServer(s -> Quota.data(s).required()) == QuotaMath.FIRST_QUOTA, "the first quota is not 100");
+			check(server.computeOnServer(s -> Quota.data(s).items().size()) == 1, "the first cycle does not ask for one item");
+			context.waitFor(client -> QuotaClient.status().active() && QuotaClient.status().day() == 1, 100);
+			context.waitTicks(10);
+			context.takeScreenshot("horror_quota_day1");
+			long homeBefore = server.computeOnServer(s -> Quota.data(s).homeTicks());
+			context.waitTicks(40);
+			check(server.computeOnServer(s -> Quota.data(s).homeTicks()) >= homeBefore + 30, "time at home did not count");
+			toLevel0(server);
+			long inside = server.computeOnServer(s -> Quota.data(s).homeTicks());
 			context.waitTicks(60);
-			check(server.computeOnServer(s -> player(s).level().dimension()) == Level.OVERWORLD,
-					"player was passively teleported out of the Overworld instead of choosing the Rift");
-			// Verify reversible natural-ground seepage + outdoor Rift opening + full restoration by Tier 2 Serum
-			server.runOnServer(s -> {
-				ServerPlayer p = player(s);
-				var ow = s.overworld();
-				SeepageData data = SeepageData.get(ow);
-				for (int i = 0; i < 6; i++) {
-					data.trySeepNear(ow, p.getUUID(), p.blockPosition(), 3, 14, p.getRandom());
-				}
-				BlockPos rift = data.ensureRiftNear(ow, p.getUUID(), p.blockPosition(), p.getRandom());
-				check(rift != null && ow.getBlockState(rift).is(BackroomsProps.BACKROOMS_RIFT),
-						"Stage 2+ seepage failed to open a glowing Backrooms Rift outdoors");
-			});
+			check(server.computeOnServer(s -> Quota.data(s).homeTicks()) <= inside + 2, "time in the Backrooms counted");
+			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 120 0");
+			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
+			context.waitTicks(5);
+			long clockBefore = server.computeOnServer(s -> s.overworld().getOverworldClockTime());
+			server.runCommand("time add 24000");
+			check(server.computeOnServer(s -> s.overworld().getOverworldClockTime()) >= clockBefore + 24000, "/time add did not move the Overworld clock");
+			server.waitFor(s -> QuotaMath.day(Quota.data(s).homeTicks()) == 2, 40);
+			context.waitFor(client -> QuotaClient.status().day() == 2, 60);
+			context.waitTicks(10);
+			context.takeScreenshot("horror_quota_day2");
+
+			// The rejection: none on day 2, some on day 4; a serum holds it back without touching the clock.
+			check(server.computeOnServer(s -> Quota.rejection(s)) == 0.0F, "rejection before day 3");
+			server.runCommand("backrooms quota day 4");
+			server.waitFor(s -> Pull.of(player(s)).stage() >= 1, 60);
+			long clock = server.computeOnServer(s -> Quota.data(s).homeTicks());
 			server.runOnServer(s -> Pull.useTier2Serum(player(s)));
+			server.waitFor(s -> Pull.of(player(s)).pull() == 0.0F, 40);
+			check(server.computeOnServer(s -> Quota.data(s).homeTicks()) < clock + 200, "the serum moved the cycle's clock");
+			server.runOnServer(s -> Pull.set(player(s), Pull.of(player(s)).withGraceUntil(0L)));
+
+			// Handing in at the buyer: required items and points, the rest paid out; the quota met starts the next cycle.
 			server.runOnServer(s -> {
 				ServerPlayer p = player(s);
-				SeepageData data = SeepageData.get(s.overworld());
-				check(data.countFor(p.getUUID()) == 0, "Tier 2 Serum did not restore all seeped ground blocks");
-				check(data.riftFor(p.getUUID()) == null, "Tier 2 Serum did not seal the Backrooms Rift");
-				check(Pull.inGrace(p), "Tier 2 Serum did not grant relief window");
+				Person buyer = People.type("trader").create(p.level(), EntitySpawnReason.COMMAND);
+				buyer.snapTo(p.getX() + 2, p.getY(), p.getZ(), 0, 0);
+				p.level().addFreshEntity(buyer);
+				buyer.addTag(ShopRole.BUYER.tag());
 			});
-			// Open a Rift again and step directly into it -> deliberately enters Level 0!
-			BlockPos riftPos = server.computeOnServer(s -> {
-				ServerPlayer p = player(s);
-				return SeepageData.get(s.overworld()).ensureRiftNear(s.overworld(), p.getUUID(), p.blockPosition(), p.getRandom());
-			});
-			check(riftPos != null, "Could not spawn Rift for entry test");
-			server.runCommand("execute as @a in minecraft:overworld run tp @s "
-					+ (riftPos.getX() + 0.5) + " " + riftPos.getY() + " " + (riftPos.getZ() + 0.5));
-			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 120);
+			java.util.Map<String, Integer> wanted = server.computeOnServer(s -> Quota.required(s));
+			String item = wanted.keySet().iterator().next();
+			server.runCommand("clear @a");
+			server.runCommand("give @a " + item + " " + wanted.get(item));
+			server.runCommand("give @a noclip_backrooms:microchip 6");
+			long credits0 = server.computeOnServer(s -> Wallet.of(player(s)));
+			check(server.computeOnServer(s -> sell(s, item, wanted.get(item))) == Shops.Outcome.DONE, "could not sell the required item");
+			check(server.computeOnServer(s -> Quota.data(s).handed().getOrDefault(item, 0)) == wanted.get(item), "the required item did not count");
+			check(server.computeOnServer(s -> sell(s, "noclip_backrooms:microchip", 6)) == Shops.Outcome.DONE, "could not sell microchips");
+			check(server.computeOnServer(s -> Quota.data(s).cycle()) == 2, "meeting the quota did not start the next cycle");
+			check(server.computeOnServer(s -> QuotaMath.day(Quota.data(s).homeTicks())) == 1, "the next cycle did not start on day 1");
+			check(server.computeOnServer(s -> Quota.data(s).required()) == Math.round(QuotaMath.FIRST_QUOTA * QuotaMath.GROWTH),
+					"the next quota did not grow 30%");
+			check(server.computeOnServer(s -> Wallet.of(player(s))) > credits0, "what was left over after the quota was not paid out");
+			check(server.computeOnServer(s -> Shops.count(player(s).getInventory(), new ItemStack(Items.BREAD))) == 4, "no care package");
+
+			// Missing the deadline: debt with 20% on top, the outpost closed, the rejection at its worst, a drop at dawn.
+			long owed = server.computeOnServer(s -> Quota.data(s).required() + Quota.data(s).items().size() * QuotaMath.MISSING_ITEM_POINTS
+					* (long) QuotaMath.itemCount(1));
+			server.runCommand("backrooms quota day 5");
+			server.runCommand("time add 24000");
+			server.waitFor(s -> Quota.data(s).debt() > 0, 60);
+			check(server.computeOnServer(s -> Quota.data(s).debt()) == QuotaMath.debtAfterDeadline(owed), "the debt is not the unpaid quota plus 20%");
+			check(server.computeOnServer(s -> Quota.locked(s)), "the outpost is not closed to a team in debt");
+			check(server.computeOnServer(s -> Quota.rejection(s)) == 100.0F, "the rejection is not at its worst while in debt");
+			long dawn = server.computeOnServer(s -> Quota.data(s).redeployAt() - s.overworld().getOverworldClockTime());
+			check(dawn > 0 && dawn <= QuotaMath.DAY, "no redeployment at the next dawn");
+			server.runCommand("time add " + dawn);
+			server.waitFor(s -> !player(s).level().dimension().identifier().getNamespace().equals("minecraft"), 200);
+			context.waitTicks(20);
+			context.takeScreenshot("horror_quota_redeployed");
+
+			// Paying the debt from the account, two credits a point, opens the outpost again.
+			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 120 0");
+			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
+			long debt = server.computeOnServer(s -> Quota.data(s).debt());
+			server.runOnServer(s -> Wallet.set(player(s), debt * QuotaMath.CREDITS_PER_DEBT_POINT));
+			check(server.computeOnServer(s -> Quota.payDebt(player(s))), "could not pay the debt from the account");
+			check(server.computeOnServer(s -> !Quota.locked(s)), "the outpost stayed closed after the debt was paid");
+			check(server.computeOnServer(s -> Wallet.of(player(s))) == 0, "paying the debt did not cost two credits a point");
 
 			// 7. A contract: sent in, reach Level 1, out alive, paid.
 			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 120 0");
 			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
 			long credits = server.computeOnServer(s -> Wallet.of(player(s)));
+			long room = server.computeOnServer(s -> Quota.data(s).required() - Quota.data(s).delivered());
+			long deliveredBefore = server.computeOnServer(s -> Quota.data(s).delivered());
 			server.runOnServer(s -> Contracts.start(player(s), Contracts.Contract.SURVEY));
 			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 200);
 			server.runOnServer(s -> LevelExits.use(player(s), "1"));
@@ -175,12 +224,30 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			check(server.computeOnServer(s -> player(s).getAttached(Contracts.ACTIVE).reached()), "reaching Level 1 did not count");
 			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 120 0");
 			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
-			check(server.computeOnServer(s -> Wallet.of(player(s))) == credits + Contracts.Contract.SURVEY.reward, "the contract was not paid");
+			// An M.E.G. order: its value goes into the quota (what does not fit is paid out), half of it again as a bonus.
+			long reward = Contracts.Contract.SURVEY.reward;
+			long expected = credits + reward / 2 + Math.max(0, reward - room);
+			check(server.computeOnServer(s -> Wallet.of(player(s))) == expected, "the contract was not paid: "
+					+ server.computeOnServer(s -> Wallet.of(player(s))) + " instead of " + expected);
+			check(server.computeOnServer(s -> Quota.data(s).delivered()) == deliveredBefore + Math.min(reward, room),
+					"the contract did not count toward the quota");
 			check(server.computeOnServer(s -> !player(s).hasAttached(Contracts.ACTIVE)), "a finished contract is still in hand");
 		}
 	}
 
 	/** How much health a well-fed player regains in ten seconds where they stand. */
+	/** Sells to the buyer standing next to the player, through the shop like a click would. */
+	private static Shops.Outcome sell(MinecraftServer server, String item, int count) {
+		var offers = Shops.offers(ShopRole.BUYER);
+		for (int i = 0; i < offers.size(); i++) {
+			var offer = offers.get(i);
+			if (offer.fromPlayer() && net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(offer.goods().getItem()).toString().equals(item)) {
+				return Shops.trade(player(server), ShopRole.BUYER, i, Math.max(1, count / offer.goods().getCount()));
+			}
+		}
+		throw new AssertionError("the buyer does not take " + item);
+	}
+
 	private static float regen(ClientGameTestContext context, TestServerContext server) {
 		server.runOnServer(s -> {
 			ServerPlayer p = player(s);
