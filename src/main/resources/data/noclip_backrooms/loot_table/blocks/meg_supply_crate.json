@@ -43,6 +43,20 @@
           "weight": 5
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:meg_squad_report",
+          "weight": 1
+        },
+        {
+          "type": "minecraft:empty",
+          "weight": 9
+        }
+      ]
     }
   ],
   "random_sequence": "noclip_backrooms:blocks/meg_supply_crate"

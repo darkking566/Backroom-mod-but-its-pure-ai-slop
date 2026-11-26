@@ -15,7 +15,7 @@
 
 ## 2. 填規格表
 
-在 `docs/levels/<層>/README.md` 加一節「畫面規格」，照下面的表填：
+在 `docs/project/5-levels/<層>/README.md` 加一節「畫面規格」，照下面的表填：
 
 | 項目 | 填什麼 |
 |---|---|
@@ -26,7 +26,7 @@
 | 氣氛 | `Look.Mood` 的三個數：多遠開始黑、多遠全黑、衰減 |
 | 光影 | 這層開光影要特別注意的（例如水面、玻璃、發光物） |
 | 道具 | 要擺的道具：已有的、要新做的（新做的交給 Gemini，附尺寸和三種版本） |
-| 掉落 | 照 [`docs/levels/MATERIALS.md`](../levels/MATERIALS.md) 的格式補這一層 |
+| 掉落 | 照 [`docs/project/3-crafting/by-level.md`](../project/3-crafting/by-level.md) 的格式補這一層 |
 
 ## 3. 材質
 

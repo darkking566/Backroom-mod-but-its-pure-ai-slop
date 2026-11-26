@@ -32,7 +32,7 @@ import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * A trip into the Backrooms and back (docs/HORROR_ESCAPE_PLAN.md):
+ * A trip into the Backrooms and back (docs/project/1-gameplay/README.md):
  * <ul>
  * <li>settling at a base (a cot in a settlement) makes it where the player wakes up, for the rest of the trip;</li>
  * <li>from there the people of the base, whichever group runs it (M.E.G. or another), can take them home
@@ -149,7 +149,8 @@ public final class Trips {
 	/** Out of the Backrooms alive, however they got out. */
 	private static void cameHome(ServerPlayer player, FloorRun run) {
 		restoreHome(player);
-		Pull.grace(player);
+		// The first time anyone gets out, the team's M.E.G. cycle starts (the days at home count from then on).
+		dev.noclip.backrooms.core.quota.Quota.onHome(player);
 		PlayerRpg.grantXp(player, ESCAPE_XP + ESCAPE_XP_PER_FLOOR * run.floor());
 		player.sendSystemMessage(Component.translatable("message.noclip_backrooms.trip.home", run.floor()).withStyle(ChatFormatting.GRAY));
 	}

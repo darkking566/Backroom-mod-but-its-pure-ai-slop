@@ -12,7 +12,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 
 /**
- * What the player sees of the floor count (docs/FLOORS.md): "Floor 3" at the top left while in the Backrooms, and
+ * What the player sees of the floor count (docs/project/1-gameplay/README.md): "Floor 3" at the top left while in the Backrooms, and
  * "Level 0 · The Lobby" above the inventory. The title on arrival comes from the server (Floors.announce).
  */
 public final class FloorsClient {

@@ -3,7 +3,7 @@ package dev.noclip.backrooms.level0;
 import java.util.SplittableRandom;
 
 /**
- * Where the ways out of Level 0 are. Since the game turned to horror (docs/HORROR_ESCAPE_PLAN.md, 2026-11-26) they are
+ * Where the ways out of Level 0 are. Since the game turned to horror (docs/project/1-gameplay/README.md, 2026-11-26) they are
  * very rare: about one region of 10x10 sectors in RARITY has one, so the usual way home is to go deeper and settle at
  * a base.
  *

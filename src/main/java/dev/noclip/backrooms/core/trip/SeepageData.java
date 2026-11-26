@@ -240,6 +240,23 @@ public final class SeepageData extends SavedData {
 		return true;
 	}
 
+	/** Puts back every seeped block and closes every rift, for everyone (the seepage was taken out of the game). */
+	public void restoreEverything(ServerLevel overworld) {
+		if (blocks.isEmpty() && rifts.isEmpty()) return;
+		Block carpet = carpetBlock();
+		for (SeepedBlock sb : new ArrayList<>(blocks.values())) {
+			BlockPos pos = BlockPos.of(sb.pos);
+			if (overworld.getBlockState(pos).is(carpet)) overworld.setBlock(pos, sb.original, Block.UPDATE_ALL);
+		}
+		blocks.clear();
+		for (Long packed : new ArrayList<>(rifts.values())) {
+			BlockPos pos = BlockPos.of(packed);
+			if (overworld.getBlockState(pos).is(BackroomsProps.BACKROOMS_RIFT)) overworld.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+		}
+		rifts.clear();
+		setDirty();
+	}
+
 	/** Removes stale records if a player manually broke a seeped carpet block. */
 	public void pruneIfBroken(ServerLevel overworld, BlockPos pos) {
 		if (blocks.remove(pos.asLong()) != null) {

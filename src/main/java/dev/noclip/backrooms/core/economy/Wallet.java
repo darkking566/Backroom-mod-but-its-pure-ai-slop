@@ -10,7 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 /**
- * The permanent money account of the design spec (docs/企劃書, sections 2.3 and 4.1): credits kept with the player through
+ * The permanent money account of the design spec (docs/project, sections 2.3 and 4.1): credits kept with the player through
  * death and every trip, never dropped. Coins found in the Backrooms are put into it (CoinItem); the guild's merchants
  * take and pay in it (core.trade). Sent to that player only, for the inventory and the shop screens.
  */

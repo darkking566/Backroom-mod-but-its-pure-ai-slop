@@ -470,7 +470,32 @@
   - `docs/HORROR_ESCAPE_PLAN.md` 兩處還寫著我舊版的「拉力、睡覺」，改成現在的現實排斥；程式位置表補上 `SeepageData`、`BackroomsRiftBlock`
   - `gradlew build` 與 `runClientGameTest -Plevels=0,horror` 通過
   - 推送前抓 GitHub，合併朋友新推的停車場地標與事件 4 批（`02551469`～`22407106`）；只有 `CLAUDE.md` 衝突（兩邊的 Antigravity 紀錄都保留）；合併後 `gradlew build` 與 `runClientGameTest -Plevels=1,horror -Psections=settlements,leaveThroughDoor,easterEggs,vignettes` 通過；使用者同意後把 `main` 推送到 GitHub（我的恐怖系統、EXIT 門變稀有、這次的修正，Gemini 的現實排斥）；沒有強制推送、沒有改寫歷史
-- 使用者要求先做 Gamma 基地大型結構（照 `docs/levels/level3/POI.md` 的 D 節）：
+- 使用者覺得「回到主世界後怎麼逼玩家回後室」還沒解決（朋友覺得可以接受），要求把企劃書裡的發光裂縫那一套換成《致命公司》式的 M.E.G. 配額，並和 Gemini 提的悲屍化倒數（《深海迷航》＋後室 wiki 悲屍化）融合：
+  - 改寫 `docs/HORROR_ESCAPE_PLAN.md` 的「怎麼再回去」：兩股力量共用同一個 5 遊戲日的週期——第 1～2 天正常、第 3～5 天排斥發作（只在主世界）；期限前到前哨繳交調查配額 → M.E.G. 治療（排斥歸零）、補給、新週期；違約 → 前哨關閉醫療兌換委託、隔天早上強制再部署到更深的樓層、欠款加到下一期；進去改成 M.E.G. 派遣（取代裂縫）；三種藥只能壓症狀、不能代替配額；根治解藥是長期目標；地表滲透建議留當症狀；寫了 Claude 的看法、要注意的死亡螺旋與待討論
+  - 規則表、核心流程、分工跟著改；只改文件，程式還沒動（配額、派遣、強制再部署待做，裂縫待拿掉）
+- 使用者對配額循環的決定（`docs/HORROR_ESCAPE_PLAN.md` 標【定】）：後室裡時間停止、只在主世界扣倒數；違約隨機丟；欠款每期複利 20%；不要主世界地面變地毯；多人一起交、人數越多配額與內容物越多；要求全部擬定好才開工。Claude 把其餘細節寫成【建議】待確認（睡覺算時間、任一隊員在主世界就扣、5 天週期、配額 100 點每期漲 30%、人數加成每人 +60%、必交項目、用收購價表算點數、有欠款時配額不漲、帳戶點數 2:1 還欠款、付點數派遣到去過的樓層）；只改文件
+- 使用者要求所有企劃書放進他建立的 `docs/project/`，跟他原本放的舊企劃書（網頁版 Gemini 寫的 `backrooms_mod_design_spec.md`）合併，分成遊戲玩法、玩家能力值、合成（要網狀圖）、怪物、樓層，多餘的刪掉、整理 `docs/`：
+  - 先把從沒進過 git 的舊企劃書提交一次（`946957fa`），留底後再拆進各章
+  - 新結構：`docs/project/README.md`（總目錄、標示說明、專案總覽、工程規範、分工與協作、里程碑）、`1-gameplay/`（故事背景、核心循環、時間與配額、層數與雙軸難度、死亡、安頓撤離、前哨、經濟與任務；`outpost.md` 是原 `docs/guild.md`，圖在 `images/`）、`2-player/`（三條資源、四項能力值現況與原企劃想加的、等級經驗、介面、隱藏能力值與流派）、`3-crafting/`（原 `docs/crafting/` 改檔名、原 `docs/levels/MATERIALS.md` 變 `by-level.md` 並加入舊企劃書第 6 節 Level 0 物資表、物品預覽圖 `items/`）、`4-monsters/`（新寫的 18 種怪物數值、行為、出沒、掉落表；原合成企劃第 02 份變 `planned.md`）、`5-levels/`（原 `docs/levels/`，開頭加已做好的樓層與舊企劃書第 4.3 節樓層架構）；`docs/` 底下只剩 `project/` 和 `look/`
+  - 新增 `tools/make_recipe_docs.py`：從遊戲資料（工作站配方、原版工作台配方、怪物掉落、中文語言檔）產生 `3-crafting/recipes.md`（360 條配方依工作站分、482 樣物品的來源與用途索引）與網狀圖 `3-crafting/recipe-graph.svg`（來源在左、越做越深往右、線依工作站上色；向量圖可放大可搜尋，PNG 版字太小看不清楚所以改 SVG）
+  - 刪除已合併的 `docs/HORROR_ESCAPE_PLAN.md`、`FLOORS.md`、`GAMEPLAY_SYSTEM_PLAN.md`、`PROJECT_PLAN_FOR_CLAUDE.md`、`PROJECT_PLAN_REPLY_FROM_CLAUDE.md`、舊企劃書，以及沒人引用、已被 `docs/look/items/` 取代的 `docs/look/trial/`、`trial_materials.png`（都在 git 紀錄裡）
+  - 改路徑：程式註解、測試註解、產生工具的輸出路徑（`make_textures.py`、`make_level1/2/3/0p1.py`、`make_economy_items.py`、`render_docs_items.java`、`resize_realistic.py`）、`AGENTS.md`（改指向 `docs/project/`、貼圖尺寸改成 128／64）、根目錄 `README.md` 的資料夾地圖、`NEXT.md`、`docs/look/` 的連結；`CLAUDE.md` 是歷史紀錄沒改。檢查過所有文件的相對連結都點得到
+  - `gradlew build` 通過
+- 抓 GitHub 合併朋友新推的 Level 3 三批（寫實材質、怪物生態、四個據點，`410641c9` 等）：只有 Level 3 說明檔衝突（我搬了位置、朋友改了內容），內容用朋友的、路徑用新的，朋友說明裡的相對連結跟著改；`gradlew build` 通過（`c240c0b1`）
+  - 朋友新增的 Level 3 安頓床（`Level3RestBlock`）原本直接設重生點，改成走 `Trips.settle`（記下家裡的重生點、出現「[請他們帶我回家]」），跟停車場的床一樣
+- 使用者要求開始做配額循環（企劃書的【建議】全部照建議），並加上「主世界倒數以天計算，每到新的一天在畫面中央用黃字大大顯示任務開始第幾天」：
+  - 新增 `core/quota/`：`QuotaMath`（純計算：天數、排斥度、配額 100 每期 ×1.3、人數 ×(1＋0.6×(人數−1))、必交件數、欠款 ×1.2 無條件進位）、`QuotaData`（存在主世界的隊伍狀態，整個伺服器一隊）、`Quota`（時鐘、配額、欠款、違約、隔天日出強制再部署到隨機開放樓層、派遣、指揮官的說明與按鈕、指令 `/meg deploy <層>`、`/meg quota`、`/meg quota paydebt`，管理員 `/backrooms quota start|day <n>|reset`）、`QuotaStatusPayload`；客戶端 `QuotaClient`（主世界左上角顯示第幾天、配額、必交、欠款）
+  - 時鐘：只要有隊員在主世界、每一刻都算（日夜循環關掉也算），時鐘跳動（睡覺、/time add）算跳過的時間；人在後室時暫停；有人第一次活著回到地面時第一期才開始（`Trips.cameHome` 改呼叫 `Quota.onHome`）
+  - 每到新的一天、以及回到主世界時，畫面中央用黃色粗體大字「任務開始第 N 天」，副標題是配額與剩幾天（最後一天、欠款時換字）
+  - 交配額＝賣給收購商：`Shops` 賣出時先還欠款、再算配額，剩下才進帳戶，必交項目賣出時自動算；違約時除了收購商都回 `LOCKED`（新的結果）；`Contracts` 的完成報酬改成算進配額＋一半當帳戶獎勵，違約時不能接，指揮官說話時先列出配額、派遣與還債按鈕
+  - 改 Gemini 的 `Pull`：排斥度改成跟著週期的天數（`Quota.rejection`：第 1～2 天 0、第 3～5 天升到 100、欠款時 100），藥和杏仁藥水只暫時壓症狀；拿掉地表滲透和裂縫（伺服器開啟時把舊存檔裡滲成地毯的地面、開著的裂縫恢復原狀，`SeepageData.restoreEverything`）；拿掉 `/backrooms rejection seep`，`set` 改成移動週期的時鐘
+  - 新道具「M.E.G. 失蹤小隊報告」（`meg_squad_report`，`Economy` 登記、`tools/make_economy_items.py` 畫圖示），放進停車場補給箱、有眼睛的箱子、Level 2 儲物箱、Level 3 M.E.G. 補給箱（約一成）；收購商補上 11 種（怪物樣本與小隊報告）
+  - `core/LevelExits` 加 `openLevels()`；語言檔加約 35 條；指揮官台詞改成講配額與派遣
+  - 測試：新增單元測試 `QuotaMathTest`；`HorrorClientTest` 的第 6 段改成整個週期：第一次回家開始第 1 天、在家才算時間、後室不算、/time add 算、第 4 天有排斥、藥不動時鐘、在收購商旁邊真的賣東西交配額與必交項目、交滿換下一期（配額 130、補給包）、期限到變欠款（＋20%）、前哨關閉、排斥最重、日出被丟進後室、用帳戶 2:1 還清；第 7 段委託改檢查算進配額。截圖看過黃色大字與左上角
+  - 中途發現測試世界關掉日夜循環，主世界時鐘不動，原本「用時鐘的差」會讓倒數永遠不走：改成每一刻都算＋時鐘跳動另外加
+  - 驗證：`gradlew build`、`runClientGameTest -Plevels=horror,guild,floors,0,3` 與 Level 1 的 `settlements,wikiSettlements,leaveThroughDoor` 都通過；`docs/project/1-gameplay/README.md` 把【建議】改成【已做】並寫上實際數字
+- 使用者要求推上 GitHub：抓 GitHub 合併朋友新推的 Level 3 Gamma 基地（`b729e8c9` 等 3 個）；衝突在 `Level3RestBlock`（兩邊都改成走 `Trips.settle`，只差註解，用朋友的）與 `CLAUDE.md`（兩邊紀錄都保留）；朋友新加的 `docs/levels/level3/POI.md` 與 Gamma 截圖被 git 自動放到新位置 `docs/project/5-levels/level3/`，裡面指向已併入的 `docs/HORROR_ESCAPE_PLAN.md` 的連結改成遊戲玩法章；合併後 `gradlew build` 與 `runClientGameTest -Plevels=3,horror` 通過；使用者同意後把 `main` 推送到 GitHub（企劃書整理、配額循環、合併）；沒有強制推送、沒有改寫歷史
+- （朋友那邊的紀錄）使用者要求先做 Gamma 基地大型結構（照 `docs/levels/level3/POI.md` 的 D 節）：
   - 新增 `level3/GammaPlan`（每 4×4 張迷宮圖一座，由種子決定）、`GammaLayout`（60×48×48 固定樣板：地下隧道 y=1、三層商場 y=9／16／23 與挑空中庭、住宅部＋檢查站 y=32、行政部 y=39；東側 12 格是存儲設施）、`GammaCheckpointBlock`（金屬探測門：身上有武器不給進，出去不檢查）；`Level3Plan` 加 `HallKind.GAMMA`（只開正門，正門前固定寬走道，那張圖的路標整張圖都指向正門），`Level3ChunkGenerator.gamma` 把樣板轉成方塊；沒有 Gamma 的圖完全不變
   - 新方塊 `daylight_panel`（模擬日光）、`checkpoint_door`（`tools/make_level3_gamma.py`）；12 個人形各在位置上只生一次（`Level3Bases.populateGamma`），新角色梅森（`ShopRole.MASON`、`shops/mason.json`，賣防毒面具與杏仁水）；溫泉每秒回 1.5 理智；打 Gamma 的人會被狙擊；行軍床改用 `Trips.settle`（可撤離）；原本的 `BASE` 大廳改稱「外圍哨站」；Gamma 裡攝影機濾鏡較亮（`Look.Mood.GAMMA`）
   - 測試：新增 `GammaTest`（頻率、正門接迷宮、從正門走得到每層每個人與床／出口／寄物櫃、外牆完整）；`Level3ClientTest` 每段都能用 `-Psections=` 單跑，新增 `gamma` 段（樣板和世界一致、帶劍被擋、空手通過、12 人各一、安頓、溫泉回理智、出口與電梯在、12 張截圖，挑 6 張存到 `docs/levels/level3/gamma/`）

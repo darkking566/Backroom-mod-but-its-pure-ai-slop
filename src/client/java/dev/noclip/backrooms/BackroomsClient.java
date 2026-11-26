@@ -79,6 +79,7 @@ public final class BackroomsClient implements ClientModInitializer {
 		WalletClient.register();
 		RpgClient.register();
 		PullClient.register();
+		dev.noclip.backrooms.core.quota.QuotaClient.register();
 		for (StationType station : StationType.values()) {
 			MenuScreens.register(BackroomsCrafting.menuType(station), BackroomsStationScreen::new);
 		}

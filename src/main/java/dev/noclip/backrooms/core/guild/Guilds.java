@@ -23,7 +23,7 @@ import net.minecraft.world.level.levelgen.structure.pieces.StructurePieceType;
 
 /**
  * The overworld base: an adventurers' guild beside every village, with merchants (core.trade) who buy what players bring
- * back from the Backrooms and sell them supplies for the next trip. See docs/guild.md.
+ * back from the Backrooms and sell them supplies for the next trip. See docs/project/1-gameplay/outpost.md.
  */
 public final class Guilds {
 	public static final StructureType<GuildStructure> GUILD = register("guild", () -> GuildStructure.CODEC);

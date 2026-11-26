@@ -9,7 +9,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
 /**
- * One trip through the Backrooms, counted the way 狐霖's Backrooms RPG counts it (see docs/FLOORS.md): {@code floor} is
+ * One trip through the Backrooms, counted the way 狐霖's Backrooms RPG counts it (see docs/project/1-gameplay/README.md): {@code floor} is
  * how many levels the player has come into on this trip, every exit one more and going back counting too; {@code visited}
  * are the different levels among them; {@code best} is the deepest floor the player has ever reached. A floor of 0 means
  * the player is not on a trip (in the Overworld).

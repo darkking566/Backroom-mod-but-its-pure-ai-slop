@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 class FloorRunTest {
 	@Test
 	void everyExitIsAFloorAndGoingBackCountsToo() {
-		// The example in docs/FLOORS.md: Level 0, Level 1, Level 2, back to Level 0.
+		// The example in docs/project/1-gameplay/README.md: Level 0, Level 1, Level 2, back to Level 0.
 		FloorRun run = FloorRun.NONE.start("0").enter("1").enter("2").enter("0");
 		assertEquals(4, run.floor());
 		assertEquals(3, run.distinct());
