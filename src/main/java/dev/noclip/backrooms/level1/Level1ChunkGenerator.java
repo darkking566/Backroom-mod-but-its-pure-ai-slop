@@ -68,7 +68,13 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 			BasePlan.Piece piece, int x, int y, int z) {
 		BlockState state = plainBlock(seed, tile, ceiling, exit, prop, piece, x, y, z);
 		BlockState dressed = Level1Sectors.dress(Level1Layout.sector(seed, x, z), tile, state, seed, x, y, z);
-		return Level1SectorArchitecture.apply(seed, tile, dressed, x, y, z);
+		BlockState arch = Level1SectorArchitecture.apply(seed, tile, dressed, x, y, z);
+		BlockState sectorPoi = Level1SectorPois.block(seed, x, y, z);
+		if (sectorPoi != null) return sectorPoi;
+		BlockState vignette = Level1Vignettes.block(seed, x, y, z);
+		if (vignette != null) return vignette;
+		BlockState easterEgg = Level1EasterEggs.block(seed, x, y, z);
+		return easterEgg != null ? easterEgg : arch;
 	}
 
 	private static BlockState plainBlock(long seed, Tile tile, Ceiling ceiling, HallPlan.Cell exit, HallPlan.PropCell prop,
@@ -90,6 +96,8 @@ final class Level1ChunkGenerator extends ChunkGenerator {
 		if (y == 0 || y >= HEIGHT - 1) return Blocks.BEDROCK.defaultBlockState();
 		BlockState landmark = Level1Landmarks.block(seed, tile, ceiling, x, y, z);
 		if (landmark != null) return landmark;
+		BlockState elevationPoi = Level1ElevationPois.block(seed, tile, ceiling, x, y, z);
+		if (elevationPoi != null) return elevationPoi;
 		BlockState elevated = Level1Elevation.block(seed, tile, ceiling, x, y, z);
 		if (elevated != null) return elevated;
 		if (y > CEILING_Y) return Blocks.CONCRETE.gray().defaultBlockState();

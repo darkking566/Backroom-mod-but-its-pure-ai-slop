@@ -469,6 +469,7 @@
   - 沒改、只回報：白名單有石頭、砂岩，玩家用這兩種方塊蓋的地板也會被滲透（會照原樣還原）；回到後室再出來時，舊的滲透地毯和裂縫不會自動清掉（要靠血清）；其他玩家走進裂縫也會掉進 Level 0
   - `docs/HORROR_ESCAPE_PLAN.md` 兩處還寫著我舊版的「拉力、睡覺」，改成現在的現實排斥；程式位置表補上 `SeepageData`、`BackroomsRiftBlock`
   - `gradlew build` 與 `runClientGameTest -Plevels=0,horror` 通過
+  - 推送前抓 GitHub，合併朋友新推的停車場地標與事件 4 批（`02551469`～`22407106`）；只有 `CLAUDE.md` 衝突（兩邊的 Antigravity 紀錄都保留）；合併後 `gradlew build` 與 `runClientGameTest -Plevels=1,horror -Psections=settlements,leaveThroughDoor,easterEggs,vignettes` 通過；使用者同意後把 `main` 推送到 GitHub（我的恐怖系統、EXIT 門變稀有、這次的修正，Gemini 的現實排斥）；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
@@ -696,3 +697,20 @@
     - Stage 1 起畫面泛黃與 60Hz 嗡嗡聲；Stage 2+ 增加日光燈閃爍暗幕與戶外抓門／低語聲（夜間加劇）；Stage 3～4 主世界夜間即使理智尚未跌破 30% 亦會觸發客戶端純視覺幻覺
     - 同步更新 `docs/HORROR_ESCAPE_PLAN.md` 規則總表、「怎麼再回去」定案章節與分工備忘
   - **驗證**：新增 `core/trip/WretchSeepageTest.java`（3 項測試）、更新 `BackroomsCraftingTest.java`（372 件 3D 物品＋68 座 3D 方塊）與 `HorrorClientTest.java` 第 6 節實機驗證（99.9 排斥不強制傳送、自然地表滲透＋裂縫生成、T2 血清全數還原＋封縫、主動進裂縫進入 Level 0）；執行 `gradlew build runClientGameTest -Plevels=horror --no-daemon` 全數 **91 項 JUnit 測試**與實機測試全數通過且日誌零模型／貼圖／配方警告，並僅於本地 `main` 提交本方改動（未動 `docs/企劃書/`、未推送）
+- Level 1 興趣點第一批（Antigravity，`Level1ElevationPois`、`Level1PoiEvents`）：
+  - 為 4 種非標準立體大廳（約 65% 機率、避開起點／走廊／據點／地標與出口道具緩衝區，且貼齊無柱 Z 帶與脫離 `y=32` 主樓層）新增立體空間專屬興趣點：挑高天橋 `SKYWALK_WATCHPOST`（`y=40..45`，藍帆布哨站、老電腦、上鎖軍械箱、補給箱、油桶、殘骸）、多層停車場 `B1_GARAGE_CHECKPOINT`（`y=24..30`，護欄臨檢站、廢棄廂型車、拆解台、上鎖軍械箱、棧板、殘骸）、下沉深谷 `BASIN_PUMP_STATION`（`y=18/24`，銅柱抽水平台、杏仁蒸餾化學組、電箱、老電視、淺層軍械箱／深層異常金庫箱）、地下管線 `TUNNEL_SERVICE_CACHE`（淺層 `y=22..26` 連通 E-W 管線走廊之維修辦公室／深層 `y=14..19` 銅柱深井密庫含異常金庫箱、改裝鍛造台與發電機），並於 `Level1ChunkGenerator.plainBlock` 接在 `Level1Landmarks` 之後、`Level1Elevation` 之前
+  - 新增 `Level1PoiEvents` 並於 `Level1.register()` 註冊（60 秒冷卻持久化於 `level1_fuse_boxes` `SavedData`）：在 Level 1 右鍵 `industrial_fuse_box` 時，停電中可直接解除停電並點亮周圍 24 格故障燈；非停電時 70% 機率恢復附近 24 格內的 `broken_garage_light`（保留 `AXIS`）與 `broken_bare_bulb`、30% 機率過載跳電熄滅 16 格內燈具並施加 4 秒黑暗；新增中英文雙語訊息條目與更新 `docs/levels/level1/README.md`
+  - 驗證：新增單元測試 `Level1ElevationPoisTest`（3 項）與實機測試 `Level1ClientTest.elevationPois`（含 5 張實機截圖與電箱恢復亮燈／解除停電實測）；`.\gradlew.bat build --no-daemon`（89 項單元測試全過、0 失敗 0 跳過）與 `.\gradlew.bat runClientGameTest "-Plevels=1" "-Psections=elevationPois,sectorFit,pipeFit" --no-daemon` 通過且逐一檢查 5 張實機截圖正常；僅於本機 `main` 提交（未推送）
+- Level 1 興趣點第二批（Antigravity，`Level1SectorPois`）：
+  - 為六大區段（約 45% 符合條件之大廳角落 `7×7`、避開起點／走廊／據點／地標／下沉深谷／出口道具與跨樓層管線區，並於 `Level1SectorArchitecture.isReserved` 保留 1 格緩衝圈）新增主樓層（`y=32..36`）專屬微型興趣點：天鷹 `TALON_CRASH_SITE`、躍金 `GILD_TRADE_STALL`、哥特 `GOTHIC_RELIQUARY_SHRINE`、花園 `GARDEN_OVERGROWN_CAMP`、傳說 `LEGEND_NEON_ARCADE`、銜尾 `TAILCHASE_WORKSITE_SHACK`，於 `Level1ChunkGenerator.block` 最後疊加輸出
+  - 驗證：新增單元測試 `Level1SectorPoisTest`（2 項）與實機測試 `Level1ClientTest.sectorPois`（含 6 張實機截圖與銜尾工棚配電箱復電實測）；`.\gradlew.bat build --no-daemon`（91 項單元測試全過、0 失敗 0 跳過）與 `.\gradlew.bat runClientGameTest "-Plevels=1" "-Psections=sectorPois,sectorFit,pipeFit" --no-daemon` 通過且逐一檢查 6 張實機截圖正常；僅於本機 `main` 提交（未推送）
+- Level 1 興趣點第三批（Antigravity，`Level1Vignettes`、`Level1PoiEvents`）：
+  - 新增 `CorridorPlan.openMask` 與 `Level1Vignettes`（於 `Level1ChunkGenerator.block` 與 `Level1SectorArchitecture.isReserved` 整合）：約 65% 走廊區塊於非房間、非出口、非故障區死路生成 3×3 小場景（治安值班角 `CORRIDOR_SECURITY_NOOK`、避難藏匿點 `CORRIDOR_SHELTER_CACHE`、走廊販賣機角 `CORRIDOR_VENDING_ALCOVE`）；約 50% 大廳於 `lx=29..33, lz=5..9`（避開深谷／地標／據點與前兩批 POI）生成 5×5 小場景（拋錨事故點 `HALL_BREAKDOWN_SPOT`、大廳販賣機休息角 `HALL_VENDING_BREAK_CORNER`）
+  - 擴充 `Level1PoiEvents` 並補齊中英文翻譯：右鍵 `abandoned_car`／`abandoned_van` 可一次搜刮（持久化於 `level1_scavenged_vehicles` `SavedData`，75% 取得杏仁水／合金／繃帶／磷粉／撬棍／C.L.I.P.P. 卡、25% 警報驚動 28 格內怪物並得 1 合金）；手持 `alloy` 右鍵 `vending_machine` 可換得杏仁水（15% 附帶繃帶）
+  - 驗證：新增單元測試 `Level1VignettesTest`（3 項）與實機測試 `Level1ClientTest.vignettes`（含 5 張實機截圖與裸燈泡復電、車輛一次搜刮、販賣機投合金實測）；`.\gradlew.bat build --no-daemon`（94 項單元測試全過、0 失敗 0 跳過）、`.\gradlew.bat runClientGameTest "-Plevels=1" "-Psections=vignettes,sectorFit,pipeFit" --no-daemon` 與重拍機位後的 `"-Psections=vignettes"` 通過且逐一檢查 5 張截圖正常；僅於本機 `main` 提交（未推送）
+- Level 1 興趣點第四批（Antigravity，`Level1EasterEggs`）暨全 4 批整合驗證：
+  - 新增 `Level1EasterEggs`（每 `4×4` 區塊巨集區域至多 1 座，避開原點／走廊／據點／地標／下沉深谷／出口道具緩衝與管線過渡區，固定於無柱無橫樑無樓梯之 `lx=28..34, lz=51..57`，並於 `Level1ChunkGenerator.block` 與 `Level1SectorArchitecture.isReserved` 整合保留 1 格緩衝圈）：
+    - `PARTYGOER_DOOR_EGG`：複用 `fun_door`／`fun_door_top`（`HORIZONTAL_AXIS=Z` 朝北）搭配洋紅／琥珀霓虹、黑白格地板、異常金庫箱、辦公桌老電視、補給箱與流浪者殘骸
+    - `ANOMALY_RIFT_ARCHIVE`：`sealed_vault_wall`／`glitched_wall_seam` 與虛空石圍出封印裂隙室，內設 `anomaly_altar`、`crystal_vein_node`、異常金庫箱、老電腦桌、工業配電箱與殘骸
+    - `VOID_RELAY_POST`：複用 `hub_door`／`hub_door_top`（`HORIZONTAL_AXIS=Z` 朝北）與青色霓虹、虛空石走道、中繼投遞箱、上鎖軍械箱、紅色異常結晶叢與殘骸
+  - 驗證：新增單元測試 `Level1EasterEggsTest`（3 項）與實機測試 `Level1ClientTest.easterEggs`（含 3 張實機截圖與 `fun_door` 右鍵觸發 `LevelExits.refusals()` 實測）；執行 `.\gradlew.bat build --no-daemon`（97 項單元測試全過、0 失敗 0 錯誤）與全 4 批合併實機測試 `.\gradlew.bat runClientGameTest "-Plevels=1" "-Psections=elevationPois,sectorPois,vignettes,easterEggs,sectorFit,pipeFit" --no-daemon` 全部通過並逐一檢查 3 張實機截圖正常；更新 `docs/levels/level1/README.md` 並僅於本機 `main` 提交（未推送）

@@ -34,6 +34,7 @@ public final class Level1 {
 		LevelExits.open("1", Level1Travel::enter);
 		FlickeringWalls.register();
 		Blackouts.register();
+		Level1PoiEvents.register();
 		Crates.register();
 		Markers.register();
 		Gardens.register();
