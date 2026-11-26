@@ -12,6 +12,7 @@
 		"jei_mod_plugin": ["dev.noclip.backrooms.crafting.jei.BackroomsJeiPlugin"]
 	},
 	"mixins": [
+		"noclip_backrooms.mixins.json",
 		{"config": "noclip_backrooms.client.mixins.json", "environment": "client"}
 	],
 	"depends": {

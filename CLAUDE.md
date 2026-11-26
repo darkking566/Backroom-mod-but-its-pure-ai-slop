@@ -445,6 +445,32 @@
   - 驗證：`gradlew build`、`runClientGameTest -Plevels=horror,0,2,3`、Level 1 的 `monsters,hounds` 段都通過
 - 使用者要求做完直接推上 GitHub：抓 GitHub 合併朋友新推的 6 個提交（Level 0 各區地標、斷路器與保險絲事件、玻璃辦公室與流浪者營地、Hub 與 Level Fun 的預告門），沒有衝突；朋友新加的 18 張寫實貼圖是 512，照規格書用 `tools/resize_realistic.py` 縮成 128；合併後 `gradlew build` 與 `runClientGameTest -Plevels=0,horror` 通過；把 `main` 推送到 GitHub（寫實物品三批、Blender 烘焙與網格試作、魔法類改回 Gemini 的、恐怖方向企劃與數值）；沒有強制推送、沒有改寫歷史
 
+### 2026-11-26
+- 使用者要求把企劃書裡「待做」的都做完，並決定：後室裡吃飽回血放慢、扣理智扣慢一點、主世界血量也砍半（細節見 `docs/HORROR_ESCAPE_PLAN.md`）：
+  - 血量：主世界也是 10（`PlayerRpg.FRAILTY`，拿掉上一版「只有後室砍半、換世界保留比例」）；新增第一個非客戶端 mixin 設定 `noclip_backrooms.mixins.json` 與 `mixin/FoodDataBackroomsRegen`（後室裡原版吃飽回血 ×0.25）；`fabric.mod.json` 加這個設定
+  - 理智：黑暗、昏暗、怪物造成的扣除都減半
+  - 死亡、安頓、撤離（新增 `core/trip/Trips`）：在後室死掉又沒安頓 → 在 Level 0 醒來（新的一趟），東西照原版掉在原地；安頓過 → 在據點醒來；安頓時記下原本的重生點，聊天欄出現「[請 M.E.G. 帶我回家]」（`/meg extract`，要在床附近 8 格內），回家後還原重生點；停車場的 `RestBlock` 改用 `Trips.settle`
+  - 被拉回後室（新增 `core/trip/Pull`、`PullState`、客戶端 `PullClient`）：主世界的拉力值（黑暗封閉、地底、理智低、身上的後室物資），滿 100 掉進 Level 0；50 起嗡嗡聲與泛黃、75 起閃黑；在暗房睡覺 20% 醒來在 Level 0；回到地面後一天內不會被拉
+  - 委託（新增 `core/guild/Contracts`）：右鍵前哨指揮官列出三份委託（到 Level 1／2／3，150／400／800 點），接受就被送進 Level 0，到達目標再活著回來付錢；`Shops` 的會長改呼叫它
+  - 公會改名 M.E.G. 地面前哨站、會長改叫前哨指揮官（語言檔、台詞、`docs/guild.md`；ID 不變）
+  - 經驗（新增 `core/rpg/SurvivalXp`）：新樓層 40、甩掉追擊 20、安頓 50、活著回家 30＋每層 20、委託報酬五分之一；殺怪改成後室怪物 12、原版 4、Boss 150
+  - 共用：`LevelExits.fallInto`（不經出口直接掉進某層）；`Floors.onArrive`、`Floors.onHome` 讓別的系統知道「到了哪一層」「活著回到家」；死後重生跟著換世界的那一下不算走回家（不然死掉會被當成逃出來、委託會被判失敗）
+  - 改了朋友的 `Level0ClientTest` 一行：在 Level 0 死掉現在會在 Level 0 醒來（原本檢查回主世界）
+  - 測試：`HorrorClientTest` 擴充成整條流程（血量、回血變慢、獵犬退開、死掉迷失在 Level 0、安頓後在據點醒來、撤離、寬限期內不會被拉、拉力滿了掉進去、委託付錢），截圖看過預兆的泛黃；`gradlew build`、`runClientGameTest -Plevels=horror,0,floors,guild` 與 Level 1 的 `settlements,wikiSettlements,leaveThroughDoor,monsters` 段通過
+  - 還沒做（企劃書裡標成待討論）：安頓與撤離的細節、Level 0 綠色 EXIT 門要不要改、怪物特殊效果、找到筆記的經驗、武器護甲數值
+- 使用者決定：Level 0 綠色 EXIT 門改成很稀有；撤離不是只有 M.E.G. 的據點（其他組織也行）：
+  - 改朋友的 `level0/Exits`：新增 `RARITY = 8`、`hasExit`，大約每 8 區（560×560 格）才有一扇門（原本每區一扇）；照著改朋友的 `ExitsTest`（「每區都有門」改成「有門的區約佔八分之一、每扇門都在牆上且兩邊有路」，走得到門的測試改成挑有門的區）；`ExitClientChecks` 沒改（它在半徑 30 區內找各種區域的門，應該還找得到）
+  - 撤離的文字改成「這裡的人知道回地面的路」「[請他們帶我回家]」（不再只說 M.E.G.）；`Trips` 說明跟著改；`docs/HORROR_ESCAPE_PLAN.md`、`docs/levels/level0/README.md` 記下兩個決定
+  - **還沒測試**：改完時 Gemini 已在同一個資料夾動工（`core/trip` 的現實排斥與滲透、新的裂隙方塊、消耗品），他寫到一半的程式讓整個專案編譯失敗，照協作規則先停手；只提交自己的檔案，等 Gemini 做完再跑 `gradlew build` 與 `runClientGameTest -Plevels=0,horror`
+  - （後來補測）Gemini 做完後，`gradlew build` 與 `runClientGameTest -Plevels=0,horror` 都通過，朋友的 `ExitClientChecks` 照樣找得到各區的門
+- 使用者要求看過 Gemini 的現實排斥（`2c656c74`）再推上 GitHub。看過 `Pull`、`PullState`、`SeepageData`、`BackroomsRiftBlock`、血清與測試，修兩個跟它自己說明不符的地方（改 Gemini 的 `SeepageData`）：
+  - 用血清還原滲透的地面、關裂縫時，原本只處理「已載入的區塊」，但不管有沒有處理都把紀錄刪掉：人在遠處用血清，那些地毯和舊裂縫就永遠留著。改成讀方塊時順便載入那個區塊再還原
+  - 裂縫原本只要地面上有兩格空氣就開，會開在玩家屋裡或洞穴裡（裂縫打不壞）；改成要看得到天空（企劃書寫的是「家外空地」）
+  - 沒改、只回報：白名單有石頭、砂岩，玩家用這兩種方塊蓋的地板也會被滲透（會照原樣還原）；回到後室再出來時，舊的滲透地毯和裂縫不會自動清掉（要靠血清）；其他玩家走進裂縫也會掉進 Level 0
+  - `docs/HORROR_ESCAPE_PLAN.md` 兩處還寫著我舊版的「拉力、睡覺」，改成現在的現實排斥；程式位置表補上 `SeepageData`、`BackroomsRiftBlock`
+  - `gradlew build` 與 `runClientGameTest -Plevels=0,horror` 通過
+  - 推送前抓 GitHub，合併朋友新推的停車場地標與事件 4 批（`02551469`～`22407106`）；只有 `CLAUDE.md` 衝突（兩邊的 Antigravity 紀錄都保留）；合併後 `gradlew build` 與 `runClientGameTest -Plevels=1,horror -Psections=settlements,leaveThroughDoor,easterEggs,vignettes` 通過；使用者同意後把 `main` 推送到 GitHub（我的恐怖系統、EXIT 門變稀有、這次的修正，Gemini 的現實排斥）；沒有強制推送、沒有改寫歷史
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23
@@ -656,6 +682,21 @@
   - 於每 `8×8` 扇區（448×448 格，避開起始區域 `(0,0)` 與其他 POI／結構）極稀少生成 1 扇，`Exits` 與 `EdgeShift` 皆保護該格不被覆蓋
   - 驗證：`ZonePoiPlanTest.mysteryExitsGenerateRarelyForHubAndFunWithoutConflicts` 與 `Level0ClientTest`（檢查兩種門方塊、右鍵實測 `LevelExits.refusals()` 增加、拍攝 `level0_hub_door` 與 `level0_fun_door` 實機截圖）皆通過，`.\gradlew build` 與 `.\gradlew runClientGameTest -Plevels=0` 全部通過
 - 合併遠端 `origin/main`（`cb884c24`）並整合 Level 0 興趣點與家具散布：解決 `Level0.java` 註冊順序衝突（同時保留 `FuseBoxEvents.register()` 與 `Level0Props.register()`），新增 `ZonePoiPlan.isAnyPoiBlock` 供 `Level0Props.tryPlaceAnywhereInChunk`／`canPlacePropInChunk` 避開所有 POI 格；合併後執行 `.\gradlew.bat build` 與 `.\gradlew.bat runClientGameTest -Plevels=0` 全部通過並依使用者要求正常推送 `main` 至 GitHub
+- 依使用者定案（模式 1「後室滲透主世界」＋模式 2「悲屍化現實排斥反應」）重做主世界回訪循環，取代舊版被動強制傳送拉扯機制（Antigravity）：
+  - **四階段現實排斥狀態與抗藥性曲線**（`core/trip/PullState.java`、`core/trip/Pull.java`、`core/rpg/PlayerRpg.java`）：
+    - 活著逃出後室後給予 **2 個遊戲日（`48,000 ticks`）** 安全緩衝期；第 3 天起排斥度隨時間升溫並跨越 4 階段（Stage 1 `25+`／Stage 2 `50+`／Stage 3 `75+`／Stage 4 `95+`），**永不被動把玩家傳送回後室**
+    - Stage 1 起主世界理智停止回復並持續緩降（`-0.08`／`-0.16`／`-0.28`／`-0.42` 每 0.5 秒），依階段疊加飢餓、虛弱、短暫黑暗脈衝，Stage 4 額外套用暫時性最大血量懲罰 `wretch_rejection_hp`（`-2.0`，回到後室或打針後自動解除）
+    - 新增 `/backrooms rejection status|set|clear|seep` GM 測試指令與既有 `almond_elixir`／`aged_almond_reserve` 的輕微暫緩排斥效果（`-25`／`-45`）
+  - **可逆自然地表滲透與主世界發光裂縫**（新增 `core/trip/SeepageData.java`、`props/BackroomsRiftBlock.java`，更新 `props/BackroomsProps.java`）：
+    - `SeepageData` 持久化於主世界 `SavedData`（`overworld_seepage`），僅滲透白名單內上方為空氣且無 `BlockEntity` 的自然地表（草地、泥土、石頭、沙、礫石等）為潮濕黃色地毯（`noclip_backrooms:carpet`，每人上限 48 格），**絕不破壞玩家建築、床、箱子或工作站**，穩定後 100% 精準還原原本 `BlockState`
+    - 排斥達 Stage 2+ 時於玩家戶外 6～16 格開出一道發光裂縫 `backrooms_rift`（不可破壞、自發光 12、帶傳送門與末影棒粒子）；玩家走進或右鍵主動跨入即進入 Level 0（原本流沙窒息入口維持不變）
+  - **三階穩定血清／現實穩定核心與 3D 資產**（`items/BackroomsItems.java`、`items/BackroomsConsumableItem.java`、`tools/rebuild_shaped_recipes.py`、`data/.../station_recipes.json`、`docs/items/`）：
+    - 新增三款物品與配方（總計 284 條工作站配方）：① `reality_stabilizer_t1`（初階杏仁穩定劑，杏仁蒸餾機 3×3，隨抗藥性 `0→5` 壓制 `2.0→1.5→1.0→0.75→0.5` 天並還原最多 12 格地毯）、② `reality_serum_t2`（高純度現實血清，杏仁蒸餾機 3×3，壓制 6 天、抗藥性 `-1`、還原全部滲透地表並關閉裂縫）、③ `reality_anchor_core`（終極現實穩定核心，初級蜘蛛網 7×7，壓制 12 天、全數還原並封閉裂縫、抗藥性歸零且清除 `marked` 標記）
+    - 產出 `backrooms_rift` 與 3 款血清／核心之獨立 3D 模型、128×128 貼圖、雙語名稱及 `docs/items/` 預覽圖（共 471 張 PNG，驗證 869 件登錄物品 0 錯誤）
+  - **主世界氛圍演出、夜間幻覺與企劃同步**（`src/client/.../core/trip/PullClient.java`、`src/client/.../core/rpg/SanityHallucinations.java`、`docs/HORROR_ESCAPE_PLAN.md`）：
+    - Stage 1 起畫面泛黃與 60Hz 嗡嗡聲；Stage 2+ 增加日光燈閃爍暗幕與戶外抓門／低語聲（夜間加劇）；Stage 3～4 主世界夜間即使理智尚未跌破 30% 亦會觸發客戶端純視覺幻覺
+    - 同步更新 `docs/HORROR_ESCAPE_PLAN.md` 規則總表、「怎麼再回去」定案章節與分工備忘
+  - **驗證**：新增 `core/trip/WretchSeepageTest.java`（3 項測試）、更新 `BackroomsCraftingTest.java`（372 件 3D 物品＋68 座 3D 方塊）與 `HorrorClientTest.java` 第 6 節實機驗證（99.9 排斥不強制傳送、自然地表滲透＋裂縫生成、T2 血清全數還原＋封縫、主動進裂縫進入 Level 0）；執行 `gradlew build runClientGameTest -Plevels=horror --no-daemon` 全數 **91 項 JUnit 測試**與實機測試全數通過且日誌零模型／貼圖／配方警告，並僅於本地 `main` 提交本方改動（未動 `docs/企劃書/`、未推送）
 - Level 1 興趣點第一批（Antigravity，`Level1ElevationPois`、`Level1PoiEvents`）：
   - 為 4 種非標準立體大廳（約 65% 機率、避開起點／走廊／據點／地標與出口道具緩衝區，且貼齊無柱 Z 帶與脫離 `y=32` 主樓層）新增立體空間專屬興趣點：挑高天橋 `SKYWALK_WATCHPOST`（`y=40..45`，藍帆布哨站、老電腦、上鎖軍械箱、補給箱、油桶、殘骸）、多層停車場 `B1_GARAGE_CHECKPOINT`（`y=24..30`，護欄臨檢站、廢棄廂型車、拆解台、上鎖軍械箱、棧板、殘骸）、下沉深谷 `BASIN_PUMP_STATION`（`y=18/24`，銅柱抽水平台、杏仁蒸餾化學組、電箱、老電視、淺層軍械箱／深層異常金庫箱）、地下管線 `TUNNEL_SERVICE_CACHE`（淺層 `y=22..26` 連通 E-W 管線走廊之維修辦公室／深層 `y=14..19` 銅柱深井密庫含異常金庫箱、改裝鍛造台與發電機），並於 `Level1ChunkGenerator.plainBlock` 接在 `Level1Landmarks` 之後、`Level1Elevation` 之前
   - 新增 `Level1PoiEvents` 並於 `Level1.register()` 註冊（60 秒冷卻持久化於 `level1_fuse_boxes` `SavedData`）：在 Level 1 右鍵 `industrial_fuse_box` 時，停電中可直接解除停電並點亮周圍 24 格故障燈；非停電時 70% 機率恢復附近 24 格內的 `broken_garage_light`（保留 `AXIS`）與 `broken_bare_bulb`、30% 機率過載跳電熄滅 16 格內燈具並施加 4 秒黑暗；新增中英文雙語訊息條目與更新 `docs/levels/level1/README.md`

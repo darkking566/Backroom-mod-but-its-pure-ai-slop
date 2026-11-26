@@ -498,6 +498,58 @@ def rebuild_station_recipes():
             "outputs": [{"item": mod("ultimate_spiderweb_crafting_table"), "count": 1}],
         })
 
+    # Ensure 3-Tier Wretch Rejection & Seepage Stabilizers have shaped recipes (Distiller 3x3 & Primary Spiderweb 7x7)
+    if ("almond_distiller", "reality_stabilizer_t1") not in seen_out_station:
+        pat, key = build_pattern_3x3([
+            {"item": mod("almond_water"), "count": 2},
+            {"item": mod("dry_soil_herbs"), "count": 2},
+            {"item": mod("sterile_gauze"), "count": 1},
+            {"item": "minecraft:glass_bottle", "count": 1},
+        ])
+        new_recipes.append({
+            "id": mod("distill_reality_stabilizer_t1"),
+            "station": "almond_distiller",
+            "category": "gear",
+            "xp": 10,
+            "pattern": pat,
+            "key": key,
+            "outputs": [{"item": mod("reality_stabilizer_t1"), "count": 1}],
+        })
+    if ("almond_distiller", "reality_serum_t2") not in seen_out_station:
+        pat, key = build_pattern_3x3([
+            {"item": mod("purified_almond_essence"), "count": 2},
+            {"item": mod("coolant_vial"), "count": 1},
+            {"item": mod("anomaly_crystal"), "count": 1},
+            {"item": mod("almond_mana_cell"), "count": 1},
+            {"item": mod("copper_wire"), "count": 2},
+        ])
+        new_recipes.append({
+            "id": mod("distill_reality_serum_t2"),
+            "station": "almond_distiller",
+            "category": "gear",
+            "xp": 18,
+            "pattern": pat,
+            "key": key,
+            "outputs": [{"item": mod("reality_serum_t2"), "count": 1}],
+        })
+    if ("spiderweb_crafting_table", "reality_anchor_core") not in seen_out_station:
+        pat, key = build_pattern_7x7("magic_reality_anchor_core", [
+            {"item": mod("noclip_shard"), "count": 1},
+            {"item": mod("reality_serum_t2"), "count": 1},
+            {"item": mod("blue_circuit"), "count": 1},
+            {"item": mod("energy_brick"), "count": 1},
+            {"item": mod("aged_almond_reserve"), "count": 1},
+        ])
+        new_recipes.append({
+            "id": mod("spiderweb_reality_anchor_core"),
+            "station": "spiderweb_crafting_table",
+            "category": "gear",
+            "xp": 35,
+            "pattern": pat,
+            "key": key,
+            "outputs": [{"item": mod("reality_anchor_core"), "count": 1}],
+        })
+
     # Add salvage recipes for all 20 newer prop_* furniture blocks so players can also salvage picked-up props!
     existing_ids = {r["id"] for r in new_recipes}
     for prop_id, drops in PROP_SALVAGE_MAP.items():
@@ -687,6 +739,158 @@ def write_ultimate_spiderweb_and_prop_part_assets():
         with open(tag_path, "w", encoding="utf-8") as f:
             json.dump(td, f, indent=2)
 
+    # 4. Assets for Backrooms Seepage Rift block & 3-Tier Wretch Stabilizer/Serum/Core items!
+    write_rift_and_serum_assets()
+
+
+def write_palette_atlas_png(path, palette):
+    size = 128
+    rows = []
+    for y in range(size):
+        row = bytearray([0])
+        ty = y // 32
+        ly = y % 32
+        for x in range(size):
+            tx = x // 32
+            lx = x % 32
+            r, g, b = palette[ty * 4 + tx]
+            border = (lx == 0 or ly == 0 or lx == 31 or ly == 31)
+            grain = ((x * 7 + y * 13) % 11) - 5
+            if border:
+                r, g, b = max(0, r - 20), max(0, g - 20), max(0, b - 20)
+            else:
+                r = max(0, min(255, r + grain))
+                g = max(0, min(255, g + grain))
+                b = max(0, min(255, b + grain))
+            row.extend((r, g, b, 255))
+        rows.append(bytes(row))
+    raw = b"".join(rows)
+
+    def chunk(tag, data):
+        return struct.pack(">I", len(data)) + tag + data + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF)
+
+    ihdr = struct.pack(">IIBBBBB", size, size, 8, 6, 0, 0, 0)
+    png = b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", ihdr) + chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b"")
+    with open(path, "wb") as f:
+        f.write(png)
+
+
+def write_rift_and_serum_assets():
+    # Backrooms Seepage Rift block (glowing jagged yellow-violet dimensional tear)
+    with open(os.path.join(ASSETS, "blockstates", "backrooms_rift.json"), "w", encoding="utf-8") as f:
+        json.dump({"variants": {"": {"model": "noclip_backrooms:block/crafting/backrooms_rift"}}}, f, indent=2)
+    with open(os.path.join(ASSETS, "items", "backrooms_rift.json"), "w", encoding="utf-8") as f:
+        json.dump({"model": {"type": "minecraft:model", "model": "noclip_backrooms:block/crafting/backrooms_rift"}}, f, indent=2)
+
+    def b_el(x0, y0, z0, x1, y1, z1, tile, glow=True, rot=None):
+        u0, v0 = (tile % 4) * 4.0, (tile // 4) * 4.0
+        face = {"uv": [u0 + 0.25, v0 + 0.25, u0 + 3.75, v0 + 3.75], "texture": "#0"}
+        if glow:
+            face["light_emission"] = 15
+        el = {"from": [x0, y0, z0], "to": [x1, y1, z1],
+              "faces": {d: dict(face) for d in ("north", "south", "east", "west", "up", "down")}}
+        if rot:
+            el["rotation"] = rot
+        return el
+
+    rift_model = {
+        "parent": "minecraft:block/block",
+        "textures": {
+            "0": "noclip_backrooms:block/crafting3d/backrooms_rift",
+            "particle": "noclip_backrooms:block/crafting3d/backrooms_rift",
+        },
+        "elements": [
+            b_el(7.2, 1.5, 7.2, 8.8, 14.8, 8.8, 9, True, {"origin": [8, 8, 8], "axis": "y", "angle": 45}),
+            b_el(6.0, 2.5, 7.6, 10.0, 13.8, 8.4, 8, True, {"origin": [8, 8, 8], "axis": "z", "angle": 12.5}),
+            b_el(7.6, 2.5, 6.0, 8.4, 13.8, 10.0, 8, True, {"origin": [8, 8, 8], "axis": "x", "angle": -12.5}),
+            b_el(5.2, 0.2, 5.2, 10.8, 1.4, 10.8, 1, False, {"origin": [8, 0.8, 8], "axis": "y", "angle": 45}),
+            b_el(4.2, 7.4, 4.2, 11.8, 8.4, 11.8, 4, True, {"origin": [8, 8, 8], "axis": "z", "angle": 22.5}),
+            b_el(4.6, 7.5, 4.6, 11.4, 8.3, 11.4, 6, True, {"origin": [8, 8, 8], "axis": "x", "angle": -22.5}),
+        ],
+    }
+    with open(os.path.join(ASSETS, "models", "block", "crafting", "backrooms_rift.json"), "w", encoding="utf-8") as f:
+        json.dump(rift_model, f, indent=2)
+    rift_pal = [
+        (28, 22, 36), (48, 38, 24), (24, 18, 32), (186, 152, 62),
+        (225, 194, 84), (62, 46, 84), (154, 68, 240), (70, 200, 230),
+        (196, 112, 255), (255, 242, 168), (138, 52, 220), (34, 26, 46),
+        (40, 32, 22), (170, 140, 56), (92, 226, 255), (255, 228, 136),
+    ]
+    write_palette_atlas_png(os.path.join(ASSETS, "textures", "block", "crafting3d", "backrooms_rift.png"), rift_pal)
+
+    # 3-Tier Wretch Stabilizer / Serum / Anchor Core 3D items
+    disp = {
+        "thirdperson_righthand": {"rotation": [12, 0, 0], "translation": [0, 2.0, 0.5], "scale": [0.68, 0.68, 0.68]},
+        "thirdperson_lefthand": {"rotation": [12, 0, 0], "translation": [0, 2.0, 0.5], "scale": [0.68, 0.68, 0.68]},
+        "firstperson_righthand": {"rotation": [0, -25, 0], "translation": [1.2, 2.8, 0.5], "scale": [0.65, 0.65, 0.65]},
+        "firstperson_lefthand": {"rotation": [0, -25, 0], "translation": [1.2, 2.8, 0.5], "scale": [0.65, 0.65, 0.65]},
+        "gui": {"rotation": [28, 38, 0], "translation": [0, 0.5, 0], "scale": [0.95, 0.95, 0.95]},
+        "ground": {"translation": [0, 2.2, 0], "scale": [0.55, 0.55, 0.55]},
+        "fixed": {"rotation": [0, 0, 0], "translation": [0, 0, 0], "scale": [0.9, 0.9, 0.9]},
+    }
+    item_specs = {
+        "reality_stabilizer_t1": (
+            [
+                b_el(5.6, 1.6, 5.6, 10.4, 9.2, 10.4, 7, False),
+                b_el(5.9, 2.0, 5.9, 10.1, 8.2, 10.1, 8, True),
+                b_el(6.4, 9.2, 6.4, 9.6, 11.2, 9.6, 7, False),
+                b_el(6.9, 11.2, 6.9, 9.1, 13.4, 9.1, 7, False),
+                b_el(6.6, 13.4, 6.6, 9.4, 14.6, 9.4, 4, False),
+                b_el(5.4, 4.4, 5.4, 10.6, 7.0, 10.6, 12, False),
+            ],
+            [
+                (70, 74, 80), (42, 46, 54), (92, 98, 106), (120, 96, 68),
+                (176, 142, 82), (180, 186, 192), (104, 152, 168), (168, 212, 220),
+                (96, 224, 186), (180, 255, 226), (186, 118, 62), (156, 56, 48),
+                (218, 206, 178), (64, 120, 88), (44, 82, 62), (112, 232, 192),
+            ],
+        ),
+        "reality_serum_t2": (
+            [
+                b_el(7.0, 4.4, 7.0, 9.0, 11.8, 9.0, 7, False),
+                b_el(7.3, 5.0, 7.3, 8.7, 10.8, 8.7, 8, True),
+                b_el(6.3, 3.8, 6.3, 9.7, 4.6, 9.7, 5, False),
+                b_el(7.6, 1.4, 7.6, 8.4, 4.0, 8.4, 0, False),
+                b_el(6.7, 0.8, 6.7, 9.3, 1.6, 9.3, 4, False),
+                b_el(7.75, 11.8, 7.75, 8.25, 15.6, 8.25, 5, False),
+            ],
+            [
+                (86, 92, 102), (38, 42, 50), (62, 68, 78), (112, 120, 132),
+                (212, 168, 68), (196, 202, 210), (88, 172, 212), (176, 226, 240),
+                (62, 226, 255), (206, 250, 255), (184, 112, 66), (192, 62, 68),
+                (212, 218, 224), (62, 134, 184), (38, 72, 102), (82, 236, 255),
+            ],
+        ),
+        "reality_anchor_core": (
+            [
+                b_el(6.0, 3.2, 6.0, 10.0, 12.8, 10.0, 8, True, {"origin": [8, 8, 8], "axis": "y", "angle": 45}),
+                b_el(6.6, 4.4, 6.6, 9.4, 11.6, 9.4, 9, True, {"origin": [8, 8, 8], "axis": "z", "angle": 22.5}),
+                b_el(4.0, 7.4, 4.0, 12.0, 8.6, 12.0, 4, False, {"origin": [8, 8, 8], "axis": "x", "angle": 22.5}),
+                b_el(4.6, 7.6, 4.6, 11.4, 8.4, 11.4, 6, True, {"origin": [8, 8, 8], "axis": "z", "angle": -22.5}),
+            ],
+            [
+                (44, 34, 62), (24, 20, 34), (66, 52, 92), (96, 76, 128),
+                (234, 188, 72), (198, 204, 216), (168, 84, 255), (144, 212, 238),
+                (192, 112, 255), (252, 240, 255), (218, 148, 66), (182, 54, 96),
+                (214, 202, 228), (112, 62, 186), (48, 30, 82), (220, 148, 255),
+            ],
+        ),
+    }
+    for item_id, (els, pal) in item_specs.items():
+        with open(os.path.join(ASSETS, "items", f"{item_id}.json"), "w", encoding="utf-8") as f:
+            json.dump({"model": {"type": "minecraft:model", "model": f"noclip_backrooms:item/crafting/{item_id}"}}, f, indent=2)
+        model = {
+            "textures": {
+                "0": f"noclip_backrooms:item/equipment3d/{item_id}",
+                "particle": f"noclip_backrooms:item/equipment3d/{item_id}",
+            },
+            "elements": els,
+            "display": disp,
+        }
+        with open(os.path.join(ASSETS, "models", "item", "crafting", f"{item_id}.json"), "w", encoding="utf-8") as f:
+            json.dump(model, f, indent=2)
+        write_palette_atlas_png(os.path.join(ASSETS, "textures", "item", "equipment3d", f"{item_id}.png"), pal)
+
 
 def write_ultimate_table_png(path):
     size = 128
@@ -741,6 +945,24 @@ def update_lang_files():
         "block.noclip_backrooms.prop_water_cooler": "Office Water Cooler",
         "block.noclip_backrooms.prop_vending_machine": "Lobby Vending Machine",
         "block.noclip_backrooms.prop_fridge": "Double-Door Refrigerator",
+        "block.noclip_backrooms.backrooms_rift": "Backrooms Seepage Rift",
+        "item.noclip_backrooms.reality_stabilizer_t1": "Almond Reality Stabilizer",
+        "item.noclip_backrooms.reality_serum_t2": "High-Purity Reality Serum",
+        "item.noclip_backrooms.reality_anchor_core": "Reality Anchor Core",
+        "lore.noclip_backrooms.reality_stabilizer_t1": "Level 0/1 stabilizer: halts Wretch Rejection for up to 2 days (builds tolerance) and restores nearby seeped ground.",
+        "lore.noclip_backrooms.reality_serum_t2": "Level 2/3 serum: suppresses Rejection for 6 days, lowers tolerance, restores all seeped ground, and closes your Rift.",
+        "lore.noclip_backrooms.reality_anchor_core": "Deep-level core: grants 12 days of stability, restores all seepage, and fully resets tolerance.",
+        "message.noclip_backrooms.rejection.stage_1": "Reality feels thin here... a faint 60Hz hum lingers in the back of your head.",
+        "message.noclip_backrooms.rejection.stage_2": "The Backrooms are seeping into your world. Yellow carpet spreads outdoors, and a rift has torn open nearby.",
+        "message.noclip_backrooms.rejection.stage_3": "Wretch Rejection worsens: your strength fades, your mind frays, and something scratches outside in the dark.",
+        "message.noclip_backrooms.rejection.stage_4": "Critical Wretch Rejection! Stabilize with serum or step through the Rift before the Backrooms swallow you.",
+        "message.noclip_backrooms.rejection.stabilizer_t1": "Stabilizer injected: %s days of relief (Tolerance %s/%s). Restored %s seeped ground blocks.",
+        "message.noclip_backrooms.rejection.tolerance_warn": "Your body is growing tolerant to basic stabilizer — you will need Level 2/3 High-Purity Serum soon.",
+        "message.noclip_backrooms.rejection.serum_t2": "High-Purity Serum took hold: 6 days safe, %s seeped blocks restored, rift sealed (Tolerance now %s).",
+        "message.noclip_backrooms.rejection.core_t3": "Reality Anchor Core resonated: 12 days safe, %s seeped blocks restored, rift sealed, tolerance fully reset.",
+        "message.noclip_backrooms.rejection.minor_relief": "The Almond brew steadies your nerves for a little while.",
+        "message.noclip_backrooms.rift.opened": "A glowing Backrooms Seepage Rift tore open outdoors at (%s, %s, %s).",
+        "message.noclip_backrooms.rift.entered": "You step deliberately into the yellow-lit rift...",
         "ui.noclip_backrooms.station.book": "Recipes",
         "ui.noclip_backrooms.station.book_title": "Recipe Book",
         "ui.noclip_backrooms.station.clear": "Clear",
@@ -774,6 +996,24 @@ def update_lang_files():
         "block.noclip_backrooms.prop_water_cooler": "辦公室飲水機",
         "block.noclip_backrooms.prop_vending_machine": "大廳飲料販賣機",
         "block.noclip_backrooms.prop_fridge": "雙門大冰箱",
+        "block.noclip_backrooms.backrooms_rift": "後室滲透裂縫",
+        "item.noclip_backrooms.reality_stabilizer_t1": "初階杏仁穩定劑",
+        "item.noclip_backrooms.reality_serum_t2": "高純度現實血清",
+        "item.noclip_backrooms.reality_anchor_core": "終極現實穩定核心",
+        "lore.noclip_backrooms.reality_stabilizer_t1": "Level 0/1 穩定劑：壓制悲屍化排斥最多 2 天（連用會累積抗藥性），並還原附近滲透地表。",
+        "lore.noclip_backrooms.reality_serum_t2": "Level 2/3 血清：壓制排斥 6 天、降低抗藥性，全面復原滲透地表並關閉裂縫。",
+        "lore.noclip_backrooms.reality_anchor_core": "深層終極核心：長效穩定 12 天、清除所有滲透與裂縫，並將抗藥性完全歸零。",
+        "message.noclip_backrooms.rejection.stage_1": "現實的邊緣開始發虛……耳邊隱約響起 60Hz 日光燈的嗡嗡聲。",
+        "message.noclip_backrooms.rejection.stage_2": "後室正順著你的足跡滲入主世界。屋外滲出了潮濕黃地毯，附近裂開了一道發光空間裂縫。",
+        "message.noclip_backrooms.rejection.stage_3": "悲屍化排斥惡化：身體發虛、理智流失，黑暗裡傳來門外的抓撓聲……",
+        "message.noclip_backrooms.rejection.stage_4": "【危急】末期悲屍化排斥！快注射穩定血清，或主動跨進屋外裂縫重返後室。",
+        "message.noclip_backrooms.rejection.stabilizer_t1": "已注射初階穩定劑：壓制 %s 天（抗藥性 %s/%s），已還原 %s 塊滲透地表。",
+        "message.noclip_backrooms.rejection.tolerance_warn": "身體對初階穩定劑已產生明顯抗藥性，需要更深樓層的高純度現實血清。",
+        "message.noclip_backrooms.rejection.serum_t2": "高純度現實血清生效：穩定 6 天、還原全部 %s 塊滲透地表並關閉裂縫（目前抗藥性 %s）。",
+        "message.noclip_backrooms.rejection.core_t3": "終極現實穩定核心共鳴：長效淨化 12 天、還原 %s 塊地表並封閉裂縫，抗藥性已完全歸零。",
+        "message.noclip_backrooms.rejection.minor_relief": "杏仁藥劑暫時安撫了現實排斥反應。",
+        "message.noclip_backrooms.rift.opened": "屋外空地撕開了一道發光的後室滲透裂縫（%s, %s, %s）。",
+        "message.noclip_backrooms.rift.entered": "你推開現實的邊界，主動跨進泛黃的裂縫……",
         "ui.noclip_backrooms.station.book": "配方書",
         "ui.noclip_backrooms.station.book_title": "分類配方書",
         "ui.noclip_backrooms.station.clear": "清空",

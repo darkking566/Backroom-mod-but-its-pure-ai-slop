@@ -70,7 +70,7 @@ public final class Shops {
 			Long last = LAST_OPEN.put(serverPlayer.getUUID(), now);
 			if (last != null && now - last < 5 && now >= last) return InteractionResult.SUCCESS;
 			if (role == ShopRole.MASTER) {
-				for (int i = 1; i <= 3; i++) serverPlayer.sendSystemMessage(Component.translatable("guild.noclip_backrooms.master." + i));
+				dev.noclip.backrooms.core.guild.Contracts.talk(serverPlayer);
 			} else {
 				ServerPlayNetworking.send(serverPlayer, new ShopOpenPayload(role.id(), offers(role)));
 			}

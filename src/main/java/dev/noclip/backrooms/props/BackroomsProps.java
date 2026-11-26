@@ -35,6 +35,11 @@ public final class BackroomsProps {
 	public static final Block PROP_PART = registerBlockOnly("prop_part", PropPartBlock::new,
 			BlockBehaviour.Properties.of().mapColor(MapColor.STONE).sound(SoundType.METAL).strength(2.0F, 4.0F).noOcclusion());
 
+	// Glowing Overworld Backrooms Seepage Rift (walk in or right-click to intentionally re-enter Level 0)
+	public static final Block BACKROOMS_RIFT = register("backrooms_rift", BackroomsRiftBlock::new,
+			BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_PURPLE).sound(SoundType.AMETHYST)
+					.strength(-1.0F, 3600000.0F).noCollision().noOcclusion().noLootTable().lightLevel(s -> 12));
+
 	// 6 Custom Workstations (1->4 Salvage, 5x5 Workshop, 3x3 Distiller, 3x3 Altar, 7x7 Primary & 9x9 Ultimate Spiderweb)
 	public static final Block SALVAGE_BENCH = station("salvage_bench", StationType.SALVAGE, SoundType.WOOD, 2.5F, 0);
 	public static final Block WORKSHOP_BENCH = station("workshop_bench", StationType.WORKSHOP, SoundType.ANVIL, 4.0F, 0);

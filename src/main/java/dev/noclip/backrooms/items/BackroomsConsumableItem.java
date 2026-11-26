@@ -3,6 +3,7 @@ package dev.noclip.backrooms.items;
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
 import dev.noclip.backrooms.core.rpg.PlayerStats;
+import dev.noclip.backrooms.core.trip.Pull;
 import java.util.Set;
 import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
@@ -47,6 +48,9 @@ public final class BackroomsConsumableItem extends Item {
 		ROUGH_BANDAGE,
 		STERILE_BANDAGE,
 		AGED_ALMOND_RESERVE,
+		REALITY_STABILIZER_T1,
+		REALITY_SERUM_T2,
+		REALITY_ANCHOR_CORE,
 		MOLOTOV_COCKTAIL,
 		TACTICAL_CORNER_MIRROR,
 		HOMEWARD_ANCHOR,
@@ -95,7 +99,10 @@ public final class BackroomsConsumableItem extends Item {
 				player.removeEffect(MobEffects.POISON);
 				player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 240, 1));
 				player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 900, 0));
-				if (player instanceof ServerPlayer sp) PlayerRpg.restoreSanity(sp, 85.0F);
+				if (player instanceof ServerPlayer sp) {
+					PlayerRpg.restoreSanity(sp, 85.0F);
+					Pull.applyMinorRelief(sp, 25.0F, 12_000L);
+				}
 				server.sendParticles(ParticleTypes.HAPPY_VILLAGER, player.getX(), player.getY() + 1.0, player.getZ(), 18, 0.5, 0.7, 0.5, 0.05);
 				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.HONEY_DRINK.value(), SoundSource.PLAYERS, 0.9F, 1.15F);
 				if (!player.isCreative()) stack.shrink(1);
@@ -220,11 +227,57 @@ public final class BackroomsConsumableItem extends Item {
 				player.heal(8.0F);
 				player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 220, 1));
 				player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 400, 0));
-				if (player instanceof ServerPlayer sp) PlayerRpg.restoreSanity(sp, 100.0F);
+				if (player instanceof ServerPlayer sp) {
+					PlayerRpg.restoreSanity(sp, 100.0F);
+					Pull.applyMinorRelief(sp, 45.0F, 24_000L);
+				}
 				server.sendParticles(ParticleTypes.END_ROD, player.getX(), player.getY() + 1.1, player.getZ(), 24, 0.5, 0.7, 0.5, 0.06);
 				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.HONEY_DRINK.value(), SoundSource.PLAYERS, 1.0F, 1.25F);
 				if (!player.isCreative()) stack.shrink(1);
 				player.getCooldowns().addCooldown(stack, 40);
+			}
+			case REALITY_STABILIZER_T1 -> {
+				player.removeEffect(MobEffects.HUNGER);
+				player.removeEffect(MobEffects.WEAKNESS);
+				player.removeEffect(MobEffects.NAUSEA);
+				if (player instanceof ServerPlayer sp) {
+					PlayerRpg.restoreSanity(sp, 30.0F);
+					Pull.useTier1Stabilizer(sp);
+				}
+				server.sendParticles(ParticleTypes.HAPPY_VILLAGER, player.getX(), player.getY() + 1.0, player.getZ(), 16, 0.5, 0.6, 0.5, 0.04);
+				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.HONEY_DRINK.value(), SoundSource.PLAYERS, 0.9F, 1.2F);
+				if (!player.isCreative()) stack.shrink(1);
+				player.getCooldowns().addCooldown(stack, 40);
+			}
+			case REALITY_SERUM_T2 -> {
+				player.removeEffect(MobEffects.HUNGER);
+				player.removeEffect(MobEffects.WEAKNESS);
+				player.removeEffect(MobEffects.DARKNESS);
+				player.removeEffect(MobEffects.NAUSEA);
+				player.heal(4.0F);
+				if (player instanceof ServerPlayer sp) {
+					PlayerRpg.restoreSanity(sp, 50.0F);
+					Pull.useTier2Serum(sp);
+				}
+				server.sendParticles(ParticleTypes.END_ROD, player.getX(), player.getY() + 1.0, player.getZ(), 28, 0.7, 0.8, 0.7, 0.06);
+				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 0.75F, 1.35F);
+				if (!player.isCreative()) stack.shrink(1);
+				player.getCooldowns().addCooldown(stack, 60);
+			}
+			case REALITY_ANCHOR_CORE -> {
+				player.removeEffect(MobEffects.HUNGER);
+				player.removeEffect(MobEffects.WEAKNESS);
+				player.removeEffect(MobEffects.DARKNESS);
+				player.removeEffect(MobEffects.NAUSEA);
+				player.heal(player.getMaxHealth());
+				if (player instanceof ServerPlayer sp) {
+					PlayerRpg.restoreSanity(sp, 100.0F);
+					Pull.useTier3Core(sp);
+				}
+				server.sendParticles(ParticleTypes.END_ROD, player.getX(), player.getY() + 1.1, player.getZ(), 48, 1.2, 1.0, 1.2, 0.08);
+				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 0.9F, 1.1F);
+				if (!player.isCreative()) stack.shrink(1);
+				player.getCooldowns().addCooldown(stack, 80);
 			}
 			case MOLOTOV_COCKTAIL -> {
 				Vec3 impact = player.getEyePosition().add(player.getLookAngle().scale(6.0));

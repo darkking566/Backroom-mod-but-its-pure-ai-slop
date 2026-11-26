@@ -128,7 +128,7 @@ final class BackroomsCraftingTest {
 		try (var stream = Files.list(equipTexDir)) {
 			textures = stream.filter(p -> p.toString().endsWith(".png")).toList();
 		}
-		assertTrue(textures.size() >= 369, "Expected all 369 3D item textures, got " + textures.size());
+		assertTrue(textures.size() >= 372, "Expected all 372 3D item textures, got " + textures.size());
 		for (Path tex : textures) {
 			String fn = tex.getFileName().toString();
 			String id = fn.substring(0, fn.length() - 4);
@@ -146,7 +146,7 @@ final class BackroomsCraftingTest {
 		try (var stream = Files.list(blockTexDir)) {
 			blockTextures = stream.filter(p -> p.toString().endsWith(".png")).toList();
 		}
-		assertTrue(blockTextures.size() >= 67, "Expected all 67 3D block textures, got " + blockTextures.size());
+		assertTrue(blockTextures.size() >= 68, "Expected all 68 3D block textures, got " + blockTextures.size());
 		for (Path tex : blockTextures) {
 			String fn = tex.getFileName().toString();
 			String id = fn.substring(0, fn.length() - 4);

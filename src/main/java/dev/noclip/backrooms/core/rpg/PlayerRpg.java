@@ -12,7 +12,6 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -58,8 +57,10 @@ public final class PlayerRpg {
 	private static final Identifier MOD_VIT_HP = BackroomsMod.id("rpg_vitality_health");
 	private static final Identifier MOD_VIT_TOUGH = BackroomsMod.id("rpg_vitality_toughness");
 	private static final Identifier MOD_BACKROOMS_HP = BackroomsMod.id("backrooms_frailty");
-	/** The Backrooms take half of the player's base 20 health (docs/HORROR_ESCAPE_PLAN.md). */
-	public static final double BACKROOMS_HEALTH_PENALTY = -10.0;
+	/** Half of the player's base 20 health, everywhere (docs/HORROR_ESCAPE_PLAN.md). */
+	public static final double FRAILTY = -10.0;
+	/** In the Backrooms, eating well heals at a quarter of the usual speed (mixin.FoodDataBackroomsRegen). */
+	public static final float BACKROOMS_FOOD_REGEN = 0.25F;
 	/** Vitality's regeneration waits this long after the player was last hurt: you heal by hiding, not mid-fight. */
 	private static final int REGEN_DELAY_TICKS = 100;
 	private static final Map<UUID, Long> LAST_HURT = new HashMap<>();
@@ -86,12 +87,6 @@ public final class PlayerRpg {
 
 		ServerPlayerEvents.JOIN.register(player -> applyAttributes(player, get(player)));
 		ServerPlayerEvents.LEAVE.register(player -> LAST_HURT.remove(player.getUUID()));
-		ServerEntityLevelChangeEvents.AFTER_PLAYER_CHANGE_LEVEL.register((player, from, to) -> {
-			// Keep the share of health across the change: full in the Backrooms is full at home, half is half.
-			float share = player.getMaxHealth() > 0.0F ? player.getHealth() / player.getMaxHealth() : 1.0F;
-			applyAttributes(player, get(player));
-			if (player.isAlive()) player.setHealth(Math.max(1.0F, share * player.getMaxHealth()));
-		});
 		ServerLivingEntityEvents.AFTER_DAMAGE.register((entity, source, baseDamage, damageTaken, blocked) -> {
 			if (entity instanceof ServerPlayer player && damageTaken > 0.0F) {
 				LAST_HURT.put(player.getUUID(), player.level().getGameTime());
@@ -108,13 +103,14 @@ public final class PlayerRpg {
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
 			if (!(source.getEntity() instanceof ServerPlayer killer)) return;
 			if (!(entity instanceof Monster)) return;
+			// Killing is not the way to grow (docs/HORROR_ESCAPE_PLAN.md): most experience comes from surviving (SurvivalXp).
 			int reward;
-			if (entity instanceof BeastOfLevel5) {
-				reward = 250;
+			if (entity instanceof BeastOfLevel5 || entity instanceof dev.noclip.backrooms.monsters.shepherdsnake.ShepherdSnake) {
+				reward = 150;
 			} else if (entity.getType().builtInRegistryHolder().key().identifier().getNamespace().equals(BackroomsMod.MOD_ID)) {
-				reward = 35;
+				reward = 12;
 			} else {
-				reward = 18;
+				reward = 4;
 			}
 			grantXp(killer, reward);
 		});
@@ -168,8 +164,7 @@ public final class PlayerRpg {
 		updateModifier(player, Attributes.MOVEMENT_SPEED, MOD_AGI_MOVE, stats.moveSpeedBonus(), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 		updateModifier(player, Attributes.ATTACK_SPEED, MOD_AGI_ATK, stats.attackSpeedBonus(), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 		updateModifier(player, Attributes.MAX_HEALTH, MOD_VIT_HP, stats.maxHealthBonus(), AttributeModifier.Operation.ADD_VALUE);
-		updateModifier(player, Attributes.MAX_HEALTH, MOD_BACKROOMS_HP, inBackrooms(player) ? BACKROOMS_HEALTH_PENALTY : 0.0,
-				AttributeModifier.Operation.ADD_VALUE);
+		updateModifier(player, Attributes.MAX_HEALTH, MOD_BACKROOMS_HP, FRAILTY, AttributeModifier.Operation.ADD_VALUE);
 		updateModifier(player, Attributes.ARMOR_TOUGHNESS, MOD_VIT_TOUGH, 0.0, AttributeModifier.Operation.ADD_VALUE);
 		if (player.getHealth() > player.getMaxHealth()) {
 			player.setHealth(player.getMaxHealth());
@@ -207,17 +202,30 @@ public final class PlayerRpg {
 			boolean inBackrooms = level.dimension().identifier().getNamespace().equals(BackroomsMod.MOD_ID);
 			float delta;
 			if (!inBackrooms) {
-				// Overworld safe base steadily restores sanity, accelerated by SAN stat.
-				float baseRec = level.dimension() == Level.OVERWORLD ? 0.85F : 0.25F;
-				delta = (baseRec + stats.passiveSanityRegenPerSec() * 0.5F) * stats.sanityRegenMultiplier();
+				int rejectionStage = dev.noclip.backrooms.core.trip.Pull.stage(player);
+				if (rejectionStage >= 1) {
+					// Wretch Rejection in the Overworld: sanity stops recovering and drains steadily!
+					float rejectDrain = switch (rejectionStage) {
+						case 1 -> -0.08F;
+						case 2 -> -0.16F;
+						case 3 -> -0.28F;
+						default -> -0.42F;
+					};
+					delta = rejectDrain * (1.0F - stats.sanityDrainResistance());
+				} else {
+					// Overworld safe base steadily restores sanity, accelerated by SAN stat.
+					float baseRec = level.dimension() == Level.OVERWORLD ? 0.85F : 0.25F;
+					delta = (baseRec + stats.passiveSanityRegenPerSec() * 0.5F) * stats.sanityRegenMultiplier();
+				}
 			} else {
 				BlockPos eyePos = BlockPos.containing(player.getX(), player.getEyeY(), player.getZ());
 				int blockLight = level.getBrightness(LightLayer.BLOCK, eyePos);
 				float envDelta;
+				// Half the old rates, with half the old maximum: about as long to break as before (the user, 2026-11-25).
 				if (blockLight <= 4) {
-					envDelta = -0.52F;
+					envDelta = -0.26F;
 				} else if (blockLight <= 8) {
-					envDelta = -0.14F;
+					envDelta = -0.07F;
 				} else if (blockLight >= 11) {
 					envDelta = 0.24F;
 				} else {
@@ -225,7 +233,7 @@ public final class PlayerRpg {
 				}
 
 				List<Monster> nearby = level.getEntitiesOfClass(Monster.class, new AABB(eyePos).inflate(12.0));
-				float monsterDrain = Math.min(1.05F, nearby.size() * 0.30F);
+				float monsterDrain = Math.min(0.5F, nearby.size() * 0.15F);
 				// SAN passive composure helps stabilize sanity whenever not in pitch darkness next to monsters.
 				float passiveCalm = (blockLight > 4 && nearby.isEmpty()) ? stats.passiveSanityRegenPerSec() * 0.5F : 0.0F;
 				float raw = envDelta - monsterDrain + passiveCalm;
