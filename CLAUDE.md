@@ -507,6 +507,7 @@
   - Gamma 的人會多生：人被推離自己的位置超過 3 格就會再生一個；區塊載入後實體還沒載入就檢查也會多生。改成整座 Gamma 找同標籤的人，而且實體還沒載入就先不檢查（`areEntitiesLoaded`）
   - `gamma` 實機測試段加：生存模式挖探測門旁的牆與外牆挖不掉、把居民推開 5 格再檢查還是只有一個；`gradlew build` 與 `runClientGameTest -Plevels=3 -Psections=gamma` 通過
   - 沒修：狙擊手沒有測試、把武器藏在收納袋或界伏盒裡可以過探測門
+- 使用者同意後推送：先抓 GitHub，合併朋友新推的 7 個提交（M.E.G. 配額循環取代滲透與裂縫、企劃移到 `docs/project`、Level 3 行軍床改走 trip 系統等），沒有衝突；合併後 `gradlew build` 與 `runClientGameTest -Plevels=3 -Psections=gamma` 通過，把 `main` 推送到 GitHub（Gamma 審查兩項修正 `f8135cb3` 與紀錄）；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
