@@ -520,6 +520,8 @@
   - 合成台 Shift 點成品時背包只放得下一部分，會用掉整份材料、放不下的那部分消失：改成放不下整份就不動（`BackroomsStationMenu.fits`）
   - `HorrorClientTest` 加：同一層換床不再給經驗、背包只剩 1 格空間時 Shift 點成品不拿也不扣材料（先把修正拿掉跑過，確認測試會失敗）；`gradlew build` 與 `runClientGameTest -Plevels=horror` 通過
   - 沒驗證：真的重開世界後重生（自動測試沒辦法重開同一個世界），只靠讀程式判斷舊身體記得死的維度
+- 使用者同意後，把 `main` 推送到 GitHub（審查三項修正 `1cd12754`）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- 修 Gamma 探測門漏洞：武器藏在收納袋或界伏盒（含巢狀）裡也會被擋；`gamma` 實機測試段加藏武器兩例與狙擊手（打 Gamma 的人會中槍）；拿掉修正跑過一次確認會失敗，修好後 `gradlew build runClientGameTest -Plevels=3 -Psections=gamma` 通過。注意：狙擊傷害 14 大於現在的血量 10，一槍就死（使用者決定維持）
 - 使用者決定（Claude 問的四題）：Gemini 新企劃裡的按趟加工與武器數值平衡也由 Claude 做；前室外面用原版自然地形；血量砍半只對進過後室的人；舊存檔的石造公會整個拆掉。寫進 `docs/project/1-gameplay/README.md`
 - 前室與流程第一大批（照「流程與前室總部定案」與 Gemini 寫的前室企劃）：
   - 新增維度 `noclip_backrooms:frontrooms`（`frontrooms/`：`Frontrooms`、`FrontroomsTerrain` 純函式地形、`FrontroomsChunkGenerator`、`InstituteLayout` 三層平面圖純資料、`Institute` 運作、`FrontroomsBlocks`／`BlastDoorBlock`／`DoorLampBlock`／`InstituteBlocks` 22 個新方塊）；維度類型與生態域照原版主世界與森林改（沒有怪物、沒有熔岩湖）；`tools/make_frontrooms.py` 產生 128 像素貼圖（含 `_n`／`_s`）、模型、方塊狀態、物品模型
@@ -552,6 +554,7 @@
   - 測試時修掉的：靜電會把玩家自己的應急燈炸掉（改成不炸工具包的燈）；絕對沉寂原本看伺服器端玩家速度（玩家是客戶端在動，改看每秒位置變化）；拍立得的取景太窄（改成視線穿過生物或 25 度內）
   - 驗證：`gradlew build`、`runClientGameTest -Plevels=field,frontrooms,horror,floors,guild`、`-Plevels=0`、`-Plevels=2,3`、Level 1 的 `monsters,hounds,leaveThroughDoor,settlements` 都通過；看過紅霧、粉筆與螢光棒、拍照、信標、含加工成果的任務報告截圖
   - 沒做：拍「停電瞬間」「紅室祭壇」這類場景照、紅霧讓紅室變多（地形已先生成）、人影是竊皮者與識破工具、研究瓶解鎖配方、雙結局
+- 使用者同意後推送：先合併朋友新推的 7 個提交（前室研究所、撤離接應、死亡新規則、後室進階玩法），只有 `CLAUDE.md` 衝突（兩邊紀錄都保留）；合併後 `gradlew build` 與 `runClientGameTest -Plevels=3 -Psections=gamma` 通過，推送 `main`（Gamma 探測門看得到收納袋與界伏盒裡的武器、狙擊手測試）；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 

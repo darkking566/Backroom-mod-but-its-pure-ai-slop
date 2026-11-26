@@ -5,6 +5,7 @@ import dev.noclip.backrooms.weapons.BackroomsMagicItem;
 import dev.noclip.backrooms.weapons.BackroomsMeleeItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -63,6 +64,11 @@ final class GammaCheckpointBlock extends Level3PartBlock {
 
 	static boolean weapon(ItemStack stack) {
 		if (stack.isEmpty()) return false;
+		// The detector sees into bundles and boxes, however deeply packed.
+		var bundle = stack.get(DataComponents.BUNDLE_CONTENTS);
+		if (bundle != null && bundle.items().stream().anyMatch(inside -> weapon(inside.create()))) return true;
+		var box = stack.get(DataComponents.CONTAINER);
+		if (box != null && box.nonEmptyItemCopyStream().anyMatch(GammaCheckpointBlock::weapon)) return true;
 		var item = stack.getItem();
 		return item instanceof BackroomsMeleeItem || item instanceof BackroomsFirearmItem || item instanceof BackroomsMagicItem
 				|| item instanceof ProjectileWeaponItem || item instanceof TridentItem || item instanceof MaceItem
