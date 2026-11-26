@@ -476,6 +476,7 @@
   - 測試：新增 `GammaTest`（頻率、正門接迷宮、從正門走得到每層每個人與床／出口／寄物櫃、外牆完整）；`Level3ClientTest` 每段都能用 `-Psections=` 單跑，新增 `gamma` 段（樣板和世界一致、帶劍被擋、空手通過、12 人各一、安頓、溫泉回理智、出口與電梯在、12 張截圖，挑 6 張存到 `docs/levels/level3/gamma/`）
   - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=3 -Psections=gamma` 通過；Level 3 其他段這次沒重跑；狙擊手沒實機測；整體偏暗但看得清
   - 還沒做：三個側門、監視器提示、帶刺鐵絲網與電網、其他圖的方向距離路標、檔案員收拓印、新方塊的寫實貼圖（細節見 POI.md D 節「實作狀態」）
+- 使用者同意後，把 `main` 推送到 GitHub（`dbe0ff1d` POI 企劃、`b7103b73` Gamma 規格、`b729e8c9` Gamma 基地第一版）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
