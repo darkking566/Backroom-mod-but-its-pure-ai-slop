@@ -12,7 +12,13 @@ import java.util.Map;
 import java.util.UUID;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import dev.noclip.backrooms.core.rpg.PlayerRpg;
+import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -33,6 +39,7 @@ final class Level3Bases {
 	static final String STAFF_TAG = "noclip_backrooms_level3_staff";
 	static final String UEC_TAG = "noclip_backrooms_level3_uec";
 	private static final int INTERVAL = 20 * 10;
+	private static final float SNIPER_DAMAGE = 14.0F, SPRING_SANITY = 1.5F;
 	private static final Map<UUID, Long> LAST_VISITED = new HashMap<>();
 
 	private Level3Bases() {
@@ -41,6 +48,15 @@ final class Level3Bases {
 	static void register() {
 		ServerTickEvents.END_SERVER_TICK.register(Level3Bases::tick);
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> LAST_VISITED.clear());
+		// Gamma's snipers (CN wiki: there is a sniper at the entrance): attack anyone there, and you are shot.
+		AttackEntityCallback.EVENT.register((player, world, hand, entity, hit) -> {
+			if (!(world instanceof ServerLevel level) || player.isCreative() || player.isSpectator() || !(entity instanceof Person)) return InteractionResult.PASS;
+			if (entity.entityTags().stream().noneMatch(tag -> tag.startsWith("noclip_backrooms_gamma_"))) return InteractionResult.PASS;
+			level.playSound(null, player.blockPosition(), SoundEvents.CROSSBOW_SHOOT, SoundSource.HOSTILE, 2.0F, 0.6F);
+			player.hurtServer(level, level.damageSources().generic(), SNIPER_DAMAGE);
+			if (player instanceof ServerPlayer serverPlayer) serverPlayer.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level3.gamma_sniper"));
+			return InteractionResult.FAIL;
+		});
 	}
 
 	private static void tick(MinecraftServer server) {
@@ -50,9 +66,20 @@ final class Level3Bases {
 		long seed = Level3ChunkGenerator.planSeed(level.getChunkSource().randomState());
 		for (ServerPlayer player : level.players()) {
 			if (player.isSpectator()) continue;
-			if (now % 20 == 0) checkArrivalMessage(seed, player);
+			if (now % 20 == 0) {
+				checkArrivalMessage(seed, player);
+				soak(level, seed, player);
+			}
 			if (now % INTERVAL == 0) populateNear(level, seed, player);
 		}
+	}
+
+	/** Gamma's hot spring: sitting in it, the mind settles. */
+	private static void soak(ServerLevel level, long seed, ServerPlayer player) {
+		Tile tile = Level3Layout.tile(seed, player.getBlockX(), player.getBlockZ());
+		if (tile.hall() == null || tile.hall().kind() != HallKind.GAMMA || !player.isInWater()) return;
+		PlayerRpg.restoreSanity(player, SPRING_SANITY);
+		level.sendParticles(ParticleTypes.CLOUD, player.getX(), player.getY() + 1.0, player.getZ(), 2, 0.4, 0.1, 0.4, 0.01);
 	}
 
 	private static void checkArrivalMessage(long seed, ServerPlayer player) {
@@ -61,6 +88,7 @@ final class Level3Bases {
 		HallKind kind = tile.hall().kind();
 		String key = switch (kind) {
 			case BASE -> "message.noclip_backrooms.level3.enter_base_gamma";
+			case GAMMA -> "message.noclip_backrooms.level3.enter_gamma";
 			case BNTG_STORAGE -> "message.noclip_backrooms.level3.enter_bntg";
 			case BLUE_SALVATION -> "message.noclip_backrooms.level3.enter_blue_salvation";
 			case SCYLLA_COLONY -> "message.noclip_backrooms.level3.enter_scylla";
@@ -80,6 +108,10 @@ final class Level3Bases {
 		for (Placed placed : Level3Events.hallsNear(seed, player.getBlockX(), player.getBlockZ(), 48)) {
 			Hall hall = placed.hall();
 			HallKind kind = hall.kind();
+			if (kind == HallKind.GAMMA) {
+				spawned += populateGamma(level, placed);
+				continue;
+			}
 			if (kind != HallKind.BASE && kind != HallKind.BNTG_STORAGE && kind != HallKind.SCYLLA_COLONY) continue;
 			int x0 = placed.x0() + 1, z0 = placed.z0() + 1;
 			int w = Level3Halls.width(hall), d = Level3Halls.depth(hall);
@@ -114,6 +146,19 @@ final class Level3Bases {
 		return spawned;
 	}
 
+	/** Everyone in Gamma has a place of their own; each is filled in as soon as its chunk is there and nobody stands in it. */
+	private static int populateGamma(ServerLevel level, Placed placed) {
+		int spawned = 0;
+		for (GammaLayout.Spot spot : GammaLayout.PEOPLE) {
+			BlockPos at = new BlockPos(placed.x0() + spot.u(), spot.y(), placed.z0() + spot.v());
+			if (!level.isLoaded(at)) continue;
+			String tag = "noclip_backrooms_gamma_" + spot.id();
+			if (!level.getEntitiesOfClass(Person.class, new AABB(at).inflate(3), p -> p.entityTags().contains(tag)).isEmpty()) continue;
+			if (spawnStaff(level, at, spot.look(), spot.name(), spot.role() == null ? null : ShopRole.byId(spot.role()), tag) > 0) spawned++;
+		}
+		return spawned;
+	}
+
 	private static BlockPos freeSpot(ServerLevel level, int x0, int z0, int w, int d, int index) {
 		int y = Level3ChunkGenerator.FLOOR_Y + 1;
 		int cx = x0 + w / 2, cz = z0 + d / 2;
@@ -134,6 +179,10 @@ final class Level3Bases {
 	}
 
 	private static int spawnStaff(ServerLevel level, BlockPos spot, String look, String name, ShopRole role) {
+		return spawnStaff(level, spot, look, name, role, null);
+	}
+
+	private static int spawnStaff(ServerLevel level, BlockPos spot, String look, String name, ShopRole role, String tag) {
 		if (spot == null) return 0;
 		Person person = People.type(look).create(level, EntitySpawnReason.NATURAL);
 		if (person == null) return 0;
@@ -142,6 +191,7 @@ final class Level3Bases {
 		person.setCustomName(Component.literal(name));
 		person.addTag(STAFF_TAG);
 		if (role != null) person.addTag(role.tag());
+		if (tag != null) person.addTag(tag);
 		level.addFreshEntity(person);
 		return 1;
 	}

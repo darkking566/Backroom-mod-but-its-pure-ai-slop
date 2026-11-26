@@ -11,7 +11,9 @@ public enum ShopRole {
 	BUYER("buyer", "trader"),
 	SUPPLIER("supplier", "medic"),
 	QUARTERMASTER("quartermaster", "meg_patrol"),
-	MASTER("master", "colonist");
+	MASTER("master", "colonist"),
+	/** Mason, in the tunnels under Base Gamma: gas masks. */
+	MASON("mason", "aiko");
 
 	private final String id, look;
 

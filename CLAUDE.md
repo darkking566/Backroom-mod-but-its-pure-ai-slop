@@ -494,6 +494,13 @@
   - 測試：新增單元測試 `QuotaMathTest`；`HorrorClientTest` 的第 6 段改成整個週期：第一次回家開始第 1 天、在家才算時間、後室不算、/time add 算、第 4 天有排斥、藥不動時鐘、在收購商旁邊真的賣東西交配額與必交項目、交滿換下一期（配額 130、補給包）、期限到變欠款（＋20%）、前哨關閉、排斥最重、日出被丟進後室、用帳戶 2:1 還清；第 7 段委託改檢查算進配額。截圖看過黃色大字與左上角
   - 中途發現測試世界關掉日夜循環，主世界時鐘不動，原本「用時鐘的差」會讓倒數永遠不走：改成每一刻都算＋時鐘跳動另外加
   - 驗證：`gradlew build`、`runClientGameTest -Plevels=horror,guild,floors,0,3` 與 Level 1 的 `settlements,wikiSettlements,leaveThroughDoor` 都通過；`docs/project/1-gameplay/README.md` 把【建議】改成【已做】並寫上實際數字
+- 使用者要求推上 GitHub：抓 GitHub 合併朋友新推的 Level 3 Gamma 基地（`b729e8c9` 等 3 個）；衝突在 `Level3RestBlock`（兩邊都改成走 `Trips.settle`，只差註解，用朋友的）與 `CLAUDE.md`（兩邊紀錄都保留）；朋友新加的 `docs/levels/level3/POI.md` 與 Gamma 截圖被 git 自動放到新位置 `docs/project/5-levels/level3/`，裡面指向已併入的 `docs/HORROR_ESCAPE_PLAN.md` 的連結改成遊戲玩法章；合併後 `gradlew build` 與 `runClientGameTest -Plevels=3,horror` 通過；使用者同意後把 `main` 推送到 GitHub（企劃書整理、配額循環、合併）；沒有強制推送、沒有改寫歷史
+- （朋友那邊的紀錄）使用者要求先做 Gamma 基地大型結構（照 `docs/levels/level3/POI.md` 的 D 節）：
+  - 新增 `level3/GammaPlan`（每 4×4 張迷宮圖一座，由種子決定）、`GammaLayout`（60×48×48 固定樣板：地下隧道 y=1、三層商場 y=9／16／23 與挑空中庭、住宅部＋檢查站 y=32、行政部 y=39；東側 12 格是存儲設施）、`GammaCheckpointBlock`（金屬探測門：身上有武器不給進，出去不檢查）；`Level3Plan` 加 `HallKind.GAMMA`（只開正門，正門前固定寬走道，那張圖的路標整張圖都指向正門），`Level3ChunkGenerator.gamma` 把樣板轉成方塊；沒有 Gamma 的圖完全不變
+  - 新方塊 `daylight_panel`（模擬日光）、`checkpoint_door`（`tools/make_level3_gamma.py`）；12 個人形各在位置上只生一次（`Level3Bases.populateGamma`），新角色梅森（`ShopRole.MASON`、`shops/mason.json`，賣防毒面具與杏仁水）；溫泉每秒回 1.5 理智；打 Gamma 的人會被狙擊；行軍床改用 `Trips.settle`（可撤離）；原本的 `BASE` 大廳改稱「外圍哨站」；Gamma 裡攝影機濾鏡較亮（`Look.Mood.GAMMA`）
+  - 測試：新增 `GammaTest`（頻率、正門接迷宮、從正門走得到每層每個人與床／出口／寄物櫃、外牆完整）；`Level3ClientTest` 每段都能用 `-Psections=` 單跑，新增 `gamma` 段（樣板和世界一致、帶劍被擋、空手通過、12 人各一、安頓、溫泉回理智、出口與電梯在、12 張截圖，挑 6 張存到 `docs/levels/level3/gamma/`）
+  - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=3 -Psections=gamma` 通過；Level 3 其他段這次沒重跑；狙擊手沒實機測；整體偏暗但看得清
+  - 還沒做：三個側門、監視器提示、帶刺鐵絲網與電網、其他圖的方向距離路標、檔案員收拓印、新方塊的寫實貼圖（細節見 POI.md D 節「實作狀態」）
 
 ## 動作記錄（Antigravity）
 
@@ -755,3 +762,5 @@
   - 擴充 `Level3Plan`、`Level3Halls`、`Level3ChunkGenerator` 與 `MapDump`：升級 `BASE`（監視器、安檢鐵柵、行軍床、拆解台／鍛造台），新增 `BNTG_STORAGE`（貨箱、當舖櫃檯、講台展櫃）、`BLUE_SALVATION`（白牆、藍燈、鸚鵡壁畫、殘破發電機與電線）、`SCYLLA_COLONY`（極暗實驗室、裝置、上鎖軍械箱與異常金庫箱）
   - 新增 `Level3Bases.java`（於 `Level3.register()` 註冊）：Gamma 基地生成 `M.E.G. Quartermaster`／`Medic`（帶 `ShopRole` 交易標籤）、B.N.T.G. 倉庫生成 `Pawnshop Trader`／`Archivist`、錫拉殖民地生成敵對 `U.E.C. Operative`（`EntityTypes.PILLAGER`），並附踏入據點一次性提示訊息；`Level3Events.nearSafety` 納入 `BNTG_STORAGE` 與 `BLUE_SALVATION`
   - 資源與測試：新增 `tools/make_level3_bases.py` 產出 5 個新方塊資源，更新 `make_level3_realistic.py` 產出全數 92 張寫實材質（經 `resize_realistic.py` 縮至 128/64），更新雙語翻譯；`Level3LayoutTest.allFourFactionBasesTurnUp` 與 `Level3ClientTest.bases` 通過，`.\gradlew.bat build --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=3 --no-daemon` 全數通過並實機檢視 4 座據點截圖；僅於本機 `main` 提交（未推送）
+- 使用者要求規劃 Level 3 的 POI：下載中文維基 `latest:level-3` 整頁原文讀過，新增 `docs/levels/level3/POI.md`（大廳變化、鐵柵後的景、走道小場景、Gamma 基地本體、勢力據點加料五類，含分批與待決定事項）；`docs/levels/level3/README.md` 第 4 批加一行指向它；只寫企劃，沒改程式
+- 使用者決定 Level 3 的 Gamma 基地做成大型結構：`docs/levels/level3/POI.md` 的 D 節寫成規格（維度 48 格高不改、往下挖：行政 y=40～46、住宅＋檢查站 y=33～39、三層公共部中庭 y=9～31、隧道 y=1～7；48×48 格＋旁邊 12×48 的存儲設施；每 4×4 張迷宮圖一座；遠處路標寫方向與距離；現有 `BASE` 大廳改叫外圍哨站、Level 11 的門保留；`GammaPlan`／`GammaLayout` 做法、驗收、舊存檔影響）；只寫企劃，沒改程式

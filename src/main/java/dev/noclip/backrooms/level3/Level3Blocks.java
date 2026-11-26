@@ -109,6 +109,11 @@ public final class Level3Blocks {
 	public static final Block FOJ_WHITE_WALL = register("foj_white_wall", brick(MapColor.QUARTZ));
 	public static final Block JERRY_MURAL = register("jerry_mural", sign(),
 			p -> new Level3FacingBlock(p, Level3Shapes.facing(1, 1, 0, 15, 15, 1), Level3FacingBlock.Effect.NONE));
+	/** Base Gamma's atrium ceiling: simulated daylight. */
+	public static final Block DAYLIGHT_PANEL = register("daylight_panel", Properties.of().mapColor(MapColor.SNOW).strength(1.0F)
+			.sound(SoundType.GLASS).lightLevel(state -> 15));
+	public static final Block CHECKPOINT_DOOR = register("checkpoint_door", unbreakable(MapColor.METAL).lightLevel(state -> 4),
+			GammaCheckpointBlock::new);
 	public static final Block BLUE_STATION_LIGHT = register("blue_station_light", fixture(9), p -> new Level3AxisBlock(p, FIXTURE));
 	public static final Block UEC_APPARATUS = register("uec_apparatus", machine().noOcclusion().lightLevel(s -> 3),
 			p -> new Level3FacingBlock(p, Level3Shapes.full(), Level3FacingBlock.Effect.WHIR));

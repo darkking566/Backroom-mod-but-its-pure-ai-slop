@@ -58,6 +58,8 @@ public final class Look {
 		static final Mood LEVEL_0 = new Mood(3, 20, 0.38F), LEVEL_3 = new Mood(6, 30, 0.18F), DEFAULT = new Mood(9, 44, 0.15F);
 		// Zenith Station is seen across: the singularity is some 180 blocks from the ring windows, the sea of rooms 60 out.
 		static final Mood ZENITH = new Mood(24, 320, 0.15F);
+		// Base Gamma's mall and halls are lit like day: light carries, the far end of the atrium shows.
+		static final Mood GAMMA = new Mood(20, 90, 0.04F);
 
 		static Mood of(Identifier dimension) {
 			return switch (dimension.getPath()) {
@@ -67,6 +69,14 @@ public final class Look {
 				default -> DEFAULT;
 			};
 		}
+	}
+
+	private static boolean inGamma;
+
+	/** The mood here: the level's own, unless the camera is inside Base Gamma. */
+	static Mood mood(Minecraft client) {
+		Mood mood = Mood.of(client.level.dimension().identifier());
+		return mood == Mood.LEVEL_3 && inGamma ? Mood.GAMMA : mood;
 	}
 
 	private Look() {
@@ -98,7 +108,7 @@ public final class Look {
 	public static void darken(Camera camera, FogData fog) {
 		Minecraft client = Minecraft.getInstance();
 		if (fog == null || !active(client) || camera.getFluidInCamera() != FogType.NONE) return;
-		Mood mood = Mood.of(client.level.dimension().identifier());
+		Mood mood = mood(client);
 		fog.environmentalStart = Math.min(fog.environmentalStart, mood.start());
 		fog.environmentalEnd = Math.min(fog.environmentalEnd, mood.end());
 		fog.color.set(0.018F, 0.016F, 0.011F, 1.0F);
@@ -109,7 +119,7 @@ public final class Look {
 		Minecraft client = Minecraft.getInstance();
 		if (!active(client)) return;
 		// The brightness setting mixes toward a brightened curve; mixing away from it darkens dim light much more than bright.
-		state.brightness = -Mood.of(client.level.dimension().identifier()).falloff();
+		state.brightness = -mood(client).falloff();
 	}
 
 	/** Ticks of footage since the player last came into the Backrooms with the filter on. */
@@ -123,6 +133,8 @@ public final class Look {
 			if (client.player != null) client.player.sendOverlayMessage(Component.translatable(enabled ? "message.noclip_backrooms.camcorder_on" : "message.noclip_backrooms.camcorder_off"));
 		}
 		boolean want = active(client);
+		inGamma = want && client.level.dimension() == dev.noclip.backrooms.level3.Level3.LEVEL_3
+				&& dev.noclip.backrooms.level3.Level3.insideGamma(client.level, client.player.getBlockX(), client.player.getBlockZ());
 		recording = want ? recording + 1 : 0;
 		Identifier current = client.gameRenderer.currentPostEffect();
 		if (want) {
@@ -147,7 +159,7 @@ public final class Look {
 		clock(client);
 		ticks = (ticks + 1) & 0xFFFF;
 		clock.getPixels().setPixel(0, 0, 0xFF000000 | (ticks >> 8) << 16 | (ticks & 0xFF) << 8 | RANDOM.nextInt(256));
-		Mood mood = Mood.of(client.level.dimension().identifier());
+		Mood mood = mood(client);
 		clock.getPixels().setPixel(1, 0, 0xFF000000 | Math.min(mood.start(), 255) << 16 | Math.min(mood.end(), 255) << 8 | Math.round(mood.falloff() * 255));
 		clock.upload();
 	}

@@ -52,6 +52,8 @@ final class Level3Halls {
 			case BNTG_STORAGE -> bntgStorage(u, v, h, w, d, gap);
 			case BLUE_SALVATION -> blueSalvation(seed, u, v, h, w, d, x, z, gap);
 			case SCYLLA_COLONY -> scyllaColony(u, v, h, w, d, gap);
+			// Gamma is laid out by GammaLayout; the generator never asks here.
+			case GAMMA -> Piece.AIR;
 		};
 	}
 
