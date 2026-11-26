@@ -1,5 +1,10 @@
 package dev.noclip.backrooms.props;
 
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.crafting.StationType;
 import java.util.ArrayList;
@@ -131,6 +136,19 @@ public final class BackroomsProps {
 
 	public static void register() {
 		// Triggers static registration of all 59 blocks, BlockItems, PROP_PART, and PROP_BLOCK_ENTITY.
+		// A chunk generator sets block states only. Props draw through their block entity, so without one they are
+		// invisible; make any that are missing as the chunk loads (which also mends chunks already saved).
+		ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> {
+			if (!level.dimension().identifier().getNamespace().equals(BackroomsMod.MOD_ID)) return;
+			var sections = chunk.getSections();
+			for (int i = 0; i < sections.length; i++) {
+				if (!sections[i].maybeHas(BlockState::hasBlockEntity)) continue;
+				BlockPos corner = SectionPos.of(chunk.getPos(), level.getSectionYFromSectionIndex(i)).origin();
+				for (BlockPos pos : BlockPos.betweenClosed(corner, corner.offset(15, 15, 15))) {
+					if (chunk.getBlockState(pos).hasBlockEntity()) chunk.getBlockEntity(pos.immutable(), LevelChunk.EntityCreationType.IMMEDIATE);
+				}
+			}
+		});
 	}
 
 	public static Map<String, Block> allBlocks() {

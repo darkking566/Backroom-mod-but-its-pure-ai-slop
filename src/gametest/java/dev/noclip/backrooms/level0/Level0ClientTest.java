@@ -677,6 +677,12 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			check(level.getBlockState(new BlockPos(gx + 4, Level0ChunkGenerator.CEILING_Y, gz + 3)).is(ModBlocks.FLUORESCENT_LIGHT),
 					"Glass office lit lamp missing");
 		});
+		// These two draw only through their block entity, which the client must have been sent.
+		context.runOnClient(client -> {
+			for (BlockPos pos : new BlockPos[] {new BlockPos(gx + 3, standY, gz + 4), new BlockPos(gx + 4, standY, gz + 3)}) {
+				check(client.level.getChunkAt(pos).getBlockEntities().containsKey(pos), "Generated prop is invisible at " + pos);
+			}
+		});
 
 		ZonePoiPlan.Vignette wandererSite = vignettes.get(ZonePoiPlan.VignetteType.WANDERER_SITE);
 		int wx = wandererSite.cx() * Maze.CELL, wz = wandererSite.cz() * Maze.CELL;
