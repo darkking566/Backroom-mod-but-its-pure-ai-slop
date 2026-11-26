@@ -554,6 +554,7 @@
   - 測試時修掉的：靜電會把玩家自己的應急燈炸掉（改成不炸工具包的燈）；絕對沉寂原本看伺服器端玩家速度（玩家是客戶端在動，改看每秒位置變化）；拍立得的取景太窄（改成視線穿過生物或 25 度內）
   - 驗證：`gradlew build`、`runClientGameTest -Plevels=field,frontrooms,horror,floors,guild`、`-Plevels=0`、`-Plevels=2,3`、Level 1 的 `monsters,hounds,leaveThroughDoor,settlements` 都通過；看過紅霧、粉筆與螢光棒、拍照、信標、含加工成果的任務報告截圖
   - 沒做：拍「停電瞬間」「紅室祭壇」這類場景照、紅霧讓紅室變多（地形已先生成）、人影是竊皮者與識破工具、研究瓶解鎖配方、雙結局
+- 使用者同意後推送：先合併朋友新推的 7 個提交（前室研究所、撤離接應、死亡新規則、後室進階玩法），只有 `CLAUDE.md` 衝突（兩邊紀錄都保留）；合併後 `gradlew build` 與 `runClientGameTest -Plevels=3 -Psections=gamma` 通過，推送 `main`（Gamma 探測門看得到收納袋與界伏盒裡的武器、狙擊手測試）；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
