@@ -147,6 +147,21 @@ def beacon_icon():
     return noisy(img, 9, 4)
 
 
+def bio_scanner():
+    img, d = canvas()
+    d.rectangle([8, 6, 23, 27], fill=(56, 62, 68, 255), outline=(28, 32, 36, 255))
+    d.line([21, 6, 21, 2], fill=(160, 168, 174, 255), width=2)
+    d.ellipse([19, 1, 23, 4], fill=(230, 60, 60, 255))
+    d.rectangle([10, 9, 21, 18], fill=(20, 48, 42, 255), outline=(40, 90, 80, 255))
+    d.ellipse([12, 10, 19, 17], outline=(70, 235, 195, 255))
+    d.point((16, 12), fill=(255, 70, 70, 255))
+    d.point((17, 12), fill=(255, 70, 70, 255))
+    d.rectangle([10, 20, 14, 23], fill=(80, 220, 180, 255))
+    d.rectangle([16, 20, 21, 23], fill=(210, 80, 70, 255))
+    d.rectangle([11, 25, 20, 26], fill=(110, 118, 124, 255))
+    return noisy(img, 14, 4)
+
+
 # Block textures (16 px faces drawn at 64 px)
 
 def block_tex(name, img):
@@ -296,6 +311,7 @@ def main():
     item("tripwire_alarm", alarm())
     item("emergency_lamp", lamp())
     item("mapping_beacon", beacon_icon())
+    item("bio_scanner", bio_scanner())
     for symbol in ("arrow", "cross", "exit"):
         block_tex(f"chalk_{symbol}", chalk_symbol(symbol))
     block_tex("glow_stick", glow_stick_tex())
@@ -307,9 +323,10 @@ def main():
     block_tex("mapping_beacon_top", beacon_tex(True))
     block_tex("mapping_beacon_side", beacon_tex(False))
     models()
-    sheet = Image.new("RGBA", (10 * (S * 3 + 4) + 4, S * 3 + 8), (40, 40, 40, 255))
-    for i, name in enumerate(("meg_camera", "evidence_photo", "topology_tape", "chalk", "glow_stick", "guide_line",
-                              "barricade_planks", "tripwire_alarm", "emergency_lamp", "mapping_beacon")):
+    all_icons = ("meg_camera", "evidence_photo", "topology_tape", "chalk", "glow_stick", "guide_line",
+                 "barricade_planks", "tripwire_alarm", "emergency_lamp", "mapping_beacon", "bio_scanner")
+    sheet = Image.new("RGBA", (len(all_icons) * (S * 3 + 4) + 4, S * 3 + 8), (40, 40, 40, 255))
+    for i, name in enumerate(all_icons):
         icon = Image.open(ITEM_TEX / f"{name}.png").resize((S * 3, S * 3), Image.NEAREST)
         sheet.alpha_composite(icon, (4 + i * (S * 3 + 4), 4))
     out = ROOT / "docs/project/1-gameplay/images/field_items.png"

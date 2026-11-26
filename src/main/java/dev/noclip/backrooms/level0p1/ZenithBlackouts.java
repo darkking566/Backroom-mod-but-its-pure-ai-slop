@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.Block;
  * Lights are swapped near each player (REACH); the same sweep, run now and then even in NORMAL, brings chunks loaded
  * later in step with the current state.
  */
-final class ZenithBlackouts {
+public final class ZenithBlackouts {
 	private static final int FIRST_DELAY = 3 * 60 * 20, DELAY = 6 * 60 * 20, DELAY_SPREAD = 4 * 60 * 20;
 	private static final int DARK = 20 * 20, DARK_SPREAD = 30 * 20;
 	private static final int WARNING = 80, RESTORING = 40;
@@ -50,14 +50,19 @@ final class ZenithBlackouts {
 		return phase;
 	}
 
+	/** Whether Level 0.1 is currently in a station blackout (warning, dark, or restoring). */
+	public static boolean isBlackout() {
+		return phase != Phase.NORMAL;
+	}
+
 	/** Starts the warning now, for tests and debugging. */
-	static void startNow() {
+	public static void startNow() {
 		phase = Phase.WARNING;
 		timer = WARNING;
 	}
 
 	/** Ends a blackout now, for tests and debugging. */
-	static void endNow() {
+	public static void endNow() {
 		phase = Phase.RESTORING;
 		timer = 1;
 	}

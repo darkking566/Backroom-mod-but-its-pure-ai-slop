@@ -39,7 +39,10 @@ public final class WeaponBalance {
 		if (tier < 0) return amount;
 		int i = Math.clamp(tier, 1, 4) - 1;
 		float factor = BOSSES.contains(key.getPath()) ? BOSS[i] : ORDINARY[i];
-		if (player instanceof ServerPlayer serverPlayer && Extraction.running(serverPlayer)) factor *= HOLDING_OUT[i];
+		if (player instanceof ServerPlayer serverPlayer
+				&& (Extraction.running(serverPlayer) || dev.noclip.backrooms.core.ending.Endings.overriding(serverPlayer))) {
+			factor *= HOLDING_OUT[i];
+		}
 		return amount * factor;
 	}
 

@@ -1,14 +1,21 @@
 package dev.noclip.backrooms.core.field;
 
+import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.core.Home;
 import dev.noclip.backrooms.core.floors.Floors;
 import dev.noclip.backrooms.core.quota.Quota;
 import dev.noclip.backrooms.core.quota.QuotaData;
+import dev.noclip.backrooms.core.trip.Anomalies;
 import dev.noclip.backrooms.core.trip.Trips;
+import dev.noclip.backrooms.level0p1.Level0p1;
+import dev.noclip.backrooms.level0p1.ZenithBlackouts;
+import dev.noclip.backrooms.level1.Blackouts;
+import dev.noclip.backrooms.level1.Level1;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -36,9 +43,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -60,9 +70,17 @@ public final class Evidence {
 	static final Map<String, Integer> SUBJECTS = Map.ofEntries(Map.entry("smiler", 60), Map.entry("hound", 40), Map.entry("skin_stealer", 80),
 			Map.entry("deathmoth", 45), Map.entry("clump", 50), Map.entry("faceling", 35), Map.entry("duller", 70), Map.entry("wretch", 55),
 			Map.entry("partygoer", 90), Map.entry("bacteria", 75), Map.entry("shepherd_snake", 85), Map.entry("bone_thief", 80));
-	/** One photo target a cycle, in turn. */
-	static final List<String> TARGETS = List.of("smiler", "hound", "deathmoth", "skin_stealer", "clump", "faceling");
+	/** Scene photos: special Backrooms events and anomalous landmarks in frame. */
+	static final Set<String> SCENE_IDS = Set.of("blackout_moment", "red_room_altar", "anomaly_vault", "electrical_hazard");
+	private static final Set<String> RED_ALTAR_BLOCKS = Set.of("red_anomaly_cluster", "red_fluorescent_light", "red_wallpaper");
+	private static final Set<String> VAULT_BLOCKS = Set.of("anomaly_vault_chest", "anomaly_altar", "crystal_vein_node", "uec_apparatus", "jerry_mural", "purple_brick");
+	private static final Set<String> HAZARD_BLOCKS = Set.of("sparking_outlet", "angel_statue", "black_sludge", "singularity");
+	/** One photo target a cycle, in turn (creatures and notable scenes). */
+	static final List<String> TARGETS = List.of("smiler", "hound", "blackout_moment", "deathmoth", "red_room_altar", "skin_stealer", "clump", "faceling");
 	private static final Map<GlobalPos, Scan> SCANS = new HashMap<>();
+
+	private record SceneShot(String id, int baseValue, double distance) {
+	}
 
 	private record Scan(UUID owner, int start, String level, int floor) {
 	}
@@ -75,9 +93,17 @@ public final class Evidence {
 		ServerTickEvents.END_SERVER_TICK.register(Evidence::tick);
 	}
 
-	/** This cycle's photo target (an entity id path), worth three times as much. */
+	/** This cycle's photo target (an entity id path or scene id), worth three times as much. */
 	public static String target(MinecraftServer server) {
 		return TARGETS.get(Math.floorMod(Quota.data(server).cycle() - 1, TARGETS.size()));
+	}
+
+	/** Localized display name of this cycle's photo target (creature or anomalous scene). */
+	public static Component targetName(MinecraftServer server) {
+		String id = target(server);
+		return SCENE_IDS.contains(id)
+				? Component.translatable("scene.noclip_backrooms." + id)
+				: Component.translatable("entity.noclip_backrooms." + id);
 	}
 
 	/** Whether the buyer values this item by what is in it (photos, tapes). */
@@ -124,10 +150,33 @@ public final class Evidence {
 			if (!(player instanceof ServerPlayer serverPlayer) || !(level instanceof ServerLevel server)) return InteractionResult.SUCCESS;
 			if (player.getCooldowns().isOnCooldown(camera)) return InteractionResult.FAIL;
 			LivingEntity subject = subject(serverPlayer);
-			String id = subject == null ? "scene" : BuiltInRegistries.ENTITY_TYPE.getKey(subject.getType()).getPath();
-			double distance = subject == null ? 0 : subject.distanceTo(player);
-			int value = subject == null ? 5 : SUBJECTS.getOrDefault(id, subject instanceof Monster ? 25 : 5);
-			if (subject != null && distance <= CLOSE) value = value * 3 / 2;
+			String id;
+			int value;
+			Component name;
+			if (subject != null) {
+				if (subject.entityTags().contains(Anomalies.MIMIC_FIGURE_TAG)) {
+					id = "skin_stealer";
+					value = SUBJECTS.getOrDefault(id, 80);
+					name = Component.translatable("scene.noclip_backrooms.mimic_figure");
+				} else {
+					id = BuiltInRegistries.ENTITY_TYPE.getKey(subject.getType()).getPath();
+					value = SUBJECTS.getOrDefault(id, subject instanceof Monster ? 25 : 5);
+					name = subject.getType().getDescription();
+				}
+				if (subject.distanceTo(player) <= CLOSE) value = value * 3 / 2;
+			} else {
+				SceneShot scene = detectScene(server, serverPlayer);
+				if (scene != null) {
+					id = scene.id();
+					value = scene.baseValue();
+					if (scene.distance() <= CLOSE) value = value * 3 / 2;
+					name = Component.translatable("scene.noclip_backrooms." + id);
+				} else {
+					id = "scene";
+					value = 5;
+					name = Component.translatable("item.noclip_backrooms.evidence_photo.scene");
+				}
+			}
 			boolean target = id.equals(target(server.getServer()));
 			if (target) value *= 3;
 			String where = Floors.key(level);
@@ -137,7 +186,6 @@ public final class Evidence {
 			tag.putInt("value", value);
 			ItemStack photo = new ItemStack(FieldKit.PHOTO);
 			photo.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
-			Component name = subject == null ? Component.translatable("item.noclip_backrooms.evidence_photo.scene") : subject.getType().getDescription();
 			photo.set(DataComponents.CUSTOM_NAME, Component.translatable("item.noclip_backrooms.evidence_photo.of", name,
 					where == null ? "?" : where, value).withStyle(style -> style.withItalic(false)));
 			if (!player.getInventory().add(photo)) player.drop(photo, false);
@@ -147,6 +195,89 @@ public final class Evidence {
 			serverPlayer.sendOverlayMessage(Component.translatable(target ? "message.noclip_backrooms.field.photo_target" : "message.noclip_backrooms.field.photo",
 					name, value).withStyle(target ? ChatFormatting.GOLD : ChatFormatting.WHITE));
 			return InteractionResult.SUCCESS;
+		}
+
+		/** Detects notable Backrooms scenes in frame when no creature is the primary subject. */
+		private static SceneShot detectScene(ServerLevel level, ServerPlayer player) {
+			if (!Home.inBackrooms(level.dimension())) return null;
+			// 1. Live blackout moment in Level 1 or Level 0.1
+			if ((level.dimension() == Level1.LEVEL_1 && Blackouts.isBlackout())
+					|| (level.dimension() == Level0p1.LEVEL_0_1 && ZenithBlackouts.isBlackout())) {
+				return new SceneShot("blackout_moment", 85, 4.0);
+			}
+			Vec3 eye = player.getEyePosition();
+			Vec3 look = player.getLookAngle();
+			double minDot = Math.cos(Math.toRadians(28));
+			BlockPos origin = player.blockPosition();
+			int r = (int) CAMERA_RANGE;
+
+			SceneShot best = null;
+			int bestScore = 0;
+			int redBlocksSeen = 0;
+			double closestRedDist = CAMERA_RANGE;
+			boolean brokenLightInDark = false;
+			double closestDarkDist = CAMERA_RANGE;
+
+			for (BlockPos pos : BlockPos.betweenClosed(origin.offset(-r, -5, -r), origin.offset(r, 6, r))) {
+				BlockState state = level.getBlockState(pos);
+				if (state.isAir()) continue;
+				var key = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+				if (!BackroomsMod.MOD_ID.equals(key.getNamespace())) continue;
+				String path = key.getPath();
+
+				boolean isRedCluster = path.equals("red_anomaly_cluster");
+				boolean isRedBlock = RED_ALTAR_BLOCKS.contains(path);
+				boolean isVault = VAULT_BLOCKS.contains(path);
+				boolean isHazard = HAZARD_BLOCKS.contains(path);
+				boolean isDeadFixture = path.contains("broken_") || path.contains("flickering_") || path.contains("dead_");
+				if (!isRedCluster && !isRedBlock && !isVault && !isHazard && !isDeadFixture) continue;
+
+				Vec3 center = Vec3.atCenterOf(pos);
+				Vec3 to = center.subtract(eye);
+				double dist = to.length();
+				if (dist < 0.8 || dist > CAMERA_RANGE) continue;
+				if (to.normalize().dot(look) < minDot) continue;
+				if (!hasBlockSight(level, eye, center, pos, player)) continue;
+
+				if (isRedCluster) {
+					int score = 110;
+					if (score > bestScore || (score == bestScore && best != null && dist < best.distance())) {
+						bestScore = score;
+						best = new SceneShot("red_room_altar", 110, dist);
+					}
+				} else if (isRedBlock) {
+					redBlocksSeen++;
+					closestRedDist = Math.min(closestRedDist, dist);
+				} else if (isVault) {
+					int score = 75;
+					if (score > bestScore || (score == bestScore && best != null && dist < best.distance())) {
+						bestScore = score;
+						best = new SceneShot("anomaly_vault", 75, dist);
+					}
+				} else if (isHazard) {
+					int score = 65;
+					if (score > bestScore || (score == bestScore && best != null && dist < best.distance())) {
+						bestScore = score;
+						best = new SceneShot("electrical_hazard", 65, dist);
+					}
+				} else if (isDeadFixture && level.getMaxLocalRawBrightness(origin) <= 5
+						&& Anomalies.current(level.getServer()) == Anomalies.Affix.STATIC) {
+					brokenLightInDark = true;
+					closestDarkDist = Math.min(closestDarkDist, dist);
+				}
+			}
+			if (best == null && redBlocksSeen >= 3) {
+				best = new SceneShot("red_room_altar", 110, closestRedDist);
+			}
+			if (best == null && brokenLightInDark) {
+				best = new SceneShot("blackout_moment", 85, closestDarkDist);
+			}
+			return best;
+		}
+
+		private static boolean hasBlockSight(ServerLevel level, Vec3 eye, Vec3 targetCenter, BlockPos targetPos, ServerPlayer player) {
+			var hit = level.clip(new ClipContext(eye, targetCenter, ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, player));
+			return hit.getType() == HitResult.Type.MISS || hit.getBlockPos().equals(targetPos);
 		}
 
 		/** The nearest living thing (not a player) near the middle of the frame, in plain sight. */

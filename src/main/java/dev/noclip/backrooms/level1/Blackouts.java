@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * Lights are switched where they are: within reach of each player, on a grid the floor plan fixes.
  * The same sweep keeps newly loaded chunks in step with the current state.
  */
-final class Blackouts {
+public final class Blackouts {
 	private static final int FIRST_DELAY = 90 * 20, DELAY = 3 * 60 * 20, DELAY_SPREAD = 3 * 60 * 20;
 	private static final int DARK = 15 * 20, DARK_SPREAD = 30 * 20;
 	private static final int WARNING = 60, RESTORING = 30;
@@ -47,14 +47,19 @@ final class Blackouts {
 		return phase;
 	}
 
+	/** Whether Level 1 is currently flickering, dark, or restoring from a blackout. */
+	public static boolean isBlackout() {
+		return phase != Phase.NORMAL;
+	}
+
 	/** Starts the warning now, for tests and debugging. */
-	static void startNow() {
+	public static void startNow() {
 		phase = Phase.WARNING;
 		timer = WARNING;
 	}
 
 	/** Ends a blackout now, for tests and debugging. */
-	static void endNow() {
+	public static void endNow() {
 		phase = Phase.RESTORING;
 		timer = 1;
 	}

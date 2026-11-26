@@ -2,10 +2,12 @@ package dev.noclip.backrooms.field;
 
 import dev.noclip.backrooms.core.Home;
 import dev.noclip.backrooms.core.LevelExits;
+import dev.noclip.backrooms.core.ending.Endings;
 import dev.noclip.backrooms.core.field.Evidence;
 import dev.noclip.backrooms.core.field.FieldKit;
 import dev.noclip.backrooms.core.locker.Lockers;
 import dev.noclip.backrooms.core.locker.Processing;
+import dev.noclip.backrooms.core.locker.Research;
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.people.Person;
 import dev.noclip.backrooms.core.quota.Quota;
@@ -17,10 +19,17 @@ import dev.noclip.backrooms.core.trip.AnomalyClient;
 import dev.noclip.backrooms.core.trip.MissionReportScreen;
 import dev.noclip.backrooms.core.trip.Report;
 import dev.noclip.backrooms.core.trip.Trips;
+import dev.noclip.backrooms.crafting.BackroomsCrafting;
+import dev.noclip.backrooms.crafting.BackroomsRecipeRegistry;
+import dev.noclip.backrooms.crafting.BackroomsStationMenu;
+import dev.noclip.backrooms.crafting.StationType;
 import dev.noclip.backrooms.items.BackroomsItems;
 import dev.noclip.backrooms.level0.Level0;
+import dev.noclip.backrooms.level1.Blackouts;
 import dev.noclip.backrooms.monsters.Monsters;
 import dev.noclip.backrooms.monsters.hound.Hound;
+import dev.noclip.backrooms.monsters.skinstealer.SkinStealer;
+import dev.noclip.backrooms.props.BackroomsProps;
 import java.util.List;
 import java.util.Map;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
@@ -35,11 +44,13 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.storage.LevelData;
@@ -265,13 +276,106 @@ public final class FieldClientTest implements FabricClientGameTest {
 			// Armour and the like take the same share of both, so compare the two: 55% against 90%.
 			check(light > 0 && Math.abs(heavy / light - 0.55F / 0.9F) < 0.03F, "balance: a tier 4 blade did " + heavy + " and a pipe " + light + " of 10");
 
-			// The institute's machines: load the recycler, take a trip two floors deep, and it has worked.
+			// The institute's machines: load the recycler + research terminal (yellow/gray/purple packs), take a trip two
+			// floors deep, verify dynamic Red Mist enclave + Red Room Altar photo + Mimic Figure Bio-Scanner expose + Level 1
+			// Blackout Moment photo + Research unlock + Dual Endings (A & B).
+			// 1. Dynamic Red Mist room infestation & Red Room Altar scene photo
+			server.runCommand("execute as @a run backrooms anomaly set red_mist");
+			BlockPos enclaveSpot = stand(server);
+			BlockPos altarAt = server.computeOnServer(s -> Anomalies.infestRedRoomAt(level(s), enclaveSpot.north(3)));
+			check(altarAt != null, "red mist failed to condense a Red Room enclave");
+			check(server.computeOnServer(s -> level(s).getBlockState(altarAt).is(BackroomsProps.RED_ANOMALY_CLUSTER)), "no red anomaly cluster in red mist enclave");
+			server.runCommand("execute as @a at @s run tp @s ~ ~ ~ 180 12");
+			context.waitTicks(5);
+			server.runCommand("clear @a");
 			server.runOnServer(s -> {
 				ServerPlayer p = player(s);
-				p.setAttached(Processing.LOADED, Map.of("scrap_recycler", List.of(new ItemStack(item("noclip_backrooms:scrap_metal"), 12))));
+				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FieldKit.CAMERA));
+				p.gameMode.useItem(p, p.level(), p.getMainHandItem(), InteractionHand.MAIN_HAND);
+			});
+			long altarPhoto = server.computeOnServer(s -> {
+				var inv = player(s).getInventory();
+				for (int i = 0; i < inv.getContainerSize(); i++) {
+					if (inv.getItem(i).is(FieldKit.PHOTO)) return Evidence.value(s, inv.getItem(i));
+				}
+				return -1L;
+			});
+			check(altarPhoto >= 110, "red room altar scene photo was worth only " + altarPhoto);
+			context.takeScreenshot("field_red_mist_enclave");
+
+			// 2. Disguised human-figure Skin-Stealer + Bio-Anomaly Scanner expose
+			server.runCommand("execute as @a run backrooms anomaly set mimics");
+			server.runCommand("kill @e[type=!player]");
+			BlockPos figAt = enclaveSpot.south(5);
+			server.runOnServer(s -> {
+				ServerLevel sl = level(s);
+				sl.setBlockAndUpdate(figAt, Blocks.AIR.defaultBlockState());
+				sl.setBlockAndUpdate(figAt.above(), Blocks.AIR.defaultBlockState());
+				sl.setBlockAndUpdate(figAt.below(), Blocks.STONE.defaultBlockState());
+				Person fig = Anomalies.spawnMimicFigure(sl, figAt);
+				check(fig != null && fig.entityTags().contains(Anomalies.MIMIC_FIGURE_TAG), "failed to spawn mimic figure");
+			});
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FieldKit.BIO_SCANNER));
+				p.gameMode.useItem(p, p.level(), p.getMainHandItem(), InteractionHand.MAIN_HAND);
+			});
+			check(server.computeOnServer(s -> level(s).getEntitiesOfClass(Person.class, new AABB(figAt).inflate(4),
+					p -> p.entityTags().contains(Anomalies.MIMIC_FIGURE_TAG)).isEmpty()), "bio-scanner did not remove mimic figure");
+			check(server.computeOnServer(s -> !level(s).getEntitiesOfClass(SkinStealer.class, new AABB(figAt).inflate(6),
+					st -> st.hasEffect(MobEffects.GLOWING) && st.hasEffect(MobEffects.SLOWNESS)).isEmpty()), "bio-scanner did not expose & stun Skin-Stealer");
+			server.runCommand("kill @e[type=!player]");
+
+			// 3. Research pack locking before unlock: 9x9 wretch_cure cannot craft yet in survival
+			server.runOnServer(s -> {
+				Research.reset(s);
+				ServerPlayer p = player(s);
+				var cureRecipe = BackroomsRecipeRegistry.byId(Identifier.parse("noclip_backrooms:ultimate_wretch_cure"));
+				check(cureRecipe != null && !Research.canCraft(p, cureRecipe), "wretch_cure should be locked before Purple research");
+				var menu = new BackroomsStationMenu(BackroomsCrafting.menuType(StationType.ULTIMATE_SPIDERWEB), 0, p.getInventory(), StationType.ULTIMATE_SPIDERWEB);
+				int gw = StationType.ULTIMATE_SPIDERWEB.gridWidth();
+				for (int y = 0; y < cureRecipe.patternHeight(); y++) {
+					for (int x = 0; x < cureRecipe.patternWidth(); x++) {
+						var cell = cureRecipe.cellAt(x, y);
+						if (cell != null) menu.inputGrid().setItem((cureRecipe.centeredOffsetY() + y) * gw + cureRecipe.centeredOffsetX() + x,
+								new ItemStack(cell.resolveItem(), cell.count()));
+					}
+				}
+				check(menu.getSlot(menu.outputSlotStart()).getItem().isEmpty(), "locked 9x9 cure recipe still produced an output");
+			});
+
+			// 4. Load recycler + research terminal (yellow, gray, purple packs), travel to Level 1, snap a Blackout Moment photo, then extract!
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				p.setAttached(Processing.LOADED, Map.of(
+						"scrap_recycler", List.of(new ItemStack(item("noclip_backrooms:scrap_metal"), 12)),
+						"anomaly_research_terminal", List.of(
+								new ItemStack(BackroomsItems.SCIENCE_PACK_YELLOW, 1),
+								new ItemStack(BackroomsItems.SCIENCE_PACK_GRAY, 1),
+								new ItemStack(BackroomsItems.SCIENCE_PACK_PURPLE, 1))));
 				LevelExits.use(p, "1");
 			});
 			server.waitFor(s -> player(s).level().dimension() != Level0.LEVEL_0, 400);
+			// Wait past the camera's 40-tick cooldown from the red room altar shot, then snap a Level 1 Blackout Moment photo
+			context.waitTicks(45);
+			server.runCommand("kill @e[type=!player]");
+			server.runCommand("clear @a");
+			server.runOnServer(s -> {
+				Blackouts.startNow();
+				ServerPlayer p = player(s);
+				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FieldKit.CAMERA));
+				p.gameMode.useItem(p, p.level(), p.getMainHandItem(), InteractionHand.MAIN_HAND);
+				Blackouts.endNow();
+			});
+			long blackoutPhoto = server.computeOnServer(s -> {
+				var inv = player(s).getInventory();
+				for (int i = 0; i < inv.getContainerSize(); i++) {
+					if (inv.getItem(i).is(FieldKit.PHOTO)) return Evidence.value(s, inv.getItem(i));
+				}
+				return -1L;
+			});
+			check(blackoutPhoto >= 85, "Level 1 blackout moment photo was worth only " + blackoutPhoto);
+
 			server.runOnServer(s -> Trips.settle(player(s), LevelData.RespawnData.of(player(s).level().dimension(), player(s).blockPosition(), 0, 0)));
 			check(server.computeOnServer(s -> Trips.extract(player(s))), "no pickup");
 			server.runCommand("execute as @a run backrooms extract now");
@@ -279,9 +383,60 @@ public final class FieldClientTest implements FabricClientGameTest {
 			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
 			context.takeScreenshot("field_report_with_processing");
 			context.runOnClient(client -> client.gui.screen().onClose());
-			check(server.computeOnServer(s -> Report.last(player(s)).notes().size()) >= 1, "the report has no word of the recycler");
+			check(server.computeOnServer(s -> Report.last(player(s)).notes().size()) >= 2, "the report has no word of recycler & research unlocks");
 			check(server.computeOnServer(s -> Lockers.count(player(s), Items.IRON_INGOT)) >= 4, "the recycler made no iron");
 			check(server.computeOnServer(s -> Lockers.count(player(s), item("noclip_backrooms:battery_cell"))) >= 1, "two floors deep gave no battery");
+			check(server.computeOnServer(s -> Research.isUnlocked(s, Research.Tier.YELLOW)
+					&& Research.isUnlocked(s, Research.Tier.GRAY)
+					&& Research.isUnlocked(s, Research.Tier.PURPLE)), "research terminal did not unlock yellow/gray/purple tiers");
+
+			// 5. Unlocked 9x9 wretch_cure now crafts cleanly; Ending A (Cure & Contract Release) + Ending B (B2 Truth & True Escape)
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				var cureRecipe = BackroomsRecipeRegistry.byId(Identifier.parse("noclip_backrooms:ultimate_wretch_cure"));
+				check(Research.canCraft(p, cureRecipe), "wretch_cure should be unlocked after Purple research");
+				var menu = new BackroomsStationMenu(BackroomsCrafting.menuType(StationType.ULTIMATE_SPIDERWEB), 0, p.getInventory(), StationType.ULTIMATE_SPIDERWEB);
+				int gw = StationType.ULTIMATE_SPIDERWEB.gridWidth();
+				for (int y = 0; y < cureRecipe.patternHeight(); y++) {
+					for (int x = 0; x < cureRecipe.patternWidth(); x++) {
+						var cell = cureRecipe.cellAt(x, y);
+						if (cell != null) menu.inputGrid().setItem((cureRecipe.centeredOffsetY() + y) * gw + cureRecipe.centeredOffsetX() + x,
+								new ItemStack(cell.resolveItem(), cell.count()));
+					}
+				}
+				check(menu.getSlot(menu.outputSlotStart()).getItem().is(BackroomsItems.WRETCH_CURE), "unlocked 9x9 wretch_cure did not appear in result slot");
+
+				// Drink Wretch Cure -> cured + full 20 max HP restored!
+				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(BackroomsItems.WRETCH_CURE));
+				p.gameMode.useItem(p, p.level(), p.getMainHandItem(), InteractionHand.MAIN_HAND);
+				check(Endings.isCured(p), "Wretch Cure did not mark player cured");
+				check(p.getMaxHealth() >= 20.0F, "Wretch Cure did not restore full 20 HP: " + p.getMaxHealth());
+
+				// Ending A: grant clearance 5 & call contract release -> real Overworld
+				while (Quota.clearance(s) < Quota.DEEP_CLEARANCE) {
+					Quota.data(s).items().forEach((id, need) -> Quota.data(s).handed().put(id, need));
+					Quota.addPoints(p, Quota.data(s).required() + Quota.data(s).debt() + 100);
+				}
+				check(Endings.tryContractEnding(p, false), "Ending A contract release failed");
+			});
+			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
+			check(server.computeOnServer(s -> Endings.isFree(player(s)) && Endings.ENDING_CONTRACT.equals(Endings.of(player(s)).ending())),
+					"Ending A did not grant freedom in Overworld");
+
+			// Ending B: reset ending, collect all 6 B2 archive files, override B1 transport pad with T3 hacker -> real Overworld
+			server.runCommand("execute as @a run backrooms ending reset");
+			server.runOnServer(s -> dev.noclip.backrooms.frontrooms.Institute.receive(player(s)));
+			server.waitFor(s -> player(s).level().dimension() == Home.FRONTROOMS, 200);
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				for (int page = 0; page < Endings.TOTAL_ARCHIVE_FILES; page++) Endings.recordFile(p, page);
+				check(Endings.truthKnown(p), "reading all 6 archive files did not unlock truth");
+				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(BackroomsItems.KEYPAD_HACKER_T3));
+				check(Endings.tryTrueEscape(p, true), "Ending B transport pad override failed");
+			});
+			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
+			check(server.computeOnServer(s -> Endings.isFree(player(s)) && Endings.ENDING_TRUE_ESCAPE.equals(Endings.of(player(s)).ending())),
+					"Ending B did not complete True Escape into Overworld");
 		}
 	}
 

@@ -153,7 +153,9 @@ public final class Quota {
 	static List<ServerPlayer> home(MinecraftServer server) {
 		List<ServerPlayer> home = new ArrayList<>();
 		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-			if (Home.isHome(player.level().dimension()) && Home.entered(player) && player.isAlive() && !player.isSpectator()) home.add(player);
+			if (Home.isHome(player.level().dimension()) && Home.entered(player)
+					&& !dev.noclip.backrooms.core.ending.Endings.isFree(player)
+					&& player.isAlive() && !player.isSpectator()) home.add(player);
 		}
 		return home;
 	}
@@ -437,13 +439,19 @@ public final class Quota {
 				: Component.translatable("message.noclip_backrooms.quota.clearance", d.paid, next,
 						Component.translatable("institute.noclip_backrooms.wing." + next)).withStyle(ChatFormatting.AQUA));
 		player.sendSystemMessage(Component.translatable("message.noclip_backrooms.quota.photo_target",
-				Component.translatable("entity.noclip_backrooms." + dev.noclip.backrooms.core.field.Evidence.target(player.level().getServer())))
+				dev.noclip.backrooms.core.field.Evidence.targetName(player.level().getServer()))
 				.withStyle(ChatFormatting.GOLD));
 		// From B1's clearance on, M.E.G.'s instruments say what the next trip will be like.
 		if (d.paid >= DEEP_CLEARANCE) {
 			var forecast = dev.noclip.backrooms.core.trip.Anomalies.next(player.level().getServer());
 			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.anomaly.forecast", forecast.title(),
 					Component.translatable("anomaly.noclip_backrooms." + forecast.id() + ".desc")).withStyle(ChatFormatting.LIGHT_PURPLE));
+		}
+		if (dev.noclip.backrooms.core.ending.Endings.isCured(player) && !dev.noclip.backrooms.core.ending.Endings.isFree(player)) {
+			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.ending.contract_offer").withStyle(ChatFormatting.GREEN)
+					.append(" ").append(button("message.noclip_backrooms.ending.contract_button", "/meg ending contract", ChatFormatting.GOLD)));
+		} else if (dev.noclip.backrooms.core.ending.Endings.truthKnown(player) && !dev.noclip.backrooms.core.ending.Endings.isFree(player)) {
+			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.ending.truth_hint").withStyle(ChatFormatting.DARK_PURPLE));
 		}
 		deployOptions(player);
 	}

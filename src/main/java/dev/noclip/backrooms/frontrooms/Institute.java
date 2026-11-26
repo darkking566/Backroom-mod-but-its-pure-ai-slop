@@ -73,7 +73,9 @@ public final class Institute {
 		// Someone touched by the Backrooms does not stay in the Overworld (older worlds, from before the institute).
 		net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
 			ServerPlayer player = handler.player;
-			if (player.level().dimension() != Level.OVERWORLD || !Home.entered(player) || player.isCreative() || player.isSpectator()) return;
+			if (player.level().dimension() != Level.OVERWORLD || !Home.entered(player)
+					|| dev.noclip.backrooms.core.ending.Endings.isFree(player)
+					|| player.isCreative() || player.isSpectator()) return;
 			server.schedule(new TickTask(server.getTickCount(), () -> {
 				if (player.hasDisconnected() || player.level().dimension() != Level.OVERWORLD) return;
 				player.sendSystemMessage(Component.translatable("message.noclip_backrooms.institute.taken").withStyle(ChatFormatting.DARK_AQUA));

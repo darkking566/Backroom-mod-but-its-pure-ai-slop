@@ -166,8 +166,10 @@ public final class PlayerRpg {
 		updateModifier(player, Attributes.MOVEMENT_SPEED, MOD_AGI_MOVE, stats.moveSpeedBonus(), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 		updateModifier(player, Attributes.ATTACK_SPEED, MOD_AGI_ATK, stats.attackSpeedBonus(), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 		updateModifier(player, Attributes.MAX_HEALTH, MOD_VIT_HP, stats.maxHealthBonus(), AttributeModifier.Operation.ADD_VALUE);
-		// Only once they have been in the Backrooms: until then the Overworld is played as it is.
-		updateModifier(player, Attributes.MAX_HEALTH, MOD_BACKROOMS_HP, dev.noclip.backrooms.core.Home.entered(player) ? FRAILTY : 0.0,
+		// Only once they have been in the Backrooms (and until permanently cured by the Wretch Cure).
+		boolean frail = dev.noclip.backrooms.core.Home.entered(player)
+				&& !dev.noclip.backrooms.core.ending.Endings.isCured(player);
+		updateModifier(player, Attributes.MAX_HEALTH, MOD_BACKROOMS_HP, frail ? FRAILTY : 0.0,
 				AttributeModifier.Operation.ADD_VALUE);
 		updateModifier(player, Attributes.ARMOR_TOUGHNESS, MOD_VIT_TOUGH, 0.0, AttributeModifier.Operation.ADD_VALUE);
 		if (player.getHealth() > player.getMaxHealth()) {

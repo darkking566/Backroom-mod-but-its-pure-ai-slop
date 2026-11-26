@@ -79,6 +79,7 @@ public final class Trips {
 		// Dying outside the Backrooms once they have been in: M.E.G. collects what they carried.
 		ServerLivingEntityEvents.ALLOW_DEATH.register((entity, source, amount) -> {
 			if (entity instanceof ServerPlayer player && Home.isHome(player.level().dimension()) && Home.entered(player)
+					&& !(dev.noclip.backrooms.core.ending.Endings.isFree(player) && player.level().dimension() == Level.OVERWORLD)
 					&& !((ServerLevel) player.level()).getGameRules().get(GameRules.KEEP_INVENTORY)) {
 				int taken = Lockers.collect(player);
 				if (taken > 0) player.sendSystemMessage(Component.translatable("message.noclip_backrooms.trip.relics", taken).withStyle(ChatFormatting.GRAY));
@@ -94,7 +95,7 @@ public final class Trips {
 				player.sendSystemMessage(Component.translatable("message.noclip_backrooms.trip.lost").withStyle(ChatFormatting.GRAY));
 				MinecraftServer server = player.level().getServer();
 				server.schedule(new TickTask(server.getTickCount(), () -> backToEntry(player)));
-			} else if (Home.entered(old)) {
+			} else if (Home.entered(old) && !(dev.noclip.backrooms.core.ending.Endings.isFree(old) && old.level().dimension() == Level.OVERWORLD)) {
 				player.sendSystemMessage(Component.translatable("message.noclip_backrooms.trip.fell_back").withStyle(ChatFormatting.DARK_RED));
 				LevelExits.fallInto(player, "0");
 			}

@@ -10355,7 +10355,7 @@
     {
       "id": "noclip_backrooms:distill_reality_stabilizer_t1",
       "station": "almond_distiller",
-      "category": "gear",
+      "category": "parts",
       "xp": 10,
       "pattern": [
         "B B",
@@ -10390,7 +10390,7 @@
     {
       "id": "noclip_backrooms:distill_reality_serum_t2",
       "station": "almond_distiller",
-      "category": "gear",
+      "category": "parts",
       "xp": 18,
       "pattern": [
         " B ",
@@ -10473,6 +10473,63 @@
       "outputs": [
         {
           "item": "noclip_backrooms:reality_anchor_core",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "id": "noclip_backrooms:ultimate_wretch_cure",
+      "station": "ultimate_spiderweb_crafting_table",
+      "category": "gear",
+      "xp": 80,
+      "pattern": [
+        "O R M R O",
+        " W  D  W ",
+        "  D C D  ",
+        "  CB BC  ",
+        "MD BKB DM",
+        "  CB BC  ",
+        "  D C D  ",
+        " W  D  W ",
+        "O R M R O"
+      ],
+      "key": {
+        "K": {
+          "item": "noclip_backrooms:reality_anchor_core",
+          "count": 1
+        },
+        "B": {
+          "item": "noclip_backrooms:reality_serum_t2",
+          "count": 1
+        },
+        "C": {
+          "item": "noclip_backrooms:aged_almond_reserve",
+          "count": 1
+        },
+        "D": {
+          "item": "noclip_backrooms:science_pack_purple",
+          "count": 1
+        },
+        "W": {
+          "item": "minecraft:amethyst_shard",
+          "count": 1
+        },
+        "M": {
+          "item": "minecraft:ender_pearl",
+          "count": 1
+        },
+        "O": {
+          "item": "minecraft:obsidian",
+          "count": 1
+        },
+        "R": {
+          "item": "noclip_backrooms:reality_fragment",
+          "count": 1
+        }
+      },
+      "outputs": [
+        {
+          "item": "noclip_backrooms:wretch_cure",
           "count": 1
         }
       ]

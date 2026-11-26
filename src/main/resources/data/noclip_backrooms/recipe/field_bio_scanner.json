@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "SGS",
+    "RCR",
+    "SBS"
+  ],
+  "key": {
+    "S": "noclip_backrooms:sheet_metal",
+    "G": "minecraft:glass",
+    "R": "minecraft:redstone",
+    "C": "noclip_backrooms:green_circuit",
+    "B": "noclip_backrooms:battery_cell"
+  },
+  "result": {
+    "id": "noclip_backrooms:bio_scanner",
+    "count": 1
+  }
+}

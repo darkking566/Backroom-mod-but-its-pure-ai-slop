@@ -1,7 +1,10 @@
 package dev.noclip.backrooms.crafting;
 
+import dev.noclip.backrooms.core.locker.Research;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
 import java.util.List;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -33,6 +36,7 @@ public final class BackroomsStationMenu extends AbstractContainerMenu {
 	private final StationType stationType;
 	private final ContainerLevelAccess access;
 	private final Block stationBlock;
+	private final Player owner;
 	private final SimpleContainer inputGrid;
 	private final ResultContainer resultSlots;
 	private StationRecipe.Match activeMatch;
@@ -48,6 +52,7 @@ public final class BackroomsStationMenu extends AbstractContainerMenu {
 		this.stationType = stationType;
 		this.access = access;
 		this.stationBlock = stationBlock;
+		this.owner = playerInv.player;
 
 		int inCount = stationType.inputSlotCount();
 		int outCount = stationType.outputSlotCount();
@@ -131,6 +136,9 @@ public final class BackroomsStationMenu extends AbstractContainerMenu {
 		updatingResult = true;
 		try {
 			activeMatch = BackroomsRecipeRegistry.findMatch(stationType, inputGrid);
+			if (activeMatch != null && !Research.canCraft(owner, activeMatch.recipe())) {
+				activeMatch = null;
+			}
 			int outCount = stationType.outputSlotCount();
 			for (int i = 0; i < outCount; i++) {
 				resultSlots.setItem(i, ItemStack.EMPTY);
@@ -205,6 +213,14 @@ public final class BackroomsStationMenu extends AbstractContainerMenu {
 	 */
 	public boolean fillRecipeFromPlayer(ServerPlayer player, StationRecipe recipe, boolean fillMax) {
 		if (recipe == null || recipe.station() != stationType) return false;
+		if (!Research.canCraft(player, recipe)) {
+			Research.Tier req = Research.requiredTier(recipe);
+			if (req != null) {
+				player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.research.locked", req.packName())
+						.withStyle(ChatFormatting.RED));
+			}
+			return false;
+		}
 		clearGridToPlayer(player);
 
 		int ox = recipe.centeredOffsetX();

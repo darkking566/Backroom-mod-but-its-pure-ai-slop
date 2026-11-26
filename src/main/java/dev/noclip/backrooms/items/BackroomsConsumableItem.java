@@ -51,6 +51,7 @@ public final class BackroomsConsumableItem extends Item {
 		REALITY_STABILIZER_T1,
 		REALITY_SERUM_T2,
 		REALITY_ANCHOR_CORE,
+		WRETCH_CURE,
 		MOLOTOV_COCKTAIL,
 		TACTICAL_CORNER_MIRROR,
 		HOMEWARD_ANCHOR,
@@ -278,6 +279,15 @@ public final class BackroomsConsumableItem extends Item {
 				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEACON_POWER_SELECT, SoundSource.PLAYERS, 0.9F, 1.1F);
 				if (!player.isCreative()) stack.shrink(1);
 				player.getCooldowns().addCooldown(stack, 80);
+			}
+			case WRETCH_CURE -> {
+				if (player instanceof ServerPlayer sp) {
+					dev.noclip.backrooms.core.ending.Endings.cure(sp);
+				}
+				server.sendParticles(ParticleTypes.END_ROD, player.getX(), player.getY() + 1.2, player.getZ(), 64, 1.2, 1.2, 1.2, 0.12);
+				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.UI_TOAST_CHALLENGE_COMPLETE, SoundSource.PLAYERS, 0.9F, 1.15F);
+				if (!player.isCreative()) stack.shrink(1);
+				player.getCooldowns().addCooldown(stack, 100);
 			}
 			case MOLOTOV_COCKTAIL -> {
 				Vec3 impact = player.getEyePosition().add(player.getLookAngle().scale(6.0));
