@@ -305,7 +305,8 @@ public final class BackroomsStationMenu extends AbstractContainerMenu {
 
 		if (index >= outStart && index < invStart) {
 			// Shift-clicking a crafted result slot: move crafted stack into player inventory & consume inputs!
-			if (!moveItemStackTo(slotStack, invStart, invEnd, true)) {
+			// Only when all of it fits: the ingredients are used up whole, and a part left in the slot would be lost.
+			if (!fits(slotStack, invStart, invEnd) || !moveItemStackTo(slotStack, invStart, invEnd, true)) {
 				return ItemStack.EMPTY;
 			}
 			slot.onTake(player, copy);
@@ -337,6 +338,18 @@ public final class BackroomsStationMenu extends AbstractContainerMenu {
 		}
 		slot.onTake(player, slotStack);
 		return copy;
+	}
+
+	/** Whether the whole stack fits into these slots. */
+	private boolean fits(ItemStack stack, int from, int to) {
+		int room = 0;
+		for (int i = from; i < to && room < stack.getCount(); i++) {
+			Slot slot = slots.get(i);
+			ItemStack there = slot.getItem();
+			if (there.isEmpty()) room += slot.getMaxStackSize(stack);
+			else if (ItemStack.isSameItemSameComponents(there, stack)) room += Math.max(0, slot.getMaxStackSize(stack) - there.getCount());
+		}
+		return room >= stack.getCount();
 	}
 
 	@Override

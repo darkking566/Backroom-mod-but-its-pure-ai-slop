@@ -110,6 +110,12 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			BlockPos base = server.computeOnServer(s -> player(s).blockPosition());
 			server.runOnServer(s -> Trips.settle(player(s), LevelData.RespawnData.of(Level0.LEVEL_0, base, 0, 0)));
 			check(server.computeOnServer(s -> Trips.settled(player(s))), "settling did not take");
+			// Going from cot to cot on the same level earns nothing more.
+			long settledXp = server.computeOnServer(s -> (long) PlayerRpg.get(player(s)).level() * 100000 + PlayerRpg.get(player(s)).xp());
+			server.runOnServer(s -> Trips.settle(player(s), LevelData.RespawnData.of(Level0.LEVEL_0, base.east(30), 0, 0)));
+			server.runOnServer(s -> Trips.settle(player(s), LevelData.RespawnData.of(Level0.LEVEL_0, base, 0, 0)));
+			check(server.computeOnServer(s -> (long) PlayerRpg.get(player(s)).level() * 100000 + PlayerRpg.get(player(s)).xp()) == settledXp,
+					"moving between cots on one level gave experience again");
 			server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + (base.getX() + 40) + " " + STAND_Y + " " + base.getZ());
 			die(context, server);
 			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0 && player(s).blockPosition().closerThan(base, 3), 200);
@@ -232,6 +238,35 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			check(server.computeOnServer(s -> Quota.data(s).delivered()) == deliveredBefore + Math.min(reward, room),
 					"the contract did not count toward the quota");
 			check(server.computeOnServer(s -> !player(s).hasAttached(Contracts.ACTIVE)), "a finished contract is still in hand");
+
+			// 9. A crafting station: shift-clicking the result into a full inventory takes nothing and uses nothing up.
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				// A recipe that makes several of one thing, and room in the inventory for only one of them.
+				var recipe = dev.noclip.backrooms.crafting.BackroomsRecipeRegistry.all().stream()
+						.filter(r -> r.allOutputStacks().size() == 1 && r.allOutputStacks().getFirst().getCount() >= 2).findFirst().orElseThrow();
+				var type = recipe.station();
+				var menu = new dev.noclip.backrooms.crafting.BackroomsStationMenu(dev.noclip.backrooms.crafting.BackroomsCrafting.menuType(type), 0, p.getInventory(), type);
+				ItemStack made = recipe.allOutputStacks().getFirst();
+				for (int i = 1; i < 36; i++) p.getInventory().setItem(i, new ItemStack(Items.BEDROCK, 64));
+				p.getInventory().setItem(0, made.copyWithCount(made.getMaxStackSize() - 1));
+				int gw = type.gridWidth();
+				for (int y = 0; y < recipe.patternHeight(); y++) {
+					for (int x = 0; x < recipe.patternWidth(); x++) {
+						var cell = recipe.cellAt(x, y);
+						if (cell != null) menu.inputGrid().setItem((recipe.centeredOffsetY() + y) * gw + recipe.centeredOffsetX() + x, new ItemStack(cell.resolveItem(), cell.count()));
+					}
+				}
+				check(!menu.getSlot(menu.outputSlotStart()).getItem().isEmpty(), "the recipe did not show a result");
+				int gridBefore = 0;
+				for (int i = 0; i < menu.inputSlotCount(); i++) gridBefore += menu.inputGrid().getItem(i).getCount();
+				check(menu.quickMoveStack(p, menu.outputSlotStart()).isEmpty(), "a result was moved into a full inventory");
+				int gridAfter = 0;
+				for (int i = 0; i < menu.inputSlotCount(); i++) gridAfter += menu.inputGrid().getItem(i).getCount();
+				check(gridAfter == gridBefore, "the ingredients were used up with nowhere to put the result");
+				for (int i = 0; i < menu.inputSlotCount(); i++) menu.inputGrid().setItem(i, ItemStack.EMPTY);
+				p.getInventory().clearContent();
+			});
 		}
 	}
 

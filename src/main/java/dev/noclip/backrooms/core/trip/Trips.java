@@ -7,14 +7,10 @@ import dev.noclip.backrooms.core.LevelExits;
 import dev.noclip.backrooms.core.floors.FloorRun;
 import dev.noclip.backrooms.core.floors.Floors;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
@@ -52,7 +48,6 @@ public final class Trips {
 	static final int SETTLE_XP = 50;
 	/** Walking out alive: this much, and this much more for every floor of the trip. */
 	static final int ESCAPE_XP = 30, ESCAPE_XP_PER_FLOOR = 20;
-	private static final Set<UUID> LOST = new HashSet<>();
 
 	public record Home(Optional<ServerPlayer.RespawnConfig> respawn) {
 		static final Codec<Home> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -63,13 +58,9 @@ public final class Trips {
 	}
 
 	public static void register() {
-		ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
-			if (entity instanceof ServerPlayer player && inBackrooms(player.level().dimension()) && !settled(player)) {
-				LOST.add(player.getUUID());
-			}
-		});
+		// Asked of the body left behind, which stays where it died even across a reload of the world.
 		ServerPlayerEvents.AFTER_RESPAWN.register((old, player, alive) -> {
-			if (alive || !LOST.remove(player.getUUID())) return;
+			if (alive || !inBackrooms(old.level().dimension()) || settled(old)) return;
 			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.trip.lost").withStyle(ChatFormatting.GRAY));
 			LevelExits.fallInto(player, "0");
 		});
@@ -95,8 +86,8 @@ public final class Trips {
 		if (!player.hasAttached(HOME)) {
 			player.setAttached(HOME, new Home(Optional.ofNullable(before).filter(c -> !inBackrooms(c.respawnData().dimension()))));
 		}
-		boolean elsewhere = before == null || before.respawnData().dimension() != spot.dimension()
-				|| !before.respawnData().pos().closerThan(spot.pos(), 24);
+		// Once a trip and level: moving from cot to cot inside a base earns nothing.
+		boolean elsewhere = before == null || before.respawnData().dimension() != spot.dimension();
 		player.setRespawnPosition(new ServerPlayer.RespawnConfig(spot, true), false);
 		if (elsewhere) PlayerRpg.grantXp(player, SETTLE_XP);
 		player.sendSystemMessage(Component.translatable("message.noclip_backrooms.trip.extract_offer").withStyle(ChatFormatting.GRAY)
