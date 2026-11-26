@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=true": {
+      "model": "noclip_backrooms:block/field/emergency_lamp"
+    },
+    "lit=false": {
+      "model": "noclip_backrooms:block/field/emergency_lamp_out"
+    }
+  }
+}

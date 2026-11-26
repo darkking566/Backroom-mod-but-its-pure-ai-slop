@@ -46,8 +46,10 @@ public final class Expedition {
 			if (emptySince < 0) emptySince = server.getTickCount();
 			if (server.getTickCount() - emptySince < CLOSE_AFTER) return;
 			Data data = Data.get(server.overworld());
-			if (!data.zones.isEmpty()) {
+			if (!data.zones.isEmpty() || !data.affix.isEmpty()) {
 				data.zones.clear();
+				// The trip is over; its anomaly with it.
+				data.affix = "";
 				data.setDirty();
 			}
 		});
@@ -58,6 +60,13 @@ public final class Expedition {
 		Data data = Data.get(server.overworld());
 		Long at = data.zones.get(level);
 		if (at == null) {
+			if (data.zones.isEmpty()) {
+				// A new trip: draw its anomaly (core.trip.Anomalies), the one the commander may have foretold.
+				Anomalies.Affix[] all = Anomalies.Affix.values();
+				data.affix = data.next.isEmpty() ? all[server.overworld().getRandom().nextInt(all.length)].id() : data.next;
+				data.next = all[server.overworld().getRandom().nextInt(all.length)].id();
+				server.execute(() -> Anomalies.opened(server));
+			}
 			RandomSource random = server.overworld().getRandom();
 			int x, z;
 			do {
@@ -71,6 +80,29 @@ public final class Expedition {
 		return new int[] {(int) (at >> 32), (int) (long) at};
 	}
 
+	/** This trip's anomaly id ("" when the team is not on a trip). */
+	static String affix(MinecraftServer server) {
+		return Data.get(server.overworld()).affix;
+	}
+
+	/** The next trip's anomaly id, drawn in advance. */
+	static String nextAffix(MinecraftServer server) {
+		Data data = Data.get(server.overworld());
+		if (data.next.isEmpty()) {
+			Anomalies.Affix[] all = Anomalies.Affix.values();
+			data.next = all[server.overworld().getRandom().nextInt(all.length)].id();
+			data.setDirty();
+		}
+		return data.next;
+	}
+
+	/** For the GM command and tests. */
+	static void setAffix(MinecraftServer server, Anomalies.Affix affix) {
+		Data data = Data.get(server.overworld());
+		data.affix = affix.id();
+		data.setDirty();
+	}
+
 	/** Whether the team has a stretch of this level open (for tests). */
 	public static boolean open(MinecraftServer server, String level) {
 		return Data.get(server.overworld()).zones.containsKey(level);
@@ -78,17 +110,22 @@ public final class Expedition {
 
 	static final class Data extends SavedData {
 		static final Codec<Data> CODEC = RecordCodecBuilder.create(i -> i.group(
-				Codec.unboundedMap(Codec.STRING, Codec.LONG).optionalFieldOf("zones", Map.of()).forGetter(d -> d.zones)).apply(i, Data::new));
+				Codec.unboundedMap(Codec.STRING, Codec.LONG).optionalFieldOf("zones", Map.of()).forGetter(d -> d.zones),
+				Codec.STRING.optionalFieldOf("affix", "").forGetter(d -> d.affix),
+				Codec.STRING.optionalFieldOf("next", "").forGetter(d -> d.next)).apply(i, Data::new));
 		static final SavedDataType<Data> TYPE = new SavedDataType<>(BackroomsMod.id("expedition"), Data::new, CODEC,
 				DataFixTypes.SAVED_DATA_COMMAND_STORAGE);
 		final Map<String, Long> zones;
+		String affix, next;
 
 		Data() {
-			this(Map.of());
+			this(Map.of(), "", "");
 		}
 
-		Data(Map<String, Long> zones) {
+		Data(Map<String, Long> zones, String affix, String next) {
 			this.zones = new HashMap<>(zones);
+			this.affix = affix;
+			this.next = next;
 		}
 
 		static Data get(ServerLevel overworld) {

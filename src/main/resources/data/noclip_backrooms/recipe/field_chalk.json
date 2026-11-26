@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:bone_meal",
+    "minecraft:bone_meal",
+    "minecraft:clay_ball"
+  ],
+  "result": {
+    "id": "noclip_backrooms:chalk",
+    "count": 1
+  }
+}

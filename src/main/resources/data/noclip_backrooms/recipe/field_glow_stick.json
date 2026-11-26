@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " G ",
+    " D ",
+    " G "
+  ],
+  "key": {
+    "G": "minecraft:glass_pane",
+    "D": "minecraft:glowstone_dust"
+  },
+  "result": {
+    "id": "noclip_backrooms:glow_stick",
+    "count": 4
+  }
+}

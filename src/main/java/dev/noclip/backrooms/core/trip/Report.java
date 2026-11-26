@@ -14,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -33,7 +32,13 @@ public final class Report {
 	/** How long after arriving the report comes up, in ticks. */
 	static final int DELAY = 30;
 	private static final Map<UUID, Pending> PENDING = new HashMap<>();
-	private static final List<BiConsumer<ServerPlayer, List<Component>>> NOTES = new ArrayList<>();
+	/** Something with news for a report: work done while the player was away, and so on. */
+	@FunctionalInterface
+	public interface Notes {
+		void add(ServerPlayer player, FloorRun trip, List<Component> notes);
+	}
+
+	private static final List<Notes> NOTES = new ArrayList<>();
 	/** The last report sent to each player, for tests. */
 	private static final Map<UUID, MissionReportPayload> LAST = new HashMap<>();
 
@@ -49,7 +54,7 @@ public final class Report {
 	}
 
 	/** Something else that has news for the report (work finished while the player was away, and so on). */
-	public static void onReport(BiConsumer<ServerPlayer, List<Component>> notes) {
+	public static void onReport(Notes notes) {
 		NOTES.add(notes);
 	}
 
@@ -103,7 +108,7 @@ public final class Report {
 			values.add(worth.get(i).getValue());
 		}
 		List<Component> notes = new ArrayList<>();
-		for (var source : NOTES) source.accept(player, notes);
+		for (var source : NOTES) source.add(player, run, notes);
 		MinecraftServer server = player.level().getServer();
 		QuotaData d = Quota.data(server);
 		return new MissionReportPayload(run.floor(), run.visited(), haul, values, total, d.active(), QuotaMath.day(d.homeTicks()),

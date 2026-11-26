@@ -51,9 +51,14 @@ public final class MissionReportScreen extends Screen {
 		return lines;
 	}
 
+	/** The notes, wrapped to the panel's width. */
+	private List<net.minecraft.util.FormattedCharSequence> wrapped = List.of();
+
 	@Override
 	protected void init() {
-		int rows = 1 + 1 + Math.max(1, (report.haul().size() + 1) / 2) * 2 + 1 + 3 + report.notes().size() + 2;
+		wrapped = new ArrayList<>();
+		for (Component note : report.notes()) wrapped.addAll(font.split(note, W - PAD * 2));
+		int rows = 1 + 1 + Math.max(1, (report.haul().size() + 1) / 2) * 2 + 1 + 3 + wrapped.size() + 2;
 		height_ = PAD * 2 + rows * LINE + BUTTON_H + 6;
 		left = (width - W) / 2;
 		top = Math.max(4, (height - height_) / 2);
@@ -102,8 +107,8 @@ public final class MissionReportScreen extends Screen {
 		}
 		g.text(font, Component.translatable("report.noclip_backrooms.clearance", report.clearance()), x, y, GREEN, false);
 		y += LINE;
-		for (Component note : report.notes()) {
-			g.text(font, note, x, y, TEXT, false);
+		for (var line : wrapped) {
+			g.text(font, line, x, y, TEXT, false);
 			y += LINE;
 		}
 		boolean over = mouseX >= buttonX && mouseX < buttonX + BUTTON_W && mouseY >= buttonY && mouseY < buttonY + BUTTON_H;

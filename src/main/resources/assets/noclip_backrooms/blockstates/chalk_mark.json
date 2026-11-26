@@ -1,0 +1,94 @@
+{
+  "variants": {
+    "face=floor,facing=north,symbol=arrow": {
+      "model": "noclip_backrooms:block/field/chalk_arrow_floor"
+    },
+    "face=wall,facing=north,symbol=arrow": {
+      "model": "noclip_backrooms:block/field/chalk_arrow_wall"
+    },
+    "face=floor,facing=east,symbol=arrow": {
+      "model": "noclip_backrooms:block/field/chalk_arrow_floor",
+      "y": 90
+    },
+    "face=wall,facing=east,symbol=arrow": {
+      "model": "noclip_backrooms:block/field/chalk_arrow_wall",
+      "y": 90
+    },
+    "face=floor,facing=south,symbol=arrow": {
+      "model": "noclip_backrooms:block/field/chalk_arrow_floor",
+      "y": 180
+    },
+    "face=wall,facing=south,symbol=arrow": {
+      "model": "noclip_backrooms:block/field/chalk_arrow_wall",
+      "y": 180
+    },
+    "face=floor,facing=west,symbol=arrow": {
+      "model": "noclip_backrooms:block/field/chalk_arrow_floor",
+      "y": 270
+    },
+    "face=wall,facing=west,symbol=arrow": {
+      "model": "noclip_backrooms:block/field/chalk_arrow_wall",
+      "y": 270
+    },
+    "face=floor,facing=north,symbol=cross": {
+      "model": "noclip_backrooms:block/field/chalk_cross_floor"
+    },
+    "face=wall,facing=north,symbol=cross": {
+      "model": "noclip_backrooms:block/field/chalk_cross_wall"
+    },
+    "face=floor,facing=east,symbol=cross": {
+      "model": "noclip_backrooms:block/field/chalk_cross_floor",
+      "y": 90
+    },
+    "face=wall,facing=east,symbol=cross": {
+      "model": "noclip_backrooms:block/field/chalk_cross_wall",
+      "y": 90
+    },
+    "face=floor,facing=south,symbol=cross": {
+      "model": "noclip_backrooms:block/field/chalk_cross_floor",
+      "y": 180
+    },
+    "face=wall,facing=south,symbol=cross": {
+      "model": "noclip_backrooms:block/field/chalk_cross_wall",
+      "y": 180
+    },
+    "face=floor,facing=west,symbol=cross": {
+      "model": "noclip_backrooms:block/field/chalk_cross_floor",
+      "y": 270
+    },
+    "face=wall,facing=west,symbol=cross": {
+      "model": "noclip_backrooms:block/field/chalk_cross_wall",
+      "y": 270
+    },
+    "face=floor,facing=north,symbol=exit": {
+      "model": "noclip_backrooms:block/field/chalk_exit_floor"
+    },
+    "face=wall,facing=north,symbol=exit": {
+      "model": "noclip_backrooms:block/field/chalk_exit_wall"
+    },
+    "face=floor,facing=east,symbol=exit": {
+      "model": "noclip_backrooms:block/field/chalk_exit_floor",
+      "y": 90
+    },
+    "face=wall,facing=east,symbol=exit": {
+      "model": "noclip_backrooms:block/field/chalk_exit_wall",
+      "y": 90
+    },
+    "face=floor,facing=south,symbol=exit": {
+      "model": "noclip_backrooms:block/field/chalk_exit_floor",
+      "y": 180
+    },
+    "face=wall,facing=south,symbol=exit": {
+      "model": "noclip_backrooms:block/field/chalk_exit_wall",
+      "y": 180
+    },
+    "face=floor,facing=west,symbol=exit": {
+      "model": "noclip_backrooms:block/field/chalk_exit_floor",
+      "y": 270
+    },
+    "face=wall,facing=west,symbol=exit": {
+      "model": "noclip_backrooms:block/field/chalk_exit_wall",
+      "y": 270
+    }
+  }
+}

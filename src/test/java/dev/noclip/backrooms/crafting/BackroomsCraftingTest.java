@@ -92,7 +92,8 @@ final class BackroomsCraftingTest {
 			}
 			if (obj.has("key")) {
 				for (var entry : obj.getAsJsonObject("key").entrySet()) {
-					if (entry.getValue().isJsonPrimitive()) {
+					// "#namespace:tag" is an item tag (e.g. any planks), not one item.
+					if (entry.getValue().isJsonPrimitive() && !entry.getValue().getAsString().startsWith("#")) {
 						assertItemExists(Identifier.parse(entry.getValue().getAsString()), knownModItems, "key of " + f.getFileName());
 					}
 				}

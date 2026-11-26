@@ -152,6 +152,25 @@ public final class Shops {
 		ShopOffer offer = list.get(index);
 		Inventory inventory = player.getInventory();
 		long price = (long) offer.price() * times;
+		if (offer.fromPlayer() && dev.noclip.backrooms.core.field.Evidence.valued(offer.goods().getItem())) {
+			// Photos and tapes: each is worth what is in it (core.field.Evidence).
+			long total = 0;
+			int sold = 0;
+			for (int n = 0; n < times; n++) {
+				int slot = -1;
+				for (int i = 0; i < inventory.getContainerSize() && slot < 0; i++) if (inventory.getItem(i).is(offer.goods().getItem())) slot = i;
+				if (slot < 0) break;
+				ItemStack stack = inventory.getItem(slot).copy();
+				inventory.removeItem(slot, 1);
+				total += dev.noclip.backrooms.core.field.Evidence.value(player.level().getServer(), stack);
+				dev.noclip.backrooms.core.field.Evidence.sold(player.level().getServer(), player, stack);
+				sold++;
+			}
+			if (sold == 0) return Outcome.NO_GOODS;
+			long credits = dev.noclip.backrooms.core.quota.Quota.onSold(player, offer.goods().getItem(), sold, total);
+			if (credits > 0) Wallet.add(player, credits);
+			return Outcome.DONE;
+		}
 		if (offer.fromPlayer()) {
 			int needed = offer.goods().getCount() * times;
 			if (count(inventory, offer.goods()) < needed) return Outcome.NO_GOODS;

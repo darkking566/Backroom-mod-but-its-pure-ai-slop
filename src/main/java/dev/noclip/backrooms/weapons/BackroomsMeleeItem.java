@@ -70,6 +70,11 @@ public final class BackroomsMeleeItem extends Item {
 
 	private final Style style;
 	private final int tier;
+
+	/** The weapon's tier (1-4), for the horror balance (core.combat.WeaponBalance). */
+	public int tier() {
+		return tier;
+	}
 	private final float baseDamage;
 	private final Trait trait;
 	private final String loreKey;

@@ -541,6 +541,17 @@
   - 發現：重生事件裡新身體的附加資料有時還沒複製過來（看起來跟模組初始化順序有關），所以重生時判斷「進過後室」改看舊身體
   - 驗證：`gradlew build`、`runClientGameTest -Plevels=frontrooms,horror,guild,floors,0` 與 Level 1 的 `leaveThroughDoor,settlements,wikiSettlements` 都通過；看過大廳、置物櫃、圍牆、研究所外觀、前室全景、醫療翼、軍械庫、B1、B2 截圖
   - 還沒做（同一批企劃）：現場取證、野戰工事、空間標記與侵蝕、每趟異常詞綴、研究所按趟加工結算、武器數值平衡、B1 異常預告、雙結局
+- 後室進階玩法第二大批（照 Gemini 的企劃，數字與做法寫進 `docs/project/1-gameplay/README.md` 各節的「已做」）：
+  - 每趟異常詞綴 `core/trip/Anomalies`（＋`AnomalyPayload`、客戶端 `AnomalyClient`）：全隊從外面掉進新的一片時抽一條（存在 `Expedition` 裡），靜電過載（附近燈爆、手電筒耗電加倍、電器零件掉落加倍）、絕對沉寂（走動與敲方塊引怪、怪物多掉）、紅霧滲透（紅霧畫面、每秒多扣 1 理智）、偽裝活躍（四分之一沒開過的補給箱是竊皮者）；指揮官在交滿 5 期後預告下一趟；管理員 `/backrooms anomaly set <詞綴>`
+  - 野戰工具包 `core/field/`（`FieldKit`、`FieldBlocks`、`Evidence`、`Drift`）：拍立得（照片價值依怪物、距離、本期拍照目標）、空間測繪信標（離落點 300 格外、掃描 20 秒引怪、拓撲磁帶賣掉後該層免派遣費）、封門木板（怪物撞 5 秒才破）、絆線警報器（告訴附近玩家方位與距離）、便攜應急燈（3 分鐘、附近回理智）、粉筆（地板與牆、箭頭／✕／EXIT）、螢光棒、導引紅線；空間侵蝕（理智低或離標記太遠時箭頭被轉、螢光棒熄，深層出現舊箭頭）
+  - 照片與磁帶照物品上的價值賣給收購商（`Shops` 特別處理）；`QuotaData` 記測繪過的層（存檔多一個欄位）；補給商賣全套工具與無線電；原版工作台配方 8 條；`tools/make_field_items.py` 畫 10 個 32 像素圖示與方塊貼圖、模型
+  - 研究所按趟加工 `core/locker/Processing`：蹲下右鍵垃圾回收機、蒸餾桶、研究終端、晶體複製機投料，下次活著回來依層數結算進置物櫃並列在任務報告（`Report.onReport` 改成會拿到這一趟的層數）
+  - 武器平衡 `core/combat/WeaponBalance`＋server mixin `LivingEntityWeaponBalance`：後室武器打模組怪物時依階級打折（一般怪 90%～55%、Boss 80%～160%、撤離倒數中高階再 ×1.5）；Gemini 的三種武器類別各加一個 `tier()` 讀取方法，沒改他的數值
+  - 修 Gemini 的 `BackroomsCraftingTest`：配方的 `#標籤` 不是單一物品，檢查時跳過
+  - 新增實機測試 `field/FieldClientTest`（`-Plevels=field`：紅霧扣理智、偽裝箱、沉寂引怪、粉筆、螢光棒、紅線、應急燈、絆線、獵犬撞破木板、拍照與賣照片、信標距離限制與磁帶、測繪後免派遣費、武器平衡比例、回收機兩層深的成果）；任務報告的長行改成自動換行
+  - 測試時修掉的：靜電會把玩家自己的應急燈炸掉（改成不炸工具包的燈）；絕對沉寂原本看伺服器端玩家速度（玩家是客戶端在動，改看每秒位置變化）；拍立得的取景太窄（改成視線穿過生物或 25 度內）
+  - 驗證：`gradlew build`、`runClientGameTest -Plevels=field,frontrooms,horror,floors,guild`、`-Plevels=0`、`-Plevels=2,3`、Level 1 的 `monsters,hounds,leaveThroughDoor,settlements` 都通過；看過紅霧、粉筆與螢光棒、拍照、信標、含加工成果的任務報告截圖
+  - 沒做：拍「停電瞬間」「紅室祭壇」這類場景照、紅霧讓紅室變多（地形已先生成）、人影是竊皮者與識破工具、研究瓶解鎖配方、雙結局
 
 ## 動作記錄（Antigravity）
 

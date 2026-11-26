@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PNP",
+    "PNP"
+  ],
+  "key": {
+    "P": "#minecraft:planks",
+    "N": "minecraft:iron_nugget"
+  },
+  "result": {
+    "id": "noclip_backrooms:barricade_planks",
+    "count": 4
+  }
+}

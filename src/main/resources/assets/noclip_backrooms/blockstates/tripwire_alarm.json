@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "noclip_backrooms:block/field/tripwire_alarm"
+    },
+    "axis=z": {
+      "model": "noclip_backrooms:block/field/tripwire_alarm",
+      "y": 90
+    }
+  }
+}

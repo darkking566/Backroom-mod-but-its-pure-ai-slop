@@ -1,0 +1,43 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "noclip_backrooms:block/field/glow_stick",
+    "t": "noclip_backrooms:block/field/glow_stick"
+  },
+  "elements": [
+    {
+      "from": [
+        2,
+        0.1,
+        2
+      ],
+      "to": [
+        14,
+        0.2,
+        14
+      ],
+      "faces": {
+        "up": {
+          "texture": "#t",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#t",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      },
+      "shade": false
+    }
+  ]
+}

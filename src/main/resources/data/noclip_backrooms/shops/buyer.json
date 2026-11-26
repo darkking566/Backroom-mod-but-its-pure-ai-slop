@@ -33,6 +33,8 @@
     {"item": "noclip_backrooms:faceless_membrane", "count": 1, "price": 25},
     {"item": "noclip_backrooms:thick_disguise_hide", "count": 1, "price": 25},
     {"item": "noclip_backrooms:meg_squad_report", "count": 1, "price": 50},
-    {"item": "noclip_backrooms:core_alpha_fang", "count": 1, "price": 400}
+    {"item": "noclip_backrooms:core_alpha_fang", "count": 1, "price": 400},
+    {"item": "noclip_backrooms:evidence_photo", "count": 1, "price": 0},
+    {"item": "noclip_backrooms:topology_tape", "count": 1, "price": 0}
   ]
 }

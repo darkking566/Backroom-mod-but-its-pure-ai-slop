@@ -436,6 +436,15 @@ public final class Quota {
 				? Component.translatable("message.noclip_backrooms.quota.clearance_full", d.paid).withStyle(ChatFormatting.AQUA)
 				: Component.translatable("message.noclip_backrooms.quota.clearance", d.paid, next,
 						Component.translatable("institute.noclip_backrooms.wing." + next)).withStyle(ChatFormatting.AQUA));
+		player.sendSystemMessage(Component.translatable("message.noclip_backrooms.quota.photo_target",
+				Component.translatable("entity.noclip_backrooms." + dev.noclip.backrooms.core.field.Evidence.target(player.level().getServer())))
+				.withStyle(ChatFormatting.GOLD));
+		// From B1's clearance on, M.E.G.'s instruments say what the next trip will be like.
+		if (d.paid >= DEEP_CLEARANCE) {
+			var forecast = dev.noclip.backrooms.core.trip.Anomalies.next(player.level().getServer());
+			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.anomaly.forecast", forecast.title(),
+					Component.translatable("anomaly.noclip_backrooms." + forecast.id() + ".desc")).withStyle(ChatFormatting.LIGHT_PURPLE));
+		}
 		deployOptions(player);
 	}
 
@@ -444,7 +453,7 @@ public final class Quota {
 		QuotaData d = data(player.level().getServer());
 		MutableComponent line = Component.translatable("message.noclip_backrooms.quota.deploy_header").withStyle(ChatFormatting.GRAY);
 		for (String level : deployable(d)) {
-			long price = DEPLOY_PRICE.getOrDefault(level, DEFAULT_DEPLOY_PRICE);
+			long price = price(d, level);
 			line.append(" ").append(button(price == 0 ? "message.noclip_backrooms.quota.deploy_free" : "message.noclip_backrooms.quota.deploy_paid",
 					"/meg deploy " + level, ChatFormatting.AQUA, level, price));
 		}
@@ -452,6 +461,11 @@ public final class Quota {
 		if (d.paid < DEEP_CLEARANCE) {
 			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.quota.deploy_deep_locked", DEEP_CLEARANCE).withStyle(ChatFormatting.DARK_GRAY));
 		}
+	}
+
+	/** What M.E.G. charges to send someone to a level: nothing for Level 0 or a level the team has mapped. */
+	static long price(QuotaData d, String level) {
+		return d.mapped.contains(level) ? 0 : DEPLOY_PRICE.getOrDefault(level, DEFAULT_DEPLOY_PRICE);
 	}
 
 	/** Levels M.E.G. can send the team to: Level 0, and open levels they have been to (deep ones from B1 only). */
@@ -496,7 +510,7 @@ public final class Quota {
 		String refusal = !Home.isHome(player.level().dimension()) ? "message.noclip_backrooms.quota.deploy_not_home"
 				: checkCommander && !nearCommander(player) && !atPad(player) ? "message.noclip_backrooms.quota.deploy_no_commander"
 				: !deployable(d).contains(level) ? "message.noclip_backrooms.quota.deploy_unknown" : null;
-		long price = DEPLOY_PRICE.getOrDefault(level, DEFAULT_DEPLOY_PRICE);
+		long price = price(d, level);
 		if (refusal == null && price > 0 && !Wallet.take(player, price)) refusal = "message.noclip_backrooms.quota.deploy_no_credits";
 		if (refusal != null) {
 			player.sendSystemMessage(Component.translatable(refusal, price));

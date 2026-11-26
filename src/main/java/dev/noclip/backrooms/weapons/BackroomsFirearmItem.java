@@ -65,6 +65,11 @@ public final class BackroomsFirearmItem extends Item {
 	}
 
 	private final int tier;
+
+	/** The weapon's tier (1-4), for the horror balance (core.combat.WeaponBalance). */
+	public int tier() {
+		return tier;
+	}
 	private final List<String> ammoIds;
 	private final float damage;
 	private final int pellets;
