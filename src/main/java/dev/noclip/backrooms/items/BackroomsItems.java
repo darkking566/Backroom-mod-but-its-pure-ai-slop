@@ -361,6 +361,8 @@ public final class BackroomsItems {
 			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.REALITY_SERUM_T2, "lore.noclip_backrooms.reality_serum_t2"));
 	public static final Item REALITY_ANCHOR_CORE = gear("reality_anchor_core", new Item.Properties().stacksTo(4).rarity(Rarity.EPIC),
 			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.REALITY_ANCHOR_CORE, "lore.noclip_backrooms.reality_anchor_core"));
+	public static final Item WRETCH_CURE = gear("wretch_cure", new Item.Properties().stacksTo(1).rarity(Rarity.EPIC),
+			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.WRETCH_CURE, "lore.noclip_backrooms.wretch_cure"));
 	public static final Item MOLOTOV_COCKTAIL = gear("molotov_cocktail", new Item.Properties().stacksTo(16).rarity(Rarity.UNCOMMON),
 			p -> new BackroomsConsumableItem(p, BackroomsConsumableItem.Kind.MOLOTOV_COCKTAIL, "lore.noclip_backrooms.molotov_cocktail"));
 	public static final Item TACTICAL_CORNER_MIRROR = gear("tactical_corner_mirror", new Item.Properties().stacksTo(1).durability(240).rarity(Rarity.UNCOMMON),

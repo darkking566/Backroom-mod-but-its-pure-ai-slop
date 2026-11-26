@@ -204,7 +204,9 @@ public final class Pull {
 
 		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 			PullState state = of(player);
-			if (!dev.noclip.backrooms.core.Home.isHome(player.level().dimension()) || !dev.noclip.backrooms.core.Home.entered(player)) {
+			if (!dev.noclip.backrooms.core.Home.isHome(player.level().dimension())
+					|| !dev.noclip.backrooms.core.Home.entered(player)
+					|| dev.noclip.backrooms.core.ending.Endings.isCured(player)) {
 				// Inside the Backrooms: rejection eases off gradually and Overworld HP penalty clears
 				if (state.pull() > 0.0F) {
 					set(player, state.withPull(Math.max(0.0F, state.pull() - 0.5F)));

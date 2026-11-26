@@ -110,6 +110,17 @@ final class InstituteBlocks {
 		}
 
 		@Override
+		protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+				BlockHitResult hit) {
+			if (player instanceof ServerPlayer serverPlayer && player.isShiftKeyDown()
+					&& (stack.is(BackroomsItems.KEYPAD_HACKER_T3) || stack.is(BackroomsItems.KEYPAD_HACKER_T4))) {
+				dev.noclip.backrooms.core.ending.Endings.tryTrueEscape(serverPlayer, true);
+				return InteractionResult.SUCCESS;
+			}
+			return InteractionResult.TRY_WITH_EMPTY_HAND;
+		}
+
+		@Override
 		protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 			if (player instanceof ServerPlayer serverPlayer) Quota.deployOptions(serverPlayer);
 			return InteractionResult.SUCCESS;
@@ -190,6 +201,7 @@ final class InstituteBlocks {
 						.withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
 				serverPlayer.sendSystemMessage(Component.translatable("archive.noclip_backrooms.file." + page + ".text").withStyle(ChatFormatting.GRAY));
 				level.playSound(null, pos, SoundEvents.BOOK_PAGE_TURN, SoundSource.BLOCKS, 0.8F, 1.0F);
+				dev.noclip.backrooms.core.ending.Endings.recordFile(serverPlayer, page);
 			}
 			return InteractionResult.SUCCESS;
 		}

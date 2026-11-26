@@ -129,7 +129,7 @@ final class BackroomsCraftingTest {
 		try (var stream = Files.list(equipTexDir)) {
 			textures = stream.filter(p -> p.toString().endsWith(".png")).toList();
 		}
-		assertTrue(textures.size() >= 372, "Expected all 372 3D item textures, got " + textures.size());
+		assertTrue(textures.size() >= 373, "Expected all 373 3D item textures, got " + textures.size());
 		for (Path tex : textures) {
 			String fn = tex.getFileName().toString();
 			String id = fn.substring(0, fn.length() - 4);

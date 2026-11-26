@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.crafting;
 
+import dev.noclip.backrooms.core.locker.Research;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -365,18 +366,20 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 			int rx = listX + 1;
 			boolean sel = r == ghostRecipe;
 			boolean hov = mouseX >= rx && mouseX < rx + rowW && mouseY >= ry && mouseY < ry + BOOK_ROW_H;
-			boolean craftable = mc.player != null && r.canCraftFromInventory(mc.player);
+			boolean unlocked = Research.canCraft(mc.player, r);
+			boolean craftable = unlocked && mc.player != null && r.canCraftFromInventory(mc.player);
 
-			int bg = sel ? 0xFF3E6C3E : (hov ? 0xFF8E8E8E : (craftable ? 0xFF5A745A : 0xFF727272));
+			int bg = !unlocked ? (sel ? 0xFF5A383E : (hov ? 0xFF5E4348 : 0xFF47363A))
+					: (sel ? 0xFF3E6C3E : (hov ? 0xFF8E8E8E : (craftable ? 0xFF5A745A : 0xFF727272)));
 			g.fill(rx, ry, rx + rowW, ry + BOOK_ROW_H - 1, bg);
 			g.fill(rx, ry + BOOK_ROW_H - 1, rx + rowW, ry + BOOK_ROW_H, 0xFF464646);
 
 			ItemStack icon = r.primaryOutput();
 			if (!icon.isEmpty()) {
 				g.item(icon, rx + 1, ry + 1);
-				String name = icon.getHoverName().getString();
+				String name = (unlocked ? "" : "[×] ") + icon.getHoverName().getString();
 				String trimmed = font.plainSubstrByWidth(name, rowW - 21);
-				g.text(font, trimmed, rx + 19, ry + 5, craftable ? 0xFFFFFFFF : 0xFFD2D2D2, true);
+				g.text(font, trimmed, rx + 19, ry + 5, !unlocked ? 0xFFD8A0A0 : (craftable ? 0xFFFFFFFF : 0xFFD2D2D2), true);
 			}
 		}
 
@@ -402,7 +405,9 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 		int innerW = bw - 14;
 		int fillW = (innerW - 3) * 60 / 100;
 		int maxW = innerW - 3 - fillW;
-		boolean canFill = ghostRecipe != null && mc.player != null && ghostRecipe.canCraftFromInventory(mc.player);
+		boolean canFill = ghostRecipe != null && mc.player != null
+				&& Research.canCraft(mc.player, ghostRecipe)
+				&& ghostRecipe.canCraftFromInventory(mc.player);
 		drawButton(g, bx + 7, footY, fillW, 15,
 				Component.translatable("ui.noclip_backrooms.station.fill_grid").getString(), canFill, mouseX, mouseY);
 		drawButton(g, bx + 7 + fillW + 3, footY, maxW, 15,
@@ -431,6 +436,27 @@ public final class BackroomsStationScreen extends AbstractContainerScreen<Backro
 					if (mouseX >= tx && mouseX < tx + tabW - 1) {
 						g.setTooltipForNextFrame(font, Component.translatable("ui.noclip_backrooms.cat_full." + availableCats.get(i)), mouseX, mouseY);
 						return;
+					}
+				}
+			}
+			// Hover tooltip on locked recipes inside the book explaining which Research Pack unlocks them
+			int listX = bx + 7;
+			int listY = bookListY();
+			int rowW = bw - 24;
+			int vis = visibleRows();
+			if (mouseX >= listX + 1 && mouseX < listX + 1 + rowW && mouseY >= listY + 1 && mouseY < listY + 1 + vis * BOOK_ROW_H) {
+				int idx = scrollOffset + (mouseY - (listY + 1)) / BOOK_ROW_H;
+				if (idx >= 0 && idx < filteredRecipes.size()) {
+					StationRecipe hovered = filteredRecipes.get(idx);
+					Minecraft mc = Minecraft.getInstance();
+					if (!Research.canCraft(mc.player, hovered)) {
+						Research.Tier req = Research.requiredTier(hovered);
+						if (req != null) {
+							g.setTooltipForNextFrame(font,
+									Component.translatable("message.noclip_backrooms.research.locked", req.packName()),
+									mouseX, mouseY);
+							return;
+						}
 					}
 				}
 			}

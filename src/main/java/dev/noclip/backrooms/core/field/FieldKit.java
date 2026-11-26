@@ -2,9 +2,13 @@ package dev.noclip.backrooms.core.field;
 
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.core.Home;
+import dev.noclip.backrooms.core.people.Person;
+import dev.noclip.backrooms.core.trip.Anomalies;
+import dev.noclip.backrooms.monsters.skinstealer.SkinStealer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -17,6 +21,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Registry;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -28,6 +33,8 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Monster;
@@ -45,6 +52,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.phys.AABB;
 
 /**
  * The investigator's field kit (docs/project/1-gameplay/README.md, "後室進階玩法與創新機制"):
@@ -83,6 +91,7 @@ public final class FieldKit {
 	public static final Item BARRICADE_PLANKS = item("barricade_planks", p -> new BlockItem(BARRICADE, p.stacksTo(16)));
 	public static final Item TRIPWIRE_ALARM = item("tripwire_alarm", p -> new BlockItem(TRIPWIRE_BLOCK, p.stacksTo(8).useBlockDescriptionPrefix()));
 	public static final Item EMERGENCY_LAMP = item("emergency_lamp", p -> new BlockItem(LAMP_BLOCK, p.stacksTo(8).useBlockDescriptionPrefix()));
+	public static final Item BIO_SCANNER = item("bio_scanner", p -> new BioScanner(p.stacksTo(1).durability(32)));
 
 	/** How long a barricade holds against something battering it, in seconds. */
 	static final int BARRICADE_HITS = 5;
@@ -96,7 +105,7 @@ public final class FieldKit {
 
 	public static void register() {
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(output -> {
-			for (Item item : new Item[] {CAMERA, BEACON, CHALK, GLOW_STICK, GUIDE_LINE, BARRICADE_PLANKS, TRIPWIRE_ALARM, EMERGENCY_LAMP}) {
+			for (Item item : new Item[] {CAMERA, BEACON, BIO_SCANNER, CHALK, GLOW_STICK, GUIDE_LINE, BARRICADE_PLANKS, TRIPWIRE_ALARM, EMERGENCY_LAMP}) {
 				output.accept(item);
 			}
 		});
@@ -247,6 +256,72 @@ public final class FieldKit {
 							.withStyle(ChatFormatting.RED));
 				}
 			}
+			return InteractionResult.SUCCESS;
+		}
+	}
+
+	/** Bio-Anomaly Scanner: detects and forcibly exposes disguised mimic crates, human-figure mimics, and hidden Skin-Stealers. */
+	static final class BioScanner extends Item {
+		private static final int RANGE = 18;
+
+		BioScanner(Properties properties) {
+			super(properties);
+		}
+
+		@Override
+		public InteractionResult use(Level level, Player player, InteractionHand hand) {
+			ItemStack stack = player.getItemInHand(hand);
+			if (player.getCooldowns().isOnCooldown(stack)) return InteractionResult.FAIL;
+			if (!(level instanceof ServerLevel server) || !(player instanceof ServerPlayer sp)) return InteractionResult.SUCCESS;
+
+			int found = 0;
+			AABB box = player.getBoundingBox().inflate(RANGE);
+
+			// 1. Expose disguised human-figure Skin-Stealers
+			List<Person> figures = server.getEntitiesOfClass(Person.class, box,
+					p -> p.isAlive() && p.entityTags().contains(Anomalies.MIMIC_FIGURE_TAG));
+			for (Person figure : figures) {
+				Anomalies.revealMimicFigure(server, figure, sp, true);
+				found++;
+			}
+
+			// 2. Expose disguised Skin-Stealers already in the world
+			List<SkinStealer> stealers = server.getEntitiesOfClass(SkinStealer.class, box,
+					s -> s.isAlive() && s.mode() == SkinStealer.STATE_DISGUISED);
+			for (SkinStealer stealer : stealers) {
+				stealer.beginReveal();
+				stealer.addEffect(new MobEffectInstance(MobEffects.GLOWING, 160, 0));
+				stealer.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 100, 2));
+				stealer.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 120, 1));
+				server.sendParticles(ParticleTypes.ELECTRIC_SPARK, stealer.getX(), stealer.getY() + 1.0, stealer.getZ(), 18, 0.4, 0.7, 0.4, 0.08);
+				found++;
+			}
+
+			// 3. Expose mimic crates before opening them
+			if (Anomalies.current(server.getServer()) == Anomalies.Affix.MIMICS) {
+				BlockPos origin = player.blockPosition();
+				for (BlockPos pos : BlockPos.betweenClosed(origin.offset(-RANGE, -4, -RANGE), origin.offset(RANGE, 4, RANGE))) {
+					if (!server.isLoaded(pos)) continue;
+					if (Anomalies.isMimicCrate(server, pos)) {
+						Anomalies.revealMimicCrate(server, sp, pos.immutable(), true);
+						found++;
+					}
+				}
+			}
+
+			// Visual & audio pulse feedback
+			server.sendParticles(found > 0 ? ParticleTypes.ELECTRIC_SPARK : ParticleTypes.HAPPY_VILLAGER,
+					player.getX(), player.getY() + 1.1, player.getZ(), 22, 1.5, 0.5, 1.5, 0.05);
+			server.playSound(null, player.getX(), player.getY(), player.getZ(),
+					found > 0 ? SoundEvents.NOTE_BLOCK_BELL.value() : SoundEvents.AMETHYST_BLOCK_CHIME,
+					SoundSource.PLAYERS, 0.9F, found > 0 ? 0.65F : 1.5F);
+			if (found > 0) {
+				sp.sendSystemMessage(Component.translatable("message.noclip_backrooms.field.scanner_found", found).withStyle(ChatFormatting.AQUA));
+			} else {
+				sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.field.scanner_clear").withStyle(ChatFormatting.GREEN));
+			}
+			if (!player.isCreative()) stack.hurtAndBreak(1, player, hand);
+			player.getCooldowns().addCooldown(stack, 40);
 			return InteractionResult.SUCCESS;
 		}
 	}

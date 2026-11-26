@@ -96,7 +96,7 @@ public class SkinStealer extends Monster {
 		targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
 	}
 
-	void beginReveal() {
+	public void beginReveal() {
 		if (mode() != STATE_DISGUISED) return;
 		setMode(STATE_REVEALING);
 		revealTimer = 0;

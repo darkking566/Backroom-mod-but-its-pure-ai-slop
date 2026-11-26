@@ -104,6 +104,16 @@ public final class Processing {
 		for (String machine : MACHINES) {
 			List<ItemStack> in = all.get(machine);
 			if (in == null) continue;
+			if ("anomaly_research_terminal".equals(machine)) {
+				for (ItemStack stack : in) {
+					if (stack.isEmpty()) continue;
+					String path = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
+					Research.Tier tier = Research.Tier.byPackPath(path);
+					if (tier != null && Research.unlock(player.level().getServer(), tier)) {
+						notes.add(Component.translatable("report.noclip_backrooms.research_unlocked", tier.title()));
+					}
+				}
+			}
 			Map<Item, Integer> out = work(machine, in, floor);
 			if (out.isEmpty()) continue;
 			StringBuilder summary = new StringBuilder();
