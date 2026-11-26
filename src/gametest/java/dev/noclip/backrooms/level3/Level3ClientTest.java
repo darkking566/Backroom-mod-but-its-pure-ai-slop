@@ -401,6 +401,13 @@ public final class Level3ClientTest implements FabricClientGameTest {
 			use(level3(s), player(s), detector.above());
 			check(player(s).getZ() < z0 + 9, "not let back out");
 			use(level3(s), player(s), detector);
+			// No digging round the detector, nor through the outer wall.
+			for (BlockPos wall : new BlockPos[] {detector.west(), new BlockPos(x0, GammaLayout.RESIDENTIAL + 1, z0 + 5)}) {
+				var before = level3(s).getBlockState(wall);
+				check(!before.isAir(), "no wall at " + wall);
+				player(s).gameMode.destroyBlock(wall);
+				check(level3(s).getBlockState(wall) == before, "dug through Gamma at " + wall);
+			}
 		});
 		server.runCommand("gamemode spectator @a");
 		shoot(context, game, gx + 1.0, GammaLayout.RESIDENTIAL + 1.6, z0 + 3.5, 0, 10, "level3_gamma_checkpoint");
@@ -410,6 +417,10 @@ public final class Level3ClientTest implements FabricClientGameTest {
 		server.runOnServer(s -> {
 			ServerLevel level = level3(s);
 			Level3Bases.populateNear(level, seed, player(s));
+			// Someone pushed away from their place is still the one there: no second one comes.
+			AABB all = new AABB(x0, 0, z0, x0 + GammaLayout.W, Level3ChunkGenerator.HEIGHT, z0 + GammaLayout.D);
+			Person moved = level.getEntitiesOfClass(Person.class, all, p -> p.entityTags().contains("noclip_backrooms_gamma_resident_north")).getFirst();
+			moved.teleportTo(moved.getX() + 5, moved.getY(), moved.getZ());
 			Level3Bases.populateNear(level, seed, player(s));
 			AABB box = new AABB(x0, 0, z0, x0 + GammaLayout.W, Level3ChunkGenerator.HEIGHT, z0 + GammaLayout.D);
 			for (GammaLayout.Spot spot : GammaLayout.PEOPLE) {

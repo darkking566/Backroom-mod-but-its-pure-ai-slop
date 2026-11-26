@@ -507,6 +507,19 @@
   - 測試：新增 `GammaTest`（頻率、正門接迷宮、從正門走得到每層每個人與床／出口／寄物櫃、外牆完整）；`Level3ClientTest` 每段都能用 `-Psections=` 單跑，新增 `gamma` 段（樣板和世界一致、帶劍被擋、空手通過、12 人各一、安頓、溫泉回理智、出口與電梯在、12 張截圖，挑 6 張存到 `docs/levels/level3/gamma/`）
   - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=3 -Psections=gamma` 通過；Level 3 其他段這次沒重跑；狙擊手沒實機測；整體偏暗但看得清
   - 還沒做：三個側門、監視器提示、帶刺鐵絲網與電網、其他圖的方向距離路標、檔案員收拓印、新方塊的寫實貼圖（細節見 POI.md D 節「實作狀態」）
+- 使用者同意後，把 `main` 推送到 GitHub（`dbe0ff1d` POI 企劃、`b7103b73` Gamma 規格、`b729e8c9` Gamma 基地第一版）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- 自己審查 Gamma 那次提交後修兩項（使用者同意）：
+  - Gamma 的牆原本挖得掉（可以挖開探測門旁的牆帶武器進去、挖進鎖住的行政部）：生存模式下 Gamma 範圍內（含外牆，伺服器用迷宮配置判斷）的方塊都不能破壞（`Level3Bases.inGamma`、`PlayerBlockBreakEvents.BEFORE`）
+  - Gamma 的人會多生：人被推離自己的位置超過 3 格就會再生一個；區塊載入後實體還沒載入就檢查也會多生。改成整座 Gamma 找同標籤的人，而且實體還沒載入就先不檢查（`areEntitiesLoaded`）
+  - `gamma` 實機測試段加：生存模式挖探測門旁的牆與外牆挖不掉、把居民推開 5 格再檢查還是只有一個；`gradlew build` 與 `runClientGameTest -Plevels=3 -Psections=gamma` 通過
+  - 沒修：狙擊手沒有測試、把武器藏在收納袋或界伏盒裡可以過探測門
+- 使用者同意後推送：先抓 GitHub，合併朋友新推的 7 個提交（M.E.G. 配額循環取代滲透與裂縫、企劃移到 `docs/project`、Level 3 行軍床改走 trip 系統等），沒有衝突；合併後 `gradlew build` 與 `runClientGameTest -Plevels=3 -Psections=gamma` 通過，把 `main` 推送到 GitHub（Gamma 審查兩項修正 `f8135cb3` 與紀錄）；沒有強制推送、沒有改寫歷史
+- 全專案審查後修三項（使用者同意，動到 Gemini 的合成台）：
+  - 在後室死掉、沒安頓又重開世界會直接回主世界：「死掉要送回 Level 0」原本只記在記憶體裡（`Trips.LOST`），重開就沒了。改成重生時看留下的舊身體死在哪、有沒有安頓（存檔會記住死的位置），刪掉 `LOST`
+  - 在同一層的床之間來回點可以一直拿 50 經驗（原本相距 24 格就算新地方，Gamma 的房間相距 30 格）：改成同一趟同一層只給一次（`Trips.settle`）
+  - 合成台 Shift 點成品時背包只放得下一部分，會用掉整份材料、放不下的那部分消失：改成放不下整份就不動（`BackroomsStationMenu.fits`）
+  - `HorrorClientTest` 加：同一層換床不再給經驗、背包只剩 1 格空間時 Shift 點成品不拿也不扣材料（先把修正拿掉跑過，確認測試會失敗）；`gradlew build` 與 `runClientGameTest -Plevels=horror` 通過
+  - 沒驗證：真的重開世界後重生（自動測試沒辦法重開同一個世界），只靠讀程式判斷舊身體記得死的維度
 
 ## 動作記錄（Antigravity）
 
