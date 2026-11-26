@@ -1,5 +1,6 @@
 {
   "buys": [
+    {"item": "noclip_backrooms:vhs_tape", "count": 1, "price": 8},
     {"item": "noclip_backrooms:damp_paper_scrap", "count": 8, "price": 4},
     {"item": "noclip_backrooms:rotten_wood_strip", "count": 4, "price": 4},
     {"item": "noclip_backrooms:scrap_metal", "count": 4, "price": 8},

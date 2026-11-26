@@ -48,3 +48,5 @@ replay_*.log
 # downloaded photo materials (tools/make_level0_realistic.py fetches them again when missing)
 
 tools/.cache/
+# The film props' fabrics and signs, painted by tools/film/prints.py before Blender runs
+tools/film/prints/

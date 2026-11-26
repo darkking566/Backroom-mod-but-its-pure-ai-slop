@@ -41,6 +41,8 @@ public final class BackroomsMod implements ModInitializer {
 		PlayerRpg.register();
 		Floors.register();
 		BackroomsProps.register();
+		// The film's Level 0 objects (after the props, whose block entity they share).
+		dev.noclip.backrooms.level0.film.FilmProps.register();
 		BackroomsItems.register();
 		BackroomsCrafting.register();
 		BackroomsWeaponNetworking.register();

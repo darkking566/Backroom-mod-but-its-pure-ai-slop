@@ -74,6 +74,7 @@ public final class BackroomsClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		Look.register();
 		ItemLook.register();
+		dev.noclip.backrooms.level0.film.FilmLook.register();
 		FloorsClient.register();
 		ShopClient.register();
 		WalletClient.register();

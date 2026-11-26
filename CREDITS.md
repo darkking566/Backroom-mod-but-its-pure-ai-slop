@@ -26,6 +26,10 @@ All custom audio files in `src/main/resources/assets/noclip_backrooms/sounds/lev
 
 The photo-based textures in `src/main/resources/resourcepacks/realistic/` are made by `tools/make_level0_realistic.py` from these ambientCG materials, all licensed **CC0 1.0 Universal (Public Domain)** (https://ambientcg.com): Carpet016 and Fabric028 (carpet), Wallpaper001A (paper grain), Wallpaper002A, Wallpaper002B and Wallpaper002C (water stains and mould). The wallpaper print, ceiling tiles, light panels, baseboard and painted metal are drawn by that tool. The camcorder filter (`shaders/post/camcorder.fsh`) is original.
 
+## Film furniture store props (Level 0)
+
+The furniture-store objects in `level0/film/` (meshes in `assets/noclip_backrooms/models/film/`, textures in `textures/film/`) are original models made in Blender by `tools/film/`. They are modelled after the kinds of furniture seen in A24's film *Backrooms* (2026) — overstuffed 1990s sofas and recliners, ladder-back chairs, piles of furniture, sale signs — without copying its store name, logo or any image. Their surfaces start from these ambientCG materials, all licensed **CC0 1.0 Universal (Public Domain)** (https://ambientcg.com): Fabric028, Fabric030, Fabric061, Leather026, Plastic006, Plastic010, Cardboard004, Wood049, Wood051, Wood066, Paper001, PaintedMetal004, Metal032, Metal049A, Rust004, Carpet016, Wallpaper002B and Wallpaper002C. The fabric prints, pictures and sign faces are drawn by `tools/film/prints.py`; the sign lettering is rendered with fonts installed with Windows (Cooper Black, Arial Black, Ink Free).
+
 ## Manila Room design
 
 The Manila Room follows the Backrooms wiki concept (https://backrooms-wiki-cn.wikidot.com/manila-room, CC BY-SA 3.0) for general structure and atmosphere: a rare 8x8 wooden-floored sanctuary with thick manila-paper walls, hidden Void Stone core, four wooden doors, an octagonal central table, chairs, supply cabinet, Almond Water, and a Manila Mary Foundation guide note. All textures are drawn by `tools/make_manila.py`.

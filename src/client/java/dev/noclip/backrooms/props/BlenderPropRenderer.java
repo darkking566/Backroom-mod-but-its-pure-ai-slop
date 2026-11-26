@@ -38,6 +38,8 @@ public final class BlenderPropRenderer implements BlockEntityRenderer<PropBlockE
 		/** Or from a Blender mesh of its own, when the pack has one. */
 		public dev.noclip.backrooms.core.look.MeshModel trialMesh = null;
 		public net.minecraft.resources.Identifier trialTexture = null;
+		/** The mesh is centred on the block like the Blender props (the film props), not laid out 0..1 like a block model. */
+		public boolean trialCentred = false;
 	}
 
 	public BlenderPropRenderer(BlockEntityRendererProvider.Context ctx) {
@@ -63,6 +65,17 @@ public final class BlenderPropRenderer implements BlockEntityRenderer<PropBlockE
 				? bs.getValue(HorizontalDirectionalBlock.FACING) : Direction.NORTH;
 		state.trial = null;
 		state.trialMesh = null;
+		state.trialCentred = false;
+		// The film's Level 0 objects: a Blender mesh with a baked texture (level0.film.FilmLook).
+		if (state.propId.startsWith("film_")) {
+			var film = dev.noclip.backrooms.level0.film.FilmLook.mesh(state.propId);
+			if (!film.isEmpty()) {
+				state.trialMesh = film;
+				state.trialTexture = dev.noclip.backrooms.level0.film.FilmLook.texture(state.propId);
+				state.trialCentred = true;
+				return;
+			}
+		}
 		if (dev.noclip.backrooms.core.look.ItemLook.replaces(state.propId)) {
 			var mesh = dev.noclip.backrooms.core.look.ItemLook.propMesh(state.propId);
 			if (!mesh.isEmpty()) {
@@ -102,7 +115,7 @@ public final class BlenderPropRenderer implements BlockEntityRenderer<PropBlockE
 				case EAST -> -90.0F;
 				default -> 0.0F;
 			}));
-			poseStack.translate(-0.5F, 0.0F, -0.5F);
+			if (!state.trialCentred) poseStack.translate(-0.5F, 0.0F, -0.5F);
 			collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(state.trialTexture),
 					(pose, vc) -> mesh.emit(pose, vc, light, OverlayTexture.NO_OVERLAY));
 			poseStack.popPose();

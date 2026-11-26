@@ -244,6 +244,15 @@
     "noclip_backrooms:omega_locker",
     "noclip_backrooms:omega_barricade",
     "noclip_backrooms:office_breaker",
-    "noclip_backrooms:office_photocopier"
+    "noclip_backrooms:office_photocopier",
+    "noclip_backrooms:film_school_chair",
+    "noclip_backrooms:film_bistro_set",
+    "noclip_backrooms:film_tv_tray",
+    "noclip_backrooms:film_entertainment_center",
+    "noclip_backrooms:film_checkout_counter",
+    "noclip_backrooms:film_chair_pile",
+    "noclip_backrooms:film_fax_machine",
+    "noclip_backrooms:film_tv_vcr",
+    "noclip_backrooms:film_tv_wall"
   ]
 }

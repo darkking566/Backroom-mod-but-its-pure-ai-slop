@@ -557,6 +557,18 @@
 - 使用者同意後推送：先合併朋友新推的 7 個提交（前室研究所、撤離接應、死亡新規則、後室進階玩法），只有 `CLAUDE.md` 衝突（兩邊紀錄都保留）；合併後 `gradlew build` 與 `runClientGameTest -Plevels=3 -Psections=gamma` 通過，推送 `main`（Gamma 探測門看得到收納袋與界伏盒裡的武器、狙擊手測試）；沒有強制推送、沒有改寫歷史
 - 使用者回報電腦前有看不見的方塊：世界生成只放方塊狀態、沒建方塊實體，靠方塊實體畫的家具（辦公椅、檔案櫃等 Blender 道具）全部隱形。改成後室區塊載入時補建缺少的方塊實體（`BackroomsProps.register`，舊存檔的區塊也會補）；Level 0 玻璃辦公室測試加檢查客戶端有收到（修前會失敗）；`gradlew build runClientGameTest -Plevels=0` 通過，截圖看到檔案櫃與椅子。其他樓層沒重跑
 - 使用者同意後推送：合併朋友新推的 2 個提交（場景照片、模仿者與生物掃描器、紅霧、研究瓶解鎖、雙結局），沒有衝突；合併後 `gradlew build runClientGameTest -Plevels=0` 通過，把 `main` 推送到 GitHub（地形生成的家具補建方塊實體 `d1ff5605`）；朋友這批的其他實機測試沒有重跑；沒有強制推送、沒有改寫歷史
+- 使用者要求把電影版（A24《Backrooms》2026）第 0 層的物件全部做出來（加 Steam 版的錄影帶，只能撿和賣）；分工：Claude 做物件、Gemini 擺放；一開始就用 Blender：
+  - 第一版單色模型使用者覺得「很塑膠、太光滑反光」：改成每個物件的表面用 CC0 照片打底（ambientCG，新下載 Fabric030、Fabric061、Leather026、Plastic006、Plastic010、Cardboard004、Wood049、Wood066、Paper001、PaintedMetal004、Chipboard004 到 `tools/.cache/`），加污漬、泛黃、掉漆、鏽斑，烘焙顏色與環境光遮蔽成一張貼圖，霧面不反光
+  - 使用者要「更像電影」：讀了電影的美術報導，下載電影劇照與截圖（只在暫存區看，沒放進專案）對照，重做成電影裡的樣子：90 年代膨鬆捲手沙發與躺椅（椅背掛粉紅／黃色價格牌）、孔雀藍拉扣旋轉椅、梯背椅、八角餐桌組、地毯捲、黃銅吊燈、金色寶座、船舵、紙板人形、特價吊牌與布條、頂到天花板的家具山與椅子山等；店名與招牌沒照抄
+  - 新增 `tools/film/`：`film_list.py`（68 個物件的 id、大小、掛法、材料、中英文名稱、掉落、錄影帶標籤，唯一來源）、`prints.py`（布料花紋、水彩畫、招牌字）、`realistic.py`（照片材質與烘焙）、`make_film_props.py`（Blender 建模）、`make_film_icons.py`（物品欄圖示）、`make_film_data.py`（寫進遊戲資源）；`tools/film/prints/` 是中間產物，加進 `.gitignore`
+  - 新增 `level0/film/`：`FilmProps`（68 個方塊與物品「VHS 錄影帶」，註冊進 Gemini 的家具方塊實體，創造模式分頁）、`FilmPropBlock`（單格物件：地板、矮、平放可走過、掛牆、吊頂）；多格物件直接用 Gemini 的 `MultiPartPropBlock`；客戶端 `FilmLook`（讀模型，資源包重載時清掉）
+  - 動到別人的檔案：Gemini 的 `BlenderPropRenderer` 加一段（`film_` 開頭的物件畫有貼圖的模型、以方塊中心為原點）；`BackroomsMod`、`BackroomsClient` 各加一行；語言檔、`mineable/axe`、`mineable/pickaxe`、收購商 `shops/buyer.json`（錄影帶每卷 8 點）
+  - 資源：模型 `models/film/`、貼圖 `textures/film/`、圖示 `textures/item/film/`、方塊狀態、物品定義、68 個掉落表（家具拆成破布、泡棉、彈簧、木條、廢金屬等；錄影帶有 12 種標籤）；新增資源約 27 MB（大型堆疊物件的貼圖到 1024）
+  - 企劃：`docs/project/5-levels/level0/README.md` 新增第八節（物件清單、掉落、錄影帶、八種擺法與哪些還沒做、展示間區規格、其他區偶爾出現的規則、給 Gemini 的擺放說明），附圖 `docs/project/5-levels/level0/film/`；`CREDITS.md` 加照片材質出處
+  - 新增實機測試 `level0/film/FilmClientTest`（`-Plevels=film`）：68 個物件都有方塊實體、模型、貼圖；逐排拍照（攝影機濾鏡開／關）與一個展示角近照；小堆錄影帶掉 6～10 卷且都有標籤；從沙發的另一格打掉整組消失並掉破布；收購商收錄影帶
+  - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=film` 通過；截圖看過物件在第 0 層裡的樣子。還沒做：穿模、倒放、地毯吞沒、藍色膠帶門框（要物件另外支援）；擺進生成器是 Gemini 的
+- 使用者定下新方向（只改企劃，程式沒動）：第 0 層以電影版為主；分工改成朋友做新樓層、Claude 專心做物件建模、Gemini 做物品分布與擺放；建模順序是先把每一層（主要樓層）會敲掉變成資源的物品做完（第 0 層先，部分物件如辦公椅移到 Level 4），之後才做武器、醫療等；合成表等建模都定了再整個重做（先想每層物品敲掉變成什麼、同時列醫療與武器等成品，最後才想怎麼組成）。寫進 `docs/project/README.md`（分工）、`AGENTS.md`（分工一行）、`docs/project/3-crafting/README.md`（重做方向）、`docs/project/5-levels/level0/README.md`（第八節第 6 點：哪些換成電影版、哪些由 Claude 重做、手機待決定）
+- 使用者同意後，把 `main` 推送到 GitHub（電影版物件 `3139b0bc` 與新方向）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
@@ -852,6 +864,8 @@
     - 新增 12 種方塊與對應資源（由 `tools/make_level0_overhaul_assets.py` 產出 128px 基礎與 512px labPBR `_n`／`_s` 寫實貼圖、模型、blockstates 與物品定義，並補齊 `en_us.json`／`zh_tw.json` 全部方塊名與模糊／高感知線索提示）
     - 每張 `300×300` Stage 確定性配置 8 處異常出口（必出：1980 阿帕拉契山莊海報 `POSTER_161` 撕下／打掉→Level 161、蒸氣地柵 `STEAM_GRATE_2`→Level 2、油污維修口 `OIL_VENT_1`→Level 1；再輪替抽出 5 種：小方窗→188、翹起地毯→27、空心灰泥牆→194、巨型落地鏡→0.5、霓虹保齡球門→499、翻新白門→0.2、懸空門→193、裂紋玻璃門→13、餐館門→68、紅光偽 EXIT→!），搭配 3 種動態誘餌（綠光招手人影→14 冷漠病院、閃爍綠光走廊→0.01、深水涉行→0.11），全數統一經 `core/LevelExits` 導流
   - **驗證**：更新 `MazeTest`、`ZonePoiPlanTest`、`ExitsTest` 與 `Level0ClientTest`（新增 `checkOverhaulFeatures` 實測撕 1980 海報接 `LevelExits("161")`、Pitfalls 下層梯井、配電箱解鎖密室、多米諾熄燈與方案 C 邊界回繞）；執行 `.\gradlew.bat build --no-daemon`（全部 122 項單元測試 0 失敗）與 `.\gradlew.bat runClientGameTest -Plevels=0 --no-daemon` 全部通過、日誌零缺模型／缺貼圖錯誤，並逐一檢視實機截圖確認 5 格淨高、海報、下層梯井、M.E.G. 隔離站、深淵前哨與紅室／昏暗區 3D 物件渲染正常；僅留於本機工作目錄（未提交、未推送）
+- 依使用者要求以觀察者模式拍攝 Level 0 實機截圖與 300×300 平面鳥瞰圖供使用者手機檢視（暫時的拍攝程式 `Level0SpectatorTour.java` 拍完即刪除，未留在專案）；拍攝時發現挑高中庭／超大廳緊鄰 5 格高房間時高處會露出基岩，尚未修正（Antigravity）
+- 依使用者要求推送至 GitHub：先提交 Level 0 大改版（`0a49ee4a`），抓取並合併遠端 `origin/main` 3 個提交（含 Claude 的 `d1ff5605`「區塊載入時補建缺少的方塊實體」）；衝突只在 `Level0ClientTest.java`（遠端的玻璃辦公室／前人失蹤現場／異常補給角檢查是改版前座標，改版後這三處已由 `ZonePoiPlanTest` 涵蓋，保留遠端新增的「客戶端有收到方塊實體」檢查並換成改版後座標）；合併後 `compileJava compileClientJava compileTestJava compileGametestJava` 通過，正常推送 `main`（`de303fb7..59684341`，無強制推送、無改寫歷史）（Antigravity）
 - 完成 **Level 4（廢棄辦公室 / Abandoned Office）** 首版完整實作與雙組實機驗證（Antigravity）：
   - **規劃、空間尺度與區域架構**（`level4/Level4Plan.java`、`Level4Layout.java`、`Level4ChunkGenerator.java`、`Level4Travel.java`、維度/生物群系 JSON）：
     - 112×112 格區域網格（16×16 格 `7×7` 單元，一般辦公室淨高 4 格、挑高雙層雨窗中庭淨高 8 格並含 `ATRIUM_ARCH` 門楣與中央 3×3 杏仁水噴泉、無燈暗區 `DARK_WING`、實心建築核與玻璃隔間套房），接入 `LevelExits.open("4", Level4Travel::enter)` 打通 Level 2 出口門與 Level 3 電梯進階路線；修復中庭東南鄰格牆高至 8 格並修正 `amor_planter` 高度使培養菌貼合無懸空
@@ -862,4 +876,4 @@
     - 飲水機與杏仁水噴泉（`Level4WaterSourceBlock`）持空玻璃瓶裝水或空手啜飲各限裝 **2 瓶**
     - M.E.G. Base Omega（醫療員、警衛、商人、安全重生地行軍床、合金交換置物櫃、自動販賣機、拆解台）；T.B.D.（6 位隱居囤積者＋藏品櫃）；Amor Incrementum（蘑菇培養室、未持十字架/聖像框主動敵對，持護符轉為和睦並可用硬幣/合金交換淨化杏仁精華）
     - Entity 2 明亮陷阱窗敲窗誘引並可用黑染料/墨囊/木炭塗黑化解；野生異常出口（Level 71/4.3/11/2/13 及非 Omega 5/6 樓梯）移開視線約 4 秒後消失並封成牆面（Omega 5/6 樓梯與 Level 3 電梯永久保留）；配電箱復電、影印機、拔線桌機電話、凹陷地毯椅聲、雨聲/停雨徵兆與稀疏獵犬/鈍人/瞬閃笑魘
-  - **驗證**：新增 `Level4LayoutTest`（3 項）與 `Level4ClientTest`（進入 Level 4、雙模式 6 張實機截圖、飲水機 2 瓶上限、Amor 敵對→手持黃銅十字架交易消耗 1 枚遺失硬幣、墨囊塗黑陷阱窗、野生出口失視後消失、翻譯完整性）；執行 `.\gradlew.bat build --no-daemon`（27 套件 / 125 項測試 0 失敗 0 錯誤 0 跳過）、`.\gradlew.bat runClientGameTest -Plevels=4 --no-daemon`（不開光影）與 `.\gradlew.bat runClientGameTest -Plevels=4 -Pshaders --no-daemon`（開 Iris＋Complementary 光影）全數通過並逐一檢視無/有光影實機截圖正常；僅留於本機工作目錄（未提交、未推送）
+  - **驗證與合併**：新增 `Level4LayoutTest`（3 項）與 `Level4ClientTest`（進入 Level 4、雙模式 6 張實機截圖、飲水機 2 瓶上限、Amor 敵對→手持黃銅十字架交易消耗 1 枚遺失硬幣、墨囊塗黑陷阱窗、野生出口失視後消失、翻譯完整性）；先以無光影與 `-Pshaders` 通過 `Level4ClientTest`，並於合併遠端 `origin/main`（`6c57ce08`，Level 0 電影商店道具與 VHS 錄影帶）且解決 `CLAUDE.md`、`fabric.mod.json`、`en_us.json`、`zh_tw.json`、挖掘標籤等合併衝突後重跑 `.\gradlew.bat build --no-daemon` 驗證通過並依使用者要求正常推送 `main` 至 GitHub（無強制推送、無改寫歷史）
