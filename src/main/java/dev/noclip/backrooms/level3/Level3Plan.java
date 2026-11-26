@@ -39,7 +39,9 @@ final class Level3Plan {
 		/** Followers of Jerry - Blue Salvation: converted generator room with white drywall, blue lights, and murals. */
 		BLUE_SALVATION,
 		/** U.E.C. Scylla Colony: dark, hostile research outpost with apparatus and locked crates. */
-		SCYLLA_COLONY
+		SCYLLA_COLONY,
+		/** Base Gamma itself: a whole walled town in the middle of its region, over every floor of the level (GammaLayout). */
+		GAMMA
 	}
 
 	/** What joins a cell to the next one on one side. */
@@ -169,6 +171,13 @@ final class Level3Plan {
 			int roll = random.nextInt(100);
 			wanted.add(roll < 30 ? HallKind.GENERATOR : roll < 55 ? HallKind.BOILER : roll < 82 ? HallKind.ASSEMBLY : HallKind.SANCTUM);
 		}
+		// Gamma goes in first, without touching the random draws: regions without it come out exactly as before.
+		if (GammaPlan.in(seed, rx, rz)) {
+			halls.add(new Hall(GammaPlan.I, GammaPlan.J, GammaPlan.W, GammaPlan.H, HallKind.GAMMA));
+			for (int a = GammaPlan.I; a < GammaPlan.I + GammaPlan.W; a++) {
+				for (int b = GammaPlan.J; b < GammaPlan.J + GammaPlan.H; b++) hallOf[cell(a, b)] = 0;
+			}
+		}
 		for (HallKind kind : wanted) {
 			int w, h;
 			switch (kind) {
@@ -295,6 +304,11 @@ final class Level3Plan {
 	private void openHalls(SplittableRandom random) {
 		for (int h = 0; h < halls.size(); h++) {
 			Hall hall = halls.get(h);
+			// Gamma has one way in, its gate, from the wide passage north of it.
+			if (hall.kind() == HallKind.GAMMA) {
+				edges[cell(GammaPlan.FRONT_I, GammaPlan.FRONT_J) * 4 + SOUTH] = Edge.HALL;
+				continue;
+			}
 			List<int[]> sides = new ArrayList<>();
 			for (int a = hall.i(); a < hall.i() + hall.w(); a++) {
 				for (int b = hall.j(); b < hall.j() + hall.h(); b++) {
@@ -312,8 +326,14 @@ final class Level3Plan {
 		}
 	}
 
-	/** From the ways into each Base Gamma outpost, a walk back along passable passages, marking which way it lies. */
+	/**
+	 * From the ways into each Base Gamma outpost, a walk back along passable passages, marking which way it lies. In the
+	 * region that holds Gamma itself, the signs lead there instead, from anywhere in the region.
+	 */
 	private void placeBaseSigns() {
+		boolean gamma = !halls.isEmpty() && halls.get(0).kind() == HallKind.GAMMA;
+		HallKind target = gamma ? HallKind.GAMMA : HallKind.BASE;
+		int depth = gamma ? N * N : SIGN_DEPTH;
 		Arrays.fill(baseTo, (byte) -1);
 		int[] seen = new int[N * N];
 		Arrays.fill(seen, -1);
@@ -324,7 +344,7 @@ final class Level3Plan {
 			for (int d = 0; d < 4; d++) {
 				if (edges[c * 4 + d] != Edge.HALL) continue;
 				int i = c % N + DX[d], j = c / N + DZ[d];
-				if (!inside(i, j) || halls.get(hallOf[cell(i, j)]).kind() != HallKind.BASE || seen[c] >= 0) continue;
+				if (!inside(i, j) || halls.get(hallOf[cell(i, j)]).kind() != target || seen[c] >= 0) continue;
 				seen[c] = 0;
 				baseTo[c] = (byte) d;
 				queue[tail++] = c;
@@ -332,7 +352,7 @@ final class Level3Plan {
 		}
 		while (head < tail) {
 			int at = queue[head++];
-			if (seen[at] >= SIGN_DEPTH) continue;
+			if (seen[at] >= depth) continue;
 			int i = at % N, j = at / N;
 			for (int way = 0; way < 4; way++) {
 				Edge edge = edges[at * 4 + way];

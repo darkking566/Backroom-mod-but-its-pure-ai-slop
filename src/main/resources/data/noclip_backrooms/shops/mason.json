@@ -1,0 +1,6 @@
+{
+  "sells": [
+    {"item": "noclip_backrooms:almond_gas_mask", "count": 1, "price": 180},
+    {"item": "noclip_backrooms:almond_water", "count": 2, "price": 35}
+  ]
+}

@@ -2,11 +2,13 @@ package dev.noclip.backrooms.level3;
 
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.core.LevelExits;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 
 /**
@@ -35,5 +37,13 @@ public final class Level3 {
 		Level3Events.register();
 		Level3Monsters.register();
 		Level3Bases.register();
+	}
+
+	/**
+	 * Whether (x, z) is inside Base Gamma, read off the blocks alone (the client has no seed): only there is the top of
+	 * the level, under the bedrock, Gamma's roof instead of bedrock.
+	 */
+	public static boolean insideGamma(BlockGetter level, int x, int z) {
+		return level.getBlockState(new BlockPos(x, GammaLayout.ROOF, z)).is(Level3Blocks.MEG_WALL);
 	}
 }

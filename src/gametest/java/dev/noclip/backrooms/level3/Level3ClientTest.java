@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level3;
 
+import dev.noclip.backrooms.TestFilter;
 import dev.noclip.backrooms.core.LevelExits;
 import dev.noclip.backrooms.core.people.Person;
 import dev.noclip.backrooms.core.trade.ShopRole;
@@ -60,17 +61,18 @@ public final class Level3ClientTest implements FabricClientGameTest {
 			for (int yaw = 0; yaw < 360; yaw += 90) {
 				shoot(context, game, arrival.getX() + 0.5, STAND, arrival.getZ() + 0.5, yaw, 5, "level3_arrival_yaw_" + yaw);
 			}
-			passages(context, game, seed, arrival);
-			halls(context, game, seed, arrival);
-			gate(context, game, seed, arrival);
-			exits(context, game, seed, arrival);
-			hazards(context, game, seed, arrival);
-			paranoia(context, game, seed, arrival);
-			angel(context, game, seed, arrival);
-			hounds(context, game, seed, arrival);
-			monsters(context, game, seed, arrival);
-			bases(context, game, seed, arrival);
-			checkBlocks(game);
+			if (TestFilter.section("passages")) passages(context, game, seed, arrival);
+			if (TestFilter.section("halls")) halls(context, game, seed, arrival);
+			if (TestFilter.section("gate")) gate(context, game, seed, arrival);
+			if (TestFilter.section("exits")) exits(context, game, seed, arrival);
+			if (TestFilter.section("hazards")) hazards(context, game, seed, arrival);
+			if (TestFilter.section("paranoia")) paranoia(context, game, seed, arrival);
+			if (TestFilter.section("angel")) angel(context, game, seed, arrival);
+			if (TestFilter.section("hounds")) hounds(context, game, seed, arrival);
+			if (TestFilter.section("monsters")) monsters(context, game, seed, arrival);
+			if (TestFilter.section("bases")) bases(context, game, seed, arrival);
+			if (TestFilter.section("gamma")) gamma(context, game, seed, arrival);
+			if (TestFilter.section("blocks")) checkBlocks(game);
 		}
 	}
 
@@ -122,6 +124,8 @@ public final class Level3ClientTest implements FabricClientGameTest {
 	/** Every kind of hall, from a corner. */
 	private static void halls(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
 		for (HallKind kind : HallKind.values()) {
+			// Gamma is far bigger than a hall; it has its own section.
+			if (kind == HallKind.GAMMA) continue;
 			int[] at = nearest(seed, from, t -> t.kind() == Kind.HALL && t.hall().kind() == kind && t.hx() == 1 && t.hz() == 1, (x, z) -> true);
 			Tile tile = Level3Layout.tile(seed, at[0], at[1]);
 			int w = Level3Halls.width(tile.hall()), d = Level3Halls.depth(tile.hall());
@@ -350,6 +354,130 @@ public final class Level3ClientTest implements FabricClientGameTest {
 			server.runCommand("gamemode spectator @a");
 		}
 		server.runCommand("kill @e[tag=" + Level3Bases.UEC_TAG + "]");
+	}
+
+	/**
+	 * Base Gamma: up to the gate from the maze, turned back at the checkpoint while armed and let through without
+	 * weapons, settling in a room, everyone at their place, the hot spring, and a look round every part.
+	 */
+	private static void gamma(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
+		var server = game.getServer();
+		int[] gate = GammaPlan.nearestGate(seed, from.getX(), from.getZ());
+		check(gate != null, "no Base Gamma within reach of " + from);
+		int x0 = gate[0] - GammaLayout.GATE_U, z0 = gate[1];
+		int gx = gate[0];
+		shoot(context, game, gx + 1.0, STAND, z0 - 4.5, 0, 5, "level3_gamma_gate");
+		server.runOnServer(s -> {
+			ServerLevel level = level3(s);
+			for (int x = x0 - 2; x < x0 + GammaLayout.W + 2; x += 3) {
+				for (int z = z0 - 2; z < z0 + 14; z++) {
+					for (int y = 1; y < Level3ChunkGenerator.HEIGHT - 1; y += 2) {
+						BlockPos pos = new BlockPos(x, y, z);
+						if (!level.isLoaded(pos)) continue;
+						check(level.getBlockState(pos).is(Level3ChunkGenerator.blockAt(seed, x, y, z).getBlock()), "Gamma differs from its template at " + pos);
+					}
+				}
+			}
+		});
+
+		// The checkpoint: an iron sword sets the detector off; without it, the guards let you in.
+		BlockPos detector = new BlockPos(gx, GammaLayout.RESIDENTIAL + 1, z0 + 9);
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_3 run tp @s %.1f %d %.1f 0 0", gx + 0.5, GammaLayout.RESIDENTIAL + 1, z0 + 7.5));
+		server.runCommand("gamemode survival @a");
+		server.runCommand("clear @a");
+		server.runCommand("give @a minecraft:iron_sword");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(10);
+		server.runOnServer(s -> {
+			ServerLevel level = level3(s);
+			check(level.getBlockState(detector).is(Level3Blocks.CHECKPOINT_DOOR), "no metal detector at " + detector);
+			use(level, player(s), detector);
+			check(player(s).getZ() < z0 + 9, "let through with a sword");
+		});
+		server.runCommand("clear @a");
+		server.runOnServer(s -> {
+			use(level3(s), player(s), detector);
+			check(player(s).getZ() > z0 + 10, "not let through without weapons: " + player(s).position());
+			use(level3(s), player(s), detector.above());
+			check(player(s).getZ() < z0 + 9, "not let back out");
+			use(level3(s), player(s), detector);
+		});
+		server.runCommand("gamemode spectator @a");
+		shoot(context, game, gx + 1.0, GammaLayout.RESIDENTIAL + 1.6, z0 + 3.5, 0, 10, "level3_gamma_checkpoint");
+
+		// Everyone at their place, once only however often it is asked.
+		shoot(context, game, x0 + 27.5, GammaLayout.RESIDENTIAL + 1, z0 + 12.5, 0, 5, "level3_gamma_street");
+		server.runOnServer(s -> {
+			ServerLevel level = level3(s);
+			Level3Bases.populateNear(level, seed, player(s));
+			Level3Bases.populateNear(level, seed, player(s));
+			AABB box = new AABB(x0, 0, z0, x0 + GammaLayout.W, Level3ChunkGenerator.HEIGHT, z0 + GammaLayout.D);
+			for (GammaLayout.Spot spot : GammaLayout.PEOPLE) {
+				String tag = "noclip_backrooms_gamma_" + spot.id();
+				int count = level.getEntitiesOfClass(Person.class, box, p -> p.entityTags().contains(tag)).size();
+				check(count == 1, spot.id() + ": " + count + " people");
+			}
+			check(level.getEntitiesOfClass(Person.class, box, p -> ShopRole.of(p) == ShopRole.MASON).size() == 1, "no Mason");
+		});
+
+		// Settling in a room: a cot sets the respawn and offers the way home.
+		int[] cot = find(GammaLayout.Thing.COT);
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_3 run tp @s %.1f %d %.1f", x0 + cot[0] + 1.5, cot[1], z0 + cot[2] + 0.5));
+		server.runCommand("gamemode survival @a");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(5);
+		server.runOnServer(s -> {
+			BlockPos at = new BlockPos(x0 + cot[0], cot[1], z0 + cot[2]);
+			check(level3(s).getBlockState(at).is(Level3Blocks.COT), "no cot at " + at);
+			use(level3(s), player(s), at);
+			check(dev.noclip.backrooms.core.trip.Trips.settled(player(s)), "a Gamma cot did not settle the player");
+		});
+
+		// The hot spring settles the mind.
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_3 run tp @s %.1f %d %.1f",
+				x0 + GammaLayout.SPRING_U0 + 2.5, GammaLayout.MALL_1, z0 + GammaLayout.SPRING_V0 + 2.5));
+		game.getConnection().waitForChunksDownload();
+		server.runOnServer(s -> dev.noclip.backrooms.core.rpg.PlayerRpg.drainSanity(player(s), 1000));
+		float low = server.computeOnServer(s -> dev.noclip.backrooms.core.rpg.PlayerRpg.get(player(s)).sanity());
+		context.waitTicks(80);
+		server.runOnServer(s -> check(player(s).isInWater(), "not in the hot spring"));
+		float after = server.computeOnServer(s -> dev.noclip.backrooms.core.rpg.PlayerRpg.get(player(s)).sanity());
+		check(after > low + 2, "the hot spring did nothing: " + low + " -> " + after);
+
+		// The way out to Level 11 and the elevator are there.
+		int[] exit = find(GammaLayout.Thing.EXIT_DOOR), lift = find(GammaLayout.Thing.ELEVATOR);
+		server.runOnServer(s -> {
+			check(level3(s).getBlockState(new BlockPos(x0 + exit[0], exit[1], z0 + exit[2])).is(Level3Blocks.BASE_GAMMA_DOOR), "no door to Level 11");
+			check(level3(s).getBlockState(new BlockPos(x0 + lift[0], lift[1], z0 + lift[2])).is(Level3Blocks.ELEVATOR), "no elevator");
+		});
+
+		server.runCommand("gamemode spectator @a");
+		shoot(context, game, x0 + 12.5, GammaLayout.MALL_3 + 2.6, z0 + 24.5, -90, 30, "level3_gamma_atrium");
+		shoot(context, game, x0 + 8.5, GammaLayout.MALL_1 + 2.6, z0 + 10.5, -60, 10, "level3_gamma_mall");
+		shoot(context, game, x0 + 23.5, GammaLayout.MALL_1 + 1.6, z0 + 16.5, 0, -70, "level3_gamma_daylight");
+		shoot(context, game, x0 + 24.5, GammaLayout.MALL_1 + 3.6, z0 + 28.5, 180, 25, "level3_gamma_spring");
+		shoot(context, game, x0 + 9.5, GammaLayout.MALL_2 + 1.6, z0 + 15.5, 180, 5, "level3_gamma_old_quarter");
+		shoot(context, game, x0 + 53.5, GammaLayout.MALL_1 + 1.6, z0 + 14.5, 180, 5, "level3_gamma_storage");
+		shoot(context, game, x0 + 17.5, GammaLayout.TUNNEL + 1.6, z0 + 40.5, 90, 5, "level3_gamma_tunnel");
+		shoot(context, game, x0 + 40.5, GammaLayout.ADMIN + 1.6, z0 + 43.5, 90, 5, "level3_gamma_admin_door");
+		shoot(context, game, x0 + 18.5, GammaLayout.RESIDENTIAL + 1.6, z0 + 16.5, 90, 5, "level3_gamma_room");
+	}
+
+	/** The first block of something in Gamma's template, as {u, y, v}. */
+	private static int[] find(GammaLayout.Thing thing) {
+		for (int y = 0; y < GammaLayout.Y; y++) {
+			for (int v = 0; v < GammaLayout.D; v++) {
+				for (int u = 0; u < GammaLayout.W; u++) {
+					GammaLayout.Bit bit = GammaLayout.at(u, y, v);
+					if (bit.thing() == thing && bit.part() == 0) return new int[] {u, y, v};
+				}
+			}
+		}
+		throw new AssertionError("no " + thing + " in Gamma");
+	}
+
+	private static void use(ServerLevel level, ServerPlayer player, BlockPos pos) {
+		level.getBlockState(pos).useWithoutItem(level, player, new net.minecraft.world.phys.BlockHitResult(Vec3.atCenterOf(pos), net.minecraft.core.Direction.UP, pos, false));
 	}
 
 	private static void checkBlocks(TestSingleplayerContext game) {

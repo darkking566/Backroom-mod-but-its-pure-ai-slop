@@ -82,6 +82,7 @@ public final class Level3Layout {
 	}
 
 	static Profile profile(long seed, int gi, int gj) {
+		if (GammaPlan.front(seed, gi, gj)) return Profile.WIDE;
 		int roll = Math.floorMod(hash(seed, gi, gj, PROFILES), 100);
 		return roll < 22 ? Profile.WIDE : roll < 65 ? Profile.NORMAL : roll < 85 ? Profile.NARROW : Profile.LOW;
 	}
@@ -105,7 +106,10 @@ public final class Level3Layout {
 		int i = lx / CELL, j = lz / CELL, ox = lx % CELL, oz = lz % CELL;
 		int cell = Level3Plan.cell(i, j);
 		int hall = plan.hallOf[cell];
-		if (hall >= 0) return hallTile(plan, plan.halls.get(hall), lx, lz);
+		if (hall >= 0) {
+			Hall h = plan.halls.get(hall);
+			return h.kind() == Level3Plan.HallKind.GAMMA ? gammaTile(h, lx, lz) : hallTile(plan, h, lx, lz);
+		}
 		Profile p = plan.profile(i, j);
 
 		boolean edgeX = ox == 0 || ox == CELL - 1, edgeZ = oz == 0 || oz == CELL - 1;
@@ -148,6 +152,16 @@ public final class Level3Layout {
 			if (ox == tx && oz == tz) return new Tile(Kind.EXIT, Level3Plan.opposite(d), p.clearance, exit, null, 0, 0);
 		}
 		return Tile.WALL;
+	}
+
+	/** Gamma's outer wall, its gate, and inside: GammaLayout says what is there at each height. */
+	private static Tile gammaTile(Hall hall, int lx, int lz) {
+		int u = lx - hall.x0(), v = lz - hall.z0();
+		if (v == 0 && u >= GammaLayout.GATE_U && u <= GammaLayout.GATE_U + 1) {
+			return new Tile(Kind.HALL_GAP, NORTH, GammaLayout.GATE_CLEARANCE, null, hall, u, v);
+		}
+		boolean edge = u == 0 || v == 0 || u == GammaLayout.W - 1 || v == GammaLayout.D - 1;
+		return new Tile(edge ? Kind.HALL_WALL : Kind.HALL, 0, edge ? 0 : Level3Halls.HEIGHT, null, hall, u, v);
 	}
 
 	private static Tile hallTile(Level3Plan plan, Hall hall, int lx, int lz) {

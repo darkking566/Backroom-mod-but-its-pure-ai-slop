@@ -106,12 +106,14 @@ class Level3LayoutTest {
 		for (int rx = -3; rx <= 3; rx++) {
 			for (int rz = -3; rz <= 3; rz++) {
 				Level3Plan plan = Level3Plan.of(SEED, rx, rz);
+				// In Gamma's own region the signs lead there from anywhere in the region.
+				int depth = GammaPlan.in(SEED, rx, rz) ? Level3Plan.N * Level3Plan.N : Level3Plan.SIGN_DEPTH;
 				for (int c = 0; c < Level3Plan.N * Level3Plan.N; c++) {
 					if (plan.baseTo[c] < 0) continue;
 					int at = c, steps = 0;
 					while (true) {
 						int d = plan.baseTo[at];
-						assertTrue(d >= 0 && steps++ <= Level3Plan.SIGN_DEPTH, "signs lose the way in region " + rx + ", " + rz);
+						assertTrue(d >= 0 && steps++ <= depth, "signs lose the way in region " + rx + ", " + rz);
 						if (plan.edge(at, d) == Level3Plan.Edge.HALL) break;
 						at = Level3Plan.cell(at % Level3Plan.N + Level3Plan.DX[d], at / Level3Plan.N + Level3Plan.DZ[d]);
 					}

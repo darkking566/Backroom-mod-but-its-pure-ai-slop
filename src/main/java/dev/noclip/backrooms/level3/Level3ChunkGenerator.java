@@ -17,6 +17,8 @@ import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
@@ -84,6 +86,7 @@ final class Level3ChunkGenerator extends ChunkGenerator {
 		}
 
 		BlockState block(int y) {
+			if (tile.hall() != null && tile.hall().kind() == Level3Plan.HallKind.GAMMA) return gamma(y);
 			// Bedrock under the floor and over the roof, so nothing gets out underneath or lands on top.
 			if (y == 0 || y > ROOF_Y) return Blocks.BEDROCK.defaultBlockState();
 			if (y < FLOOR_Y) return Blocks.CONCRETE.gray().defaultBlockState();
@@ -230,6 +233,57 @@ final class Level3ChunkGenerator extends ChunkGenerator {
 				case BLUE_SALVATION -> state(Level3Blocks.FOJ_WHITE_WALL);
 				case GENERATOR, BOILER, ASSEMBLY, SCYLLA_COLONY -> state(Level3Blocks.CINDER_BLOCK_WALL);
 				case CAR -> state(Level3Blocks.RED_BRICK_WALL);
+				case GAMMA -> state(Level3Blocks.MEG_WALL);
+			};
+		}
+
+		/** Base Gamma, after GammaLayout's template; tile.hx and hz are the position inside it. */
+		private BlockState gamma(int y) {
+			GammaLayout.Bit bit = GammaLayout.at(tile.hx(), y, tile.hz());
+			Direction facing = Direction.from2DDataValue(horizontal(bit.dir()));
+			Direction.Axis along = bit.dir() == 1 ? Direction.Axis.Z : Direction.Axis.X;
+			return switch (bit.thing()) {
+				case AIR -> air();
+				case BEDROCK -> Blocks.BEDROCK.defaultBlockState();
+				case BRICK -> state(Level3Blocks.RED_BRICK_WALL);
+				case WALL -> state(Level3Blocks.MEG_WALL);
+				case FLOOR -> state(Level3Blocks.DUSTY_FLOOR);
+				case MALL_FLOOR -> state(Level3Blocks.GLAZED_TILE_WALL);
+				case CEILING -> state(Level3Blocks.STATION_CEILING);
+				case LIGHT -> axis(Level3Blocks.STATION_LIGHT);
+				case BULB -> axis(Level3Blocks.CAGE_BULB);
+				case DAYLIGHT -> state(Level3Blocks.DAYLIGHT_PANEL);
+				case RAIL -> Level3Blocks.BLACK_BARS.defaultBlockState().setValue(Level3AxisBlock.AXIS, along);
+				case STAIRS -> Blocks.POLISHED_ANDESITE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, facing);
+				case GLASS -> Blocks.GLASS.defaultBlockState();
+				case WATER -> Blocks.WATER.defaultBlockState();
+				case RIM -> state(Level3Blocks.CINDER_BLOCK_WALL);
+				case CHECKPOINT -> part(Level3Blocks.CHECKPOINT_DOOR, bit.part(), facing);
+				case LOCKER -> Blocks.BARREL.defaultBlockState().setValue(BlockStateProperties.FACING, facing);
+				case COT -> Level3Blocks.COT.defaultBlockState().setValue(Level3FacingBlock.FACING, facing);
+				case TABLE -> state(Level3Blocks.TABLE);
+				case SUPPLY_CRATE -> state(Level3Blocks.SUPPLY_CRATE);
+				case CRATE -> state(Level3Blocks.PARTS_CRATE);
+				case CAMERA -> Level3Blocks.SECURITY_CAMERA.defaultBlockState().setValue(Level3FacingBlock.FACING, facing);
+				case MEG_SIGN -> state(Level3Blocks.MEG_SIGN);
+				case LECTERN -> Blocks.LECTERN.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, facing);
+				case IRON_DOOR -> Blocks.IRON_DOOR.defaultBlockState().setValue(DoorBlock.FACING, facing)
+						.setValue(DoorBlock.HALF, bit.part() == 0 ? DoubleBlockHalf.LOWER : DoubleBlockHalf.UPPER);
+				case CAGE_GATE -> Level3Blocks.CAGE_GATE.defaultBlockState().setValue(Level3GateBlock.AXIS, along)
+						.setValue(Level3GateBlock.HALF, bit.part() == 0 ? DoubleBlockHalf.LOWER : DoubleBlockHalf.UPPER);
+				case EXIT_DOOR -> part(Level3Blocks.BASE_GAMMA_DOOR, bit.part(), facing);
+				case ELEVATOR -> part(Level3Blocks.ELEVATOR, bit.part(), facing);
+				case PLANKS -> Blocks.SPRUCE_PLANKS.defaultBlockState();
+				case PATCH -> Blocks.OAK_PLANKS.defaultBlockState();
+				case COBWEB -> Blocks.COBWEB.defaultBlockState();
+				case CANOPY_RED -> Blocks.WOOL.red().defaultBlockState();
+				case CANOPY_YELLOW -> Blocks.WOOL.yellow().defaultBlockState();
+				case CANOPY_BLUE -> Blocks.WOOL.blue().defaultBlockState();
+				case SERVER -> part(Level3Blocks.SWITCHGEAR, bit.part(), facing);
+				case ARCADE -> Blocks.CONCRETE.black().defaultBlockState();
+				case SCREEN -> Blocks.SEA_LANTERN.defaultBlockState();
+				case JUKEBOX -> Blocks.JUKEBOX.defaultBlockState();
+				case SMOKER -> Blocks.SMOKER.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, facing);
 			};
 		}
 
