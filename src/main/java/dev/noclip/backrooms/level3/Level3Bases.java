@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
@@ -28,6 +29,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.illager.Pillager;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.AABB;
 
 /**
@@ -49,6 +51,9 @@ final class Level3Bases {
 		ServerTickEvents.END_SERVER_TICK.register(Level3Bases::tick);
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> LAST_VISITED.clear());
 		// Gamma's snipers (CN wiki: there is a sniper at the entrance): attack anyone there, and you are shot.
+		// Gamma's walls hold: no digging round the checkpoint or into the locked parts.
+		PlayerBlockBreakEvents.BEFORE.register((world, player, pos, state, blockEntity) ->
+				!(world instanceof ServerLevel level) || level.dimension() != Level3.LEVEL_3 || player.isCreative() || !inGamma(level, pos));
 		AttackEntityCallback.EVENT.register((player, world, hand, entity, hit) -> {
 			if (!(world instanceof ServerLevel level) || player.isCreative() || player.isSpectator() || !(entity instanceof Person)) return InteractionResult.PASS;
 			if (entity.entityTags().stream().noneMatch(tag -> tag.startsWith("noclip_backrooms_gamma_"))) return InteractionResult.PASS;
@@ -72,6 +77,12 @@ final class Level3Bases {
 			}
 			if (now % INTERVAL == 0) populateNear(level, seed, player);
 		}
+	}
+
+	/** Whether a block is part of Base Gamma, its outer wall included. */
+	static boolean inGamma(ServerLevel level, BlockPos pos) {
+		Tile tile = Level3Layout.tile(Level3ChunkGenerator.planSeed(level.getChunkSource().randomState()), pos.getX(), pos.getZ());
+		return tile.hall() != null && tile.hall().kind() == HallKind.GAMMA;
 	}
 
 	/** Gamma's hot spring: sitting in it, the mind settles. */
@@ -149,11 +160,14 @@ final class Level3Bases {
 	/** Everyone in Gamma has a place of their own; each is filled in as soon as its chunk is there and nobody stands in it. */
 	private static int populateGamma(ServerLevel level, Placed placed) {
 		int spawned = 0;
+		AABB box = new AABB(placed.x0(), 0, placed.z0(), placed.x0() + GammaLayout.W, Level3ChunkGenerator.HEIGHT, placed.z0() + GammaLayout.D);
 		for (GammaLayout.Spot spot : GammaLayout.PEOPLE) {
 			BlockPos at = new BlockPos(placed.x0() + spot.u(), spot.y(), placed.z0() + spot.v());
-			if (!level.isLoaded(at)) continue;
+			// Entities load a moment after their chunk: asking before then would find nobody and spawn a second one.
+			if (!level.isLoaded(at) || !level.areEntitiesLoaded(ChunkPos.pack(at))) continue;
 			String tag = "noclip_backrooms_gamma_" + spot.id();
-			if (!level.getEntitiesOfClass(Person.class, new AABB(at).inflate(3), p -> p.entityTags().contains(tag)).isEmpty()) continue;
+			// Anywhere in Gamma, not just at the spot: people get pushed about.
+			if (!level.getEntitiesOfClass(Person.class, box, p -> p.entityTags().contains(tag)).isEmpty()) continue;
 			if (spawnStaff(level, at, spot.look(), spot.name(), spot.role() == null ? null : ShopRole.byId(spot.role()), tag) > 0) spawned++;
 		}
 		return spawned;

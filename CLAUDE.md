@@ -477,6 +477,11 @@
   - 驗證：`gradlew build` 與 `runClientGameTest -Plevels=3 -Psections=gamma` 通過；Level 3 其他段這次沒重跑；狙擊手沒實機測；整體偏暗但看得清
   - 還沒做：三個側門、監視器提示、帶刺鐵絲網與電網、其他圖的方向距離路標、檔案員收拓印、新方塊的寫實貼圖（細節見 POI.md D 節「實作狀態」）
 - 使用者同意後，把 `main` 推送到 GitHub（`dbe0ff1d` POI 企劃、`b7103b73` Gamma 規格、`b729e8c9` Gamma 基地第一版）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- 自己審查 Gamma 那次提交後修兩項（使用者同意）：
+  - Gamma 的牆原本挖得掉（可以挖開探測門旁的牆帶武器進去、挖進鎖住的行政部）：生存模式下 Gamma 範圍內（含外牆，伺服器用迷宮配置判斷）的方塊都不能破壞（`Level3Bases.inGamma`、`PlayerBlockBreakEvents.BEFORE`）
+  - Gamma 的人會多生：人被推離自己的位置超過 3 格就會再生一個；區塊載入後實體還沒載入就檢查也會多生。改成整座 Gamma 找同標籤的人，而且實體還沒載入就先不檢查（`areEntitiesLoaded`）
+  - `gamma` 實機測試段加：生存模式挖探測門旁的牆與外牆挖不掉、把居民推開 5 格再檢查還是只有一個；`gradlew build` 與 `runClientGameTest -Plevels=3 -Psections=gamma` 通過
+  - 沒修：狙擊手沒有測試、把武器藏在收納袋或界伏盒裡可以過探測門
 
 ## 動作記錄（Antigravity）
 
