@@ -623,6 +623,7 @@
   - 驗證：`runClientGameTest -Plevels=frontrooms` 通過；截圖 `docs/project/1-gameplay/images/town_398.jpg`；企劃寫上已做與還沒做（畫面再暗、好結局「回家了」怎麼接結局 B、小女孩、槍店、時鐘真的變慢）
   - Antigravity 仍有未提交的改動在工作區，只提交我的檔案
 - 398 的夜晚變暗：新增 `Night398Payload`（伺服器在夜晚狀態改變時告訴前室裡的人）與客戶端 `frontrooms/Night398Client`；`core/look/Look` 多一種 `NIGHT_398`（霧 4～34 格、暗紅、光照衰減 0.14），前室在 398 的夜晚也套用（開光影時不套）；`BackroomsClient` 加一行註冊；`runClientGameTest -Plevels=frontrooms` 通過，夜景截圖換成新的
+- 使用者同意後推送：抓過 GitHub，沒有新提交要合併；推送前用另開的 git worktree 只拿已提交的程式編譯並跑單元測試（147 個全過，工作區裡 Antigravity 未提交的改動不算進去），把 `main` 推送到 GitHub（眷舍小鎮 `8cb578ec`、398 的夜晚 `f0d71c0c`、夜晚變暗 `38ee0823`）；Antigravity 未提交的改動沒有推；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
