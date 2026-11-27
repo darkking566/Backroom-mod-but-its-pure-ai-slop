@@ -2170,5 +2170,13 @@
   "block.noclip_backrooms.town_shingle_stairs": "Asphalt Shingle Roof",
   "block.noclip_backrooms.town_window": "Six-Pane Window",
   "block.noclip_backrooms.town_garage_door": "Garage Door",
-  "block.noclip_backrooms.town_garage_door_top": "Garage Door (Top)"
+  "block.noclip_backrooms.town_garage_door_top": "Garage Door (Top)",
+  "title.noclip_backrooms.398": "Level 398",
+  "title.noclip_backrooms.398.subtitle": "\"A Cruel Prank\"",
+  "message.noclip_backrooms.398.lamp": "It's warm under the streetlight. Surely it'll be morning soon.",
+  "message.noclip_backrooms.398.house": "The door is shut and the sounds outside are gone. Like coming home.",
+  "message.noclip_backrooms.398.never_left": "(Bad ending) You never left.",
+  "ending.noclip_backrooms.never_left.title": "You Never Left",
+  "ending.noclip_backrooms.never_left.subtitle": "When you wake, a fluorescent light is humming overhead.",
+  "message.noclip_backrooms.town.clock_398": "The clock has stopped at two minutes to twelve. As if it always had."
 }

@@ -616,6 +616,12 @@
   - 測試：新增 `FrontroomsTownTest`（物件放在空處且有東西撐著、每棟房子的門與屋內、店的櫃台、野餐的位置都從街上走得到、物件清單跟工具的一致）；`FrontroomsClientTest` 加門、居民、信箱一天一封、野餐回飢餓的檢查與 4 張小鎮照
   - 驗證：前室的 11 個單元測試、`runClientGameTest -Plevels=frontrooms,horror,film` 通過；`gradlew build` 有 1 個失敗在 Antigravity 進行中的 `ExplorationSystemsTest`（它同時在改 `RelayService` 等，與小鎮無關）
   - 同時 Antigravity 在同一資料夾改程式（任務／LevelGates、RPG、商店、語言檔、遊戲玩法企劃），只提交我的檔案；語言檔與企劃只放我的那幾段
+- 398 的夜晚（使用者確認微笑夢魘直接用朋友做的微笑者）：
+  - 新增 `frontrooms/Nights398`：前室入夜且有人讀完 B2 檔案時變成 Level 398；標題、白天的人消失、草坪上站著無面靈、每人一隻調強的微笑者（血量 2 倍、速度 1.15 倍）；在路燈下待 60 秒或晚上進屋關門待 10 秒是壞結局「從來沒有離開過」，3 秒後在 Level 0 醒來；天亮全部清掉
+  - `FrontroomsTown` 多了房子與路燈的位置清單；`TownLife` 在 398 的夜晚不放白天的人、時鐘停住
+  - 測試：`FrontroomsClientTest` 最後加 398 的檢查（讀完檔案、入夜、無面靈與微笑者出現、白天的人不在、拍夜景、站在路燈下被送到 Level 0、天亮全部消失）；第一次把這段放在中間，讓玩家去 Level 0 再回來，打亂了後面「交滿三期」的檢查，移到最後就通過了
+  - 驗證：`runClientGameTest -Plevels=frontrooms` 通過；截圖 `docs/project/1-gameplay/images/town_398.jpg`；企劃寫上已做與還沒做（畫面再暗、好結局「回家了」怎麼接結局 B、小女孩、槍店、時鐘真的變慢）
+  - Antigravity 仍有未提交的改動在工作區，只提交我的檔案
 
 ## 動作記錄（Antigravity）
 

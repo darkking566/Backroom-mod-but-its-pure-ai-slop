@@ -187,6 +187,7 @@ public final class FrontroomsClientTest implements FabricClientGameTest {
 				check(p.getFoodData().getFoodLevel() > 4, "the picnic did not feed the player");
 				TownLife.clock(p);
 			});
+
 			server.runCommand("gamemode spectator @a");
 			server.runCommand("gamemode survival @a");
 
@@ -244,7 +245,50 @@ public final class FrontroomsClientTest implements FabricClientGameTest {
 			check(server.computeOnServer(s -> Quota.deploy(player(s), "0", true)), "the pad would not send the player in");
 			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 200);
 			check(!server.computeOnServer(s -> Extraction.running(player(s))), "a pickup is still running");
+
+			// Level 398: once someone knows the truth of the B2 files, the town's nights are 398's.
+			// (Last: it sends the player to Level 0 and back, so it must not come between the quotas above.)
+			server.runOnServer(s -> Institute.receive(player(s)));
+			server.waitFor(s -> player(s).level().dimension() == Home.FRONTROOMS, 200);
+			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
+			context.runOnClient(client -> client.gui.screen().onClose());
+			server.runCommand("gamemode creative @a");
+			server.runCommand("execute as @a in noclip_backrooms:frontrooms run tp @s -70.5 %d 80.5 90 0".formatted(FrontroomsTown.G + 1));
+			game.getConnection().waitForChunksRender();
+			server.runOnServer(s -> {
+				for (int i = 0; i < dev.noclip.backrooms.core.ending.Endings.TOTAL_ARCHIVE_FILES; i++) dev.noclip.backrooms.core.ending.Endings.recordFile(player(s), i);
+			});
+			server.runCommand("time set midnight");
+			server.waitFor(s -> Nights398.active(level(s)), 200);
+			server.waitFor(s -> nightThings(s, dev.noclip.backrooms.monsters.faceling.Faceling.class) >= 3
+					&& nightThings(s, dev.noclip.backrooms.monsters.smiler.Smiler.class) >= 1, 400);
+			check(server.computeOnServer(s -> level(s).getEntitiesOfClass(Person.class, new net.minecraft.world.phys.AABB(-120, 60, 50, -10, 80, 115),
+					p -> p.entityTags().contains(TownLife.TAG)).isEmpty()), "the town's day people are still out on a night of 398");
+			shoot(context, server, game, "frontrooms_398", -76.5, FrontroomsTown.G + 2, 80.5, -90, 0);
+			// Waiting under a streetlight for the morning: you never left, and wake in Level 0.
+			server.runOnServer(s -> Nights398.lampTicks = 60);
+			server.runCommand("gamemode creative @a");
+			server.runCommand("execute as @a in noclip_backrooms:frontrooms run tp @s -71.5 %d 77.5".formatted(FrontroomsTown.G + 1));
+			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 400);
+			server.runOnServer(s -> Nights398.lampTicks = 60 * 20);
+			// Back to the institute; morning takes the night away.
+			server.runOnServer(s -> Institute.receive(player(s)));
+			server.waitFor(s -> player(s).level().dimension() == Home.FRONTROOMS, 200);
+			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
+			context.runOnClient(client -> client.gui.screen().onClose());
+			server.runCommand("time set day");
+			server.runCommand("execute as @a in noclip_backrooms:frontrooms run tp @s -70.5 %d 80.5".formatted(FrontroomsTown.G + 1));
+			server.waitFor(s -> !Nights398.active(level(s)) && nightThings(s, net.minecraft.world.entity.Entity.class) == 0, 200);
 		}
+	}
+
+	/** How many things of a 398 night (Nights398) of a kind are about. */
+	private static int nightThings(MinecraftServer s, Class<? extends net.minecraft.world.entity.Entity> kind) {
+		int count = 0;
+		for (var entity : level(s).getAllEntities()) {
+			if (kind.isInstance(entity) && entity.entityTags().contains(Nights398.TAG)) count++;
+		}
+		return count;
 	}
 
 	/** A spectator's picture from a place, looking a way. */

@@ -164,6 +164,10 @@ public final class TownLife {
 	/** The clock: the day of the cycle, and that the days are getting slower. */
 	static void clock(ServerPlayer player) {
 		MinecraftServer server = player.level().getServer();
+		if (Nights398.active(player.level())) {
+			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.town.clock_398").withStyle(ChatFormatting.DARK_RED));
+			return;
+		}
 		int day = QuotaMath.day(Quota.data(server).homeTicks());
 		String key = Quota.rejection(server) > 0 ? "message.noclip_backrooms.town.clock_slow" : "message.noclip_backrooms.town.clock";
 		player.sendSystemMessage(Component.translatable(key, day).withStyle(ChatFormatting.GOLD));
@@ -171,6 +175,8 @@ public final class TownLife {
 
 	/** Keeps the town's people where they belong, once their part of the town and its entities are loaded. */
 	static void people(ServerLevel level) {
+		// On the nights of 398 they are not there (Nights398).
+		if (Nights398.active(level)) return;
 		for (int i = 0; i < FrontroomsTown.PICNIC.length; i++) {
 			int[] spot = FrontroomsTown.PICNIC[i];
 			keep(level, "noclip_backrooms_town_picnic_" + i, PICNIC_LOOKS[i], spot, PICNIC_YAWS[i], null, true);

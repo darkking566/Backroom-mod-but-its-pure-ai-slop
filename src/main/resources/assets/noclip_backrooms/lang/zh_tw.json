@@ -2170,5 +2170,13 @@
   "block.noclip_backrooms.town_shingle_stairs": "瀝青瓦屋頂",
   "block.noclip_backrooms.town_window": "六格窗",
   "block.noclip_backrooms.town_garage_door": "車庫門",
-  "block.noclip_backrooms.town_garage_door_top": "車庫門（上段）"
+  "block.noclip_backrooms.town_garage_door_top": "車庫門（上段）",
+  "title.noclip_backrooms.398": "Level 398",
+  "title.noclip_backrooms.398.subtitle": "「慘無人道的惡作劇」",
+  "message.noclip_backrooms.398.lamp": "路燈底下很暖。再等一下就天亮了吧。",
+  "message.noclip_backrooms.398.house": "門關上了，外面的聲音都不見了。好像回到家了。",
+  "message.noclip_backrooms.398.never_left": "（壞結局）從來沒有離開過。",
+  "ending.noclip_backrooms.never_left.title": "從來沒有離開過",
+  "ending.noclip_backrooms.never_left.subtitle": "你醒來的時候，頭頂的日光燈正嗡嗡作響。",
+  "message.noclip_backrooms.town.clock_398": "時鐘停了，停在十二點差兩分。好像一直都是這樣。"
 }

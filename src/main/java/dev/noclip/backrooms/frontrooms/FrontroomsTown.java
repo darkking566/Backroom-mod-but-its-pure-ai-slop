@@ -188,6 +188,39 @@ public final class FrontroomsTown {
 		return TYPES.get(id);
 	}
 
+	/** A house: its front door's lower block, and the room inside (x0..x1, z0..z1 on the floor y G + 1). */
+	public record House(int doorX, int doorZ, int x0, int z0, int x1, int z1) {
+		public boolean inside(double x, double y, double z) {
+			return x >= x0 && x < x1 + 1 && z >= z0 && z < z1 + 1 && y >= G + 1 && y < G + 5;
+		}
+	}
+
+	/** The eight houses (north side first). */
+	public static List<House> houses() {
+		List<House> houses = new ArrayList<>();
+		for (int lot = 0; lot < LOTS.length * 2; lot++) {
+			int x0 = LOTS[lot % LOTS.length];
+			boolean south = lot >= LOTS.length;
+			int door = south ? MIRROR - FRONT : FRONT;
+			int z0 = south ? MIRROR - (FRONT - 2) : BACK + 2, z1 = south ? MIRROR - (BACK + 2) : FRONT - 2;
+			houses.add(new House(x0 + 4, door, x0 + 2, z0, x0 + 10, z1));
+		}
+		return houses;
+	}
+
+	/** The street lamps' poles, {x, z}: along both sidewalks and in the park. */
+	public static List<int[]> lamps() {
+		List<int[]> lamps = new ArrayList<>();
+		for (int x = MIN_X; x <= -9; x++) {
+			if (Math.floorMod(x + 8, 16) == 0) lamps.add(new int[] {x, STREET_MIN_Z - 2});
+			if (Math.floorMod(x, 16) == 0) lamps.add(new int[] {x, STREET_MAX_Z + 2});
+		}
+		for (int[] lamp : PARK_LAMPS) lamps.add(lamp);
+		return lamps;
+	}
+
+	private static final int[][] PARK_LAMPS = {{-35, 86}, {-35, 105}, {-45, 94}, {-21, 97}};
+
 	// The town's blocks -------------------------------------------------------------------------------------------
 
 	/** Whether (x, z) is in the town's ground (kept flat). */
@@ -361,7 +394,7 @@ public final class FrontroomsTown {
 			double r = Math.sqrt(dx * dx + dz * dz + (h - 6) * (h - 6) * 1.4);
 			if (h >= 4 && h <= 8 && r <= 2.7 && (dx != 0 || dz != 0 || h > 5)) return Piece.of(Kind.LEAVES);
 		}
-		for (int[] lamp : new int[][] {{-35, 86}, {-35, 105}, {-45, 94}, {-21, 97}}) {
+		for (int[] lamp : PARK_LAMPS) {
 			if (x == lamp[0] && z == lamp[1]) return h <= 6 && h > 0 ? Piece.of(Kind.POLE) : h == 7 ? Piece.of(Kind.SODIUM) : h == 0 ? Piece.of(Kind.SIDEWALK) : null;
 		}
 		if (h == 0 && path) return Piece.of(Kind.SIDEWALK);

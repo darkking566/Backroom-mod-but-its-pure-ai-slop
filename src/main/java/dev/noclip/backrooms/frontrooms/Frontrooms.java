@@ -28,6 +28,7 @@ public final class Frontrooms {
 		FrontroomsBlocks.register();
 		InstituteProps.register();
 		TownLife.register();
+		Nights398.register();
 		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, id("frontrooms"), FrontroomsChunkGenerator.CODEC);
 		Institute.register();
 	}
