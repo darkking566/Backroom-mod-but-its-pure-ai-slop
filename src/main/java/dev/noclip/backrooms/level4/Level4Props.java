@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level4;
 
+import dev.noclip.backrooms.level1.Level1Blocks;
 import dev.noclip.backrooms.level4.Level4Layout.Kind;
 import dev.noclip.backrooms.level4.Level4Plan.ZoneKind;
 import dev.noclip.backrooms.level4.Level4PoiPlan.PlacedPoi;
@@ -146,21 +147,32 @@ final class Level4Props {
 			}
 			case ACTIVE_TERMINAL_ISLAND -> {
 				if (poi.dir() == Level4Plan.SOUTH) {
-					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 2, y, bz + 3), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.EAST);
-					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 4, y, bz + 3), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.WEST);
-					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 1, y, bz + 3), BackroomsProps.PROP_OFFICE_CHAIR, Direction.EAST);
-					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 5, y, bz + 3), BackroomsProps.PROP_OFFICE_CHAIR, Direction.WEST);
+					any |= tryPlaceOnDesk(chunk, minX, minZ, new BlockPos(bx + 2, y + 1, bz + 3), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.WEST);
+					any |= tryPlaceOnDesk(chunk, minX, minZ, new BlockPos(bx + 3, y + 1, bz + 3), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.EAST);
+					any |= tryPlacePoiSingle(chunk, minX, minZ, new BlockPos(bx + 1, y, bz + 3), BackroomsProps.PROP_OFFICE_CHAIR, Direction.EAST);
+					any |= tryPlacePoiSingle(chunk, minX, minZ, new BlockPos(bx + 4, y, bz + 3), BackroomsProps.PROP_OFFICE_CHAIR, Direction.WEST);
 				} else {
-					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 2), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.SOUTH);
-					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 4), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.NORTH);
-					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 1), BackroomsProps.PROP_OFFICE_CHAIR, Direction.SOUTH);
-					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 5), BackroomsProps.PROP_OFFICE_CHAIR, Direction.NORTH);
+					any |= tryPlaceOnDesk(chunk, minX, minZ, new BlockPos(bx + 3, y + 1, bz + 2), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.NORTH);
+					any |= tryPlaceOnDesk(chunk, minX, minZ, new BlockPos(bx + 3, y + 1, bz + 3), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.SOUTH);
+					any |= tryPlacePoiSingle(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 1), BackroomsProps.PROP_OFFICE_CHAIR, Direction.SOUTH);
+					any |= tryPlacePoiSingle(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 4), BackroomsProps.PROP_OFFICE_CHAIR, Direction.NORTH);
 				}
 			}
 			case LOCKED_PBX_ROOM -> {
 				int[] uv = Level4PoiPlan.uvToLocal(poi.dir(), 1, 3);
 				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + uv[0], y, bz + uv[1]),
 						BackroomsProps.INDUSTRIAL_FUSE_BOX, Direction.EAST);
+			}
+			case FROZEN_FRIDAY_1998 -> {
+				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 2, y, bz + 4), BackroomsProps.PROP_FOLDING_TABLE, Direction.NORTH);
+				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 2, y, bz + 3), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.SOUTH);
+				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 4), BackroomsProps.PROP_OFFICE_CHAIR, Direction.NORTH);
+				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 1, y, bz + 5), BackroomsProps.PROP_POTTED_PLANT_PLASTIC, Direction.SOUTH);
+				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 5, y, bz + 4), BackroomsProps.PROP_FILE_CABINET, Direction.WEST);
+			}
+			case EXECUTIVE_BROADCAST_SUITE -> {
+				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 2), BackroomsProps.PROP_OFFICE_CHAIR, Direction.SOUTH);
+				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 1, y, bz + 5), BackroomsProps.PROP_CRT_TV, Direction.EAST);
 			}
 			default -> {
 			}
@@ -170,6 +182,22 @@ final class Level4Props {
 
 	private static boolean tryPlacePoi(LevelChunk chunk, int minX, int minZ, BlockPos pos, Block block, Direction facing) {
 		if (!canPlace(chunk, minX, minZ, pos, block, facing, 1)) return false;
+		place(chunk, pos, block, facing);
+		return true;
+	}
+
+	private static boolean tryPlacePoiSingle(LevelChunk chunk, int minX, int minZ, BlockPos pos, Block block, Direction facing) {
+		if (pos.getX() < minX || pos.getX() > minX + 15 || pos.getZ() < minZ || pos.getZ() > minZ + 15) return false;
+		if (!chunk.getBlockState(pos).isAir() || !chunk.getBlockState(pos.above()).isAir()) return false;
+		if (!validFloor(chunk.getBlockState(pos.below()))) return false;
+		place(chunk, pos, block, facing);
+		return true;
+	}
+
+	private static boolean tryPlaceOnDesk(LevelChunk chunk, int minX, int minZ, BlockPos pos, Block block, Direction facing) {
+		if (pos.getX() < minX || pos.getX() > minX + 15 || pos.getZ() < minZ || pos.getZ() > minZ + 15) return false;
+		if (!chunk.getBlockState(pos).isAir()) return false;
+		if (!chunk.getBlockState(pos.below()).is(Level1Blocks.OFFICE_DESK)) return false;
 		place(chunk, pos, block, facing);
 		return true;
 	}
@@ -190,7 +218,8 @@ final class Level4Props {
 	private static boolean validFloor(BlockState state) {
 		return state.is(Level4Blocks.OFFICE_CARPET)
 				|| state.is(Level4Blocks.OFFICE_CARPET_DENT)
-				|| state.is(Level4Blocks.OFFICE_DAMP_CARPET);
+				|| state.is(Level4Blocks.OFFICE_DAMP_CARPET)
+				|| state.is(net.minecraft.world.level.block.Blocks.DARK_OAK_PLANKS);
 	}
 
 	private static boolean canPlace(LevelChunk chunk, int minX, int minZ, BlockPos masterPos, Block block, Direction facing) {

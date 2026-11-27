@@ -2180,6 +2180,7 @@
   "message.noclip_backrooms.level4.poi.outpost_locker": "從撤離前哨置物櫃清出殘留救急物資：1 繃帶、1 瓶杏仁水。",
   "message.noclip_backrooms.level4.poi.outpost_locker_empty": "這座前哨置物櫃在 M.E.G. 撤離時已幾乎搬空。",
   "block.noclip_backrooms.corrupted_fountain_pool": "變質紅霧泉眼水池",
+  "block.noclip_backrooms.office_elevator_frame": "深灰金屬電梯框",
   "message.noclip_backrooms.level4.poi.storm_loot": "在風雨沖濕的破窗走廊箱內撿回電池芯、空玻璃瓶與繃帶。",
   "message.noclip_backrooms.level4.poi.storm_empty": "被雨水浸濕的走廊補給箱裡已經沒有可用物資。",
   "message.noclip_backrooms.level4.poi.red_atrium_poison": "刺鼻的暗紅藻毒湧上咽喉——這池水早已變質，絕非杏仁水！（蹲下右鍵可安全取樣）",
@@ -2187,5 +2188,17 @@
   "message.noclip_backrooms.level4.poi.red_atrium_sampled": "枯竭的水池裡只剩濃稠暗紅淤泥。",
   "message.noclip_backrooms.level4.poi.abyss_loot": "從報廢冷水機組拆出電動馬達與管路閥門。",
   "message.noclip_backrooms.level4.poi.abyss_empty": "冷水機組能用的閥門與馬達已被拆光。",
-  "message.noclip_backrooms.level4.poi.abyss_exit": "你解開深淵石階盡頭的鐵鍊暗門，穿往第 %s 層。"
+  "message.noclip_backrooms.level4.poi.abyss_exit": "你解開深淵石階盡頭的鐵鍊暗門，穿往第 %s 層。",
+  "block.noclip_backrooms.executive_red_phone": "總裁室紅色專線電話",
+  "message.noclip_backrooms.level4.poi.frozen_enter": "雨聲與冷氣嗡鳴驟然消逝——牆上時鐘的秒針停在 1998 年最後一個週五微微抖動。",
+  "message.noclip_backrooms.level4.poi.frozen_loot": "打開 1998 年的辦公抽屜：取出 1998 年桌曆、遺失舊幣與未開封杏仁水。",
+  "message.noclip_backrooms.level4.poi.frozen_empty": "桌面只剩滿杯不再冒煙的咖啡與一塵不染的空白打卡單。",
+  "message.noclip_backrooms.level4.poi.frozen_email": "CRT 螢幕開著未寄出的郵件草稿：「主旨：週五值班——連假前切勿關閉主樓層照明。」",
+  "message.noclip_backrooms.level4.poi.mirror_well_loot": "打開鏡像天窗死角物資箱：獲得合金、異常鏡面玻璃與純化杏仁精華！",
+  "message.noclip_backrooms.level4.poi.mirror_well_empty": "鏡像天窗角落裡的補給箱已經被拿空。",
+  "message.noclip_backrooms.level4.poi.exec_phone_wait": "紅色聽筒裡只剩低沉的無源載波靜音沙沙聲。",
+  "message.noclip_backrooms.level4.poi.exec_broadcast_landmark": "無源廣播穿透靜電穩住你的心神——偵測到罕見奇觀座標：%s 方向約 %sm。",
+  "message.noclip_backrooms.level4.poi.exec_broadcast_omega": "總裁專線短暫傳出清楚座標：「M.E.G. Omega 基地訊號位於 %s 方向（約 %sm）……」",
+  "message.noclip_backrooms.level4.poi.exec_vault_loot": "打開總裁室防盜保險箱：搜出純化杏仁精華、合金、微晶片與高壓線圈！",
+  "message.noclip_backrooms.level4.poi.exec_vault_empty": "深木總裁室的保險櫃裡空無一物。"
 }

@@ -70,12 +70,17 @@ final class Level4PoiEvents {
 	private static final int PBX_BREAKER_COOLDOWN = 20 * 30;
 	private static final int OUTPOST_COT_COOLDOWN = 20 * 120;
 	private static final int MIRROR_COOLDOWN = 20 * 45;
+	private static final int EXEC_PHONE_COOLDOWN = 20 * 60;
+	private static final int FROZEN_CALM_COOLDOWN = 20 * 120;
 	private static final Map<UUID, Integer> CHALK_NEXT = new HashMap<>();
 	private static final Map<UUID, Integer> MEMO_NEXT = new HashMap<>();
 	private static final Map<BlockPos, Integer> PBX_BREAKER_NEXT = new HashMap<>();
 	private static final Map<UUID, Integer> OUTPOST_COT_NEXT = new HashMap<>();
 	private static final Map<UUID, Integer> MIRROR_STARE_TICKS = new HashMap<>();
 	private static final Map<UUID, Integer> MIRROR_NEXT = new HashMap<>();
+	private static final Map<UUID, Integer> EXEC_PHONE_NEXT = new HashMap<>();
+	private static final Map<UUID, Integer> FROZEN_CALM_NEXT = new HashMap<>();
+	private static final Set<UUID> IN_FROZEN_FRIDAY = new HashSet<>();
 
 	private Level4PoiEvents() {
 	}
@@ -88,6 +93,9 @@ final class Level4PoiEvents {
 			OUTPOST_COT_NEXT.clear();
 			MIRROR_STARE_TICKS.clear();
 			MIRROR_NEXT.clear();
+			EXEC_PHONE_NEXT.clear();
+			FROZEN_CALM_NEXT.clear();
+			IN_FROZEN_FRIDAY.clear();
 		});
 		ServerTickEvents.END_SERVER_TICK.register(Level4PoiEvents::tick);
 
@@ -169,6 +177,39 @@ final class Level4PoiEvents {
 			if (state.is(Level4Blocks.OFFICE_DARK_MIRROR)) {
 				sl.playSound(null, pos, SoundEvents.GLASS_HIT, SoundSource.BLOCKS, 0.7F, 0.65F);
 				sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.mirror_touch"));
+				return InteractionResult.SUCCESS;
+			}
+
+			// #20 EXECUTIVE_RED_PHONE sourceless broadcast
+			if (state.is(Level4Blocks.EXECUTIVE_RED_PHONE)) {
+				if (now < EXEC_PHONE_NEXT.getOrDefault(sp.getUUID(), 0)) {
+					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.exec_phone_wait"));
+					return InteractionResult.SUCCESS;
+				}
+				EXEC_PHONE_NEXT.put(sp.getUUID(), now + EXEC_PHONE_COOLDOWN);
+				sl.playSound(null, pos, Level4Sounds.PHONE_RING, SoundSource.BLOCKS, 0.8F, 0.8F);
+				PlayerStats stats = PlayerRpg.get(sp);
+				if (stats.sanityStat() >= 3 || stats.level() >= 4) {
+					PlayerRpg.restoreSanity(sp, 8.0F);
+					PlayerRpg.grantXp(sp, 25);
+				} else {
+					PlayerRpg.drainSanity(sp, 4.0F);
+				}
+				int[] landmark = nearestUltraRareLandmark(seed, sp.getBlockX(), sp.getBlockZ());
+				if (landmark != null) {
+					int dx = landmark[0] - sp.getBlockX(), dz = landmark[1] - sp.getBlockZ();
+					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.exec_broadcast_landmark",
+							Level4Events.compass(dx, dz), (int) Math.round(Math.hypot(dx, dz))));
+				} else {
+					int[] omega = Level4Events.nearestOmega(seed, sp.getBlockX(), sp.getBlockZ());
+					if (omega != null) {
+						int dx = omega[0] - sp.getBlockX(), dz = omega[1] - sp.getBlockZ();
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.exec_broadcast_omega",
+								Level4Events.compass(dx, dz), (int) Math.round(Math.hypot(dx, dz))));
+					} else {
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.exec_phone_wait"));
+					}
+				}
 				return InteractionResult.SUCCESS;
 			}
 
@@ -399,6 +440,57 @@ final class Level4PoiEvents {
 					}
 					return InteractionResult.PASS;
 				}
+				case FROZEN_FRIDAY_1998 -> {
+					if (state.is(BackroomsProps.PROP_DESKTOP_COMPUTER)) {
+						sl.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 0.7F, 1.1F);
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.frozen_email"));
+						return InteractionResult.SUCCESS;
+					}
+					if (!state.is(Blocks.BARREL)) return InteractionResult.PASS;
+					PoiState data = state(sl);
+					if (data.isClaimed(anchor)) {
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.frozen_empty"));
+						return InteractionResult.SUCCESS;
+					}
+					data.markClaimed(anchor);
+					giveOrDrop(sp, new ItemStack(Level4Items.CALENDAR_1998, 1));
+					giveOrDrop(sp, new ItemStack(Economy.LOST_COIN, 2));
+					giveOrDrop(sp, new ItemStack(Level1Items.ALMOND_WATER, 2));
+					sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.8F, 1.05F);
+					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.frozen_loot"));
+					return InteractionResult.SUCCESS;
+				}
+				case INVERTED_MIRROR_LIGHTWELL -> {
+					if (!state.is(Blocks.BARREL)) return InteractionResult.PASS;
+					PoiState data = state(sl);
+					if (data.isClaimed(anchor)) {
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.mirror_well_empty"));
+						return InteractionResult.SUCCESS;
+					}
+					data.markClaimed(anchor);
+					giveOrDrop(sp, new ItemStack(Level1Items.ALLOY, 2));
+					giveOrDrop(sp, new ItemStack(BackroomsItems.ANOMALOUS_MIRROR_GLASS, 1));
+					giveOrDrop(sp, new ItemStack(BackroomsItems.PURIFIED_ALMOND_ESSENCE, 1));
+					sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.85F, 1.1F);
+					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.mirror_well_loot"));
+					return InteractionResult.SUCCESS;
+				}
+				case EXECUTIVE_BROADCAST_SUITE -> {
+					if (!state.is(Blocks.BARREL)) return InteractionResult.PASS;
+					PoiState data = state(sl);
+					if (data.isClaimed(anchor)) {
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.exec_vault_empty"));
+						return InteractionResult.SUCCESS;
+					}
+					data.markClaimed(anchor);
+					giveOrDrop(sp, new ItemStack(BackroomsItems.PURIFIED_ALMOND_ESSENCE, 2));
+					giveOrDrop(sp, new ItemStack(Level1Items.ALLOY, 2));
+					giveOrDrop(sp, new ItemStack(BackroomsItems.MICROCHIP, 1));
+					giveOrDrop(sp, new ItemStack(BackroomsItems.HIGH_VOLTAGE_COIL, 1));
+					sl.playSound(null, pos, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 0.85F, 0.9F);
+					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.exec_vault_loot"));
+					return InteractionResult.SUCCESS;
+				}
 				default -> {
 					return InteractionResult.PASS;
 				}
@@ -471,6 +563,18 @@ final class Level4PoiEvents {
 			}
 
 			if (now % 25 != 0) continue;
+			boolean inFrozen = Level4PoiPlan.isFrozenFriday(seed, sp.getBlockX(), sp.getBlockZ());
+			if (inFrozen) {
+				if (IN_FROZEN_FRIDAY.add(sp.getUUID())) {
+					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.frozen_enter"));
+					if (now >= FROZEN_CALM_NEXT.getOrDefault(sp.getUUID(), 0)) {
+						FROZEN_CALM_NEXT.put(sp.getUUID(), now + FROZEN_CALM_COOLDOWN);
+						PlayerRpg.restoreSanity(sp, 10.0F);
+					}
+				}
+			} else {
+				IN_FROZEN_FRIDAY.remove(sp.getUUID());
+			}
 			int px = sp.getBlockX(), pz = sp.getBlockZ();
 			int gi0 = Math.floorDiv(px - 12, Level4Plan.CELL), gi1 = Math.floorDiv(px + 12, Level4Plan.CELL);
 			int gj0 = Math.floorDiv(pz - 12, Level4Plan.CELL), gj1 = Math.floorDiv(pz + 12, Level4Plan.CELL);
@@ -682,6 +786,30 @@ final class Level4PoiEvents {
 					if (d < bestDist) {
 						bestDist = d;
 						best = new int[] {ex, ez};
+					}
+				}
+			}
+		}
+		return best;
+	}
+
+	private static int[] nearestUltraRareLandmark(long seed, int x, int z) {
+		int rx0 = Math.floorDiv(x, Level4Plan.SIZE), rz0 = Math.floorDiv(z, Level4Plan.SIZE);
+		int[] best = null;
+		double bestDist = Double.MAX_VALUE;
+		for (int dx = -2; dx <= 2; dx++) {
+			for (int dz = -2; dz <= 2; dz++) {
+				int rx = rx0 + dx, rz = rz0 + dz;
+				for (PlacedPoi poi : Level4PoiPlan.of(seed, rx, rz).pois) {
+					if (poi.kind() != PoiKind.FROZEN_FRIDAY_1998 && poi.kind() != PoiKind.INVERTED_MIRROR_LIGHTWELL) {
+						continue;
+					}
+					int lx = rx * Level4Plan.SIZE + poi.cellI() * Level4Plan.CELL + 3;
+					int lz = rz * Level4Plan.SIZE + poi.cellJ() * Level4Plan.CELL + 3;
+					double d = Math.hypot(lx - x, lz - z);
+					if (d > 16.0 && d < bestDist) {
+						bestDist = d;
+						best = new int[] {lx, lz};
 					}
 				}
 			}

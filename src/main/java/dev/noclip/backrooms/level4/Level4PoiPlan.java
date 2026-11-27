@@ -123,6 +123,16 @@ final class Level4PoiPlan {
 		return roomId >= 0 && pbxRoomIds.contains(roomId);
 	}
 
+	static boolean isFrozenFriday(long seed, int x, int z) {
+		PlacedPoi poi = atCell(seed, x, z);
+		return poi != null && poi.kind() == PoiKind.FROZEN_FRIDAY_1998;
+	}
+
+	static boolean isInvertedLightwell(long seed, int x, int z) {
+		PlacedPoi poi = atCell(seed, x, z);
+		return poi != null && poi.kind() == PoiKind.INVERTED_MIRROR_LIGHTWELL;
+	}
+
 	private Level4PoiPlan(long seed, int rx, int rz) {
 		Level4Plan plan = Level4Plan.of(seed, rx, rz);
 		SplittableRandom rng = new SplittableRandom(Level4Layout.hash(seed, rx, rz, POI_SALT));
@@ -144,6 +154,20 @@ final class Level4PoiPlan {
 		}
 		for (PlacedExit pe : plan.exits) {
 			usedCells.add(pe.cell());
+		}
+
+		// Batch 4: Ultra-Rare landmark POIs (non-origin regions only; rolled before normal POIs for clean footprints)
+		if (!(rx == 0 && rz == 0)) {
+			SplittableRandom landmarkRng = new SplittableRandom(Level4Layout.hash(seed, rx, rz, POI_SALT + 4));
+			if (landmarkRng.nextInt(100) < 18) {
+				placeInvertedMirrorLightwell(plan, usedCells);
+			}
+			if (landmarkRng.nextInt(100) < 24) {
+				placeExecutiveBroadcastSuite(plan, landmarkRng, usedCells);
+			}
+			if (landmarkRng.nextInt(100) < 8) {
+				placeFrozenFriday1998(plan, landmarkRng, usedCells);
+			}
 		}
 
 		// #3 SEALED_MEETING_ROOM (Common, ~70% per region on a 1x1 or 2x1 suite)
@@ -759,6 +783,116 @@ final class Level4PoiPlan {
 				Level4Layout.FLOOR_Y - 6, false, -1);
 		pois.add(poi);
 		byCell.put(poi.cell(), poi);
+	}
+
+	private void placeInvertedMirrorLightwell(Level4Plan plan, Set<Integer> usedCells) {
+		for (int id = 0; id < plan.rooms.size(); id++) {
+			RoomBox room = plan.rooms.get(id);
+			if (room.kind() != ZoneKind.LIGHTWELL) continue;
+			for (int a = room.i(); a < room.i() + room.w(); a++) {
+				for (int b = room.j(); b < room.j() + room.h(); b++) {
+					if (a == room.cx() && b == room.cz()) continue;
+					if (usedCells.contains(Level4Plan.cell(a, b))) return;
+				}
+			}
+			PlacedPoi anchor = new PlacedPoi(PoiKind.INVERTED_MIRROR_LIGHTWELL, room.i(), room.j(), SOUTH,
+					Level4Layout.FLOOR_Y, false, id);
+			pois.add(anchor);
+			for (int a = room.i(); a < room.i() + room.w(); a++) {
+				for (int b = room.j(); b < room.j() + room.h(); b++) {
+					int c = Level4Plan.cell(a, b);
+					byCell.put(c, anchor);
+					usedCells.add(c);
+				}
+			}
+			return;
+		}
+	}
+
+	private void placeExecutiveBroadcastSuite(Level4Plan plan, SplittableRandom rng, Set<Integer> usedCells) {
+		List<int[]> candidates = new ArrayList<>();
+		for (int id = 0; id < plan.rooms.size(); id++) {
+			RoomBox room = plan.rooms.get(id);
+			if (room.kind() != ZoneKind.AUDITORIUM) continue;
+			int[][] adj = {
+					{room.cx(), room.j() - 1, NORTH, id},
+					{room.cx(), room.j() + room.h(), SOUTH, id},
+					{room.i() - 1, room.cz(), WEST, id},
+					{room.i() + room.w(), room.cz(), EAST, id}
+			};
+			for (int[] cand : adj) {
+				int a = cand[0], b = cand[1];
+				if (a < MARGIN || a >= N - MARGIN || b < MARGIN || b >= N - MARGIN) continue;
+				int c = Level4Plan.cell(a, b);
+				if (plan.zones[c] != ZoneKind.OPEN_OFFICE || usedCells.contains(c)
+						|| plan.balconyDir[c] >= 0 || plan.nearHumanBase(a, b) || Level4Plan.isSkybridgeCell(a, b)) {
+					continue;
+				}
+				candidates.add(cand);
+			}
+		}
+		if (candidates.isEmpty()) return;
+		int[] pick = candidates.get(rng.nextInt(candidates.size()));
+		add(new PlacedPoi(PoiKind.EXECUTIVE_BROADCAST_SUITE, pick[0], pick[1], pick[2],
+				Level4Layout.FLOOR_Y, false, pick[3]), usedCells);
+	}
+
+	private void placeFrozenFriday1998(Level4Plan plan, SplittableRandom rng, Set<Integer> usedCells) {
+		List<Integer> candidates = new ArrayList<>();
+		for (int id = 0; id < plan.rooms.size(); id++) {
+			RoomBox room = plan.rooms.get(id);
+			if (room.kind() != ZoneKind.SUITE || room.w() > 2 || room.h() > 2) continue;
+			boolean free = true;
+			int doorDir = -1;
+			for (int a = room.i(); a < room.i() + room.w() && free; a++) {
+				for (int b = room.j(); b < room.j() + room.h() && free; b++) {
+					int c = Level4Plan.cell(a, b);
+					if (usedCells.contains(c) || plan.balconyDir[c] >= 0 || plan.nearHumanBase(a, b)) {
+						free = false;
+						break;
+					}
+					if (a == room.i() && b == room.j()) {
+						for (int d = 0; d < 4; d++) {
+							if (plan.edge(c, d) == Edge.DOOR) {
+								doorDir = d;
+								break;
+							}
+						}
+					}
+				}
+			}
+			if (free && doorDir >= 0) candidates.add(id);
+		}
+		if (candidates.isEmpty()) return;
+		int pickedId = candidates.get(rng.nextInt(candidates.size()));
+		RoomBox room = plan.rooms.get(pickedId);
+		int anchorCell = Level4Plan.cell(room.i(), room.j());
+		int doorDir = NORTH;
+		for (int d = 0; d < 4; d++) {
+			if (plan.edge(anchorCell, d) == Edge.DOOR) {
+				doorDir = d;
+				break;
+			}
+		}
+		PlacedPoi anchor = new PlacedPoi(PoiKind.FROZEN_FRIDAY_1998, room.i(), room.j(),
+				Level4Plan.opposite(doorDir), Level4Layout.FLOOR_Y, false, pickedId);
+		pois.add(anchor);
+		for (int a = room.i(); a < room.i() + room.w(); a++) {
+			for (int b = room.j(); b < room.j() + room.h(); b++) {
+				int c = Level4Plan.cell(a, b);
+				byCell.put(c, anchor);
+				usedCells.add(c);
+			}
+		}
+		int doorI = room.i() + DX[doorDir], doorJ = room.j() + DZ[doorDir];
+		if (Level4Plan.inside(doorI, doorJ)) {
+			int dc = Level4Plan.cell(doorI, doorJ);
+			if (plan.zones[dc] == ZoneKind.OPEN_OFFICE && !usedCells.contains(dc) && plan.balconyDir[dc] < 0
+					&& !Level4Plan.isSkybridgeCell(doorI, doorJ) && !plan.nearHumanBase(doorI, doorJ)) {
+				byCell.put(dc, anchor);
+				usedCells.add(dc);
+			}
+		}
 	}
 
 	/** Maps wall-relative (u in 1..5 along wall, v in 0..6 depth into cell from wall) to cell-local (cx, cz). */

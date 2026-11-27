@@ -241,6 +241,63 @@ final class Level4PoiPlanTest {
 	}
 
 	@Test
+	void batch4UltraRareLandmarksAppearAndStayValid() {
+		Set<PoiKind> seen = EnumSet.noneOf(PoiKind.class);
+
+		for (long seed = 1; seed <= 24; seed++) {
+			for (int rx = -2; rx <= 2; rx++) {
+				for (int rz = -2; rz <= 2; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					Level4PoiPlan poiPlan = Level4PoiPlan.of(seed, rx, rz);
+
+					Set<Integer> exitCells = new HashSet<>();
+					for (PlacedExit pe : plan.exits) exitCells.add(pe.cell());
+
+					for (PlacedPoi poi : poiPlan.pois) {
+						if (poi.kind().batch != 4) continue;
+						seen.add(poi.kind());
+						assertFalse(rx == 0 && rz == 0, "Ultra-Rare landmark must not spawn in origin region");
+						int c = poi.cell();
+						ZoneKind z = plan.zones[c];
+						assertNotEquals(ZoneKind.OMEGA_BASE, z);
+						assertNotEquals(ZoneKind.AMOR_CAMP, z);
+						assertNotEquals(ZoneKind.TBD_ROOM, z);
+						assertNotEquals(ZoneKind.SOLID_CORE, z);
+						assertNotEquals(ZoneKind.OUTSIDE, z);
+						assertFalse(exitCells.contains(c), "Batch 4 POI overlapped exit cell in " + rx + "," + rz);
+
+						int wx = rx * Level4Plan.SIZE + poi.cellI() * Level4Plan.CELL + 3;
+						int wz = rz * Level4Plan.SIZE + poi.cellJ() * Level4Plan.CELL + 3;
+						switch (poi.kind()) {
+							case FROZEN_FRIDAY_1998 -> {
+								assertEquals(ZoneKind.SUITE, z);
+								assertTrue(Level4PoiPlan.isFrozenFriday(seed, wx, wz),
+										"isFrozenFriday must return true at landmark anchor");
+							}
+							case INVERTED_MIRROR_LIGHTWELL -> {
+								assertEquals(ZoneKind.LIGHTWELL, z);
+								assertTrue(Level4PoiPlan.isInvertedLightwell(seed, wx, wz),
+										"isInvertedLightwell must return true at ring anchor");
+								assertTrue(Level4PoiPlan.isInvertedLightwell(seed, wx + Level4Plan.CELL, wz + Level4Plan.CELL),
+										"isInvertedLightwell must also cover central shaft");
+							}
+							case EXECUTIVE_BROADCAST_SUITE -> assertEquals(ZoneKind.OPEN_OFFICE, z);
+							default -> {
+							}
+						}
+					}
+				}
+			}
+		}
+
+		for (PoiKind kind : PoiKind.values()) {
+			if (kind.batch == 4) {
+				assertTrue(seen.contains(kind), "Missing Batch 4 POI: " + kind);
+			}
+		}
+	}
+
+	@Test
 	void megChalkSignHasValidBackingBlockAndAirCell() {
 		for (long seed = 1; seed <= 8; seed++) {
 			for (int rx = -1; rx <= 1; rx++) {

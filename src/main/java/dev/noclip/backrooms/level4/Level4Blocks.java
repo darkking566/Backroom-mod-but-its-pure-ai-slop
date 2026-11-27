@@ -77,6 +77,8 @@ public final class Level4Blocks {
 			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(3, 10, 14, 13, 15, 16)));
 	public static final Block OFFICE_ELEVATOR = register("office_elevator", unbreakable(MapColor.METAL, SoundType.METAL).lightLevel(s -> 3),
 			p -> Level4ExitBlock.create(p, Level4Exit.ELEVATOR_3, false));
+	public static final Block OFFICE_ELEVATOR_FRAME = register("office_elevator_frame",
+			unbreakable(MapColor.COLOR_GRAY, SoundType.METAL));
 	public static final Block OFFICE_STAIRWELL_5 = register("office_stairwell_5", unbreakable(MapColor.COLOR_RED, SoundType.METAL),
 			p -> Level4ExitBlock.create(p, Level4Exit.STAIRS_5, false));
 	public static final Block OFFICE_STAIRWELL_6 = register("office_stairwell_6", unbreakable(MapColor.COLOR_BLACK, SoundType.METAL),
@@ -179,6 +181,12 @@ public final class Level4Blocks {
 					.strength(-1.0F, 3600000.0F).noLootTable().sound(SoundType.HONEY_BLOCK)
 					.noOcclusion().lightLevel(s -> 3),
 			CorruptedFountainPoolBlock::new);
+
+	// Batch 4 POI blocks
+	public static final Block EXECUTIVE_RED_PHONE = register("executive_red_phone",
+			Properties.of().mapColor(MapColor.COLOR_RED)
+					.strength(2.0F).sound(SoundType.METAL).noOcclusion().lightLevel(s -> 4),
+			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(1, 0, 2, 15, 14, 14)));
 
 	private Level4Blocks() {
 	}

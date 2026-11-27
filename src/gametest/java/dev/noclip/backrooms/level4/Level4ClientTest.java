@@ -5,6 +5,7 @@ import dev.noclip.backrooms.core.LevelExits;
 import dev.noclip.backrooms.core.economy.Economy;
 import dev.noclip.backrooms.core.people.Person;
 import dev.noclip.backrooms.items.BackroomsItems;
+import dev.noclip.backrooms.level1.Level1Blocks;
 import dev.noclip.backrooms.level1.Level1Items;
 import dev.noclip.backrooms.level4.Level4Layout.Kind;
 import dev.noclip.backrooms.level4.Level4Layout.Tile;
@@ -12,6 +13,7 @@ import dev.noclip.backrooms.level4.Level4Plan.PlacedExit;
 import dev.noclip.backrooms.level4.Level4Plan.ZoneKind;
 import dev.noclip.backrooms.level4.Level4PoiPlan.PlacedPoi;
 import dev.noclip.backrooms.level4.Level4PoiPlan.PoiKind;
+import dev.noclip.backrooms.props.BackroomsProps;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
@@ -29,6 +31,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -777,6 +780,22 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		int[] terminal = findPoi(seed, from, PoiKind.ACTIVE_TERMINAL_ISLAND);
 		check(terminal != null, "no ACTIVE_TERMINAL_ISLAND POI found");
 		shoot(context, game, terminal[0] + 1.4, STAND, terminal[2] + 1.4, -45, 14, false, "level4_poi_terminal");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			boolean foundDeskPc = false;
+			for (int dx = 0; dx < Level4Plan.CELL; dx++) {
+				for (int dz = 0; dz < Level4Plan.CELL; dz++) {
+					BlockPos deskPos = new BlockPos(terminal[0] + dx, STAND, terminal[2] + dz);
+					check(!l4.getBlockState(deskPos).is(BackroomsProps.PROP_DESKTOP_COMPUTER),
+							"terminal computer should sit on a desk, not on the floor at " + deskPos);
+					if (l4.getBlockState(deskPos).is(Level1Blocks.OFFICE_DESK)
+							&& l4.getBlockState(deskPos.above()).is(BackroomsProps.PROP_DESKTOP_COMPUTER)) {
+						foundDeskPc = true;
+					}
+				}
+			}
+			check(foundDeskPc, "expected desktop computer sitting on office_desk inside ACTIVE_TERMINAL_ISLAND");
+		});
 
 		// 6. Window paint cart (screenshot + grab dye & paint adjacent trap window)
 		int[] cart = findPoi(seed, from, PoiKind.WINDOW_PAINT_CART);
@@ -978,6 +997,10 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					"expected TBD_HOARD_CRATE in cage");
 			check(l4.getBlockState(new BlockPos(cage[0] + 6, STAND, cage[2] + 5)).is(Level4Blocks.TBD_CURIO_SHELF),
 					"expected TBD_CURIO_SHELF in cage");
+			var cageCorner = l4.getBlockState(new BlockPos(cage[0] + 4, STAND, cage[2] + 4));
+			check(cageCorner.is(Blocks.IRON_BARS) && cageCorner.getValue(BlockStateProperties.EAST)
+					&& cageCorner.getValue(BlockStateProperties.SOUTH),
+					"expected connected iron bars corner in TBD_OVERFLOW_CAGE");
 			p.getInventory().clearContent();
 			BlockPos barrelPos = new BlockPos(cage[0] + 5, STAND, cage[2] + 6);
 			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
@@ -1027,6 +1050,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		server.runOnServer(s -> {
 			ServerLevel l4 = level4(s);
 			ServerPlayer p = player(s);
+			check(l4.getBlockState(new BlockPos(fe[0] + 2, STAND, fe[2] + 2)).is(Level4Blocks.OFFICE_ELEVATOR_FRAME),
+					"expected dedicated OFFICE_ELEVATOR_FRAME on freight elevator threshold");
 			check(l4.getBlockState(new BlockPos(fe[0] + 3, Level4ChunkGenerator.FLOOR_Y, fe[2] + 1)).is(Blocks.IRON_TRAPDOOR),
 					"expected open iron trapdoor on stalled cab roof");
 			check(l4.getBlockState(new BlockPos(fe[0] + 3, Level4ChunkGenerator.FLOOR_Y - 1, fe[2] + 1)).is(Blocks.LADDER),
@@ -1194,12 +1219,108 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					"chiller barrel loot must be one-time only");
 		});
 		server.runCommand("gamemode spectator @a");
+
+		// === BATCH 4 POIs (#18, #19, #20) ===
+
+		// 18. Frozen Friday 1998 (all lit + dry carpet + monster-free + silent + 1998 desk drawer)
+		int[] frozen = findPoi(seed, from, PoiKind.FROZEN_FRIDAY_1998);
+		check(frozen != null, "no FROZEN_FRIDAY_1998 POI found");
+		shoot(context, game, frozen[0] + 1.5, STAND, frozen[2] + 1.5, -45, 10, false, "level4_poi_frozen_1998");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			check(Level4PoiPlan.isFrozenFriday(seed, frozen[0] + 3, frozen[2] + 3),
+					"expected isFrozenFriday at 1998 anchor");
+			check(l4.getBlockState(new BlockPos(frozen[0] + 3, Level4ChunkGenerator.FLOOR_Y, frozen[2] + 3))
+					.is(Level4Blocks.OFFICE_CARPET), "expected spotless dry carpet in Frozen Friday 1998");
+			check(l4.getBlockState(new BlockPos(frozen[0] + 3, Level4ChunkGenerator.FLOOR_Y + 5, frozen[2] + 3))
+					.is(Level4Blocks.OFFICE_TROFFER_LIT), "expected 100% lit troffers in Frozen Friday 1998");
+			p.getInventory().clearContent();
+			BlockPos barrelPos = new BlockPos(frozen[0] + 5, STAND, frozen[2] + 2);
+			p.teleportTo(frozen[0] + 4.5, STAND, frozen[2] + 2.5);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			check(p.getInventory().countItem(Level4Items.CALENDAR_1998) == 1
+					&& p.getInventory().countItem(Economy.LOST_COIN) == 2
+					&& p.getInventory().countItem(Level1Items.ALMOND_WATER) >= 2,
+					"expected 1998 desk drawer loot");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			check(p.getInventory().countItem(Level4Items.CALENDAR_1998) == 1,
+					"Frozen Friday drawer loot must be one-time only");
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 19. Inverted Mirror Lightwell (upside-down mirrored upper floors + permanent Level 13 exit + cache)
+		int[] inv = findPoi(seed, from, PoiKind.INVERTED_MIRROR_LIGHTWELL);
+		check(inv != null, "no INVERTED_MIRROR_LIGHTWELL POI found");
+		shoot(context, game, inv[0] + 4.5, STAND, inv[2] + 4.5, -45, -28, false, "level4_poi_inverted_well");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			check(Level4PoiPlan.isInvertedLightwell(seed, inv[0] + 3, inv[2] + 3),
+					"expected isInvertedLightwell at ring anchor");
+			check(Level4PoiPlan.isInvertedLightwell(seed, inv[0] + Level4Plan.CELL + 3, inv[2] + Level4Plan.CELL + 3),
+					"expected isInvertedLightwell across shaft center");
+			check(l4.getBlockState(new BlockPos(inv[0] + 2, STAND, inv[2] + 1)).is(Level4Blocks.OFFICE_DOOR_13),
+					"expected permanent OFFICE_DOOR_13 inside inverted lightwell");
+			check(l4.getBlockState(new BlockPos(inv[0] + Level4Plan.CELL + 1, Level4ChunkGenerator.FLOOR_Y + 13, inv[2] + Level4Plan.CELL + 3))
+					.is(Level4Blocks.OFFICE_CARPET), "expected inverted ceiling carpet overhead in lightwell shaft rim");
+			p.getInventory().clearContent();
+			BlockPos barrelPos = new BlockPos(inv[0] + 5, STAND, inv[2] + 1);
+			p.teleportTo(inv[0] + 4.5, STAND, inv[2] + 2.5);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			check(p.getInventory().countItem(BackroomsItems.ANOMALOUS_MIRROR_GLASS) == 1
+					&& p.getInventory().countItem(BackroomsItems.PURIFIED_ALMOND_ESSENCE) == 1,
+					"expected mirrored lightwell cache loot");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			check(p.getInventory().countItem(BackroomsItems.ANOMALOUS_MIRROR_GLASS) == 1,
+					"inverted lightwell cache must be one-time only");
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 20. Executive Broadcast Suite (mahogany executive office + red phone + vault safe)
+		int[] exec = findPoi(seed, from, PoiKind.EXECUTIVE_BROADCAST_SUITE);
+		check(exec != null, "no EXECUTIVE_BROADCAST_SUITE POI found");
+		shoot(context, game, exec[0] + 1.5, STAND, exec[2] + 1.5, -45, 16, false, "level4_poi_executive");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			check(l4.getBlockState(new BlockPos(exec[0] + 3, Level4ChunkGenerator.FLOOR_Y, exec[2] + 3))
+					.is(Blocks.DARK_OAK_PLANKS), "expected mahogany dark_oak_planks executive floor");
+			BlockPos phonePos = new BlockPos(exec[0] + 3, STAND, exec[2] + 3);
+			check(l4.getBlockState(phonePos).is(Level4Blocks.EXECUTIVE_RED_PHONE),
+					"expected EXECUTIVE_RED_PHONE on executive desk");
+			var phoneRes = p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(phonePos), Direction.UP, phonePos, false));
+			check(phoneRes == net.minecraft.world.InteractionResult.SUCCESS, "executive red phone broadcast failed");
+
+			p.getInventory().clearContent();
+			BlockPos safePos = new BlockPos(exec[0] + 5, STAND, exec[2] + 5);
+			p.teleportTo(exec[0] + 4.5, STAND, exec[2] + 4.5);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(safePos), Direction.UP, safePos, false));
+			check(p.getInventory().countItem(BackroomsItems.PURIFIED_ALMOND_ESSENCE) == 2
+					&& p.getInventory().countItem(BackroomsItems.MICROCHIP) == 1
+					&& p.getInventory().countItem(BackroomsItems.HIGH_VOLTAGE_COIL) == 1,
+					"expected executive vault safe loot");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(safePos), Direction.UP, safePos, false));
+			check(p.getInventory().countItem(BackroomsItems.MICROCHIP) == 1,
+					"executive vault safe loot must be one-time only");
+		});
+		server.runCommand("gamemode spectator @a");
 	}
 
 	/** Returns {cellOriginX, cellOriginZ, dir, baseY, roomId} for the nearest matching POI. */
 	private static int[] findPoi(long seed, BlockPos from, PoiKind target) {
 		int rx0 = Math.floorDiv(from.getX(), Level4Plan.SIZE), rz0 = Math.floorDiv(from.getZ(), Level4Plan.SIZE);
-		for (int r = 0; r <= 5; r++) {
+		for (int r = 0; r <= 7; r++) {
 			for (int dx = -r; dx <= r; dx++) {
 				for (int dz = -r; dz <= r; dz++) {
 					if (Math.abs(dx) != r && Math.abs(dz) != r) continue;
@@ -1272,7 +1393,11 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					"poi.outpost_locker_empty",
 					"poi.storm_loot", "poi.storm_empty", "poi.red_atrium_poison",
 					"poi.red_atrium_sample", "poi.red_atrium_sampled", "poi.abyss_loot",
-					"poi.abyss_empty", "poi.abyss_exit"}) {
+					"poi.abyss_empty", "poi.abyss_exit",
+					"poi.frozen_enter", "poi.frozen_loot", "poi.frozen_empty", "poi.frozen_email",
+					"poi.mirror_well_loot", "poi.mirror_well_empty", "poi.exec_phone_wait",
+					"poi.exec_broadcast_landmark", "poi.exec_broadcast_omega",
+					"poi.exec_vault_loot", "poi.exec_vault_empty"}) {
 				check(lang.has("message.noclip_backrooms.level4." + msg), "missing wanderer message: " + msg);
 			}
 		});
@@ -1280,9 +1405,10 @@ public final class Level4ClientTest implements FabricClientGameTest {
 
 	private static int[] findZone(long seed, BlockPos from, ZoneKind target) {
 		int rx0 = Math.floorDiv(from.getX(), Level4Plan.SIZE), rz0 = Math.floorDiv(from.getZ(), Level4Plan.SIZE);
-		for (int r = 0; r <= 3; r++) {
+		for (int r = 0; r <= 10; r++) {
 			for (int dx = -r; dx <= r; dx++) {
 				for (int dz = -r; dz <= r; dz++) {
+					if (Math.abs(dx) != r && Math.abs(dz) != r) continue;
 					Level4Plan plan = Level4Plan.of(seed, rx0 + dx, rz0 + dz);
 					for (Level4Plan.RoomBox box : plan.rooms) {
 						if (box.kind() != target) continue;
@@ -1400,13 +1526,16 @@ public final class Level4ClientTest implements FabricClientGameTest {
 
 	private static int[] findExitView(long seed, BlockPos from, Level4Exit target) {
 		int rx0 = Math.floorDiv(from.getX(), Level4Plan.SIZE), rz0 = Math.floorDiv(from.getZ(), Level4Plan.SIZE);
-		for (int dx = -2; dx <= 2; dx++) {
-			for (int dz = -2; dz <= 2; dz++) {
-				Level4Plan plan = Level4Plan.of(seed, rx0 + dx, rz0 + dz);
-				for (PlacedExit pe : plan.exits) {
-					if (pe.exit() != target) continue;
-					int[] view = exitViewFromPlaced(seed, rx0 + dx, rz0 + dz, pe);
-					if (view != null) return view;
+		for (int r = 0; r <= 10; r++) {
+			for (int dx = -r; dx <= r; dx++) {
+				for (int dz = -r; dz <= r; dz++) {
+					if (Math.abs(dx) != r && Math.abs(dz) != r) continue;
+					Level4Plan plan = Level4Plan.of(seed, rx0 + dx, rz0 + dz);
+					for (PlacedExit pe : plan.exits) {
+						if (pe.exit() != target) continue;
+						int[] view = exitViewFromPlaced(seed, rx0 + dx, rz0 + dz, pe);
+						if (view != null) return view;
+					}
 				}
 			}
 		}

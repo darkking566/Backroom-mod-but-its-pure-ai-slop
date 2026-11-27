@@ -2180,6 +2180,7 @@
   "message.noclip_backrooms.level4.poi.outpost_locker": "Found leftover emergency supplies in the evacuated outpost locker: 1 Bandage, 1 Almond Water.",
   "message.noclip_backrooms.level4.poi.outpost_locker_empty": "The evacuated outpost locker was cleared out during the retreat.",
   "block.noclip_backrooms.corrupted_fountain_pool": "Corrupted Red-Mist Fountain Pool",
+  "block.noclip_backrooms.office_elevator_frame": "Brushed Steel Elevator Frame",
   "message.noclip_backrooms.level4.poi.storm_loot": "Recovered storm-washed batteries, glass bottles, and a bandage from the breached corridor.",
   "message.noclip_backrooms.level4.poi.storm_empty": "Nothing useful remains in the storm-soaked supply crate.",
   "message.noclip_backrooms.level4.poi.red_atrium_poison": "Bitter crimson algae burns your throat — this corrupted pool is NOT Almond Water! (Sneak-click to safely sample.)",
@@ -2187,5 +2188,17 @@
   "message.noclip_backrooms.level4.poi.red_atrium_sampled": "Only stagnant crimson sludge coats the dry basin.",
   "message.noclip_backrooms.level4.poi.abyss_loot": "Stripped an electric motor and pipe valve from the dead chiller unit.",
   "message.noclip_backrooms.level4.poi.abyss_empty": "The chiller unit has already been stripped of valves and motors.",
-  "message.noclip_backrooms.level4.poi.abyss_exit": "You unchain the iron door at the bottom of the abyss stairs toward Level %s."
+  "message.noclip_backrooms.level4.poi.abyss_exit": "You unchain the iron door at the bottom of the abyss stairs toward Level %s.",
+  "block.noclip_backrooms.executive_red_phone": "Executive Red Hotline Phone",
+  "message.noclip_backrooms.level4.poi.frozen_enter": "Rain and HVAC hum vanish completely — the wall clock's second hand trembles in place on Friday, 1998.",
+  "message.noclip_backrooms.level4.poi.frozen_loot": "Opened the 1998 desk drawer: found a 1998 desk calendar, old coins, and sealed Almond Water.",
+  "message.noclip_backrooms.level4.poi.frozen_empty": "Only cold coffee mugs and spotless blank timesheets sit on the desk.",
+  "message.noclip_backrooms.level4.poi.frozen_email": "Draft email open on CRT monitor: 'RE: FRIDAY SHIFT — DO NOT TURN OFF LIGHTS BEFORE LONG WEEKEND.'",
+  "message.noclip_backrooms.level4.poi.mirror_well_loot": "Opened the mirrored corridor supply cache: Alloy, Anomalous Mirror Glass, and Purified Almond Essence!",
+  "message.noclip_backrooms.level4.poi.mirror_well_empty": "The mirrored lightwell supply cache is already empty.",
+  "message.noclip_backrooms.level4.poi.exec_phone_wait": "Only faint dead carrier static whispers through the red receiver.",
+  "message.noclip_backrooms.level4.poi.exec_broadcast_landmark": "Sourceless executive broadcast steadies your mind — anomaly coordinates detected %s (%sm away).",
+  "message.noclip_backrooms.level4.poi.exec_broadcast_omega": "Static briefly resolves on the executive line: 'M.E.G. Base Omega signal %s (%sm away)...'",
+  "message.noclip_backrooms.level4.poi.exec_vault_loot": "Cracked the executive vault safe: Purified Almond Essence, Alloy, Microchip, and High Voltage Coil!",
+  "message.noclip_backrooms.level4.poi.exec_vault_empty": "The mahogany executive safe is empty."
 }

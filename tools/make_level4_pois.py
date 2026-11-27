@@ -206,6 +206,105 @@ def save_liquid_pbr(name: str, rgba: Image.Image):
     s_img.save(TEXTURES / f"{name}_s.png", optimize=True)
 
 
+def draw_executive_desk_wood() -> Image.Image:
+    # 128x128 rich dark lacquered mahogany wood grain for the executive pedestal
+    img = Image.new("RGBA", (SIZE, SIZE), (58, 24, 18, 255))
+    px = img.load()
+    for y in range(SIZE):
+        for x in range(SIZE):
+            grain = math.sin(y * 0.25 + math.sin(x * 0.08) * 2.2) * 0.5 + math.sin(x * 0.05 + y * 0.14) * 0.5
+            r = int(58 + 16 * grain)
+            g = int(24 + 8 * grain)
+            b = int(17 + 6 * grain)
+            px[x, y] = (max(0, min(255, r)), max(0, min(255, g)), max(0, min(255, b)), 255)
+    d = ImageDraw.Draw(img)
+    d.rectangle([0, 0, SIZE - 1, SIZE - 1], outline=(38, 15, 11, 255), width=3)
+    d.rectangle([10, 14, SIZE - 11, 56], outline=(42, 17, 13, 255), width=2)
+    d.rectangle([10, 70, SIZE - 11, 114], outline=(42, 17, 13, 255), width=2)
+    return img
+
+
+def draw_executive_red_phone() -> Image.Image:
+    # 128x128 glossy crimson executive hotline enamel with brass dial/cradle & lit amber/green indicator LED
+    img = Image.new("RGBA", (SIZE, SIZE), (156, 22, 26, 255))
+    d = ImageDraw.Draw(img)
+    for y in range(SIZE):
+        shade = int(18 * math.cos(y / float(SIZE) * math.pi))
+        d.line([(0, y), (SIZE - 1, y)], fill=(148 + shade, 20 + shade // 4, 24 + shade // 4, 255))
+    # Brass rotary dial & cradle plates
+    d.ellipse([34, 38, 94, 98], fill=(198, 162, 68, 255), outline=(92, 68, 22, 255), width=3)
+    d.ellipse([48, 52, 80, 84], fill=(162, 26, 30, 255), outline=(120, 92, 32, 255), width=2)
+    for k in range(10):
+        ang = k * (math.pi * 2 / 10)
+        hx = int(64 + math.cos(ang) * 22)
+        hy = int(68 + math.sin(ang) * 22)
+        d.ellipse([hx - 4, hy - 4, hx + 4, hy + 4], fill=(28, 22, 22, 255))
+    # Tiny lit status LEDs (amber + green)
+    d.rectangle([16, 16, 28, 24], fill=(255, 196, 48, 255))
+    d.rectangle([34, 16, 46, 24], fill=(74, 232, 92, 255))
+    d.rectangle([0, 0, SIZE - 1, SIZE - 1], outline=(98, 14, 16, 255), width=2)
+    return img
+
+
+def save_solid_pbr(name: str, rgba: Image.Image, smooth: int, f0: int):
+    TEXTURES.mkdir(parents=True, exist_ok=True)
+    rgba.save(TEXTURES / f"{name}.png", optimize=True)
+    Image.new("RGBA", (SIZE, SIZE), (128, 128, 255, 255)).save(TEXTURES / f"{name}_n.png", optimize=True)
+    Image.new("RGBA", (SIZE, SIZE), (smooth, f0, 0, 255)).save(TEXTURES / f"{name}_s.png", optimize=True)
+
+
+def draw_office_elevator_frame() -> Image.Image:
+    # 128x128 dark gunmetal/charcoal brushed architectural steel elevator casing
+    img = Image.new("RGBA", (SIZE, SIZE), (54, 59, 66, 255))
+    px = img.load()
+    for y in range(SIZE):
+        for x in range(SIZE):
+            streak = math.sin(y * 0.85 + math.sin(x * 0.12) * 1.4) * 3.0 + math.sin(y * 2.1) * 1.5
+            sheen = math.sin(x * 0.05 + y * 0.02) * 2.0
+            delta = int(streak + sheen)
+            px[x, y] = (
+                max(0, min(255, 54 + delta)),
+                max(0, min(255, 59 + delta)),
+                max(0, min(255, 66 + delta)),
+                255,
+            )
+    d = ImageDraw.Draw(img)
+    # Crisp vertical panel seam grooves at x=2..4 and x=124..126
+    d.rectangle([2, 0, 4, SIZE - 1], fill=(32, 36, 42, 255))
+    d.line([(5, 0), (5, SIZE - 1)], fill=(72, 78, 86, 255), width=1)
+    d.rectangle([SIZE - 5, 0, SIZE - 3, SIZE - 1], fill=(32, 36, 42, 255))
+    d.line([(SIZE - 6, 0), (SIZE - 6, SIZE - 1)], fill=(72, 78, 86, 255), width=1)
+    # Mid-height horizontal reveal groove at y=62..65
+    d.rectangle([0, 62, SIZE - 1, 65], fill=(30, 34, 40, 255))
+    d.line([(0, 66), (SIZE - 1, 66)], fill=(74, 80, 88, 255), width=1)
+    # 4 subtle dark metallic rivets/fasteners near corners
+    for rx, ry in [(12, 12), (SIZE - 13, 12), (12, SIZE - 13), (SIZE - 13, SIZE - 13)]:
+        d.ellipse([rx - 2, ry - 2, rx + 2, ry + 2], fill=(38, 42, 48, 255), outline=(74, 80, 88, 255))
+    return img
+
+
+def save_elevator_frame_pbr(name: str, rgba: Image.Image):
+    TEXTURES.mkdir(parents=True, exist_ok=True)
+    rgba.save(TEXTURES / f"{name}.png", optimize=True)
+    n_img = Image.new("RGBA", (SIZE, SIZE), (128, 128, 255, 255))
+    nd = ImageDraw.Draw(n_img)
+    # Beveled panel seam normals
+    nd.rectangle([2, 0, 4, SIZE - 1], fill=(104, 128, 250, 255))
+    nd.line([(5, 0), (5, SIZE - 1)], fill=(152, 128, 250, 255), width=1)
+    nd.rectangle([SIZE - 5, 0, SIZE - 3, SIZE - 1], fill=(152, 128, 250, 255))
+    nd.line([(SIZE - 6, 0), (SIZE - 6, SIZE - 1)], fill=(104, 128, 250, 255), width=1)
+    nd.rectangle([0, 62, SIZE - 1, 65], fill=(128, 102, 250, 255))
+    nd.line([(0, 66), (SIZE - 1, 66)], fill=(128, 154, 250, 255), width=1)
+    n_img.save(TEXTURES / f"{name}_n.png", optimize=True)
+    # Brushed steel specular (smooth ~135, f0 ~195, porosity 0)
+    s_img = Image.new("RGBA", (SIZE, SIZE), (135, 195, 0, 255))
+    sd = ImageDraw.Draw(s_img)
+    sd.rectangle([2, 0, 4, SIZE - 1], fill=(75, 140, 0, 255))
+    sd.rectangle([SIZE - 5, 0, SIZE - 3, SIZE - 1], fill=(75, 140, 0, 255))
+    sd.rectangle([0, 62, SIZE - 1, 65], fill=(75, 140, 0, 255))
+    s_img.save(TEXTURES / f"{name}_s.png", optimize=True)
+
+
 def write_fountain_model(name: str, top_y: int):
     faces_base = {f: {"uv": [0, 0, 16, 16], "texture": "#base"} for f in ("north", "south", "east", "west", "up", "down")}
     faces_liq = {f: {"uv": [0, 0, 16, 16], "texture": "#liq"} for f in ("north", "south", "east", "west", "up", "down")}
@@ -313,7 +412,47 @@ def main():
         }
     })
     write_item_files("corrupted_fountain_pool")
-    print("Generated Level 4 Batch 1+2+3 POI assets: meg_chalk_sign, caution_tape_barrier, office_dark_mirror, corrupted_fountain_pool")
+
+    # 5. executive_red_phone (Batch 4 POI #20)
+    save_solid_pbr("executive_desk_wood", draw_executive_desk_wood(), smooth=110, f0=18)
+    save_solid_pbr("executive_red_phone", draw_executive_red_phone(), smooth=210, f0=42)
+    wood_faces = {f: {"uv": [0, 0, 16, 16], "texture": "#wood"} for f in ("north", "south", "east", "west", "up", "down")}
+    phone_faces = {f: {"uv": [0, 0, 16, 16], "texture": "#phone"} for f in ("north", "south", "east", "west", "up", "down")}
+    write_json(MODELS / "executive_red_phone.json", {
+        "textures": {
+            "wood": NS + "executive_desk_wood",
+            "phone": NS + "executive_red_phone",
+            "particle": NS + "executive_desk_wood"
+        },
+        "elements": [
+            {"from": [1, 0, 2], "to": [15, 11, 14], "faces": wood_faces},
+            {"from": [4, 11, 4], "to": [12, 13.5, 11], "faces": phone_faces},
+            {"from": [3, 13.5, 5], "to": [13, 15, 8], "faces": phone_faces}
+        ]
+    })
+    write_json(BLOCKSTATES / "executive_red_phone.json", {
+        "variants": {
+            f"facing={facing}": {
+                "model": NS + "executive_red_phone",
+                **({"y": y} if y else {})
+            }
+            for facing, y in [("north", 0), ("east", 90), ("south", 180), ("west", 270)]
+        }
+    })
+    write_item_files("executive_red_phone")
+    write_loot_self("executive_red_phone")
+
+    # 6. office_elevator_frame (dedicated brushed dark steel elevator shaft/cabin frame)
+    save_elevator_frame_pbr("office_elevator_frame", draw_office_elevator_frame())
+    write_json(MODELS / "office_elevator_frame.json", {
+        "parent": "minecraft:block/cube_all",
+        "textures": {"all": NS + "office_elevator_frame"}
+    })
+    write_json(BLOCKSTATES / "office_elevator_frame.json", {
+        "variants": {"": {"model": NS + "office_elevator_frame"}}
+    })
+    write_item_files("office_elevator_frame")
+    print("Generated Level 4 Batch 1..4 POI assets complete (office_elevator_frame added)")
 
 
 if __name__ == "__main__":

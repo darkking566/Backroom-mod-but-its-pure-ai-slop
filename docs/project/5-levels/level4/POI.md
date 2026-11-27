@@ -63,7 +63,7 @@
 | **Batch 1** | #1, #2, #3, #4, #5, #6, #7, #10（8 種） | `meg_chalk_sign`、`caution_tape_barrier` | 【已實作】 |
 | **Batch 2** | #8, #9, #11, #12, #14, #15（6 種） | `office_dark_mirror` | 【已實作】 |
 | **Batch 3** | #13, #16, #17（3 種） | `corrupted_fountain_pool` | 【已實作】 |
-| **Batch 4** | #18, #19, #20（3 種） | `executive_red_phone` | 待 Batch 3 驗收後接續 |
+| **Batch 4** | #18, #19, #20（3 種） | `executive_red_phone` | 【已實作】 |
 
 每批驗收基準：
 1. `Level4PoiPlanTest` + `Level4LayoutTest` 全部通過（機率覆蓋、零據點／出口重疊、100% 連通性）。
