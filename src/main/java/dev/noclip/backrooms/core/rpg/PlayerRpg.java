@@ -89,6 +89,8 @@ public final class PlayerRpg {
 	private static final Map<UUID, Long> LAST_HURT = new HashMap<>();
 
 	private static final int SANITY_TICK_INTERVAL = 10; // 0.5 seconds
+	/** The Backrooms drain rates below are per second (docs/project/2-player/README.md); one step is half a second. */
+	private static final float STEP_SECONDS = SANITY_TICK_INTERVAL / 20.0F;
 
 	public static final SoundEvent SANITY_LOW_DRONE = registerSound("sanity.low_drone");
 	public static final SoundEvent SANITY_HALLUCINATION_CUE = registerSound("sanity.hallucination_cue");
@@ -247,9 +249,8 @@ public final class PlayerRpg {
 		updateModifier(player, Attributes.MOVEMENT_SPEED, MOD_AGI_MOVE, stats.moveSpeedBonus(), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 		updateModifier(player, Attributes.ATTACK_SPEED, MOD_AGI_ATK, stats.attackSpeedBonus(), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 		updateModifier(player, Attributes.MAX_HEALTH, MOD_VIT_HP, stats.maxHealthBonus(), AttributeModifier.Operation.ADD_VALUE);
-		// Only once they have been in the Backrooms (and until permanently cured by the Wretch Cure).
-		boolean frail = dev.noclip.backrooms.core.Home.entered(player)
-				&& !dev.noclip.backrooms.core.ending.Endings.isCured(player);
+		// Once they have been in the Backrooms, for good: the Wretch Cure ends the rejection, not this (the user, 2026-11-28).
+		boolean frail = dev.noclip.backrooms.core.Home.entered(player);
 		updateModifier(player, Attributes.MAX_HEALTH, MOD_BACKROOMS_HP, frail ? FRAILTY : 0.0,
 				AttributeModifier.Operation.ADD_VALUE);
 		updateModifier(player, Attributes.ARMOR_TOUGHNESS, MOD_VIT_TOUGH, 0.0, AttributeModifier.Operation.ADD_VALUE);
@@ -383,9 +384,9 @@ public final class PlayerRpg {
 				float envDelta;
 				// Half the old rates, with half the old maximum: about as long to break as before (the user, 2026-11-25).
 				if (blockLight <= 4) {
-					envDelta = -0.26F;
+					envDelta = -0.26F * STEP_SECONDS;
 				} else if (blockLight <= 8) {
-					envDelta = -0.07F;
+					envDelta = -0.07F * STEP_SECONDS;
 				} else if (blockLight >= 11) {
 					envDelta = 0.24F;
 				} else {
@@ -393,7 +394,7 @@ public final class PlayerRpg {
 				}
 
 				List<Monster> nearby = level.getEntitiesOfClass(Monster.class, new AABB(eyePos).inflate(12.0));
-				float monsterDrain = Math.min(0.5F, nearby.size() * 0.15F);
+				float monsterDrain = Math.min(0.5F, nearby.size() * 0.15F) * STEP_SECONDS;
 				// SAN passive composure helps stabilize sanity whenever not in pitch darkness next to monsters.
 				float passiveCalm = (blockLight > 4 && nearby.isEmpty()) ? stats.passiveSanityRegenPerSec() * 0.5F : 0.0F;
 				float scholarBonus = 0.0F;

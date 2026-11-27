@@ -53,7 +53,7 @@ import net.minecraft.world.phys.Vec3;
  * Dual-ending endgame progression (docs/project/1-gameplay/README.md, "主線與雙結局"):
  * <ul>
  *   <li><b>Ending A — Cured &amp; Contract Released ("contract")</b>: research Purple Science Pack, craft and drink the
- *       9x9 {@code wretch_cure} (permanently eliminating Wretch rejection and restoring full 20 HP), reach full
+ *       9x9 {@code wretch_cure} (permanently eliminating Wretch rejection and healing to full; max health stays halved), reach full
  *       institute clearance (5 quotas met, debt-free), and formally terminate the M.E.G. contract with the commander to
  *       return freely to the real Overworld.</li>
  *   <li><b>Ending B — Defiance / True Escape ("true_escape")</b>: crack B2's archive hatch, read all 6 classified
@@ -145,7 +145,7 @@ public final class Endings {
 		return of(player).filesCount();
 	}
 
-	/** Permanently cures the player's Wretch cycle, clearing rejection and restoring full 20 max HP. */
+	/** Permanently cures the player's Wretch cycle, clearing rejection and healing to full (max health stays halved). */
 	public static void cure(ServerPlayer player) {
 		State cur = of(player);
 		if (!cur.cured()) {
