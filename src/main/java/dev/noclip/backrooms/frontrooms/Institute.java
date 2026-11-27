@@ -68,6 +68,7 @@ public final class Institute {
 					|| pos.getMaxBlockZ() < InstituteLayout.MIN_Z || pos.getMinBlockZ() > InstituteLayout.MAX_Z) return;
 			MinecraftServer server = level.getServer();
 			server.schedule(new TickTask(server.getTickCount(), () -> syncDoors(level)));
+			server.schedule(new TickTask(server.getTickCount(), () -> linkParts(level, pos)));
 		});
 		Quota.onClearance(Institute::clearanceRose);
 		// Someone touched by the Backrooms does not stay in the Overworld (older worlds, from before the institute).
@@ -100,6 +101,26 @@ public final class Institute {
 			}
 			return InteractionResult.FAIL;
 		});
+	}
+
+	/**
+	 * The generator lays the objects' blocks; here each part block of a multi-block object learns which block draws it
+	 * (and breaks with it), for the parts in a chunk that has just loaded.
+	 */
+	private static void linkParts(ServerLevel level, ChunkPos chunk) {
+		for (InstituteFurnishing.Place place : InstituteFurnishing.places()) {
+			if (!place.type().multi()) continue;
+			int floorY = InstituteLayout.floorY(place.floor()) + 1;
+			BlockPos master = new BlockPos(place.x(), floorY, place.z());
+			for (int[] cell : InstituteFurnishing.cells(place)) {
+				if (cell[0] >> 4 != chunk.x() || cell[2] >> 4 != chunk.z()) continue;
+				BlockPos at = new BlockPos(cell[0], floorY + cell[1], cell[2]);
+				if (at.equals(master) || !level.isLoaded(at)) continue;
+				if (level.getBlockEntity(at) instanceof dev.noclip.backrooms.props.PropBlockEntity part && part.masterPos().equals(at)) {
+					part.setMasterPos(master);
+				}
+			}
+		}
 	}
 
 	/** The building and the grounds' works (towers, mast, roads, the gate): M.E.G.'s, not to be broken or built on. */

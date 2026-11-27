@@ -11,8 +11,9 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
 /**
  * The film props' meshes (models/film/<id>.obj, baked in Blender by tools/film/) and their textures
- * (textures/film/<id>.png), drawn by props.BlenderPropRenderer. Loaded the first time a prop is seen, dropped when
- * the resource packs reload.
+ * (textures/film/<id>.png), drawn by props.BlenderPropRenderer; the institute's objects, made the same way, are in
+ * models/institute and textures/institute ("inst_" ids). Loaded the first time a prop is seen, dropped when the resource
+ * packs reload.
  */
 public final class FilmLook {
 	private static final Map<String, MeshModel> MESHES = new ConcurrentHashMap<>();
@@ -27,10 +28,14 @@ public final class FilmLook {
 
 	/** The prop's mesh, or MeshModel.EMPTY when there is none. */
 	public static MeshModel mesh(String id) {
-		return MESHES.computeIfAbsent(id, key -> MeshModel.load(BackroomsMod.id("models/film/" + key + ".obj")));
+		return MESHES.computeIfAbsent(id, key -> MeshModel.load(BackroomsMod.id("models/" + folder(key) + "/" + key + ".obj")));
 	}
 
 	public static Identifier texture(String id) {
-		return BackroomsMod.id("textures/film/" + id + ".png");
+		return BackroomsMod.id("textures/" + folder(id) + "/" + id + ".png");
+	}
+
+	private static String folder(String id) {
+		return id.startsWith("inst_") ? "institute" : "film";
 	}
 }

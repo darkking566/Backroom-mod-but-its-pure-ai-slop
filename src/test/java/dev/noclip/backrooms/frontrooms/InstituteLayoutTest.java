@@ -29,6 +29,8 @@ final class InstituteLayoutTest {
 				char ch = InstituteLayout.plan(floor, x, z);
 				boolean door = ch == '1' || ch == '3' || ch == '5';
 				if (!(InstituteLayout.open(ch) || door && ch - '0' <= clearance)) continue;
+				// The institute's objects stand in the way.
+				if (InstituteLayout.furnished(floor, x, z)) continue;
 				seen.add(key(x, z));
 				queue.add(new int[] {x, z});
 			}
@@ -189,6 +191,25 @@ final class InstituteLayoutTest {
 				}
 			}
 		}
+	}
+
+	@Test
+	void objectsStandOnFloorsAndLeaveSpotsFree() {
+		for (InstituteFurnishing.Place place : InstituteFurnishing.places()) {
+			for (int[] cell : InstituteFurnishing.cells(place)) {
+				char ch = InstituteLayout.plan(place.floor(), cell[0], cell[2]);
+				assertTrue(".,;+_".indexOf(ch) >= 0, place.type().id() + " stands on '" + ch + "' at " + cell[0] + ", " + cell[2]);
+				int y = InstituteLayout.floorY(place.floor()) + 1 + cell[1];
+				assertTrue(y < InstituteLayout.ceilingY(place.floor()), place.type().id() + " goes through the ceiling");
+				Kind kind = InstituteLayout.cell(cell[0], y, cell[2]).kind();
+				assertTrue(kind == Kind.PROP || kind == Kind.PROP_PART, place.type().id() + " is not in the building at " + cell[0] + ", " + y + ", " + cell[2]);
+			}
+		}
+		for (char who : "akyunq".toCharArray()) {
+			InstituteLayout.Spot s = InstituteLayout.spot(who);
+			assertFalse(InstituteLayout.furnished(GROUND, s.x(), s.z()), "an object stands on " + who);
+		}
+		assertEquals(18, InstituteFurnishing.types().size(), "the institute's kinds of objects");
 	}
 
 	@Test

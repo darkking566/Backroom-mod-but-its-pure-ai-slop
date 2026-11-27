@@ -56,7 +56,9 @@ public final class InstituteLayout {
 		/** The specimen chamber: wired glass, hazard bands, a piece of Level 0 hung inside, the field coils over it. */
 		CONTAINMENT, BAND, LEVEL0_CARPET, LEVEL0_WALL, LEVEL0_CEILING, LEVEL0_LIGHT, BARS, COIL,
 		/** On the roof: the helipad's asphalt and its paint. */
-		ASPHALT, PAINT
+		ASPHALT, PAINT,
+		/** One of the institute's objects (InstituteFurnishing): the block that draws it, and the rest of its blocks. */
+		PROP, PROP_PART
 	}
 
 	/**
@@ -258,6 +260,8 @@ public final class InstituteLayout {
 	public static Cell cell(int x, int y, int z) {
 		if (y < BOTTOM || y > TOP || !inside(x, z)) return Cell.NONE;
 		if (y >= ROOF) return roof(x, y, z);
+		Cell prop = prop(x, y, z);
+		if (prop != null) return prop;
 		if (atrium(x, z) && y > FLOOR) return specimen(x, y, z);
 		for (Flight flight : FLIGHTS) {
 			if (flight.covers(x, z) && y >= flight.low() && y < flight.ceiling()) return stair(flight, x, y, z);
@@ -319,6 +323,22 @@ public final class InstituteLayout {
 			case 'l' -> ladder();
 			default -> station(plan, c, r, ch, h);
 		};
+	}
+
+	/** An object of the institute filling this block, or null. {@code requires} carries which object it is. */
+	private static Cell prop(int x, int y, int z) {
+		int floor = floorOf(y);
+		if (floor < 0 || y <= FLOORS[floor] || y >= CEILINGS[floor]) return null;
+		InstituteFurnishing.Occupant occupant = InstituteFurnishing.at(floor, x, y - FLOORS[floor] - 1, z);
+		if (occupant == null) return null;
+		InstituteFurnishing.Place place = InstituteFurnishing.places().get(occupant.index());
+		return new Cell(occupant.master() ? Kind.PROP : Kind.PROP_PART, place.facing(), occupant.index(), false, 'p');
+	}
+
+	/** Whether an object stands in the way on a floor at (x, z) (things hung on walls do not). */
+	public static boolean furnished(int floor, int x, int z) {
+		InstituteFurnishing.Occupant occupant = InstituteFurnishing.at(floor, x, 0, z);
+		return occupant != null && !InstituteFurnishing.places().get(occupant.index()).type().mount().equals("wall");
 	}
 
 	private static Cell station(String[] plan, int c, int r, char ch, int h) {

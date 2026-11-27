@@ -219,10 +219,28 @@ flowchart LR
     - [中庭](images/institute_atrium.jpg)、[從三樓看標本艙](images/institute_atrium_top.jpg)
     - [接收室](images/institute_receiving.jpg)、[醫療翼](images/institute_medical_wing.jpg)、[收容區](images/institute_cells.jpg)
     - [冷卻塔與發電廠](images/institute_towers.jpg)
+- **第二批：室內 3D 物件【已做】（2026-11-27，Claude）**：
+  - 18 種物件（`tools/film/institute_list.py`）用 Blender 建模、照片材質烘焙（`tools/film/make_institute_props.py`，跟電影家具同一套）：
+    - 擔架床、包著塑膠布的器材、詢問室鐵桌、鐵管塑膠椅、候診連排椅、X 光看片燈箱、點滴架、輪椅、壁掛飲水機；
+    - 除汙淋浴間、防護衣吊架；
+    - CRT 監視台、鐵製辦公桌與電腦、四層檔案櫃、磁帶機櫃、實驗桌、標本槽；
+    - B1 的深層傳送裝置（從門裡看得到一段 Level 0）；
+  - 總覽 [images/institute_props.jpg](images/institute_props.jpg)；
+  - 擺放由平面圖工具決定（`make_institute_plans.py` 的 `furnish()`，共 318 件），工具會檢查每件都放在地板上、不互相重疊；
+  - 擺放：
+    - 一樓：接收室、單面鏡後的觀察室、候診室、置物櫃室、中庭、醫療翼、軍械庫、休息室、深層區的作戰室；
+    - B1：傳送裝置、磁帶機，三間收容格裡各有一座標本槽；B2：檔案櫃；
+    - 二、三樓：實驗室與辦公室；三樓暗室裡一排排標本槽（M.E.G. 的秘密）；
+  - 研究所裡的物件跟建築一樣打不壞；拿到研究所外面放，打掉會拆成廢料；
+  - 觀察窗改成半透明：亮的那邊看過去只看得到黑（後面的房間沒開燈），暗的那邊看得到亮的房間，跟真的單面鏡一樣；
+  - 遊戲畫面：
+    - [接收室](images/institute_receiving.jpg)、[觀察室](images/institute_observation.jpg)
+    - [B1 傳送裝置](images/institute_gate.jpg)
+    - [二樓實驗室](images/institute_labs.jpg)、[三樓標本槽](images/institute_tanks.jpg)
 - **還沒做**：
-  - 室內的 3D 物件（擔架床、詢問室桌椅、看片燈箱、除汙間、防護衣架、CRT 監視牆、傳送裝置）；
   - 眷舍小鎮與 398 的夜晚；
-  - 收容區裡的怪物（任務主線）。
+  - 收容區裡的怪物（任務主線）；
+  - 欄杆還是原版鐵欄杆，之後換成自己的。
 
 ### 前室的夜晚：398「慘無人道的惡作劇」（參考狐霖的後室，2026-11-27）【定：全部採用】
 

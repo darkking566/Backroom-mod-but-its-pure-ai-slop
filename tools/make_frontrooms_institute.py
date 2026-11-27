@@ -161,11 +161,12 @@ def terrazzo(seed):
 
 
 def observation_window():
-    """Dark one-way glass in a white aluminium frame: from the bright side you see yourself, not the room."""
+    """One-way glass in a white aluminium frame: tinted and half see-through, so from the lit room the dark room behind
+    shows only darkness, and from the dark room the lit one shows."""
     image = np.zeros((SIZE, SIZE, 4))
     sheen = 0.08 * step(0, 128, X + Y * 0.6) + 0.04 * clouds(41, 3)
     image[..., 0], image[..., 1], image[..., 2] = 16 + sheen * 120, 19 + sheen * 120, 23 + sheen * 130
-    image[..., 3] = 236
+    image[..., 3] = 150
     frame = 1 - box(5, 5, 123, 123, 0.4)
     for c, v in enumerate((214, 212, 206)):
         image[..., c] = image[..., c] * (1 - frame) + v * frame

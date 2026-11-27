@@ -599,6 +599,14 @@
   - 測試：`InstituteLayoutTest` 改寫並新增（每段樓梯一階一格有頭頂空間、兩端接得到、上樓梯從大廳走得到、園區不蓋進主館）；`FrontroomsClientTest` 改座標、回大廳後關任務報告、加 8 張風景照（拍照時藏介面）
   - 驗證：`gradlew build`（138 個單元測試）、`runClientGameTest -Plevels=frontrooms` 與 `-Plevels=horror` 通過，log 沒有缺模型或貼圖；截圖存到 `docs/project/1-gameplay/images/institute_*.jpg`，企劃「研究所改版」一節標上已做與還沒做（室內 3D 物件、眷舍小鎮與 398、收容區的怪物）
   - 同時 Antigravity 有未提交的改動（RPG、武器、合約等，也改了兩個語言檔），只提交我的檔案。Antigravity 在我提交前先提交了它的部分（`8cb6cbc4`），當時語言檔裡已經有我加的 13 個方塊名稱，所以那 13 個跟著它的提交進去了，我的提交只多了「細鋼桿」一個
+- 研究所第二批：室內 3D 物件（使用者要先做 3D 物件再推）：
+  - 18 種物件用 Blender 建模、照片材質烘焙：新增 `tools/film/institute_list.py`（清單、掉落、亮度）、`institute_prints.py`（X 光片、綠字螢幕、M.E.G. 標誌、生物危害標籤、標本、門裡的 Level 0）、`make_institute_props.py`（沿用電影家具的工具，`make_film_props.py` 最後一行改成 `if __name__ == "__main__"` 才能被匯入）、`make_institute_data.py`（模型 `models/institute/`、貼圖 `textures/institute/`、圖示、方塊狀態、掉落表、名稱、十字鎬標籤）
+  - 第一版有四個問題改掉重烤：CRT 螢幕被外框蓋住、烤漆面出現迷彩斑（改用塑膠照片加掉漆）、該是不鏽鋼的地方生鏽、防護衣太方
+  - 擺放：`make_institute_plans.py` 新增 `furnish()`（318 件，檢查每件都在地板上、不重疊、壁掛的背後是牆），寫進 `InstitutePlans.PROPS` 與 `PROP_TYPES`；新增 `frontrooms/InstituteFurnishing`（純資料）、`InstituteProps`（註冊方塊，掛到共用的方塊實體）；`InstituteLayout` 多 `PROP`／`PROP_PART`，生成器放方塊，`Institute` 在區塊載入時把多格物件的其他格接到主方塊
+  - 改到別人的：Gemini 的 `BlenderPropRenderer` 一行（`inst_` 開頭也畫網格）；我的 `FilmLook` 依前綴換資料夾
+  - 觀察窗改成半透明（亮的那邊只看到黑、暗的那邊看得到亮的房間）
+  - 測試：`InstituteLayoutTest` 走路時把物件當障礙（人、門、樓梯照樣走得到）並新增物件檢查；`FrontroomsClientTest` 檢查詢問桌在位置上、另一半接到主方塊，加 6 張室內照
+  - 驗證：`gradlew build`（139 個單元測試）、`runClientGameTest -Plevels=frontrooms,film` 與 `-Plevels=frontrooms,horror` 通過；截圖與物件總覽存到 `docs/project/1-gameplay/images/`；`CREDITS.md` 補上這次用到的照片
 
 ## 動作記錄（Antigravity）
 

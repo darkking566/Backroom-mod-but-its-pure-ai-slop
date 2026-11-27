@@ -262,6 +262,169 @@ def upper(level):
 
 
 PLANS = {"B2": b2(), "B1": b1(), "F1": ground(), "F2": upper(2), "F3": upper(3)}
+FLOOR_INDEX = {"B2": 0, "B1": 1, "F1": 2, "F2": 3, "F3": 4}
+
+# Furnishing ------------------------------------------------------------------------------------------------------------
+# The institute's objects (tools/film/institute_list.py): where each stands, which way its front looks (S W N E, the
+# Minecraft way: a multi-block prop grows to its right and backwards from the master block). Walls take wall props.
+
+sys.path.insert(0, str(Path(__file__).resolve().parent / "film"))
+from institute_list import LIGHT as PROP_LIGHT, PROPS as PROP_LIST  # noqa: E402
+
+SIZES = {pid: (size, mount) for pid, size, mount, *_ in PROP_LIST}
+STEP = {"S": (0, 1), "W": (-1, 0), "N": (0, -1), "E": (1, 0)}
+RIGHT = {"S": "W", "W": "N", "N": "E", "E": "S"}
+BACK = {"S": "N", "W": "E", "N": "S", "E": "W"}
+FLOOR_CHARS = ".+;_,"
+PLACES = []
+
+
+def cells(pid, x, z, facing):
+    (w, h, d), mount = SIZES[pid]
+    if mount != "multi":
+        return [(x, z)]
+    rx, rz = STEP[RIGHT[facing]]
+    bx, bz = STEP[BACK[facing]]
+    return [(x + i * rx + j * bx, z + i * rz + j * bz) for i in range(w) for j in range(d)]
+
+
+def place(floor, pid, x, z, facing):
+    plan = PLANS[floor]
+    for cx, cz in cells(pid, x, z, facing):
+        ch = get(plan, cx, cz)
+        if ch not in FLOOR_CHARS:
+            raise SystemExit(f"{pid} at {floor} {x},{z} {facing} lands on {ch!r} at {cx},{cz}")
+        for other in PLACES:
+            if other[0] == floor and (cx, cz) in cells(other[1], other[2], other[3], other[4]):
+                raise SystemExit(f"{pid} at {floor} {x},{z} overlaps {other}")
+    if SIZES[pid][1] == "wall":
+        bx, bz = STEP[BACK[facing]]
+        behind = get(plan, x + bx, z + bz)
+        if behind not in "#EW":
+            raise SystemExit(f"{pid} at {floor} {x},{z} hangs on {behind!r}")
+    PLACES.append((floor, pid, x, z, facing))
+
+
+def desk_with_chair(floor, x, z, facing="S"):
+    place(floor, "inst_office_desk", x, z, facing)
+    fx, fz = STEP[facing]
+    place(floor, "inst_stacking_chair", x + fx, z + fz, BACK[facing])
+
+
+def furnish():
+    # The receiving room: the interview table, the gurney, the X-ray viewer, a wheelchair, something wrapped in plastic.
+    place("F1", "inst_interview_table", -34, 20, "S")
+    place("F1", "inst_stacking_chair", -34, 19, "S")
+    place("F1", "inst_stacking_chair", -35, 21, "N")
+    place("F1", "inst_gurney", -28, 15, "S")
+    place("F1", "inst_iv_stand", -29, 14, "S")
+    place("F1", "inst_wrapped_equipment", -27, 33, "N")
+    place("F1", "inst_xray_viewer", -32, 33, "N")
+    place("F1", "inst_wheelchair", -38, 30, "E")
+    place("F1", "inst_file_cabinet", -40, 14, "E")
+    # Behind the one-way glass: consoles watching the room, tape drives, files.
+    for z in (19, 25):
+        place("F1", "inst_monitor_console", -43, z, "E")
+        place("F1", "inst_stacking_chair", -44, z, "E")
+        place("F1", "inst_stacking_chair", -44, z + 1, "E")
+    for z in (15, 16, 30, 31, 32):
+        place("F1", "inst_tape_drive" if z < 20 else "inst_file_cabinet", -47, z, "E")
+    # The waiting room.
+    for x in (-22, -17):
+        place("F1", "inst_waiting_chairs", x, 25, "S")
+    for x in (-24, -19):
+        place("F1", "inst_waiting_chairs", x, 34, "N")
+    place("F1", "inst_water_fountain", -13, 25, "S")
+    # The locker room: decontamination showers and the suits.
+    place("F1", "inst_decon_shower", -26, 5, "W")
+    place("F1", "inst_decon_shower", -26, 8, "W")
+    place("F1", "inst_hazmat_rack", -34, 12, "N")
+    # The atrium hall: the commander's desk, seats facing the specimen, files behind the counters.
+    place("F1", "inst_office_desk", 1, 12, "S")
+    place("F1", "inst_waiting_chairs", -8, 7, "N")
+    place("F1", "inst_waiting_chairs", 6, 7, "N")
+    for z in (-3, -2):
+        place("F1", "inst_file_cabinet", -24, z, "E")
+        place("F1", "inst_file_cabinet", 23, z, "W")
+    # The medical wing: IV stands by the beds, wheelchairs, a gurney, the viewer, files, a row of seats.
+    for x in (28, 32, 36, 40, 44):
+        place("F1", "inst_iv_stand", x, 33, "N")
+    place("F1", "inst_wheelchair", 26, 10, "E")
+    place("F1", "inst_wheelchair", 26, 12, "E")
+    place("F1", "inst_gurney", 44, 13, "W")
+    place("F1", "inst_xray_viewer", 46, 22, "W")
+    place("F1", "inst_file_cabinet", 37, 10, "N")
+    place("F1", "inst_file_cabinet", 38, 10, "N")
+    place("F1", "inst_waiting_chairs", 25, 14, "E")
+    # The armoury: suits, files, a desk.
+    place("F1", "inst_hazmat_rack", 26, -20, "E")
+    place("F1", "inst_file_cabinet", 25, -12, "E")
+    place("F1", "inst_file_cabinet", 25, -11, "E")
+    desk_with_chair("F1", 28, -6, "S")
+    # The staff lounge.
+    place("F1", "inst_interview_table", 16, 30, "S")
+    place("F1", "inst_stacking_chair", 16, 29, "S")
+    place("F1", "inst_stacking_chair", 15, 31, "N")
+    place("F1", "inst_waiting_chairs", 23, 32, "W")
+    place("F1", "inst_water_fountain", 12, 25, "S")
+    # The deep wing: the operations room, consoles along the north wall, tape drives along the sides.
+    for x in (-22, -18, -14, 12, 16, 20):
+        place("F1", "inst_monitor_console", x, -35, "S")
+        place("F1", "inst_stacking_chair", x, -34, "N")
+    for z in (-32, -31, -30, -29):
+        place("F1", "inst_tape_drive", -24, z, "E")
+        place("F1", "inst_tape_drive", 23, z, "W")
+
+    # B1: the deployment gate in the middle of the hall, tape drives, a console; specimens in three of the cells.
+    place("B1", "inst_deployment_gate", 1, -20, "S")
+    for x in range(12, 21):
+        place("B1", "inst_tape_drive", x, -34, "S")
+    place("B1", "inst_monitor_console", -18, -5, "E")
+    place("B1", "inst_stacking_chair", -19, -5, "E")
+    for x in (-20, -6, 8):
+        place("B1", "inst_specimen_tank", x, 15, "N")
+    # B2: the archive's cabinets.
+    for z in (-6, -5, -4):
+        place("B2", "inst_file_cabinet", 19, z, "E")
+        place("B2", "inst_file_cabinet", 35, z, "W")
+
+    # The floors above: labs, offices, a control room, conference tables; on the third floor the dark rooms keep tanks.
+    for level in ("F2", "F3"):
+        for x0, x1 in ((-47, -38), (-36, -26), (25, 35), (37, 46)):
+            # North rooms.
+            if level == "F2" and x0 < 0:
+                for z in (-30, -22, -14):
+                    place(level, "inst_lab_bench", x0 + 3, z, "S")
+                    place(level, "inst_lab_bench", x0 + 7, z, "S") if x1 - x0 >= 9 else None
+                place(level, "inst_specimen_tank", x0 + 1, -35, "S")
+                place(level, "inst_specimen_tank", x1 - 1, -35, "S")
+            else:
+                for z in (-31, -22, -13):
+                    desk_with_chair(level, x0 + 3, z, "S")
+                    desk_with_chair(level, x0 + 7, z, "S") if x1 - x0 >= 9 else None
+                place(level, "inst_file_cabinet", x0, -35, "S")
+                place(level, "inst_file_cabinet", x1, -35, "S")
+            # South rooms.
+            if level == "F3":
+                for z in (8, 18, 28):
+                    for x in range(x0 + 2, x1, 4):
+                        place(level, "inst_specimen_tank", x, z, "N")
+            else:
+                for z in (6, 12, 24):
+                    desk_with_chair(level, x0 + 3, z, "S")
+                    desk_with_chair(level, x0 + 7, z, "S") if x1 - x0 >= 9 else None
+        # North: the control room; south: conference tables.
+        for x in (-22, -16, -10, 10, 16, 22):
+            place(level, "inst_monitor_console", x, -35, "S")
+            place(level, "inst_stacking_chair", x, -34, "N")
+        for x in (-20, -8, 6, 18):
+            z = 32
+            place(level, "inst_interview_table", x, z, "S")
+            place(level, "inst_stacking_chair", x, z - 1, "S")
+            place(level, "inst_stacking_chair", x - 1, z + 1, "N")
+
+
+furnish()
 
 
 def show():
@@ -270,6 +433,7 @@ def show():
         for row in p:
             print("".join(row))
         print()
+    print(len(PLACES), "props placed")
 
 
 def write():
@@ -281,6 +445,16 @@ def write():
         for row in p:
             lines.append('\t\t\t"' + "".join(row) + '",')
         lines.append("\t};")
+    lines.append("\t/** The kinds of objects (tools/film/institute_list.py): id, width, height, depth, mount, material, light. */")
+    lines.append("\tstatic final String[] PROP_TYPES = {")
+    for pid, (w, h, d), mount, material, *_ in PROP_LIST:
+        lines.append(f'\t\t\t"{pid} {w} {h} {d} {mount} {material} {PROP_LIGHT.get(pid, 0)}",')
+    lines.append("\t};")
+    lines.append("\t/** The institute's objects: floor (0 B2 .. 4 the third floor), x, z, which way the front looks (S W N E), id. */")
+    lines.append("\tstatic final String[] PROPS = {")
+    for floor, pid, x, z, facing in PLACES:
+        lines.append(f'\t\t\t"{FLOOR_INDEX[floor]} {x} {z} {facing} {pid}",')
+    lines.append("\t};")
     lines += ["", "\tprivate InstitutePlans() {", "\t}", "}", ""]
     JAVA.write_text("\n".join(lines), encoding="utf8")
     print("wrote", JAVA)

@@ -66,6 +66,18 @@ public final class FrontroomsClientTest implements FabricClientGameTest {
 			context.waitTicks(40);
 			context.takeScreenshot("frontrooms_lobby");
 
+			// The objects stand where the plans put them, and a multi-block one's other blocks know the one that draws it.
+			InstituteFurnishing.Place table = InstituteFurnishing.places().stream()
+					.filter(p -> p.type().id().equals("inst_interview_table")).findFirst().orElseThrow();
+			server.runOnServer(s -> {
+				BlockPos master = new BlockPos(table.x(), InstituteLayout.FLOOR + 1, table.z());
+				check(level(s).getBlockState(master).is(InstituteProps.block("inst_interview_table")), "no interview table in the receiving room");
+				int[] part = InstituteFurnishing.cells(table).get(1);
+				BlockPos partPos = new BlockPos(part[0], InstituteLayout.FLOOR + 1 + part[1], part[2]);
+				check(level(s).getBlockEntity(partPos) instanceof dev.noclip.backrooms.props.PropBlockEntity be && be.masterPos().equals(master),
+						"the table's other half does not know its master");
+			});
+
 			// Its people, each at their post.
 			server.waitFor(s -> people(s) >= 5, 400);
 			for (ShopRole role : new ShopRole[] {ShopRole.MASTER, ShopRole.BUYER, ShopRole.SUPPLIER, ShopRole.MEDIC, ShopRole.QUARTERMASTER}) {
@@ -140,6 +152,12 @@ public final class FrontroomsClientTest implements FabricClientGameTest {
 			shoot(context, server, game, "frontrooms_atrium_top", 9.5, InstituteLayout.F3_FLOOR + 1, 9.5, 135, 35);
 			shoot(context, server, game, "frontrooms_receiving", -28.5, InstituteLayout.FLOOR + 1, 31.5, 135, 5);
 			shoot(context, server, game, "frontrooms_cells", 0.5, InstituteLayout.B1_FLOOR + 1, 2.5, 0, 5);
+			shoot(context, server, game, "frontrooms_gate", 1.5, InstituteLayout.B1_FLOOR + 2, -10.5, 180, 5);
+			shoot(context, server, game, "frontrooms_observation", -46.5, InstituteLayout.FLOOR + 1, 23.5, -100, 5);
+			shoot(context, server, game, "frontrooms_lockers", -44.5, InstituteLayout.FLOOR + 1, 6.5, -75, 5);
+			shoot(context, server, game, "frontrooms_operations", 8.5, InstituteLayout.FLOOR + 1, -30.5, 140, 5);
+			shoot(context, server, game, "frontrooms_labs", -42.5, InstituteLayout.F2_FLOOR + 1, -8.5, 180, 0);
+			shoot(context, server, game, "frontrooms_tanks", -36.5, InstituteLayout.F3_FLOOR + 1, 4.5, 20, 0);
 			server.runCommand("gamemode survival @a");
 
 			// Quotas open the wings: one the medical wing, three the armoury, five B1.

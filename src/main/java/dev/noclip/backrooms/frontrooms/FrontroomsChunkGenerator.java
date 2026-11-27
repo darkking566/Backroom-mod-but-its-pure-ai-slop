@@ -190,6 +190,11 @@ final class FrontroomsChunkGenerator extends ChunkGenerator {
 			case COIL -> ZenithBlocks.BRIDGE_COIL.defaultBlockState();
 			case ASPHALT -> FrontroomsBlocks.CAMPUS_ASPHALT.defaultBlockState();
 			case PAINT -> FrontroomsBlocks.INSTITUTE_WALL.defaultBlockState();
+			case PROP -> {
+				InstituteFurnishing.Place place = InstituteFurnishing.places().get(cell.requires());
+				yield InstituteProps.block(place.type().id()).defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, facing);
+			}
+			case PROP_PART -> BackroomsProps.PROP_PART.defaultBlockState();
 			case FLOOR -> FrontroomsBlocks.INSTITUTE_FLOOR.defaultBlockState();
 			case WORK_FLOOR -> FrontroomsBlocks.INSTITUTE_WORK_FLOOR.defaultBlockState();
 			case CEILING -> FrontroomsBlocks.INSTITUTE_CEILING.defaultBlockState();

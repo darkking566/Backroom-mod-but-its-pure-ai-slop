@@ -1132,4 +1132,5 @@ def main():
     print("FILM PROPS:", len(R.SIZES))
 
 
-main()
+if __name__ == "__main__":
+    main()
