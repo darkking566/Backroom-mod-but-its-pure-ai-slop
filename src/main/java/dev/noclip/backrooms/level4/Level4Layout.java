@@ -32,6 +32,10 @@ final class Level4Layout {
 		BALCONY_RAIL,
 		BALCONY_FLOOR,
 		BALCONY_CANOPY,
+		ELEVATOR_SHAFT,
+		ELEVATOR_CABLE,
+		ELEVATOR_SHAFT_WALL,
+		ELEVATOR_THRESHOLD,
 		OMEGA_WALL,
 		OMEGA_SIGN,
 		WINDOW_BLACKED,
@@ -123,7 +127,7 @@ final class Level4Layout {
 		int cx = lx % CELL, cz = lz % CELL;
 		int c = Level4Plan.cell(i, j);
 		ZoneKind zone = plan.zones[c];
-		int ceilH = zone == ZoneKind.ATRIUM ? ATRIUM_HEIGHT : OPEN_HEIGHT;
+		int ceilH = (zone == ZoneKind.ATRIUM || zone == ZoneKind.AUDITORIUM) ? ATRIUM_HEIGHT : OPEN_HEIGHT;
 
 		if (zone == ZoneKind.SOLID_CORE) {
 			return new Tile(Kind.DRYWALL, zone, Level4Plan.NORTH, ceilH, null, false);
@@ -263,18 +267,28 @@ final class Level4Layout {
 		};
 	}
 
+	private static boolean isTallZone(ZoneKind zone) {
+		return zone == ZoneKind.ATRIUM || zone == ZoneKind.AUDITORIUM;
+	}
+
 	private static boolean isAtrium(Level4Plan plan, int i, int j) {
-		return Level4Plan.inside(i, j) && plan.zones[Level4Plan.cell(i, j)] == ZoneKind.ATRIUM;
+		return Level4Plan.inside(i, j) && isTallZone(plan.zones[Level4Plan.cell(i, j)]);
 	}
 
 	private static Tile cornerTile(long seed, Level4Plan plan, int i, int j, ZoneKind zone, int ceilH) {
-		boolean nearAtrium = zone == ZoneKind.ATRIUM || isAtrium(plan, i - 1, j)
+		boolean nearAtrium = isTallZone(zone) || isAtrium(plan, i - 1, j)
 				|| isAtrium(plan, i, j - 1) || isAtrium(plan, i - 1, j - 1);
 		int cornerCeil = nearAtrium ? ATRIUM_HEIGHT : ceilH;
 		if (zone == ZoneKind.OMEGA_BASE) {
 			RoomBox room = plan.rooms.get(plan.roomId[Level4Plan.cell(i, j)]);
 			boolean outer = i == room.i() || j == room.j();
 			if (outer) return new Tile(Kind.OMEGA_WALL, zone, Level4Plan.NORTH, cornerCeil, null, false);
+		}
+		if (zone == ZoneKind.AUDITORIUM) {
+			RoomBox room = plan.rooms.get(plan.roomId[Level4Plan.cell(i, j)]);
+			if (i > room.i() && j > room.j()) {
+				return new Tile(Kind.AIR, zone, Level4Plan.NORTH, ATRIUM_HEIGHT, null, false);
+			}
 		}
 		return new Tile(Kind.PILLAR, zone, Level4Plan.NORTH, cornerCeil, null, false);
 	}
@@ -285,10 +299,14 @@ final class Level4Layout {
 		int ni = i + Level4Plan.DX[dir], nj = j + Level4Plan.DZ[dir];
 		ZoneKind neighbor = Level4Plan.inside(ni, nj) ? plan.zones[Level4Plan.cell(ni, nj)] : ZoneKind.OPEN_OFFICE;
 		boolean omegaWall = zone == ZoneKind.OMEGA_BASE || neighbor == ZoneKind.OMEGA_BASE;
-		boolean atriumBorder = zone == ZoneKind.ATRIUM || neighbor == ZoneKind.ATRIUM;
+		boolean atriumBorder = isTallZone(zone) || isTallZone(neighbor);
 		int edgeCeil = atriumBorder ? ATRIUM_HEIGHT : ceilH;
 		int facingInto = dir == Level4Plan.NORTH ? Level4Plan.SOUTH : Level4Plan.EAST;
 		if (omegaWall && zone != ZoneKind.OMEGA_BASE) facingInto = Level4Plan.opposite(facingInto);
+
+		if (zone == ZoneKind.ELEVATOR_LOBBY && dir == Level4Plan.NORTH && along >= 1 && along <= 5) {
+			return new Tile(Kind.ELEVATOR_SHAFT_WALL, zone, facingInto, edgeCeil, null, false);
+		}
 
 		if (e == Edge.OPEN) {
 			if (atriumBorder && zone != neighbor) {
@@ -351,6 +369,32 @@ final class Level4Layout {
 	}
 
 	record BridgeInfo(boolean eastWest, boolean elevated, int spanPos, int perpPos) {
+	}
+
+	record AuditoriumInfo(int floorY, boolean stair, int stairDir, boolean stage, boolean screenWall, int rx) {
+	}
+
+	/** Returns tiered seating/stage geometry inside a {@link ZoneKind#AUDITORIUM} room, or null elsewhere. */
+	static AuditoriumInfo auditoriumInfo(long seed, int x, int z) {
+		int rx0 = Math.floorDiv(x, SIZE), rz0 = Math.floorDiv(z, SIZE);
+		Level4Plan plan = Level4Plan.of(seed, rx0, rz0);
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		int i = lx / CELL, j = lz / CELL;
+		int c = Level4Plan.cell(i, j);
+		if (plan.zones[c] != ZoneKind.AUDITORIUM || plan.roomId[c] < 0) return null;
+		RoomBox room = plan.rooms.get(plan.roomId[c]);
+		int rx = lx - room.i() * CELL;
+		int rz = lz - room.j() * CELL;
+		boolean screen = (rz == 19 && rx >= 5 && rx <= 15);
+		if (rz <= 3) return new AuditoriumInfo(FLOOR_Y, false, Level4Plan.NORTH, false, screen, rx);
+		if (rz <= 6) return new AuditoriumInfo(FLOOR_Y - 1, rz == 4 && rx >= 2 && rx <= 18, Level4Plan.NORTH, false, screen, rx);
+		if (rz <= 9) return new AuditoriumInfo(FLOOR_Y - 2, rz == 7 && rx >= 2 && rx <= 18, Level4Plan.NORTH, false, screen, rx);
+		if (rz <= 12) return new AuditoriumInfo(FLOOR_Y - 3, rz == 10 && rx >= 2 && rx <= 18, Level4Plan.NORTH, false, screen, rx);
+		if (rz <= 15) return new AuditoriumInfo(FLOOR_Y - 3, false, Level4Plan.NORTH, false, screen, rx);
+		if (rz == 16 && rx >= 8 && rx <= 12) {
+			return new AuditoriumInfo(FLOOR_Y - 3, true, Level4Plan.SOUTH, true, screen, rx);
+		}
+		return new AuditoriumInfo(FLOOR_Y - 2, false, Level4Plan.SOUTH, true, screen, rx);
 	}
 
 	/** Returns bridge geometry metadata if (x, z) lies on or forms a wall of an exterior skybridge. */
@@ -484,6 +528,20 @@ final class Level4Layout {
 
 		if (zone == ZoneKind.DARK_WING && room != null && i == room.i() && j == room.j() && cx == 1 && cz == 2) {
 			return new Tile(Kind.BREAKER, zone, Level4Plan.EAST, ceilH, null, false);
+		}
+
+		if (zone == ZoneKind.ELEVATOR_LOBBY && room != null) {
+			if (cz == 0 && cx >= 1 && cx <= 5) {
+				return new Tile(Kind.ELEVATOR_SHAFT_WALL, zone, Level4Plan.SOUTH, ceilH, null, false);
+			}
+			if (cz == 1) {
+				if (cx == 1 || cx == 5) return new Tile(Kind.ELEVATOR_SHAFT_WALL, zone, Level4Plan.SOUTH, ceilH, null, false);
+				if (cx == 3) return new Tile(Kind.ELEVATOR_CABLE, zone, Level4Plan.SOUTH, ceilH, null, false);
+				if (cx == 2 || cx == 4) return new Tile(Kind.ELEVATOR_SHAFT, zone, Level4Plan.SOUTH, ceilH, null, false);
+			}
+			if (cz == 2 && cx >= 1 && cx <= 5) {
+				return new Tile(Kind.ELEVATOR_THRESHOLD, zone, Level4Plan.SOUTH, ceilH, null, false);
+			}
 		}
 
 		if (zone == ZoneKind.UNFINISHED_WING && room != null) {

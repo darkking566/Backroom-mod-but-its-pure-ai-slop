@@ -323,4 +323,38 @@ final class Level4LayoutTest {
 		assertTrue(sawLightwell && sawShaft, "expected open-sky central lightwell shaft");
 		assertTrue(sawBalconyFloor && sawBalconyRail && sawBalconyCanopy, "expected recessed rain balconies");
 	}
+
+	@Test
+	void batch3StructuresElevatorShaftsAndAuditoriumAppear() {
+		boolean sawElevatorLobby = false, sawShaft = false, sawCable = false, sawThreshold = false;
+		boolean sawAuditorium = false, sawSunkenStage = false, sawStair = false, sawScreen = false;
+		for (long seed = 10; seed <= 16; seed++) {
+			for (int rx = -1; rx <= 1; rx++) {
+				for (int rz = -1; rz <= 1; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					for (ZoneKind z : plan.zones) {
+						if (z == ZoneKind.ELEVATOR_LOBBY) sawElevatorLobby = true;
+						if (z == ZoneKind.AUDITORIUM) sawAuditorium = true;
+					}
+					for (int lx = 0; lx < Level4Plan.SIZE; lx++) {
+						for (int lz = 0; lz < Level4Plan.SIZE; lz++) {
+							int x = rx * Level4Plan.SIZE + lx, z = rz * Level4Plan.SIZE + lz;
+							Tile t = Level4Layout.tile(seed, x, z);
+							if (t.kind() == Kind.ELEVATOR_SHAFT) sawShaft = true;
+							if (t.kind() == Kind.ELEVATOR_CABLE) sawCable = true;
+							if (t.kind() == Kind.ELEVATOR_THRESHOLD) sawThreshold = true;
+							Level4Layout.AuditoriumInfo aud = Level4Layout.auditoriumInfo(seed, x, z);
+							if (aud != null) {
+								if (aud.floorY() == Level4Layout.FLOOR_Y - 3) sawSunkenStage = true;
+								if (aud.stair()) sawStair = true;
+								if (aud.screenWall()) sawScreen = true;
+							}
+						}
+					}
+				}
+			}
+		}
+		assertTrue(sawElevatorLobby && sawShaft && sawCable && sawThreshold, "expected elevator lobby with open shafts");
+		assertTrue(sawAuditorium && sawSunkenStage && sawStair && sawScreen, "expected sunken tiered auditorium");
+	}
 }

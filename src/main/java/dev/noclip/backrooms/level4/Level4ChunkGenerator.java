@@ -88,6 +88,10 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 			return bridgeColumn(seed, x, y, z, tile, bridge);
 		}
 
+		if (tile.kind() == Kind.ELEVATOR_SHAFT || tile.kind() == Kind.ELEVATOR_CABLE || tile.kind() == Kind.ELEVATOR_SHAFT_WALL) {
+			return elevatorShaftColumn(y, topY, tile.kind());
+		}
+
 		if (es != null && y >= FLOOR_Y - 3 && y <= FLOOR_Y + 6) {
 			return exitStructureBlock(es, y);
 		}
@@ -97,9 +101,17 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 		if (y == topY) return Blocks.CONCRETE.gray().defaultBlockState();
 
 		int roofY = FLOOR_Y + tile.ceilingHeight() + 1;
+		Level4Layout.AuditoriumInfo aud = tile.kind() == Kind.AIR ? Level4Layout.auditoriumInfo(seed, x, z) : null;
+		if (aud != null) {
+			return auditoriumColumn(seed, x, y, z, tile, aud, roofY);
+		}
+
 		if (y >= FLOOR_Y && y <= roofY) {
 			if (y == FLOOR_Y) return floor(seed, x, z, tile);
 			if (y == roofY) return ceiling(seed, x, z, tile);
+			if (tile.kind() == Kind.ELEVATOR_THRESHOLD) {
+				return elevatorThresholdBlock(x, y - FLOOR_Y);
+			}
 			return columnBlock(tile, y - FLOOR_Y);
 		}
 
@@ -115,6 +127,42 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 			return (lit ? Level4Blocks.OFFICE_TROFFER_DIM : Level4Blocks.OFFICE_BLACKED_WINDOW).defaultBlockState();
 		}
 		return Blocks.CONCRETE.gray().defaultBlockState();
+	}
+
+	private static BlockState elevatorShaftColumn(int y, int topY, Kind kind) {
+		int minShaft = Math.max(MIN_Y + 2, FLOOR_Y - 22);
+		int maxShaft = Math.min(topY - 1, FLOOR_Y + 28);
+		if (y < minShaft || y > maxShaft) {
+			return (y > topY) ? Blocks.AIR.defaultBlockState() : Blocks.CONCRETE.gray().defaultBlockState();
+		}
+		if (kind == Kind.ELEVATOR_SHAFT_WALL) return Blocks.CONCRETE.gray().defaultBlockState();
+		if (kind == Kind.ELEVATOR_CABLE) return Blocks.IRON_BARS.defaultBlockState();
+		return Blocks.AIR.defaultBlockState();
+	}
+
+	private static BlockState elevatorThresholdBlock(int x, int h) {
+		int cx = Math.floorMod(x, Level4Plan.CELL);
+		if (cx == 1 || cx == 5 || cx == 2 || h >= 3) return Level4Blocks.OMEGA_WALL.defaultBlockState();
+		if (h == 1) return Blocks.IRON_BARS.defaultBlockState();
+		return Blocks.AIR.defaultBlockState();
+	}
+
+	private static BlockState auditoriumColumn(long seed, int x, int y, int z, Tile tile,
+			Level4Layout.AuditoriumInfo aud, int roofY) {
+		if (y > roofY) return Blocks.CONCRETE.gray().defaultBlockState();
+		if (y == roofY) return ceiling(seed, x, z, tile);
+		if (aud.screenWall() && y >= FLOOR_Y - 1 && y <= FLOOR_Y + 3) {
+			boolean border = aud.rx() == 5 || aud.rx() == 15 || y == FLOOR_Y - 1 || y == FLOOR_Y + 3;
+			return (border ? Blocks.CONCRETE.gray() : Blocks.CONCRETE.lightGray()).defaultBlockState();
+		}
+		if (y < aud.floorY()) return Blocks.CONCRETE.gray().defaultBlockState();
+		if (y == aud.floorY()) {
+			return (aud.stage() ? Blocks.POLISHED_ANDESITE : Level4Blocks.OFFICE_CARPET).defaultBlockState();
+		}
+		if (aud.stair() && y == aud.floorY() + 1) {
+			return Blocks.POLISHED_ANDESITE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, dirFrom(aud.stairDir()));
+		}
+		return Blocks.AIR.defaultBlockState();
 	}
 
 	private static BlockState balconyColumn(int y, Kind kind, boolean exterior) {
@@ -281,6 +329,9 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 			if (r < 80) return Level4Blocks.OFFICE_TROFFER_DIM.defaultBlockState();
 			return Level4Blocks.OFFICE_TROFFER_LIT.defaultBlockState();
 		}
+		if (zone == ZoneKind.AUDITORIUM) {
+			return (r < 42 ? Level4Blocks.OFFICE_TROFFER_DIM : Level4Blocks.OFFICE_TROFFER_BROKEN).defaultBlockState();
+		}
 		if (zone == ZoneKind.OMEGA_BASE) {
 			return Level4Blocks.OFFICE_TROFFER_LIT.defaultBlockState();
 		}
@@ -337,7 +388,8 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 				}
 				yield (tile.zone() == ZoneKind.OMEGA_BASE ? Level4Blocks.OMEGA_WALL : Level4Blocks.OFFICE_DRYWALL_UPPER).defaultBlockState();
 			}
-			case EXIT_STRUCTURE, EXIT_HATCH, BALCONY_FLOOR, BALCONY_CANOPY, BALCONY_RAIL -> Blocks.AIR.defaultBlockState();
+			case EXIT_STRUCTURE, EXIT_HATCH, BALCONY_FLOOR, BALCONY_CANOPY, BALCONY_RAIL,
+					ELEVATOR_SHAFT, ELEVATOR_CABLE, ELEVATOR_SHAFT_WALL, ELEVATOR_THRESHOLD -> Blocks.AIR.defaultBlockState();
 			case WATER_COOLER -> h == 1
 					? Level4Blocks.OFFICE_WATER_COOLER.defaultBlockState().setValue(Level4WaterSourceBlock.FACING, dir).setValue(Level4WaterSourceBlock.BOTTLES, 2)
 					: Blocks.AIR.defaultBlockState();

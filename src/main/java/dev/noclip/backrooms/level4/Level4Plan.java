@@ -34,6 +34,10 @@ final class Level4Plan {
 		DARK_WING,
 		/** Half-built bare-concrete office wing abandoned mid-renovation. */
 		UNFINISHED_WING,
+		/** Abandoned elevator waiting hall with open vertical hoist shafts. */
+		ELEVATOR_LOBBY,
+		/** Sunken tiered presentation auditorium with dimly lit front stage. */
+		AUDITORIUM,
 		/** M.E.G. Base Omega safe stronghold (with permanent Level 5 & 6 stairwells). */
 		OMEGA_BASE,
 		/** Amor Incrementum fungal greenhouse (hostile unless holding a religious item). */
@@ -125,6 +129,8 @@ final class Level4Plan {
 		this.hasTbd = rng.nextInt(100) < 28 && placeBox(rng, 2, 3, ZoneKind.TBD_ROOM, -1, -1);
 		if (rng.nextInt(100) < 42) placeBox(rng, 3, 3, ZoneKind.DARK_WING, -1, -1);
 		if (rng.nextInt(100) < 38) placeBox(rng, rng.nextBoolean() ? 3 : 2, 2, ZoneKind.UNFINISHED_WING, -1, -1);
+		if (rng.nextInt(100) < 34) placeBox(rng, 3, 3, ZoneKind.AUDITORIUM, -1, -1);
+		if (rng.nextInt(100) < 45) placeBox(rng, 2, 1, ZoneKind.ELEVATOR_LOBBY, -1, -1);
 
 		// Add 2 structural solid cores inside the open office tower
 		for (int k = 0; k < 2; k++) placeBox(rng, 1 + rng.nextInt(2), 1, ZoneKind.SOLID_CORE, -1, -1);
@@ -390,6 +396,19 @@ final class Level4Plan {
 				if (room.kind() == ZoneKind.UNFINISHED_WING && walkable(room.i() + room.w(), room.cz())) {
 					setEdge(cell(room.i() + room.w() - 1, room.cz()), EAST, Edge.OPEN);
 				}
+				continue;
+			}
+			if (room.kind() == ZoneKind.ELEVATOR_LOBBY) {
+				if (walkable(room.i(), room.j() + 1)) setEdge(cell(room.i(), room.j()), SOUTH, Edge.OPEN);
+				if (walkable(room.i() + 1, room.j() + 1)) setEdge(cell(room.i() + 1, room.j()), SOUTH, Edge.OPEN);
+				if (walkable(room.i() - 1, room.j())) setEdge(cell(room.i(), room.j()), WEST, Edge.OPEN);
+				if (walkable(room.i() + room.w(), room.j())) setEdge(cell(room.i() + room.w() - 1, room.j()), EAST, Edge.OPEN);
+				continue;
+			}
+			if (room.kind() == ZoneKind.AUDITORIUM) {
+				if (walkable(room.cx(), room.j() - 1)) setEdge(cell(room.cx(), room.j()), NORTH, Edge.OPEN);
+				if (walkable(room.i() - 1, room.j())) setEdge(cell(room.i(), room.j()), WEST, Edge.DOOR);
+				if (walkable(room.i() + room.w(), room.j())) setEdge(cell(room.i() + room.w() - 1, room.j()), EAST, Edge.DOOR);
 				continue;
 			}
 			// Suites, Amor Camp, T.B.D. Room get 1..2 fire doors

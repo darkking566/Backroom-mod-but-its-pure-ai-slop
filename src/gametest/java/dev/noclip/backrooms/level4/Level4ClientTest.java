@@ -171,6 +171,33 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			});
 		}
 
+		// Batch 3 structures: open elevator shaft lobby & sunken tiered auditorium
+		int[] elevLobby = findZone(seed, from, ZoneKind.ELEVATOR_LOBBY);
+		if (elevLobby != null) {
+			shoot(context, game, elevLobby[0] + 0.5, STAND, elevLobby[1] + 2.0, 180, 10, false, "level4_elevator_lobby");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				int[] shaft = findKind(seed, new BlockPos(elevLobby[0], STAND, elevLobby[1]), Kind.ELEVATOR_SHAFT);
+				check(shaft != null, "expected open vertical elevator shaft near lobby");
+				check(l4.getBlockState(new BlockPos(shaft[0], Level4ChunkGenerator.FLOOR_Y - 12, shaft[1])).isAir(),
+						"elevator shaft should drop deeply below FLOOR_Y");
+				check(l4.getBlockState(new BlockPos(shaft[0], Level4ChunkGenerator.FLOOR_Y + 12, shaft[1])).isAir(),
+						"elevator shaft should rise high above FLOOR_Y");
+			});
+		}
+
+		int[] auditorium = findZone(seed, from, ZoneKind.AUDITORIUM);
+		if (auditorium != null) {
+			shoot(context, game, auditorium[0] + 0.5, STAND - 2.0, auditorium[1] + 0.5, 180, 12, false, "level4_auditorium");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				check(l4.getBlockState(new BlockPos(auditorium[0], Level4ChunkGenerator.FLOOR_Y, auditorium[1])).isAir(),
+						"sunken auditorium floor should be lowered below FLOOR_Y");
+				check(!l4.getBlockState(new BlockPos(auditorium[0], Level4ChunkGenerator.FLOOR_Y - 3, auditorium[1])).isAir(),
+						"sunken auditorium pit floor should exist at FLOOR_Y - 3");
+			});
+		}
+
 		int[] rainView = findRainWindowView(seed, from);
 		if (rainView != null) {
 			shoot(context, game, rainView[0] + 0.5, STAND, rainView[1] + 0.5, rainView[2], 2, false, "level4_rain_window_view");
