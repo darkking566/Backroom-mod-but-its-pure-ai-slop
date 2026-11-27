@@ -48,7 +48,7 @@ public final class Institute {
 	/** Who stands where, and which way they look (yaw: 0 south, 90 west, 180 north, -90 east). */
 	private static final List<Post> POSTS = List.of(
 			new Post('k', ShopRole.MASTER, 0), new Post('y', ShopRole.BUYER, -90), new Post('u', ShopRole.SUPPLIER, 90),
-			new Post('n', ShopRole.MEDIC, 0), new Post('q', ShopRole.QUARTERMASTER, 0));
+			new Post('n', ShopRole.MEDIC, 180), new Post('q', ShopRole.QUARTERMASTER, 0));
 	private static final AABB BUILDING = new AABB(InstituteLayout.MIN_X, InstituteLayout.BOTTOM, InstituteLayout.MIN_Z,
 			InstituteLayout.MAX_X + 1, InstituteLayout.TOP + 1, InstituteLayout.MAX_Z + 1);
 
@@ -84,14 +84,14 @@ public final class Institute {
 		});
 		ServerTickEvents.END_SERVER_TICK.register(Institute::tick);
 		PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) ->
-				level.dimension() != Home.FRONTROOMS || player.isCreative() || !InstituteLayout.building(pos.getX(), pos.getY(), pos.getZ()));
+				level.dimension() != Home.FRONTROOMS || player.isCreative() || !protectedBlock(pos.getX(), pos.getY(), pos.getZ()));
 		UseBlockCallback.EVENT.register((player, level, hand, hit) -> {
 			if (level.dimension() != Home.FRONTROOMS || player.isCreative() || !(player.getItemInHand(hand).getItem() instanceof BlockItem)) {
 				return InteractionResult.PASS;
 			}
 			BlockPos clicked = hit.getBlockPos();
 			BlockPos target = level.getBlockState(clicked).canBeReplaced() ? clicked : clicked.relative(hit.getDirection());
-			if (!InstituteLayout.building(target.getX(), target.getY(), target.getZ())) return InteractionResult.PASS;
+			if (!protectedBlock(target.getX(), target.getY(), target.getZ())) return InteractionResult.PASS;
 			// Lockers, pads, doors and workstations still answer a click; only building onto the institute is refused.
 			Block block = level.getBlockState(clicked).getBlock();
 			if (!plain(block)) return InteractionResult.PASS;
@@ -102,11 +102,17 @@ public final class Institute {
 		});
 	}
 
+	/** The building and the grounds' works (towers, mast, roads, the gate): M.E.G.'s, not to be broken or built on. */
+	static boolean protectedBlock(int x, int y, int z) {
+		return InstituteLayout.building(x, y, z) || FrontroomsCampus.structure(x, y, z);
+	}
+
 	/** The institute's walls, floors and fittings, which answer no click. */
 	private static boolean plain(Block block) {
 		return FrontroomsBlocks.ALL.contains(block) && block != FrontroomsBlocks.MEG_LOCKER && block != FrontroomsBlocks.TRANSPORT_PAD
 				&& block != FrontroomsBlocks.ARCHIVE_HATCH && block != FrontroomsBlocks.ARCHIVE_FILE && block != FrontroomsBlocks.BLAST_DOOR
-				|| block == net.minecraft.world.level.block.Blocks.GLASS || block == net.minecraft.world.level.block.Blocks.BOOKSHELF;
+				|| block == net.minecraft.world.level.block.Blocks.GLASS || block == net.minecraft.world.level.block.Blocks.BOOKSHELF
+				|| block == net.minecraft.world.level.block.Blocks.IRON_BARS;
 	}
 
 	static ServerLevel level(MinecraftServer server) {

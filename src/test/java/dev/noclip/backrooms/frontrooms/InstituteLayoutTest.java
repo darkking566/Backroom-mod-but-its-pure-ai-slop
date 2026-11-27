@@ -75,37 +75,67 @@ final class InstituteLayoutTest {
 		InstituteLayout.Spot medic = InstituteLayout.spot('n'), quartermaster = InstituteLayout.spot('q');
 		assertFalse(near(zero, medic.x(), medic.z()), "the medic is reachable before any quota");
 		assertFalse(near(zero, quartermaster.x(), quartermaster.z()), "the armoury is reachable before any quota");
-		assertFalse(nearAny(zero, GROUND, 's'), "the stairs to B1 are reachable before any quota");
+		assertFalse(nearB1Stairs(zero), "the stairs to B1 are reachable before any quota");
 
 		Set<Long> one = walk(GROUND, a.x(), a.z(), 1);
 		assertTrue(near(one, medic.x(), medic.z()), "one quota does not open the medical wing");
 		assertFalse(near(one, quartermaster.x(), quartermaster.z()), "one quota opens the armoury");
 		Set<Long> three = walk(GROUND, a.x(), a.z(), 3);
 		assertTrue(near(three, quartermaster.x(), quartermaster.z()), "three quotas do not open the armoury");
-		assertFalse(nearAny(three, GROUND, 's'), "three quotas open B1");
-		assertTrue(nearAny(walk(GROUND, a.x(), a.z(), 5), GROUND, 's'), "five quotas do not open the stairs to B1");
+		assertFalse(nearB1Stairs(three), "three quotas open B1");
+		assertTrue(nearB1Stairs(walk(GROUND, a.x(), a.z(), 5)), "five quotas do not open the stairs to B1");
+	}
+
+	/** The flight down to B1 is the one whose low floor is B1. */
+	private static InstituteLayout.Flight b1Stairs() {
+		return InstituteLayout.flights().stream().filter(f -> f.low() == InstituteLayout.B1_FLOOR).findFirst().orElseThrow();
+	}
+
+	private static boolean nearB1Stairs(Set<Long> reached) {
+		InstituteLayout.Flight f = b1Stairs();
+		for (int x = f.minX(); x <= f.maxX(); x++) for (int z = f.minZ(); z <= f.maxZ(); z++) if (reached.contains(key(x, z))) return true;
+		return false;
+	}
+
+	/** The floor (plan index) whose floor block is at a height. */
+	private static int floorAt(int y) {
+		for (int f = 0; f < InstituteLayout.floors(); f++) if (InstituteLayout.floorY(f) == y) return f;
+		throw new AssertionError("no floor at " + y);
 	}
 
 	@Test
-	void theStairsGoDownOneBlockAStepToB1AndB1ReachesItsPads() {
-		int stairX = -1, top = Integer.MAX_VALUE, bottom = Integer.MIN_VALUE;
-		for (int x = InstituteLayout.MIN_X; x <= InstituteLayout.MAX_X; x++) {
-			for (int z = InstituteLayout.MIN_Z; z <= InstituteLayout.MAX_Z; z++) {
-				if (InstituteLayout.plan(GROUND, x, z) != 's') continue;
-				stairX = x;
-				top = Math.min(top, z);
-				bottom = Math.max(bottom, z);
+	void everyFlightClimbsOneBlockAStepWithHeadroomAndJoinsBothFloors() {
+		for (InstituteLayout.Flight f : InstituteLayout.flights()) {
+			for (int x = f.minX(); x <= f.maxX(); x++) {
+				for (int z = f.minZ(); z <= f.maxZ(); z++) {
+					int step = f.step(x, z);
+					assertTrue(step >= 0 && step < f.steps(), "a column of the stairs is off the flight at " + x + ", " + z);
+					int surface = f.low() + 1 + step;
+					Kind kind = InstituteLayout.cell(x, surface, z).kind();
+					assertTrue(kind == Kind.STAIR || kind == Kind.FLOOR, "no step at " + x + ", " + surface + ", " + z);
+					assertEquals(Kind.SOLID, InstituteLayout.cell(x, surface - 1, z).kind(), "a step hangs in the air at " + x + ", " + z);
+					for (int y = surface + 1; y <= surface + 3; y++) {
+						assertEquals(Kind.AIR, InstituteLayout.cell(x, y, z).kind(), "no headroom over the step at " + x + ", " + y + ", " + z);
+					}
+				}
 			}
+			// Someone walks onto the foot from the low floor and off the top onto the high floor.
+			int low = floorAt(f.low()), high = floorAt(f.high());
+			int fx = f.dx() != 0 ? f.foot() - f.dx() : f.minX(), fz = f.dz() != 0 ? f.foot() - f.dz() : f.minZ();
+			assertTrue(InstituteLayout.open(InstituteLayout.plan(low, fx, fz)), "the foot of a flight starts in a wall at " + fx + ", " + fz);
+			int top = f.foot() + (f.steps()) * (f.dx() != 0 ? f.dx() : f.dz());
+			int tx = f.dx() != 0 ? top : f.minX(), tz = f.dz() != 0 ? top : f.minZ();
+			assertTrue(InstituteLayout.open(InstituteLayout.plan(high, tx, tz)), "a flight ends in a wall at " + tx + ", " + tz);
 		}
-		assertEquals(InstituteLayout.FLOOR - InstituteLayout.B1_FLOOR, bottom - top + 1, "the stairs are not as long as the drop");
-		for (int z = top; z <= bottom; z++) {
-			int surface = InstituteLayout.FLOOR - 1 - (z - top);
-			assertEquals(Kind.STAIR, InstituteLayout.cell(stairX, surface, z).kind(), "no step at " + z);
-			for (int y = surface + 1; y < surface + 4; y++) assertEquals(Kind.AIR, InstituteLayout.cell(stairX, y, z).kind(), "no headroom over step " + z);
-		}
-		// The foot of the stairs opens onto B1's floor.
-		assertTrue(InstituteLayout.open(InstituteLayout.plan(B1, stairX, bottom + 1)), "the stairs end in a wall");
-		Set<Long> b1 = walk(B1, stairX, bottom + 1, 0);
+	}
+
+	@Test
+	void b1ReachesItsPadsHatchAndMachinesFromTheStairs() {
+		InstituteLayout.Flight f = b1Stairs();
+		assertEquals(InstituteLayout.FLOOR - InstituteLayout.B1_FLOOR, f.steps(), "the stairs are not as long as the drop");
+		int fx = f.foot() - f.dx(), fz = f.minZ();
+		assertTrue(InstituteLayout.open(InstituteLayout.plan(B1, fx, fz)), "the stairs end in a wall");
+		Set<Long> b1 = walk(B1, fx, fz, 0);
 		for (InstituteLayout.Spot pad : InstituteLayout.pads()) assertTrue(b1.contains(key(pad.x(), pad.z())), "a pad is out of reach");
 		InstituteLayout.Spot hatch = InstituteLayout.hatch();
 		assertTrue(b1.contains(key(hatch.x(), hatch.z())), "B2's hatch is out of reach");
@@ -139,26 +169,43 @@ final class InstituteLayoutTest {
 		assertEquals(Kind.FLOOR, InstituteLayout.cell(a.x(), InstituteLayout.FLOOR, a.z()).kind());
 		assertEquals(Kind.AIR, InstituteLayout.cell(a.x(), InstituteLayout.FLOOR + 1, a.z()).kind());
 		assertEquals(Kind.AIR, InstituteLayout.cell(a.x(), InstituteLayout.FLOOR + 2, a.z()).kind());
-		assertTrue(InstituteLayout.workArea(-20, InstituteLayout.FLOOR + 1, 10), "the west work area does not take building");
+		assertTrue(InstituteLayout.workArea(-36, InstituteLayout.FLOOR + 1, -25), "the west work area does not take building");
 		assertFalse(InstituteLayout.workArea(a.x(), InstituteLayout.FLOOR + 1, a.z()), "the lobby takes building");
 		assertTrue(InstituteLayout.building(a.x(), InstituteLayout.FLOOR, a.z()), "the lobby floor can be broken");
+	}
+
+	@Test
+	void everyFloorAboveGroundIsReachedFromTheLobbyAndTheGroundsKeepClearOfTheBuilding() {
+		InstituteLayout.Spot a = InstituteLayout.spot('a');
+		Set<Long> lobby = walk(GROUND, a.x(), a.z(), 0);
+		for (InstituteLayout.Flight f : InstituteLayout.flights()) {
+			if (f.low() != InstituteLayout.FLOOR) continue;
+			assertTrue(lobby.contains(key(f.minX(), f.foot() - f.dz())), "a staircase up is out of reach of the lobby");
+		}
+		for (int x = InstituteLayout.MIN_X; x <= InstituteLayout.MAX_X; x++) {
+			for (int z = InstituteLayout.MIN_Z; z <= InstituteLayout.MAX_Z; z++) {
+				for (int y = InstituteLayout.FLOOR; y <= InstituteLayout.TOP; y += 4) {
+					assertEquals(FrontroomsCampus.Part.NONE, FrontroomsCampus.part(x, y, z), "the grounds build into the institute at " + x + ", " + y + ", " + z);
+				}
+			}
+		}
 	}
 
 	@Test
 	void theGroundIsLevelAroundTheBuildingAndWalledIn() {
 		long seed = 12345L;
 		for (int x = InstituteLayout.MIN_X - 6; x <= InstituteLayout.MAX_X + 6; x += 3) {
-			for (int z = InstituteLayout.MIN_Z - 6; z <= InstituteLayout.YARD_MAX_Z + 6; z += 3) {
+			for (int z = InstituteLayout.MIN_Z - 6; z <= InstituteLayout.MAX_Z + 30; z += 3) {
 				assertEquals(FrontroomsTerrain.GROUND, FrontroomsTerrain.height(seed, x, z), "the ground is not level at " + x + ", " + z);
 			}
 		}
 		assertTrue(FrontroomsTerrain.grounds(0, 0));
-		assertTrue(FrontroomsTerrain.grounds(98, 0));
-		assertTrue(FrontroomsTerrain.wall(100, 0) && FrontroomsTerrain.wall(0, -101));
-		assertTrue(FrontroomsTerrain.beyond(110, 0) && FrontroomsTerrain.beyond(80, 80));
+		assertTrue(FrontroomsTerrain.grounds(194, 0));
+		assertTrue(FrontroomsTerrain.wall(196, 0) && FrontroomsTerrain.wall(0, -197));
+		assertTrue(FrontroomsTerrain.beyond(205, 0) && FrontroomsTerrain.beyond(150, 150));
 		int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
-		for (int x = -95; x <= 95; x += 5) {
-			for (int z = -95; z <= 95; z += 5) {
+		for (int x = -190; x <= 190; x += 5) {
+			for (int z = -190; z <= 190; z += 5) {
 				if (!FrontroomsTerrain.grounds(x, z)) continue;
 				int h = FrontroomsTerrain.height(seed, x, z);
 				min = Math.min(min, h);

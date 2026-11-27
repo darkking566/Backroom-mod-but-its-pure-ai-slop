@@ -100,6 +100,34 @@ final class InstituteBlocks {
 	 * A transport pad: on the ground-floor lobby it directly returns anyone to Level 0 (free, open from quota 0);
 	 * in B1 M.E.G. uses it to send teams down to any visited/deep level.
 	 */
+	/** A thin steel pole: lamp posts, flagpoles, the radio mast's legs. */
+	static final class Pole extends Block {
+		private static final VoxelShape SHAPE = Block.box(6, 0, 6, 10, 16, 10);
+
+		Pole(Properties properties) {
+			super(properties);
+		}
+
+		@Override
+		protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+			return SHAPE;
+		}
+	}
+
+	/** A street lamp's head on top of its pole: a flat housing, the orange lens underneath. */
+	static final class LampHead extends Block {
+		private static final VoxelShape SHAPE = Block.box(1, 9, 1, 15, 14, 15);
+
+		LampHead(Properties properties) {
+			super(properties);
+		}
+
+		@Override
+		protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+			return SHAPE;
+		}
+	}
+
 	static final class Pad extends Block {
 		private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 2, 16);
 		private static final java.util.Map<java.util.UUID, Integer> LOBBY_CONFIRM = new java.util.HashMap<>();

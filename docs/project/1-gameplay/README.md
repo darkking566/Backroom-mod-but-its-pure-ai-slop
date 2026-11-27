@@ -196,7 +196,33 @@ flowchart LR
     - 發電廠與冷卻塔、水塔、儲存槽、通訊塔、圍牆哨塔，以及焊死的大門；
   - 最外圈保留丘陵和樹，給玩家砍木頭、自由建造。
 - 一樓的功能、分期開門、B1 與 B2 照舊，只是重新排；外觀與房間照上面的電影風格。
-- 前一個提案（玻璃帷幕大樓、中庭標本艙）看過劇照後不採用。
+- 前一個提案（玻璃帷幕大樓）看過劇照後不採用；中庭的標本艙留著（裡面吊著一塊 Level 0，呼應 M.E.G. 的秘密實驗）。
+- **第一批【已做】（2026-11-27，Claude）**：
+  - 主館 96×72，B2、B1 加地上三層；平面圖由 `tools/make_institute_plans.py` 產生（`InstitutePlans.java`），`InstituteLayout` 把平面圖變成方塊；
+  - 一樓：
+    - 三層挑高中庭，中間是 Level 0 標本艙，玻璃天窗；
+    - 指揮官櫃台、收購與補給窗口、回 Level 0 的傳送台；
+    - 西翼：工作區、宿舍、置物櫃室，以及電影那種白牆、黃腰牆加單面鏡觀察室的**接收室**（回來的人在這裡醒來）；
+    - 東翼：醫療翼（薄荷綠牆、橘色扶手，1 期）、軍械庫與工作坊（3 期）；
+    - 北邊：深層區（5 期）往下到 B1；
+  - 二、三樓：環繞中庭的走廊，加上兩翼的辦公室與實驗室；
+  - B1：傳送廳，以及隔著觀察窗的**地下收容區**格間（現在是空的，等任務主線放怪物進去）；B2：檔案室；
+  - 外觀：預鑄混凝土加茶色帶狀窗，正門雨遮，上方「M.E.G.」大字，屋頂有直升機坪、雷達罩、空調機組、天線；
+  - 園區（`FrontroomsCampus`）：
+    - 前廣場與標誌、旗桿，大道、鈉燈、停車場；
+    - 發電廠與煙囪、兩座冷卻塔、水塔、三座儲存槽、約 100 格高的通訊塔；
+    - 圍牆上 8 座哨塔，以及焊死的南大門；
+  - 圍牆半徑 196；150 格內是平的研究園區，外圈是丘陵與樹林；
+  - 新方塊 14 個，舊的 5 個換了貼圖（方塊 ID 不變）；貼圖由 `tools/make_frontrooms_institute.py` 用 CC0 照片做（總覽 [images/institute_textures.png](images/institute_textures.png)）；
+  - 遊戲畫面：
+    - [外觀](images/institute_outside.jpg)
+    - [中庭](images/institute_atrium.jpg)、[從三樓看標本艙](images/institute_atrium_top.jpg)
+    - [接收室](images/institute_receiving.jpg)、[醫療翼](images/institute_medical_wing.jpg)、[收容區](images/institute_cells.jpg)
+    - [冷卻塔與發電廠](images/institute_towers.jpg)
+- **還沒做**：
+  - 室內的 3D 物件（擔架床、詢問室桌椅、看片燈箱、除汙間、防護衣架、CRT 監視牆、傳送裝置）；
+  - 眷舍小鎮與 398 的夜晚；
+  - 收容區裡的怪物（任務主線）。
 
 ### 前室的夜晚：398「慘無人道的惡作劇」（參考狐霖的後室，2026-11-27）【定：全部採用】
 
@@ -561,7 +587,7 @@ Claude 的建議（待使用者確認）：
 | 層數、Level 名稱、到達標題 | `src/main/java/dev/noclip/backrooms/core/floors/`、客戶端 `core/floors/FloorsClient` |
 | 出口、落點「全新的一片」、直接掉進某層 | `core/LevelExits.java`（`anchor`、`fallInto`） |
 | 死亡、安頓、撤離 | `core/trip/Trips.java`、接應倒數 `Extraction`、隊伍落點 `Expedition`、任務報告 `Report`（客戶端 `MissionReportScreen`） |
-| 前室與研究所、回家 | `frontrooms/`（`Frontrooms`、`FrontroomsTerrain`、`FrontroomsChunkGenerator`、`InstituteLayout`、`Institute`、方塊）、`core/Home.java`；舊公會拆除 `core/guild/GuildRemoval.java` |
+| 前室與研究所、回家 | `frontrooms/`（`Frontrooms`、`FrontroomsTerrain`、`FrontroomsCampus` 園區、`FrontroomsChunkGenerator`、`InstituteLayout`＋`InstitutePlans` 平面圖、`Institute`、方塊）、`core/Home.java`；工具 `tools/make_institute_plans.py`（平面圖）、`tools/make_frontrooms_institute.py`（貼圖）；舊公會拆除 `core/guild/GuildRemoval.java` |
 | 置物櫃、無線電、醫官治療 | `core/locker/Lockers.java`、`core/radio/Radio.java`、`core/trade/Treatment.java` |
 | 異常詞綴、取證、工事、標記、侵蝕、按趟加工、武器平衡 | `core/trip/Anomalies.java`（客戶端 `AnomalyClient`）、`core/field/`（`FieldKit`、`FieldBlocks`、`Evidence`、`Drift`）、`core/locker/Processing.java`、`core/combat/WeaponBalance.java`＋`mixin/LivingEntityWeaponBalance`；圖示工具 `tools/make_field_items.py` |
 | 悲屍化排斥（跟著週期的天數走）、藥、預兆 | `core/trip/Pull.java`、`PullState.java`、`SeepageData.java`、`props/BackroomsRiftBlock.java`、客戶端 `core/trip/PullClient.java` |

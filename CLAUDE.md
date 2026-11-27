@@ -592,6 +592,13 @@
 - 使用者把「物品擺進各層」從 Gemini 改給 Claude（接在建模之後）：改 `docs/project/README.md` 的分工表與順序、`AGENTS.md` 的分工一行、`docs/project/5-levels/level0/README.md`（第三節給擺放的人、第八節分工、第 5、6 點）；只改文件
 - 使用者說了 M.E.G. 任務主線的構想、要求研究所照劇照重做（寫實、3D 模型、壯觀、範圍變大）、狐霖前室的點子全部採用：寫進 `docs/project/1-gameplay/README.md`（新的「M.E.G. 任務主線」一節含使用者原話與 Claude 的建議；「研究所改版：照電影結尾的研究機構」；「前室的夜晚：398」對照表；戶外區半徑改約 196）；只改文件。參考了暫存區的電影截圖（結尾的研究機構：白牆、芥末黃腰牆、深色觀察窗、雙開門、防護衣）；用參照頁標頭重抓原圖被權限擋下，沒有再試。當時工作區有 Antigravity 未提交的改動（雙軸難度、保險箱、中繼箱、合約擴充），沒有動，提交時只放自己的部分
 - 使用者確定任務主線由 Claude 做，並補上故事背景（M.E.G. 在地下室做恐怖實驗、用玩家做的任務研究出有多種怪物能力的 Boss、玩家最後要反過來打倒 M.E.G.）：寫進 `docs/project/1-gameplay/README.md` 故事背景的新一節「M.E.G. 的秘密」，含原話與 Claude 的建議（任務成果變成 Boss 的能力、觀察窗後看得到收容區、結局改反轉版、反抗後 M.E.G. 斷資源）；只改文件
+- 前室研究所照電影結尾的研究機構重做（第一批）：
+  - 新工具 `tools/make_institute_plans.py` 畫五層平面圖（輸出 `frontrooms/InstitutePlans.java`），`InstituteLayout` 重寫：主館 96×72、B2／B1／地上三層、三層挑高中庭與 Level 0 標本艙、樓梯（`Flight`）、電影風接收室（白牆、黃腰牆、單面鏡觀察室）、薄荷綠醫療翼、B1 地下收容區格間、預鑄外牆與帶狀窗、「M.E.G.」大字、屋頂直升機坪與雷達罩；分期開門、人員位置、置物櫃、傳送台、B2 艙口都照舊
+  - 新 `FrontroomsCampus`：前廣場、大道與鈉燈、停車場、發電廠與煙囪、兩座冷卻塔、水塔、儲存槽、通訊塔、8 座哨塔、焊死的南大門；`FrontroomsTerrain` 圍牆半徑 100→196、150 格內平坦；生成器加園區、欄杆連接、每柱高度、園區附近不長樹；`Institute` 的保護範圍加上園區建物、醫官改朝北
+  - 新方塊 14 個（水磨石、薄荷牆與扶手牆、觀察窗、收容玻璃、預鑄板、帶狀窗、鋼構、招牌字板、柏油、標線、人行道、鈉燈燈頭、細鋼桿），舊的 5 個換貼圖（ID 不變）；新工具 `tools/make_frontrooms_institute.py`，照片材質新下載 ambientCG CC0：PaintedPlaster017、Terrazzo004、Asphalt031、OfficeCeiling001、Tiles107、Concrete049（另抓了幾個候選沒用到）
+  - 測試：`InstituteLayoutTest` 改寫並新增（每段樓梯一階一格有頭頂空間、兩端接得到、上樓梯從大廳走得到、園區不蓋進主館）；`FrontroomsClientTest` 改座標、回大廳後關任務報告、加 8 張風景照（拍照時藏介面）
+  - 驗證：`gradlew build`（138 個單元測試）、`runClientGameTest -Plevels=frontrooms` 與 `-Plevels=horror` 通過，log 沒有缺模型或貼圖；截圖存到 `docs/project/1-gameplay/images/institute_*.jpg`，企劃「研究所改版」一節標上已做與還沒做（室內 3D 物件、眷舍小鎮與 398、收容區的怪物）
+  - 同時 Antigravity 有未提交的改動（RPG、武器、合約等，也改了兩個語言檔），只提交我的檔案；語言檔只提交我加的 14 個名稱
 
 ## 動作記錄（Antigravity）
 
