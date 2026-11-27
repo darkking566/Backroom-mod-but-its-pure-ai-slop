@@ -113,6 +113,61 @@ def draw_caution_tape() -> Image.Image:
     return img
 
 
+def draw_office_dark_mirror() -> Image.Image:
+    # 128x128 opaque dark mirror glass: sleek anodized dark aluminum border, obsidian-blue-gray mirror,
+    # diagonal cool-silver specular reflection bands, and a faint ghostly silhouette in pale mist.
+    img = Image.new("RGBA", (SIZE, SIZE), (18, 22, 28, 255))
+    d = ImageDraw.Draw(img)
+
+    # Outer anodized dark aluminum frame & inner bevel
+    d.rectangle([0, 0, SIZE - 1, SIZE - 1], fill=(32, 36, 42, 255))
+    d.rectangle([4, 4, SIZE - 5, SIZE - 5], fill=(22, 26, 32, 255))
+    d.rectangle([6, 6, SIZE - 7, SIZE - 7], fill=(15, 19, 26, 255))
+
+    # Subtle vertical foggy reflection tint gradient & faint office horizon
+    for y in range(7, SIZE - 7):
+        t = (y - 7) / (SIZE - 14)
+        base_r = int(14 + 10 * (1.0 - t))
+        base_g = int(18 + 14 * (1.0 - t))
+        base_b = int(26 + 18 * (1.0 - t))
+        d.line([(7, y), (SIZE - 8, y)], fill=(base_r, base_g, base_b, 255))
+
+    # Diagonal cool-silver specular reflection bands
+    d.polygon([(14, 7), (42, 7), (7, 42), (7, 14)], fill=(42, 52, 66, 255))
+    d.polygon([(52, 7), (68, 7), (7, 68), (7, 52)], fill=(34, 43, 56, 255))
+    d.polygon([(SIZE - 8, 56), (SIZE - 8, 76), (56, SIZE - 8), (76, SIZE - 8)], fill=(36, 45, 58, 255))
+
+    # Faint ghostly silhouette standing in pale mist near center-right
+    mist_color = (48, 58, 70, 255)
+    silhouette = (9, 11, 15, 255)
+    d.ellipse([66, 38, 98, 92], fill=mist_color)
+    d.ellipse([75, 44, 89, 58], fill=silhouette)
+    d.polygon([(70, 60), (94, 60), (98, 108), (66, 108)], fill=silhouette)
+
+    # Re-draw crisp inner highlight & shadow border around mirror glass
+    d.rectangle([5, 5, SIZE - 6, SIZE - 6], outline=(58, 66, 78, 255), width=1)
+    d.rectangle([0, 0, SIZE - 1, SIZE - 1], outline=(24, 27, 33, 255), width=2)
+    return img
+
+
+def save_mirror_pbr(name: str, rgba: Image.Image):
+    TEXTURES.mkdir(parents=True, exist_ok=True)
+    rgba.save(TEXTURES / f"{name}.png", optimize=True)
+    # Flat normal with subtle frame bevel
+    n_img = Image.new("RGBA", (SIZE, SIZE), (128, 128, 255, 255))
+    nd = ImageDraw.Draw(n_img)
+    nd.rectangle([0, 0, SIZE - 1, 4], fill=(128, 108, 252, 255))
+    nd.rectangle([0, SIZE - 5, SIZE - 1, SIZE - 1], fill=(128, 148, 252, 255))
+    nd.rectangle([0, 0, 4, SIZE - 1], fill=(108, 128, 252, 255))
+    nd.rectangle([SIZE - 5, 0, SIZE - 1, SIZE - 1], fill=(148, 128, 252, 255))
+    n_img.save(TEXTURES / f"{name}_n.png", optimize=True)
+    # High-gloss mirror glass inside, matte anodized aluminum frame
+    s_img = Image.new("RGBA", (SIZE, SIZE), (242, 118, 0, 255))
+    sd = ImageDraw.Draw(s_img)
+    sd.rectangle([0, 0, SIZE - 1, SIZE - 1], outline=(110, 145, 0, 255), width=6)
+    s_img.save(TEXTURES / f"{name}_s.png", optimize=True)
+
+
 def write_item_files(name: str):
     write_json(ITEM_MODELS / f"{name}.json", {"parent": NS + name})
     write_json(ITEMS_DEF / f"{name}.json", {"model": {"type": "minecraft:model", "model": f"noclip_backrooms:item/{name}"}})
@@ -181,7 +236,18 @@ def main():
     })
     write_item_files("caution_tape_barrier")
     write_loot_self("caution_tape_barrier")
-    print("Generated Level 4 Batch 1 POI assets: meg_chalk_sign, caution_tape_barrier")
+
+    # 3. office_dark_mirror (Batch 2 POI #9 - unbreakable opaque dark reflective mirror)
+    save_mirror_pbr("office_dark_mirror", draw_office_dark_mirror())
+    write_json(MODELS / "office_dark_mirror.json", {
+        "parent": "minecraft:block/cube_all",
+        "textures": {"all": NS + "office_dark_mirror"}
+    })
+    write_json(BLOCKSTATES / "office_dark_mirror.json", {
+        "variants": {"": {"model": NS + "office_dark_mirror"}}
+    })
+    write_item_files("office_dark_mirror")
+    print("Generated Level 4 Batch 1+2 POI assets: meg_chalk_sign, caution_tape_barrier, office_dark_mirror")
 
 
 if __name__ == "__main__":

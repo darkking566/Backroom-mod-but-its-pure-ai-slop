@@ -104,11 +104,17 @@ final class Level4Bases {
 				return InteractionResult.PASS;
 			}
 			if (world.dimension() != Level4.LEVEL_4) return InteractionResult.PASS;
+			ServerLevel sl = (ServerLevel) world;
 			BlockPos pos = hit.getBlockPos();
 			BlockState state = world.getBlockState(pos);
 			int now = sp.level().getServer().getTickCount();
 
 			if (state.is(Level4Blocks.OMEGA_COT)) {
+				long seed = Level4ChunkGenerator.planSeed(sl.getChunkSource().randomState());
+				var poi = Level4PoiPlan.atCell(seed, pos.getX(), pos.getZ());
+				if (poi != null && poi.kind() == Level4PoiPlan.PoiKind.EVACUATED_OUTPOST) {
+					return Level4PoiEvents.useOutpostCot(sl, sp, pos, now);
+				}
 				LevelData.RespawnData spot = LevelData.RespawnData.of(world.dimension(), sp.blockPosition(), sp.getYRot(), 0);
 				Trips.settle(sp, spot);
 				world.playSound(null, pos, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 0.8F, 0.8F);
@@ -118,6 +124,11 @@ final class Level4Bases {
 			}
 
 			if (state.is(Level4Blocks.OMEGA_LOCKER)) {
+				long seed = Level4ChunkGenerator.planSeed(sl.getChunkSource().randomState());
+				var poi = Level4PoiPlan.atCell(seed, pos.getX(), pos.getZ());
+				if (poi != null && poi.kind() == Level4PoiPlan.PoiKind.EVACUATED_OUTPOST) {
+					return Level4PoiEvents.useOutpostLocker(sl, sp, pos);
+				}
 				ItemStack held = sp.getMainHandItem();
 				boolean alloySwap = held.is(Level1Items.ALLOY);
 				int next = LOCKER_NEXT.getOrDefault(pos, 0);

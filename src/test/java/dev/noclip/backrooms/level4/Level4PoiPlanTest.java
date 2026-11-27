@@ -87,6 +87,87 @@ final class Level4PoiPlanTest {
 	}
 
 	@Test
+	void batch2PoisAppearWithValidStructuresAndAvoidProtectedZones() {
+		Set<PoiKind> seen = EnumSet.noneOf(PoiKind.class);
+		boolean sawLightwellMirror = false;
+
+		for (long seed = 1; seed <= 24; seed++) {
+			for (int rx = -1; rx <= 1; rx++) {
+				for (int rz = -1; rz <= 1; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					Level4PoiPlan poiPlan = Level4PoiPlan.of(seed, rx, rz);
+
+					Set<Integer> exitCells = new HashSet<>();
+					for (PlacedExit pe : plan.exits) exitCells.add(pe.cell());
+
+					for (PlacedPoi poi : poiPlan.pois) {
+						if (poi.kind().batch != 2) continue;
+						seen.add(poi.kind());
+						int c = poi.cell();
+						ZoneKind z = plan.zones[c];
+						assertNotEquals(ZoneKind.OMEGA_BASE, z);
+						assertNotEquals(ZoneKind.AMOR_CAMP, z);
+						assertNotEquals(ZoneKind.TBD_ROOM, z);
+						assertNotEquals(ZoneKind.SOLID_CORE, z);
+						assertNotEquals(ZoneKind.OUTSIDE, z);
+						assertFalse(exitCells.contains(c), "Batch 2 POI overlapped exit cell in " + rx + "," + rz);
+
+						switch (poi.kind()) {
+							case LOCKED_PBX_ROOM -> {
+								assertEquals(ZoneKind.SUITE, z);
+								assertTrue(poiPlan.isPbxSuiteRoom(poi.roomId()), "PBX suite must register pbxRoomId");
+							}
+							case DELAYED_REFLECTION_MIRROR -> {
+								if (!poi.variantFlag()) {
+									assertEquals(ZoneKind.LIGHTWELL, z);
+									int wallDir = Level4Plan.opposite(poi.dir());
+									int wi = poi.cellI() + (wallDir == Level4Plan.EAST ? 1 : 0);
+									int wj = poi.cellJ() + (wallDir == Level4Plan.SOUTH ? 1 : 0);
+									int wx = rx * Level4Plan.SIZE + wi * Level4Plan.CELL
+											+ (wallDir == Level4Plan.NORTH || wallDir == Level4Plan.SOUTH ? 3 : 0);
+									int wz = rz * Level4Plan.SIZE + wj * Level4Plan.CELL
+											+ (wallDir == Level4Plan.NORTH || wallDir == Level4Plan.SOUTH ? 0 : 3);
+									assertEquals(Kind.WINDOW_DARK_MIRROR, Level4Layout.tile(seed, wx, wz).kind(),
+											"Expected dark mirror window on LIGHTWELL shaft edge");
+									sawLightwellMirror = true;
+								}
+							}
+							case PLENUM_MAINTENANCE_HUB -> {
+								assertEquals(ZoneKind.DARK_WING, z);
+								int cx = rx * Level4Plan.SIZE + poi.cellI() * Level4Plan.CELL + 3;
+								int cz = rz * Level4Plan.SIZE + poi.cellJ() * Level4Plan.CELL + 3;
+								Level4Layout.PlenumInfo pi = Level4Layout.plenumInfo(seed, cx, cz);
+								assertTrue(pi != null && pi.ventGrate(), "Plenum hub must sit on DARK_WING center vent grate");
+							}
+							case STALLED_FREIGHT_ELEVATOR -> assertEquals(ZoneKind.ELEVATOR_LOBBY, z);
+							case EVACUATED_OUTPOST -> {
+								assertFalse(plan.hasOmega, "Evacuated outpost must not spawn in Omega region");
+								for (int a = poi.cellI(); a <= poi.cellI() + 1; a++) {
+									for (int b = poi.cellJ(); b <= poi.cellJ() + 1; b++) {
+										int subC = Level4Plan.cell(a, b);
+										assertEquals(ZoneKind.OPEN_OFFICE, plan.zones[subC]);
+										assertFalse(plan.nearHumanBase(a, b));
+										assertFalse(exitCells.contains(subC));
+									}
+								}
+							}
+							default -> {
+							}
+						}
+					}
+				}
+			}
+		}
+
+		for (PoiKind kind : PoiKind.values()) {
+			if (kind.batch == 2) {
+				assertTrue(seen.contains(kind), "Missing Batch 2 POI: " + kind);
+			}
+		}
+		assertTrue(sawLightwellMirror, "Expected at least one LIGHTWELL shaft DELAYED_REFLECTION_MIRROR");
+	}
+
+	@Test
 	void megChalkSignHasValidBackingBlockAndAirCell() {
 		for (long seed = 1; seed <= 8; seed++) {
 			for (int rx = -1; rx <= 1; rx++) {

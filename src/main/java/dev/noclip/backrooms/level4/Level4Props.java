@@ -61,7 +61,7 @@ final class Level4Props {
 			if (benchesPlaced >= 2) break;
 		}
 
-		// Batch 1 POI 3D furniture inside single-chunk bounds
+		// Batch 1 & 2 POI 3D furniture inside single-chunk bounds
 		int i0 = Math.floorDiv(minX, Level4Plan.CELL), i1 = Math.floorDiv(minX + 15, Level4Plan.CELL);
 		int j0 = Math.floorDiv(minZ, Level4Plan.CELL), j1 = Math.floorDiv(minZ + 15, Level4Plan.CELL);
 		for (int gi = i0; gi <= i1; gi++) {
@@ -69,8 +69,16 @@ final class Level4Props {
 				int rx = Math.floorDiv(gi, Level4Plan.N), rz = Math.floorDiv(gj, Level4Plan.N);
 				int ci = Math.floorMod(gi, Level4Plan.N), cj = Math.floorMod(gj, Level4Plan.N);
 				PlacedPoi poi = Level4PoiPlan.of(seed, rx, rz).atCellIndex(Level4Plan.cell(ci, cj));
-				if (poi == null || poi.cellI() != ci || poi.cellJ() != cj) continue;
+				if (poi == null) continue;
 				int bx = gi * Level4Plan.CELL, bz = gj * Level4Plan.CELL;
+				if (poi.kind() == Level4PoiPlan.PoiKind.EVACUATED_OUTPOST && ci == poi.cellI() + 1 && cj == poi.cellJ()) {
+					if (tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 3, Level4ChunkGenerator.FLOOR_Y + 1, bz + 3),
+							BackroomsProps.SALVAGE_BENCH, Direction.SOUTH)) {
+						placed = true;
+					}
+					continue;
+				}
+				if (poi.cellI() != ci || poi.cellJ() != cj) continue;
 				if (populatePoiProps(chunk, minX, minZ, bx, bz, poi)) placed = true;
 			}
 		}
@@ -148,6 +156,11 @@ final class Level4Props {
 					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 1), BackroomsProps.PROP_OFFICE_CHAIR, Direction.SOUTH);
 					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 5), BackroomsProps.PROP_OFFICE_CHAIR, Direction.NORTH);
 				}
+			}
+			case LOCKED_PBX_ROOM -> {
+				int[] uv = Level4PoiPlan.uvToLocal(poi.dir(), 1, 3);
+				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + uv[0], y, bz + uv[1]),
+						BackroomsProps.INDUSTRIAL_FUSE_BOX, Direction.EAST);
 			}
 			default -> {
 			}

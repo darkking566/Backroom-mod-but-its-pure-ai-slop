@@ -169,6 +169,10 @@ public final class Level4Blocks {
 			.strength(0.2F).sound(SoundType.WOOL).noOcclusion().pushReaction(PushReaction.DESTROY),
 			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(0, 4, 7, 16, 15, 9)));
 
+	// Batch 2 POI blocks
+	public static final Block OFFICE_DARK_MIRROR = register("office_dark_mirror",
+			unbreakable(MapColor.COLOR_BLACK, SoundType.GLASS));
+
 	private Level4Blocks() {
 	}
 

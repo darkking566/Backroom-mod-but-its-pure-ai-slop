@@ -97,6 +97,7 @@ final class Level4PoiPlan {
 	final List<PlacedPoi> pois = new ArrayList<>();
 	private final Map<Integer, PlacedPoi> byCell = new HashMap<>();
 	private final Set<Integer> sealedRoomIds = new HashSet<>();
+	private final Set<Integer> pbxRoomIds = new HashSet<>();
 
 	static Level4PoiPlan of(long seed, int rx, int rz) {
 		if (CACHE.size() > 512) CACHE.clear();
@@ -116,6 +117,10 @@ final class Level4PoiPlan {
 
 	boolean isSealedSuiteRoom(int roomId) {
 		return roomId >= 0 && sealedRoomIds.contains(roomId);
+	}
+
+	boolean isPbxSuiteRoom(int roomId) {
+		return roomId >= 0 && pbxRoomIds.contains(roomId);
 	}
 
 	private Level4PoiPlan(long seed, int rx, int rz) {
@@ -181,6 +186,37 @@ final class Level4PoiPlan {
 		// #10 AMOR_FIELD_SHRINE (Uncommon, ~45% per region in DARK_WING or isolated SUITE)
 		if (rng.nextInt(100) < 45) {
 			placeAmorFieldShrine(plan, rng, usedCells);
+		}
+
+		// Batch 2 POIs
+		// #8 LOCKED_PBX_ROOM (Uncommon, ~48% per region on a 1x1 SUITE)
+		if (rng.nextInt(100) < 48) {
+			placeLockedPbxRoom(plan, rng, usedCells);
+		}
+
+		// #9 DELAYED_REFLECTION_MIRROR (Uncommon, ~58% per region on LIGHTWELL shaft window, MEZZANINE 2F, or OPEN_OFFICE wall)
+		if (rng.nextInt(100) < 58) {
+			placeDelayedReflectionMirror(plan, rng, usedCells);
+		}
+
+		// #11 TBD_OVERFLOW_CAGE (Uncommon, ~52% per region in UNFINISHED_WING or ELEVATOR_LOBBY corner)
+		if (rng.nextInt(100) < 52) {
+			placeTbdOverflowCage(plan, rng, usedCells);
+		}
+
+		// #12 PLENUM_MAINTENANCE_HUB (Uncommon, ~70% when DARK_WING exists, centered in overhead plenum)
+		if (rng.nextInt(100) < 70) {
+			placePlenumMaintenanceHub(plan, usedCells);
+		}
+
+		// #14 STALLED_FREIGHT_ELEVATOR (Rare, ~65% when ELEVATOR_LOBBY exists)
+		if (rng.nextInt(100) < 65) {
+			placeStalledFreightElevator(plan, usedCells);
+		}
+
+		// #15 EVACUATED_OUTPOST (Rare, ~42% when !plan.hasOmega on a 2x2 open bay)
+		if (!plan.hasOmega && rng.nextInt(100) < 42) {
+			placeEvacuatedOutpost(plan, rng, usedCells);
 		}
 	}
 
@@ -447,6 +483,199 @@ final class Level4PoiPlan {
 		if (candidates.isEmpty()) return;
 		int[] pick = candidates.get(rng.nextInt(candidates.size()));
 		add(new PlacedPoi(PoiKind.AMOR_FIELD_SHRINE, pick[0], pick[1], NORTH, Level4Layout.FLOOR_Y, false, -1), usedCells);
+	}
+
+	private void placeLockedPbxRoom(Level4Plan plan, SplittableRandom rng, Set<Integer> usedCells) {
+		List<Integer> candidates = new ArrayList<>();
+		for (int id = 0; id < plan.rooms.size(); id++) {
+			RoomBox room = plan.rooms.get(id);
+			if (room.kind() != ZoneKind.SUITE || room.w() != 1 || room.h() != 1) continue;
+			int c = Level4Plan.cell(room.i(), room.j());
+			if (usedCells.contains(c) || plan.balconyDir[c] >= 0) continue;
+			for (int d = 0; d < 4; d++) {
+				if (plan.edge(c, d) == Edge.DOOR) {
+					candidates.add(id);
+					break;
+				}
+			}
+		}
+		if (candidates.isEmpty()) return;
+		int pickedId = candidates.get(rng.nextInt(candidates.size()));
+		RoomBox room = plan.rooms.get(pickedId);
+		int c = Level4Plan.cell(room.i(), room.j());
+		int doorDir = NORTH;
+		for (int d = 0; d < 4; d++) {
+			if (plan.edge(c, d) == Edge.DOOR) {
+				doorDir = d;
+				break;
+			}
+		}
+		pbxRoomIds.add(pickedId);
+		add(new PlacedPoi(PoiKind.LOCKED_PBX_ROOM, room.i(), room.j(), Level4Plan.opposite(doorDir),
+				Level4Layout.FLOOR_Y, false, pickedId), usedCells);
+	}
+
+	private void placeDelayedReflectionMirror(Level4Plan plan, SplittableRandom rng, Set<Integer> usedCells) {
+		List<int[]> lightwellSpots = new ArrayList<>();
+		for (int i = MARGIN; i < N - MARGIN; i++) {
+			for (int j = MARGIN; j < N - MARGIN; j++) {
+				int c = Level4Plan.cell(i, j);
+				if (usedCells.contains(c) || plan.balconyDir[c] >= 0 || plan.nearHumanBase(i, j)) continue;
+				if (plan.zones[c] != ZoneKind.LIGHTWELL) continue;
+				for (int d = 0; d < 4; d++) {
+					int ni = i + DX[d], nj = j + DZ[d];
+					if (Level4Plan.inside(ni, nj) && plan.zones[Level4Plan.cell(ni, nj)] == ZoneKind.OUTSIDE
+							&& plan.edge(c, d) == Edge.WALL) {
+						lightwellSpots.add(new int[] {i, j, Level4Plan.opposite(d), Level4Layout.FLOOR_Y, 0});
+					}
+				}
+			}
+		}
+		if (!lightwellSpots.isEmpty()) {
+			int[] pick = lightwellSpots.get(rng.nextInt(lightwellSpots.size()));
+			add(new PlacedPoi(PoiKind.DELAYED_REFLECTION_MIRROR, pick[0], pick[1], pick[2], pick[3], false, -1), usedCells);
+			return;
+		}
+
+		List<int[]> wallSpots = new ArrayList<>();
+		for (RoomBox room : plan.rooms) {
+			if (room.kind() != ZoneKind.MEZZANINE) continue;
+			for (int a = room.i() + 1; a < room.i() + room.w(); a++) {
+				for (int b = room.j(); b < room.j() + room.h(); b++) {
+					int c = Level4Plan.cell(a, b);
+					if (usedCells.contains(c) || plan.balconyDir[c] >= 0) continue;
+					for (int d = 0; d < 4; d++) {
+						if (plan.edge(c, d) != Edge.WALL) continue;
+						int ni = a + DX[d], nj = b + DZ[d];
+						if (!Level4Plan.inside(ni, nj)) continue;
+						ZoneKind nz = plan.zones[Level4Plan.cell(ni, nj)];
+						if (nz != ZoneKind.OUTSIDE && nz != ZoneKind.MEZZANINE) {
+							wallSpots.add(new int[] {a, b, Level4Plan.opposite(d), Level4Layout.FLOOR_Y + 6});
+						}
+					}
+				}
+			}
+		}
+		if (wallSpots.isEmpty()) {
+			for (int i = MARGIN + 1; i < N - MARGIN - 1; i++) {
+				for (int j = MARGIN + 1; j < N - MARGIN - 1; j++) {
+					int c = Level4Plan.cell(i, j);
+					if (usedCells.contains(c) || plan.balconyDir[c] >= 0 || plan.zones[c] != ZoneKind.OPEN_OFFICE) continue;
+					if (Level4Plan.isSkybridgeCell(i, j)) continue;
+					for (int d = 0; d < 4; d++) {
+						if (plan.edge(c, d) != Edge.WALL) continue;
+						int ni = i + DX[d], nj = j + DZ[d];
+						if (!Level4Plan.inside(ni, nj)) continue;
+						ZoneKind nz = plan.zones[Level4Plan.cell(ni, nj)];
+						if (nz == ZoneKind.OPEN_OFFICE || nz == ZoneKind.SUITE || nz == ZoneKind.SOLID_CORE || nz == ZoneKind.DARK_WING) {
+							wallSpots.add(new int[] {i, j, Level4Plan.opposite(d), Level4Layout.FLOOR_Y});
+						}
+					}
+				}
+			}
+		}
+		if (wallSpots.isEmpty()) return;
+		int[] pick = wallSpots.get(rng.nextInt(wallSpots.size()));
+		add(new PlacedPoi(PoiKind.DELAYED_REFLECTION_MIRROR, pick[0], pick[1], pick[2], pick[3], true, -1), usedCells);
+	}
+
+	private void placeTbdOverflowCage(Level4Plan plan, SplittableRandom rng, Set<Integer> usedCells) {
+		List<int[]> candidates = new ArrayList<>();
+		for (RoomBox room : plan.rooms) {
+			if (room.kind() != ZoneKind.UNFINISHED_WING) continue;
+			for (int a = room.i(); a < room.i() + room.w(); a++) {
+				for (int b = room.j(); b < room.j() + room.h(); b++) {
+					if (a == room.i() && b == room.j()) continue; // keep corner (i, j) available for #7 camp
+					int c = Level4Plan.cell(a, b);
+					if (!usedCells.contains(c) && plan.balconyDir[c] < 0) {
+						candidates.add(new int[] {a, b});
+					}
+				}
+			}
+		}
+		if (candidates.isEmpty()) {
+			for (RoomBox room : plan.rooms) {
+				if (room.kind() != ZoneKind.ELEVATOR_LOBBY) continue;
+				int c = Level4Plan.cell(room.i(), room.j());
+				if (!usedCells.contains(c)) {
+					candidates.add(new int[] {room.i(), room.j()});
+				}
+			}
+		}
+		if (candidates.isEmpty()) return;
+		int[] pick = candidates.get(rng.nextInt(candidates.size()));
+		add(new PlacedPoi(PoiKind.TBD_OVERFLOW_CAGE, pick[0], pick[1], NORTH, Level4Layout.FLOOR_Y, false, -1), usedCells);
+	}
+
+	private void placePlenumMaintenanceHub(Level4Plan plan, Set<Integer> usedCells) {
+		for (int id = 0; id < plan.rooms.size(); id++) {
+			RoomBox room = plan.rooms.get(id);
+			if (room.kind() != ZoneKind.DARK_WING || room.w() < 3 || room.h() < 3) continue;
+			int ci = room.i() + 1, cj = room.j() + 1;
+			int c = Level4Plan.cell(ci, cj);
+			if (usedCells.contains(c)) continue;
+			add(new PlacedPoi(PoiKind.PLENUM_MAINTENANCE_HUB, ci, cj, NORTH, Level4Layout.FLOOR_Y + 5, false, id), usedCells);
+			return;
+		}
+	}
+
+	private void placeStalledFreightElevator(Level4Plan plan, Set<Integer> usedCells) {
+		for (int id = 0; id < plan.rooms.size(); id++) {
+			RoomBox room = plan.rooms.get(id);
+			if (room.kind() != ZoneKind.ELEVATOR_LOBBY) continue;
+			int ci = room.i() + (room.w() > 1 ? 1 : 0);
+			int cj = room.j();
+			int c = Level4Plan.cell(ci, cj);
+			if (usedCells.contains(c)) {
+				ci = room.i();
+				c = Level4Plan.cell(ci, cj);
+				if (usedCells.contains(c)) continue;
+			}
+			add(new PlacedPoi(PoiKind.STALLED_FREIGHT_ELEVATOR, ci, cj, SOUTH, Level4Layout.FLOOR_Y - 4, false, id), usedCells);
+			return;
+		}
+	}
+
+	private void placeEvacuatedOutpost(Level4Plan plan, SplittableRandom rng, Set<Integer> usedCells) {
+		List<int[]> preferred = new ArrayList<>();
+		List<int[]> fallback = new ArrayList<>();
+		for (int i0 = MARGIN; i0 <= N - MARGIN - 2; i0++) {
+			for (int j0 = MARGIN; j0 <= N - MARGIN - 2; j0++) {
+				boolean ok = true;
+				boolean nearAud = false;
+				for (int a = i0; a <= i0 + 1 && ok; a++) {
+					for (int b = j0; b <= j0 + 1 && ok; b++) {
+						int c = Level4Plan.cell(a, b);
+						if (usedCells.contains(c) || plan.balconyDir[c] >= 0 || plan.nearHumanBase(a, b)
+								|| plan.isTunnelCell(a, b) || plan.zones[c] != ZoneKind.OPEN_OFFICE) {
+							ok = false;
+							break;
+						}
+						for (int d = 0; d < 4; d++) {
+							int na = a + DX[d], nb = b + DZ[d];
+							if (Level4Plan.inside(na, nb) && plan.zones[Level4Plan.cell(na, nb)] == ZoneKind.AUDITORIUM) {
+								nearAud = true;
+							}
+						}
+					}
+				}
+				if (!ok) continue;
+				if (nearAud) preferred.add(new int[] {i0, j0});
+				else fallback.add(new int[] {i0, j0});
+			}
+		}
+		List<int[]> pool = !preferred.isEmpty() ? preferred : fallback;
+		if (pool.isEmpty()) return;
+		int[] pick = pool.get(rng.nextInt(pool.size()));
+		PlacedPoi anchor = new PlacedPoi(PoiKind.EVACUATED_OUTPOST, pick[0], pick[1], SOUTH, Level4Layout.FLOOR_Y, false, -1);
+		pois.add(anchor);
+		for (int a = pick[0]; a <= pick[0] + 1; a++) {
+			for (int b = pick[1]; b <= pick[1] + 1; b++) {
+				int c = Level4Plan.cell(a, b);
+				byCell.put(c, anchor);
+				usedCells.add(c);
+			}
+		}
 	}
 
 	/** Maps wall-relative (u in 1..5 along wall, v in 0..6 depth into cell from wall) to cell-local (cx, cz). */

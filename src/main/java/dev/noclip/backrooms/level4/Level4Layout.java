@@ -42,6 +42,7 @@ final class Level4Layout {
 		WINDOW_BLACKED,
 		WINDOW_TRAP,
 		WINDOW_RAIN,
+		WINDOW_DARK_MIRROR,
 		FIRE_DOOR,
 		EXIT_DOOR,
 		EXIT_STRUCTURE,
@@ -361,6 +362,11 @@ final class Level4Layout {
 		if (plan.nearHumanBase(roomI, roomJ)) return Kind.WINDOW_BLACKED;
 		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
 		Level4PoiPlan.PlacedPoi poi = Level4PoiPlan.of(seed, rx, rz).atCellIndex(Level4Plan.cell(roomI, roomJ));
+		if (poi != null && poi.kind() == Level4PoiPlan.PoiKind.EVACUATED_OUTPOST) return Kind.WINDOW_BLACKED;
+		if (poi != null && poi.kind() == Level4PoiPlan.PoiKind.DELAYED_REFLECTION_MIRROR
+				&& !poi.variantFlag() && poi.dir() == Level4Plan.opposite(dir) && along >= 2 && along <= 4) {
+			return Kind.WINDOW_DARK_MIRROR;
+		}
 		if (poi != null && poi.kind() == Level4PoiPlan.PoiKind.WINDOW_PAINT_CART && poi.dir() == Level4Plan.opposite(dir)) {
 			if (along <= 2) return Kind.WINDOW_BLACKED;
 			if (along <= 4) return Kind.WINDOW_TRAP;
@@ -647,7 +653,7 @@ final class Level4Layout {
 			}
 		}
 
-		if (zone == ZoneKind.UNFINISHED_WING && room != null) {
+		if (zone == ZoneKind.UNFINISHED_WING && room != null && !hasPoi) {
 			if ((cx == 3 && (cz == 2 || cz == 5)) || (cz == 3 && cx == 2 && (i + j) % 2 == 0)) {
 				return new Tile(Kind.UNFINISHED_PILLAR, zone, Level4Plan.NORTH, ceilH, null, false);
 			}

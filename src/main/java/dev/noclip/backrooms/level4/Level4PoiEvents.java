@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.core.economy.Economy;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
+import dev.noclip.backrooms.core.rpg.PlayerStats;
 import dev.noclip.backrooms.items.BackroomsItems;
 import dev.noclip.backrooms.level1.Level1Items;
 import dev.noclip.backrooms.level4.Level4Plan.PlacedExit;
@@ -14,6 +15,7 @@ import dev.noclip.backrooms.level4.Level4PoiPlan.PlacedPoi;
 import dev.noclip.backrooms.level4.Level4PoiPlan.PoiKind;
 import dev.noclip.backrooms.props.BackroomsProps;
 import dev.noclip.backrooms.props.PropBlockEntity;
+import dev.noclip.backrooms.tools.BackroomsToolItem;
 import it.unimi.dsi.fastutil.longs.LongIterator;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import java.util.ArrayList;
@@ -28,6 +30,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -37,6 +40,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.InteractionHand;
@@ -44,10 +48,13 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Interactive events, persistent one-time loot tracking, and ambient effects for Level 4 POIs.
@@ -55,8 +62,15 @@ import net.minecraft.world.level.saveddata.SavedDataType;
 final class Level4PoiEvents {
 	private static final int CHALK_COOLDOWN = 20 * 60;
 	private static final int MEMO_COOLDOWN = 20 * 60;
+	private static final int PBX_BREAKER_COOLDOWN = 20 * 30;
+	private static final int OUTPOST_COT_COOLDOWN = 20 * 120;
+	private static final int MIRROR_COOLDOWN = 20 * 45;
 	private static final Map<UUID, Integer> CHALK_NEXT = new HashMap<>();
 	private static final Map<UUID, Integer> MEMO_NEXT = new HashMap<>();
+	private static final Map<BlockPos, Integer> PBX_BREAKER_NEXT = new HashMap<>();
+	private static final Map<UUID, Integer> OUTPOST_COT_NEXT = new HashMap<>();
+	private static final Map<UUID, Integer> MIRROR_STARE_TICKS = new HashMap<>();
+	private static final Map<UUID, Integer> MIRROR_NEXT = new HashMap<>();
 
 	private Level4PoiEvents() {
 	}
@@ -65,6 +79,10 @@ final class Level4PoiEvents {
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			CHALK_NEXT.clear();
 			MEMO_NEXT.clear();
+			PBX_BREAKER_NEXT.clear();
+			OUTPOST_COT_NEXT.clear();
+			MIRROR_STARE_TICKS.clear();
+			MIRROR_NEXT.clear();
 		});
 		ServerTickEvents.END_SERVER_TICK.register(Level4PoiEvents::tick);
 
@@ -117,6 +135,35 @@ final class Level4PoiEvents {
 				}
 				sl.playSound(null, pos, SoundEvents.WOOL_BREAK, SoundSource.BLOCKS, 0.85F, 1.05F);
 				sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.tape_torn"));
+				return InteractionResult.SUCCESS;
+			}
+
+			// #8 LOCKED_PBX_ROOM iron door (checked before atCell so clicking from outside corridor works)
+			if (state.is(Blocks.IRON_DOOR) && isPbxDoorPos(seed, pos)) {
+				if (!state.getValue(DoorBlock.OPEN)) {
+					if (canPryPbxDoor(sp.getMainHandItem())) {
+						sl.setBlock(pos, state.setValue(DoorBlock.OPEN, true), 10);
+						BlockPos other = state.getValue(DoorBlock.HALF) == DoubleBlockHalf.LOWER ? pos.above() : pos.below();
+						BlockState otherState = sl.getBlockState(other);
+						if (otherState.is(Blocks.IRON_DOOR)) {
+							sl.setBlock(other, otherState.setValue(DoorBlock.OPEN, true), 10);
+						}
+						sl.playSound(null, pos, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 0.9F, 0.95F);
+						sl.playSound(null, pos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.35F, 1.4F);
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.pbx_pried"));
+					} else {
+						sl.playSound(null, pos, SoundEvents.IRON_DOOR_CLOSE, SoundSource.BLOCKS, 0.8F, 0.75F);
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.pbx_locked"));
+					}
+					return InteractionResult.SUCCESS;
+				}
+				return InteractionResult.PASS;
+			}
+
+			// #9 DELAYED_REFLECTION_MIRROR direct touch (shaft mirrors sit on OUTSIDE edge cells)
+			if (state.is(Level4Blocks.OFFICE_DARK_MIRROR)) {
+				sl.playSound(null, pos, SoundEvents.GLASS_HIT, SoundSource.BLOCKS, 0.7F, 0.65F);
+				sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.mirror_touch"));
 				return InteractionResult.SUCCESS;
 			}
 
@@ -234,6 +281,80 @@ final class Level4PoiEvents {
 					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.camp_loot"));
 					return InteractionResult.SUCCESS;
 				}
+				case LOCKED_PBX_ROOM -> {
+					if (state.is(BackroomsProps.INDUSTRIAL_FUSE_BOX)) {
+						return togglePbxBreaker(sl, sp, pos, now);
+					}
+					if (!state.is(Blocks.BARREL)) return InteractionResult.PASS;
+					PoiState data = state(sl);
+					if (data.isClaimed(anchor)) {
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.pbx_empty"));
+						return InteractionResult.SUCCESS;
+					}
+					data.markClaimed(anchor);
+					RandomSource rng = sl.getRandom();
+					giveOrDrop(sp, new ItemStack(BackroomsItems.CAPACITOR, 1 + rng.nextInt(2)));
+					giveOrDrop(sp, new ItemStack(BackroomsItems.COPPER_WIRE, 1 + rng.nextInt(2)));
+					giveOrDrop(sp, new ItemStack(BackroomsItems.BATTERY_CELL, 1));
+					sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.8F, 0.95F);
+					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.pbx_loot"));
+					return InteractionResult.SUCCESS;
+				}
+				case TBD_OVERFLOW_CAGE -> {
+					if (!state.is(Blocks.BARREL)) return InteractionResult.PASS;
+					PoiState data = state(sl);
+					if (data.isClaimed(pos)) {
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.tbd_cage_empty"));
+						return InteractionResult.SUCCESS;
+					}
+					data.markClaimed(pos);
+					RandomSource rng = sl.getRandom();
+					if (rng.nextInt(100) < 75) {
+						ItemStack curio = new ItemStack(Level4Items.CURIOS.get(rng.nextInt(Level4Items.CURIOS.size())));
+						giveOrDrop(sp, curio);
+						giveOrDrop(sp, new ItemStack(BackroomsItems.SCRAP_METAL, 1 + rng.nextInt(2)));
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.tbd_cage_curio", curio.getHoverName()));
+					} else {
+						ItemStack prize = new ItemStack(rng.nextBoolean() ? Economy.LOST_COIN : Level1Items.ALLOY);
+						giveOrDrop(sp, prize);
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.tbd_cage_rare", prize.getHoverName()));
+					}
+					sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.8F, 1.05F);
+					return InteractionResult.SUCCESS;
+				}
+				case PLENUM_MAINTENANCE_HUB -> {
+					if (!state.is(Blocks.BARREL) || pos.getY() != Level4ChunkGenerator.FLOOR_Y + 6) return InteractionResult.PASS;
+					PoiState data = state(sl);
+					if (data.isClaimed(anchor)) {
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.plenum_empty"));
+						return InteractionResult.SUCCESS;
+					}
+					data.markClaimed(anchor);
+					RandomSource rng = sl.getRandom();
+					giveOrDrop(sp, new ItemStack(BackroomsItems.IRON_PIPE, 1));
+					giveOrDrop(sp, new ItemStack(BackroomsItems.STEEL_GEAR, 1));
+					giveOrDrop(sp, new ItemStack(BackroomsItems.RUSTY_SCREWS, 2));
+					if (rng.nextInt(100) < 35) giveOrDrop(sp, new ItemStack(Level1Items.ALLOY, 1));
+					sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.8F, 0.9F);
+					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.plenum_loot"));
+					return InteractionResult.SUCCESS;
+				}
+				case STALLED_FREIGHT_ELEVATOR -> {
+					if (!state.is(Blocks.BARREL) || pos.getY() != Level4ChunkGenerator.FLOOR_Y - 3) return InteractionResult.PASS;
+					PoiState data = state(sl);
+					if (data.isClaimed(anchor)) {
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.freight_empty"));
+						return InteractionResult.SUCCESS;
+					}
+					data.markClaimed(anchor);
+					RandomSource rng = sl.getRandom();
+					giveOrDrop(sp, new ItemStack(Level1Items.ALLOY, 2 + rng.nextInt(2)));
+					giveOrDrop(sp, new ItemStack(Level1Items.BANDAGE, 2));
+					giveOrDrop(sp, new ItemStack(BackroomsItems.PURIFIED_ALMOND_ESSENCE, 1));
+					sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.85F, 0.85F);
+					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.freight_loot"));
+					return InteractionResult.SUCCESS;
+				}
 				default -> {
 					return InteractionResult.PASS;
 				}
@@ -256,13 +377,56 @@ final class Level4PoiEvents {
 
 	private static void tick(MinecraftServer server) {
 		int now = server.getTickCount();
-		if (now % 25 != 0) return;
+		if (now % 5 != 0) return;
 		ServerLevel level = server.getLevel(Level4.LEVEL_4);
 		if (level == null || level.players().isEmpty()) return;
 		long seed = Level4ChunkGenerator.planSeed(level.getChunkSource().randomState());
 
 		for (ServerPlayer sp : level.players()) {
 			if (sp.isSpectator()) continue;
+
+			// #9 DELAYED_REFLECTION_MIRROR stare trigger (5.5-block line of sight)
+			boolean lookingAtMirror = false;
+			Vec3 eye = sp.getEyePosition();
+			Vec3 look = sp.getLookAngle();
+			for (double d = 1.0; d <= 5.5; d += 0.5) {
+				BlockPos hit = BlockPos.containing(eye.add(look.scale(d)));
+				if (!level.isLoaded(hit)) break;
+				BlockState st = level.getBlockState(hit);
+				if (st.isAir()) continue;
+				lookingAtMirror = st.is(Level4Blocks.OFFICE_DARK_MIRROR);
+				break;
+			}
+			if (lookingAtMirror && now >= MIRROR_NEXT.getOrDefault(sp.getUUID(), 0)) {
+				int stared = MIRROR_STARE_TICKS.getOrDefault(sp.getUUID(), 0) + 5;
+				if (stared >= 60) {
+					MIRROR_STARE_TICKS.remove(sp.getUUID());
+					MIRROR_NEXT.put(sp.getUUID(), now + MIRROR_COOLDOWN);
+					PlayerRpg.drainSanity(sp, 5.0F);
+					level.playSound(null, sp.getX() - look.x * 2.0, sp.getY(), sp.getZ() - look.z * 2.0,
+							SoundEvents.WOOL_STEP, SoundSource.AMBIENT, 0.7F, 0.8F);
+					PlayerStats stats = PlayerRpg.get(sp);
+					boolean perceptive = stats.sanityStat() >= 3 || stats.level() >= 4 || stats.psi() >= 1
+							|| level.getRandom().nextInt(100) < 25;
+					int[] exit13 = perceptive ? nearestExitOfType(seed, sp.getBlockX(), sp.getBlockZ(), Level4Exit.MIRROR_13) : null;
+					if (exit13 != null) {
+						int dx = exit13[0] - sp.getBlockX(), dz = exit13[1] - sp.getBlockZ();
+						int dist = (int) Math.round(Math.hypot(dx, dz));
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.mirror_omen_13",
+								Level4Events.compass(dx, dz), dist));
+					} else {
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.mirror_shadow"));
+					}
+				} else {
+					MIRROR_STARE_TICKS.put(sp.getUUID(), stared);
+				}
+			} else {
+				int prev = MIRROR_STARE_TICKS.getOrDefault(sp.getUUID(), 0);
+				if (prev <= 10) MIRROR_STARE_TICKS.remove(sp.getUUID());
+				else MIRROR_STARE_TICKS.put(sp.getUUID(), prev - 10);
+			}
+
+			if (now % 25 != 0) continue;
 			int px = sp.getBlockX(), pz = sp.getBlockZ();
 			int gi0 = Math.floorDiv(px - 12, Level4Plan.CELL), gi1 = Math.floorDiv(px + 12, Level4Plan.CELL);
 			int gj0 = Math.floorDiv(pz - 12, Level4Plan.CELL), gj1 = Math.floorDiv(pz + 12, Level4Plan.CELL);
@@ -286,6 +450,116 @@ final class Level4PoiEvents {
 				}
 			}
 		}
+	}
+
+	static InteractionResult togglePbxBreaker(ServerLevel sl, ServerPlayer sp, BlockPos pos, int now) {
+		if (now < PBX_BREAKER_NEXT.getOrDefault(pos, 0)) {
+			sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.pbx_breaker_wait"));
+			return InteractionResult.SUCCESS;
+		}
+		PBX_BREAKER_NEXT.put(pos.immutable(), now + PBX_BREAKER_COOLDOWN);
+		List<BlockPos> lit = new ArrayList<>();
+		List<BlockPos> unlit = new ArrayList<>();
+		BlockPos.MutableBlockPos scan = new BlockPos.MutableBlockPos();
+		for (int dx = -28; dx <= 28; dx++) {
+			for (int dz = -28; dz <= 28; dz++) {
+				for (int dy = 1; dy <= 9; dy++) {
+					scan.set(pos.getX() + dx, Level4ChunkGenerator.FLOOR_Y + dy, pos.getZ() + dz);
+					BlockState st = sl.getBlockState(scan);
+					if (st.is(Level4Blocks.OFFICE_TROFFER_LIT)) lit.add(scan.immutable());
+					else if (st.is(Level4Blocks.OFFICE_TROFFER_BROKEN)
+							|| st.is(Level4Blocks.OFFICE_TROFFER_FLICKER)
+							|| st.is(Level4Blocks.OFFICE_TROFFER_DIM)) {
+						unlit.add(scan.immutable());
+					}
+				}
+			}
+		}
+		boolean turnOn = unlit.size() >= lit.size();
+		List<BlockPos> targets = turnOn ? unlit : lit;
+		var targetBlock = turnOn ? Level4Blocks.OFFICE_TROFFER_LIT : Level4Blocks.OFFICE_TROFFER_BROKEN;
+		for (BlockPos p : targets) {
+			Direction.Axis axis = sl.getBlockState(p).getValue(Level4AxisBlock.AXIS);
+			sl.setBlock(p, targetBlock.defaultBlockState().setValue(Level4AxisBlock.AXIS, axis), 3);
+			sl.sendParticles(ParticleTypes.ELECTRIC_SPARK, p.getX() + 0.5, p.getY() + 0.3, p.getZ() + 0.5,
+					3, 0.2, 0.1, 0.2, 0.04);
+		}
+		sl.playSound(null, pos, SoundEvents.LEVER_CLICK, SoundSource.BLOCKS, 1.0F, turnOn ? 1.05F : 0.7F);
+		sp.sendOverlayMessage(Component.translatable(
+				turnOn ? "message.noclip_backrooms.level4.poi.pbx_power_on" : "message.noclip_backrooms.level4.poi.pbx_power_off",
+				targets.size()));
+		return InteractionResult.SUCCESS;
+	}
+
+	static InteractionResult useOutpostCot(ServerLevel sl, ServerPlayer sp, BlockPos pos, int now) {
+		if (now < OUTPOST_COT_NEXT.getOrDefault(sp.getUUID(), 0)) {
+			sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.outpost_cot_wait"));
+			return InteractionResult.SUCCESS;
+		}
+		OUTPOST_COT_NEXT.put(sp.getUUID(), now + OUTPOST_COT_COOLDOWN);
+		sp.heal(8.0F);
+		PlayerRpg.restoreSanity(sp, 30.0F);
+		sl.playSound(null, pos, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 0.8F, 0.9F);
+		sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.outpost_cot"));
+		return InteractionResult.SUCCESS;
+	}
+
+	static InteractionResult useOutpostLocker(ServerLevel sl, ServerPlayer sp, BlockPos pos) {
+		PoiState data = state(sl);
+		if (data.isClaimed(pos)) {
+			sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.outpost_locker_empty"));
+			return InteractionResult.SUCCESS;
+		}
+		data.markClaimed(pos);
+		giveOrDrop(sp, new ItemStack(Level1Items.BANDAGE, 1));
+		giveOrDrop(sp, new ItemStack(Level1Items.ALMOND_WATER, 1));
+		sl.playSound(null, pos, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 0.7F, 1.15F);
+		sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.outpost_locker"));
+		return InteractionResult.SUCCESS;
+	}
+
+	private static boolean isPbxDoorPos(long seed, BlockPos pos) {
+		int x = pos.getX(), z = pos.getZ();
+		int rx = Math.floorDiv(x, Level4Plan.SIZE), rz = Math.floorDiv(z, Level4Plan.SIZE);
+		int lx = Math.floorMod(x, Level4Plan.SIZE), lz = Math.floorMod(z, Level4Plan.SIZE);
+		int i = lx / Level4Plan.CELL, j = lz / Level4Plan.CELL;
+		int cx = lx % Level4Plan.CELL, cz = lz % Level4Plan.CELL;
+		Level4Plan plan = Level4Plan.of(seed, rx, rz);
+		Level4PoiPlan poiPlan = Level4PoiPlan.of(seed, rx, rz);
+		if (poiPlan.isPbxSuiteRoom(plan.roomId[Level4Plan.cell(i, j)])) return true;
+		if (cz == 0 && j > 0 && poiPlan.isPbxSuiteRoom(plan.roomId[Level4Plan.cell(i, j - 1)])) return true;
+		if (cx == 0 && i > 0 && poiPlan.isPbxSuiteRoom(plan.roomId[Level4Plan.cell(i - 1, j)])) return true;
+		return false;
+	}
+
+	private static boolean canPryPbxDoor(ItemStack held) {
+		return held.is(Level1Items.CROWBAR)
+				|| (held.getItem() instanceof BackroomsToolItem tool && tool.tier() >= 2)
+				|| held.is(ItemTags.PICKAXES)
+				|| held.is(ItemTags.AXES);
+	}
+
+	private static int[] nearestExitOfType(long seed, int x, int z, Level4Exit kind) {
+		int rx0 = Math.floorDiv(x, Level4Plan.SIZE), rz0 = Math.floorDiv(z, Level4Plan.SIZE);
+		int[] best = null;
+		double bestDist = Double.MAX_VALUE;
+		for (int dx = -2; dx <= 2; dx++) {
+			for (int dz = -2; dz <= 2; dz++) {
+				int rx = rx0 + dx, rz = rz0 + dz;
+				Level4Plan plan = Level4Plan.of(seed, rx, rz);
+				for (PlacedExit pe : plan.exits) {
+					if (pe.exit() != kind) continue;
+					int ex = rx * Level4Plan.SIZE + (pe.cell() % Level4Plan.N) * Level4Plan.CELL + 3;
+					int ez = rz * Level4Plan.SIZE + (pe.cell() / Level4Plan.N) * Level4Plan.CELL + 3;
+					double d = Math.hypot(ex - x, ez - z);
+					if (d < bestDist) {
+						bestDist = d;
+						best = new int[] {ex, ez};
+					}
+				}
+			}
+		}
+		return best;
 	}
 
 	static boolean isAmorDesecrated(ServerLevel level, UUID playerId) {

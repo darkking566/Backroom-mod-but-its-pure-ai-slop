@@ -74,6 +74,12 @@ final class Level4Events {
 			int now = sp.level().getServer().getTickCount();
 
 			if (state.is(Level4Blocks.OFFICE_BREAKER)) {
+				ServerLevel sl = (ServerLevel) world;
+				long seed = Level4ChunkGenerator.planSeed(sl.getChunkSource().randomState());
+				var poi = Level4PoiPlan.atCell(seed, pos.getX(), pos.getZ());
+				if (poi != null && poi.kind() == Level4PoiPlan.PoiKind.LOCKED_PBX_ROOM) {
+					return Level4PoiEvents.togglePbxBreaker(sl, sp, pos, now);
+				}
 				if (now < BREAKER_NEXT.getOrDefault(pos, 0)) {
 					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.breaker_cooldown"));
 					return InteractionResult.SUCCESS;

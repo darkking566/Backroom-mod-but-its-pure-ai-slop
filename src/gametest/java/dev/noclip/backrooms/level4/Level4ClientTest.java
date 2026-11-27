@@ -27,6 +27,9 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -862,12 +865,232 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			check(Level4PoiEvents.isAmorDesecrated(l4, p.getUUID()), "breaking shrine must mark player as Amor desecrated");
 		});
 		server.runCommand("gamemode spectator @a");
+
+		// === BATCH 2 POIs (#8, #9, #11, #12, #14, #15) ===
+
+		// 8. Locked PBX Room (locked iron door refuses hand, opens with CROWBAR; 1-time parts + breaker toggle)
+		int[] pbx = findPoi(seed, from, PoiKind.LOCKED_PBX_ROOM);
+		check(pbx != null, "no LOCKED_PBX_ROOM POI found");
+		int pbxDoorDir = Level4Plan.opposite(pbx[3]);
+		int pbxDx = pbx[0] + (pbxDoorDir == Level4Plan.WEST ? 0 : pbxDoorDir == Level4Plan.EAST ? Level4Plan.CELL : 3);
+		int pbxDz = pbx[2] + (pbxDoorDir == Level4Plan.NORTH ? 0 : pbxDoorDir == Level4Plan.SOUTH ? Level4Plan.CELL : 3);
+		shoot(context, game, pbxDx + Level4Plan.DX[pbxDoorDir] * 2.2 + 0.5, STAND, pbxDz + Level4Plan.DZ[pbxDoorDir] * 2.2 + 0.5,
+				poiYawTo(pbxDoorDir), 6, false, "level4_poi_pbx");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			p.getInventory().clearContent();
+			BlockPos doorPos = new BlockPos(pbxDx, STAND, pbxDz);
+			check(l4.getBlockState(doorPos).is(Blocks.IRON_DOOR), "expected locked iron door at " + doorPos);
+			check(!l4.getBlockState(doorPos).getValue(DoorBlock.OPEN), "PBX iron door should start locked");
+			p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(doorPos), Direction.UP, doorPos, false));
+			check(!l4.getBlockState(doorPos).getValue(DoorBlock.OPEN), "empty hand must not open PBX iron door");
+			p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Level1Items.CROWBAR));
+			p.gameMode.useItemOn(p, l4, p.getMainHandItem(), InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(doorPos), Direction.UP, doorPos, false));
+			check(l4.getBlockState(doorPos).getValue(DoorBlock.OPEN), "crowbar should pry open PBX iron door");
+
+			int[] pbxBarrelUv = Level4PoiPlan.uvToLocal(pbx[3], 5, 2);
+			BlockPos barrelPos = new BlockPos(pbx[0] + pbxBarrelUv[0], STAND, pbx[2] + pbxBarrelUv[1]);
+			p.teleportTo(pbx[0] + 3.5, STAND, pbx[2] + 3.5);
+			p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			int batteries = p.getInventory().countItem(BackroomsItems.BATTERY_CELL);
+			check(batteries == 1 && p.getInventory().countItem(BackroomsItems.CAPACITOR) >= 1, "expected PBX electrical parts");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			check(p.getInventory().countItem(BackroomsItems.BATTERY_CELL) == batteries, "PBX barrel loot must be one-time only");
+
+			int[] breakerUv = Level4PoiPlan.uvToLocal(pbx[3], 5, 5);
+			BlockPos breakerPos = new BlockPos(pbx[0] + breakerUv[0], STAND + 1, pbx[2] + breakerUv[1]);
+			var brRes = p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(breakerPos), Direction.UP, breakerPos, false));
+			check(brRes == net.minecraft.world.InteractionResult.SUCCESS, "PBX breaker switch failed");
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 9. Delayed reflection dark mirror (screenshot + touch + 3s stare sanity drain)
+		int[] mirror = findPoi(seed, from, PoiKind.DELAYED_REFLECTION_MIRROR);
+		check(mirror != null, "no DELAYED_REFLECTION_MIRROR POI found");
+		BlockPos[] mirrorBlockRef = new BlockPos[2]; // [0]=mirror, [1]=stand
+		int mirrorBaseY = mirror[4];
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			player(s).teleportTo(mirror[0] + 3.5, mirrorBaseY + 1, mirror[2] + 3.5);
+			for (int x = mirror[0]; x <= mirror[0] + Level4Plan.CELL && mirrorBlockRef[0] == null; x++) {
+				for (int z = mirror[2]; z <= mirror[2] + Level4Plan.CELL && mirrorBlockRef[0] == null; z++) {
+					BlockPos cand = new BlockPos(x, mirrorBaseY + 2, z);
+					if (l4.getBlockState(cand).is(Level4Blocks.OFFICE_DARK_MIRROR)) {
+						mirrorBlockRef[0] = cand;
+						for (Direction d : new Direction[] {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST}) {
+							BlockPos st = new BlockPos(x + d.getStepX() * 2, mirrorBaseY + 1, z + d.getStepZ() * 2);
+							BlockPos mid = new BlockPos(x + d.getStepX(), mirrorBaseY + 1, z + d.getStepZ());
+							if (l4.getBlockState(st).isAir() && l4.getBlockState(st.above()).isAir()
+									&& l4.getBlockState(mid).isAir() && l4.getBlockState(mid.above()).isAir()
+									&& Level4Layout.tile(seed, st.getX(), st.getZ()).walkable()) {
+								mirrorBlockRef[1] = st;
+								break;
+							}
+						}
+					}
+				}
+			}
+			check(mirrorBlockRef[0] != null && mirrorBlockRef[1] != null, "expected OFFICE_DARK_MIRROR and walkable viewpoint");
+		});
+		game.getConnection().waitForChunksDownload();
+		BlockPos mBlock = mirrorBlockRef[0], mStand = mirrorBlockRef[1];
+		double mdx = (mBlock.getX() + 0.5) - (mStand.getX() + 0.5);
+		double mdy = (mBlock.getY() + 0.5) - (mStand.getY() + 1.62);
+		double mdz = (mBlock.getZ() + 0.5) - (mStand.getZ() + 0.5);
+		float mYaw = (float) Math.toDegrees(Math.atan2(-mdx, mdz));
+		float mPitch = (float) Math.toDegrees(-Math.atan2(mdy, Math.hypot(mdx, mdz)));
+		shoot(context, game, mStand.getX() + 0.5, mStand.getY(), mStand.getZ() + 0.5, mYaw, mPitch, false, "level4_poi_mirror");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			var touchRes = p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(mBlock), Direction.UP, mBlock, false));
+			check(touchRes == net.minecraft.world.InteractionResult.SUCCESS, "expected mirror touch response");
+			dev.noclip.backrooms.core.rpg.PlayerRpg.set(p,
+					dev.noclip.backrooms.core.rpg.PlayerRpg.get(p).withSanity(40.0F));
+		});
+		context.waitTicks(70);
+		server.runOnServer(s -> {
+			float sanAfter = dev.noclip.backrooms.core.rpg.PlayerRpg.get(player(s)).sanity();
+			check(sanAfter < 40.0F, "staring at OFFICE_DARK_MIRROR should drain sanity, was " + sanAfter);
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 11. T.B.D. overflow wire cage (screenshot + 1-time loot)
+		int[] cage = findPoi(seed, from, PoiKind.TBD_OVERFLOW_CAGE);
+		check(cage != null, "no TBD_OVERFLOW_CAGE POI found");
+		shoot(context, game, cage[0] + 2.5, STAND, cage[2] + 5.5, -90, 8, false, "level4_poi_tbd_cage");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			check(l4.getBlockState(new BlockPos(cage[0] + 5, STAND, cage[2] + 5)).is(Level4Blocks.TBD_HOARD_CRATE),
+					"expected TBD_HOARD_CRATE in cage");
+			check(l4.getBlockState(new BlockPos(cage[0] + 6, STAND, cage[2] + 5)).is(Level4Blocks.TBD_CURIO_SHELF),
+					"expected TBD_CURIO_SHELF in cage");
+			p.getInventory().clearContent();
+			BlockPos barrelPos = new BlockPos(cage[0] + 5, STAND, cage[2] + 6);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			int count1 = 0;
+			for (int i = 0; i < p.getInventory().getContainerSize(); i++) count1 += p.getInventory().getItem(i).getCount();
+			check(count1 >= 1, "expected loot from TBD overflow cage barrel");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			int count2 = 0;
+			for (int i = 0; i < p.getInventory().getContainerSize(); i++) count2 += p.getInventory().getItem(i).getCount();
+			check(count2 == count1, "TBD cage barrel loot must be one-time only");
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 12. Plenum maintenance hub (screenshot inside ceiling plenum + 1-time toolbox loot)
+		int[] hub = findPoi(seed, from, PoiKind.PLENUM_MAINTENANCE_HUB);
+		check(hub != null, "no PLENUM_MAINTENANCE_HUB POI found");
+		shoot(context, game, hub[0] + 4.3, Level4ChunkGenerator.FLOOR_Y + 6.0, hub[2] + 4.3, 135, 10, false, "level4_poi_plenum_hub");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			check(l4.getBlockState(new BlockPos(hub[0] + 3, Level4ChunkGenerator.FLOOR_Y + 5, hub[2] + 3)).is(Blocks.IRON_BARS),
+					"expected iron bars peep grate below plenum hub");
+			check(l4.getBlockState(new BlockPos(hub[0] + 2, Level4ChunkGenerator.FLOOR_Y + 5, hub[2] + 3)).is(Blocks.POLISHED_ANDESITE),
+					"expected polished andesite platform in plenum hub");
+			check(l4.getBlockState(new BlockPos(hub[0] + 4, Level4ChunkGenerator.FLOOR_Y + 8, hub[2] + 4)).is(Blocks.LANTERN),
+					"expected hanging lantern in plenum hub");
+			p.getInventory().clearContent();
+			BlockPos barrelPos = new BlockPos(hub[0] + 2, Level4ChunkGenerator.FLOOR_Y + 6, hub[2] + 2);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			int gears = p.getInventory().countItem(BackroomsItems.STEEL_GEAR);
+			check(gears == 1 && p.getInventory().countItem(BackroomsItems.IRON_PIPE) == 1, "expected plenum toolbox loot");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			check(p.getInventory().countItem(BackroomsItems.STEEL_GEAR) == gears, "plenum toolbox loot must be one-time only");
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 14. Stalled freight elevator (screenshot from threshold + descend cab + 1-time accident crate)
+		int[] fe = findPoi(seed, from, PoiKind.STALLED_FREIGHT_ELEVATOR);
+		check(fe != null, "no STALLED_FREIGHT_ELEVATOR POI found");
+		shoot(context, game, fe[0] + 3.5, STAND, fe[2] + 3.5, 180, 28, false, "level4_poi_freight_elev");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			check(l4.getBlockState(new BlockPos(fe[0] + 3, Level4ChunkGenerator.FLOOR_Y, fe[2] + 1)).is(Blocks.IRON_TRAPDOOR),
+					"expected open iron trapdoor on stalled cab roof");
+			check(l4.getBlockState(new BlockPos(fe[0] + 3, Level4ChunkGenerator.FLOOR_Y - 1, fe[2] + 1)).is(Blocks.LADDER),
+					"expected ladder down into stalled freight cab");
+			check(l4.getBlockState(new BlockPos(fe[0] + 2, Level4ChunkGenerator.FLOOR_Y - 3, fe[2] + 1)).is(Blocks.REDSTONE_TORCH),
+					"expected emergency redstone torch inside stalled freight cab");
+			p.teleportTo(fe[0] + 3.5, Level4ChunkGenerator.FLOOR_Y - 3, fe[2] + 1.5);
+			p.getInventory().clearContent();
+			BlockPos barrelPos = new BlockPos(fe[0] + 4, Level4ChunkGenerator.FLOOR_Y - 3, fe[2] + 1);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			int alloys = p.getInventory().countItem(Level1Items.ALLOY);
+			check(alloys >= 2 && p.getInventory().countItem(Level1Items.BANDAGE) >= 2
+					&& p.getInventory().countItem(BackroomsItems.PURIFIED_ALMOND_ESSENCE) >= 1,
+					"expected M.E.G. accident crate loot in stalled freight cab");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			check(p.getInventory().countItem(Level1Items.ALLOY) == alloys, "accident crate loot must be one-time only");
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 15. Evacuated outpost (screenshot + cot heals without overwriting Omega respawn + 1-time locker)
+		int[] outpost = findPoi(seed, from, PoiKind.EVACUATED_OUTPOST);
+		check(outpost != null, "no EVACUATED_OUTPOST POI found");
+		shoot(context, game, outpost[0] + 4.5, STAND, outpost[2] + 4.5, 135, 14, false, "level4_poi_outpost");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			dev.noclip.backrooms.core.trip.Trips.settle(p, LevelData.RespawnData.of(Level4.LEVEL_4, from, 0.0F, 0.0F));
+			var respawnBefore = p.getRespawnConfig();
+			p.setHealth(4.0F);
+			dev.noclip.backrooms.core.rpg.PlayerRpg.set(p,
+					dev.noclip.backrooms.core.rpg.PlayerRpg.get(p).withSanity(15.0F));
+
+			BlockPos cotPos = new BlockPos(outpost[0] + 2, STAND, outpost[2] + 2);
+			check(l4.getBlockState(cotPos).is(Level4Blocks.OMEGA_COT), "expected OMEGA_COT at evacuated outpost");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(cotPos), Direction.UP, cotPos, false));
+			check(p.getHealth() > 4.0F, "outpost cot should heal player");
+			check(dev.noclip.backrooms.core.rpg.PlayerRpg.get(p).sanity() > 15.0F, "outpost cot should restore sanity");
+			check(java.util.Objects.equals(respawnBefore, p.getRespawnConfig()),
+					"EVACUATED_OUTPOST cot must NEVER overwrite Omega respawn point");
+
+			p.getInventory().clearContent();
+			BlockPos lockerPos = new BlockPos(outpost[0] + 5, STAND, outpost[2] + 2);
+			check(l4.getBlockState(lockerPos).is(Level4Blocks.OMEGA_LOCKER), "expected OMEGA_LOCKER at evacuated outpost");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(lockerPos), Direction.UP, lockerPos, false));
+			check(p.getInventory().countItem(Level1Items.BANDAGE) == 1
+					&& p.getInventory().countItem(Level1Items.ALMOND_WATER) == 1,
+					"expected evacuated outpost locker depleted supplies");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(lockerPos), Direction.UP, lockerPos, false));
+			check(p.getInventory().countItem(Level1Items.ALMOND_WATER) == 1,
+					"outpost locker loot must be one-time only");
+		});
+		server.runCommand("gamemode spectator @a");
 	}
 
 	/** Returns {cellOriginX, cellOriginZ, dir, baseY, roomId} for the nearest matching POI. */
 	private static int[] findPoi(long seed, BlockPos from, PoiKind target) {
 		int rx0 = Math.floorDiv(from.getX(), Level4Plan.SIZE), rz0 = Math.floorDiv(from.getZ(), Level4Plan.SIZE);
-		for (int r = 0; r <= 3; r++) {
+		for (int r = 0; r <= 5; r++) {
 			for (int dx = -r; dx <= r; dx++) {
 				for (int dz = -r; dz <= r; dz++) {
 					if (Math.abs(dx) != r && Math.abs(dz) != r) continue;
@@ -930,7 +1153,14 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					"poi.drip_hint", "poi.terminal_notice", "poi.terminal_salvage",
 					"poi.paint_cart_empty", "poi.paint_cart_take", "poi.camp_empty",
 					"poi.camp_loot", "poi.amor_shrine_broken", "poi.amor_desecrated",
-					"poi.amor_forgiven"}) {
+					"poi.amor_forgiven",
+					"poi.pbx_locked", "poi.pbx_pried", "poi.pbx_loot", "poi.pbx_empty",
+					"poi.pbx_breaker_wait", "poi.pbx_power_on", "poi.pbx_power_off",
+					"poi.mirror_touch", "poi.mirror_shadow", "poi.mirror_omen_13",
+					"poi.tbd_cage_curio", "poi.tbd_cage_rare", "poi.tbd_cage_empty",
+					"poi.plenum_loot", "poi.plenum_empty", "poi.freight_loot", "poi.freight_empty",
+					"poi.outpost_cot", "poi.outpost_cot_wait", "poi.outpost_locker",
+					"poi.outpost_locker_empty"}) {
 				check(lang.has("message.noclip_backrooms.level4." + msg), "missing wanderer message: " + msg);
 			}
 		});
