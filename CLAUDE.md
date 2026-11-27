@@ -607,6 +607,7 @@
   - 觀察窗改成半透明（亮的那邊只看到黑、暗的那邊看得到亮的房間）
   - 測試：`InstituteLayoutTest` 走路時把物件當障礙（人、門、樓梯照樣走得到）並新增物件檢查；`FrontroomsClientTest` 檢查詢問桌在位置上、另一半接到主方塊，加 6 張室內照
   - 驗證：`gradlew build`（139 個單元測試）、`runClientGameTest -Plevels=frontrooms,film` 與 `-Plevels=frontrooms,horror` 通過；截圖與物件總覽存到 `docs/project/1-gameplay/images/`；`CREDITS.md` 補上這次用到的照片
+- 使用者同意後推送：抓 GitHub 合併朋友新推的 11 個 Level 4 提交（結構變化四批、流浪者與窗戶調整等），沒有衝突；合併後 `gradlew build`（144 個單元測試）通過；把 `main` 推送到 GitHub（研究所改版兩批 `a1c05caf`、`2155210e` 與企劃文件，以及 Antigravity 先前在本機提交的 `4a9f0aee`、`8cb6cbc4`）；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
