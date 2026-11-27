@@ -19,7 +19,6 @@ import net.minecraft.world.level.NoiseColumn;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.BiomeSource;
-import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
@@ -245,6 +244,9 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 			if (tile.kind() == Kind.ELEVATOR_THRESHOLD) {
 				return elevatorThresholdBlock(x, y - FLOOR_Y, poi);
 			}
+			if (tile.kind() == Kind.WINDOW_DARK_MIRROR) {
+				return darkMirrorWindowColumn(x, z, y - FLOOR_Y, dirFrom(tile.dir()));
+			}
 			return columnBlock(tile, y - FLOOR_Y);
 		}
 		if (poi != null && poi.kind() == PoiKind.INVERTED_MIRROR_LIGHTWELL && y >= FLOOR_Y + 6 && y <= FLOOR_Y + 21) {
@@ -317,7 +319,7 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 					return (cx == 3 && cz == 3 ? Blocks.IRON_BARS : Blocks.POLISHED_ANDESITE).defaultBlockState();
 				}
 				if (y == FLOOR_Y + 6 && cx == 2 && cz == 2) {
-					return Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
+					return Level4Blocks.INDUSTRIAL_TOOLBOX.defaultBlockState().setValue(Level4FacingBlock.FACING, Direction.SOUTH);
 				}
 				if (y == FLOOR_Y + 8 && cx == 4 && cz == 4) {
 					return Blocks.LANTERN.defaultBlockState().setValue(LanternBlock.HANGING, true);
@@ -379,7 +381,7 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 		int cx = Math.floorMod(x, Level4Plan.CELL);
 		int cz = Math.floorMod(z, Level4Plan.CELL);
 		if (cz == 4 && cx == 2 && y == FLOOR_Y - 5) {
-			return Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.NORTH);
+			return Level4Blocks.INDUSTRIAL_TOOLBOX.defaultBlockState().setValue(Level4FacingBlock.FACING, Direction.NORTH);
 		}
 		if (cz == 5) {
 			if ((cx == 1 || cx == 5) && (y == FLOOR_Y - 5 || y == FLOOR_Y - 4)) {
@@ -449,7 +451,7 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 			if (y == FLOOR_Y - 3) {
 				if (cx == 2) return Blocks.REDSTONE_TORCH.defaultBlockState();
 				if (cx == 3) return Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.SOUTH);
-				if (cx == 4) return Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
+				if (cx == 4) return Level4Blocks.MEG_SUPPLY_CRATE.defaultBlockState().setValue(Level4FacingBlock.FACING, Direction.WEST);
 			}
 			if (y == FLOOR_Y - 2 || y == FLOOR_Y - 1) {
 				return cx == 3
@@ -899,6 +901,18 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 		return Level4Blocks.OFFICE_DRYWALL_UPPER.defaultBlockState();
 	}
 
+	private static BlockState darkMirrorWindowColumn(int x, int z, int h, Direction facing) {
+		if (h == 1) return Level4Blocks.OFFICE_RADIATOR_WALL.defaultBlockState().setValue(Level4FacingBlock.FACING, facing);
+		if (h == 2 || h == 3) {
+			boolean center = Math.floorMod(x, Level4Plan.CELL) == 3 || Math.floorMod(z, Level4Plan.CELL) == 3;
+			int sil = center ? (h == 2 ? 1 : 2) : 0;
+			return Level4Blocks.OFFICE_DARK_MIRROR.defaultBlockState()
+					.setValue(Level4Blocks.OfficeDarkMirrorBlock.SILHOUETTE, sil);
+		}
+		if (h == 6 || h == 7) return Level4Blocks.OFFICE_DARK_MIRROR.defaultBlockState();
+		return Level4Blocks.OFFICE_DRYWALL_UPPER.defaultBlockState();
+	}
+
 	private static Block exitBlock(Level4Exit exit) {
 		return switch (exit) {
 			case ELEVATOR_3 -> Level4Blocks.OFFICE_ELEVATOR;
@@ -1031,7 +1045,7 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 				}
 				if (y == FLOOR_Y + 1 && uv[1] == 1) {
 					if (uv[0] == 2) yield Blocks.CAULDRON.defaultBlockState();
-					if (uv[0] == 3) yield Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
+					if (uv[0] == 3) yield Level4Blocks.INDUSTRIAL_TOOLBOX.defaultBlockState().setValue(Level4FacingBlock.FACING, dirFrom(poi.dir()));
 				}
 				yield null;
 			}
@@ -1046,20 +1060,20 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 						default -> Level4Plan.CELL - cx;
 					};
 					if (depth == 1 && along == 1) yield greenCarpet();
-					if (depth == 2 && along == 1) yield Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
+					if (depth == 2 && along == 1) yield Level4Blocks.MEG_SUPPLY_CRATE.defaultBlockState().setValue(Level4FacingBlock.FACING, dirFrom(poi.dir()));
 					if (depth == 2 && along == 2) yield Blocks.LANTERN.defaultBlockState();
 					if (depth == 1 && along == 5) yield Level4Blocks.ALMOND_BOTTLE_CLUSTER.defaultBlockState();
 					yield null;
 				}
 				if (poi.variantFlag() && poi.baseY() == FLOOR_Y + 6) {
 					if ((cx == 3 || cx == 4) && cz == 2) yield greenCarpet();
-					if (cx == 5 && cz == 2) yield Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
+					if (cx == 5 && cz == 2) yield Level4Blocks.MEG_SUPPLY_CRATE.defaultBlockState().setValue(Level4FacingBlock.FACING, Direction.SOUTH);
 					if (cx == 5 && cz == 3) yield Blocks.LANTERN.defaultBlockState();
 					if (cx == 3 && cz == 3) yield Level4Blocks.ALMOND_BOTTLE_CLUSTER.defaultBlockState();
 					yield null;
 				}
 				if ((cx == 1 || cx == 2) && cz == 1) yield greenCarpet();
-				if (cx == 1 && cz == 2) yield Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
+				if (cx == 1 && cz == 2) yield Level4Blocks.MEG_SUPPLY_CRATE.defaultBlockState().setValue(Level4FacingBlock.FACING, Direction.SOUTH);
 				if (cx == 2 && cz == 2) yield Blocks.LANTERN.defaultBlockState();
 				if (cx == 1 && cz == 3) yield Level4Blocks.ALMOND_BOTTLE_CLUSTER.defaultBlockState();
 				yield null;
@@ -1093,14 +1107,19 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 					yield Level4Blocks.OFFICE_BREAKER.defaultBlockState().setValue(Level4FacingBlock.FACING, backFace);
 				}
 				if (uv[0] == 5 && uv[1] == 2 && y == FLOOR_Y + 1) {
-					yield Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
+					yield Level4Blocks.INDUSTRIAL_TOOLBOX.defaultBlockState().setValue(Level4FacingBlock.FACING, dirFrom(poi.dir()));
 				}
 				yield null;
 			}
 			case DELAYED_REFLECTION_MIRROR -> {
 				if (!poi.variantFlag()) yield null;
 				int[] uv = uvFromLocal(poi.dir(), cx, cz);
-				if ((uv[0] == 2 || uv[0] == 3) && uv[1] == 1 && (y == poi.baseY() + 1 || y == poi.baseY() + 2)) {
+				if (uv[0] == 2 && uv[1] == 1 && (y == poi.baseY() + 1 || y == poi.baseY() + 2)) {
+					int sil = (y == poi.baseY() + 1) ? 1 : 2;
+					yield Level4Blocks.OFFICE_DARK_MIRROR.defaultBlockState()
+							.setValue(Level4Blocks.OfficeDarkMirrorBlock.SILHOUETTE, sil);
+				}
+				if (uv[0] == 3 && uv[1] == 1 && (y == poi.baseY() + 1 || y == poi.baseY() + 2)) {
 					yield Level4Blocks.OFFICE_DARK_MIRROR.defaultBlockState();
 				}
 				yield null;
@@ -1132,15 +1151,19 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 				if (y == FLOOR_Y + 1 || y == FLOOR_Y + 2) {
 					if (cx == 4 && cz == 4) yield ironBars(false, true, true, false);
 					if (cx == 5 && cz == 4) yield ironBars(false, false, true, true);
-					if (cx == 6 && cz == 4) yield ironBars(false, false, true, true);
-					if (cx == 4 && cz == 5) yield ironBars(true, false, true, false);
+					if (cx == 6 && cz == 4) yield ironBars(false, true, false, true);
+					if (cx == 4 && cz == 5) yield ironBars(true, false, false, false);
 				}
 				if (y == FLOOR_Y + 3) {
 					if (cx == 4 && cz == 4) yield ironBars(false, true, true, false);
-					if (cx == 5 && cz == 4) yield ironBars(false, false, true, true);
-					if (cx == 6 && cz == 4) yield ironBars(false, false, true, true);
-					if (cx == 4 && cz == 5) yield ironBars(true, true, false, false);
-					if (cx == 4 && cz == 6) yield ironBars(true, true, false, false);
+					if (cx == 5 && cz == 4) yield ironBars(false, true, true, true);
+					if (cx == 6 && cz == 4) yield ironBars(false, true, false, true);
+					if (cx == 4 && cz == 5) yield ironBars(true, true, true, false);
+					if (cx == 4 && cz == 6) yield ironBars(true, false, true, false);
+					if (cx == 5 && cz == 5) yield ironBars(true, true, true, true);
+					if (cx == 6 && cz == 5) yield ironBars(true, true, false, true);
+					if (cx == 5 && cz == 6) yield ironBars(true, false, true, true);
+					if (cx == 6 && cz == 6) yield ironBars(true, false, false, true);
 				}
 				if (cx == 5 && cz == 5 && (y == FLOOR_Y + 1 || y == FLOOR_Y + 2)) {
 					yield Level4Blocks.TBD_HOARD_CRATE.defaultBlockState().setValue(Level4FacingBlock.FACING, Direction.NORTH);
@@ -1149,8 +1172,11 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 					if (cx == 6 && cz == 5) {
 						yield Level4Blocks.TBD_CURIO_SHELF.defaultBlockState().setValue(Level4FacingBlock.FACING, Direction.WEST);
 					}
-					if ((cx == 5 || cx == 6) && cz == 6) {
-						yield Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
+					if (cx == 5 && cz == 6) {
+						yield Level4Blocks.MEG_SUPPLY_CRATE.defaultBlockState().setValue(Level4FacingBlock.FACING, Direction.WEST);
+					}
+					if (cx == 6 && cz == 6) {
+						yield Level4Blocks.OFFICE_STEEL_SAFE.defaultBlockState().setValue(Level4FacingBlock.FACING, Direction.WEST);
 					}
 				}
 				yield null;
@@ -1191,7 +1217,7 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 				if (y == FLOOR_Y + 1) {
 					int[] uv = uvFromLocal(poi.dir(), cx, cz);
 					if (uv[0] == 2 && uv[1] == 2) yield Level4Blocks.ALMOND_BOTTLE_CLUSTER.defaultBlockState();
-					if (uv[0] == 4 && uv[1] == 2) yield Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
+					if (uv[0] == 4 && uv[1] == 2) yield Level4Blocks.MEG_SUPPLY_CRATE.defaultBlockState().setValue(Level4FacingBlock.FACING, dirFrom(poi.dir()));
 				}
 				yield null;
 			}
@@ -1199,8 +1225,11 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 				int ci = Math.floorMod(Math.floorDiv(x, Level4Plan.CELL), Level4Plan.N);
 				int cj = Math.floorMod(Math.floorDiv(z, Level4Plan.CELL), Level4Plan.N);
 				if (ci == poi.cellI() && cj == poi.cellJ() && y == FLOOR_Y + 1) {
+					if ((cx == 2 || cx == 3) && cz == 4) {
+						yield Level1Blocks.OFFICE_DESK.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH);
+					}
 					if (cx == 2 && cz == 2) yield Level4Blocks.ALMOND_BOTTLE_CLUSTER.defaultBlockState();
-					if (cx == 5 && cz == 2) yield Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
+					if (cx == 5 && cz == 2) yield Level4Blocks.OFFICE_STEEL_SAFE.defaultBlockState().setValue(Level4FacingBlock.FACING, Direction.WEST);
 					if (cx == 5 && cz == 5) {
 						yield Level4Blocks.OFFICE_WATER_COOLER.defaultBlockState()
 								.setValue(Level4WaterSourceBlock.FACING, Direction.NORTH)
@@ -1219,7 +1248,7 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 								.setValue(Level4ExitBlock.FACING, Direction.SOUTH);
 					}
 					if (cx == 5 && cz == 1 && y == FLOOR_Y + 1) {
-						yield Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
+						yield Level4Blocks.MEG_SUPPLY_CRATE.defaultBlockState().setValue(Level4FacingBlock.FACING, Direction.SOUTH);
 					}
 				}
 				yield null;
@@ -1236,8 +1265,7 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 						yield Blocks.DARK_OAK_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.TOP);
 					}
 					if (cx == 3 && cz == 4) yield redCarpet();
-					if (cx == 5 && cz == 5) yield Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
-					if (cx == 5 && cz == 4) yield Blocks.IRON_BLOCK.defaultBlockState();
+					if (cx == 5 && cz == 5) yield Level4Blocks.OFFICE_STEEL_SAFE.defaultBlockState().setValue(Level4FacingBlock.FACING, Direction.WEST);
 				}
 				yield null;
 			}

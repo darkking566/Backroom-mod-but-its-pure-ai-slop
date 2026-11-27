@@ -114,58 +114,84 @@ def draw_caution_tape() -> Image.Image:
     return img
 
 
-def draw_office_dark_mirror() -> Image.Image:
+def draw_office_dark_mirror(mode: str = "plain") -> Image.Image:
     # 128x128 opaque dark mirror glass: sleek anodized dark aluminum border, obsidian-blue-gray mirror,
-    # diagonal cool-silver specular reflection bands, and a faint ghostly silhouette in pale mist.
+    # diagonal cool-silver specular reflection bands. "top" and "bottom" form ONE tall 2-block silhouette.
     img = Image.new("RGBA", (SIZE, SIZE), (18, 22, 28, 255))
     d = ImageDraw.Draw(img)
 
-    # Outer anodized dark aluminum frame & inner bevel
-    d.rectangle([0, 0, SIZE - 1, SIZE - 1], fill=(32, 36, 42, 255))
-    d.rectangle([4, 4, SIZE - 5, SIZE - 5], fill=(22, 26, 32, 255))
-    d.rectangle([6, 6, SIZE - 7, SIZE - 7], fill=(15, 19, 26, 255))
-
     # Subtle vertical foggy reflection tint gradient & faint office horizon
-    for y in range(7, SIZE - 7):
-        t = (y - 7) / (SIZE - 14)
+    for y in range(SIZE):
+        t = y / float(SIZE - 1)
         base_r = int(14 + 10 * (1.0 - t))
         base_g = int(18 + 14 * (1.0 - t))
         base_b = int(26 + 18 * (1.0 - t))
-        d.line([(7, y), (SIZE - 8, y)], fill=(base_r, base_g, base_b, 255))
+        d.line([(0, y), (SIZE - 1, y)], fill=(base_r, base_g, base_b, 255))
 
     # Diagonal cool-silver specular reflection bands
     d.polygon([(14, 7), (42, 7), (7, 42), (7, 14)], fill=(42, 52, 66, 255))
     d.polygon([(52, 7), (68, 7), (7, 68), (7, 52)], fill=(34, 43, 56, 255))
     d.polygon([(SIZE - 8, 56), (SIZE - 8, 76), (56, SIZE - 8), (76, SIZE - 8)], fill=(36, 45, 58, 255))
 
-    # Faint ghostly silhouette standing in pale mist near center-right
-    mist_color = (48, 58, 70, 255)
-    silhouette = (9, 11, 15, 255)
-    d.ellipse([66, 38, 98, 92], fill=mist_color)
-    d.ellipse([75, 44, 89, 58], fill=silhouette)
-    d.polygon([(70, 60), (94, 60), (98, 108), (66, 108)], fill=silhouette)
+    mist_color = (46, 56, 68, 255)
+    silhouette = (8, 10, 14, 255)
+    if mode == "top":
+        d.line([(6, SIZE - 1), (SIZE - 7, SIZE - 1)], fill=(28, 33, 41, 255), width=1)
+        d.ellipse([36, 26, 92, 127], fill=mist_color)
+        d.ellipse([51, 34, 77, 62], fill=silhouette)
+        d.rectangle([59, 60, 69, 74], fill=silhouette)
+        d.polygon([(44, 76), (64, 68), (84, 76), (86, SIZE - 1), (42, SIZE - 1)], fill=silhouette)
+    elif mode == "bottom":
+        d.line([(6, 0), (SIZE - 7, 0)], fill=(28, 33, 41, 255), width=1)
+        d.ellipse([36, -12, 92, 118], fill=mist_color)
+        d.polygon([(42, 0), (86, 0), (82, 121), (46, 121)], fill=silhouette)
 
-    # Re-draw crisp inner highlight & shadow border around mirror glass
-    d.rectangle([5, 5, SIZE - 6, SIZE - 6], outline=(58, 66, 78, 255), width=1)
-    d.rectangle([0, 0, SIZE - 1, SIZE - 1], outline=(24, 27, 33, 255), width=2)
+    # Side frames (always present so stacked mirror panes join vertically)
+    d.rectangle([0, 0, 5, SIZE - 1], fill=(22, 26, 32, 255))
+    d.rectangle([0, 0, 3, SIZE - 1], fill=(32, 36, 42, 255))
+    d.line([(5, 0), (5, SIZE - 1)], fill=(58, 66, 78, 255), width=1)
+    d.line([(0, 0), (0, SIZE - 1)], fill=(24, 27, 33, 255), width=2)
+
+    d.rectangle([SIZE - 6, 0, SIZE - 1, SIZE - 1], fill=(22, 26, 32, 255))
+    d.rectangle([SIZE - 4, 0, SIZE - 1, SIZE - 1], fill=(32, 36, 42, 255))
+    d.line([(SIZE - 6, 0), (SIZE - 6, SIZE - 1)], fill=(58, 66, 78, 255), width=1)
+    d.line([(SIZE - 1, 0), (SIZE - 1, SIZE - 1)], fill=(24, 27, 33, 255), width=2)
+
+    if mode != "bottom":
+        d.rectangle([0, 0, SIZE - 1, 5], fill=(22, 26, 32, 255))
+        d.rectangle([0, 0, SIZE - 1, 3], fill=(32, 36, 42, 255))
+        d.line([(5, 5), (SIZE - 6, 5)], fill=(58, 66, 78, 255), width=1)
+        d.line([(0, 0), (SIZE - 1, 0)], fill=(24, 27, 33, 255), width=2)
+    if mode != "top":
+        d.rectangle([0, SIZE - 6, SIZE - 1, SIZE - 1], fill=(22, 26, 32, 255))
+        d.rectangle([0, SIZE - 4, SIZE - 1, SIZE - 1], fill=(32, 36, 42, 255))
+        d.line([(5, SIZE - 6), (SIZE - 6, SIZE - 6)], fill=(58, 66, 78, 255), width=1)
+        d.line([(0, SIZE - 1), (SIZE - 1, SIZE - 1)], fill=(24, 27, 33, 255), width=2)
     return img
 
 
-def save_mirror_pbr(name: str, rgba: Image.Image):
+def save_mirror_pbr(name: str, rgba: Image.Image, mode: str = "plain"):
     TEXTURES.mkdir(parents=True, exist_ok=True)
     rgba.save(TEXTURES / f"{name}.png", optimize=True)
     # Flat normal with subtle frame bevel
     n_img = Image.new("RGBA", (SIZE, SIZE), (128, 128, 255, 255))
     nd = ImageDraw.Draw(n_img)
-    nd.rectangle([0, 0, SIZE - 1, 4], fill=(128, 108, 252, 255))
-    nd.rectangle([0, SIZE - 5, SIZE - 1, SIZE - 1], fill=(128, 148, 252, 255))
+    if mode != "bottom":
+        nd.rectangle([0, 0, SIZE - 1, 4], fill=(128, 108, 252, 255))
+    if mode != "top":
+        nd.rectangle([0, SIZE - 5, SIZE - 1, SIZE - 1], fill=(128, 148, 252, 255))
     nd.rectangle([0, 0, 4, SIZE - 1], fill=(108, 128, 252, 255))
     nd.rectangle([SIZE - 5, 0, SIZE - 1, SIZE - 1], fill=(148, 128, 252, 255))
     n_img.save(TEXTURES / f"{name}_n.png", optimize=True)
     # High-gloss mirror glass inside, matte anodized aluminum frame
     s_img = Image.new("RGBA", (SIZE, SIZE), (242, 118, 0, 255))
     sd = ImageDraw.Draw(s_img)
-    sd.rectangle([0, 0, SIZE - 1, SIZE - 1], outline=(110, 145, 0, 255), width=6)
+    sd.rectangle([0, 0, 5, SIZE - 1], fill=(110, 145, 0, 255))
+    sd.rectangle([SIZE - 6, 0, SIZE - 1, SIZE - 1], fill=(110, 145, 0, 255))
+    if mode != "bottom":
+        sd.rectangle([0, 0, SIZE - 1, 5], fill=(110, 145, 0, 255))
+    if mode != "top":
+        sd.rectangle([0, SIZE - 6, SIZE - 1, SIZE - 1], fill=(110, 145, 0, 255))
     s_img.save(TEXTURES / f"{name}_s.png", optimize=True)
 
 
@@ -337,6 +363,165 @@ def write_loot_self(name: str):
     })
 
 
+def box_faces(tex: str, sides_uv=None):
+    uv = sides_uv or [0, 0, 16, 16]
+    return {f: {"uv": uv, "texture": f"#{tex}"} for f in ("north", "south", "east", "west", "up", "down")}
+
+
+def save_pbr_pair(name: str, rgba: Image.Image, n_img: Image.Image, s_img: Image.Image):
+    TEXTURES.mkdir(parents=True, exist_ok=True)
+    rgba.save(TEXTURES / f"{name}.png", optimize=True)
+    n_img.save(TEXTURES / f"{name}_n.png", optimize=True)
+    s_img.save(TEXTURES / f"{name}_s.png", optimize=True)
+
+
+def make_bevel_normal(border: int = 4, strength: int = 24) -> Image.Image:
+    n_img = Image.new("RGBA", (SIZE, SIZE), (128, 128, 255, 255))
+    nd = ImageDraw.Draw(n_img)
+    nd.rectangle([0, 0, SIZE - 1, border], fill=(128, max(0, 128 - strength), 252, 255))
+    nd.rectangle([0, SIZE - 1 - border, SIZE - 1, SIZE - 1], fill=(128, min(255, 128 + strength), 252, 255))
+    nd.rectangle([0, 0, border, SIZE - 1], fill=(max(0, 128 - strength), 128, 252, 255))
+    nd.rectangle([SIZE - 1 - border, 0, SIZE - 1, SIZE - 1], fill=(min(255, 128 + strength), 128, 252, 255))
+    return n_img
+
+
+def draw_meg_supply_crate():
+    # Slate-blue polymer/steel M.E.G. tactical field crate
+    side = Image.new("RGBA", (SIZE, SIZE), (34, 54, 82, 255))
+    px = side.load()
+    for y in range(SIZE):
+        for x in range(SIZE):
+            rib = 6 if (y // 8) % 2 == 0 and 24 <= x <= 104 and 32 <= y <= 108 else 0
+            grain = int(math.sin(x * 0.25 + y * 0.17) * 3)
+            px[x, y] = (34 + rib + grain, 54 + rib + grain, 82 + rib + grain, 255)
+    sd = ImageDraw.Draw(side)
+    # Dark charcoal corner bumpers
+    for bx, by in [(0, 0), (SIZE - 20, 0), (0, SIZE - 20), (SIZE - 20, SIZE - 20)]:
+        sd.rectangle([bx, by, bx + 19, by + 19], fill=(24, 28, 34, 255))
+    sd.rectangle([0, 0, SIZE - 1, 14], fill=(28, 34, 42, 255))
+    sd.rectangle([0, SIZE - 12, SIZE - 1, SIZE - 1], fill=(24, 28, 34, 255))
+    # Thin yellow hazard accent stripe & metallic latch plates
+    sd.rectangle([20, 16, SIZE - 21, 22], fill=(216, 174, 42, 255))
+    for lx in (24, 92):
+        sd.rectangle([lx, 12, lx + 12, 34], fill=(138, 148, 158, 255), outline=(44, 48, 54, 255), width=2)
+    # Stenciled white M.E.G. mark
+    st = (224, 234, 244, 255)
+    sd.line([(40, 86), (40, 62), (48, 74), (56, 62), (56, 86)], fill=st, width=3)
+    sd.line([(64, 62), (64, 86)], fill=st, width=3)
+    sd.line([(64, 62), (76, 62)], fill=st, width=3)
+    sd.line([(64, 74), (74, 74)], fill=st, width=3)
+    sd.line([(64, 86), (76, 86)], fill=st, width=3)
+    sd.arc([82, 62, 96, 86], start=35, end=325, fill=st, width=3)
+    sd.line([(90, 74), (96, 74), (96, 83)], fill=st, width=3)
+
+    n_side = make_bevel_normal(5, 22)
+    s_side = Image.new("RGBA", (SIZE, SIZE), (58, 20, 12, 255))
+    ssd = ImageDraw.Draw(s_side)
+    for lx in (24, 92):
+        ssd.rectangle([lx, 12, lx + 12, 34], fill=(175, 195, 0, 255))
+
+    top = Image.new("RGBA", (SIZE, SIZE), (38, 60, 92, 255))
+    tpx = top.load()
+    for y in range(SIZE):
+        for x in range(SIZE):
+            rib = 7 if (20 <= x <= 108 and 18 <= y <= 110 and (x // 12) % 2 == 0) else 0
+            tpx[x, y] = (38 + rib, 60 + rib, 92 + rib, 255)
+    td = ImageDraw.Draw(top)
+    td.rectangle([0, 0, SIZE - 1, SIZE - 1], outline=(24, 28, 34, 255), width=8)
+    for bx, by in [(0, 0), (SIZE - 22, 0), (0, SIZE - 22), (SIZE - 22, SIZE - 22)]:
+        td.rectangle([bx, by, bx + 21, by + 21], fill=(24, 28, 34, 255))
+    td.polygon([(64, 42), (86, 64), (64, 86), (42, 64)], fill=(28, 44, 68, 255), outline=(216, 174, 42, 255))
+    n_top = make_bevel_normal(6, 26)
+    s_top = Image.new("RGBA", (SIZE, SIZE), (62, 22, 10, 255))
+    return (side, n_side, s_side), (top, n_top, s_top)
+
+
+def draw_industrial_toolbox():
+    # Red enameled steel cantilever toolbox
+    side = Image.new("RGBA", (SIZE, SIZE), (154, 28, 28, 255))
+    px = side.load()
+    for y in range(SIZE):
+        for x in range(SIZE):
+            scuff = int(math.sin(x * 0.19 + y * 0.31) * 5 + math.cos(x * 0.07) * 4)
+            px[x, y] = (max(0, min(255, 152 + scuff)), max(0, min(255, 28 + scuff // 3)), max(0, min(255, 28 + scuff // 3)), 255)
+    sd = ImageDraw.Draw(side)
+    # Corner guards & recessed clasp band
+    sd.rectangle([0, 0, SIZE - 1, SIZE - 1], outline=(82, 18, 18, 255), width=4)
+    sd.rectangle([6, 44, SIZE - 7, 52], fill=(192, 198, 206, 255), outline=(58, 62, 68, 255), width=1)
+    sd.rectangle([50, 32, 78, 66], fill=(176, 184, 192, 255), outline=(48, 52, 58, 255), width=2)
+    sd.rectangle([58, 42, 70, 56], fill=(74, 78, 84, 255))
+    for bx, by in [(0, 0), (SIZE - 16, 0), (0, SIZE - 16), (SIZE - 16, SIZE - 16)]:
+        sd.rectangle([bx, by, bx + 15, by + 15], fill=(42, 46, 52, 255))
+
+    n_side = make_bevel_normal(4, 24)
+    nd = ImageDraw.Draw(n_side)
+    nd.rectangle([6, 44, SIZE - 7, 52], fill=(128, 150, 250, 255))
+    s_side = Image.new("RGBA", (SIZE, SIZE), (145, 42, 0, 255))
+    ssd = ImageDraw.Draw(s_side)
+    ssd.rectangle([6, 44, SIZE - 7, 52], fill=(195, 210, 0, 255))
+    ssd.rectangle([50, 32, 78, 66], fill=(195, 210, 0, 255))
+
+    top = Image.new("RGBA", (SIZE, SIZE), (160, 32, 32, 255))
+    tpx = top.load()
+    for y in range(SIZE):
+        for x in range(SIZE):
+            rib = 8 if 28 <= y <= 100 and (y // 16) % 2 == 0 else 0
+            tpx[x, y] = (160 + rib, 32 + rib // 2, 32 + rib // 2, 255)
+    td = ImageDraw.Draw(top)
+    td.rectangle([0, 0, SIZE - 1, SIZE - 1], outline=(82, 18, 18, 255), width=5)
+    td.rectangle([38, 52, 50, 76], fill=(176, 184, 192, 255), outline=(48, 52, 58, 255), width=2)
+    td.rectangle([78, 52, 90, 76], fill=(176, 184, 192, 255), outline=(48, 52, 58, 255), width=2)
+    n_top = make_bevel_normal(5, 24)
+    s_top = Image.new("RGBA", (SIZE, SIZE), (150, 42, 0, 255))
+    return (side, n_side, s_side), (top, n_top, s_top)
+
+
+def draw_office_steel_safe():
+    # Heavy charcoal steel office safe (front with brushed steel dial + side casing)
+    side = Image.new("RGBA", (SIZE, SIZE), (48, 52, 58, 255))
+    spx = side.load()
+    for y in range(SIZE):
+        for x in range(SIZE):
+            br = int(math.sin(y * 0.7 + math.sin(x * 0.08)) * 3 + math.cos(x * 0.05) * 2)
+            spx[x, y] = (48 + br, 52 + br, 58 + br, 255)
+    sd = ImageDraw.Draw(side)
+    sd.rectangle([0, 0, SIZE - 1, SIZE - 1], outline=(28, 31, 36, 255), width=5)
+    for rx, ry in [(12, 12), (SIZE - 13, 12), (12, SIZE - 13), (SIZE - 13, SIZE - 13)]:
+        sd.ellipse([rx - 3, ry - 3, rx + 3, ry + 3], fill=(92, 98, 106, 255), outline=(24, 26, 30, 255))
+    n_side = make_bevel_normal(5, 26)
+    spec_side = Image.new("RGBA", (SIZE, SIZE), (112, 165, 0, 255))
+
+    front = side.copy()
+    fd = ImageDraw.Draw(front)
+    # Recessed door seam & hinge knuckles on left
+    fd.rectangle([10, 10, SIZE - 11, SIZE - 11], outline=(20, 22, 26, 255), width=3)
+    fd.rectangle([14, 14, SIZE - 15, SIZE - 15], outline=(70, 76, 84, 255), width=1)
+    for hy in (28, 82):
+        fd.rectangle([6, hy, 14, hy + 18], fill=(116, 122, 130, 255), outline=(24, 26, 30, 255), width=1)
+    # Brushed steel combination dial & tick marks
+    fd.ellipse([44, 34, 84, 74], fill=(168, 174, 184, 255), outline=(30, 34, 38, 255), width=3)
+    fd.ellipse([54, 44, 74, 64], fill=(42, 46, 52, 255), outline=(120, 126, 134, 255), width=2)
+    for k in range(12):
+        ang = k * (math.pi * 2 / 12)
+        x0 = int(64 + math.cos(ang) * 14)
+        y0 = int(54 + math.sin(ang) * 14)
+        x1 = int(64 + math.cos(ang) * 19)
+        y1 = int(54 + math.sin(ang) * 19)
+        fd.line([(x0, y0), (x1, y1)], fill=(28, 30, 34, 255), width=1)
+    # Handle plate & tiny green/red lock LED
+    fd.rectangle([86, 62, 106, 86], fill=(138, 144, 154, 255), outline=(26, 28, 32, 255), width=2)
+    fd.rectangle([88, 34, 98, 40], fill=(74, 224, 110, 255))
+
+    n_front = make_bevel_normal(5, 28)
+    nfd = ImageDraw.Draw(n_front)
+    nfd.rectangle([10, 10, SIZE - 11, SIZE - 11], outline=(102, 102, 250, 255), width=3)
+    spec_front = Image.new("RGBA", (SIZE, SIZE), (118, 172, 0, 255))
+    sfd = ImageDraw.Draw(spec_front)
+    sfd.ellipse([44, 34, 84, 74], fill=(205, 225, 0, 255))
+    sfd.rectangle([86, 62, 106, 86], fill=(190, 215, 0, 255))
+    return (front, n_front, spec_front), (side, n_side, spec_side)
+
+
 def main():
     # 1. meg_chalk_sign (normal + slashed)
     save_cutout_pbr("meg_chalk_sign", draw_meg_chalk_sign(False), smooth=18, f0=8, porosity=65)
@@ -390,14 +575,24 @@ def main():
     write_item_files("caution_tape_barrier")
     write_loot_self("caution_tape_barrier")
 
-    # 3. office_dark_mirror (Batch 2 POI #9 - unbreakable opaque dark reflective mirror)
-    save_mirror_pbr("office_dark_mirror", draw_office_dark_mirror())
-    write_json(MODELS / "office_dark_mirror.json", {
-        "parent": "minecraft:block/cube_all",
-        "textures": {"all": NS + "office_dark_mirror"}
-    })
+    # 3. office_dark_mirror (Batch 2 POI #9 - unbreakable 3-variant dark mirror: plain + unified 2-tall silhouette)
+    mirror_variants = [
+        ("office_dark_mirror", "plain"),
+        ("office_dark_mirror_figure_bottom", "bottom"),
+        ("office_dark_mirror_figure_top", "top"),
+    ]
+    for tex_name, mode in mirror_variants:
+        save_mirror_pbr(tex_name, draw_office_dark_mirror(mode), mode)
+        write_json(MODELS / f"{tex_name}.json", {
+            "parent": "minecraft:block/cube_all",
+            "textures": {"all": NS + tex_name}
+        })
     write_json(BLOCKSTATES / "office_dark_mirror.json", {
-        "variants": {"": {"model": NS + "office_dark_mirror"}}
+        "variants": {
+            "silhouette=0": {"model": NS + "office_dark_mirror"},
+            "silhouette=1": {"model": NS + "office_dark_mirror_figure_bottom"},
+            "silhouette=2": {"model": NS + "office_dark_mirror_figure_top"},
+        }
     })
     write_item_files("office_dark_mirror")
 
@@ -452,7 +647,102 @@ def main():
         "variants": {"": {"model": NS + "office_elevator_frame"}}
     })
     write_item_files("office_elevator_frame")
-    print("Generated Level 4 Batch 1..4 POI assets complete (office_elevator_frame added)")
+
+    # 7. Route A POI container blocks (replaces all vanilla wooden barrels in Level 4 POIs)
+    (crate_side, crate_n, crate_s), (crate_top, crate_tn, crate_ts) = draw_meg_supply_crate()
+    save_pbr_pair("office_supply_crate_side", crate_side, crate_n, crate_s)
+    save_pbr_pair("office_supply_crate_top", crate_top, crate_tn, crate_ts)
+    crate_side_faces = {f: {"uv": [1, 4, 15, 15], "texture": "#side"} for f in ("north", "south", "east", "west")}
+    crate_side_faces["down"] = {"uv": [1, 2, 15, 14], "texture": "#top"}
+    crate_lid_faces = {f: {"uv": [0, 0, 16, 2], "texture": "#top"} for f in ("north", "south", "east", "west")}
+    crate_lid_faces["up"] = {"uv": [0, 0, 16, 16], "texture": "#top"}
+    crate_lid_faces["down"] = {"uv": [0, 0, 16, 16], "texture": "#top"}
+    write_json(MODELS / "office_supply_crate.json", {
+        "textures": {
+            "side": NS + "office_supply_crate_side",
+            "top": NS + "office_supply_crate_top",
+            "particle": NS + "office_supply_crate_side"
+        },
+        "elements": [
+            {"from": [1, 0, 2], "to": [15, 9, 14], "faces": crate_side_faces},
+            {"from": [0.75, 9, 1.75], "to": [15.25, 11, 14.25], "faces": crate_lid_faces},
+            {"from": [3.5, 7, 1.3], "to": [5, 10, 2], "faces": box_faces("side", [3, 1, 5, 4])},
+            {"from": [11, 7, 1.3], "to": [12.5, 10, 2], "faces": box_faces("side", [11, 1, 13, 4])},
+            {"from": [6, 11, 7], "to": [10, 12, 9], "faces": box_faces("top", [0, 0, 3, 3])}
+        ]
+    })
+    write_json(BLOCKSTATES / "office_supply_crate.json", {
+        "variants": {
+            f"facing={facing}": {"model": NS + "office_supply_crate", **({"y": y} if y else {})}
+            for facing, y in [("north", 0), ("east", 90), ("south", 180), ("west", 270)]
+        }
+    })
+    write_item_files("office_supply_crate")
+    write_loot_self("office_supply_crate")
+
+    (tb_side, tb_n, tb_s), (tb_top, tb_tn, tb_ts) = draw_industrial_toolbox()
+    save_pbr_pair("industrial_toolbox_side", tb_side, tb_n, tb_s)
+    save_pbr_pair("industrial_toolbox_top", tb_top, tb_tn, tb_ts)
+    tb_body_faces = {f: {"uv": [1, 6, 15, 15], "texture": "#side"} for f in ("north", "south", "east", "west")}
+    tb_body_faces["down"] = {"uv": [1, 3, 15, 13], "texture": "#top"}
+    tb_lid_faces = {f: {"uv": [1, 0, 15, 3], "texture": "#top"} for f in ("north", "south", "east", "west")}
+    tb_lid_faces["up"] = {"uv": [1, 3, 15, 13], "texture": "#top"}
+    tb_lid_faces["down"] = {"uv": [1, 3, 15, 13], "texture": "#top"}
+    write_json(MODELS / "industrial_toolbox.json", {
+        "textures": {
+            "side": NS + "industrial_toolbox_side",
+            "top": NS + "industrial_toolbox_top",
+            "particle": NS + "industrial_toolbox_side"
+        },
+        "elements": [
+            {"from": [1, 0, 3], "to": [15, 7.5, 13], "faces": tb_body_faces},
+            {"from": [1.5, 7.5, 3.5], "to": [14.5, 9.5, 12.5], "faces": tb_lid_faces},
+            {"from": [7, 6.2, 2.5], "to": [9, 8.6, 3.1], "faces": box_faces("side", [7, 5, 9, 8])},
+            {"from": [5, 9.5, 7.5], "to": [6, 11, 8.5], "faces": box_faces("side", [7, 5, 8, 7])},
+            {"from": [10, 9.5, 7.5], "to": [11, 11, 8.5], "faces": box_faces("side", [7, 5, 8, 7])},
+            {"from": [5, 10.5, 7.5], "to": [11, 11.3, 8.5], "faces": box_faces("side", [5, 5, 11, 6])}
+        ]
+    })
+    write_json(BLOCKSTATES / "industrial_toolbox.json", {
+        "variants": {
+            f"facing={facing}": {"model": NS + "industrial_toolbox", **({"y": y} if y else {})}
+            for facing, y in [("north", 0), ("east", 90), ("south", 180), ("west", 270)]
+        }
+    })
+    write_item_files("industrial_toolbox")
+    write_loot_self("industrial_toolbox")
+
+    (safe_front, safe_fn, safe_fs), (safe_side, safe_sn, safe_ss) = draw_office_steel_safe()
+    save_pbr_pair("office_steel_safe_front", safe_front, safe_fn, safe_fs)
+    save_pbr_pair("office_steel_safe_side", safe_side, safe_sn, safe_ss)
+    safe_body_faces = {f: {"uv": [1, 1, 15, 15], "texture": "#side"} for f in ("south", "east", "west", "up", "down")}
+    safe_body_faces["north"] = {"uv": [1, 1, 15, 15], "texture": "#front"}
+    safe_door_faces = {f: {"uv": [0, 0, 16, 16], "texture": "#side"} for f in ("south", "east", "west", "up", "down")}
+    safe_door_faces["north"] = {"uv": [1, 1, 15, 15], "texture": "#front"}
+    write_json(MODELS / "office_steel_safe.json", {
+        "textures": {
+            "front": NS + "office_steel_safe_front",
+            "side": NS + "office_steel_safe_side",
+            "particle": NS + "office_steel_safe_side"
+        },
+        "elements": [
+            {"from": [1, 0, 1.5], "to": [15, 15, 15], "faces": safe_body_faces},
+            {"from": [2, 1, 1], "to": [14, 14, 1.5], "faces": safe_door_faces},
+            {"from": [6.5, 8.5, 0.4], "to": [9.5, 11.5, 1], "faces": box_faces("front", [6, 4, 10, 8])},
+            {"from": [10.5, 6.5, 0.3], "to": [12.5, 7.8, 1], "faces": box_faces("front", [11, 8, 13, 10])},
+            {"from": [1.1, 3, 0.7], "to": [2, 5, 1.5], "faces": box_faces("front", [1, 10, 2, 12])},
+            {"from": [1.1, 10, 0.7], "to": [2, 12, 1.5], "faces": box_faces("front", [1, 3, 2, 5])}
+        ]
+    })
+    write_json(BLOCKSTATES / "office_steel_safe.json", {
+        "variants": {
+            f"facing={facing}": {"model": NS + "office_steel_safe", **({"y": y} if y else {})}
+            for facing, y in [("north", 0), ("east", 90), ("south", 180), ("west", 270)]
+        }
+    })
+    write_item_files("office_steel_safe")
+    write_loot_self("office_steel_safe")
+    print("Generated Level 4 Batch 1..4 + Route A POI assets complete")
 
 
 if __name__ == "__main__":

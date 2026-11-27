@@ -164,10 +164,11 @@ final class Level4Props {
 						BackroomsProps.INDUSTRIAL_FUSE_BOX, Direction.EAST);
 			}
 			case FROZEN_FRIDAY_1998 -> {
-				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 2, y, bz + 4), BackroomsProps.PROP_FOLDING_TABLE, Direction.NORTH);
-				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 2, y, bz + 3), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.SOUTH);
-				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 4), BackroomsProps.PROP_OFFICE_CHAIR, Direction.NORTH);
-				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 1, y, bz + 5), BackroomsProps.PROP_POTTED_PLANT_PLASTIC, Direction.SOUTH);
+				any |= tryPlaceOnDesk(chunk, minX, minZ, new BlockPos(bx + 2, y + 1, bz + 4), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.NORTH);
+				any |= tryPlaceOnDesk(chunk, minX, minZ, new BlockPos(bx + 3, y + 1, bz + 4), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.NORTH);
+				any |= tryPlacePoiSingle(chunk, minX, minZ, new BlockPos(bx + 2, y, bz + 3), BackroomsProps.PROP_OFFICE_CHAIR, Direction.SOUTH);
+				any |= tryPlacePoiSingle(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 3), BackroomsProps.PROP_OFFICE_CHAIR, Direction.SOUTH);
+				any |= tryPlacePoiSingle(chunk, minX, minZ, new BlockPos(bx + 1, y, bz + 5), BackroomsProps.PROP_POTTED_PLANT_PLASTIC, Direction.SOUTH);
 				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 5, y, bz + 4), BackroomsProps.PROP_FILE_CABINET, Direction.WEST);
 			}
 			case EXECUTIVE_BROADCAST_SUITE -> {

@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -173,7 +174,7 @@ public final class Level4Blocks {
 
 	// Batch 2 POI blocks
 	public static final Block OFFICE_DARK_MIRROR = register("office_dark_mirror",
-			unbreakable(MapColor.COLOR_BLACK, SoundType.GLASS));
+			unbreakable(MapColor.COLOR_BLACK, SoundType.GLASS), OfficeDarkMirrorBlock::new);
 
 	// Batch 3 POI blocks
 	public static final Block CORRUPTED_FOUNTAIN_POOL = register("corrupted_fountain_pool",
@@ -187,6 +188,20 @@ public final class Level4Blocks {
 			Properties.of().mapColor(MapColor.COLOR_RED)
 					.strength(2.0F).sound(SoundType.METAL).noOcclusion().lightLevel(s -> 4),
 			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(1, 0, 2, 15, 14, 14)));
+
+	// Route A POI container blocks
+	public static final Block MEG_SUPPLY_CRATE = register("office_supply_crate",
+			Properties.of().mapColor(MapColor.COLOR_BLUE)
+					.strength(2.5F, 6.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(1, 0, 2, 15, 11, 14)));
+	public static final Block INDUSTRIAL_TOOLBOX = register("industrial_toolbox",
+			Properties.of().mapColor(MapColor.COLOR_RED)
+					.strength(2.5F, 5.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(1, 0, 3, 15, 10, 13)));
+	public static final Block OFFICE_STEEL_SAFE = register("office_steel_safe",
+			Properties.of().mapColor(MapColor.COLOR_GRAY)
+					.strength(4.0F, 8.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(1, 0, 1, 15, 15, 15)));
 
 	private Level4Blocks() {
 	}
@@ -328,6 +343,20 @@ public final class Level4Blocks {
 		@Override
 		protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 			builder.add(SAMPLED);
+		}
+	}
+
+	static final class OfficeDarkMirrorBlock extends Block {
+		static final IntegerProperty SILHOUETTE = IntegerProperty.create("silhouette", 0, 2);
+
+		OfficeDarkMirrorBlock(Properties properties) {
+			super(properties);
+			registerDefaultState(defaultBlockState().setValue(SILHOUETTE, 0));
+		}
+
+		@Override
+		protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+			builder.add(SILHOUETTE);
 		}
 	}
 }

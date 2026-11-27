@@ -783,9 +783,9 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		server.runOnServer(s -> {
 			ServerLevel l4 = level4(s);
 			boolean foundDeskPc = false;
-			for (int dx = 0; dx < Level4Plan.CELL; dx++) {
-				for (int dz = 0; dz < Level4Plan.CELL; dz++) {
-					BlockPos deskPos = new BlockPos(terminal[0] + dx, STAND, terminal[2] + dz);
+			for (int cx = 0; cx < Level4Plan.CELL; cx++) {
+				for (int cz = 0; cz < Level4Plan.CELL; cz++) {
+					BlockPos deskPos = new BlockPos(terminal[0] + cx, STAND, terminal[2] + cz);
 					check(!l4.getBlockState(deskPos).is(BackroomsProps.PROP_DESKTOP_COMPUTER),
 							"terminal computer should sit on a desk, not on the floor at " + deskPos);
 					if (l4.getBlockState(deskPos).is(Level1Blocks.OFFICE_DESK)
@@ -810,6 +810,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			ServerPlayer p = player(s);
 			p.getInventory().clearContent();
 			BlockPos barrel = new BlockPos(bx, STAND, bz);
+			check(l4.getBlockState(barrel).is(Level4Blocks.INDUSTRIAL_TOOLBOX),
+					"expected INDUSTRIAL_TOOLBOX on paint cart at " + barrel);
 			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
 					new BlockHitResult(Vec3.atCenterOf(barrel), Direction.UP, barrel, false));
 			var blackDye = BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace("black_dye"));
@@ -839,13 +841,13 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			for (int x = camp[0]; x < camp[0] + Level4Plan.CELL && campBarrelRef[0] == null; x++) {
 				for (int z = camp[2]; z < camp[2] + Level4Plan.CELL; z++) {
 					BlockPos cand = new BlockPos(x, campStandY, z);
-					if (l4.getBlockState(cand).is(net.minecraft.world.level.block.Blocks.BARREL)) {
+					if (l4.getBlockState(cand).is(Level4Blocks.MEG_SUPPLY_CRATE)) {
 						campBarrelRef[0] = cand;
 						break;
 					}
 				}
 			}
-			check(campBarrelRef[0] != null, "expected camp barrel inside MISSING_WANDERER_CAMP");
+			check(campBarrelRef[0] != null, "expected MEG_SUPPLY_CRATE inside MISSING_WANDERER_CAMP");
 		});
 		game.getConnection().waitForChunksDownload();
 		BlockPos cb = campBarrelRef[0];
@@ -914,6 +916,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 
 			int[] pbxBarrelUv = Level4PoiPlan.uvToLocal(pbx[3], 5, 2);
 			BlockPos barrelPos = new BlockPos(pbx[0] + pbxBarrelUv[0], STAND, pbx[2] + pbxBarrelUv[1]);
+			check(l4.getBlockState(barrelPos).is(Level4Blocks.INDUSTRIAL_TOOLBOX),
+					"expected INDUSTRIAL_TOOLBOX inside PBX room at " + barrelPos);
 			p.teleportTo(pbx[0] + 3.5, STAND, pbx[2] + 3.5);
 			p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
 			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
@@ -922,42 +926,53 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			check(batteries == 1 && p.getInventory().countItem(BackroomsItems.CAPACITOR) >= 1, "expected PBX electrical parts");
 			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
 					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
-			check(p.getInventory().countItem(BackroomsItems.BATTERY_CELL) == batteries, "PBX barrel loot must be one-time only");
+			check(p.getInventory().countItem(BackroomsItems.BATTERY_CELL) == batteries, "PBX toolbox loot must be one-time only");
 
 			int[] breakerUv = Level4PoiPlan.uvToLocal(pbx[3], 5, 5);
 			BlockPos breakerPos = new BlockPos(pbx[0] + breakerUv[0], STAND + 1, pbx[2] + breakerUv[1]);
+			check(l4.getBlockState(breakerPos).is(Level4Blocks.OFFICE_BREAKER),
+					"expected wall OFFICE_BREAKER inside PBX room at " + breakerPos);
 			var brRes = p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
 					new BlockHitResult(Vec3.atCenterOf(breakerPos), Direction.UP, breakerPos, false));
 			check(brRes == net.minecraft.world.InteractionResult.SUCCESS, "PBX breaker switch failed");
 		});
 		server.runCommand("gamemode spectator @a");
 
-		// 9. Delayed reflection dark mirror (screenshot + touch + 3s stare sanity drain)
+		// 9. Delayed reflection dark mirror (screenshot + single 2-tall silhouette + touch + 3s stare sanity drain)
 		int[] mirror = findPoi(seed, from, PoiKind.DELAYED_REFLECTION_MIRROR);
 		check(mirror != null, "no DELAYED_REFLECTION_MIRROR POI found");
-		BlockPos[] mirrorBlockRef = new BlockPos[2]; // [0]=mirror, [1]=stand
+		BlockPos[] mirrorBlockRef = new BlockPos[2]; // [0]=mirror (prefers silhouette=2), [1]=stand
 		int mirrorBaseY = mirror[4];
 		server.runOnServer(s -> {
 			ServerLevel l4 = level4(s);
 			player(s).teleportTo(mirror[0] + 3.5, mirrorBaseY + 1, mirror[2] + 3.5);
-			for (int x = mirror[0]; x <= mirror[0] + Level4Plan.CELL && mirrorBlockRef[0] == null; x++) {
-				for (int z = mirror[2]; z <= mirror[2] + Level4Plan.CELL && mirrorBlockRef[0] == null; z++) {
-					BlockPos cand = new BlockPos(x, mirrorBaseY + 2, z);
-					if (l4.getBlockState(cand).is(Level4Blocks.OFFICE_DARK_MIRROR)) {
-						mirrorBlockRef[0] = cand;
-						for (Direction d : new Direction[] {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST}) {
-							BlockPos st = new BlockPos(x + d.getStepX() * 2, mirrorBaseY + 1, z + d.getStepZ() * 2);
-							BlockPos mid = new BlockPos(x + d.getStepX(), mirrorBaseY + 1, z + d.getStepZ());
-							if (l4.getBlockState(st).isAir() && l4.getBlockState(st.above()).isAir()
-									&& l4.getBlockState(mid).isAir() && l4.getBlockState(mid.above()).isAir()
-									&& Level4Layout.tile(seed, st.getX(), st.getZ()).walkable()) {
-								mirrorBlockRef[1] = st;
-								break;
+			boolean sawTop = false, sawPlain = false;
+			for (int my : new int[] {mirrorBaseY + 3, mirrorBaseY + 2}) {
+				for (int x = mirror[0]; x <= mirror[0] + Level4Plan.CELL; x++) {
+					for (int z = mirror[2]; z <= mirror[2] + Level4Plan.CELL; z++) {
+						BlockPos cand = new BlockPos(x, my, z);
+						var bs = l4.getBlockState(cand);
+						if (!bs.is(Level4Blocks.OFFICE_DARK_MIRROR)) continue;
+						int sil = bs.getValue(Level4Blocks.OfficeDarkMirrorBlock.SILHOUETTE);
+						if (sil == 2) sawTop = true;
+						if (sil == 0) sawPlain = true;
+						if (mirrorBlockRef[0] == null || sil == 2) {
+							for (Direction d : new Direction[] {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST}) {
+								BlockPos st = new BlockPos(x + d.getStepX() * 2, mirrorBaseY + 1, z + d.getStepZ() * 2);
+								BlockPos mid = new BlockPos(x + d.getStepX(), mirrorBaseY + 1, z + d.getStepZ());
+								if (l4.getBlockState(st).isAir() && l4.getBlockState(st.above()).isAir()
+										&& l4.getBlockState(mid).isAir() && l4.getBlockState(mid.above()).isAir()
+										&& Level4Layout.tile(seed, st.getX(), st.getZ()).walkable()) {
+									mirrorBlockRef[0] = cand;
+									mirrorBlockRef[1] = st;
+									break;
+								}
 							}
 						}
 					}
 				}
 			}
+			check(sawTop && sawPlain, "expected single 2-tall silhouette (silhouette=2) flanked by plain mirror panes (silhouette=0)");
 			check(mirrorBlockRef[0] != null && mirrorBlockRef[1] != null, "expected OFFICE_DARK_MIRROR and walkable viewpoint");
 		});
 		game.getConnection().waitForChunksDownload();
@@ -1001,8 +1016,14 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			check(cageCorner.is(Blocks.IRON_BARS) && cageCorner.getValue(BlockStateProperties.EAST)
 					&& cageCorner.getValue(BlockStateProperties.SOUTH),
 					"expected connected iron bars corner in TBD_OVERFLOW_CAGE");
-			p.getInventory().clearContent();
+			check(l4.getBlockState(new BlockPos(cage[0] + 5, Level4ChunkGenerator.FLOOR_Y + 3, cage[2] + 5)).is(Blocks.IRON_BARS),
+					"expected enclosed iron bars roof mesh over TBD_OVERFLOW_CAGE");
 			BlockPos barrelPos = new BlockPos(cage[0] + 5, STAND, cage[2] + 6);
+			BlockPos safePos = new BlockPos(cage[0] + 6, STAND, cage[2] + 6);
+			check(l4.getBlockState(barrelPos).is(Level4Blocks.MEG_SUPPLY_CRATE)
+					&& l4.getBlockState(safePos).is(Level4Blocks.OFFICE_STEEL_SAFE),
+					"expected MEG_SUPPLY_CRATE and OFFICE_STEEL_SAFE inside TBD_OVERFLOW_CAGE");
+			p.getInventory().clearContent();
 			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
 					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
 			int count1 = 0;
@@ -1032,6 +1053,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					"expected hanging lantern in plenum hub");
 			p.getInventory().clearContent();
 			BlockPos barrelPos = new BlockPos(hub[0] + 2, Level4ChunkGenerator.FLOOR_Y + 6, hub[2] + 2);
+			check(l4.getBlockState(barrelPos).is(Level4Blocks.INDUSTRIAL_TOOLBOX),
+					"expected INDUSTRIAL_TOOLBOX inside PLENUM_MAINTENANCE_HUB");
 			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
 					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
 			int gears = p.getInventory().countItem(BackroomsItems.STEEL_GEAR);
@@ -1061,6 +1084,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			p.teleportTo(fe[0] + 3.5, Level4ChunkGenerator.FLOOR_Y - 3, fe[2] + 1.5);
 			p.getInventory().clearContent();
 			BlockPos barrelPos = new BlockPos(fe[0] + 4, Level4ChunkGenerator.FLOOR_Y - 3, fe[2] + 1);
+			check(l4.getBlockState(barrelPos).is(Level4Blocks.MEG_SUPPLY_CRATE),
+					"expected MEG_SUPPLY_CRATE inside STALLED_FREIGHT_ELEVATOR");
 			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
 					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
 			int alloys = p.getInventory().countItem(Level1Items.ALLOY);
@@ -1136,6 +1161,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 
 			int[] stBarrelUv = Level4PoiPlan.uvToLocal(storm[3], 4, 2);
 			BlockPos barrelPos = new BlockPos(storm[0] + stBarrelUv[0], STAND, storm[2] + stBarrelUv[1]);
+			check(l4.getBlockState(barrelPos).is(Level4Blocks.MEG_SUPPLY_CRATE),
+					"expected MEG_SUPPLY_CRATE in STORM_BREACH_CORRIDOR");
 			p.getInventory().clearContent();
 			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
 					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
@@ -1208,6 +1235,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 
 			p.getInventory().clearContent();
 			BlockPos barrelPos = new BlockPos(abyss[0] + 2, Level4ChunkGenerator.FLOOR_Y - 5, abyss[2] + 4);
+			check(l4.getBlockState(barrelPos).is(Level4Blocks.INDUSTRIAL_TOOLBOX),
+					"expected INDUSTRIAL_TOOLBOX at SUBTUNNEL_ABYSS_DOOR chiller");
 			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
 					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
 			check(p.getInventory().countItem(BackroomsItems.ELECTRIC_MOTOR) == 1
@@ -1236,8 +1265,16 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					.is(Level4Blocks.OFFICE_CARPET), "expected spotless dry carpet in Frozen Friday 1998");
 			check(l4.getBlockState(new BlockPos(frozen[0] + 3, Level4ChunkGenerator.FLOOR_Y + 5, frozen[2] + 3))
 					.is(Level4Blocks.OFFICE_TROFFER_LIT), "expected 100% lit troffers in Frozen Friday 1998");
+			check(l4.getBlockState(new BlockPos(frozen[0] + 2, STAND, frozen[2] + 4))
+					.is(Level1Blocks.OFFICE_DESK), "expected OFFICE_DESK in Frozen Friday 1998");
+			check(l4.getBlockState(new BlockPos(frozen[0] + 2, STAND + 1, frozen[2] + 4))
+					.is(BackroomsProps.PROP_DESKTOP_COMPUTER), "expected desktop computer sitting on desk in Frozen Friday 1998");
+			check(l4.getBlockState(new BlockPos(frozen[0] + 2, STAND, frozen[2] + 3))
+					.is(BackroomsProps.PROP_OFFICE_CHAIR), "expected OFFICE_CHAIR facing desk in Frozen Friday 1998");
 			p.getInventory().clearContent();
 			BlockPos barrelPos = new BlockPos(frozen[0] + 5, STAND, frozen[2] + 2);
+			check(l4.getBlockState(barrelPos).is(Level4Blocks.OFFICE_STEEL_SAFE),
+					"expected OFFICE_STEEL_SAFE in Frozen Friday 1998");
 			p.teleportTo(frozen[0] + 4.5, STAND, frozen[2] + 2.5);
 			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
 					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
@@ -1268,8 +1305,14 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					"expected permanent OFFICE_DOOR_13 inside inverted lightwell");
 			check(l4.getBlockState(new BlockPos(inv[0] + Level4Plan.CELL + 1, Level4ChunkGenerator.FLOOR_Y + 13, inv[2] + Level4Plan.CELL + 3))
 					.is(Level4Blocks.OFFICE_CARPET), "expected inverted ceiling carpet overhead in lightwell shaft rim");
+			var rimMirror = l4.getBlockState(new BlockPos(inv[0] + Level4Plan.CELL + 1, Level4ChunkGenerator.FLOOR_Y + 12, inv[2] + Level4Plan.CELL + 3));
+			check(rimMirror.is(Level4Blocks.OFFICE_DARK_MIRROR)
+					&& rimMirror.getValue(Level4Blocks.OfficeDarkMirrorBlock.SILHOUETTE) == 0,
+					"expected plain silhouette=0 dark mirror on inverted lightwell shaft rim");
 			p.getInventory().clearContent();
 			BlockPos barrelPos = new BlockPos(inv[0] + 5, STAND, inv[2] + 1);
+			check(l4.getBlockState(barrelPos).is(Level4Blocks.MEG_SUPPLY_CRATE),
+					"expected MEG_SUPPLY_CRATE in inverted lightwell corner");
 			p.teleportTo(inv[0] + 4.5, STAND, inv[2] + 2.5);
 			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
 					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
@@ -1302,6 +1345,10 @@ public final class Level4ClientTest implements FabricClientGameTest {
 
 			p.getInventory().clearContent();
 			BlockPos safePos = new BlockPos(exec[0] + 5, STAND, exec[2] + 5);
+			check(l4.getBlockState(safePos).is(Level4Blocks.OFFICE_STEEL_SAFE),
+					"expected OFFICE_STEEL_SAFE in EXECUTIVE_BROADCAST_SUITE");
+			check(l4.getBlockState(new BlockPos(exec[0] + 5, STAND, exec[2] + 4)).isAir(),
+					"expected no raw iron_block next to executive safe");
 			p.teleportTo(exec[0] + 4.5, STAND, exec[2] + 4.5);
 			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
 					new BlockHitResult(Vec3.atCenterOf(safePos), Direction.UP, safePos, false));

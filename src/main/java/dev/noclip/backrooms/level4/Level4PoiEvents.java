@@ -299,7 +299,7 @@ final class Level4PoiEvents {
 					return InteractionResult.SUCCESS;
 				}
 				case WINDOW_PAINT_CART -> {
-					if (!state.is(Blocks.BARREL) && !state.is(Blocks.CAULDRON)) return InteractionResult.PASS;
+					if (!state.is(Level4Blocks.INDUSTRIAL_TOOLBOX) && !state.is(Blocks.CAULDRON)) return InteractionResult.PASS;
 					PoiState data = state(sl);
 					if (data.isClaimed(anchor)) {
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.paint_cart_empty"));
@@ -313,7 +313,7 @@ final class Level4PoiEvents {
 					return InteractionResult.SUCCESS;
 				}
 				case MISSING_WANDERER_CAMP -> {
-					if (!state.is(Blocks.BARREL) || pos.getY() != poi.baseY() + 1) return InteractionResult.PASS;
+					if (!state.is(Level4Blocks.MEG_SUPPLY_CRATE) || pos.getY() != poi.baseY() + 1) return InteractionResult.PASS;
 					PoiState data = state(sl);
 					if (data.isClaimed(anchor)) {
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.camp_empty"));
@@ -323,15 +323,15 @@ final class Level4PoiEvents {
 					RandomSource rng = sl.getRandom();
 					giveOrDrop(sp, new ItemStack(Level1Items.BANDAGE, 1 + rng.nextInt(2)));
 					giveOrDrop(sp, new ItemStack(rng.nextBoolean() ? BackroomsItems.INSULATING_TAPE : BackroomsItems.SCRAP_METAL));
-					sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.8F, 1.0F);
+					sl.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_OPEN, SoundSource.BLOCKS, 0.75F, 1.15F);
 					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.camp_loot"));
 					return InteractionResult.SUCCESS;
 				}
 				case LOCKED_PBX_ROOM -> {
-					if (state.is(BackroomsProps.INDUSTRIAL_FUSE_BOX)) {
+					if (state.is(BackroomsProps.INDUSTRIAL_FUSE_BOX) || state.is(Level4Blocks.OFFICE_BREAKER)) {
 						return togglePbxBreaker(sl, sp, pos, now);
 					}
-					if (!state.is(Blocks.BARREL)) return InteractionResult.PASS;
+					if (!state.is(Level4Blocks.INDUSTRIAL_TOOLBOX)) return InteractionResult.PASS;
 					PoiState data = state(sl);
 					if (data.isClaimed(anchor)) {
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.pbx_empty"));
@@ -342,12 +342,14 @@ final class Level4PoiEvents {
 					giveOrDrop(sp, new ItemStack(BackroomsItems.CAPACITOR, 1 + rng.nextInt(2)));
 					giveOrDrop(sp, new ItemStack(BackroomsItems.COPPER_WIRE, 1 + rng.nextInt(2)));
 					giveOrDrop(sp, new ItemStack(BackroomsItems.BATTERY_CELL, 1));
-					sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.8F, 0.95F);
+					sl.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_OPEN, SoundSource.BLOCKS, 0.75F, 1.1F);
 					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.pbx_loot"));
 					return InteractionResult.SUCCESS;
 				}
 				case TBD_OVERFLOW_CAGE -> {
-					if (!state.is(Blocks.BARREL)) return InteractionResult.PASS;
+					if (!state.is(Level4Blocks.MEG_SUPPLY_CRATE) && !state.is(Level4Blocks.OFFICE_STEEL_SAFE)) {
+						return InteractionResult.PASS;
+					}
 					PoiState data = state(sl);
 					if (data.isClaimed(pos)) {
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.tbd_cage_empty"));
@@ -365,11 +367,17 @@ final class Level4PoiEvents {
 						giveOrDrop(sp, prize);
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.tbd_cage_rare", prize.getHoverName()));
 					}
-					sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.8F, 1.05F);
+					if (state.is(Level4Blocks.OFFICE_STEEL_SAFE)) {
+						sl.playSound(null, pos, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 0.8F, 0.9F);
+					} else {
+						sl.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_OPEN, SoundSource.BLOCKS, 0.75F, 1.15F);
+					}
 					return InteractionResult.SUCCESS;
 				}
 				case PLENUM_MAINTENANCE_HUB -> {
-					if (!state.is(Blocks.BARREL) || pos.getY() != Level4ChunkGenerator.FLOOR_Y + 6) return InteractionResult.PASS;
+					if (!state.is(Level4Blocks.INDUSTRIAL_TOOLBOX) || pos.getY() != Level4ChunkGenerator.FLOOR_Y + 6) {
+						return InteractionResult.PASS;
+					}
 					PoiState data = state(sl);
 					if (data.isClaimed(anchor)) {
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.plenum_empty"));
@@ -381,12 +389,14 @@ final class Level4PoiEvents {
 					giveOrDrop(sp, new ItemStack(BackroomsItems.STEEL_GEAR, 1));
 					giveOrDrop(sp, new ItemStack(BackroomsItems.RUSTY_SCREWS, 2));
 					if (rng.nextInt(100) < 35) giveOrDrop(sp, new ItemStack(Level1Items.ALLOY, 1));
-					sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.8F, 0.9F);
+					sl.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_OPEN, SoundSource.BLOCKS, 0.75F, 1.1F);
 					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.plenum_loot"));
 					return InteractionResult.SUCCESS;
 				}
 				case STALLED_FREIGHT_ELEVATOR -> {
-					if (!state.is(Blocks.BARREL) || pos.getY() != Level4ChunkGenerator.FLOOR_Y - 3) return InteractionResult.PASS;
+					if (!state.is(Level4Blocks.MEG_SUPPLY_CRATE) || pos.getY() != Level4ChunkGenerator.FLOOR_Y - 3) {
+						return InteractionResult.PASS;
+					}
 					PoiState data = state(sl);
 					if (data.isClaimed(anchor)) {
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.freight_empty"));
@@ -397,12 +407,14 @@ final class Level4PoiEvents {
 					giveOrDrop(sp, new ItemStack(Level1Items.ALLOY, 2 + rng.nextInt(2)));
 					giveOrDrop(sp, new ItemStack(Level1Items.BANDAGE, 2));
 					giveOrDrop(sp, new ItemStack(BackroomsItems.PURIFIED_ALMOND_ESSENCE, 1));
-					sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.85F, 0.85F);
+					sl.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_OPEN, SoundSource.BLOCKS, 0.75F, 1.15F);
 					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.freight_loot"));
 					return InteractionResult.SUCCESS;
 				}
 				case STORM_BREACH_CORRIDOR -> {
-					if (!state.is(Blocks.BARREL) || pos.getY() != Level4ChunkGenerator.FLOOR_Y + 1) return InteractionResult.PASS;
+					if (!state.is(Level4Blocks.MEG_SUPPLY_CRATE) || pos.getY() != Level4ChunkGenerator.FLOOR_Y + 1) {
+						return InteractionResult.PASS;
+					}
 					PoiState data = state(sl);
 					if (data.isClaimed(anchor)) {
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.storm_empty"));
@@ -413,12 +425,12 @@ final class Level4PoiEvents {
 					giveOrDrop(sp, new ItemStack(BackroomsItems.BATTERY_CELL, 1 + rng.nextInt(2)));
 					giveOrDrop(sp, new ItemStack(Items.GLASS_BOTTLE, 2));
 					giveOrDrop(sp, new ItemStack(Level1Items.BANDAGE, 1));
-					sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.85F, 1.0F);
+					sl.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_OPEN, SoundSource.BLOCKS, 0.75F, 1.15F);
 					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.storm_loot"));
 					return InteractionResult.SUCCESS;
 				}
 				case SUBTUNNEL_ABYSS_DOOR -> {
-					if (state.is(Blocks.BARREL) && pos.getY() == Level4ChunkGenerator.FLOOR_Y - 5) {
+					if (state.is(Level4Blocks.INDUSTRIAL_TOOLBOX) && pos.getY() == Level4ChunkGenerator.FLOOR_Y - 5) {
 						PoiState data = state(sl);
 						if (data.isClaimed(anchor)) {
 							sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.abyss_empty"));
@@ -427,7 +439,7 @@ final class Level4PoiEvents {
 						data.markClaimed(anchor);
 						giveOrDrop(sp, new ItemStack(BackroomsItems.ELECTRIC_MOTOR, 1));
 						giveOrDrop(sp, new ItemStack(BackroomsItems.PIPE_VALVE, 1));
-						sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.85F, 0.9F);
+						sl.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_OPEN, SoundSource.BLOCKS, 0.75F, 1.1F);
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.abyss_loot"));
 						return InteractionResult.SUCCESS;
 					}
@@ -446,7 +458,7 @@ final class Level4PoiEvents {
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.frozen_email"));
 						return InteractionResult.SUCCESS;
 					}
-					if (!state.is(Blocks.BARREL)) return InteractionResult.PASS;
+					if (!state.is(Level4Blocks.OFFICE_STEEL_SAFE)) return InteractionResult.PASS;
 					PoiState data = state(sl);
 					if (data.isClaimed(anchor)) {
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.frozen_empty"));
@@ -456,12 +468,12 @@ final class Level4PoiEvents {
 					giveOrDrop(sp, new ItemStack(Level4Items.CALENDAR_1998, 1));
 					giveOrDrop(sp, new ItemStack(Economy.LOST_COIN, 2));
 					giveOrDrop(sp, new ItemStack(Level1Items.ALMOND_WATER, 2));
-					sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.8F, 1.05F);
+					sl.playSound(null, pos, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 0.8F, 0.95F);
 					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.frozen_loot"));
 					return InteractionResult.SUCCESS;
 				}
 				case INVERTED_MIRROR_LIGHTWELL -> {
-					if (!state.is(Blocks.BARREL)) return InteractionResult.PASS;
+					if (!state.is(Level4Blocks.MEG_SUPPLY_CRATE)) return InteractionResult.PASS;
 					PoiState data = state(sl);
 					if (data.isClaimed(anchor)) {
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.mirror_well_empty"));
@@ -471,12 +483,12 @@ final class Level4PoiEvents {
 					giveOrDrop(sp, new ItemStack(Level1Items.ALLOY, 2));
 					giveOrDrop(sp, new ItemStack(BackroomsItems.ANOMALOUS_MIRROR_GLASS, 1));
 					giveOrDrop(sp, new ItemStack(BackroomsItems.PURIFIED_ALMOND_ESSENCE, 1));
-					sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.85F, 1.1F);
+					sl.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_OPEN, SoundSource.BLOCKS, 0.75F, 1.2F);
 					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.mirror_well_loot"));
 					return InteractionResult.SUCCESS;
 				}
 				case EXECUTIVE_BROADCAST_SUITE -> {
-					if (!state.is(Blocks.BARREL)) return InteractionResult.PASS;
+					if (!state.is(Level4Blocks.OFFICE_STEEL_SAFE)) return InteractionResult.PASS;
 					PoiState data = state(sl);
 					if (data.isClaimed(anchor)) {
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.exec_vault_empty"));
@@ -684,11 +696,12 @@ final class Level4PoiEvents {
 	}
 
 	static InteractionResult togglePbxBreaker(ServerLevel sl, ServerPlayer sp, BlockPos pos, int now) {
-		if (now < PBX_BREAKER_NEXT.getOrDefault(pos, 0)) {
+		BlockPos key = cellAnchor(pos, Level4ChunkGenerator.FLOOR_Y);
+		if (now < PBX_BREAKER_NEXT.getOrDefault(key, 0)) {
 			sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.pbx_breaker_wait"));
 			return InteractionResult.SUCCESS;
 		}
-		PBX_BREAKER_NEXT.put(pos.immutable(), now + PBX_BREAKER_COOLDOWN);
+		PBX_BREAKER_NEXT.put(key, now + PBX_BREAKER_COOLDOWN);
 		List<BlockPos> lit = new ArrayList<>();
 		List<BlockPos> unlit = new ArrayList<>();
 		BlockPos.MutableBlockPos scan = new BlockPos.MutableBlockPos();

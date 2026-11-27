@@ -1,7 +1,13 @@
 {
   "variants": {
-    "": {
+    "silhouette=0": {
       "model": "noclip_backrooms:block/level4/office_dark_mirror"
+    },
+    "silhouette=1": {
+      "model": "noclip_backrooms:block/level4/office_dark_mirror_figure_bottom"
+    },
+    "silhouette=2": {
+      "model": "noclip_backrooms:block/level4/office_dark_mirror_figure_top"
     }
   }
 }

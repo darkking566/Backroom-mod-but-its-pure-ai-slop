@@ -1083,3 +1083,11 @@
     - **#20 `EXECUTIVE_BROADCAST_SUITE`**：附著於 `AUDITORIUM` 旁之深木（`DARK_OAK_PLANKS`）總裁空間與防盜保險箱，桌上擺 **[NEW]** `executive_red_phone`（128px 紅釉撥號與亮面燈號＋深色桃花心木底座及寫實 labPBR 貼圖，`realistic` 同步更新，Level 0 零改動）
   - **互動事件與雙語**（`Level4Blocks.java`、`Level4Props.java`、`Level4PoiEvents.java`、`en_us.json`、`zh_tw.json`）：踏入 1998 靜止樓層提示停滯時針與穩住理智（120s 冷卻），抽屜給 `calendar_1998`／`lost_coin`／杏仁水；鏡像天窗死角給合金、`anomalous_mirror_glass` 與純化杏仁精華；總裁紅電話進行無源廣播導引遠處地標或 Omega 基地並進行理智考驗（60s 冷卻），保險箱給純化杏仁精華、合金、`microchip` 與 `high_voltage_coil`
   - **驗證**：新增 `Level4PoiPlanTest.batch4UltraRareLandmarksAppearAndStayValid` 與 `Level4ClientTest.pois`／`checkBlocks` 實機驗證 3 座地標方塊、一次性搜刮與紅色專線互動；`.\gradlew.bat test --tests "dev.noclip.backrooms.level4.*" --no-daemon`、`.\gradlew.bat build --no-daemon` 與 `.\gradlew.bat runClientGameTest "-Plevels=4" "-Psections=pois,blocks" --no-daemon` 全數通過，並檢視 3 張實機截圖與日誌確認零缺貼圖／模型錯誤（`-Pshaders` 未單獨跑）；同步更新 `POI.md`、`README.md` 標記全 20/20 完成；僅於本機 `main` 提交（未推送）
+- 完成 **Level 4 POI 精緻化路線 A（消滅全部原版木桶＋修復 5 項細節瑕疵）**（Antigravity）：
+  - **3 款 128px 現代／工業收納容器方塊**（`Level4Blocks.java`、`tools/make_level4_pois.py`、`Level4ChunkGenerator.java`、`Level4PoiEvents.java`、`en_us.json`、`zh_tw.json`）：新增 `office_supply_crate`（M.E.G. 野戰金屬物資箱）、`industrial_toolbox`（工業工具箱）與 `office_steel_safe`（辦公室保險箱）之多元素 3D 模型、labPBR `_n`/`_s` 貼圖與金屬開蓋音效，全面替換全部 11 處 POI 借用的原版木桶（#6、#7、#8、#11、#12、#13、#14、#17、#18、#19、#20）並移除 #20 旁多餘的單顆原版鐵塊
+  - **5 項實機缺陷修正**：
+    - **#9 暗窗去重**：`office_dark_mirror` 擴充為 `SILHOUETTE=0..2` 三態，僅中央兩格拼出一個完整高瘦黑影，兩側與天井鏡框改為純暗高反光鏡面，解決 6 人複製貼上違和感
+    - **#11 T.B.D. 貨籠封閉**：補齊轉角圍欄與頂層 `y=35` 鐵欄柵頂網，並配置 `office_supply_crate` 與 `office_steel_safe`
+    - **#18 1998 靜止樓層擺設修復**：改採 `Level1Blocks.OFFICE_DESK` 雙人辦公桌讓兩台 `PROP_DESKTOP_COMPUTER` 正確架於桌上，並排除桌椅座標撞車讓兩把 `PROP_OFFICE_CHAIR` 順利落地
+    - **#8 總機房雙開關同步**：`Level4PoiEvents` 同時接通 `INDUSTRIAL_FUSE_BOX` 與牆上 `OFFICE_BREAKER`，並以 `cellAnchor` 共用 30 秒冷卻時間
+  - **文件與驗證**：更新 `docs/project/5-levels/level4/POI.md`、`Level4ClientTest.java`；驗證 JSON 語法、單元測試、全專案建置與實機 GameTest 截圖（`-Pshaders` 尚未單獨執行）；僅於本機 `main` 提交 Route A 自身改動（刻意排除既有未暫存之 `Level4Plan.java` 與 `Level4LayoutTest.java`，未推送）
