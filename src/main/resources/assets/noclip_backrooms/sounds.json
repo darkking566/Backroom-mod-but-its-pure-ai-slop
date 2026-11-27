@@ -616,8 +616,8 @@
       {
         "name": "minecraft:weather.rain",
         "type": "event",
-        "volume": 0.35,
-        "pitch": 0.9
+        "volume": 0.9,
+        "pitch": 0.95
       }
     ]
   },

@@ -1,6 +1,7 @@
 package dev.noclip.backrooms.level4;
 
 import dev.noclip.backrooms.core.economy.Economy;
+import dev.noclip.backrooms.core.economy.Wallet;
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.people.Person;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
@@ -19,7 +20,9 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,6 +31,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
@@ -37,17 +42,16 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Friendly roaming wanderers in Level 4 ("Because the level lacks creatures, there are many people wandering here.
- * Level 4 is the best place to meet other people and look for supplies.").
- * They stroll through open-plan office bays, suites, and atriums, pause to face approaching players, share
- * navigation/lore tips (including nearest M.E.G. Base Omega and Atrium directions), and barter small supplies.
+ * Friendly roaming wanderers in Level 4: rare fellow survivors strolling through open-plan office bays,
+ * suites, and atriums who provide one-time role-specific field aid, useful supply barters (including buying
+ * T.B.D. curios and office tech scraps), and directional tips.
  */
 final class Level4Wanderers {
 	static final String TAG = "noclip_backrooms_level4_wanderer";
-	private static final int SPAWN_INTERVAL = 20 * 12;
-	private static final int MAX_NEAR = 5, NEAR_RADIUS = 48, MIN_DIST = 10, MAX_DIST = 34, DESPAWN_DIST = 64;
+	private static final int SPAWN_INTERVAL = 20 * 40;
+	private static final int MAX_NEAR = 2, NEAR_RADIUS = 64, MIN_DIST = 20, MAX_DIST = 44, DESPAWN_DIST = 80;
 	private static final double WALK_SPEED = 0.045;
-	private static final int CHAT_COOLDOWN = 60, SANITY_COOLDOWN = 20 * 60, MAX_BARTERS = 2;
+	private static final int CHAT_COOLDOWN = 50, SANITY_COOLDOWN = 20 * 60, MAX_BARTERS = 3;
 
 	private static final String[][] ROLES = {
 			{"colonist", "drifter"},
@@ -67,6 +71,8 @@ final class Level4Wanderers {
 	}
 
 	private static final Map<UUID, WanderState> STATES = new HashMap<>();
+	private static final Map<UUID, String> ROLES_BY_ID = new HashMap<>();
+	private static final Set<UUID> AID_GIVEN = new HashSet<>();
 	private static final Map<UUID, Integer> BARTERS_LEFT = new HashMap<>();
 	private static final Map<UUID, Integer> CHAT_INDEX = new HashMap<>();
 	private static final Map<UUID, Integer> NEXT_CHAT = new HashMap<>();
@@ -87,6 +93,8 @@ final class Level4Wanderers {
 	static void register() {
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			STATES.clear();
+			ROLES_BY_ID.clear();
+			AID_GIVEN.clear();
 			BARTERS_LEFT.clear();
 			CHAT_INDEX.clear();
 			NEXT_CHAT.clear();
@@ -117,6 +125,12 @@ final class Level4Wanderers {
 				return handleBarter(sp, person, held);
 			}
 
+			// First empty-handed encounter with each wanderer provides real role-specific field aid
+			if (AID_GIVEN.add(person.getUUID())) {
+				giveFieldAid(sp, person);
+				return InteractionResult.SUCCESS;
+			}
+
 			if (now < NEXT_CHAT.getOrDefault(sp.getUUID(), 0)) {
 				return InteractionResult.SUCCESS;
 			}
@@ -124,7 +138,7 @@ final class Level4Wanderers {
 
 			if (now >= NEXT_SANITY.getOrDefault(sp.getUUID(), 0)) {
 				NEXT_SANITY.put(sp.getUUID(), now + SANITY_COOLDOWN);
-				PlayerRpg.restoreSanity(sp, 3.0F);
+				PlayerRpg.restoreSanity(sp, 5.0F);
 			}
 
 			world.playSound(null, person.blockPosition(), SoundEvents.VILLAGER_AMBIENT, SoundSource.NEUTRAL, 0.7F, 1.0F);
@@ -136,9 +150,50 @@ final class Level4Wanderers {
 		});
 	}
 
+	private static void giveFieldAid(ServerPlayer sp, Person person) {
+		String role = ROLES_BY_ID.getOrDefault(person.getUUID(), "drifter");
+		switch (role) {
+			case "barterer" -> {
+				Wallet.add(sp, 12);
+				giveItem(sp, new ItemStack(BackroomsItems.FLASHLIGHT_BATTERY_PACK));
+				sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.wanderer_aid_barterer"));
+			}
+			case "scout" -> {
+				sp.addEffect(new MobEffectInstance(MobEffects.SPEED, 20 * 45, 0, true, false, true));
+				sp.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, 20 * 45, 0, true, false, true));
+				giveItem(sp, new ItemStack(Level1Items.PHOSPHOR_POWDER, 2));
+				sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.wanderer_aid_scout"));
+			}
+			case "cartographer" -> {
+				PlayerRpg.grantXp(sp, 15);
+				PlayerRpg.restoreSanity(sp, 10.0F);
+				giveItem(sp, new ItemStack(Economy.LOST_COIN));
+				sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.wanderer_aid_cartographer"));
+			}
+			case "restless" -> {
+				sp.heal(6.0F);
+				sp.removeEffect(MobEffects.DARKNESS);
+				sp.removeEffect(MobEffects.SLOWNESS);
+				sp.removeEffect(MobEffects.WEAKNESS);
+				PlayerRpg.restoreSanity(sp, 10.0F);
+				giveItem(sp, new ItemStack(BackroomsItems.ROUGH_BANDAGE));
+				sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.wanderer_aid_restless"));
+			}
+			default -> {
+				giveItem(sp, new ItemStack(Items.CHARCOAL, 2));
+				PlayerRpg.restoreSanity(sp, 8.0F);
+				sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.wanderer_aid_drifter"));
+			}
+		}
+		sp.level().playSound(null, person.blockPosition(), SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.NEUTRAL, 0.7F, 1.05F);
+	}
+
 	private static boolean isBarterItem(ItemStack held) {
 		return held.is(Economy.LOST_COIN)
 				|| held.is(Level1Items.ALLOY)
+				|| held.is(BackroomsItems.OLD_CIRCUIT_BOARD)
+				|| held.is(BackroomsItems.OFFICE_KEYBOARD)
+				|| Level4Items.CURIOS.contains(held.getItem())
 				|| ((held.is(BackroomsItems.DAMP_PAPER_SCRAP) || held.is(Items.PAPER)) && held.getCount() >= 2);
 	}
 
@@ -153,18 +208,31 @@ final class Level4Wanderers {
 			if (!sp.getAbilities().instabuild) held.shrink(1);
 			giveItem(sp, new ItemStack(Level1Items.ALMOND_WATER));
 			giveItem(sp, new ItemStack(Items.GLASS_BOTTLE));
-			if (sp.level().getRandom().nextInt(100) < 12) {
+			giveItem(sp, new ItemStack(BackroomsItems.FLASHLIGHT_BATTERY_PACK));
+			if (sp.level().getRandom().nextInt(100) < 18) {
 				giveItem(sp, new ItemStack(Level4Items.FADED_ICON_FRAME));
 			}
 			sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.wanderer_barter_coin"));
 		} else if (held.is(Level1Items.ALLOY)) {
 			if (!sp.getAbilities().instabuild) held.shrink(1);
-			giveItem(sp, new ItemStack(Level1Items.ALMOND_WATER));
-			giveItem(sp, new ItemStack(Level1Items.BANDAGE));
+			giveItem(sp, new ItemStack(BackroomsItems.PURIFIED_ALMOND_ESSENCE));
+			giveItem(sp, new ItemStack(BackroomsItems.STERILE_BANDAGE));
+			giveItem(sp, new ItemStack(BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace("black_dye")), 2));
 			sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.wanderer_barter_alloy"));
+		} else if (Level4Items.CURIOS.contains(held.getItem())) {
+			if (!sp.getAbilities().instabuild) held.shrink(1);
+			Wallet.add(sp, 20);
+			giveItem(sp, new ItemStack(BackroomsItems.STERILE_BANDAGE));
+			sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.wanderer_barter_curio"));
+		} else if (held.is(BackroomsItems.OLD_CIRCUIT_BOARD) || held.is(BackroomsItems.OFFICE_KEYBOARD)) {
+			if (!sp.getAbilities().instabuild) held.shrink(1);
+			giveItem(sp, new ItemStack(Economy.LOST_COIN));
+			giveItem(sp, new ItemStack(BackroomsItems.FLASHLIGHT_BATTERY_PACK));
+			sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.wanderer_barter_tech"));
 		} else {
 			if (!sp.getAbilities().instabuild) held.shrink(2);
-			giveItem(sp, new ItemStack(Items.GLASS_BOTTLE));
+			giveItem(sp, new ItemStack(Items.CHARCOAL, 2));
+			giveItem(sp, new ItemStack(BackroomsItems.ROUGH_BANDAGE));
 			sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.wanderer_barter_paper"));
 		}
 		BARTERS_LEFT.put(person.getUUID(), left - 1);
@@ -223,15 +291,18 @@ final class Level4Wanderers {
 			}
 		} else if (now % 100 == 0) {
 			STATES.clear();
+			ROLES_BY_ID.clear();
+			AID_GIVEN.clear();
 			BARTERS_LEFT.clear();
 			CHAT_INDEX.clear();
 		}
 
 		if (now % SPAWN_INTERVAL == 0 && now >= heldOffUntil && !level.players().isEmpty()) {
+			RandomSource rng = level.getRandom();
 			for (ServerPlayer player : level.players()) {
 				if (player.isSpectator()) continue;
 				int near = countNear(level, player);
-				if (near < MAX_NEAR) {
+				if (near < MAX_NEAR && rng.nextInt(100) < 45) {
 					spawnNear(level, seed, player, 1);
 				}
 			}
@@ -250,6 +321,8 @@ final class Level4Wanderers {
 			}
 		}
 		STATES.keySet().removeIf(id -> !activeNearPlayers.contains(id));
+		ROLES_BY_ID.keySet().removeIf(id -> !activeNearPlayers.contains(id));
+		AID_GIVEN.removeIf(id -> !activeNearPlayers.contains(id));
 		BARTERS_LEFT.keySet().removeIf(id -> !activeNearPlayers.contains(id));
 		CHAT_INDEX.keySet().removeIf(id -> !activeNearPlayers.contains(id));
 	}
@@ -287,6 +360,7 @@ final class Level4Wanderers {
 				level.addFreshEntity(person);
 				// Tag only after adding to world so ENTITY_LOAD cleanup does not discard newly spawned wanderers.
 				person.addTag(TAG);
+				ROLES_BY_ID.put(person.getUUID(), pick[1]);
 				BARTERS_LEFT.put(person.getUUID(), MAX_BARTERS);
 				spawned++;
 				break;

@@ -108,8 +108,145 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		int[] base71 = findExitView(seed, from, Level4Exit.BASEMENT_71);
 		if (base71 != null) shoot(context, game, base71[2] + 0.5, STAND, base71[3] + 0.5, base71[4], 18, false, "level4_basement");
 
+		// Batch 1 structures: cubicle mazes, unfinished concrete wing, elevated glass skybridge
+		int[] cubicle = findKind(seed, from, Kind.CUBICLE_GLASS);
+		check(cubicle != null, "expected cubicle glass partition near arrival");
+		int[] cubicleStand = indoorStandNextTo(seed, cubicle[0], cubicle[1]);
+		if (cubicleStand != null) shoot(context, game, cubicleStand[0] + 0.5, STAND, cubicleStand[1] + 0.5, 45, 5, false, "level4_cubicles");
+		game.getServer().runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			check(l4.getBlockState(new BlockPos(cubicle[0], Level4ChunkGenerator.FLOOR_Y + 1, cubicle[1])).is(Level4Blocks.OFFICE_DRYWALL),
+					"cubicle lower half should be drywall");
+			check(l4.getBlockState(new BlockPos(cubicle[0], Level4ChunkGenerator.FLOOR_Y + 2, cubicle[1])).is(Level4Blocks.OFFICE_GLASS_WALL),
+					"cubicle upper half should be glass wall");
+			check(l4.getBlockState(new BlockPos(cubicle[0], Level4ChunkGenerator.FLOOR_Y + 3, cubicle[1])).isAir(),
+					"cubicle top clearance should remain open air");
+		});
+
+		int[] unfinished = findZone(seed, from, ZoneKind.UNFINISHED_WING);
+		if (unfinished != null) {
+			shoot(context, game, unfinished[0] + 0.5, STAND, unfinished[1] + 0.5, 35, 5, false, "level4_unfinished_wing");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				var fl = l4.getBlockState(new BlockPos(unfinished[0], Level4ChunkGenerator.FLOOR_Y, unfinished[1]));
+				check(!fl.is(Level4Blocks.OFFICE_CARPET) && !fl.is(Level4Blocks.OFFICE_DAMP_CARPET),
+						"unfinished wing should have bare concrete floor instead of carpet");
+			});
+		}
+
+		int[] elevBridge = findElevatedBridgeStand(seed, from);
+		if (elevBridge != null) {
+			shoot(context, game, elevBridge[0] + 0.5, STAND + 2.0, elevBridge[1] + 0.5, elevBridge[2], 3, false, "level4_elevated_bridge");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				check(l4.getBlockState(new BlockPos(elevBridge[0], Level4ChunkGenerator.FLOOR_Y, elevBridge[1])).isAir(),
+						"elevated bridge underside should remain open canyon air");
+				check(!l4.getBlockState(new BlockPos(elevBridge[0], Level4ChunkGenerator.FLOOR_Y + 2, elevBridge[1])).isAir(),
+						"elevated bridge floor deck should exist at FLOOR_Y + 2");
+			});
+		}
+
+		// Batch 2 structures: open-sky lightwell & recessed rain balcony
+		int[] lightwell = findZone(seed, from, ZoneKind.LIGHTWELL);
+		if (lightwell != null) {
+			shoot(context, game, lightwell[0] + 0.5, STAND, lightwell[1] + 0.5, 45, 5, false, "level4_lightwell");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				int[] shaft = findLightwellShaft(seed, new BlockPos(lightwell[0], STAND, lightwell[1]));
+				check(shaft != null, "expected open-sky shaft inside lightwell");
+				check(l4.canSeeSky(new BlockPos(shaft[0], STAND, shaft[1])), "lightwell shaft should see sky");
+				check(l4.getBlockState(new BlockPos(shaft[0], Level4ChunkGenerator.FLOOR_Y, shaft[1])).is(net.minecraft.world.level.block.Blocks.WATER),
+						"lightwell shaft bottom should hold rain water pool");
+			});
+		}
+
+		int[] balcony = findKind(seed, from, Kind.BALCONY_FLOOR);
+		if (balcony != null) {
+			shoot(context, game, balcony[0] + 0.5, STAND, balcony[1] + 0.5, 0, 0, false, "level4_balcony");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				check(l4.canSeeSky(new BlockPos(balcony[0], STAND, balcony[1])), "recessed rain balcony should see open sky");
+				check(!l4.getBlockState(new BlockPos(balcony[0], Level4ChunkGenerator.FLOOR_Y, balcony[1])).isAir(),
+						"balcony floor should be solid concrete");
+			});
+		}
+
+		// Batch 3 structures: open elevator shaft lobby & sunken tiered auditorium
+		int[] elevLobby = findZone(seed, from, ZoneKind.ELEVATOR_LOBBY);
+		if (elevLobby != null) {
+			shoot(context, game, elevLobby[0] + 0.5, STAND, elevLobby[1] + 2.0, 180, 10, false, "level4_elevator_lobby");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				int[] shaft = findKind(seed, new BlockPos(elevLobby[0], STAND, elevLobby[1]), Kind.ELEVATOR_SHAFT);
+				check(shaft != null, "expected open vertical elevator shaft near lobby");
+				check(l4.getBlockState(new BlockPos(shaft[0], Level4ChunkGenerator.FLOOR_Y - 12, shaft[1])).isAir(),
+						"elevator shaft should drop deeply below FLOOR_Y");
+				check(l4.getBlockState(new BlockPos(shaft[0], Level4ChunkGenerator.FLOOR_Y + 12, shaft[1])).isAir(),
+						"elevator shaft should rise high above FLOOR_Y");
+			});
+		}
+
+		int[] auditorium = findZone(seed, from, ZoneKind.AUDITORIUM);
+		if (auditorium != null) {
+			shoot(context, game, auditorium[0] + 0.5, STAND - 2.0, auditorium[1] + 0.5, 180, 12, false, "level4_auditorium");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				check(l4.getBlockState(new BlockPos(auditorium[0], Level4ChunkGenerator.FLOOR_Y, auditorium[1])).isAir(),
+						"sunken auditorium floor should be lowered below FLOOR_Y");
+				check(!l4.getBlockState(new BlockPos(auditorium[0], Level4ChunkGenerator.FLOOR_Y - 3, auditorium[1])).isAir(),
+						"sunken auditorium pit floor should exist at FLOOR_Y - 3");
+			});
+		}
+
+		// Batch 4 structures: 2-story mezzanine, dark wing ceiling plenum crawlway, sub-level MEP corridor
+		int[] mezzanine = findZone(seed, from, ZoneKind.MEZZANINE);
+		if (mezzanine != null) {
+			shoot(context, game, mezzanine[0] + 0.5, Level4ChunkGenerator.FLOOR_Y + 7.0, mezzanine[1] + 0.5, 135, 12, false, "level4_mezzanine");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				check(!l4.getBlockState(new BlockPos(mezzanine[0], Level4ChunkGenerator.FLOOR_Y + 6, mezzanine[1])).isAir(),
+						"mezzanine 2F floor slab should exist at FLOOR_Y + 6");
+				check(l4.getBlockState(new BlockPos(mezzanine[0], Level4ChunkGenerator.FLOOR_Y + 7, mezzanine[1])).isAir(),
+						"mezzanine 2F headroom should remain clear air");
+			});
+		}
+
+		int[] tunnelSpot = findSubTunnelCorridor(seed, from);
+		if (tunnelSpot != null) {
+			shoot(context, game, tunnelSpot[0] + 0.5, Level4ChunkGenerator.FLOOR_Y - 5.0, tunnelSpot[1] + 0.5, 90, 2, false, "level4_sub_tunnel");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				check(l4.getBlockState(new BlockPos(tunnelSpot[0], Level4ChunkGenerator.FLOOR_Y - 5, tunnelSpot[1])).isAir(),
+						"sub-level MEP tunnel corridor should be hollow at FLOOR_Y - 5");
+				check(!l4.getBlockState(new BlockPos(tunnelSpot[0], Level4ChunkGenerator.FLOOR_Y - 6, tunnelSpot[1])).isAir(),
+						"sub-level MEP tunnel floor should exist at FLOOR_Y - 6");
+			});
+		}
+
+		if (dark != null) {
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				int[] plenumSpot = findPlenumCrawl(seed, new BlockPos(dark[0], STAND, dark[1]));
+				check(plenumSpot != null, "expected plenum crawlspace above DARK_WING");
+				check(l4.getBlockState(new BlockPos(plenumSpot[0], Level4ChunkGenerator.FLOOR_Y + 6, plenumSpot[1])).isAir(),
+						"ceiling plenum crawlspace should be hollow at FLOOR_Y + 6");
+			});
+		}
+
 		int[] rainView = findRainWindowView(seed, from);
-		if (rainView != null) shoot(context, game, rainView[0] + 0.5, STAND, rainView[1] + 0.5, rainView[2], 2, false, "level4_rain_window_view");
+		if (rainView != null) {
+			shoot(context, game, rainView[0] + 0.5, STAND, rainView[1] + 0.5, rainView[2], 2, false, "level4_rain_window_view");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				check(l4.isRaining(), "Level 4 server should be raining");
+				int[] out = findKind(seed, new BlockPos(rainView[0], STAND, rainView[1]), Kind.OUTSIDE_AIR);
+				check(out != null, "expected OUTSIDE_AIR near rain window");
+				BlockPos outPos = new BlockPos(out[0], STAND + 1, out[1]);
+				check(l4.canSeeSky(outPos), "OUTSIDE_AIR should see sky for rain rendering at " + outPos);
+				check(l4.getBlockState(new BlockPos(out[0], Level4ChunkGenerator.MAX_Y, out[1])).isAir(),
+						"OUTSIDE_AIR MAX_Y should remain open air");
+			});
+		}
 	}
 
 	private static void waterSources(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
@@ -297,6 +434,26 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		game.getConnection().waitForChunksRender();
 		context.takeScreenshot("level4_trap_window");
 
+		// Verify walking around to the outdoor/opposite side causes the window-bound entity to vanish rather than hover staring backward
+		server.runOnServer(s -> {
+			ServerPlayer p = player(s);
+			double outX = win[0] + 0.5 + (win[0] + 0.5 - standX) * 4.0;
+			double outZ = win[1] + 0.5 + (win[1] + 0.5 - standZ) * 4.0;
+			p.teleportTo(outX, STAND, outZ);
+		});
+		context.waitTicks(6);
+		server.runOnServer(s -> {
+			var leftover = level4(s).getEntitiesOfClass(
+					dev.noclip.backrooms.monsters.windowentity.WindowEntity.class,
+					new AABB(new BlockPos(win[0], STAND + 1, win[1])).inflate(6.0));
+			check(leftover.isEmpty(), "expected WindowEntity to vanish when viewed from opposite/outside side");
+			player(s).teleportTo(standX, STAND, standZ);
+			player(s).setDeltaMovement(Vec3.ZERO);
+			player(s).resetFallDistance();
+			player(s).setHealth(player(s).getMaxHealth());
+		});
+		context.waitTicks(2);
+
 		server.runOnServer(s -> {
 			ServerPlayer p = player(s);
 			BlockPos pos = new BlockPos(win[0], STAND + 1, win[1]);
@@ -437,6 +594,21 @@ public final class Level4ClientTest implements FabricClientGameTest {
 				if (st.is(Items.GLASS_BOTTLE)) bottles += st.getCount();
 			}
 			check(almond >= 1 && bottles >= 1, "expected Almond Water and Glass Bottle from wanderer barter");
+
+			// Also verify T.B.D. curios can be sold to wanderers for credits + sterile bandage
+			long creditsBefore = dev.noclip.backrooms.core.economy.Wallet.of(p);
+			p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Level4Items.CALENDAR_1998));
+			var curioRes = net.fabricmc.fabric.api.event.player.UseEntityCallback.EVENT.invoker()
+					.interact(p, level4(s), InteractionHand.MAIN_HAND, w, null);
+			check(curioRes == net.minecraft.world.InteractionResult.SUCCESS, "expected wanderer curio trade to succeed");
+			check(!p.getMainHandItem().is(Level4Items.CALENDAR_1998), "expected wanderer curio trade to consume calendar_1998");
+			check(dev.noclip.backrooms.core.economy.Wallet.of(p) >= creditsBefore + 20,
+					"expected wanderer curio trade to grant 20 credits");
+			boolean hasBandage = false;
+			for (int i = 0; i < p.getInventory().getContainerSize(); i++) {
+				if (p.getInventory().getItem(i).is(dev.noclip.backrooms.items.BackroomsItems.STERILE_BANDAGE)) hasBandage = true;
+			}
+			check(hasBandage, "expected wanderer curio trade to grant sterile_bandage");
 		});
 		server.runCommand("gamemode spectator @a");
 	}
@@ -534,7 +706,10 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			}
 			for (String msg : new String[] {"wanderer_tip_omega", "wanderer_tip_atrium", "wanderer_tip_windows",
 					"wanderer_tip_exits", "wanderer_tip_amor", "wanderer_tip_tbd", "wanderer_tip_barter",
-					"wanderer_barter_coin", "wanderer_barter_alloy", "wanderer_barter_paper", "wanderer_barter_done",
+					"wanderer_barter_coin", "wanderer_barter_alloy", "wanderer_barter_paper", "wanderer_barter_curio",
+					"wanderer_barter_tech", "wanderer_barter_done",
+					"wanderer_aid_drifter", "wanderer_aid_barterer", "wanderer_aid_scout",
+					"wanderer_aid_cartographer", "wanderer_aid_restless",
 					"amor_offered", "tbd_hoard_refuse",
 					"window_lure", "window_rain_lure", "window_grab", "window_touch_grab",
 					"almond_pickup", "returned_omega"}) {
@@ -554,6 +729,11 @@ public final class Level4ClientTest implements FabricClientGameTest {
 						int x = (rx0 + dx) * Level4Plan.SIZE + box.cx() * Level4Plan.CELL + 3;
 						int z = (rz0 + dz) * Level4Plan.SIZE + box.cz() * Level4Plan.CELL + 3;
 						if (Level4Layout.tile(seed, x, z).kind() == Kind.AIR) return new int[] {x, z};
+						if (target == ZoneKind.LIGHTWELL) {
+							int cornerX = (rx0 + dx) * Level4Plan.SIZE + box.i() * Level4Plan.CELL + 3;
+							int cornerZ = (rz0 + dz) * Level4Plan.SIZE + box.j() * Level4Plan.CELL + 3;
+							if (Level4Layout.tile(seed, cornerX, cornerZ).kind() == Kind.AIR) return new int[] {cornerX, cornerZ};
+						}
 						return new int[] {x - 2, z - 2};
 					}
 				}
@@ -580,6 +760,65 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		for (int[] d : dirs) {
 			int sx = wx + d[0], sz = wz + d[1];
 			if (Level4Layout.tile(seed, sx, sz).kind() == Kind.AIR) return new int[] {sx, sz};
+		}
+		return null;
+	}
+
+	private static int[] findPlenumCrawl(long seed, BlockPos from) {
+		for (int dx = -12; dx <= 12; dx++) {
+			for (int dz = -12; dz <= 12; dz++) {
+				int x = from.getX() + dx, z = from.getZ() + dz;
+				Level4Layout.PlenumInfo pi = Level4Layout.plenumInfo(seed, x, z);
+				if (pi != null && !pi.wallShell() && pi.ladderDir() < 0 && !pi.duct()) {
+					return new int[] {x, z};
+				}
+			}
+		}
+		return null;
+	}
+
+	private static int[] findSubTunnelCorridor(long seed, BlockPos from) {
+		int rx0 = Math.floorDiv(from.getX(), Level4Plan.SIZE), rz0 = Math.floorDiv(from.getZ(), Level4Plan.SIZE);
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				Level4Plan plan = Level4Plan.of(seed, rx0 + dx, rz0 + dz);
+				if (plan.tunnelJ < 0) continue;
+				int ci = (plan.tunnelI0 + plan.tunnelI1) / 2;
+				int x = (rx0 + dx) * Level4Plan.SIZE + ci * Level4Plan.CELL + 3;
+				int z = (rz0 + dz) * Level4Plan.SIZE + plan.tunnelJ * Level4Plan.CELL + 3;
+				Level4Layout.SubTunnelInfo sub = Level4Layout.subTunnelInfo(seed, x, z);
+				if (sub != null && sub.corridor()) return new int[] {x, z};
+			}
+		}
+		return null;
+	}
+
+	private static int[] findLightwellShaft(long seed, BlockPos from) {
+		for (int dx = -14; dx <= 14; dx++) {
+			for (int dz = -14; dz <= 14; dz++) {
+				int x = from.getX() + dx, z = from.getZ() + dz;
+				if (Level4Layout.isLightwellShaft(seed, x, z)) return new int[] {x, z};
+			}
+		}
+		return null;
+	}
+
+	private static int[] findElevatedBridgeStand(long seed, BlockPos from) {
+		int rx0 = Math.floorDiv(from.getX(), Level4Plan.SIZE), rz0 = Math.floorDiv(from.getZ(), Level4Plan.SIZE);
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				int x0 = (rx0 + dx) * Level4Plan.SIZE, z0 = (rz0 + dz) * Level4Plan.SIZE;
+				for (int lx = 0; lx < Level4Plan.SIZE; lx++) {
+					for (int lz = 0; lz < Level4Plan.SIZE; lz++) {
+						int x = x0 + lx, z = z0 + lz;
+						Level4Layout.BridgeInfo bi = Level4Layout.skybridgeInfo(seed, x, z);
+						if (bi != null && bi.elevated() && bi.spanPos() == 14 && bi.perpPos() == 3
+								&& Level4Layout.tile(seed, x, z).kind() == Kind.AIR) {
+							return new int[] {x, z, bi.eastWest() ? 270 : 0};
+						}
+					}
+				}
+			}
 		}
 		return null;
 	}

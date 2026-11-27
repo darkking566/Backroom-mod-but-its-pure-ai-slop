@@ -420,7 +420,13 @@ final class Level4Bases {
 					int z1 = z0 + room.h() * Level4Plan.CELL - 1;
 					int cx = rx * Level4Plan.SIZE + room.cx() * Level4Plan.CELL + 3;
 					int cz = rz * Level4Plan.SIZE + room.cz() * Level4Plan.CELL + 3;
-					if (player.distanceToSqr(cx + 0.5, Level4ChunkGenerator.FLOOR_Y + 1, cz + 0.5) > 58 * 58) continue;
+					if (player.distanceToSqr(cx + 0.5, Level4ChunkGenerator.FLOOR_Y + 1, cz + 0.5) > 48 * 48) continue;
+					if (!level.isLoaded(new BlockPos(x0, Level4ChunkGenerator.FLOOR_Y, z0))
+							|| !level.isLoaded(new BlockPos(x1, Level4ChunkGenerator.FLOOR_Y, z0))
+							|| !level.isLoaded(new BlockPos(x0, Level4ChunkGenerator.FLOOR_Y, z1))
+							|| !level.isLoaded(new BlockPos(x1, Level4ChunkGenerator.FLOOR_Y, z1))) {
+						continue;
+					}
 					AABB box = new AABB(x0, Level4ChunkGenerator.FLOOR_Y, z0, x1 + 1, Level4ChunkGenerator.FLOOR_Y + 5, z1 + 1);
 					if (!level.getEntitiesOfClass(Person.class, box).isEmpty()) continue;
 

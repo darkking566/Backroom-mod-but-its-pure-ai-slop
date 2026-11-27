@@ -952,6 +952,50 @@
   - `Level4Travel.java`：從其他樓層進入 Level 4 時，若玩家曾於 M.E.G. Omega 基地行軍床安頓（重生點在 `Level4.LEVEL_4`），直接傳送回已安頓基地旁並顯示提示，還原「很容易返回」
   - `Level4Monsters.java` 調降實戰刷怪頻率並移除伺服器笑魘；新增 `src/client/java/dev/noclip/backrooms/level4/Level4Client.java`（於 `BackroomsClient.java` 註冊），於暗處以負 ID 生成 100% 純客戶端本地笑魘幻影（走近或盯視即煙散，伺服器零實體、隊友無法證實）
   - 補齊雙語翻譯、`docs/project/5-levels/level4/README.md` 與 `Level4ClientTest.extras`（實測散落瓶群撿取、純客戶端笑魘零伺服器實體、以及於 Omega 行軍床安頓後從 Level 2 返回直接落回基地）；`.\gradlew.bat cleanTest build --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=4 --no-daemon` 全部通過（僅提交本項 Level 4 改動，未推送）
+### 2026-11-27
+- 修正 **Level 4 下雨窗戶與雨景／雨聲不明顯問題**（Antigravity）：
+  - **修復窗戶雨滴「斜斜往上」與「玻璃雨滴無變化」**（`tools/make_level4.py`、`office_rain_window.png`／`_n.png`／`_s.png`／`.png.mcmeta`）：原 4 格貼圖間距 40px 卻每格位移 `+32px` 造成 `-8px/格` 逆向頻閃錯覺（雨滴往右上方倒退），且 4 格樣式單調並使用平面 `_n`/`_s`。改為 **32 格無縫下墜動畫**（`frametime: 1`、`interpolate: false`），結合三層動態：斜左下急落雨絲（每格 `(-4, +8)` 精準對齊 `128px` 循環、無頻閃）、附著玻璃表面緩慢垂直滑落的水珠與漸消濕痕（每格 `+4px` 帶微幅蛇行），以及錯相出現／擴散／淡出的玻璃撞擊水花小水珠，並同步生成對應幀的 labPBR 法線凸起 `_n` 與光滑反光 `_s`
+  - **修復建築外街谷天空與原版下雨完全失效**（`Level4ChunkGenerator.java`）：原 `y >= MAX_Y` 基岩層壓在 `OUTSIDE_AIR` 判斷之前，導致整層連戶外街谷 `y=127` 都封滿基岩、`canSeeSky` 恆為 `false` 且 `MOTION_BLOCKING` 高度恆為 `128`，使原版雨幕與窗外雨滴粒子完全無法生成；調整為 `OUTSIDE_AIR` 保留 `MIN_Y` 基岩底、開放 `MAX_Y` 天空，讓戶外雨幕與自然天光貫穿整座街谷
+  - **強化窗外雨幕粒子與連續立體雨聲**（`Level4Client.java`、`Level4Events.java`、`sounds.json`）：伺服器端持續維持 `Level4` 下雨天氣（`WeatherData` + `setRainLevel(1.0F)`），`Level4Client` 每 tick 以 `MOTION_BLOCKING <= FLOOR_Y` 嚴格僅於戶外與窗外投放密集下墜雨滴；`sounds.json` 的 `level4.rain` 音量由 `0.35` 提升至 `0.9`，`Level4Events` 改為每 `22..31` tick（約 1.1～1.55 秒）於玩家附近窗戶／戶外位置連續播放雨聲（窗邊／戶外 `0.85..0.90`、室內深處柔和 `0.34`，並保留「雨聲驟停」異象與獨立空調低鳴）
+  - **驗證**：於 `Level4ClientTest.views` 新增 `isRaining()`、`OUTSIDE_AIR` `canSeeSky` 與 `MAX_Y` 開天檢查，執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過，並檢視 `0009_level4_rain_window_view.png` 與 `0010_level4_trap_window.png` 確認玻璃水珠滑落與窗外雨幕正常渲染且室內無誤生粒子；僅提交本項改動於本機 `main`（未推送）
+- 改善 **Level 4 窗戶怪物（Entity 2 / `WindowEntity`）呈現方式與刷新率**（Antigravity）：
+  - **大幅降低出現頻率並杜絕「一排人站窗外」**：`Level4Layout.exteriorWindowKind` 陷阱窗機率由 `24%` 降至 `10%`；`Level4Windows.spawnNearbyWindowEntities` 改為跳過觀察者模式、將偵測半徑從 `22` 縮至 `12.5` 格、限制玩家 `28` 格內至多同時存在 **1 隻** 窗戶怪物，且僅在玩家位於室內面對該窗時於最近一扇窗外生成（略偏窗框一側、退後 `1.35` 格並壓低至 `FLOOR_Y + 0.85` 隱藏懸空雙腳）
+  - **修正跨中庭對望與「在空中轉身盯著玩家」**：`WindowEntity` 偵測半徑縮為 `16` 格；當玩家繞到窗外或對面中庭（`sideDot <= 0.1`）時直接消散，不再飄在對面空中轉身回頭盯著玩家；室內面對時身體始終朝向窗內（`yBodyRot` 鎖在 `±10°`、頭部微轉 `±32°`），並縮小誘引距離至 `10` 格
+  - **降低違和感與突兀感**：`office_trap_window` 調柔為磨砂霧面（貼圖與寫實包同步，`light_emission: 12→5`、`lightLevel: 4→2`）；`WindowEntityModel` 與 `WindowEntityRenderer` 加入微幅左右搖晃、遠距（`> 5.5` 格）壓低躲在窗台與霧後、以及超過 `9` 格隱藏自發光雙眼（靠近才浮現並起身招手）
+  - **驗證**：`Level4ClientTest.trapWindows` 補上「移動到窗外對面後 `WindowEntity` 自動消散」檢查；執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 與 `-Psections=windows` 通過並檢視 `0000_level4_trap_window.png` 確認磨砂霧氣遮罩下的怪物姿態自然；僅提交本項改動於本機 `main`（未推送）
+- 巨幅降低 **Level 4 物件、販賣機、飲水機與散落杏仁水刷新率**（Antigravity）：
+  - `Level4Layout.interiorTile`：隔間套房（`SUITE`）中心擺設機率由 `100%` 巨幅降至 `14%`（飲水機 5%、販賣機 2%、影印機 4%、桌機 3%，其餘 `86%` 保持空曠）；開放辦公區（`OPEN_OFFICE`）飲水機由 `9%→2%`、販賣機由 `6%→1%`（Omega 基地內部配置不變）
+  - `Level4Props.populateChunk`：每區塊散落 3D 辦公家具殘留由 `24%→5%`、散落杏仁水瓶群（`almond_bottle_cluster`）由 `30%→4%`
+  - **驗證**：執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本項改動於本機 `main`（未推送）
+- 減少 **Level 4 流浪者（`Level4Wanderers`）人數並賦予實用職業支援與以物易物功能**（Antigravity）：
+  - **人數與刷新率調降**：附近人數上限由 `5` 降至 **`2`**（偵測半徑由 `48→64`、消失距離由 `64→80`、出生距離由 `10..34→20..44`），生成間隔由 `12` 秒拉長至 **`40` 秒**且每次僅 `45%` 機率生成
+  - **實用職業支援（空手首次互動）**：每位流浪者依身分提供一次實戰協助——`drifter` 贈 2 塊塗窗用木炭＋理智 +8、`barterer` 贈 12 信用點＋手電筒電池組、`scout` 贈 2 份磷粉＋45 秒加速與夜視、`cartographer` 贈 15 經驗＋1 枚遺失舊幣＋理智 +10、`restless` 治療 3 顆心並清除負面狀態＋簡易繃帶＋理智 +10
+  - **擴充實用交換（每人上限提高至 `3` 次）**：遺失舊幣換杏仁水＋空瓶＋電池（並有機會拿聖像框）、合金換純化杏仁精華＋無菌繃帶＋2 份黑染料、2 份紙／廢紙換 2 塊木炭＋簡易繃帶、舊電路板／鍵盤換舊幣＋電池，並新增**收購 T.B.D.「無用」奇物換 20 信用點＋無菌繃帶**
+  - **驗證**：更新 `zh_tw.json`／`en_us.json` 並於 `Level4ClientTest` 補齊奇物交換實測與新譯名檢查，執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本項改動於本機 `main`（未推送）
+- 修復 **Level 4 空中走廊／外牆轉角 1 格裂縫缺口**（Antigravity）：
+  - **修復 `cornerTile` 區域接縫打穿外牆問題**（`Level4Layout.java`）：`Level4Layout.cornerTile` 殘留早期全樓連通時期的 `i == 0` / `j == 0` 邊界 `Edge.OPEN` 特例，導致空中走廊跨區域接縫處（`cx == 0, cz == 0`）的轉角柱被設為 `Kind.AIR`（鋪地毯與天花板卻直接貫穿至 `OUTSIDE_AIR`），形成面向戶外雨幕的 1 格垂直裂縫；移除該特例後統一補齊 `Kind.PILLAR` 結構柱，密閉空中走廊牆角
+  - **修復東／南向塔樓外牆空中走廊交界缺口**（`Level4ChunkGenerator.java`）：`blockAtColumn` 調整為 `if (skybridge && !exterior)`，避免塔樓外牆皮膚（`isExteriorSkin`）與空中走廊交會處在走廊上方／下方被挖出直通缺口
+  - **驗證**：於 `Level4LayoutTest` 新增 `indoorWalkableSpacesNeverTouchOutsideAir`（掃描多組種子與相鄰 3×3 區域驗證所有室內可行走格八鄰域皆不與 `OUTSIDE_AIR` 相接），執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本項改動於本機 `main`（未推送）
+- **Level 4 建築結構擴充第一批——半高格子間迷宮、毛坯結構翼區與高低錯層天橋**（Antigravity）：
+  - 更新企劃文件 `docs/project/5-levels/level4/README.md`，納入分四批實作的 10 項建築結構變化方案
+  - **半高格子間迷宮**（`Level4Layout.Kind.CUBICLE_WALL`／`CUBICLE_GLASS`、`Level4ChunkGenerator`）：約 37% 非出口且非天橋的 `OPEN_OFFICE` 單元內生成 4 種對稱／錯位 2 格高矮隔間（下層石膏板＋上層半截牆或透明玻璃），保留上方燈具視線同時切割地面視距與走道節奏
+  - **施工毛坯結構翼區**（`Level4Plan.ZoneKind.UNFINISHED_WING`、`Level4Layout.Kind.UNFINISHED_STUB`／`UNFINISHED_PILLAR`、`Level4ChunkGenerator`）：約 38% 區域生成 `2×2` 或 `2×3` 毛坯水泥空間，地面為雙色裸露灰混凝土（無地毯）、天花板為混凝土樑架搭配高故障率燈具，內部設灰混凝土柱與鐵欄圍籬半成品隔斷
+  - **高低錯層與觀景玻璃天橋**（`Level4Layout.skybridgeInfo`、`Level4ChunkGenerator.bridgeColumn`、`Level4Windows`）：約半數空中走廊升級為抬升 `+2` 格的高架全景玻璃天橋（兩端以磨製安山岩階梯上下銜接、橋底懸空貫穿峽谷、四面全高落地雨窗）；平層天橋中段則擴為三格高落地雨窗並於中央增設玻璃分流脊柱；`Level4Windows` 同步支援依玩家實際站立高度偵測上層陷阱窗
+  - **驗證**：更新 `Level4LayoutTest.batch1StructuresCubiclesUnfinishedAndVariedSkybridgesAppear` 與 `Level4ClientTest.views`（實機檢查格子間、毛坯地坪、高架天橋底懸空／橋面與拍攝 `level4_cubicles`／`level4_unfinished_wing`／`level4_elevated_bridge`），`.\gradlew.bat test --no-daemon` 與 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 通過；僅提交本批改動於本機 `main`（未推送）
+- **Level 4 建築結構擴充第二批——貫通天空採光天井與凹入式避雨陽台**（Antigravity）：
+  - **貫通天空採光天井**（`Level4Plan.ZoneKind.LIGHTWELL`、`Level4Layout.isLightwellShaft`、`Level4ChunkGenerator`）：約 42% 區域生成 `3×3` 格環形玻璃走廊（四面皆設開放拱門與鄰區連通），中央 `1×1` 格（`7×7` 方塊）垂直開天貫穿至 `MAX_Y` 讓真實雨水直落至 `y=32` 積水井底，周邊圍以全透明雨景窗並與據點塗黑窗規則相容
+  - **凹入式避雨陽台**（`Level4Plan.balconyDir`、`Level4Layout.Kind.BALCONY_RAIL`／`BALCONY_FLOOR`／`BALCONY_CANOPY`、`Level4ChunkGenerator.balconyColumn`、`Level4Client`、`Level4Events`）：高樓四面外緣（避開據點、出口與非開放側壁）約 22% 符合單元向內凹入 2 格成半戶外灰水泥露台：外側以輕灰水泥矮牆＋鐵欄護欄隔絕街谷墜落風險，上方延 `MAX_Y` 開天淋雨並保留門口 1 格挑出雨棚，室內門牆同步配防火門與雙側雨窗，玩家走上露台即可觸發戶外級雨聲（`0.90F`）與 `Heightmap` 降雨粒子
+  - 順手修復 `Level4Bases.populateNear` 跨未載入區塊邊界時可能只生成部分陣營成員的問題（要求據點四角區塊皆已載入才開始放置人員，避免 `AMOR_CAMP` 只刷出 7 人）
+  - **驗證**：新增 `Level4LayoutTest.batch2StructuresLightwellAndRainBalconiesAppear` 與 `Level4ClientTest.views` 天井積水／開天及露台淋雨開天實機檢查（並拍攝 `level4_lightwell`、`level4_balcony`），`.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本批改動於本機 `main`（未推送）
+- **Level 4 建築結構擴充第三批——開放垂直電梯井大廳與下沉階梯簡報廳**（Antigravity）：
+  - **開放垂直電梯井大廳**（`Level4Plan.ZoneKind.ELEVATOR_LOBBY`、`Level4Layout.Kind.ELEVATOR_SHAFT`／`ELEVATOR_CABLE`／`ELEVATOR_SHAFT_WALL`／`ELEVATOR_THRESHOLD`、`Level4ChunkGenerator`）：約 45% 區域生成 `2×1` 電梯等待大廳，北側設有半開破敗電梯門檻（防墜鐵欄柵與可窺視暗井之門縫）直通貫穿 `50` 格深（`y=10..60`）的黑洞垂直電梯井，井心垂懸垂直鋼纜鐵欄
+  - **下沉階梯式大型簡報廳 / 廢棄禮堂**（`Level4Plan.ZoneKind.AUDITORIUM`、`Level4Layout.auditoriumInfo`、`Level4ChunkGenerator.auditoriumColumn`）：約 34% 區域生成 `3×3` 挑高 `8` 格的階梯報告廳；後排入口於 `y=32` 無段差接入，經由多排磨製安山岩觀眾階梯逐級下沉至 `y=29` 坑道與 `y=30` 講台（附灰白布幕牆與後暗前明聚光燈）
+  - **驗證**：新增 `Level4LayoutTest.batch3StructuresElevatorShaftsAndAuditoriumAppear` 與 `Level4ClientTest.views` 電梯深井上下通透及簡報廳下沉地坪實機檢查（拍攝 `level4_elevator_lobby`、`level4_auditorium`），`.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本批改動於本機 `main`（未推送）
+- **Level 4 建築結構擴充第四批（最終批）——二樓挑高夾層、天花板維修夾層與地下冰水機電管廊**（Antigravity）：
+  - **局部二樓夾層與連通安全梯**（`Level4Plan.ZoneKind.MEZZANINE`、`Level4Layout.mezzanineInfo`、`Level4ChunkGenerator.mezzanineColumn`）：約 38% 區域生成 `3×2` 挑高 `10` 格雙層空間（1F `y=32` 附吊頂燈管＋2F `y=38` 地毯夾層與玻璃辦公室隔間），西側以 `6` 階磨製安山岩大梯階無段差連通 1F/2F，東南角開設雙層挑高天井口搭配 2F 玻璃護欄俯瞰下層
+  - **天花板維修夾層與 HVAC 風管通道**（`Level4Layout.plenumInfo`、`Level4ChunkGenerator.plenumBlock`）：於 `DARK_WING` 上方 `y=38..40` 開放可攀爬的設備維修夾層，兩端設直通 `y=33..39` 的靠牆爬梯井口（附 `IRON_BARS` 中央天花板窺視格柵、淺灰混凝土懸吊風管與昏黃檢修燈）
+  - **地下冰水機電連通長廊**（`Level4Plan.findMepTunnel`、`Level4Layout.subTunnelInfo`、`Level4ChunkGenerator.subTunnelBlock`）：每區最高 65% 機率沿未跨出室外與出口之列位貫通 `5～7` 格單元地下設備長廊（`y=26..29`，潮濕中溝、兩側淺灰混凝土與管線鐵柵、昏黃應急燈），兩端以鐵欄護欄包圍石磚階梯對稱下潛與回返地面翼區
+  - 同步更新 `docs/project/5-levels/level4/README.md` 標記全 10 項建築擴充已實作；新增 `Level4LayoutTest.batch4StructuresMezzaninePlenumAndSubTunnelAppear` 與 `Level4ClientTest.views` 實機驗證（拍攝 `level4_mezzanine`、`level4_sub_tunnel`），`.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本批改動於本機 `main`（未推送）
 - 完成 **手電筒系統翻修、3D 雙款手電筒與五格電量 HUD、濾鏡／光照／光影相容與 F7 卡頓修復、紅霧滲透細節修正**（Antigravity）：
   - **紅霧滲透細節修正**（`core/trip/Anomalies.java`、`zh_tw.json`、`en_us.json`）：`infestRedRoomNear` 加入最小生成距離 ≥ 14 格（不再直接凝結在玩家腳邊）；紅霧區 `ANOMALY_VAULT_CHEST` 與 `supply_crate` 改為優先於 `RED_ANOMALY_CLUSTER` 東西兩側對稱生成，避免補給箱擋住正面視線與拍照；更新 `anomaly.noclip_backrooms.red_mist.desc` 雙語說明對齊局部紅霧與異常寶箱區機制
   - **濾鏡／迷霧／光照／Iris 光影相容與 F7 零延遲切換**（`src/client/.../core/look/Look.java`、`shaders/post/camcorder.fsh`、`post_effect/camcorder.json`、`dimension_type/level_{0..3}.json`）：
