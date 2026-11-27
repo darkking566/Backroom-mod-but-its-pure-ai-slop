@@ -8,37 +8,33 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleBuilder;
 import net.minecraft.commands.Commands;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
+import net.minecraft.server.level.TicketType;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Relative;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.gamerules.GameRule;
 import net.minecraft.world.level.gamerules.GameRuleCategory;
-import net.minecraft.world.phys.Vec3;
 
 /**
- * Plan C non-Euclidean Stage Loop for Level 0:
- * Every 300x300-block Stage (5x5 sectors) forms a dense self-contained labyrinth containing all 10 zones,
- * landmarks, micro-events, and branching exits. When a survival/adventure player walks past the outer 4-block
- * rim of their active Stage, they seamlessly wrap around to the opposite side of the same Stage with a subtle
- * fluorescent flicker—making the finite high-density map feel endless with zero invisible walls.
+ * Level 0 is finite and you cannot see where it ends: a 300 x 300 Stage that repeats in every direction (Level0Space).
+ * Every player, in any game mode, is kept in the centre Stage of their region: on crossing one of its edges they are
+ * moved exactly one Stage back. The blocks around them are the same before and after (the copy they walked into is
+ * the Stage itself), their facing and speed are kept, so the move cannot be seen; walking on, you come round to where
+ * you started. Near an edge the far side is loaded ahead, so the move does not wait on chunks.
  *
- * Creative/spectator players and explicit admin teleports (> 24 blocks jump) smoothly switch to the destination
- * Stage instead of being pulled back.
+ * The game rule noclip_backrooms:stage_loop (on by default) turns the loop off; the world still repeats.
  */
 final class StageLoop {
 	private static GameRule<Boolean> stageLoopRule;
-	private static final int CHECK_INTERVAL_TICKS = 4;
-	private static final int WRAP_MARGIN = 4;
-	private static final int WRAP_COOLDOWN_TICKS = 30;
-	private static final double TELEPORT_JUMP_THRESHOLD = 24.0;
-
-	private static final Map<UUID, StageTracker> TRACKERS = new HashMap<>();
+	/** How close to an edge (blocks) the far side starts loading. */
+	private static final int PRELOAD_DISTANCE = 48;
+	private static final int PRELOAD_RADIUS = 3;
+	private static final int PRELOAD_EVERY = 40;
+	private static final Map<UUID, Integer> LAST_PRELOAD = new HashMap<>();
 
 	private StageLoop() {
 	}
@@ -61,143 +57,71 @@ final class StageLoop {
 									int stz = stageZOfBlock(player.getBlockZ());
 									int minX = stx * Maze.STAGE_BLOCKS;
 									int minZ = stz * Maze.STAGE_BLOCKS;
-									int lx = player.getBlockX() - minX;
-									int lz = player.getBlockZ() - minZ;
+									int lx = Level0Space.template(player.getBlockX()) - minX;
+									int lz = Level0Space.template(player.getBlockZ()) - minZ;
 									long seed = Level0ChunkGenerator.mazeSeed(player.level().getChunkSource().randomState());
-									Maze.Zone zone = Maze.zoneAt(seed, player.getBlockX(), player.getBlockZ());
+									Maze.Zone zone = Maze.zoneAt(seed, Level0Space.template(player.getBlockX()), Level0Space.template(player.getBlockZ()));
+									boolean original = Level0Space.original(player.getBlockX()) && Level0Space.original(player.getBlockZ());
 									ctx.getSource().sendSuccess(() -> Component.literal(
 											"Level 0 Stage (" + stx + ", " + stz + ") origin=[" + minX + "," + minZ
 													+ "] local=(" + lx + "," + lz + ")/" + Maze.STAGE_BLOCKS
-													+ " zone=" + zone), false);
+													+ " zone=" + zone + (original ? "" : " (in a copy)")), false);
 									return 1;
 								})))));
 	}
 
+	/** The Stage a block belongs to: the centre Stage it is a copy of. */
 	static int stageXOfBlock(int x) {
-		return Math.floorDiv(x, Maze.STAGE_BLOCKS);
+		return Math.floorDiv(Level0Space.template(x), Maze.STAGE_BLOCKS);
 	}
 
 	static int stageZOfBlock(int z) {
-		return Math.floorDiv(z, Maze.STAGE_BLOCKS);
+		return Math.floorDiv(Level0Space.template(z), Maze.STAGE_BLOCKS);
 	}
 
 	private static void tick(MinecraftServer server) {
-		int now = server.getTickCount();
-		if (now % CHECK_INTERVAL_TICKS != 0) return;
 		ServerLevel level = server.getLevel(Level0.LEVEL_0);
-		if (level == null || stageLoopRule == null || !level.getGameRules().get(stageLoopRule)) return;
-
-		long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
-		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-			UUID id = player.getUUID();
-			if (player.level().dimension() != Level0.LEVEL_0 || !player.isAlive()) {
-				TRACKERS.remove(id);
-				continue;
-			}
-			int curStx = stageXOfBlock(player.getBlockX());
-			int curStz = stageZOfBlock(player.getBlockZ());
-			StageTracker prev = TRACKERS.get(id);
-
-			if (player.isCreative() || player.isSpectator() || RedRoomLoop.isTrapped(player)) {
-				TRACKERS.put(id, new StageTracker(curStx, curStz, player.getX(), player.getZ(),
-						prev != null ? prev.lastWrapTick() : -WRAP_COOLDOWN_TICKS));
-				continue;
-			}
-
-			if (prev == null) {
-				TRACKERS.put(id, new StageTracker(curStx, curStz, player.getX(), player.getZ(), -WRAP_COOLDOWN_TICKS));
-				continue;
-			}
-
-			double moved = Math.hypot(player.getX() - prev.lastX(), player.getZ() - prev.lastZ());
-			if (moved > TELEPORT_JUMP_THRESHOLD) {
-				// External teleport (e.g. respawn, command, arrival): adopt the new Stage cleanly.
-				TRACKERS.put(id, new StageTracker(curStx, curStz, player.getX(), player.getZ(), prev.lastWrapTick()));
-				continue;
-			}
-
-			if (now - prev.lastWrapTick() < WRAP_COOLDOWN_TICKS) {
-				TRACKERS.put(id, new StageTracker(prev.stx(), prev.stz(), player.getX(), player.getZ(), prev.lastWrapTick()));
-				continue;
-			}
-
-			int minX = prev.stx() * Maze.STAGE_BLOCKS;
-			int maxX = minX + Maze.STAGE_BLOCKS;
-			int minZ = prev.stz() * Maze.STAGE_BLOCKS;
-			int maxZ = minZ + Maze.STAGE_BLOCKS;
-
-			double targetX = player.getX();
-			double targetZ = player.getZ();
-			boolean wrap = false;
-
-			if (targetX < minX + WRAP_MARGIN) {
-				targetX = maxX - WRAP_MARGIN - 2.5;
-				wrap = true;
-			} else if (targetX > maxX - WRAP_MARGIN) {
-				targetX = minX + WRAP_MARGIN + 2.5;
-				wrap = true;
-			}
-			if (targetZ < minZ + WRAP_MARGIN) {
-				targetZ = maxZ - WRAP_MARGIN - 2.5;
-				wrap = true;
-			} else if (targetZ > maxZ - WRAP_MARGIN) {
-				targetZ = minZ + WRAP_MARGIN + 2.5;
-				wrap = true;
-			}
-
-			if (!wrap) {
-				TRACKERS.put(id, new StageTracker(prev.stx(), prev.stz(), player.getX(), player.getZ(), prev.lastWrapTick()));
-				continue;
-			}
-
-			Vec3 safeDest = findSafeWrapDest(level, seed, player, targetX, targetZ, minX, maxX, minZ, maxZ);
-			if (safeDest != null) {
-				player.teleportTo(level, safeDest.x, safeDest.y, safeDest.z,
+		if (level == null || stageLoopRule == null || !level.getGameRules().get(stageLoopRule)) {
+			LAST_PRELOAD.clear();
+			return;
+		}
+		int now = server.getTickCount();
+		java.util.Set<UUID> here = new java.util.HashSet<>();
+		for (ServerPlayer player : level.players()) here.add(player.getUUID());
+		Level0Space.keepOnly(here);
+		for (ServerPlayer player : level.players()) {
+			if (!player.isAlive() || RedRoomLoop.isTrapped(player)) continue;
+			int bx = Mth.floor(player.getX()), bz = Mth.floor(player.getZ());
+			int dx = Level0Space.template(bx) - bx, dz = Level0Space.template(bz) - bz;
+			if (dx != 0 || dz != 0) {
+				// Out of the centre Stage (over an edge, or set down in a copy): back by whole Stages. Same blocks around.
+				player.teleportTo(level, player.getX() + dx, player.getY(), player.getZ() + dz,
 						Relative.union(Relative.DELTA, Relative.ROTATION), 0.0F, 0.0F, false);
-				player.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 14, 0, true, false, false));
-				level.playSound(null, safeDest.x, safeDest.y + 2.0, safeDest.z,
-						ModSounds.FLUORESCENT_HUM, SoundSource.AMBIENT, 0.35F, 1.35F);
-				TRACKERS.put(id, new StageTracker(prev.stx(), prev.stz(), safeDest.x, safeDest.z, now));
-			} else {
-				TRACKERS.put(id, new StageTracker(curStx, curStz, player.getX(), player.getZ(), now));
+				Level0Space.moved(player.getUUID(), dx, dz);
+				continue;
 			}
+			preload(level, player, bx, bz, now);
 		}
 	}
 
-	private static Vec3 findSafeWrapDest(ServerLevel level, long seed, ServerPlayer player,
-			double rawX, double rawZ, int minX, int maxX, int minZ, int maxZ) {
-		int baseCx = Math.floorDiv((int) Math.floor(rawX), Maze.CELL);
-		int baseCz = Math.floorDiv((int) Math.floor(rawZ), Maze.CELL);
-		int minCx = minX / Maze.CELL + 1;
-		int maxCx = maxX / Maze.CELL - 2;
-		int minCz = minZ / Maze.CELL + 1;
-		int maxCz = maxZ / Maze.CELL - 2;
-
-		for (int ring = 0; ring <= 4; ring++) {
-			for (int dcx = -ring; dcx <= ring; dcx++) {
-				for (int dcz = -ring; dcz <= ring; dcz++) {
-					if (Math.max(Math.abs(dcx), Math.abs(dcz)) != ring) continue;
-					int cx = Math.clamp(baseCx + dcx, minCx, maxCx);
-					int cz = Math.clamp(baseCz + dcz, minCz, maxCz);
-					int tx = cx * Maze.CELL + Maze.CENTER;
-					int tz = cz * Maze.CELL + Maze.CENTER;
-					Maze.Zone z = Maze.zoneAt(seed, tx, tz);
-					if (z == Maze.Zone.RED_ROOM || z == Maze.Zone.CHASM || z == Maze.Zone.PITS) continue;
-					int floorY = Maze.walkableFloorY(seed, tx, tz, Maze.EpochSource.ZERO);
-					if (floorY == Integer.MIN_VALUE) continue;
-					BlockPos feet = new BlockPos(tx, floorY + 1, tz);
-					level.getChunk(feet);
-					if (level.getBlockState(feet.below()).getCollisionShape(level, feet.below()).isEmpty()) continue;
-					Vec3 cand = new Vec3(tx + 0.5, floorY + 1, tz + 0.5);
-					if (level.noCollision(player.getDimensions(player.getPose()).makeBoundingBox(cand))) {
-						return cand;
-					}
-				}
-			}
+	/** Near an edge, load the far side (where the player will be moved to) a little ahead. */
+	private static void preload(ServerLevel level, ServerPlayer player, int bx, int bz, int now) {
+		int lx = Math.floorMod(bx, Level0Space.PERIOD), lz = Math.floorMod(bz, Level0Space.PERIOD);
+		int shiftX = lx < PRELOAD_DISTANCE ? Level0Space.PERIOD : lx >= Level0Space.PERIOD - PRELOAD_DISTANCE ? -Level0Space.PERIOD : 0;
+		int shiftZ = lz < PRELOAD_DISTANCE ? Level0Space.PERIOD : lz >= Level0Space.PERIOD - PRELOAD_DISTANCE ? -Level0Space.PERIOD : 0;
+		if (shiftX == 0 && shiftZ == 0) return;
+		Integer last = LAST_PRELOAD.get(player.getUUID());
+		if (last != null && now - last < PRELOAD_EVERY && now >= last) return;
+		LAST_PRELOAD.put(player.getUUID(), now);
+		var chunks = level.getChunkSource();
+		if (shiftX != 0) chunks.addTicketWithRadius(TicketType.PORTAL, chunk(bx + shiftX, bz), PRELOAD_RADIUS);
+		if (shiftZ != 0) chunks.addTicketWithRadius(TicketType.PORTAL, chunk(bx, bz + shiftZ), PRELOAD_RADIUS);
+		if (shiftX != 0 && shiftZ != 0) {
+			chunks.addTicketWithRadius(TicketType.PORTAL, chunk(bx + shiftX, bz + shiftZ), PRELOAD_RADIUS);
 		}
-		return null;
 	}
 
-	private record StageTracker(int stx, int stz, double lastX, double lastZ, int lastWrapTick) {
+	private static ChunkPos chunk(int x, int z) {
+		return new ChunkPos(Math.floorDiv(x, 16), Math.floorDiv(z, 16));
 	}
 }

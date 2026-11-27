@@ -98,7 +98,8 @@ public final class Level1ClientTest implements FabricClientGameTest {
 	/** Spends a moment in Level 0, makes a wall flicker, looks at it, and walks into it. */
 	private static void enterThroughFlickeringWall(ClientGameTestContext context, TestSingleplayerContext game) {
 		var server = game.getServer();
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 33 3.5 0 0");
+		// Well inside Stage (0,0): Level 0 repeats it past its edges, and walls only open in the Stage itself.
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 45.5 33 45.5 0 0");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(40);
 		game.getConnection().waitForChunksRender();

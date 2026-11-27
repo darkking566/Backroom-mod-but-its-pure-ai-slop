@@ -570,6 +570,18 @@
 - 使用者定下新方向（只改企劃，程式沒動）：第 0 層以電影版為主；分工改成朋友做新樓層、Claude 專心做物件建模、Gemini 做物品分布與擺放；建模順序是先把每一層（主要樓層）會敲掉變成資源的物品做完（第 0 層先，部分物件如辦公椅移到 Level 4），之後才做武器、醫療等；合成表等建模都定了再整個重做（先想每層物品敲掉變成什麼、同時列醫療與武器等成品，最後才想怎麼組成）。寫進 `docs/project/README.md`（分工）、`AGENTS.md`（分工一行）、`docs/project/3-crafting/README.md`（重做方向）、`docs/project/5-levels/level0/README.md`（第八節第 6 點：哪些換成電影版、哪些由 Claude 重做、手機待決定）
 - 使用者同意後，把 `main` 推送到 GitHub（電影版物件 `3139b0bc` 與新方向）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
+### 2026-11-27
+- 使用者問 Gemini 的「有限第 0 層」是否真的有用環面：查了 `StageLoop`，原本只在生存／冒險模式把走到邊緣的玩家傳到對面，地形不重複（邊界外是隔壁不同的場景），傳送落在對面某格中央、四周會突然變樣；旁觀者與創造模式完全不循環（朋友用旁觀者，所以一直看到新地形）。使用者要求做成真正看不出接縫的環面：
+  - 先合併朋友新推的 9 個 Level 4 提交（衝突在 `sounds.json` 與 `CLAUDE.md`，兩邊都保留）
+  - 新增 `level0/Level0Space`：每 5×5 塊場景為一區，區內每塊都是中央那塊的複製（`template()`）；生成器寫進世界的方塊改用 `worldBlockAt`（計畫 `blockAt` 本身不變，單元測試照舊）
+  - 改 Gemini 的 `StageLoop`：所有模式都循環；玩家一律待在中央場景，跨過邊緣剛好平移 300 格（面向、速度不變）；靠近邊緣 48 格時用 PORTAL 票先載入對面；`/backrooms stage info` 顯示是否在複製品裡；拿掉原本找落點失敗時讓玩家跑出去的漏洞
+  - 改朋友／Gemini 的程式：`Level0Arrival`（落點選在中央場景、紅室判斷用範本座標）、`EdgeShift`（以原始格為準，同時改寫附近每份複製，任一份被看著就不變形；狀態以原始格記錄）
+  - 改我自己的：`level1/FlickeringWalls`（閃爍牆只開在中央場景）、`level0p1/ZenithEntrance`（白色艙門改成每兩塊場景藏一扇，位置從計畫算出，每份複製都在同一處）、`core/field/Evidence`（測繪信標距離用走過的距離：`Level0Space.walkedX/Z`）
+  - 測試：Gemini 的 `Level0ClientTest` 新增「邊界外的複製品與場景逐格相同」「旁觀者、創造、生存跨過邊緣都剛好平移 300 格」，地標搜尋改成只找中央場景裡的（擴大搜尋範圍），世界比對改成跟 `worldBlockAt` 比，觀察模式變形等待改成前方任一格；`ExitClientChecks` 只找中央場景的門；`Level1ClientTest` 閃爍牆段改站在場景內；`Level0p1ClientTest` 艙門段改用新的找法
+  - 驗證：`gradlew build`、`runClientGameTest -Plevels=0`（通過；另外兩次各失敗在不同的隨機檢查「黑影時有怪物」「卡住的落點沒跳過」，看起來是第 0 層隨機事件造成的偶發，第三次通過）、`-Plevels=horror,floors,field,frontrooms,film,1 -Psections=leaveThroughDoor`、`-Plevels=0.1 -Psections=hatch,ways` 通過
+  - 企劃寫進 `docs/project/5-levels/level0/README.md` 第三節第 4 點（含給 Gemini 擺放家具的注意：要照範本座標放，不能照區塊掃描）
+  - 限制：在中央場景改動的方塊不會出現在遠處複製品上；複製品裡看不到另一側的隊友、怪物、掉落物
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23

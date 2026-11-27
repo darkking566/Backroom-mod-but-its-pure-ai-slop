@@ -54,6 +54,14 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		return blockAt(seed, x, y, z, Maze.EpochSource.ZERO);
 	}
 
+	/**
+	 * What the world holds at a block: Level 0 is a torus, every Stage of a region a copy of its centre Stage
+	 * (Level0Space). The plan (blockAt) stays unbounded; only what is written into the world repeats.
+	 */
+	static BlockState worldBlockAt(long seed, int x, int y, int z) {
+		return blockAt(seed, Level0Space.template(x), y, Level0Space.template(z));
+	}
+
 	static BlockState blockAt(long seed, int x, int y, int z, Maze.EpochSource epochs) {
 		if (y == MIN_Y) return Blocks.BEDROCK.defaultBlockState();
 		int cx = Math.floorDiv(x, Maze.CELL), cz = Math.floorDiv(z, Maze.CELL);
@@ -479,7 +487,7 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
 				for (int y = MIN_Y; y <= MAX_Y; y++) {
-					BlockState state = blockAt(seed, minX + x, y, minZ + z);
+					BlockState state = worldBlockAt(seed, minX + x, y, minZ + z);
 					chunk.setBlockState(pos.set(x, y, z), state);
 					if (state.getBlock() instanceof EntityBlock entityBlock) {
 						BlockPos worldPos = new BlockPos(minX + x, y, minZ + z);
@@ -500,7 +508,7 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 	public NoiseColumn getBaseColumn(int x, int z, LevelHeightAccessor heightAccessor, RandomState randomState) {
 		long seed = mazeSeed(randomState);
 		BlockState[] column = new BlockState[HEIGHT];
-		for (int i = 0; i < HEIGHT; i++) column[i] = blockAt(seed, x, MIN_Y + i, z);
+		for (int i = 0; i < HEIGHT; i++) column[i] = worldBlockAt(seed, x, MIN_Y + i, z);
 		return new NoiseColumn(MIN_Y, column);
 	}
 

@@ -22,7 +22,8 @@ public final class Level0Arrival {
 		if (level0 == null) return false;
 		// Through an exit, a fresh stretch of Level 0 (docs/project/1-gameplay/README.md); falling in from the Overworld, under the player.
 		int[] at = dev.noclip.backrooms.core.LevelExits.anchor(player);
-		int cx = Math.floorDiv(at[0], CELL), cz = Math.floorDiv(at[1], CELL);
+		// Land in the region's centre Stage (Level 0 repeats it all around; StageLoop keeps players there).
+		int cx = Math.floorDiv(Level0Space.template(at[0]), CELL), cz = Math.floorDiv(Level0Space.template(at[1]), CELL);
 		for (int ring = 0; ring < RINGS; ring++) {
 			for (int i = -ring; i <= ring; i++) {
 				for (int j = -ring; j <= ring; j++) {
@@ -52,6 +53,6 @@ public final class Level0Arrival {
 	/** Red Room zones come from the maze seed; probing walls missed most cells (the room is open where doors are). */
 	static boolean inRedRoom(ServerLevel level0, BlockPos pos) {
 		long seed = Level0ChunkGenerator.mazeSeed(level0.getChunkSource().randomState());
-		return Maze.zoneAt(seed, pos.getX(), pos.getZ()) == Maze.Zone.RED_ROOM;
+		return Maze.zoneAt(seed, Level0Space.template(pos.getX()), Level0Space.template(pos.getZ())) == Maze.Zone.RED_ROOM;
 	}
 }

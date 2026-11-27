@@ -347,7 +347,10 @@ public final class Evidence {
 			if (where == null) refusal = "message.noclip_backrooms.field.beacon_not_here";
 			else if (entry == null || !entry.dimension().equals(level.dimension().identifier().toString())) refusal = "message.noclip_backrooms.field.beacon_no_entry";
 			else {
-				distance = (int) Math.sqrt(Math.pow(entry.pos().getX() - at.getX(), 2) + Math.pow(entry.pos().getZ() - at.getZ(), 2));
+				// As walked: Level 0 is a torus and carries players round it (level0.Level0Space).
+				int atX = dev.noclip.backrooms.level0.Level0Space.walkedX(player, at.getX());
+				int atZ = dev.noclip.backrooms.level0.Level0Space.walkedZ(player, at.getZ());
+				distance = (int) Math.sqrt(Math.pow(entry.pos().getX() - atX, 2) + Math.pow(entry.pos().getZ() - atZ, 2));
 				if (distance < MIN_DISTANCE) refusal = "message.noclip_backrooms.field.beacon_too_near";
 			}
 			if (refusal != null) {

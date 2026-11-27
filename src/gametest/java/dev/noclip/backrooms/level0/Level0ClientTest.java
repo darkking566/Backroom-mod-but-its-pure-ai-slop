@@ -240,7 +240,17 @@ public final class Level0ClientTest implements FabricClientGameTest {
 
 		server.runCommand("execute as @a run backrooms edgeshift watch on");
 		server.runOnServer(s -> check(EdgeShift.isWatching(player(s)), "watch mode failed to enable"));
-		server.waitFor(s -> player(s).level().getDataStorage().computeIfAbsent(EdgeShift.ShiftState.TYPE).epochAt(0, 3) > 0, 400);
+		// Watch mode reshapes cells in plain view too (any of those in front; Level 0 being a torus, a cell's
+		// neighbours across a seam can rule a particular one out).
+		server.waitFor(s -> {
+			EdgeShift.ShiftState watched = player(s).level().getDataStorage().computeIfAbsent(EdgeShift.ShiftState.TYPE);
+			for (int cz = 1; cz <= 3; cz++) {
+				for (int cx = -2; cx <= 2; cx++) {
+					if (watched.epochAt(cx, cz) > 0) return true;
+				}
+			}
+			return false;
+		}, 400);
 		server.runCommand("execute as @a run backrooms edgeshift watch off");
 		server.runOnServer(s -> check(!EdgeShift.isWatching(player(s)), "watch mode failed to disable"));
 		server.runCommand("execute as @a run backrooms edgeshift status");
@@ -253,17 +263,18 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			ServerLevel level = s.getLevel(Level0.LEVEL_0);
 			long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
 			int sectorBlocks = Maze.CELL * Maze.SECTOR;
-			for (int radius = 1; radius <= 12; radius++) {
+			for (int radius = 1; radius <= 40; radius++) {
 				for (int sx = -radius; sx <= radius; sx++) {
 					for (int sz = -radius; sz <= radius; sz++) {
-						if (Maze.zoneAt(seed, sx * sectorBlocks + Maze.CENTER, sz * sectorBlocks + Maze.CENTER) == Maze.Zone.RED_ROOM
+						if (sectorInWorld(sx, sz) && sectorInWorld(sx - 1, sz)
+								&& Maze.zoneAt(seed, sx * sectorBlocks + Maze.CENTER, sz * sectorBlocks + Maze.CENTER) == Maze.Zone.RED_ROOM
 								&& Maze.zoneAt(seed, (sx - 1) * sectorBlocks + Maze.CENTER, sz * sectorBlocks + Maze.CENTER) != Maze.Zone.RED_ROOM) {
 							return new int[] {sx, sz};
 						}
 					}
 				}
 			}
-			throw new AssertionError("no RED_ROOM sector found within radius 12");
+			throw new AssertionError("no RED_ROOM sector in a centre Stage within radius 40");
 		});
 
 		int rsx = redSector[0], rsz = redSector[1];
@@ -370,16 +381,16 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		ManilaRoomPlan.Room room = server.computeOnServer(s -> {
 			ServerLevel level = s.getLevel(Level0.LEVEL_0);
 			long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
-			for (int radius = 0; radius <= 6; radius++) {
+			for (int radius = 0; radius <= 30; radius++) {
 				for (int rx = -radius; rx <= radius; rx++) {
 					for (int rz = -radius; rz <= radius; rz++) {
 						if (Math.max(Math.abs(rx), Math.abs(rz)) != radius) continue;
 						ManilaRoomPlan.Room found = ManilaRoomPlan.roomInRegion(seed, rx, rz);
-						if (found != null) return found;
+						if (found != null && cellInWorld(found.cx0(), found.cz0())) return found;
 					}
 				}
 			}
-			throw new AssertionError("no Manila Room found within radius 6 stages");
+			throw new AssertionError("no Manila Room in a centre Stage within radius 30");
 		});
 
 		int bx = room.baseX(), bz = room.baseZ();
@@ -468,12 +479,13 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			ServerLevel level = s.getLevel(Level0.LEVEL_0);
 			long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
 			EnumMap<StaircasePlan.Type, StaircasePlan.Complex> map = new EnumMap<>(StaircasePlan.Type.class);
-			for (int radius = 1; radius <= 20 && map.size() < StaircasePlan.Type.values().length; radius++) {
+			for (int radius = 1; radius <= 80 && map.size() < StaircasePlan.Type.values().length; radius++) {
 				for (int sx = -radius; sx <= radius; sx++) {
 					for (int sz = -radius; sz <= radius; sz++) {
 						if (Math.max(Math.abs(sx), Math.abs(sz)) != radius) continue;
+						if (!sectorInWorld(sx, sz)) continue;
 						StaircasePlan.Complex c = StaircasePlan.complexInSector(seed, sx, sz);
-						if (c != null) map.putIfAbsent(c.type(), c);
+						if (c != null && cellInWorld(c.cx0(), c.cz0())) map.putIfAbsent(c.type(), c);
 					}
 				}
 			}
@@ -829,12 +841,49 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		server.runCommand("execute as @a run backrooms stage info");
 		context.waitTicks(10);
 
-		// Enable stage_loop, stand inside Stage (0,0) near west border, step across x < 4 -> should wrap to east side (> 240)
+		// Level 0 is a torus (Level0Space): past the west edge of Stage (0,0) lies the same Stage again, block for block...
+		String seam = server.computeOnServer(s -> {
+			ServerLevel level = s.getLevel(Level0.LEVEL_0);
+			// (Away from the origin, where the blackout just above turned lamps off on both sides of the edge.)
+			for (int z = 60; z < Maze.STAGE_BLOCKS; z += 7) {
+				for (int x = -24; x < 0; x += 3) {
+					for (int y = standY - 1; y <= standY + 4; y++) {
+						BlockState copy = level.getBlockState(new BlockPos(x, y, z));
+						BlockState original = level.getBlockState(new BlockPos(x + Level0Space.PERIOD, y, z));
+						if (!copy.equals(original)) return "(" + x + "," + y + "," + z + ") " + copy + " vs " + original;
+					}
+				}
+			}
+			return null;
+		});
+		check(seam == null, "the copy past Stage (0,0)'s west edge differs from the Stage at " + seam);
+		// ...and crossing it, in every game mode, moves the player exactly one Stage, facing kept.
 		server.runCommand("gamerule noclip_backrooms:stage_loop true");
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 15.5 " + standY + " 15.5 90 0");
-		context.waitTicks(10);
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 2.5 " + standY + " 15.5 90 0");
-		server.waitFor(s -> player(s).getX() > 220.0 && player(s).getX() < Maze.STAGE_BLOCKS, 40);
+		int freeZ = server.computeOnServer(s -> {
+			long mazeSeed = Level0ChunkGenerator.mazeSeed(s.getLevel(Level0.LEVEL_0).getChunkSource().randomState());
+			for (int z = 60; z < Maze.STAGE_BLOCKS - 5; z++) {
+				boolean open = true;
+				for (int x = -3; x <= 3 && open; x++) {
+					open = Level0ChunkGenerator.worldBlockAt(mazeSeed, x, standY, z).isAir()
+							&& Level0ChunkGenerator.worldBlockAt(mazeSeed, x, standY + 1, z).isAir()
+							&& !Level0ChunkGenerator.worldBlockAt(mazeSeed, x, standY - 1, z).isAir();
+				}
+				if (open) return z;
+			}
+			throw new AssertionError("no open way across Stage (0,0)'s west edge");
+		});
+		for (String mode : new String[] {"spectator", "creative", "survival"}) {
+			server.runCommand("gamemode " + mode + " @a");
+			server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 2.5 " + standY + " " + (freeZ + 0.5) + " 90 0");
+			context.waitTicks(5);
+			server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s -1.5 " + standY + " " + (freeZ + 0.5) + " 90 0");
+			server.waitFor(s -> player(s).getX() > 0, 40);
+			double[] after = server.computeOnServer(s -> new double[] {player(s).getX(), player(s).getZ(), player(s).getYRot()});
+			check(Math.abs(after[0] - (Level0Space.PERIOD - 1.5)) < 0.01 && Math.abs(after[1] - (freeZ + 0.5)) < 0.01,
+					mode + " crossing the west edge landed at " + after[0] + ", " + after[1] + " (want " + (Level0Space.PERIOD - 1.5) + ")");
+			check(Math.abs(after[2] - 90) < 0.01, mode + " crossing the edge turned the player to " + after[2]);
+		}
+		server.runCommand("gamemode survival @a");
 		server.runCommand("gamerule noclip_backrooms:stage_loop false");
 
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + originC + " " + standY + " " + originC);
@@ -842,14 +891,26 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		context.waitTicks(5);
 	}
 
+	/** Level 0 repeats the centre Stage of each region (Level0Space): a planned feature is in the world only there. */
+	private static boolean sectorInWorld(int sx, int sz) {
+		return Level0Space.originalCell(sx * Maze.SECTOR + Maze.SECTOR / 2, Maze.SECTOR / 2)
+				&& Level0Space.originalCell(sz * Maze.SECTOR + Maze.SECTOR / 2, Maze.SECTOR / 2);
+	}
+
+	/** A feature at a cell, with a few cells around it, lies in a centre Stage. */
+	private static boolean cellInWorld(int cx, int cz) {
+		return Level0Space.originalCell(cx, 2) && Level0Space.originalCell(cz, 2);
+	}
+
 	private static EnumMap<ZonePoiPlan.VignetteType, ZonePoiPlan.Vignette> findAllVignettes(long seed) {
 		EnumMap<ZonePoiPlan.VignetteType, ZonePoiPlan.Vignette> map = new EnumMap<>(ZonePoiPlan.VignetteType.class);
-		for (int radius = 1; radius <= 24 && map.size() < ZonePoiPlan.VignetteType.values().length; radius++) {
+		for (int radius = 1; radius <= 80 && map.size() < ZonePoiPlan.VignetteType.values().length; radius++) {
 			for (int sx = -radius; sx <= radius; sx++) {
 				for (int sz = -radius; sz <= radius; sz++) {
 					if (Math.max(Math.abs(sx), Math.abs(sz)) != radius) continue;
+					if (!sectorInWorld(sx, sz)) continue;
 					ZonePoiPlan.Vignette v = ZonePoiPlan.vignetteInSector(seed, sx, sz);
-					if (v != null) map.putIfAbsent(v.type(), v);
+					if (v != null && cellInWorld(v.cx(), v.cz())) map.putIfAbsent(v.type(), v);
 				}
 			}
 		}
@@ -860,20 +921,20 @@ public final class Level0ClientTest implements FabricClientGameTest {
 	}
 
 	private static ZonePoiPlan.MysteryExit findMysteryExit(long seed, ZonePoiPlan.MysteryKind kind) {
-		for (int radius = 0; radius <= 12; radius++) {
+		for (int radius = 0; radius <= 40; radius++) {
 			for (int rx = -radius; rx <= radius; rx++) {
 				for (int rz = -radius; rz <= radius; rz++) {
 					if (Math.max(Math.abs(rx), Math.abs(rz)) != radius) continue;
 					ZonePoiPlan.MysteryExit exit = ZonePoiPlan.mysteryExitInRegion(seed, rx, rz);
-					if (exit != null && exit.kind() == kind) return exit;
+					if (exit != null && exit.kind() == kind && cellInWorld(exit.cx(), exit.cz())) return exit;
 				}
 			}
 		}
-		throw new AssertionError("no mystery exit " + kind + " found within radius 12 regions");
+		throw new AssertionError("no mystery exit " + kind + " in a centre Stage within radius 40 regions");
 	}
 
 	private static ZonePoiPlan.ChasmOutpost findChasmOutpost(long seed) {
-		for (int radius = 0; radius <= 12; radius++) {
+		for (int radius = 0; radius <= 60; radius++) {
 			for (int mx = -radius; mx <= radius; mx++) {
 				for (int mz = -radius; mz <= radius; mz++) {
 					if (Math.max(Math.abs(mx), Math.abs(mz)) != radius) continue;
@@ -883,15 +944,15 @@ public final class Level0ClientTest implements FabricClientGameTest {
 						continue;
 					}
 					ZonePoiPlan.ChasmOutpost found = ZonePoiPlan.chasmOutpostInMacro(seed, baseCx, baseCz);
-					if (found != null) return found;
+					if (found != null && cellInWorld(found.cx(), found.cz())) return found;
 				}
 			}
 		}
-		throw new AssertionError("no CHASM outpost found within macro radius 12");
+		throw new AssertionError("no CHASM outpost in a centre Stage within macro radius 60");
 	}
 
 	private static ZonePoiPlan.MegahallLounge findMegahallLounge(long seed) {
-		for (int radius = 0; radius <= 12; radius++) {
+		for (int radius = 0; radius <= 60; radius++) {
 			for (int mx = -radius; mx <= radius; mx++) {
 				for (int mz = -radius; mz <= radius; mz++) {
 					if (Math.max(Math.abs(mx), Math.abs(mz)) != radius) continue;
@@ -901,26 +962,26 @@ public final class Level0ClientTest implements FabricClientGameTest {
 						continue;
 					}
 					ZonePoiPlan.MegahallLounge found = ZonePoiPlan.megahallLoungeInMacro(seed, baseCx, baseCz);
-					if (found != null) return found;
+					if (found != null && cellInWorld(found.cx(), found.cz())) return found;
 				}
 			}
 		}
-		throw new AssertionError("no MEGATHALL lounge found within macro radius 12");
+		throw new AssertionError("no MEGATHALL lounge in a centre Stage within macro radius 60");
 	}
 
 	private static int[] findLargeZonePoiCell(long seed, Maze.Zone target) {
-		for (int radius = 1; radius <= 12; radius++) {
+		for (int radius = 1; radius <= 40; radius++) {
 			for (int sx = -radius; sx <= radius; sx++) {
 				for (int sz = -radius; sz <= radius; sz++) {
 					if (Math.max(Math.abs(sx), Math.abs(sz)) != radius) continue;
 					if (sx == 0 && sz == 0) continue;
-					if (Maze.baseZoneForSector(seed, sx, sz) == target) {
+					if (sectorInWorld(sx, sz) && Maze.baseZoneForSector(seed, sx, sz) == target) {
 						return new int[] {sx * Maze.SECTOR + 3, sz * Maze.SECTOR + 3};
 					}
 				}
 			}
 		}
-		throw new AssertionError("no " + target + " sector found within radius 12");
+		throw new AssertionError("no " + target + " sector in a centre Stage within radius 40");
 	}
 
 	private static void verify3DReachabilityAndNoExposedBedrock(long seed, StaircasePlan.Complex c) {
@@ -1016,7 +1077,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		for (int x = -32; x < 32; x++) {
 			for (int z = -32; z < 32; z++) {
 				for (int y : ys) {
-					var expected = Level0ChunkGenerator.blockAt(seed, x, y, z);
+					var expected = Level0ChunkGenerator.worldBlockAt(seed, x, y, z); // Level 0 repeats its centre Stage (Level0Space)
 					check(level.getBlockState(new BlockPos(x, y, z)).is(expected.getBlock()),
 							"world differs from generator at " + x + ", " + y + ", " + z);
 				}

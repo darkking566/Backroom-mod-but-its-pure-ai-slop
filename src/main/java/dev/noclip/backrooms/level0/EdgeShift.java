@@ -279,7 +279,11 @@ final class EdgeShift {
 		return false;
 	}
 
-	private static boolean canReshapeCell(ServerLevel level, long seed, int cx, int cz) {
+	private static boolean canReshapeCell(ServerLevel level, long seed, int rawCx, int rawCz) {
+		// Level 0 repeats its centre Stage (Level0Space): ask the plan about the original cell, and its neighbours
+		// as the world has them (across a seam, the other side of the same Stage).
+		int cx = templateCell(rawCx), cz = templateCell(rawCz);
+		int westCx = templateCell(rawCx - 1), northCz = templateCell(rawCz - 1);
 		Maze.Zone zone = cellZone(seed, cx, cz);
 		if (Maze.shiftWeight(zone) <= 0) return false;
 		if (Exits.isProtectedCell(seed, cx, cz)) return false;
@@ -294,14 +298,14 @@ final class EdgeShift {
 		}
 
 		// Keep shared walls with stable ARCHES or protected Exit/Manila cells completely unchanged.
-		if (cellZone(seed, cx - 1, cz) == Maze.Zone.ARCHES || Exits.isProtectedCell(seed, cx - 1, cz)
-				|| ManilaRoomPlan.isProtectedCell(seed, cx - 1, cz)
-				|| ZonePoiPlan.isProtectedCell(seed, cx - 1, cz)) return false;
-		if (cellZone(seed, cx, cz - 1) == Maze.Zone.ARCHES || Exits.isProtectedCell(seed, cx, cz - 1)
-				|| ManilaRoomPlan.isProtectedCell(seed, cx, cz - 1)
-				|| ZonePoiPlan.isProtectedCell(seed, cx, cz - 1)) return false;
+		if (cellZone(seed, westCx, cz) == Maze.Zone.ARCHES || Exits.isProtectedCell(seed, westCx, cz)
+				|| ManilaRoomPlan.isProtectedCell(seed, westCx, cz)
+				|| ZonePoiPlan.isProtectedCell(seed, westCx, cz)) return false;
+		if (cellZone(seed, cx, northCz) == Maze.Zone.ARCHES || Exits.isProtectedCell(seed, cx, northCz)
+				|| ManilaRoomPlan.isProtectedCell(seed, cx, northCz)
+				|| ZonePoiPlan.isProtectedCell(seed, cx, northCz)) return false;
 
-		return areCellChunksLoaded(level, cx * Maze.CELL, cz * Maze.CELL);
+		return areCellChunksLoaded(level, rawCx * Maze.CELL, rawCz * Maze.CELL);
 	}
 
 	private static boolean isEligibleCell(ServerLevel level, long seed, ShiftState state,
@@ -309,18 +313,20 @@ final class EdgeShift {
 		if (!state.isCooldownReady(cx, cz, now)) return false;
 		if (!canReshapeCell(level, seed, cx, cz)) return false;
 
-		Maze.Zone zone = cellZone(seed, cx, cz);
-		int minX = cx * Maze.CELL;
-		int minZ = cz * Maze.CELL;
-
+		Maze.Zone zone = cellZone(seed, templateCell(cx), templateCell(cz));
 		double minDist = zone == Maze.Zone.DARKENED ? MIN_DISTANCE_DARK : MIN_DISTANCE_LIT;
 		boolean withinRange = false;
-		for (ServerPlayer player : allPlayers) {
-			double distSq = distanceSqToCell(player.getX(), player.getZ(), minX, minZ);
-			if (distSq < minDist * minDist) return false;
-			if (distSq <= MAX_DISTANCE * MAX_DISTANCE) withinRange = true;
-			if (distSq <= OBSERVED_RADIUS * OBSERVED_RADIUS && isCellObserved(player, minX, minZ)) {
-				return false;
+		// The cell and its copies a Stage around (Level0Space): shifting one shifts them all, so none may be seen.
+		for (int[] copy : copies(cx, cz)) {
+			int minX = copy[0] * Maze.CELL;
+			int minZ = copy[1] * Maze.CELL;
+			for (ServerPlayer player : allPlayers) {
+				double distSq = distanceSqToCell(player.getX(), player.getZ(), minX, minZ);
+				if (distSq < minDist * minDist) return false;
+				if (distSq <= MAX_DISTANCE * MAX_DISTANCE) withinRange = true;
+				if (distSq <= OBSERVED_RADIUS * OBSERVED_RADIUS && isCellObserved(player, minX, minZ)) {
+					return false;
+				}
 			}
 		}
 		return withinRange;
@@ -382,7 +388,14 @@ final class EdgeShift {
 		return dx * dx + dz * dz;
 	}
 
-	private static void applyCellShift(ServerLevel level, long seed, int cx, int cz, ShiftState state) {
+	private static void applyCellShift(ServerLevel level, long seed, int rawCx, int rawCz, ShiftState state) {
+		// The same cell in every loaded copy of the Stage (Level0Space), so a shift never shows at a seam.
+		for (int[] copy : copies(rawCx, rawCz)) {
+			if (areCellChunksLoaded(level, copy[0] * Maze.CELL, copy[1] * Maze.CELL)) applyCellShiftAt(level, seed, copy[0], copy[1], state);
+		}
+	}
+
+	private static void applyCellShiftAt(ServerLevel level, long seed, int cx, int cz, ShiftState state) {
 		int minX = cx * Maze.CELL;
 		int minZ = cz * Maze.CELL;
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
@@ -394,14 +407,15 @@ final class EdgeShift {
 		}
 
 		// Sync adjacent corners that depend on this cell's north/west edges.
-		if (cellZone(seed, cx + 1, cz) != Maze.Zone.ARCHES && !Exits.isProtectedCell(seed, cx + 1, cz)
-				&& !ManilaRoomPlan.isProtectedCell(seed, cx + 1, cz)
-				&& !ZonePoiPlan.isProtectedCell(seed, cx + 1, cz)) {
+		int tx = templateCell(cx), tz = templateCell(cz), eastCx = templateCell(cx + 1), southCz = templateCell(cz + 1);
+		if (cellZone(seed, eastCx, tz) != Maze.Zone.ARCHES && !Exits.isProtectedCell(seed, eastCx, tz)
+				&& !ManilaRoomPlan.isProtectedCell(seed, eastCx, tz)
+				&& !ZonePoiPlan.isProtectedCell(seed, eastCx, tz)) {
 			rewriteColumn(level, seed, minX + Maze.CELL, minZ, state, pos);
 		}
-		if (cellZone(seed, cx, cz + 1) != Maze.Zone.ARCHES && !Exits.isProtectedCell(seed, cx, cz + 1)
-				&& !ManilaRoomPlan.isProtectedCell(seed, cx, cz + 1)
-				&& !ZonePoiPlan.isProtectedCell(seed, cx, cz + 1)) {
+		if (cellZone(seed, tx, southCz) != Maze.Zone.ARCHES && !Exits.isProtectedCell(seed, tx, southCz)
+				&& !ManilaRoomPlan.isProtectedCell(seed, tx, southCz)
+				&& !ZonePoiPlan.isProtectedCell(seed, tx, southCz)) {
 			rewriteColumn(level, seed, minX, minZ + Maze.CELL, state, pos);
 		}
 	}
@@ -413,7 +427,7 @@ final class EdgeShift {
 			BlockState current = level.getBlockState(pos);
 			if (isProtectedBlock(current)) continue;
 
-			BlockState target = Level0ChunkGenerator.blockAt(seed, x, y, z, state);
+			BlockState target = Level0ChunkGenerator.blockAt(seed, Level0Space.template(x), y, Level0Space.template(z), state);
 			if (current.equals(target)) continue;
 
 			if (!target.getCollisionShape(level, pos).isEmpty()
@@ -434,6 +448,22 @@ final class EdgeShift {
 				|| state.getBlock() instanceof AnomalyExitBlock
 				|| state.getBlock() instanceof AnomalyPortalDoorBlock
 				|| state.is(KEEP);
+	}
+
+	/** The original of a maze cell: Level 0 repeats the centre Stage of each region (Level0Space). */
+	static int templateCell(int cell) {
+		return Math.floorDiv(Level0Space.template(cell * Maze.CELL), Maze.CELL);
+	}
+
+	/** A cell and its copies one Stage around it (3 x 3), as world cell coordinates. */
+	private static int[][] copies(int cx, int cz) {
+		int period = Level0Space.PERIOD / Maze.CELL;
+		int[][] out = new int[9][];
+		int i = 0;
+		for (int kx = -1; kx <= 1; kx++) {
+			for (int kz = -1; kz <= 1; kz++) out[i++] = new int[] {cx + kx * period, cz + kz * period};
+		}
+		return out;
 	}
 
 	private static Maze.Zone cellZone(long seed, int cx, int cz) {
@@ -463,13 +493,18 @@ final class EdgeShift {
 			cooldownUntilTick.defaultReturnValue(0);
 		}
 
+		/** Shifts belong to the original cell, so every copy of it reads the same epoch (Level0Space). */
+		private static long key(int cx, int cz) {
+			return ChunkPos.pack(templateCell(cx), templateCell(cz));
+		}
+
 		@Override
 		public int epochAt(int cx, int cz) {
-			return epochs.get(ChunkPos.pack(cx, cz));
+			return epochs.get(key(cx, cz));
 		}
 
 		int bumpEpoch(int cx, int cz) {
-			long key = ChunkPos.pack(cx, cz);
+			long key = key(cx, cz);
 			int next = epochs.get(key) + 1;
 			epochs.put(key, next);
 			setDirty();
@@ -477,11 +512,11 @@ final class EdgeShift {
 		}
 
 		boolean isCooldownReady(int cx, int cz, int now) {
-			return now >= cooldownUntilTick.get(ChunkPos.pack(cx, cz));
+			return now >= cooldownUntilTick.get(key(cx, cz));
 		}
 
 		void setCooldown(int cx, int cz, int readyAtTick) {
-			cooldownUntilTick.put(ChunkPos.pack(cx, cz), readyAtTick);
+			cooldownUntilTick.put(key(cx, cz), readyAtTick);
 		}
 
 		private Map<String, Integer> toSerialized() {

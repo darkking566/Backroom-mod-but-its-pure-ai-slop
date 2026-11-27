@@ -488,18 +488,19 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 		server.runCommand("execute in noclip_backrooms:level_0 run tp @a 32.5 33 41.5");
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(10);
-		// The first region with a hatch: load only its chunk (a Level 0 chunk is expensive) and give it a moment.
+		// The first Stage with a hatch (Level 0 repeats the centre Stage of each region: Level0Space): load only its
+		// chunk (a Level 0 chunk is expensive) and give it a moment.
 		int[] where = server.computeOnServer(s -> {
 			ServerLevel level0 = s.getLevel(Level0.LEVEL_0);
-			for (int rx = 0; rx >= -3; rx--) {
-				for (int rz = 0; rz >= -3; rz--) {
-					int[] target = ZenithEntrance.targetChunk(level0.getSeed(), rx, rz);
-					if (target != null) return target;
+			for (int stx = 0; stx >= -20; stx -= 5) {
+				for (int stz = 0; stz >= -20; stz -= 5) {
+					ZenithEntrance.Hatch hatch = ZenithEntrance.hatchInStage(level0, stx, stz);
+					if (hatch != null) return new int[] {hatch.pos().getX() >> 4, hatch.pos().getZ() >> 4};
 				}
 			}
 			return null;
 		});
-		check(where != null, "no region near the origin has a hatch");
+		check(where != null, "no Stage near the origin has a hatch");
 		server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_0 run forceload add %d %d", where[0] * 16, where[1] * 16));
 		context.waitTicks(60);
 		BlockPos found = server.computeOnServer(s -> {
