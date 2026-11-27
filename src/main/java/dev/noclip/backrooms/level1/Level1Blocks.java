@@ -35,6 +35,23 @@ public final class Level1Blocks {
 	private static final VoxelShape GENERATOR_SHAPE = Block.box(1, 0, 2, 15, 14, 14);
 	private static final VoxelShape DRUM_SHAPE = Block.box(2.5, 0, 2.5, 13.5, 15, 13.5);
 	private static final VoxelShape CAGED_LAMP_SHAPE = Block.box(5, 6, 5, 11, 16, 11);
+	private static final VoxelShape SHELF_SHAPE = Shapes.or(
+			Block.box(0, 0, 0, 1.2, 16, 1.2),
+			Block.box(14.8, 0, 0, 16, 16, 1.2),
+			Block.box(0, 0, 14.8, 1.2, 16, 16),
+			Block.box(14.8, 0, 14.8, 16, 16, 16),
+			Block.box(1.2, 0.6, 0, 14.8, 2.0, 1.2),
+			Block.box(1.2, 0.6, 14.8, 14.8, 2.0, 16),
+			Block.box(1.2, 2.0, 1.2, 14.8, 2.6, 14.8),
+			Block.box(1.2, 8.2, 0, 14.8, 9.6, 1.2),
+			Block.box(1.2, 8.2, 14.8, 14.8, 9.6, 16),
+			Block.box(1.2, 9.6, 1.2, 14.8, 10.2, 14.8)
+	).optimize();
+	private static final VoxelShape DEBRIS_SHAPE = Shapes.or(
+			Block.box(1, 0, 1.5, 15, 3.5, 15),
+			Block.box(3, 2, 3.5, 11, 6.8, 11.5),
+			Block.box(5, 3.5, 1.5, 11, 4.8, 14.5)
+	).optimize();
 
 	// The parking structure
 	public static final Block GARAGE_FLOOR = register("garage_floor", concrete(MapColor.STONE));
@@ -51,7 +68,7 @@ public final class Level1Blocks {
 	public static final Block CEILING_PIPE = register("ceiling_pipe", pipe(), PipeBlock::new);
 	public static final Block LEAKING_CEILING_PIPE = register("leaking_ceiling_pipe", pipe(), LeakingPipeBlock::new);
 	public static final Block METAL_SHELF = register("metal_shelf", Properties.of()
-			.mapColor(MapColor.METAL).strength(2.0F).sound(SoundType.METAL).noOcclusion());
+			.mapColor(MapColor.METAL).strength(2.0F).sound(SoundType.METAL).noOcclusion(), p -> new ShapedBlock(p, SHELF_SHAPE));
 	public static final Block SUPPLY_CRATE = register("supply_crate", Properties.of()
 			.mapColor(MapColor.WOOD).strength(1.5F).sound(SoundType.WOOD), SupplyCrateBlock::new);
 
@@ -68,7 +85,7 @@ public final class Level1Blocks {
 			.sound(SoundType.METAL), PhosphorMarkBlock::new);
 	/** Wreckage on the floor: planks, scrap and, now and then, a crowbar. Opens like a crate. */
 	public static final Block DEBRIS_PILE = register("debris_pile", Properties.of()
-			.mapColor(MapColor.WOOD).strength(1.0F).sound(SoundType.WOOD).noOcclusion(), SupplyCrateBlock::new);
+			.mapColor(MapColor.WOOD).strength(1.0F).sound(SoundType.WOOD).noOcclusion(), p -> new SupplyCrateBlock(p, DEBRIS_SHAPE));
 
 	// The corridors
 	public static final Block PAINTED_CONCRETE_WALL = register("painted_concrete_wall", concrete(MapColor.QUARTZ));

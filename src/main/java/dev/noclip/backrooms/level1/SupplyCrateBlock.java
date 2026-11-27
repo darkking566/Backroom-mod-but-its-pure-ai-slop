@@ -9,10 +9,14 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * Prying a crate open spills what is inside (its loot table) and leaves nothing behind. Bare-handed there is a
@@ -20,9 +24,20 @@ import net.minecraft.world.phys.BlockHitResult;
  */
 final class SupplyCrateBlock extends Block {
 	private static final int CUT_PERCENT = 20;
+	private final VoxelShape shape;
 
 	SupplyCrateBlock(Properties properties) {
+		this(properties, Shapes.block());
+	}
+
+	SupplyCrateBlock(Properties properties, VoxelShape shape) {
 		super(properties);
+		this.shape = shape;
+	}
+
+	@Override
+	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+		return shape;
 	}
 
 	@Override

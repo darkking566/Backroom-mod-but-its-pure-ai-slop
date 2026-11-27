@@ -8,6 +8,7 @@ import java.util.function.Function;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.object.builder.v1.block.type.BlockSetTypeBuilder;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -38,6 +39,43 @@ public final class Level2Blocks {
 	private static final VoxelShape TOOLBOX_SHAPE = Block.box(2, 0, 4, 14, 7.5, 12);
 	private static final VoxelShape REEL_SHAPE = Block.box(2, 0, 2, 14, 12, 14);
 	private static final VoxelShape LUMBER_SHAPE = Block.box(1, 0, 1, 15, 8.5, 15);
+	private static final Map<Direction, VoxelShape> STANDARD_PIPES_SHAPE = Level2BankBlock.facing(
+			new double[] {0, 1.5, 1.5, 16, 6.5, 6.5},
+			new double[] {0, 9, 2.5, 16, 14, 7.5},
+			new double[] {7.5, 0, 0, 8.5, 16, 1},
+			new double[] {7.5, 6.5, 1, 8.5, 7.5, 4}
+	);
+	private static final Map<Direction, VoxelShape> VALVE_PIPES_SHAPE = Level2BankBlock.facing(
+			new double[] {0, 1.5, 1.5, 16, 6.5, 6.5},
+			new double[] {0, 9, 2.5, 16, 14, 7.5},
+			new double[] {7.5, 0, 0, 8.5, 16, 1},
+			new double[] {7.5, 6.5, 1, 8.5, 7.5, 4},
+			new double[] {7.5, 10.5, 7.5, 8.5, 11.5, 11},
+			new double[] {5, 8, 11, 11, 14, 12}
+	);
+	private static final Map<Direction, VoxelShape> BLUE_LIGHT_PIPES_SHAPE = Level2BankBlock.facing(
+			new double[] {0, 1.5, 1.5, 16, 6.5, 6.5},
+			new double[] {0, 9, 2.5, 16, 14, 7.5},
+			new double[] {7.5, 0, 0, 8.5, 16, 1},
+			new double[] {7.5, 6.5, 1, 8.5, 7.5, 4},
+			new double[] {2.5, 6.5, 6.5, 4.5, 8.5, 8.5},
+			new double[] {11.5, 6.5, 6.5, 13.5, 8.5, 8.5}
+	);
+	private static final Map<Direction, VoxelShape> SMALL_PIPES_SHAPE = Level2BankBlock.facing(
+			new double[] {0, 2, 1, 16, 4.5, 3.5},
+			new double[] {0, 6, 2, 16, 8, 4},
+			new double[] {0, 10, 1, 16, 13, 4},
+			new double[] {7.5, 0, 0, 8.5, 16, 1}
+	);
+	private static final Map<Direction, VoxelShape> CONDUIT_TRAY_SHAPE = Level2BankBlock.facing(
+			new double[] {0, 5, 0, 16, 9, 11},
+			new double[] {3, 9, 0, 4, 12, 1},
+			new double[] {12, 9, 0, 13, 12, 1}
+	);
+	private static final Map<Direction, VoxelShape> BIG_PIPE_SHAPE = Level2BankBlock.facing(
+			new double[] {0, 2.5, 1.5, 16, 13.5, 12.5},
+			new double[] {7, 0, 3, 9, 2.5, 11}
+	);
 
 	private static final BlockSetType STEEL = BlockSetTypeBuilder.copyOf(BlockSetType.IRON).openableByHand(true).register(Level2.id("steel"));
 	private static final BlockSetType STEEL_LOCKED = BlockSetTypeBuilder.copyOf(BlockSetType.IRON).register(Level2.id("steel_locked"));
@@ -55,16 +93,16 @@ public final class Level2Blocks {
 	public static final Block VOID_CONCRETE = register("void_concrete", concrete(MapColor.COLOR_BLACK));
 
 	// The pipe banks, bottom to top
-	public static final Block INSULATED_PIPE = register("insulated_pipe", pipe(MapColor.SAND), p -> new Level2BankBlock(p, Level2BankBlock.Effect.NONE));
-	public static final Block GREEN_PIPE = register("green_pipe", pipe(MapColor.COLOR_LIGHT_GREEN), p -> new Level2BankBlock(p, Level2BankBlock.Effect.NONE));
-	public static final Block STEEL_PIPES = register("steel_pipes", pipe(MapColor.METAL), p -> new Level2BankBlock(p, Level2BankBlock.Effect.NONE));
-	public static final Block VALVE_PIPES = register("valve_pipes", pipe(MapColor.METAL), p -> new Level2BankBlock(p, Level2BankBlock.Effect.NONE));
-	public static final Block LEAKING_PIPES = register("leaking_pipes", pipe(MapColor.METAL), p -> new Level2BankBlock(p, Level2BankBlock.Effect.LEAK));
-	public static final Block STEAM_PIPES = register("steam_pipes", pipe(MapColor.METAL), p -> new Level2BankBlock(p, Level2BankBlock.Effect.STEAM));
+	public static final Block INSULATED_PIPE = register("insulated_pipe", pipe(MapColor.SAND), p -> new Level2BankBlock(p, Level2BankBlock.Effect.NONE, BIG_PIPE_SHAPE));
+	public static final Block GREEN_PIPE = register("green_pipe", pipe(MapColor.COLOR_LIGHT_GREEN), p -> new Level2BankBlock(p, Level2BankBlock.Effect.NONE, BIG_PIPE_SHAPE));
+	public static final Block STEEL_PIPES = register("steel_pipes", pipe(MapColor.METAL), p -> new Level2BankBlock(p, Level2BankBlock.Effect.NONE, STANDARD_PIPES_SHAPE));
+	public static final Block VALVE_PIPES = register("valve_pipes", pipe(MapColor.METAL), p -> new Level2BankBlock(p, Level2BankBlock.Effect.NONE, VALVE_PIPES_SHAPE));
+	public static final Block LEAKING_PIPES = register("leaking_pipes", pipe(MapColor.METAL), p -> new Level2BankBlock(p, Level2BankBlock.Effect.LEAK, STANDARD_PIPES_SHAPE));
+	public static final Block STEAM_PIPES = register("steam_pipes", pipe(MapColor.METAL), p -> new Level2BankBlock(p, Level2BankBlock.Effect.STEAM, STANDARD_PIPES_SHAPE));
 	public static final Block BLUE_LIGHT_PIPES = register("blue_light_pipes", pipe(MapColor.COLOR_BLUE).lightLevel(state -> 5),
-			p -> new Level2BankBlock(p, Level2BankBlock.Effect.NONE));
-	public static final Block CONDUIT_TRAY = register("conduit_tray", pipe(MapColor.COLOR_GRAY), p -> new Level2BankBlock(p, Level2BankBlock.Effect.NONE));
-	public static final Block SMALL_PIPES = register("small_pipes", pipe(MapColor.METAL), p -> new Level2BankBlock(p, Level2BankBlock.Effect.NONE));
+			p -> new Level2BankBlock(p, Level2BankBlock.Effect.NONE, BLUE_LIGHT_PIPES_SHAPE));
+	public static final Block CONDUIT_TRAY = register("conduit_tray", pipe(MapColor.COLOR_GRAY), p -> new Level2BankBlock(p, Level2BankBlock.Effect.NONE, CONDUIT_TRAY_SHAPE));
+	public static final Block SMALL_PIPES = register("small_pipes", pipe(MapColor.METAL), p -> new Level2BankBlock(p, Level2BankBlock.Effect.NONE, SMALL_PIPES_SHAPE));
 	public static final Block MACHINE_CABINET = register("machine_cabinet", machine(), p -> new Level2FacingBlock(p, true));
 	public static final Block MACHINE_PANEL = register("machine_panel", machine(), p -> new Level2FacingBlock(p, true));
 
@@ -136,9 +174,9 @@ public final class Level2Blocks {
 	public static final Block FROSTED_UTILITY_WALL = register("frosted_utility_wall", concrete(MapColor.ICE));
 	public static final Block FROSTED_UTILITY_FLOOR = register("frosted_utility_floor", concrete(MapColor.ICE).friction(0.75F));
 	public static final Block FROSTED_PIPES = register("frosted_pipes", pipe(MapColor.ICE),
-			p -> new Level2BankBlock(p, Level2BankBlock.Effect.FROST));
+			p -> new Level2BankBlock(p, Level2BankBlock.Effect.FROST, STANDARD_PIPES_SHAPE));
 	public static final Block BURST_GAS_PIPES = register("burst_gas_pipes", pipe(MapColor.COLOR_GREEN),
-			p -> new Level2BankBlock(p, Level2BankBlock.Effect.GAS));
+			p -> new Level2BankBlock(p, Level2BankBlock.Effect.GAS, STANDARD_PIPES_SHAPE));
 	public static final Block PUDDLED_UTILITY_FLOOR = register("puddled_utility_floor",
 			concrete(MapColor.WATER).sound(SoundType.MUD));
 	public static final Block OVERHEAD_PIPE_BRIDGE = register("overhead_pipe_bridge", pipe(MapColor.COLOR_GRAY),

@@ -1,17 +1,23 @@
 package dev.noclip.backrooms.level2;
 
+import java.util.EnumMap;
+import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * One block of a pipe bank: pipes bracketed to the wall behind, running across. FACING points away from that
@@ -26,11 +32,38 @@ final class Level2BankBlock extends Block {
 	}
 
 	private final Effect effect;
+	private final Map<Direction, VoxelShape> shapes;
 
-	Level2BankBlock(Properties properties, Effect effect) {
+	Level2BankBlock(Properties properties, Effect effect, Map<Direction, VoxelShape> shapes) {
 		super(properties);
 		this.effect = effect;
+		this.shapes = shapes;
 		registerDefaultState(stateDefinition.any().setValue(FACING, Direction.SOUTH));
+	}
+
+	/** Boxes given for facing SOUTH (wall on north side, pipes jutting toward +Z), turned for all four facings. */
+	static Map<Direction, VoxelShape> facing(double[]... boxes) {
+		Map<Direction, VoxelShape> map = new EnumMap<>(Direction.class);
+		for (Direction dir : Direction.Plane.HORIZONTAL) {
+			VoxelShape combined = Shapes.empty();
+			for (double[] b : boxes) {
+				double x0 = b[0], y0 = b[1], z0 = b[2], x1 = b[3], y1 = b[4], z1 = b[5];
+				VoxelShape box = switch (dir) {
+					case NORTH -> Block.box(16 - x1, y0, 16 - z1, 16 - x0, y1, 16 - z0);
+					case EAST -> Block.box(z0, y0, 16 - x1, z1, y1, 16 - x0);
+					case WEST -> Block.box(16 - z1, y0, x0, 16 - z0, y1, x1);
+					default -> Block.box(x0, y0, z0, x1, y1, z1);
+				};
+				combined = Shapes.or(combined, box);
+			}
+			map.put(dir, combined.optimize());
+		}
+		return map;
+	}
+
+	@Override
+	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+		return shapes.get(state.getValue(FACING));
 	}
 
 	@Override
