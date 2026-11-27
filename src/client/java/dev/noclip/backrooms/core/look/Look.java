@@ -75,6 +75,8 @@ public final class Look {
 				LEVEL_4 = new Mood(16, 62, 0.05F), DEFAULT = new Mood(9, 44, 0.11F);
 		static final Mood ZENITH = new Mood(24, 320, 0.11F);
 		static final Mood GAMMA = new Mood(20, 90, 0.03F);
+		/** A night of Level 398 in the Frontrooms (frontrooms.Night398Client): close fog, dark red. */
+		static final Mood NIGHT_398 = new Mood(4, 34, 0.14F);
 
 		static Mood of(Identifier dimension) {
 			return switch (dimension.getPath()) {
@@ -90,6 +92,7 @@ public final class Look {
 	private static boolean inGamma;
 
 	static Mood mood(Minecraft client) {
+		if (night398(client)) return Mood.NIGHT_398;
 		Mood mood = Mood.of(client.level.dimension().identifier());
 		return mood == Mood.LEVEL_3 && inGamma ? Mood.GAMMA : mood;
 	}
@@ -121,6 +124,11 @@ public final class Look {
 	public static boolean inBackroomsView(Minecraft client) {
 		return client.level != null && client.player != null && client.getCameraEntity() == client.player
 				&& dev.noclip.backrooms.core.Home.inBackrooms(client.level.dimension());
+	}
+
+	/** Whether the player is in the Frontrooms on a night of Level 398, from their own camera. */
+	static boolean night398(Minecraft client) {
+		return client.player != null && client.getCameraEntity() == client.player && dev.noclip.backrooms.frontrooms.Night398Client.active(client);
 	}
 
 	/** Whether the VHS camcorder overlay/filter is active (used by CamcorderOverlay and LookClientTest). */
@@ -155,11 +163,13 @@ public final class Look {
 	 */
 	public static void darken(Camera camera, FogData fog) {
 		Minecraft client = Minecraft.getInstance();
-		if (fog == null || !inBackroomsView(client) || shadersActive() || camera.getFluidInCamera() != FogType.NONE) return;
+		if (fog == null || !(inBackroomsView(client) || night398(client)) || shadersActive() || camera.getFluidInCamera() != FogType.NONE) return;
 		Mood mood = mood(client);
 		fog.environmentalStart = Math.min(fog.environmentalStart, mood.start());
 		fog.environmentalEnd = Math.min(fog.environmentalEnd, mood.end());
-		if (mood == Mood.LEVEL_4) {
+		if (mood == Mood.NIGHT_398) {
+			fog.color.set(0.045F, 0.010F, 0.008F, 1.0F);
+		} else if (mood == Mood.LEVEL_4) {
 			fog.color.set(0.80F, 0.84F, 0.87F, 1.0F);
 		} else {
 			fog.color.set(0.018F, 0.016F, 0.012F, 1.0F);
@@ -172,7 +182,7 @@ public final class Look {
 	 */
 	public static void falloff(LightmapRenderState state) {
 		Minecraft client = Minecraft.getInstance();
-		if (!inBackroomsView(client) || shadersActive()) return;
+		if (!(inBackroomsView(client) || night398(client)) || shadersActive()) return;
 		state.brightness = -mood(client).falloff();
 	}
 

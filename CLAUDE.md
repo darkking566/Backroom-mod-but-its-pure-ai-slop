@@ -622,6 +622,7 @@
   - 測試：`FrontroomsClientTest` 最後加 398 的檢查（讀完檔案、入夜、無面靈與微笑者出現、白天的人不在、拍夜景、站在路燈下被送到 Level 0、天亮全部消失）；第一次把這段放在中間，讓玩家去 Level 0 再回來，打亂了後面「交滿三期」的檢查，移到最後就通過了
   - 驗證：`runClientGameTest -Plevels=frontrooms` 通過；截圖 `docs/project/1-gameplay/images/town_398.jpg`；企劃寫上已做與還沒做（畫面再暗、好結局「回家了」怎麼接結局 B、小女孩、槍店、時鐘真的變慢）
   - Antigravity 仍有未提交的改動在工作區，只提交我的檔案
+- 398 的夜晚變暗：新增 `Night398Payload`（伺服器在夜晚狀態改變時告訴前室裡的人）與客戶端 `frontrooms/Night398Client`；`core/look/Look` 多一種 `NIGHT_398`（霧 4～34 格、暗紅、光照衰減 0.14），前室在 398 的夜晚也套用（開光影時不套）；`BackroomsClient` 加一行註冊；`runClientGameTest -Plevels=frontrooms` 通過，夜景截圖換成新的
 
 ## 動作記錄（Antigravity）
 

@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -52,6 +54,8 @@ public final class Nights398 {
 	private static final Map<UUID, Integer> BEHIND_DOOR = new HashMap<>();
 	/** Those the night has taken, and the seconds left before they wake in Level 0. */
 	private static final Map<UUID, Integer> TAKEN = new HashMap<>();
+	/** What each player was last told about the night. */
+	private static final Map<UUID, Boolean> SENT = new HashMap<>();
 	private static final AABB NEAR_TOWN = new AABB(FrontroomsTown.MIN_X - 24, FrontroomsTown.G - 4, FrontroomsTown.MIN_Z - 24,
 			FrontroomsTown.MAX_X + 24, FrontroomsTown.G + 20, FrontroomsTown.MAX_Z + 24);
 
@@ -59,6 +63,7 @@ public final class Nights398 {
 	}
 
 	static void register() {
+		PayloadTypeRegistry.clientboundPlay().register(Night398Payload.TYPE, Night398Payload.STREAM_CODEC);
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			if (server.getTickCount() % 20 != 0) return;
 			ServerLevel level = server.getLevel(Home.FRONTROOMS);
@@ -78,6 +83,11 @@ public final class Nights398 {
 	}
 
 	static void tick(ServerLevel level) {
+		// Everyone in the Frontrooms learns whether it is a night of 398 (for its look), when that changes.
+		boolean night = active(level);
+		for (ServerPlayer player : level.players()) {
+			if (SENT.put(player.getUUID(), night) != Boolean.valueOf(night)) ServerPlayNetworking.send(player, new Night398Payload(night));
+		}
 		for (var it = TAKEN.entrySet().iterator(); it.hasNext(); ) {
 			var entry = it.next();
 			if (entry.getValue() > 1) {
