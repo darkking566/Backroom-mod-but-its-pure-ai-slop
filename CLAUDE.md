@@ -589,6 +589,7 @@
   - 驗證：`gradlew build`、`runClientGameTest -Plevels=0,horror,floors,field,frontrooms,film,1 -Psections=leaveThroughDoor`（分兩次跑完都通過）
   - 還沒鏡像：音效、粒子、方塊實體的內容（箱子內容、告示牌字）
 - 使用者同意後，把 `main` 推送到 GitHub（合併朋友的 Level 4、第 0 層環面 `af5e82dd`、完整鏡像 `1a751068`）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- 使用者把「物品擺進各層」從 Gemini 改給 Claude（接在建模之後）：改 `docs/project/README.md` 的分工表與順序、`AGENTS.md` 的分工一行、`docs/project/5-levels/level0/README.md`（第三節給擺放的人、第八節分工、第 5、6 點）；只改文件
 
 ## 動作記錄（Antigravity）
 
