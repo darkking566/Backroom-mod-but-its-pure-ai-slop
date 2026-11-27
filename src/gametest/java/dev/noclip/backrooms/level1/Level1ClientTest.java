@@ -341,28 +341,8 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			shoot(context, game, at[0] * 64 + 31.5, STAND, at[1] * 64 + 40.5, 180, 10, "level1_tour_" + base.name().toLowerCase());
 		}
 
-		// Newcomers are found and led toward the outpost. Somewhere clear of the thresholds to Level 2 and Level 38,
-		// which would carry the player off before the patrol got there.
-		int[] spot = Level1Layout.landing(seed, 0, 0);
-		for (int k = 1; k < 20 && nearThreshold(seed, spot); k++) spot = Level1Layout.landing(seed, k * 300, k * 170);
-		shoot(context, game, spot[0] + 0.5, STAND, spot[1] + 0.5, 0, 0, "level1_patrol_start");
-		server.runCommand("gamemode survival @a");
-		check(server.computeOnServer(s -> Patrols.dispatch(level1(s), player(s))), "no patrol set out");
-		for (int i = 0; i < 80 && Patrols.leading() == 0; i++) context.waitTicks(10);
-		check(Patrols.leading() > 0, "the patrol never reached the player (who is in " + server.computeOnServer(s -> player(s).level().dimension().identifier()) + ")");
-		double start = server.computeOnServer(s -> Patrols.memberPosition().distanceTo(Patrols.destination()));
-		for (int i = 0; i < 60; i++) {
-			context.waitTicks(10);
-			Vec3 to = server.computeOnServer(s -> {
-				Vec3 member = Patrols.memberPosition(), base = Patrols.destination();
-				if (member == null || base == null) return null;
-				return member.add(base.subtract(member).multiply(1, 0, 1).normalize().scale(6));
-			});
-			if (to != null) server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.2f %d %.2f", to.x, STAND, to.z));
-		}
-		double end = server.computeOnServer(s -> Patrols.memberPosition() == null ? 0 : Patrols.memberPosition().distanceTo(Patrols.destination()));
-		check(end < start - 15, "the patrol did not lead anywhere: " + start + " -> " + end);
-		server.runCommand("gamemode spectator @a");
+		// M.E.G. patrols are disabled in Level1.register(); verify none are active.
+		check(Patrols.active() == 0, "patrols should remain inactive while disabled");
 
 		// A natural lock in a doorway shuts the whole room for good.
 		int[] corridor = null;

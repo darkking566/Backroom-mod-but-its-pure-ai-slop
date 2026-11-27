@@ -15,7 +15,7 @@ import java.util.Map;
  * many quotas, {@code a} where people arrive, {@code k y u n q} where the commander, buyer, supplier, medic and
  * quartermaster stand, {@code B S C M Q} their counters, {@code L} lockers, {@code r} weapon lockers, {@code b f} the head
  * and foot of a bed, {@code s} stairs down to B1, {@code h} the sealed hatch down to B2, {@code l} its ladder, {@code D}
- * transport pads, {@code P} pillars, {@code H} archive shelves, {@code F} archive files, and workstations: {@code T}
+ * B1 transport pads, {@code d} ground-floor Level 0 return pad, {@code P} pillars, {@code H} archive shelves, {@code F} archive files, and workstations: {@code T}
  * crafting table, {@code K} salvage bench, {@code W} workshop bench, {@code A} almond distiller, {@code R} anomaly altar,
  * {@code X} scrap recycler, {@code N} spiderweb crafting table, {@code Y} distillery barrel, {@code U} research terminal,
  * {@code Z} crystal replicator.
@@ -29,7 +29,7 @@ public final class InstituteLayout {
 	/** The paved forecourt outside the main gate. */
 	public static final int YARD_MIN_X = -6, YARD_MAX_X = 5, YARD_MIN_Z = MAX_Z + 1, YARD_MAX_Z = MAX_Z + 8;
 	private static final String WORKSTATIONS = "TKWARXNYUZ";
-	private static final String OPEN = ".,akyunqgoDhsl";
+	private static final String OPEN = ".,akyunqgoDdhsl";
 	private static final String PEOPLE = "kyunq";
 
 	private static final String[] B2_PLAN = {
@@ -159,8 +159,8 @@ public final class InstituteLayout {
 			"######################....................######################",
 			"######################....................1........#############",
 			"#,T,K,W,A,R,,#########...P............P...1........#############",
-			"#,,,,,,,,,,,,.............................#####....#############",
-			"#,,,,,,,,,,,,.............................#####....#############",
+			"#,,,,,,,,,,,,..................dd.........#####....#############",
+			"#,,,,,,,,,,,,..................dd.........#####....#############",
 			"w,,,,,,,,,,,,.............................#####....#############",
 			"w,,,,,,,,,,,,#############............#########....#############",
 			"#,,,,,,,,,,,,#########....................#####.........n......#",
@@ -220,6 +220,7 @@ public final class InstituteLayout {
 	private static final Map<Character, Spot> SPOTS = new HashMap<>();
 	private static final List<Door> DOORS = new ArrayList<>();
 	private static final List<Spot> PADS = new ArrayList<>();
+	private static final List<Spot> LOBBY_PADS = new ArrayList<>();
 	private static final List<Spot> FILES = new ArrayList<>();
 	private static Spot hatch;
 	/** The row of the top step of the stairs down, per column; -1 where there are none. */
@@ -240,6 +241,7 @@ public final class InstituteLayout {
 					boolean alongX = isDoor(F1_PLAN, c - 1, r) || isDoor(F1_PLAN, c + 1, r);
 					DOORS.add(new Door(c + MIN_X, FLOOR + 1, r + MIN_Z, ch - '0', alongX));
 				}
+				if (ch == 'd') LOBBY_PADS.add(new Spot(c + MIN_X, r + MIN_Z));
 				if (B1_PLAN[r].charAt(c) == 'D') PADS.add(new Spot(c + MIN_X, r + MIN_Z));
 				if (B1_PLAN[r].charAt(c) == 'h') hatch = new Spot(c + MIN_X, r + MIN_Z);
 				if (B2_PLAN[r].charAt(c) == 'F') FILES.add(new Spot(c + MIN_X, r + MIN_Z));
@@ -288,6 +290,11 @@ public final class InstituteLayout {
 
 	public static List<Spot> pads() {
 		return PADS;
+	}
+
+	/** Ground-floor lobby return pads that send players straight back to Level 0 (open from clearance 0). */
+	public static List<Spot> lobbyPads() {
+		return LOBBY_PADS;
 	}
 
 	public static List<Spot> files() {
@@ -340,7 +347,7 @@ public final class InstituteLayout {
 				case '#', 'P' -> Cell.SOLID;
 				case ',' -> Cell.of(Kind.WORK_FLOOR);
 				case 'h' -> Cell.of(Kind.HATCH);
-				case 'D' -> Cell.of(Kind.PAD);
+				case 'D', 'd' -> Cell.of(Kind.PAD);
 				default -> Cell.of(Kind.FLOOR);
 			};
 		}

@@ -345,6 +345,17 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 			if (dx == da && dz == db) return ModBlocks.MANILA_TABLE.defaultBlockState().setValue(ManilaFurnitureBlock.FACING, Direction.WEST);
 			if (dx == da - 1 && dz == da) return ModBlocks.MANILA_CHAIR.defaultBlockState().setValue(ManilaFurnitureBlock.FACING, Direction.EAST);
 			if (dx == db + 1 && dz == db) return ModBlocks.MANILA_CHAIR.defaultBlockState().setValue(ManilaFurnitureBlock.FACING, Direction.WEST);
+			// Interactive cot/bed in the quiet northeast corner: sleeping offers a random jump to Level 1 or Level 2
+			if (dx == 15 && dz == 4) {
+				return Blocks.BED.brown().defaultBlockState()
+						.setValue(net.minecraft.world.level.block.BedBlock.FACING, Direction.NORTH)
+						.setValue(net.minecraft.world.level.block.BedBlock.PART, net.minecraft.world.level.block.state.properties.BedPart.HEAD);
+			}
+			if (dx == 15 && dz == 5) {
+				return Blocks.BED.brown().defaultBlockState()
+						.setValue(net.minecraft.world.level.block.BedBlock.FACING, Direction.NORTH)
+						.setValue(net.minecraft.world.level.block.BedBlock.PART, net.minecraft.world.level.block.state.properties.BedPart.FOOT);
+			}
 		}
 		if (y == FLOOR_Y + 2 && dx == da && dz == da) {
 			return ModBlocks.MANILA_NOTE.defaultBlockState().setValue(ManilaNoteBlock.FACING, Direction.NORTH);

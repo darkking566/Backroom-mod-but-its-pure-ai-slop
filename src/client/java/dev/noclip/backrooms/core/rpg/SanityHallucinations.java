@@ -1,5 +1,11 @@
 package dev.noclip.backrooms.core.rpg;
 
+import dev.noclip.backrooms.core.Home;
+import dev.noclip.backrooms.level0.Level0;
+import dev.noclip.backrooms.level0p1.Level0p1;
+import dev.noclip.backrooms.level1.Level1;
+import dev.noclip.backrooms.level2.Level2;
+import dev.noclip.backrooms.level3.Level3;
 import dev.noclip.backrooms.monsters.Monsters;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +28,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
@@ -42,22 +48,36 @@ public final class SanityHallucinations {
 	private static final int PHANTOM_ID_BASE = -740100;
 	private static final int MAX_PHANTOMS = 2;
 
-	private static final List<EntityType<? extends Monster>> STALKER_POOL = List.of(
+	private static final List<EntityType<? extends Mob>> LEVEL_0_POOL = List.of(
+			Monsters.BACTERIA
+	);
+	private static final List<EntityType<? extends Mob>> LEVEL_1_POOL = List.of(
 			Monsters.SMILER,
 			Monsters.HOUND,
-			Monsters.BACTERIA,
-			Monsters.SKIN_STEALER,
-			Monsters.PARTYGOER,
+			Monsters.DULLER,
+			Monsters.SKIN_STEALER
+	);
+	private static final List<EntityType<? extends Mob>> LEVEL_2_POOL = List.of(
+			Monsters.HOUND,
+			Monsters.SMILER,
+			Monsters.CLUMP,
 			Monsters.WRETCH
 	);
-
-	private static final List<EntityType<? extends Monster>> DISGUISE_POOL = List.of(
-			Monsters.SKIN_STEALER,
+	private static final List<EntityType<? extends Mob>> LEVEL_3_POOL = List.of(
+			Monsters.FACELING,
+			Monsters.DEATHMOTH,
+			Monsters.HOUND,
 			Monsters.SMILER,
-			Monsters.PARTYGOER,
-			Monsters.BACTERIA,
-			Monsters.WRETCH,
-			Monsters.HOUND
+			Monsters.CLUMP,
+			Monsters.SKIN_STEALER
+	);
+	private static final List<EntityType<? extends Mob>> REJECTION_POOL = List.of(
+			Monsters.WRETCH
+	);
+	private static final List<EntityType<? extends Mob>> DEFAULT_BACKROOMS_POOL = List.of(
+			Monsters.SMILER,
+			Monsters.HOUND,
+			Monsters.SKIN_STEALER
 	);
 
 	private static final List<PhantomEntry> PHANTOMS = new ArrayList<>();
@@ -65,17 +85,31 @@ public final class SanityHallucinations {
 
 	private static ResourceKey<Level> lastDimension;
 	private static int nextPhantomId = PHANTOM_ID_BASE;
-	private static int spawnCooldownTicks = 30;
-	private static int whisperCooldownTicks = 60;
+	private static int spawnCooldownTicks = 120;
+	private static int whisperCooldownTicks = 300;
+	private static int globalAudioCooldownTicks = 0;
 	private static int scareFlashTicks;
 	private static int lastHandledSwingTick = -1;
 
 	private SanityHallucinations() {
 	}
 
+	/** Dimension-specific low-sanity monster pool so hallucinations always match the current floor. */
+	public static List<EntityType<? extends Mob>> poolFor(ResourceKey<Level> dim, boolean rejectionHallucination) {
+		if (dim.equals(Level0.LEVEL_0)) return LEVEL_0_POOL;
+		if (dim.equals(Level0p1.LEVEL_0_1)) return List.of();
+		if (dim.equals(Level1.LEVEL_1)) return LEVEL_1_POOL;
+		if (dim.equals(Level2.LEVEL_2)) return LEVEL_2_POOL;
+		if (dim.equals(Level3.LEVEL_3)) return LEVEL_3_POOL;
+		if (dim.equals(Home.FRONTROOMS)) return List.of();
+		if (Home.inBackrooms(dim)) return DEFAULT_BACKROOMS_POOL;
+		return rejectionHallucination ? REJECTION_POOL : List.of();
+	}
+
 	/** Called every client tick; spawns/updates/clears client-only hallucinations strictly for the local player. */
 	public static void tick(Minecraft client) {
 		if (scareFlashTicks > 0) scareFlashTicks--;
+		if (globalAudioCooldownTicks > 0) globalAudioCooldownTicks--;
 
 		ClientLevel level = client.level;
 		LocalPlayer player = client.player;
@@ -87,6 +121,7 @@ public final class SanityHallucinations {
 		if (lastDimension != level.dimension()) {
 			clearAll(level);
 			lastDimension = level.dimension();
+			spawnCooldownTicks = level.dimension().equals(Level0.LEVEL_0) ? 240 : 120;
 		}
 
 		PlayerStats stats = PlayerRpg.get(player);
@@ -94,7 +129,8 @@ public final class SanityHallucinations {
 		boolean rejectionHallucination = overworldRejectionStage >= 3 && !level.isBrightOutside();
 		if (!stats.isHallucinating() && !rejectionHallucination) {
 			clearAll(level);
-			spawnCooldownTicks = 30;
+			spawnCooldownTicks = level.dimension().equals(Level0.LEVEL_0) ? 240 : 120;
+			whisperCooldownTicks = 300;
 			return;
 		}
 
@@ -105,9 +141,10 @@ public final class SanityHallucinations {
 		float rejectSev = rejectionHallucination ? (overworldRejectionStage >= 4 ? 0.85F : 0.45F) : 0.0F;
 		float severity = Math.max(sanitySev, rejectSev);
 		RandomSource random = level.getRandom();
+		List<EntityType<? extends Mob>> pool = poolFor(level.dimension(), rejectionHallucination);
 
-		tickPhantoms(level, player, severity, random);
-		tickDisguises(level, player, severity, random);
+		tickPhantoms(level, player, severity, random, pool);
+		tickDisguises(level, player, severity, random, pool);
 		tickLocalWhispers(level, player, severity, random);
 	}
 
@@ -115,6 +152,8 @@ public final class SanityHallucinations {
 		clearAll(level);
 		lastDimension = null;
 		scareFlashTicks = 0;
+		globalAudioCooldownTicks = 0;
+		whisperCooldownTicks = 300;
 	}
 
 	/** 0..1 intensity for the brief screen-edge panic flash when a phantom lunges into the player. */
@@ -137,7 +176,8 @@ public final class SanityHallucinations {
 		return entry.monster;
 	}
 
-	private static void tickPhantoms(ClientLevel level, LocalPlayer player, float severity, RandomSource random) {
+	private static void tickPhantoms(ClientLevel level, LocalPlayer player, float severity, RandomSource random,
+			List<EntityType<? extends Mob>> pool) {
 		// Detect fresh weapon/hand swing on the local player: slashing a phantom dispels it locally
 		// while teammates only see the local player slashing empty air.
 		boolean swungThisTick = player.swinging && player.swingTime == 1 && lastHandledSwingTick != player.tickCount;
@@ -151,7 +191,7 @@ public final class SanityHallucinations {
 		Iterator<PhantomEntry> it = PHANTOMS.iterator();
 		while (it.hasNext()) {
 			PhantomEntry entry = it.next();
-			Monster mob = entry.monster;
+			Mob mob = entry.monster;
 			entry.age++;
 
 			if (mob.isRemoved() || level.getEntity(entry.entityId) == null
@@ -168,7 +208,8 @@ public final class SanityHallucinations {
 				double dist = toPhantom.length();
 				if (dist <= 5.2 && dist > 1.0E-4 && look.dot(toPhantom.scale(1.0 / dist)) > 0.62) {
 					level.playLocalSound(mob.getX(), mob.getEyeY(), mob.getZ(),
-							SoundEvents.ENDERMAN_SCREAM, SoundSource.HOSTILE, 0.75F, 0.55F + random.nextFloat() * 0.2F, false);
+							PlayerRpg.SANITY_HALLUCINATION_CUE, SoundSource.AMBIENT, 0.45F, 0.85F + random.nextFloat() * 0.15F, false);
+					globalAudioCooldownTicks = Math.max(globalAudioCooldownTicks, 200);
 					burstSmoke(level, mob.position(), 18, true);
 					removePhantom(level, entry, false);
 					it.remove();
@@ -180,10 +221,11 @@ public final class SanityHallucinations {
 			Vec3 toPlayer = player.position().subtract(mob.position());
 			double horizDist = Math.hypot(toPlayer.x, toPlayer.z);
 			if (horizDist <= 1.45 && Math.abs(toPlayer.y) <= 2.2) {
-				// Close-range psychological ambush: loud screech + HUD flash, zero real damage.
+				// Close-range psychological ambush: eerie cue + HUD flash, zero real damage.
 				scareFlashTicks = 16;
 				level.playLocalSound(player.getX(), player.getEyeY(), player.getZ(),
-						SoundEvents.GHAST_SCREAM, SoundSource.HOSTILE, 0.85F, 0.6F, false);
+						PlayerRpg.SANITY_HALLUCINATION_CUE, SoundSource.AMBIENT, 0.55F, 0.72F, false);
+				globalAudioCooldownTicks = Math.max(globalAudioCooldownTicks, 240);
 				burstSmoke(level, mob.position(), 22, true);
 				removePhantom(level, entry, false);
 				it.remove();
@@ -214,24 +256,33 @@ public final class SanityHallucinations {
 			mob.tickCount++;
 			mob.walkAnimation.update((float) Math.min(1.0, speed * 4.2), 0.4F, 1.0F);
 
-			if (entry.age % 35 == 0 && random.nextFloat() < 0.55F) {
+			if (entry.age % 55 == 0 && random.nextFloat() < 0.35F) {
 				level.playLocalSound(mob.getX(), mob.getEyeY(), mob.getZ(),
-						SoundEvents.WARDEN_STEP, SoundSource.HOSTILE, 0.55F, 0.7F, false);
+						SoundEvents.WOOL_STEP, SoundSource.AMBIENT, 0.35F, 0.65F, false);
 			}
 		}
 
+		if (pool.isEmpty()) return;
+
+		boolean isLevel0 = level.dimension().equals(Level0.LEVEL_0);
 		// Spawn new client-only phantom stalkers as sanity drops below 30%.
 		if (--spawnCooldownTicks <= 0) {
-			int baseInterval = (int) Mth.lerp(severity, 170.0F, 65.0F);
-			spawnCooldownTicks = baseInterval + random.nextInt(55);
-			int allowed = severity > 0.45F ? MAX_PHANTOMS : 1;
+			if (isLevel0) {
+				// Level 0: occasional brief Bacteria apparition only (18-30s interval, max 1)
+				spawnCooldownTicks = 360 + random.nextInt(240);
+			} else {
+				int baseInterval = (int) Mth.lerp(severity, 240.0F, 110.0F);
+				spawnCooldownTicks = baseInterval + random.nextInt(80);
+			}
+			int allowed = isLevel0 ? 1 : (severity > 0.45F ? MAX_PHANTOMS : 1);
 			if (PHANTOMS.size() < allowed) {
-				spawnPhantomNear(level, player, random);
+				spawnPhantomNear(level, player, random, pool, isLevel0);
 			}
 		}
 	}
 
-	private static void spawnPhantomNear(ClientLevel level, LocalPlayer player, RandomSource random) {
+	private static void spawnPhantomNear(ClientLevel level, LocalPlayer player, RandomSource random,
+			List<EntityType<? extends Mob>> pool, boolean briefApparition) {
 		Vec3 look = player.getLookAngle();
 		double baseAngle = Math.atan2(look.z, look.x);
 		Vec3 spawnPos = null;
@@ -252,8 +303,8 @@ public final class SanityHallucinations {
 		}
 		if (spawnPos == null) return;
 
-		EntityType<? extends Monster> type = STALKER_POOL.get(random.nextInt(STALKER_POOL.size()));
-		Monster mob = type.create(level, EntitySpawnReason.EVENT);
+		EntityType<? extends Mob> type = pool.get(random.nextInt(pool.size()));
+		Mob mob = type.create(level, EntitySpawnReason.EVENT);
 		if (mob == null) return;
 
 		int entityId = nextPhantomId--;
@@ -274,12 +325,21 @@ public final class SanityHallucinations {
 		mob.yHeadRotO = yaw;
 
 		level.addEntity(mob);
-		PHANTOMS.add(new PhantomEntry(entityId, mob, 220 + random.nextInt(140)));
-		level.playLocalSound(spawnPos.x, spawnPos.y + 1.5, spawnPos.z,
-				SoundEvents.ENDERMAN_STARE, SoundSource.HOSTILE, 0.35F, 0.52F, false);
+		int duration = briefApparition ? (100 + random.nextInt(55)) : (220 + random.nextInt(140));
+		PHANTOMS.add(new PhantomEntry(entityId, mob, duration));
+		if (globalAudioCooldownTicks <= 0) {
+			level.playLocalSound(spawnPos.x, spawnPos.y + 1.5, spawnPos.z,
+					PlayerRpg.SANITY_HALLUCINATION_CUE, SoundSource.AMBIENT, 0.34F, 0.82F + random.nextFloat() * 0.16F, false);
+			globalAudioCooldownTicks = 240;
+		}
 	}
 
-	private static void tickDisguises(ClientLevel level, LocalPlayer local, float severity, RandomSource random) {
+	private static void tickDisguises(ClientLevel level, LocalPlayer local, float severity, RandomSource random,
+			List<EntityType<? extends Mob>> pool) {
+		if (pool.isEmpty()) {
+			DISGUISES.clear();
+			return;
+		}
 		// Remove entries for teammates who left or are no longer loaded.
 		DISGUISES.keySet().removeIf(uuid -> level.players().stream().noneMatch(p -> p.getUUID().equals(uuid)));
 
@@ -289,7 +349,7 @@ public final class SanityHallucinations {
 
 			DisguiseEntry entry = DISGUISES.computeIfAbsent(remote.getUUID(), id -> new DisguiseEntry());
 			if (entry.monster == null || entry.monster.level() != level) {
-				EntityType<? extends Monster> type = DISGUISE_POOL.get(random.nextInt(DISGUISE_POOL.size()));
+				EntityType<? extends Mob> type = pool.get(random.nextInt(pool.size()));
 				entry.monster = type.create(level, EntitySpawnReason.EVENT);
 				if (entry.monster != null) {
 					entry.monster.setNoGravity(true);
@@ -301,12 +361,12 @@ public final class SanityHallucinations {
 				if (entry.active) {
 					// Brief flicker back to human (very short at very low sanity).
 					entry.active = false;
-					entry.phaseTicks = (int) Mth.lerp(severity, 55.0F, 12.0F) + random.nextInt(25);
+					entry.phaseTicks = (int) Mth.lerp(severity, 80.0F, 25.0F) + random.nextInt(35);
 				} else {
-					// Swap teammate into a Backrooms monster on this client only!
+					// Swap teammate into a floor-appropriate Backrooms monster on this client only!
 					if (random.nextFloat() < 0.35F) {
-						EntityType<? extends Monster> type = DISGUISE_POOL.get(random.nextInt(DISGUISE_POOL.size()));
-						Monster swapped = type.create(level, EntitySpawnReason.EVENT);
+						EntityType<? extends Mob> type = pool.get(random.nextInt(pool.size()));
+						Mob swapped = type.create(level, EntitySpawnReason.EVENT);
 						if (swapped != null) {
 							swapped.setNoGravity(true);
 							swapped.setSilent(true);
@@ -315,8 +375,11 @@ public final class SanityHallucinations {
 					}
 					entry.active = true;
 					entry.phaseTicks = (int) Mth.lerp(severity, 90.0F, 220.0F) + random.nextInt(60);
-					level.playLocalSound(remote.getX(), remote.getEyeY(), remote.getZ(),
-							SoundEvents.WARDEN_HEARTBEAT, SoundSource.AMBIENT, 0.45F, 0.65F, false);
+					if (globalAudioCooldownTicks <= 0) {
+						level.playLocalSound(remote.getX(), remote.getEyeY(), remote.getZ(),
+								PlayerRpg.SANITY_HALLUCINATION_CUE, SoundSource.AMBIENT, 0.32F, 0.8F, false);
+						globalAudioCooldownTicks = 240;
+					}
 				}
 			}
 		}
@@ -324,17 +387,20 @@ public final class SanityHallucinations {
 
 	private static void tickLocalWhispers(ClientLevel level, LocalPlayer player, float severity, RandomSource random) {
 		if (--whisperCooldownTicks > 0) return;
-		whisperCooldownTicks = (int) Mth.lerp(severity, 130.0F, 48.0F) + random.nextInt(45);
+		// Low-frequency eerie ambience (26-54 seconds), respecting global cooldown so cues never overlap.
+		whisperCooldownTicks = (int) Mth.lerp(severity, 920.0F, 520.0F) + random.nextInt(160);
+		if (globalAudioCooldownTicks > 0) return;
 		double angle = random.nextDouble() * Math.PI * 2.0;
-		double dist = 3.0 + random.nextDouble() * 4.5;
+		double dist = 4.0 + random.nextDouble() * 5.0;
 		double sx = player.getX() + Math.cos(angle) * dist;
 		double sz = player.getZ() + Math.sin(angle) * dist;
 		level.playLocalSound(sx, player.getEyeY(), sz,
-				random.nextBoolean() ? SoundEvents.WARDEN_HEARTBEAT : SoundEvents.SOUL_ESCAPE.value(),
-				SoundSource.AMBIENT, 0.38F + severity * 0.25F, 0.55F + random.nextFloat() * 0.2F, false);
+				PlayerRpg.SANITY_LOW_DRONE,
+				SoundSource.AMBIENT, 0.26F + severity * 0.16F, 0.88F + random.nextFloat() * 0.18F, false);
+		globalAudioCooldownTicks = 240;
 	}
 
-	private static void syncPose(Monster mob, RemotePlayer remote) {
+	private static void syncPose(Mob mob, RemotePlayer remote) {
 		mob.xo = remote.xo;
 		mob.yo = remote.yo;
 		mob.zo = remote.zo;
@@ -407,11 +473,11 @@ public final class SanityHallucinations {
 
 	private static final class PhantomEntry {
 		final int entityId;
-		final Monster monster;
+		final Mob monster;
 		final int maxAge;
 		int age;
 
-		PhantomEntry(int entityId, Monster monster, int maxAge) {
+		PhantomEntry(int entityId, Mob monster, int maxAge) {
 			this.entityId = entityId;
 			this.monster = monster;
 			this.maxAge = maxAge;
@@ -419,7 +485,7 @@ public final class SanityHallucinations {
 	}
 
 	private static final class DisguiseEntry {
-		Monster monster;
+		Mob monster;
 		boolean active;
 		int phaseTicks = 12;
 	}

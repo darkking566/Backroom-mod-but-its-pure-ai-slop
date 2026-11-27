@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -124,7 +125,8 @@ public final class MultiPartPropBlock extends HorizontalDirectionalBlock impleme
 
 	@Override
 	public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-		if (!level.isClientSide()) {
+		if (level instanceof ServerLevel sl) {
+			PropBreakEffects.emitMulti(sl, pos, this, state);
 			clearLinkedParts(level, pos, state, pos);
 		}
 		return super.playerWillDestroy(level, pos, state, player);
@@ -132,6 +134,9 @@ public final class MultiPartPropBlock extends HorizontalDirectionalBlock impleme
 
 	/** Called when a player breaks ANY linked PropPartBlock cell: destroys master (dropping salvage loot ONCE) + all parts! */
 	public void breakWholeStructure(Level level, BlockPos masterPos, BlockState masterState, Player player, BlockPos alreadyBreakingPos) {
+		if (level instanceof ServerLevel sl) {
+			PropBreakEffects.emitMulti(sl, masterPos, this, masterState);
+		}
 		clearLinkedParts(level, masterPos, masterState, alreadyBreakingPos);
 		if (!masterPos.equals(alreadyBreakingPos)) {
 			boolean dropLoot = player == null || !player.isCreative();

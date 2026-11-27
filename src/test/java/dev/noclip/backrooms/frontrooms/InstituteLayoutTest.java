@@ -67,6 +67,11 @@ final class InstituteLayoutTest {
 		assertTrue(nearAny(zero, GROUND, 'L'), "no locker from the lobby");
 		assertTrue(nearAny(zero, GROUND, ','), "no work area from the lobby");
 		assertTrue(nearAny(zero, GROUND, 'g'), "the gate is not reachable");
+		assertFalse(InstituteLayout.lobbyPads().isEmpty(), "no 1F lobby return pad to Level 0");
+		for (InstituteLayout.Spot lp : InstituteLayout.lobbyPads()) {
+			assertTrue(zero.contains(key(lp.x(), lp.z())), "1F lobby pad is not reachable before any quota");
+			assertEquals(Kind.PAD, InstituteLayout.cell(lp.x(), InstituteLayout.FLOOR, lp.z()).kind(), "1F lobby pad missing PAD cell");
+		}
 		InstituteLayout.Spot medic = InstituteLayout.spot('n'), quartermaster = InstituteLayout.spot('q');
 		assertFalse(near(zero, medic.x(), medic.z()), "the medic is reachable before any quota");
 		assertFalse(near(zero, quartermaster.x(), quartermaster.z()), "the armoury is reachable before any quota");

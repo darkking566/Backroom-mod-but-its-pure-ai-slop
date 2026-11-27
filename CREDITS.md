@@ -22,6 +22,30 @@ All custom audio files in `src/main/resources/assets/noclip_backrooms/sounds/lev
   - URL: https://freesound.org/people/Jadis0x/sounds/832628/
   - License: CC0 1.0 (Public Domain)
 
+### Low-sanity psychological audio (`sounds/sanity/`)
+
+All files in `src/main/resources/assets/noclip_backrooms/sounds/sanity/` are derived from **CC0 1.0 Universal (Public Domain)** recordings on Freesound.org, trimmed and converted to mono Ogg Vorbis:
+
+- `low_drone_1.ogg`
+  - Source: *Dark Myst Horror Thriller Mood Drone Atmo Atmosphere Cinematic Film Movie Surround.wav* by **szegvari**
+  - URL: https://freesound.org/people/szegvari/sounds/631650/
+  - License: CC0 1.0 (Public Domain)
+
+- `low_drone_2.ogg`
+  - Source: *Dark Planet - Dark Horror Thriller Atmo Drone Sound Amb Surround.wav* by **szegvari**
+  - URL: https://freesound.org/people/szegvari/sounds/609149/
+  - License: CC0 1.0 (Public Domain)
+
+- `tinnitus.ogg`
+  - Source: *Ear Ringing Long (Extended Falloff)* by **deleted_user_9482149**
+  - URL: https://freesound.org/people/deleted_user_9482149/sounds/456698/
+  - License: CC0 1.0 (Public Domain)
+
+- `hallucination_cue.ogg`
+  - Source: *Creepy Whoosh* by **SoundEffectsForAll**
+  - URL: https://freesound.org/people/SoundEffectsForAll/sounds/875656/
+  - License: CC0 1.0 (Public Domain)
+
 ## Realistic textures (built-in resource pack)
 
 The photo-based textures in `src/main/resources/resourcepacks/realistic/` are made by `tools/make_level0_realistic.py` from these ambientCG materials, all licensed **CC0 1.0 Universal (Public Domain)** (https://ambientcg.com): Carpet016 and Fabric028 (carpet), Wallpaper001A (paper grain), Wallpaper002A, Wallpaper002B and Wallpaper002C (water stains and mould). The wallpaper print, ceiling tiles, light panels, baseboard and painted metal are drawn by that tool. The camcorder filter (`shaders/post/camcorder.fsh`) is original.

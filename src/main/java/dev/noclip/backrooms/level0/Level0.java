@@ -33,7 +33,8 @@ public final class Level0 {
 		FlashlightLight.register();
 		StaircaseBreaker.register();
 		FuseBoxEvents.register();
-		Level0Props.register();
+		// Temporarily withdrawn until Claude finishes prop modeling and per-floor redistribution.
+		// Level0Props.register();
 		StageLoop.register();
 		Level0MicroEvents.register();
 		// How you arrive here through an exit from another level (see core.LevelExits).

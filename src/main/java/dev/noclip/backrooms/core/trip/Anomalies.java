@@ -11,9 +11,12 @@ import dev.noclip.backrooms.monsters.skinstealer.SkinStealer;
 import dev.noclip.backrooms.props.BackroomsLootChestBlock;
 import dev.noclip.backrooms.props.BackroomsProps;
 import dev.noclip.backrooms.props.NoClipPropBlock;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -35,6 +38,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -47,6 +51,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
@@ -94,10 +99,13 @@ public final class Anomalies {
 	private static final List<String> MIMIC_LOOKS = List.of("meg_patrol", "colonist", "tom", "aiko");
 	/** How often a mimic waits in an unopened crate. */
 	static final float MIMIC_CHANCE = 0.25F;
-	private static final int MAX_RED_MIST_ROOMS = 6;
+	private static final int MAX_RED_MIST_ROOMS = 8;
+	private static final int RED_MIST_RADIUS = 10;
 	private static final Set<UUID> TOLD = new HashSet<>();
-	private static final java.util.Map<UUID, net.minecraft.world.phys.Vec3> LAST = new java.util.HashMap<>();
+	private static final Map<UUID, net.minecraft.world.phys.Vec3> LAST = new HashMap<>();
 	private static final Set<Long> RED_MIST_ROOMS = new HashSet<>();
+	private static final Map<ResourceKey<Level>, List<BlockPos>> RED_MIST_ZONES = new HashMap<>();
+	private static final Map<UUID, Boolean> IN_RED_MIST_ZONE = new HashMap<>();
 
 	private Anomalies() {
 	}
@@ -108,6 +116,8 @@ public final class Anomalies {
 			TOLD.clear();
 			LAST.clear();
 			RED_MIST_ROOMS.clear();
+			RED_MIST_ZONES.clear();
+			IN_RED_MIST_ZONE.clear();
 		});
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> send(handler.player));
 		ServerTickEvents.END_SERVER_TICK.register(Anomalies::tick);
@@ -169,6 +179,7 @@ public final class Anomalies {
 			for (Affix affix : Affix.values()) {
 				set.then(Commands.literal(affix.id()).executes(ctx -> {
 					Expedition.setAffix(ctx.getSource().getServer(), affix);
+					IN_RED_MIST_ZONE.clear();
 					for (ServerPlayer player : ctx.getSource().getServer().getPlayerList().getPlayers()) send(player);
 					return 1;
 				}));
@@ -192,12 +203,52 @@ public final class Anomalies {
 	static void opened(MinecraftServer server) {
 		TOLD.clear();
 		RED_MIST_ROOMS.clear();
+		RED_MIST_ZONES.clear();
+		IN_RED_MIST_ZONE.clear();
 		for (ServerPlayer player : server.getPlayerList().getPlayers()) send(player);
 	}
 
 	static void send(ServerPlayer player) {
 		Affix affix = Home.inBackrooms(player.level().dimension()) ? current(player.level().getServer()) : null;
-		ServerPlayNetworking.send(player, new AnomalyPayload(affix == null ? "" : affix.id()));
+		boolean inZone = affix == Affix.RED_MIST && isInRedMistZone((ServerLevel) player.level(), player.blockPosition());
+		IN_RED_MIST_ZONE.put(player.getUUID(), inZone);
+		ServerPlayNetworking.send(player, new AnomalyPayload(affix == null ? "" : affix.id(), inZone));
+	}
+
+	/** Whether a position is inside a localized Red Mist zone (an infested enclave or a native Red Room). */
+	public static boolean isInRedMistZone(ServerLevel level, BlockPos pos) {
+		List<BlockPos> zones = RED_MIST_ZONES.get(level.dimension());
+		if (zones != null) {
+			for (BlockPos center : zones) {
+				int dx = pos.getX() - center.getX();
+				int dz = pos.getZ() - center.getZ();
+				if (dx * dx + dz * dz <= RED_MIST_RADIUS * RED_MIST_RADIUS && Math.abs(pos.getY() - center.getY()) <= 4) {
+					return true;
+				}
+			}
+		}
+		// Fallback for native Level 0 Red Rooms or reloaded Red Mist enclaves
+		int redHits = 0;
+		for (int dy = 0; dy <= 6; dy++) {
+			if (isRedMistMarkerBlock(level.getBlockState(pos.above(dy)))) {
+				if (++redHits >= 1) return true;
+			}
+		}
+		for (Direction dir : Direction.Plane.HORIZONTAL) {
+			if (isRedMistMarkerBlock(level.getBlockState(pos.relative(dir, 2)))
+					|| isRedMistMarkerBlock(level.getBlockState(pos.relative(dir, 2).above()))) {
+				if (++redHits >= 2) return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean isRedMistMarkerBlock(BlockState state) {
+		if (state.is(BackroomsProps.RED_ANOMALY_CLUSTER)) return true;
+		var id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
+		if (!BackroomsMod.MOD_ID.equals(id.getNamespace())) return false;
+		String path = id.getPath();
+		return path.equals("red_wallpaper") || path.equals("red_wallpaper_baseboard") || path.equals("red_fluorescent_light");
 	}
 
 	private static void tick(MinecraftServer server) {
@@ -221,21 +272,53 @@ public final class Anomalies {
 					if (moving && !player.isShiftKeyDown()) alert(level, player, player.isSprinting() ? 32 : 20);
 				}
 				case RED_MIST -> {
-					PlayerRpg.drainSanity(player, 1.0F);
-					if (player.getRandom().nextInt(3) == 0) {
-						level.sendParticles(ParticleTypes.CRIMSON_SPORE, player.getX(), player.getY() + 1, player.getZ(), 12, 4, 2, 4, 0.01);
-					}
-					if (RED_MIST_ROOMS.size() < MAX_RED_MIST_ROOMS && player.getRandom().nextInt(22) == 0) {
-						BlockPos made = infestRedRoomNear(level, player.blockPosition());
-						if (made != null) {
-							player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.anomaly.red_room_formed").withStyle(ChatFormatting.DARK_RED));
-						}
-					}
+					tickRedMistZone(level, player);
 				}
 				case MIMICS -> {
 					tickMimicFigures(level, player);
 				}
 			}
+		}
+	}
+
+	private static void tickRedMistZone(ServerLevel level, ServerPlayer player) {
+		BlockPos pPos = player.blockPosition();
+		List<BlockPos> zones = RED_MIST_ZONES.getOrDefault(level.dimension(), List.of());
+
+		// Emit visible crimson mist beacons at nearby Red Mist enclaves so players can spot them down the hall
+		boolean hasNearbyEnclave = false;
+		for (BlockPos center : zones) {
+			double distSq = center.distSqr(pPos);
+			if (distSq <= 48 * 48) hasNearbyEnclave = true;
+			if (distSq <= 28 * 28) {
+				level.sendParticles(player, ParticleTypes.CRIMSON_SPORE, false, false,
+						center.getX() + 0.5, center.getY() + 1.4, center.getZ() + 0.5, 10, 3.2, 1.4, 3.2, 0.01);
+			}
+		}
+
+		// Periodically seed a localized Red Mist enclave ahead when exploring away from existing enclaves
+		if (!hasNearbyEnclave && RED_MIST_ROOMS.size() < MAX_RED_MIST_ROOMS && player.getRandom().nextInt(18) == 0) {
+			BlockPos made = infestRedRoomNear(level, pPos);
+			if (made != null) {
+				player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.anomaly.red_room_formed")
+						.withStyle(ChatFormatting.DARK_RED));
+			}
+		}
+
+		// Sanity drain & red HUD vignette apply ONLY while inside a Red Mist enclave zone
+		boolean inZone = isInRedMistZone(level, pPos);
+		boolean wasInZone = IN_RED_MIST_ZONE.getOrDefault(player.getUUID(), false);
+		if (inZone != wasInZone) {
+			send(player);
+			player.sendOverlayMessage(Component.translatable(inZone
+					? "message.noclip_backrooms.anomaly.red_mist_enter"
+					: "message.noclip_backrooms.anomaly.red_mist_leave")
+					.withStyle(inZone ? ChatFormatting.RED : ChatFormatting.GRAY));
+		}
+		if (inZone) {
+			PlayerRpg.drainSanity(player, 0.75F);
+			level.sendParticles(player, ParticleTypes.CRIMSON_SPORE, false, false,
+					player.getX(), player.getY() + 1.0, player.getZ(), 10, 3.0, 1.5, 3.0, 0.01);
 		}
 	}
 
@@ -343,7 +426,7 @@ public final class Anomalies {
 			return null;
 		}
 		// Never touch any existing BlockEntity (chests, props, workbenches) in the 7x7 footprint
-		for (BlockPos p : BlockPos.betweenClosed(center.offset(-3, -1, -3), center.offset(3, 4, 3))) {
+		for (BlockPos p : BlockPos.betweenClosed(center.offset(-3, -1, -3), center.offset(3, 5, 3))) {
 			if (level.getBlockEntity(p) != null) return null;
 		}
 		Block redWall = BuiltInRegistries.BLOCK.getValue(BackroomsMod.id("red_wallpaper"));
@@ -352,7 +435,7 @@ public final class Anomalies {
 		if (redWall == Blocks.AIR || redLight == Blocks.AIR) return null;
 
 		int changed = 0;
-		for (BlockPos p : BlockPos.betweenClosed(center.offset(-3, 0, -3), center.offset(3, 4, 3))) {
+		for (BlockPos p : BlockPos.betweenClosed(center.offset(-3, 0, -3), center.offset(3, 5, 3))) {
 			BlockState st = level.getBlockState(p);
 			if (st.isAir() || st.hasBlockEntity()) continue;
 			var id = BuiltInRegistries.BLOCK.getKey(st.getBlock());
@@ -371,26 +454,56 @@ public final class Anomalies {
 				changed++;
 			}
 		}
-		// Place the crimson anomaly cluster at center + an anomaly vault chest beside it if open
+		// Place the crimson anomaly cluster at center + guarantee an anomaly vault chest beside it (+ optional bonus supply crate)
 		level.setBlock(center, BackroomsProps.RED_ANOMALY_CLUSTER.defaultBlockState()
 				.setValue(NoClipPropBlock.FACING, Direction.SOUTH), Block.UPDATE_ALL);
+		Direction vaultDir = null;
 		for (Direction dir : Direction.Plane.HORIZONTAL) {
 			BlockPos beside = center.relative(dir);
 			if (level.getBlockState(beside).isAir() && level.getBlockState(beside.below()).isFaceSturdy(level, beside.below(), Direction.UP)) {
 				level.setBlock(beside, BackroomsProps.ANOMALY_VAULT_CHEST.defaultBlockState()
 						.setValue(BackroomsLootChestBlock.FACING, dir.getOpposite()), Block.UPDATE_ALL);
+				vaultDir = dir;
 				break;
 			}
 		}
-		// Ensure overhead red illumination so the room unmistakably glows crimson
-		BlockPos ceil = center.above(3);
+		if (vaultDir == null) {
+			BlockPos beside = center.relative(Direction.EAST);
+			level.setBlock(beside, BackroomsProps.ANOMALY_VAULT_CHEST.defaultBlockState()
+					.setValue(BackroomsLootChestBlock.FACING, Direction.WEST), Block.UPDATE_ALL);
+			vaultDir = Direction.EAST;
+		}
+		Block supplyCrate = BuiltInRegistries.BLOCK.getValue(BackroomsMod.id("supply_crate"));
+		if (supplyCrate != Blocks.AIR) {
+			BlockPos opp = center.relative(vaultDir.getOpposite());
+			if (level.getBlockState(opp).isAir() && level.getBlockState(opp.below()).isFaceSturdy(level, opp.below(), Direction.UP)) {
+				level.setBlock(opp, supplyCrate.defaultBlockState(), Block.UPDATE_ALL);
+			}
+		}
+		// Ensure overhead red illumination mounted flush in the room's ceiling
+		BlockPos ceil = null;
+		for (int dy = 2; dy <= 6; dy++) {
+			BlockPos probe = center.above(dy);
+			if (!level.getBlockState(probe).isAir() && level.getBlockEntity(probe) == null) {
+				ceil = probe;
+				break;
+			}
+		}
+		if (ceil == null) ceil = center.above(3);
 		if (level.getBlockState(ceil).isSolidRender() || changed == 0) {
 			level.setBlock(ceil, redLight.defaultBlockState(), Block.UPDATE_ALL);
 		}
 		RED_MIST_ROOMS.add(key);
+		BlockPos immutableCenter = center.immutable();
+		RED_MIST_ZONES.computeIfAbsent(level.dimension(), k -> new ArrayList<>()).add(immutableCenter);
+		for (ServerPlayer player : level.players()) {
+			if (player.blockPosition().distSqr(immutableCenter) <= (RED_MIST_RADIUS + 2) * (RED_MIST_RADIUS + 2)) {
+				send(player);
+			}
+		}
 		level.sendParticles(ParticleTypes.CRIMSON_SPORE, center.getX() + 0.5, center.getY() + 1.0, center.getZ() + 0.5, 45, 2.5, 1.2, 2.5, 0.04);
 		level.playSound(null, center, SoundEvents.AMBIENT_NETHER_WASTES_MOOD.value(), SoundSource.AMBIENT, 0.9F, 0.65F);
-		return center.immutable();
+		return immutableCenter;
 	}
 
 	/** The flashlight (Level 0's) loses a second charge each second it is lit. */

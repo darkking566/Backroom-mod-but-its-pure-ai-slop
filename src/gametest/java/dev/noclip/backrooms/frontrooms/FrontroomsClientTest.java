@@ -99,6 +99,24 @@ public final class FrontroomsClientTest implements FabricClientGameTest {
 			context.takeScreenshot("frontrooms_locker");
 			context.runOnClient(client -> client.gui.screen().onClose());
 
+			// 1F lobby Level 0 return pad works even at 0 quotas: right-clicking twice sends the player straight back to Level 0.
+			InstituteLayout.Spot lobbyPad = InstituteLayout.lobbyPads().getFirst();
+			BlockPos lobbyPadPos = new BlockPos(lobbyPad.x(), InstituteLayout.FLOOR, lobbyPad.z());
+			check(server.computeOnServer(s -> level(s).getBlockState(lobbyPadPos).is(FrontroomsBlocks.TRANSPORT_PAD)), "no 1F lobby return pad block");
+			stand(server, lobbyPad.x(), lobbyPad.z() + 2);
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				BlockState st = level(s).getBlockState(lobbyPadPos);
+				BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(lobbyPadPos), Direction.UP, lobbyPadPos, false);
+				st.useWithoutItem(level(s), p, hit); // 1st click: confirmation prompt
+				check(p.level().dimension() == Home.FRONTROOMS, "1F lobby pad teleported on first accidental click");
+				st.useWithoutItem(level(s), p, hit); // 2nd click: confirmed deploy to Level 0
+			});
+			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 200);
+			// Return to institute lobby for the remaining Frontrooms checks
+			server.runOnServer(s -> Institute.receive(player(s)));
+			server.waitFor(s -> player(s).level().dimension() == Home.FRONTROOMS, 200);
+
 			// The quarantine wall: whoever gets past it is walked back in.
 			server.runCommand("gamemode spectator @a");
 			server.runCommand("execute as @a in noclip_backrooms:frontrooms run tp @s 0.5 96 70.5 0 5");

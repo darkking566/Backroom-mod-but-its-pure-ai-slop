@@ -758,8 +758,7 @@ final class Maze {
 					|| vignette.type() == ZonePoiPlan.VignetteType.BREAKER_NICHE) {
 				return false;
 			}
-			if (vignette.type() == ZonePoiPlan.VignetteType.PEEK_CHAMBER
-					|| vignette.type() == ZonePoiPlan.VignetteType.MEG_ISOLATION_POST) return true;
+			if (vignette.type() == ZonePoiPlan.VignetteType.PEEK_CHAMBER) return true;
 			if (vignette.type() == ZonePoiPlan.VignetteType.GLASS_OFFICE) {
 				return Math.floorMod(x, CELL) == CENTER + 1 && Math.floorMod(z, CELL) == CENTER;
 			}

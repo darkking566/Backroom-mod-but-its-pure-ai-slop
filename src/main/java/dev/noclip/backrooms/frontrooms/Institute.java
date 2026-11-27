@@ -225,12 +225,16 @@ public final class Institute {
 		}
 	}
 
-	/** Whether the player stands on or right beside one of B1's transport pads. */
+	/** Whether the player stands on or right beside one of the institute's transport pads (B1 or 1F lobby). */
 	public static boolean onPad(Player player) {
 		if (player.level().dimension() != Home.FRONTROOMS) return false;
 		for (InstituteLayout.Spot pad : InstituteLayout.pads()) {
 			if (Math.abs(player.getX() - (pad.x() + 0.5)) < 2.5 && Math.abs(player.getZ() - (pad.z() + 0.5)) < 2.5
 					&& Math.abs(player.getY() - (InstituteLayout.B1_FLOOR + 1)) < 2) return true;
+		}
+		for (InstituteLayout.Spot pad : InstituteLayout.lobbyPads()) {
+			if (Math.abs(player.getX() - (pad.x() + 0.5)) < 2.5 && Math.abs(player.getZ() - (pad.z() + 0.5)) < 2.5
+					&& Math.abs(player.getY() - (InstituteLayout.FLOOR + 1)) < 2) return true;
 		}
 		return false;
 	}

@@ -20,11 +20,14 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -66,6 +69,14 @@ public final class PlayerRpg {
 	private static final Map<UUID, Long> LAST_HURT = new HashMap<>();
 
 	private static final int SANITY_TICK_INTERVAL = 10; // 0.5 seconds
+
+	public static final SoundEvent SANITY_LOW_DRONE = registerSound("sanity.low_drone");
+	public static final SoundEvent SANITY_HALLUCINATION_CUE = registerSound("sanity.hallucination_cue");
+
+	private static SoundEvent registerSound(String path) {
+		Identifier id = BackroomsMod.id(path);
+		return Registry.register(BuiltInRegistries.SOUND_EVENT, id, SoundEvent.createVariableRangeEvent(id));
+	}
 
 	private PlayerRpg() {
 	}

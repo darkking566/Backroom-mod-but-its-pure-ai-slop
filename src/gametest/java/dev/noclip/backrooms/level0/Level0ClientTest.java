@@ -409,7 +409,36 @@ public final class Level0ClientTest implements FabricClientGameTest {
 					"Manila Room hidden Void Stone missing");
 			check(level.getBlockState(new BlockPos(bx + da, Level0ChunkGenerator.CEILING_Y, bz + da)).is(ModBlocks.MANILA_LIGHT),
 					"Manila Room warm light missing");
+			check(level.getBlockState(new BlockPos(bx + 15, standY, bz + 4)).getBlock() instanceof net.minecraft.world.level.block.BedBlock,
+					"Manila Room bed head missing");
+			check(level.getBlockState(new BlockPos(bx + 15, standY, bz + 5)).getBlock() instanceof net.minecraft.world.level.block.BedBlock,
+					"Manila Room bed foot missing");
 		});
+
+		// Manila Room grants positive Regeneration while inside, and clears it immediately on leaving
+		context.waitTicks(20);
+		check(server.computeOnServer(s -> Level0MicroEvents.isInsideManilaSanctuary(player(s))
+				&& player(s).hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION)),
+				"Manila Room did not grant Regeneration inside sanctuary");
+
+		// Manila Room bed: first right-click prompts choice without exploding; second right-click sleeps -> Level 1 or Level 2
+		BlockPos bedPos = new BlockPos(bx + 15, standY, bz + 5);
+		server.runOnServer(s -> {
+			ServerPlayer p = player(s);
+			Level0MicroEvents.handleManilaBedInteract(p.level(), p, bedPos);
+			check(p.level().dimension() == Level0.LEVEL_0, "Manila bed should prompt before sleeping");
+			Level0MicroEvents.handleManilaBedInteract(p.level(), p, bedPos);
+		});
+		server.waitFor(s -> {
+			var dim = player(s).level().dimension();
+			return dim == dev.noclip.backrooms.level1.Level1.LEVEL_1 || dim == dev.noclip.backrooms.level2.Level2.LEVEL_2;
+		}, 120);
+		// Return to Manila interior to verify flickering wallpaper & exit-buff-removal cleanly
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + (bx + 5.5) + " " + standY + " " + (bz + 5.5) + " -45 5");
+		game.getConnection().waitForChunksDownload();
+		context.waitTicks(20);
+		check(server.computeOnServer(s -> player(s).hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION)),
+				"Manila Room Regeneration did not re-apply upon re-entering");
 
 		server.waitFor(s -> {
 			ServerLevel level = player(s).level();
@@ -427,7 +456,10 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		double originC = Maze.CENTER + 0.5;
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + originC + " " + standY + " " + originC);
 		game.getConnection().waitForChunksDownload();
-		context.waitTicks(5);
+		context.waitTicks(20);
+		check(server.computeOnServer(s -> !Level0MicroEvents.isInsideManilaSanctuary(player(s))
+				&& !player(s).hasEffect(net.minecraft.world.effect.MobEffects.REGENERATION)),
+				"Manila Room Regeneration was not removed after leaving");
 	}
 
 	private static void checkStaircaseComplexes(ClientGameTestContext context, TestSingleplayerContext game, int standY) {
@@ -643,7 +675,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 					"Darkened signal supply crate missing");
 		});
 
-		// 5. Sector micro-vignettes (all 9 including MEG_ISOLATION_POST & LOCKED_UTILITY_ROOM)
+		// 5. Sector micro-vignettes (all 8 including GLASS_OFFICE, BREAKER_NICHE & LOCKED_UTILITY_ROOM)
 		EnumMap<ZonePoiPlan.VignetteType, ZonePoiPlan.Vignette> vignettes = findAllVignettes(seed);
 		ZonePoiPlan.Vignette glassOffice = vignettes.get(ZonePoiPlan.VignetteType.GLASS_OFFICE);
 		int gx = glassOffice.cx() * Maze.CELL, gz = glassOffice.cz() * Maze.CELL;
@@ -703,17 +735,6 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			check(level.getBlockState(doorPos).getValue(Level0EventBlocks.LockedUtilityDoorBlock.OPEN),
 					"Locked utility door did not open after fuse box restore");
 		});
-
-		// M.E.G. Isolation Post screenshot
-		ZonePoiPlan.Vignette megPost = vignettes.get(ZonePoiPlan.VignetteType.MEG_ISOLATION_POST);
-		int px = megPost.cx() * Maze.CELL, pz = megPost.cz() * Maze.CELL;
-		server.runCommand("gamemode spectator @a");
-		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
-				+ (px + c + 0.5) + " " + standY + " " + (pz + c + 3.2) + " 180 8");
-		game.getConnection().waitForChunksDownload();
-		context.waitTicks(15);
-		game.getConnection().waitForChunksRender();
-		context.takeScreenshot("level0_meg_isolation_post");
 
 		// 6. Mystery exits (HUB_DOOR, FUN_DOOR)
 		ZonePoiPlan.MysteryExit hubExit = findMysteryExit(seed, ZonePoiPlan.MysteryKind.HUB);

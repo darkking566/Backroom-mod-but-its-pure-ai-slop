@@ -8,9 +8,11 @@ import dev.noclip.backrooms.level1.Level1Items;
 import dev.noclip.backrooms.props.BackroomsProps;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -33,10 +35,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Relative;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -45,17 +47,18 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Pure psychological-horror micro-event engine for Level 0 (zero roaming monsters):
+ * Pure psychological-horror micro-event & POI engine for Level 0 (zero roaming monsters):
  * 1. Loose ceiling tile search (perception / sanity linked)
  * 2. Hollow peeling wallpaper knock
  * 3. Mirror / peek-window uncanny reflection & Level 0.5 giant mirror gaze crossing
- * 4. Soaked carpet slip (agility linked) & damaged ceiling water drips
+ * 4. Damaged ceiling water drips & deep darkened puddle crossing (Level 0.11)
  * 5. Domino corridor blackout (progressive lamp shutoff -> recovery, photo-able as blackout_moment)
- * 6. Unplugged phantom phone ringing (3 outcomes: clue / static screech / shadow summon)
- * 7. Delayed phantom footsteps behind the player after stopping
+ * 6. Unplugged phantom phone ringing near office/POI zones
+ * 7. Delayed phantom footsteps behind the player in DARKENED / CORRIDORS zones
  * 8. Self-activating CRT TV static & temperamental vending machine slaps
  * 9. Fake door hall eerie surprises
- * 10. Mini corridor loop (disoriented backtrack cue until turning around)
+ * 10. Manila Room sanctuary (positive Regeneration & sanity recovery only while inside; interactive bed
+ *     giving a deliberate choice to sleep and transfer randomly to Level 1 or Level 2)
  * 11. Locked utility room feedback (unlocked via nearby FuseBoxEvents)
  * 12. Wanderer graffiti walls (truthful directions at high sanity, warped lies at low sanity)
  * Plus 3 dynamic environmental anomaly exits (green beckoning figure -> Level 14,
@@ -63,16 +66,24 @@ import net.minecraft.world.phys.Vec3;
  * and left-click tear/smash crossing for AnomalyExitBlock forms (1980 Appalachia poster -> Level 161, etc.).
  */
 public final class Level0MicroEvents {
+	private static final int AMBIENT_COOLDOWN_MIN = 2800; // 2m 20s minimum between ambient scares
+	private static final int AMBIENT_COOLDOWN_RANGE = 1800; // up to 3m 50s
+	private static final int FOOTSTEP_COOLDOWN_TICKS = 2400; // 2m between delayed footsteps
+	private static final int INITIAL_GRACE_TICKS = 1200; // 60s calm opening on entering Level 0
+
 	private static final Map<UUID, DominoWave> ACTIVE_DOMINO = new HashMap<>();
 	private static final Map<UUID, RingingPhone> RINGING_PHONES = new HashMap<>();
 	private static final Map<UUID, PendingFootstep> DELAYED_STEPS = new HashMap<>();
 	private static final Map<UUID, Vec3> PREV_POS = new HashMap<>();
 	private static final Map<UUID, Integer> MIRROR_GAZE_TICKS = new HashMap<>();
-	private static final Map<UUID, Integer> STRAIGHT_RUN_TICKS = new HashMap<>();
-	private static final Map<UUID, Integer> LOOP_COOLDOWN = new HashMap<>();
+	private static final Map<UUID, Integer> AMBIENT_COOLDOWN = new HashMap<>();
+	private static final Map<UUID, Integer> FOOTSTEP_COOLDOWN = new HashMap<>();
 	private static final Map<UUID, DynamicLure> ACTIVE_LURES = new HashMap<>();
 	private static final Map<Long, Integer> VENDING_COOLDOWN = new HashMap<>();
 	private static final Map<Long, Integer> FAKE_DOOR_COOLDOWN = new HashMap<>();
+	private static final Set<UUID> IN_MANILA = new HashSet<>();
+	private static final Map<UUID, Integer> MANILA_BED_CONFIRM = new HashMap<>();
+	private static final Map<UUID, PendingManilaSleep> PENDING_MANILA_SLEEP = new HashMap<>();
 
 	private Level0MicroEvents() {
 	}
@@ -153,6 +164,12 @@ public final class Level0MicroEvents {
 			if (state.is(ModBlocks.MANILA_DOOR) || state.is(ModBlocks.MANILA_DOOR_TOP)) {
 				return handleFakeDoorCheck(sl, sp, pos);
 			}
+			if (state.getBlock() instanceof BedBlock) {
+				long seed = Level0ChunkGenerator.mazeSeed(sl.getChunkSource().randomState());
+				if (ManilaRoomPlan.roomAtBlock(seed, pos.getX(), pos.getZ()) != null) {
+					return handleManilaBedInteract(sl, sp, pos);
+				}
+			}
 			return InteractionResult.PASS;
 		});
 
@@ -191,11 +208,14 @@ public final class Level0MicroEvents {
 		DELAYED_STEPS.clear();
 		PREV_POS.clear();
 		MIRROR_GAZE_TICKS.clear();
-		STRAIGHT_RUN_TICKS.clear();
-		LOOP_COOLDOWN.clear();
+		AMBIENT_COOLDOWN.clear();
+		FOOTSTEP_COOLDOWN.clear();
 		ACTIVE_LURES.clear();
 		VENDING_COOLDOWN.clear();
 		FAKE_DOOR_COOLDOWN.clear();
+		IN_MANILA.clear();
+		MANILA_BED_CONFIRM.clear();
+		PENDING_MANILA_SLEEP.clear();
 	}
 
 	private static void tick(MinecraftServer server) {
@@ -205,29 +225,46 @@ public final class Level0MicroEvents {
 
 		tickDominoWaves(level, now);
 		tickDelayedSteps(level, now);
+		tickPendingManilaSleeps(server, now);
 
 		long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
 		RandomSource random = level.getRandom();
+
+		// Strip Manila sanctuary buff immediately if a player left Level 0 altogether
+		IN_MANILA.removeIf(uuid -> {
+			ServerPlayer p = server.getPlayerList().getPlayer(uuid);
+			if (p == null || p.level().dimension() != Level0.LEVEL_0) {
+				if (p != null) p.removeEffect(MobEffects.REGENERATION);
+				return true;
+			}
+			return false;
+		});
 
 		for (ServerPlayer player : level.players()) {
 			UUID id = player.getUUID();
 			if (player.isSpectator() || !player.isAlive()) {
 				PREV_POS.remove(id);
 				MIRROR_GAZE_TICKS.remove(id);
+				if (IN_MANILA.remove(id)) {
+					player.removeEffect(MobEffects.REGENERATION);
+				}
 				continue;
 			}
+
+			// First time seen in Level 0: give a calm opening grace window so ambient scares don't spam right away
+			AMBIENT_COOLDOWN.putIfAbsent(id, now + INITIAL_GRACE_TICKS);
 
 			tickRingingPhone(level, player, now);
 			tickDynamicLure(level, player, now);
 
 			if (now % 10 == 0) {
-				tickDelayedFootstepDetector(level, player, now, random);
+				tickManilaSanctuary(seed, player);
+				tickDelayedFootstepDetector(level, seed, player, now, random);
 				tickMirrorAndWindowGaze(level, seed, player);
 			}
 
 			if (now % 20 == 0 && !player.isCreative()) {
 				tickDampCarpetAndDrips(level, seed, player, random);
-				tickMiniCorridorLoop(level, seed, player, now, random);
 				tickAmbientMicroEventRolls(level, seed, player, now, random);
 			}
 		}
@@ -488,37 +525,103 @@ public final class Level0MicroEvents {
 		return v != null && v.type() == ZonePoiPlan.VignetteType.PEEK_CHAMBER;
 	}
 
-	// --- #4 Damp Carpet Slip & Ceiling Drips ---
+	// --- #10 Manila Room Sanctuary Buff & Interactive Sleep Choice ---
+	static boolean isInsideManilaSanctuary(ServerPlayer player) {
+		return IN_MANILA.contains(player.getUUID());
+	}
+
+	private static void tickManilaSanctuary(long seed, ServerPlayer player) {
+		UUID id = player.getUUID();
+		ManilaRoomPlan.Room room = ManilaRoomPlan.roomAtBlock(seed, player.getBlockX(), player.getBlockZ());
+		boolean inside = room != null && room.isInteriorBlock(player.getBlockX(), player.getBlockZ());
+		if (inside) {
+			if (IN_MANILA.add(id)) {
+				player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level0.manila.enter")
+						.withStyle(ChatFormatting.GOLD));
+			}
+			// Positive sanctuary effect ONLY while inside Manila Room (short rolling duration, cleared immediately on exit)
+			player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 40, 0, true, false, true));
+			player.removeEffect(MobEffects.DARKNESS);
+			player.removeEffect(MobEffects.NAUSEA);
+			PlayerRpg.restoreSanity(player, 0.85F);
+		} else if (IN_MANILA.remove(id)) {
+			player.removeEffect(MobEffects.REGENERATION);
+			MANILA_BED_CONFIRM.remove(id);
+			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level0.manila.leave")
+					.withStyle(ChatFormatting.GRAY));
+		}
+	}
+
+	static InteractionResult handleManilaBedInteract(ServerLevel level, ServerPlayer player, BlockPos pos) {
+		UUID id = player.getUUID();
+		int now = level.getServer().getTickCount();
+		if (PENDING_MANILA_SLEEP.containsKey(id)) {
+			return InteractionResult.SUCCESS;
+		}
+		int confirmUntil = MANILA_BED_CONFIRM.getOrDefault(id, -1);
+		if (now <= confirmUntil) {
+			MANILA_BED_CONFIRM.remove(id);
+			String dest = beginManilaBedSleep(level, player, now, 25);
+			if (dest != null) {
+				level.playSound(null, pos, ModSounds.MANILA_PIANO, SoundSource.AMBIENT, 0.65F, 0.85F);
+			}
+		} else {
+			MANILA_BED_CONFIRM.put(id, now + 120);
+			level.playSound(null, pos, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 0.55F, 0.9F);
+			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level0.manila.bed_prompt")
+					.withStyle(ChatFormatting.YELLOW));
+		}
+		return InteractionResult.SUCCESS;
+	}
+
+	/** Starts sleeping on the Manila Room bed: brief blackout fadeout followed by random transfer to Level 1 or Level 2. */
+	static String beginManilaBedSleep(ServerLevel level, ServerPlayer player, int now, int delayTicks) {
+		String target = level.getRandom().nextBoolean() ? "1" : "2";
+		if (!LevelExits.isOpen(target)) {
+			target = LevelExits.isOpen("1") ? "1" : "2";
+		}
+		player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, Math.max(30, delayTicks + 15), 0, true, false, false));
+		player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level0.manila.bed_sleeping")
+				.withStyle(ChatFormatting.AQUA));
+		PENDING_MANILA_SLEEP.put(player.getUUID(), new PendingManilaSleep(target, now + delayTicks));
+		return target;
+	}
+
+	private static void tickPendingManilaSleeps(MinecraftServer server, int now) {
+		for (Iterator<Map.Entry<UUID, PendingManilaSleep>> it = PENDING_MANILA_SLEEP.entrySet().iterator(); it.hasNext(); ) {
+			var entry = it.next();
+			PendingManilaSleep pending = entry.getValue();
+			if (now < pending.atTick()) continue;
+			it.remove();
+			ServerPlayer player = server.getPlayerList().getPlayer(entry.getKey());
+			if (player == null || !player.isAlive() || player.level().dimension() != Level0.LEVEL_0) continue;
+			if (IN_MANILA.remove(player.getUUID())) {
+				player.removeEffect(MobEffects.REGENERATION);
+			}
+			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level0.manila.bed_wake", pending.targetLevel())
+					.withStyle(ChatFormatting.GOLD));
+			LevelExits.use(player, pending.targetLevel());
+		}
+	}
+
+	// --- #4 Ceiling Drips & Deep Puddle Crossing ---
 	private static void tickDampCarpetAndDrips(ServerLevel level, long seed, ServerPlayer player, RandomSource rng) {
 		BlockPos feet = player.blockPosition();
-		BlockState below = level.getBlockState(feet.below());
-		if (below.is(ModBlocks.THICK_CARPET) && player.isSprinting() && rng.nextInt(14) == 0) {
-			PlayerStats stats = PlayerRpg.get(player);
-			if (stats.agility() >= 3) {
-				player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level0.event.slip_recovered")
-						.withStyle(ChatFormatting.GREEN));
-			} else {
-				player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 35, 1, true, false, true));
-				level.playSound(null, feet, SoundEvents.PLAYER_SPLASH, SoundSource.PLAYERS, 0.4F, 0.8F);
-				player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level0.event.slip_carpet")
-						.withStyle(ChatFormatting.YELLOW));
-			}
-		}
 
 		// Ceiling drip particles under DAMAGED_TILES cells
 		int cx = Math.floorDiv(feet.getX(), Maze.CELL), cz = Math.floorDiv(feet.getZ(), Maze.CELL);
-		if (Maze.ceilingStyle(seed, cx, cz) == Maze.CeilingStyle.DAMAGED_TILES && rng.nextInt(3) == 0) {
+		if (Maze.ceilingStyle(seed, cx, cz) == Maze.CeilingStyle.DAMAGED_TILES && rng.nextInt(4) == 0) {
 			double dx = cx * Maze.CELL + 4 + rng.nextDouble() * 3.0;
 			double dz = cz * Maze.CELL + 4 + rng.nextDouble() * 2.0;
 			level.sendParticles(player, ParticleTypes.DRIPPING_WATER, false, false,
 					dx, Level0ChunkGenerator.CEILING_Y - 0.1, dz, 2, 0.25, 0.0, 0.25, 0.0);
-			if (rng.nextInt(3) == 0) {
+			if (rng.nextInt(4) == 0) {
 				level.playSound(null, dx, Level0ChunkGenerator.FLOOR_Y + 1.0, dz,
-						SoundEvents.POINTED_DRIPSTONE_DRIP_WATER, SoundSource.AMBIENT, 0.35F, 1.05F);
+						SoundEvents.POINTED_DRIPSTONE_DRIP_WATER, SoundSource.AMBIENT, 0.30F, 1.05F);
 			}
 		}
 
-		// Dynamic Water Damage (Level 0.11) exit when wading deep in DARKENED puddles
+		// Dynamic Water Damage (Level 0.11) exit when intentionally crouching in DARKENED puddles
 		if (Maze.zoneAt(seed, feet.getX(), feet.getZ()) == Maze.Zone.DARKENED
 				&& level.getBlockState(feet).is(Blocks.WATER) && player.isShiftKeyDown() && rng.nextInt(8) == 0) {
 			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level0.exit.water_0p11.clue")
@@ -527,16 +630,20 @@ public final class Level0MicroEvents {
 		}
 	}
 
-	// --- #7 Delayed Phantom Footsteps ---
-	private static void tickDelayedFootstepDetector(ServerLevel level, ServerPlayer player, int now, RandomSource rng) {
+	// --- #7 Delayed Phantom Footsteps (Zone-gated to DARKENED & CORRIDORS with 2-min cooldown) ---
+	private static void tickDelayedFootstepDetector(ServerLevel level, long seed, ServerPlayer player, int now, RandomSource rng) {
 		UUID id = player.getUUID();
 		Vec3 cur = player.position();
 		Vec3 prev = PREV_POS.put(id, cur);
 		if (prev == null || DELAYED_STEPS.containsKey(id)) return;
+		if (now < FOOTSTEP_COOLDOWN.getOrDefault(id, 0)) return;
+		Maze.Zone zone = Maze.zoneAt(seed, player.getBlockX(), player.getBlockZ());
+		if (zone != Maze.Zone.DARKENED && zone != Maze.Zone.CORRIDORS) return;
 		double dist = cur.distanceTo(prev);
-		if (dist < 0.05 && player.onGround() && rng.nextInt(26) == 0) {
+		if (dist < 0.05 && player.onGround() && rng.nextInt(42) == 0) {
 			BlockState below = level.getBlockState(player.blockPosition().below());
 			if (below.is(ModBlocks.CARPET) || below.is(ModBlocks.THICK_CARPET)) {
+				FOOTSTEP_COOLDOWN.put(id, now + FOOTSTEP_COOLDOWN_TICKS + rng.nextInt(1200));
 				Vec3 back = player.getLookAngle().multiply(-1, 0, -1);
 				double len = Math.hypot(back.x, back.z);
 				double bx = player.getX() + (len > 1e-4 ? back.x / len * 2.6 : 0);
@@ -623,79 +730,63 @@ public final class Level0MicroEvents {
 		}
 	}
 
-	// --- #10 Mini Corridor Loop ---
-	private static void tickMiniCorridorLoop(ServerLevel level, long seed, ServerPlayer player, int now, RandomSource rng) {
-		UUID id = player.getUUID();
-		if (now < LOOP_COOLDOWN.getOrDefault(id, 0)) return;
-		if (Maze.zoneAt(seed, player.getBlockX(), player.getBlockZ()) != Maze.Zone.CORRIDORS) {
-			STRAIGHT_RUN_TICKS.remove(id);
-			return;
-		}
-		if (PlayerRpg.get(player).sanityRatio() > 0.68F || RedRoomLoop.isTrapped(player)) return;
-		if (player.getDeltaMovement().horizontalDistanceSqr() > 0.008) {
-			int run = STRAIGHT_RUN_TICKS.merge(id, 20, Integer::sum);
-			if (run >= 120 && rng.nextInt(4) == 0) {
-				STRAIGHT_RUN_TICKS.remove(id);
-				LOOP_COOLDOWN.put(id, now + 3600);
-				Vec3 look = player.getLookAngle();
-				int stepX = Math.abs(look.x) >= Math.abs(look.z) ? (look.x >= 0 ? -Maze.CELL : Maze.CELL) : 0;
-				int stepZ = stepX == 0 ? (look.z >= 0 ? -Maze.CELL : Maze.CELL) : 0;
-				double tx = player.getX() + stepX;
-				double tz = player.getZ() + stepZ;
-				BlockPos feet = BlockPos.containing(tx, player.getY(), tz);
-				if (level.isLoaded(feet) && !Maze.isWall(seed, feet.getX(), feet.getZ(), false)
-						&& level.noCollision(player.getDimensions(player.getPose()).makeBoundingBox(new Vec3(tx, player.getY(), tz)))) {
-					player.teleportTo(level, tx, player.getY(), tz,
-							Relative.union(Relative.DELTA, Relative.ROTATION), 0.0F, 0.0F, false);
-					player.addEffect(new MobEffectInstance(MobEffects.DARKNESS, 18, 0, true, false, false));
-					player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level0.event.corridor_loop")
-							.withStyle(ChatFormatting.YELLOW));
-				}
-			}
-		}
-	}
-
-	// --- Ambient Micro-Event Director (Phone Ring, CRT Static, Domino Blackout, Green Lures) ---
+	// --- Zone/POI-Paced Ambient Micro-Event Director (Phone Ring, CRT Static, Domino Blackout, Green Lures) ---
 	private static void tickAmbientMicroEventRolls(ServerLevel level, long seed, ServerPlayer player, int now, RandomSource rng) {
 		UUID id = player.getUUID();
+		if (now < AMBIENT_COOLDOWN.getOrDefault(id, 0)) return;
 		BlockPos origin = player.blockPosition();
 		Maze.Zone zone = Maze.zoneAt(seed, origin.getX(), origin.getZ());
 		if (zone == Maze.Zone.RED_ROOM || ManilaRoomPlan.nearbyRoom(seed, origin.getX(), origin.getZ(), 18) != null) {
 			return;
 		}
+		int cx = Math.floorDiv(origin.getX(), Maze.CELL);
+		int cz = Math.floorDiv(origin.getZ(), Maze.CELL);
+		boolean nearPoi = ZonePoiPlan.isStandardPoiCell(seed, cx, cz)
+				|| ZonePoiPlan.vignetteAtCell(seed, cx, cz) != null
+				|| ZonePoiPlan.isDarkenedPoiCell(seed, cx, cz);
 
-		// Scan nearby phone or CRT TV for micro-events #6 & #8
-		if (!RINGING_PHONES.containsKey(id) && rng.nextInt(25) == 0) {
+		// POI-bound phone ring or CRT TV static when exploring office/darkened/wanderer POIs
+		if (nearPoi && !RINGING_PHONES.containsKey(id) && rng.nextInt(14) == 0) {
 			for (BlockPos p : BlockPos.betweenClosed(origin.offset(-10, -1, -10), origin.offset(10, 2, 10))) {
 				BlockState st = level.getBlockState(p);
 				if (isPhoneBlock(st)) {
 					RINGING_PHONES.put(id, new RingingPhone(p.immutable(), now + 400));
+					AMBIENT_COOLDOWN.put(id, now + AMBIENT_COOLDOWN_MIN + rng.nextInt(AMBIENT_COOLDOWN_RANGE));
 					player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level0.event.phone_ringing")
 							.withStyle(ChatFormatting.YELLOW));
-					break;
+					return;
 				}
 				if ((st.is(BackroomsProps.PROP_CRT_TV) || st.is(BackroomsProps.NOCLIPPED_CRT_TV)) && rng.nextBoolean()) {
 					level.playSound(null, p, ModSounds.FLUORESCENT_HUM, SoundSource.BLOCKS, 0.65F, 1.55F);
 					level.sendParticles(ParticleTypes.ELECTRIC_SPARK, p.getX() + 0.5, p.getY() + 0.7, p.getZ() + 0.5,
 							10, 0.25, 0.25, 0.25, 0.04);
+					AMBIENT_COOLDOWN.put(id, now + AMBIENT_COOLDOWN_MIN + rng.nextInt(AMBIENT_COOLDOWN_RANGE));
 					player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level0.event.crt_static")
 							.withStyle(ChatFormatting.AQUA));
-					break;
+					return;
 				}
 			}
 		}
 
-		// Occasional domino blackout wave in lit corridors
-		if (!ACTIVE_DOMINO.containsKey(id) && rng.nextInt(140) == 0) {
-			startDominoBlackout(level, player, now);
+		long distSqFromOrigin = (long) origin.getX() * origin.getX() + (long) origin.getZ() * origin.getZ();
+
+		// Rare domino blackout wave restricted to CORRIDORS / deep CLASSIC sectors away from spawn
+		if ((zone == Maze.Zone.CORRIDORS || (zone == Maze.Zone.CLASSIC && distSqFromOrigin > 3600))
+				&& !ACTIVE_DOMINO.containsKey(id) && rng.nextInt(260) == 0) {
+			if (startDominoBlackout(level, player, now)) {
+				AMBIENT_COOLDOWN.put(id, now + AMBIENT_COOLDOWN_MIN + rng.nextInt(AMBIENT_COOLDOWN_RANGE));
+				return;
+			}
 		}
 
-		// Occasional dynamic non-block anomalous exit lures (Level 14 green figure / Level 0.01 green corridor)
-		if (!ACTIVE_LURES.containsKey(id) && rng.nextInt(210) == 0) {
+		// Rare dynamic non-block anomalous exit lures restricted to deep CORRIDORS / PILLARS / ARCHES
+		if ((zone == Maze.Zone.CORRIDORS || zone == Maze.Zone.PILLARS || zone == Maze.Zone.ARCHES)
+				&& distSqFromOrigin > 6400 && !ACTIVE_LURES.containsKey(id) && rng.nextInt(320) == 0) {
 			LureKind kind = (zone == Maze.Zone.CORRIDORS && rng.nextBoolean())
 					? LureKind.GREEN_CORRIDOR_0P01
 					: LureKind.GREEN_FIGURE_14;
 			spawnDynamicLure(level, player, kind, now);
+			AMBIENT_COOLDOWN.put(id, now + AMBIENT_COOLDOWN_MIN + rng.nextInt(AMBIENT_COOLDOWN_RANGE));
 		}
 	}
 
@@ -787,5 +878,8 @@ public final class Level0MicroEvents {
 	}
 
 	private record DynamicLure(BlockPos pos, LureKind kind, int expiresAtTick) {
+	}
+
+	private record PendingManilaSleep(String targetLevel, int atTick) {
 	}
 }

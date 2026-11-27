@@ -574,5 +574,40 @@
         "pitch": 1.6
       }
     ]
+  },
+  "sanity.low_drone": {
+    "subtitle": "subtitles.noclip_backrooms.sanity.low_drone",
+    "sounds": [
+      {
+        "name": "noclip_backrooms:sanity/low_drone_1",
+        "attenuation_distance": 24,
+        "volume": 0.85
+      },
+      {
+        "name": "noclip_backrooms:sanity/low_drone_2",
+        "attenuation_distance": 24,
+        "volume": 0.85
+      },
+      {
+        "name": "noclip_backrooms:sanity/tinnitus",
+        "attenuation_distance": 20,
+        "volume": 0.65
+      }
+    ]
+  },
+  "sanity.hallucination_cue": {
+    "subtitle": "subtitles.noclip_backrooms.sanity.hallucination_cue",
+    "sounds": [
+      {
+        "name": "noclip_backrooms:sanity/hallucination_cue",
+        "attenuation_distance": 24,
+        "volume": 0.8
+      },
+      {
+        "name": "noclip_backrooms:level0/distant_whisper",
+        "attenuation_distance": 24,
+        "volume": 0.75
+      }
+    ]
   }
 }
