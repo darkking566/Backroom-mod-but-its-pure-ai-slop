@@ -1,6 +1,9 @@
 package dev.noclip.backrooms.weapons;
 
 import dev.noclip.backrooms.BackroomsMod;
+import dev.noclip.backrooms.core.rpg.Badges;
+import dev.noclip.backrooms.core.rpg.PlayerRpg;
+import dev.noclip.backrooms.core.rpg.PlayerStats;
 import java.util.List;
 import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
@@ -76,17 +79,34 @@ public final class BackroomsMeleeItem extends Item {
 		return tier;
 	}
 	private final float baseDamage;
+	private final float baseAttackSpeed;
+	private final float healthCost;
 	private final Trait trait;
 	private final String loreKey;
 
 	public BackroomsMeleeItem(Properties properties, Style style, int tier, float attackDamage,
 			float attackSpeed, float extraReach, Trait trait, String loreKey) {
+		this(properties, style, tier, attackDamage, attackSpeed, extraReach, 0.0F, trait, loreKey);
+	}
+
+	public BackroomsMeleeItem(Properties properties, Style style, int tier, float attackDamage,
+			float attackSpeed, float extraReach, float healthCost, Trait trait, String loreKey) {
 		super(properties.attributes(buildAttributes(attackDamage, attackSpeed, extraReach)));
 		this.style = style;
 		this.tier = tier;
 		this.baseDamage = attackDamage;
+		this.baseAttackSpeed = attackSpeed;
+		this.healthCost = Math.max(0.0F, healthCost);
 		this.trait = trait;
 		this.loreKey = loreKey;
+	}
+
+	public boolean isHeavyWeapon() {
+		return baseAttackSpeed <= 1.2F;
+	}
+
+	public float healthCost() {
+		return healthCost;
 	}
 
 	public Style style() {
@@ -143,7 +163,18 @@ public final class BackroomsMeleeItem extends Item {
 			target.hurtServer(serverLevel, attacker instanceof Player p ? serverLevel.damageSources().playerAttack(p) : serverLevel.damageSources().mobAttack(attacker), evoBonus);
 		}
 		if (attacker instanceof ServerPlayer sp) {
+			PlayerStats stats = PlayerRpg.get(sp);
+			if (stats.critChance() > 0.0F && sp.getRandom().nextFloat() < stats.critChance() && target.isAlive()) {
+				target.invulnerableTime = 0;
+				target.hurtServer(serverLevel, serverLevel.damageSources().playerAttack(sp), baseDamage * 0.35F);
+				serverLevel.sendParticles(ParticleTypes.CRIT, target.getX(), target.getY() + 1.0, target.getZ(), 10, 0.3, 0.4, 0.3, 0.08);
+				serverLevel.playSound(null, target.getX(), target.getY(), target.getZ(),
+						SoundEvents.PLAYER_ATTACK_CRIT, SoundSource.PLAYERS, 0.65F, 1.1F);
+			}
 			BackroomsWeaponNetworking.sendHitmarker(sp, !target.isAlive());
+			if (healthCost > 0.0F && !hasActiveRightClickSkill() && !tryPayHealthCost(sp, serverLevel)) {
+				return;
+			}
 		}
 
 		String entityPath = target.getType().builtInRegistryHolder().key().identifier().getPath();
@@ -254,6 +285,9 @@ public final class BackroomsMeleeItem extends Item {
 		}
 		if (player.getCooldowns().isOnCooldown(stack)) return InteractionResult.PASS;
 		if (!(level instanceof ServerLevel serverLevel)) return InteractionResult.SUCCESS;
+		if (healthCost > 0.0F && player instanceof ServerPlayer sp && !tryPayHealthCost(sp, serverLevel)) {
+			return InteractionResult.FAIL;
+		}
 
 		Vec3 eye = player.getEyePosition();
 		Vec3 look = player.getLookAngle();
@@ -320,6 +354,20 @@ public final class BackroomsMeleeItem extends Item {
 		return InteractionResult.SUCCESS;
 	}
 
+	private boolean tryPayHealthCost(ServerPlayer sp, ServerLevel level) {
+		float effCost = healthCost * Badges.meleeHealthCostMultiplier(sp);
+		if (effCost <= 0.01F || sp.isCreative()) return true;
+		if (sp.getHealth() <= effCost + 1.0F) {
+			sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.melee.low_health")
+					.withStyle(ChatFormatting.RED));
+			level.playSound(null, sp.getX(), sp.getY(), sp.getZ(), SoundEvents.FIRE_EXTINGUISH, SoundSource.PLAYERS, 0.5F, 1.1F);
+			return false;
+		}
+		sp.setHealth(Math.max(1.0F, sp.getHealth() - effCost));
+		level.sendParticles(ParticleTypes.DAMAGE_INDICATOR, sp.getX(), sp.getY() + 1.1, sp.getZ(), 4, 0.25, 0.3, 0.25, 0.05);
+		return true;
+	}
+
 	private static void pushBack(LivingEntity target, double strength, double dx, double dz) {
 		double len = Math.sqrt(dx * dx + dz * dz);
 		if (len < 1.0E-4) return;
@@ -345,6 +393,10 @@ public final class BackroomsMeleeItem extends Item {
 		};
 		adder.accept(Component.translatable("tooltip.noclip_backrooms.weapon_tier", tier, Component.translatable(styleKey)).withStyle(color));
 		WeaponEvolution.appendTooltip(stack, adder);
+		if (healthCost > 0.0F) {
+			adder.accept(Component.translatable("tooltip.noclip_backrooms.melee_health_cost",
+					String.format(java.util.Locale.ROOT, "%.1f", healthCost)).withStyle(ChatFormatting.RED));
+		}
 		if (loreKey != null && !loreKey.isEmpty()) {
 			adder.accept(Component.translatable(loreKey).withStyle(ChatFormatting.GRAY));
 		}

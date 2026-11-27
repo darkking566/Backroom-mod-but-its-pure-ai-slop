@@ -323,7 +323,8 @@ public final class Contracts {
 		if (success) {
 			// An M.E.G. order: its value goes into the quota (or the debt), and half of it again into the account as a bonus.
 			long left = dev.noclip.backrooms.core.quota.Quota.addPoints(player, contract.reward);
-			long bonus = contract.reward / 2 + left;
+			long luckBonus = Math.round(contract.reward * PlayerRpg.get(player).luckContractBonus());
+			long bonus = contract.reward / 2 + left + luckBonus;
 			Wallet.add(player, bonus);
 			PlayerRpg.grantXp(player, (int) (contract.reward / 5));
 			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.contract.paid", contract.title(), contract.reward - left, bonus)

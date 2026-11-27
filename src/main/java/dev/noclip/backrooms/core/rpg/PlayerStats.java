@@ -18,7 +18,13 @@ public record PlayerStats(
 		int agility,
 		int vitality,
 		int sanityStat,
-		float sanity
+		float sanity,
+		boolean luckUnlocked,
+		int luck,
+		boolean psiUnlocked,
+		int psi,
+		boolean engUnlocked,
+		int eng
 ) {
 	/*
 	 * Horror direction (docs/project/1-gameplay/README.md, 2026-11-25): levels make you steadier, not stronger. Max health and
@@ -33,6 +39,10 @@ public record PlayerStats(
 	public static final int POINTS_PER_LEVEL = 3;
 	public static final int INITIAL_STAT_POINTS = 3;
 
+	public PlayerStats(int level, int xp, int statPoints, int strength, int agility, int vitality, int sanityStat, float sanity) {
+		this(level, xp, statPoints, strength, agility, vitality, sanityStat, sanity, false, 0, false, 0, false, 0);
+	}
+
 	public static final Codec<PlayerStats> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Codec.INT.optionalFieldOf("level", 1).forGetter(PlayerStats::level),
 			Codec.INT.optionalFieldOf("xp", 0).forGetter(PlayerStats::xp),
@@ -41,7 +51,13 @@ public record PlayerStats(
 			Codec.INT.optionalFieldOf("agility", 0).forGetter(PlayerStats::agility),
 			Codec.INT.optionalFieldOf("vitality", 0).forGetter(PlayerStats::vitality),
 			Codec.INT.optionalFieldOf("sanity_stat", 0).forGetter(PlayerStats::sanityStat),
-			Codec.FLOAT.optionalFieldOf("sanity", BASE_MAX_SANITY).forGetter(PlayerStats::sanity)
+			Codec.FLOAT.optionalFieldOf("sanity", BASE_MAX_SANITY).forGetter(PlayerStats::sanity),
+			Codec.BOOL.optionalFieldOf("luck_unlocked", false).forGetter(PlayerStats::luckUnlocked),
+			Codec.INT.optionalFieldOf("luck", 0).forGetter(PlayerStats::luck),
+			Codec.BOOL.optionalFieldOf("psi_unlocked", false).forGetter(PlayerStats::psiUnlocked),
+			Codec.INT.optionalFieldOf("psi", 0).forGetter(PlayerStats::psi),
+			Codec.BOOL.optionalFieldOf("eng_unlocked", false).forGetter(PlayerStats::engUnlocked),
+			Codec.INT.optionalFieldOf("eng", 0).forGetter(PlayerStats::eng)
 	).apply(instance, PlayerStats::new));
 
 	public static final StreamCodec<RegistryFriendlyByteBuf, PlayerStats> STREAM_CODEC = StreamCodec.of(
@@ -54,17 +70,31 @@ public record PlayerStats(
 				buf.writeVarInt(stats.vitality);
 				buf.writeVarInt(stats.sanityStat);
 				buf.writeFloat(stats.sanity);
+				int mask = (stats.luckUnlocked ? 1 : 0)
+						| (stats.psiUnlocked ? 2 : 0)
+						| (stats.engUnlocked ? 4 : 0);
+				buf.writeByte(mask);
+				buf.writeVarInt(stats.luck);
+				buf.writeVarInt(stats.psi);
+				buf.writeVarInt(stats.eng);
 			},
-			buf -> new PlayerStats(
-					buf.readVarInt(),
-					buf.readVarInt(),
-					buf.readVarInt(),
-					buf.readVarInt(),
-					buf.readVarInt(),
-					buf.readVarInt(),
-					buf.readVarInt(),
-					buf.readFloat()
-			)
+			buf -> {
+				int lvl = buf.readVarInt();
+				int x = buf.readVarInt();
+				int pts = buf.readVarInt();
+				int str = buf.readVarInt();
+				int agi = buf.readVarInt();
+				int vit = buf.readVarInt();
+				int sanStat = buf.readVarInt();
+				float san = buf.readFloat();
+				int mask = buf.readByte();
+				return new PlayerStats(
+						lvl, x, pts, str, agi, vit, sanStat, san,
+						(mask & 1) != 0, buf.readVarInt(),
+						(mask & 2) != 0, buf.readVarInt(),
+						(mask & 4) != 0, buf.readVarInt()
+				);
+			}
 	);
 
 	public PlayerStats {
@@ -75,6 +105,12 @@ public record PlayerStats(
 		agility = Math.max(0, agility);
 		vitality = Math.max(0, vitality);
 		sanityStat = Math.max(0, sanityStat);
+		luck = Math.max(0, luck);
+		luckUnlocked = luckUnlocked || luck > 0;
+		psi = Math.max(0, psi);
+		psiUnlocked = psiUnlocked || psi > 0;
+		eng = Math.max(0, eng);
+		engUnlocked = engUnlocked || eng > 0;
 		float max = BASE_MAX_SANITY + SANITY_PER_STEP * (level / LEVELS_PER_STEP);
 		sanity = Mth.clamp(sanity, 0.0F, max);
 	}
@@ -149,8 +185,119 @@ public record PlayerStats(
 		return 0.3F * curve(sanityStat);
 	}
 
+	/** Strength knockback distance bonus in blocks, diminishing up to +0.8. */
+	public double knockbackBonus() {
+		return 0.8 * curve(strength);
+	}
+
+	/** Strength attack-speed compensation for heavy slow melee weapons, diminishing up to +20%. */
+	public double heavySwingSpeedBonus() {
+		return 0.20 * curve(strength);
+	}
+
+	/** Agility multiplier on firearm cooldown ticks, diminishing down to 0.70 (-30%). */
+	public float firearmCooldownScale() {
+		return 1.0F - 0.30F * curve(agility);
+	}
+
+	/** Agility multiplier on firearm spread, diminishing down to 0.65 (-35%). */
+	public float firearmSpreadScale() {
+		return 1.0F - 0.35F * curve(agility);
+	}
+
+	/** Agility multiplier on firearm client recoil, diminishing down to 0.65 (-35%). */
+	public float firearmRecoilScale() {
+		return 1.0F - 0.35F * curve(agility);
+	}
+
+	/** Agility critical strike chance for firearms & melee (1.35x damage), diminishing up to 20%. */
+	public float critChance() {
+		return 0.20F * curve(agility);
+	}
+
+	/** Agility multiplier on sprint hunger exhaustion, diminishing down to 0.65 (-35%). */
+	public float sprintExhaustionScale() {
+		return 1.0F - 0.35F * curve(agility);
+	}
+
+	/** Vitality reduction on finite harmful effect duration (poison, wither, bleed), up to -45%. */
+	public float harmfulDurationReduction() {
+		return 0.45F * curve(vitality);
+	}
+
+	/** Sanity multiplier on magic weapon sanity cost, diminishing down to 0.65 (-35%). */
+	public float magicSanityCostScale() {
+		return 1.0F - 0.35F * curve(sanityStat);
+	}
+
+	/** Luck extra chance for bonus container/mob drops (theme-locked), up to +35%. */
+	public double luckLootChance() {
+		return luckUnlocked ? 0.35 * curve(luck) : 0.0;
+	}
+
+	/** Luck extra personal credit bonus on completed contracts, up to +25%. */
+	public double luckContractBonus() {
+		return luckUnlocked ? 0.25 * curve(luck) : 0.0;
+	}
+
+	/** Luck roll bonus applied to Fate Dice casts (0..3). */
+	public int luckFateRollBonus() {
+		return luckUnlocked ? Math.round(3.0F * curve(luck)) : 0;
+	}
+
+	/** Psi extra sanity-drain resistance stacked multiplicatively with Sanity, up to 20%. */
+	public float psiSanityResistance() {
+		return psiUnlocked ? 0.20F * curve(psi) : 0.0F;
+	}
+
+	/** Combined sanity drain resistance from Sanity (max 40%) and Psi (max 20%), capped around 52%. */
+	public float totalSanityDrainResistance() {
+		return 1.0F - (1.0F - sanityDrainResistance()) * (1.0F - psiSanityResistance());
+	}
+
+	/** Psi spell radius/reach multiplier on Backrooms magic items, up to 1.35x. */
+	public float psiSpellRadiusScale() {
+		return psiUnlocked ? 1.0F + 0.35F * curve(psi) : 1.0F;
+	}
+
+	/** Engineering chance for firearms to fire without consuming ammo, up to 30%. */
+	public float engAmmoSaveChance() {
+		return engUnlocked ? 0.30F * curve(eng) : 0.0F;
+	}
+
+	/** Engineering chance for extra base material when dismantling Backrooms blocks, up to +40%. */
+	public double engSalvageBonusChance() {
+		return engUnlocked ? 0.40 * curve(eng) : 0.0;
+	}
+
+	public boolean isUnlocked(StatKind kind) {
+		return switch (kind) {
+			case STRENGTH, AGILITY, VITALITY, SANITY -> true;
+			case LUCK -> luckUnlocked;
+			case PSI -> psiUnlocked;
+			case ENGINEERING -> engUnlocked;
+		};
+	}
+
+	public boolean canAllocate(StatKind kind) {
+		return statPoints > 0 && isUnlocked(kind);
+	}
+
+	public int valueOf(StatKind kind) {
+		return switch (kind) {
+			case STRENGTH -> strength;
+			case AGILITY -> agility;
+			case VITALITY -> vitality;
+			case SANITY -> sanityStat;
+			case LUCK -> luck;
+			case PSI -> psi;
+			case ENGINEERING -> eng;
+		};
+	}
+
 	public PlayerStats withSanity(float value) {
-		return new PlayerStats(level, xp, statPoints, strength, agility, vitality, sanityStat, value);
+		return new PlayerStats(level, xp, statPoints, strength, agility, vitality, sanityStat, value,
+				luckUnlocked, luck, psiUnlocked, psi, engUnlocked, eng);
 	}
 
 	public PlayerStats addSanity(float delta) {
@@ -158,7 +305,8 @@ public record PlayerStats(
 	}
 
 	public PlayerStats addStatPoints(int points) {
-		return new PlayerStats(level, xp, statPoints + Math.max(0, points), strength, agility, vitality, sanityStat, sanity);
+		return new PlayerStats(level, xp, statPoints + Math.max(0, points), strength, agility, vitality, sanityStat, sanity,
+				luckUnlocked, luck, psiUnlocked, psi, engUnlocked, eng);
 	}
 
 	public PlayerStats addXp(int amount) {
@@ -173,16 +321,40 @@ public record PlayerStats(
 			newPoints += POINTS_PER_LEVEL;
 			newSanity += 10.0F;
 		}
-		return new PlayerStats(newLevel, newXp, newPoints, strength, agility, vitality, sanityStat, newSanity);
+		return new PlayerStats(newLevel, newXp, newPoints, strength, agility, vitality, sanityStat, newSanity,
+				luckUnlocked, luck, psiUnlocked, psi, engUnlocked, eng);
 	}
 
 	public PlayerStats allocate(StatKind kind) {
-		if (statPoints <= 0) return this;
+		if (!canAllocate(kind)) return this;
 		return switch (kind) {
-			case STRENGTH -> new PlayerStats(level, xp, statPoints - 1, strength + 1, agility, vitality, sanityStat, sanity);
-			case AGILITY -> new PlayerStats(level, xp, statPoints - 1, strength, agility + 1, vitality, sanityStat, sanity);
-			case VITALITY -> new PlayerStats(level, xp, statPoints - 1, strength, agility, vitality + 1, sanityStat, sanity);
-			case SANITY -> new PlayerStats(level, xp, statPoints - 1, strength, agility, vitality, sanityStat + 1, sanity);
+			case STRENGTH -> new PlayerStats(level, xp, statPoints - 1, strength + 1, agility, vitality, sanityStat, sanity,
+					luckUnlocked, luck, psiUnlocked, psi, engUnlocked, eng);
+			case AGILITY -> new PlayerStats(level, xp, statPoints - 1, strength, agility + 1, vitality, sanityStat, sanity,
+					luckUnlocked, luck, psiUnlocked, psi, engUnlocked, eng);
+			case VITALITY -> new PlayerStats(level, xp, statPoints - 1, strength, agility, vitality + 1, sanityStat, sanity,
+					luckUnlocked, luck, psiUnlocked, psi, engUnlocked, eng);
+			case SANITY -> new PlayerStats(level, xp, statPoints - 1, strength, agility, vitality, sanityStat + 1, sanity,
+					luckUnlocked, luck, psiUnlocked, psi, engUnlocked, eng);
+			case LUCK -> new PlayerStats(level, xp, statPoints - 1, strength, agility, vitality, sanityStat, sanity,
+					true, luck + 1, psiUnlocked, psi, engUnlocked, eng);
+			case PSI -> new PlayerStats(level, xp, statPoints - 1, strength, agility, vitality, sanityStat, sanity,
+					luckUnlocked, luck, true, psi + 1, engUnlocked, eng);
+			case ENGINEERING -> new PlayerStats(level, xp, statPoints - 1, strength, agility, vitality, sanityStat, sanity,
+					luckUnlocked, luck, psiUnlocked, psi, true, eng + 1);
+		};
+	}
+
+	/** Option 1 scroll rule: first scroll unlocks at 1; repeat scrolls of an unlocked stat grant +1 free point. */
+	public PlayerStats applyScroll(StatKind kind) {
+		return switch (kind) {
+			case LUCK -> new PlayerStats(level, xp, statPoints, strength, agility, vitality, sanityStat, sanity,
+					true, luckUnlocked ? luck + 1 : 1, psiUnlocked, psi, engUnlocked, eng);
+			case PSI -> new PlayerStats(level, xp, statPoints, strength, agility, vitality, sanityStat, sanity,
+					luckUnlocked, luck, true, psiUnlocked ? psi + 1 : 1, engUnlocked, eng);
+			case ENGINEERING -> new PlayerStats(level, xp, statPoints, strength, agility, vitality, sanityStat, sanity,
+					luckUnlocked, luck, psiUnlocked, psi, true, engUnlocked ? eng + 1 : 1);
+			default -> this;
 		};
 	}
 
@@ -190,7 +362,10 @@ public record PlayerStats(
 		STRENGTH,
 		AGILITY,
 		VITALITY,
-		SANITY;
+		SANITY,
+		LUCK,
+		PSI,
+		ENGINEERING;
 
 		public static StatKind fromOrdinal(int ordinal) {
 			StatKind[] values = values();

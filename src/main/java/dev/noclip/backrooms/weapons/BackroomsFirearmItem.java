@@ -1,6 +1,9 @@
 package dev.noclip.backrooms.weapons;
 
 import dev.noclip.backrooms.BackroomsMod;
+import dev.noclip.backrooms.core.rpg.Badges;
+import dev.noclip.backrooms.core.rpg.PlayerRpg;
+import dev.noclip.backrooms.core.rpg.PlayerStats;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -163,7 +166,7 @@ public final class BackroomsFirearmItem extends Item {
 	public boolean fireWeapon(ServerLevel serverLevel, ServerPlayer player, InteractionHand hand, ItemStack stack, boolean aiming) {
 		if (player.getCooldowns().isOnCooldown(stack)) return false;
 
-		String usedAmmo = consumeAmmo(player);
+		String usedAmmo = findAmmo(player);
 		if (usedAmmo == null) {
 			serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),
 					SoundEvents.DISPENSER_FAIL, SoundSource.PLAYERS, 0.6F, 1.4F);
@@ -172,12 +175,26 @@ public final class BackroomsFirearmItem extends Item {
 			return false;
 		}
 
+		PlayerStats stats = PlayerRpg.get(player);
+		float saveChance = Math.min(0.45F, stats.engAmmoSaveChance() + Badges.extraAmmoSaveChance(player));
+		boolean savedAmmo = !player.isCreative() && saveChance > 0.0F && player.getRandom().nextFloat() < saveChance;
+		if (savedAmmo) {
+			serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),
+					SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.30F, 1.85F);
+		} else if (!player.isCreative()) {
+			consumeAmmoId(player, usedAmmo);
+		}
+
 		boolean phosphorBonus = "ammo_556_phosphor".equals(usedAmmo);
 		boolean acidAmmo = "ammo_12g_acid".equals(usedAmmo) || mode == FireMode.ACID_SHOTGUN;
 		boolean apAmmo = "ammo_308_ap".equals(usedAmmo) || mode == FireMode.PIERCING_AP || mode == FireMode.RAILGUN_ARC;
-		float effSpread = aiming ? spread * 0.25F : spread;
+		float effSpread = (aiming ? spread * 0.25F : spread)
+				* stats.firearmSpreadScale() * Badges.firearmSpreadMultiplier(player);
 		float adsBonus = (aiming && hasOpticalScope()) ? 1.20F : 1.0F;
 		float evoMult = WeaponEvolution.damageMultiplier(stack);
+		float critChance = Math.min(0.45F, stats.critChance() + Badges.extraFirearmCritChance(player));
+		boolean crit = critChance > 0.0F && player.getRandom().nextFloat() < critChance;
+		float critMult = crit ? 1.35F : 1.0F;
 
 		Vec3 eye = player.getEyePosition();
 		Vec3 look = player.getLookAngle();
@@ -199,8 +216,9 @@ public final class BackroomsFirearmItem extends Item {
 				Vec3 p = eye.add(look.scale(step * 1.1));
 				serverLevel.sendParticles(ParticleTypes.SONIC_BOOM, p.x, p.y, p.z, 1, 0, 0, 0, 0);
 				for (LivingEntity e : serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(p, p).inflate(1.8), ent -> ent != player)) {
-					if (e.hurtServer(serverLevel, serverLevel.damageSources().sonicBoom(player), damage * evoMult)) {
+					if (e.hurtServer(serverLevel, serverLevel.damageSources().sonicBoom(player), damage * evoMult * critMult)) {
 						hitAny = true;
+						if (crit) serverLevel.sendParticles(ParticleTypes.CRIT, e.getX(), e.getY() + 1.0, e.getZ(), 8, 0.3, 0.4, 0.3, 0.08);
 						if (!e.isAlive()) killedAny = true;
 					}
 					Vec3 push = e.position().subtract(player.position());
@@ -216,8 +234,9 @@ public final class BackroomsFirearmItem extends Item {
 				Vec3 p = eye.add(look.scale(step * 0.95));
 				serverLevel.sendParticles(ParticleTypes.FLAME, p.x, p.y, p.z, 6, 0.35, 0.35, 0.35, 0.04);
 				for (LivingEntity e : serverLevel.getEntitiesOfClass(LivingEntity.class, new AABB(p, p).inflate(1.35), ent -> ent != player)) {
-					if (e.hurtServer(serverLevel, serverLevel.damageSources().onFire(), damage * evoMult)) {
+					if (e.hurtServer(serverLevel, serverLevel.damageSources().onFire(), damage * evoMult * critMult)) {
 						hitAny = true;
+						if (crit) serverLevel.sendParticles(ParticleTypes.CRIT, e.getX(), e.getY() + 1.0, e.getZ(), 6, 0.3, 0.4, 0.3, 0.08);
 						if (!e.isAlive()) killedAny = true;
 					}
 					e.igniteForSeconds(5);
@@ -255,7 +274,7 @@ public final class BackroomsFirearmItem extends Item {
 					if (!hits.isEmpty()) {
 						LivingEntity target = hits.getFirst();
 						hitIds.add(target.getId());
-						float dealt = damage * adsBonus * evoMult;
+						float dealt = damage * adsBonus * evoMult * critMult;
 						if (mode == FireMode.ACID_SHOTGUN && "ammo_12g_acid".equals(usedAmmo)) dealt *= 1.35F;
 						if (phosphorBonus) {
 							String path = target.getType().builtInRegistryHolder().key().identifier().getPath();
@@ -267,6 +286,7 @@ public final class BackroomsFirearmItem extends Item {
 						target.invulnerableTime = 0;
 						if (target.hurtServer(serverLevel, apAmmo ? serverLevel.damageSources().magic() : serverLevel.damageSources().playerAttack(player), dealt)) {
 							hitAny = true;
+							if (crit && p == 0) serverLevel.sendParticles(ParticleTypes.CRIT, target.getX(), target.getY() + 1.0, target.getZ(), 10, 0.3, 0.4, 0.3, 0.08);
 							if (!target.isAlive()) killedAny = true;
 						}
 						if (mode == FireMode.TASER_STUN) {
@@ -287,17 +307,22 @@ public final class BackroomsFirearmItem extends Item {
 		}
 
 		if (hitAny) {
+			if (crit) {
+				serverLevel.playSound(null, player.getX(), player.getY(), player.getZ(),
+						SoundEvents.PLAYER_ATTACK_CRIT, SoundSource.PLAYERS, 0.65F, 1.1F);
+			}
 			BackroomsWeaponNetworking.sendHitmarker(player, killedAny);
 		}
 
 		if (mode != FireMode.SILENT_NAIL && mode != FireMode.TASER_STUN) {
-			for (Monster m : serverLevel.getEntitiesOfClass(Monster.class, player.getBoundingBox().inflate(24.0))) {
+			double alertRadius = Badges.firearmNoiseRadius(player);
+			for (Monster m : serverLevel.getEntitiesOfClass(Monster.class, player.getBoundingBox().inflate(alertRadius))) {
 				if (m.getTarget() == null) m.setTarget(player);
 			}
 		}
 
 		stack.hurtAndBreak(1, player, hand);
-		player.getCooldowns().addCooldown(stack, cooldownTicks);
+		player.getCooldowns().addCooldown(stack, Math.max(2, Math.round(cooldownTicks * stats.firearmCooldownScale())));
 		return true;
 	}
 
@@ -313,20 +338,10 @@ public final class BackroomsFirearmItem extends Item {
 	}
 
 	public boolean hasAmmo(Player player) {
-		if (player.isCreative()) return true;
-		Inventory inv = player.getInventory();
-		for (String ammoId : ammoIds) {
-			Item ammoItem = BuiltInRegistries.ITEM.getValue(Identifier.parse(ammoId.contains(":") ? ammoId : BackroomsMod.MOD_ID + ":" + ammoId));
-			if (ammoItem == Items.AIR) continue;
-			for (int i = 0; i < inv.getContainerSize(); i++) {
-				ItemStack s = inv.getItem(i);
-				if (!s.isEmpty() && s.is(ammoItem)) return true;
-			}
-		}
-		return false;
+		return findAmmo(player) != null;
 	}
 
-	private String consumeAmmo(Player player) {
+	private String findAmmo(Player player) {
 		if (player.isCreative()) return ammoIds.isEmpty() ? "" : ammoIds.getFirst();
 		Inventory inv = player.getInventory();
 		for (String ammoId : ammoIds) {
@@ -334,13 +349,24 @@ public final class BackroomsFirearmItem extends Item {
 			if (ammoItem == Items.AIR) continue;
 			for (int i = 0; i < inv.getContainerSize(); i++) {
 				ItemStack s = inv.getItem(i);
-				if (!s.isEmpty() && s.is(ammoItem)) {
-					s.shrink(1);
-					return ammoId;
-				}
+				if (!s.isEmpty() && s.is(ammoItem)) return ammoId;
 			}
 		}
 		return null;
+	}
+
+	private void consumeAmmoId(Player player, String ammoId) {
+		if (player.isCreative() || ammoId == null || ammoId.isEmpty()) return;
+		Item ammoItem = BuiltInRegistries.ITEM.getValue(Identifier.parse(ammoId.contains(":") ? ammoId : BackroomsMod.MOD_ID + ":" + ammoId));
+		if (ammoItem == Items.AIR) return;
+		Inventory inv = player.getInventory();
+		for (int i = 0; i < inv.getContainerSize(); i++) {
+			ItemStack s = inv.getItem(i);
+			if (!s.isEmpty() && s.is(ammoItem)) {
+				s.shrink(1);
+				return;
+			}
+		}
 	}
 
 	@Override

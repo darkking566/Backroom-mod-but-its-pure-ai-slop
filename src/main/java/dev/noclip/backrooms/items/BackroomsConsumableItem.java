@@ -354,15 +354,12 @@ public final class BackroomsConsumableItem extends Item {
 			}
 			case FORBIDDEN_SCROLL_LUCK, FORBIDDEN_SCROLL_PSY, FORBIDDEN_SCROLL_TECH -> {
 				if (player instanceof ServerPlayer sp) {
-					PlayerStats cur = PlayerRpg.get(sp);
-					PlayerRpg.set(sp, new PlayerStats(cur.level(), cur.xp(), cur.statPoints() + 1,
-							cur.strength(), cur.agility(), cur.vitality(), cur.sanityStat(), cur.sanity()));
-					PlayerRpg.grantXp(sp, 120);
-					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.scroll.unlocked", stack.getHoverName()));
-					server.sendParticles(ParticleTypes.ENCHANT, sp.getX(), sp.getY() + 1.2, sp.getZ(), 30, 0.6, 0.8, 0.6, 0.1);
-					server.playSound(null, sp.getX(), sp.getY(), sp.getZ(), SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.PLAYERS, 0.9F, 1.2F);
-					if (!sp.isCreative()) stack.shrink(1);
-					sp.getCooldowns().addCooldown(stack, 20);
+					PlayerStats.StatKind hiddenStat = switch (kind) {
+						case FORBIDDEN_SCROLL_LUCK -> PlayerStats.StatKind.LUCK;
+						case FORBIDDEN_SCROLL_PSY -> PlayerStats.StatKind.PSI;
+						default -> PlayerStats.StatKind.ENGINEERING;
+					};
+					PlayerRpg.applyForbiddenScroll(sp, hiddenStat, stack);
 				}
 			}
 		}

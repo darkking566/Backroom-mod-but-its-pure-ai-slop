@@ -62,8 +62,8 @@ public final class FloorsClient {
 		graphics.text(client.font, Component.translatable("hud.noclip_backrooms.floor", floor), 10, 8, TEXT, true);
 		graphics.pose().popMatrix();
 
+		int nextY = AnomalyClient.affix().isEmpty() ? 28 : 40;
 		if (difficulty.active()) {
-			int y = AnomalyClient.affix().isEmpty() ? 28 : 40;
 			int bandIdx = Math.clamp(difficulty.band(), 0, BAND_ROMAN.length - 1);
 			Component label = Component.translatable("hud.noclip_backrooms.difficulty",
 					BAND_ROMAN[bandIdx],
@@ -73,7 +73,13 @@ public final class FloorsClient {
 				label = label.copy().append(Component.translatable("hud.noclip_backrooms.difficulty.anti_farm", difficulty.farmPenalty()));
 			}
 			int color = difficulty.farmPenalty() > 0 ? 0xFFFF5555 : BAND_COLORS[bandIdx];
-			graphics.text(client.font, label, 15, y, color, true);
+			graphics.text(client.font, label, 15, nextY, color, true);
+			nextY += 11;
+		}
+		dev.noclip.backrooms.core.rpg.Badges.Badge badge = dev.noclip.backrooms.core.rpg.Badges.active(client.player);
+		if (badge != null) {
+			graphics.text(client.font, Component.translatable("hud.noclip_backrooms.badge", badge.title()),
+					15, nextY, 0xFFE8C868, true);
 		}
 	}
 

@@ -86,4 +86,61 @@ final class PlayerStatsTest {
 		assertTrue(twenty.healthRegenPerSec() - ten.healthRegenPerSec() < ten.healthRegenPerSec(),
 				"the second ten points add less than the first ten");
 	}
+
+	@Test
+	void hiddenStatsStartLockedAndScrollUnlocksThenBoostsFree() {
+		PlayerStats fresh = PlayerStats.initial();
+		assertFalse(fresh.isUnlocked(PlayerStats.StatKind.LUCK));
+		assertFalse(fresh.canAllocate(PlayerStats.StatKind.LUCK));
+		assertEquals(0.0, fresh.luckLootChance(), 1.0E-5);
+
+		// Spending a normal point on a locked hidden stat is a no-op.
+		assertEquals(fresh, fresh.allocate(PlayerStats.StatKind.LUCK));
+
+		// First scroll unlocks at 1 without spending stat points; second boosts free to 2 (Option 1).
+		PlayerStats unlocked = fresh.applyScroll(PlayerStats.StatKind.LUCK);
+		assertTrue(unlocked.luckUnlocked());
+		assertEquals(1, unlocked.luck());
+		assertEquals(fresh.statPoints(), unlocked.statPoints());
+		assertTrue(unlocked.luckLootChance() > 0.0);
+
+		PlayerStats repeat = unlocked.applyScroll(PlayerStats.StatKind.LUCK);
+		assertEquals(2, repeat.luck());
+		assertEquals(unlocked.statPoints(), repeat.statPoints());
+
+		// Once unlocked, player can spend normal stat points on it too.
+		PlayerStats spent = repeat.allocate(PlayerStats.StatKind.LUCK);
+		assertEquals(3, spent.luck());
+		assertEquals(repeat.statPoints() - 1, spent.statPoints());
+	}
+
+	@Test
+	void advancedFourStatFormulasFollowDiminishingBounds() {
+		PlayerStats high = new PlayerStats(50, 0, 0, 100, 100, 100, 100, 50.0F,
+				true, 100, true, 100, true, 100);
+		assertTrue(high.knockbackBonus() > 0.7 && high.knockbackBonus() <= 0.8);
+		assertTrue(high.heavySwingSpeedBonus() > 0.18 && high.heavySwingSpeedBonus() <= 0.20);
+		assertTrue(high.firearmCooldownScale() >= 0.70F && high.firearmCooldownScale() < 0.72F);
+		assertTrue(high.firearmSpreadScale() >= 0.65F && high.firearmSpreadScale() < 0.67F);
+		assertTrue(high.firearmRecoilScale() >= 0.65F && high.firearmRecoilScale() < 0.67F);
+		assertTrue(high.critChance() > 0.18F && high.critChance() <= 0.20F);
+		assertTrue(high.sprintExhaustionScale() >= 0.65F && high.sprintExhaustionScale() < 0.67F);
+		assertTrue(high.harmfulDurationReduction() > 0.40F && high.harmfulDurationReduction() <= 0.45F);
+		assertTrue(high.magicSanityCostScale() >= 0.65F && high.magicSanityCostScale() < 0.67F);
+		assertTrue(high.totalSanityDrainResistance() > 0.45F && high.totalSanityDrainResistance() <= 0.525F);
+	}
+
+	@Test
+	void badgeTradeoffsExposeExpectedModifiers() {
+		for (Badges.Badge b : Badges.Badge.values()) {
+			assertEquals(6, b.coinCost);
+		}
+		assertEquals(0.80F, Badges.magicSanityCostMultiplier(Badges.Badge.ANOMALY_SCHOLAR), 1.0E-4F);
+		assertEquals(0.85F, Badges.meleeDamageMultiplier(Badges.Badge.ANOMALY_SCHOLAR), 1.0E-4F);
+		assertEquals(0.50F, Badges.meleeHealthCostMultiplier(Badges.Badge.VANGUARD_BREAKER), 1.0E-4F);
+		assertEquals(1.20F, Badges.firearmSpreadMultiplier(Badges.Badge.VANGUARD_BREAKER), 1.0E-4F);
+		assertEquals(30.0, Badges.firearmNoiseRadius(Badges.Badge.TACTICAL_SCOUT), 1.0E-4);
+		assertEquals(70, Badges.regenDelayTicks(Badges.Badge.SCAVENGER_SURVIVOR));
+		assertEquals(0.90F, Badges.monsterDamageMultiplier(Badges.Badge.SCAVENGER_SURVIVOR), 1.0E-4F);
+	}
 }

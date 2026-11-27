@@ -9,7 +9,11 @@ import dev.noclip.backrooms.core.guild.Contracts;
 import dev.noclip.backrooms.core.locker.Lockers;
 import dev.noclip.backrooms.core.locker.RelayService;
 import dev.noclip.backrooms.core.locker.Safebox;
+import dev.noclip.backrooms.core.rpg.Badges;
+import dev.noclip.backrooms.core.rpg.InventoryStatsPanel;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
+import dev.noclip.backrooms.core.rpg.PlayerStats;
+import dev.noclip.backrooms.core.rpg.SurvivalXp;
 import dev.noclip.backrooms.core.trip.Pull;
 import dev.noclip.backrooms.core.trip.PullState;
 import dev.noclip.backrooms.core.trip.Trips;
@@ -35,6 +39,7 @@ import dev.noclip.backrooms.level1.Level1Items;
 import dev.noclip.backrooms.level2.Level2;
 import dev.noclip.backrooms.monsters.Monsters;
 import dev.noclip.backrooms.monsters.hound.Hound;
+import dev.noclip.backrooms.weapons.BackroomsMeleeItem;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
@@ -42,9 +47,12 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContex
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelData;
+import org.lwjgl.glfw.GLFW;
 
 /**
  * The horror direction (docs/project/1-gameplay/README.md) end to end:
@@ -478,6 +486,103 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			check(server.computeOnServer(s -> player(s).getInventory().countItem(Level1Items.ALMOND_WATER)) == 1,
 					"COLLECT_ALMOND did not consume exact goal count (4 of 5)");
 			check(server.computeOnServer(s -> Wallet.of(player(s))) > creditsBeforeCollect, "COLLECT_ALMOND contract did not pay out");
+			context.waitTicks(5);
+
+			// 11. Priority-2 RPG depth: hidden stats via scrolls (Option 1), high-risk health cost melee,
+			// Martial Master badge unlock & safe-zone switch, extra survival XP, and Inventory [Adv.] tab.
+			server.runCommand("clear @a");
+			server.runCommand("gamemode survival @a");
+
+			// 11a. Hidden stats: first scroll unlocks at 1, repeat scroll grants +1 free point; unlocked stat accepts points.
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				PlayerRpg.set(p, PlayerRpg.get(p).addStatPoints(1));
+				ItemStack luckA = new ItemStack(BackroomsItems.FORBIDDEN_SCROLL_LUCK, 2);
+				ItemStack psy = new ItemStack(BackroomsItems.FORBIDDEN_SCROLL_PSY, 1);
+				ItemStack tech = new ItemStack(BackroomsItems.FORBIDDEN_SCROLL_TECH, 1);
+				PlayerRpg.applyForbiddenScroll(p, PlayerStats.StatKind.LUCK, luckA);
+				PlayerRpg.applyForbiddenScroll(p, PlayerStats.StatKind.LUCK, luckA);
+				PlayerRpg.applyForbiddenScroll(p, PlayerStats.StatKind.PSI, psy);
+				PlayerRpg.applyForbiddenScroll(p, PlayerStats.StatKind.ENGINEERING, tech);
+				PlayerRpg.set(p, PlayerRpg.get(p).allocate(PlayerStats.StatKind.ENGINEERING));
+			});
+			check(server.computeOnServer(s -> {
+				PlayerStats st = PlayerRpg.get(player(s));
+				return st.luckUnlocked() && st.luck() == 2 && st.psiUnlocked() && st.psi() == 1
+						&& st.engUnlocked() && st.eng() == 2;
+			}), "forbidden scroll Option 1 unlock/boost or hidden stat allocation failed");
+
+			// 11b. High-risk heavy melee health toll locks when health is too low and drains safely when healthy.
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(BackroomsItems.WEST_VOID_GREATSWORD));
+				p.setHealth(2.0F);
+				InteractionResult lowRes = ((BackroomsMeleeItem) p.getMainHandItem().getItem())
+						.use(p.level(), p, InteractionHand.MAIN_HAND);
+				check(lowRes == InteractionResult.FAIL && Math.abs(p.getHealth() - 2.0F) < 0.05F,
+						"high-risk weapon did not lock when player health was critically low");
+				p.setHealth(10.0F);
+				InteractionResult okRes = ((BackroomsMeleeItem) p.getMainHandItem().getItem())
+						.use(p.level(), p, InteractionHand.MAIN_HAND);
+				check(okRes != InteractionResult.FAIL && Math.abs(p.getHealth() - 7.5F) < 0.05F,
+						"high-risk weapon did not deduct 2.5 HP: " + p.getHealth());
+			});
+
+			// 11c. Martial Master badge unlock with Lost Old Coins, safe-zone toggle & Vanguard Breaker 50% toll cut.
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				Badges.spawnVendor(p.level(), p.getX() + 1.5, p.getY(), p.getZ());
+				p.getInventory().add(new ItemStack(BackroomsItems.LOST_OLD_COIN, 12));
+				check(Badges.unlock(p, Badges.Badge.VANGUARD_BREAKER, true), "failed to unlock Vanguard Breaker");
+				check(Badges.unlock(p, Badges.Badge.ANOMALY_SCHOLAR, true), "failed to unlock Anomaly Scholar");
+				check(Badges.countCoins(p.getInventory()) == 0, "coins were not deducted cleanly on badge unlock");
+				check(Badges.equip(p, Badges.Badge.VANGUARD_BREAKER, true), "failed to equip badge inside safe zone");
+			});
+			context.waitTicks(45); // Wait out VOID_GREATSWORD 40-tick cooldown
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				p.setHealth(10.0F);
+				InteractionResult res = ((BackroomsMeleeItem) p.getMainHandItem().getItem())
+						.use(p.level(), p, InteractionHand.MAIN_HAND);
+				check(res != InteractionResult.FAIL && Math.abs(p.getHealth() - 8.75F) < 0.05F,
+						"Vanguard Breaker did not halve high-risk weapon health cost: " + p.getHealth());
+			});
+			toLevel0(server);
+			game.getConnection().waitForChunksRender();
+			context.waitTicks(10);
+			check(server.computeOnServer(s -> !Badges.inSafeZone(player(s))
+					&& !Badges.equip(player(s), Badges.Badge.ANOMALY_SCHOLAR, true)
+					&& Badges.active(player(s)) == Badges.Badge.VANGUARD_BREAKER),
+					"badge swap should be blocked outside safe zones");
+
+			server.runOnServer(s -> Institute.receive(player(s)));
+			server.waitFor(s -> player(s).level().dimension() == Home.FRONTROOMS, 200);
+			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
+			context.runOnClient(client -> client.gui.screen().onClose());
+			context.waitTicks(5);
+
+			// 11d. Survival XP: first-time field note read (+15 XP once) & buyer delivery XP.
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				long xpBeforeNote = (long) PlayerRpg.get(p).level() * 10000L + PlayerRpg.get(p).xp();
+				check(SurvivalXp.recordNoteRead(p, "test:manila_manual"), "first note read did not grant XP");
+				check(!SurvivalXp.recordNoteRead(p, "test:manila_manual"), "duplicate note read granted XP twice");
+				long afterNote = (long) PlayerRpg.get(p).level() * 10000L + PlayerRpg.get(p).xp();
+				check(afterNote != xpBeforeNote, "note read did not change player XP");
+				long xpBeforeSale = afterNote;
+				SurvivalXp.onBuyerSale(p, 200L);
+				long afterSale = (long) PlayerRpg.get(p).level() * 10000L + PlayerRpg.get(p).xp();
+				check(afterSale > xpBeforeSale, "buyer sale did not grant survival XP");
+			});
+
+			// 11e. Open inventory switched to [Adv.] tab to inspect hidden stats & Specialization Badge UI.
+			context.runOnClient(client -> InventoryStatsPanel.selectTab(1));
+			context.getInput().pressKey(GLFW.GLFW_KEY_E);
+			context.waitTicks(5);
+			context.takeScreenshot("horror_rpg_advanced");
+			context.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
+			context.waitTicks(5);
+			context.runOnClient(client -> InventoryStatsPanel.selectTab(0));
 		}
 	}
 

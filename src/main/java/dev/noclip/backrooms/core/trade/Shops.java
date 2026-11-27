@@ -71,6 +71,8 @@ public final class Shops {
 			if (last != null && now - last < 5 && now >= last) return InteractionResult.SUCCESS;
 			if (role == ShopRole.MASTER) {
 				dev.noclip.backrooms.core.guild.Contracts.talk(serverPlayer);
+			} else if (role == ShopRole.MARTIAL_MASTER) {
+				dev.noclip.backrooms.core.rpg.Badges.talk(serverPlayer);
 			} else {
 				if (role == ShopRole.MEDIC) Treatment.offer(serverPlayer);
 				ServerPlayNetworking.send(serverPlayer, new ShopOpenPayload(role.id(), offers(role)));
@@ -169,6 +171,7 @@ public final class Shops {
 			if (sold == 0) return Outcome.NO_GOODS;
 			long credits = dev.noclip.backrooms.core.quota.Quota.onSold(player, offer.goods().getItem(), sold, total);
 			if (credits > 0) Wallet.add(player, credits);
+			if (role == ShopRole.BUYER) dev.noclip.backrooms.core.rpg.SurvivalXp.onBuyerSale(player, total);
 			return Outcome.DONE;
 		}
 		if (offer.fromPlayer()) {
@@ -178,6 +181,7 @@ public final class Shops {
 			// Selling to the buyer is handing things in to M.E.G.: debt first, then the quota; only the rest is paid out.
 			long credits = dev.noclip.backrooms.core.quota.Quota.onSold(player, offer.goods().getItem(), needed, price);
 			if (credits > 0) Wallet.add(player, credits);
+			if (role == ShopRole.BUYER) dev.noclip.backrooms.core.rpg.SurvivalXp.onBuyerSale(player, price);
 			return Outcome.DONE;
 		}
 		if (Wallet.of(player) < price) return Outcome.NO_CREDITS;

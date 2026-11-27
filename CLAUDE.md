@@ -966,3 +966,19 @@
   - **雙語翻譯與驗證**（`zh_tw.json`、`en_us.json`、`FloorDifficultyTest.java`、`HorrorClientTest.java`）：
     - 補齊 39 組雙語鍵並通過 JSON 語法檢核；`FloorDifficultyTest` 覆蓋距離段位、單次回頭 vs `A->B->A->B` 懲罰、保險箱擴充階梯與合約防卡死；`HorrorClientTest` 步驟 `10a..10e` 覆蓋雙軸縮放、防刷懲罰、保險箱死亡保護與升級、中繼投放與投保理賠、新增合約並於 `0011_horror_safebox.png` 實機檢視畫面
     - 已執行 `.\gradlew.bat build compileGametestJava --no-daemon`（含全部 133 項單元測試通過）與 `.\gradlew.bat runClientGameTest "-Plevels=horror,floors,field" --no-daemon` 全數通過，已提交於本機 main（未推送）
+- 完成 **企劃書核心玩法順位二系統（3 項隱藏能力值／四維進階效果／高風險近戰扣血／方案 B 流派徽章與馬尼拉房間武人／額外生存經驗／雙分頁角色面板）**（Antigravity；嚴格未修改 `crafting/`、`monsters/`、`Level0ChunkGenerator.java`、`level1..4/` 與模型貼圖，已提交於本機 main（未推送））：
+  - **隱藏能力值與禁忌卷軸方案一**（`core/rpg/PlayerStats.java`、`PlayerRpg.java`、`items/BackroomsConsumableItem.java`、`core/guild/Contracts.java`、`core/floors/FloorDifficulty.java`）：
+    - `PlayerStats` 向下相容新增 `LUCK`（幸運）、`PSI`（靈能）、`ENGINEERING`（工程）解鎖旗標與等級（皆採 `optionalFieldOf` 預設與遞減曲線），保留原 8 參數建構子不變
+    - 使用 3 種禁忌知識卷軸永久解鎖對應欄位為 1 級，**已解鎖後重複使用直接免費 `+1`**（方案一）；並接通稀有掉落／委託紅利／命運骰加權、額外理智流失減免（與 `SAN` 乘法疊加）＆法術半徑倍率、槍械機率省彈＆拆解增產；順手修正 `FloorDifficulty` 容器獎勵 `lost_coin` 筆誤為 `lost_old_coin`
+  - **四維進階戰鬥與生存效果**（`PlayerRpg.java`、`PlayerSprintExhaustionMixin.java`、`noclip_backrooms.mixins.json`、`BackroomsFirearmItem.java`、`WeaponAnimState.java`、`BackroomsMagicItem.java`、`BackroomsMeleeItem.java`）：
+    - `STR` 新增擊退距離加成（最多 `+0.8` 格）與重武器（`baseAttackSpeed <= 1.2F`）揮速補償（最多 `+20%`）；負重限制定案暫不實作
+    - `AGI` 新增槍械冷卻縮短（最多 `-30%`）、擴散與客戶端後座力同步縮減（最多 `-35%`）、槍械／近戰暴擊率（最多 `20%`，1.35×）與衝刺耗飢餓減少（`PlayerSprintExhaustionMixin`，最多 `-35%`）
+    - `VIT` 每秒定期縮短非永久有害狀態（中毒／凋零／流血等）剩餘時間最多 `-45%`；`SAN` 新增法杖施法理智消耗額外減免（最多 `-35%`）
+  - **高風險特定近戰武器扣血機制**（`BackroomsMeleeItem.java`、`BackroomsItems.java`、`SurvivalXp.java`、`core/trade/Shops.java`）：
+    - 僅對 5 把高風險武器（`blunt_crimson_crusher`、`blunt_thunder_colossus`、`west_hotel_greatsword`、`west_void_greatsword`、`cn_alpha_tangdao`）設定特技生命代價（`2.0` / `2.5`）；血量過低（`<= effCost + 1.0F`）自動鎖定並提示不扣死
+    - `SurvivalXp` 新增首次細讀筆記／現場檔案（`manila_note`、`field_note`、`WrittenBook`、`MEG_SQUAD_REPORT`）`+15` 經驗（去重防刷）與基地買家交付收購經驗（`onBuyerSale`）；**【待辦備忘】「首次合成新物品給經驗」依分工暫刻意未修改 `crafting/BackroomsStationMenu.java`，待日後合成周邊定案再接上**
+  - **方案 B 流派徽章與 Level 0 馬尼拉房間武人 NPC**（`core/rpg/Badges.java`、`BadgeActionPayload.java`、`core/trade/ShopRole.java`、`level0/Level0Ambience.java`、`core/combat/WeaponBalance.java`）：
+    - 新增 `ShopRole.MARTIAL_MASTER`（`martial_master`，外觀 `tom`）並於現行 Level 0 馬尼拉房間室內自動生成（透過公開介面 `Badges.spawnVendor(level, x, y, z)`，日後 Claude 重設計 Level 0 地圖時可直接沿用同一介面擺放）
+    - 4 種流派（異常學者、破陣重衛、戰術斥候、拾荒倖存者）採「正面專長＋輕微代價」，各以 6 枚 `lost_old_coin` 向武人兌換解鎖，僅於安全區（前室／主世界或安頓據點床旁 16 格）切換
+  - **雙分頁角色面板與雙語驗證**（`InventoryStatsPanel.java`、`FloorsClient.java`、`zh_tw.json`、`en_us.json`、`PlayerStatsTest.java`、`HorrorClientTest.java`、`docs/project/2-player/README.md`）：
+    - 維持 `132×166` 面板整合 `[能力 | 進階]` 雙分頁（3 項隱藏屬性解鎖／配點＋流派切換／卸下），左上角 HUD 同步顯示啟用流派；雙語 JSON 通過檢核；`.\gradlew.bat build compileGametestJava --no-daemon`（136 項單元測試全過）與 `.\gradlew.bat runClientGameTest "-Plevels=horror,floors,field" --no-daemon`（含 `HorrorClientTest` 步驟 `11a..11e` 與實機檢視 `0003_floors_inventory.png`、`0012_horror_rpg_advanced.png`）全數通過

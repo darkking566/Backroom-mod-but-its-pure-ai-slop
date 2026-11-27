@@ -370,7 +370,7 @@ public final class FloorDifficulty {
 			picked.setCount(Math.min(picked.getMaxStackSize(), picked.getCount() + extra));
 		}
 		if (isContainer && lootBonus >= 0.65 && random.nextDouble() < Math.min(0.35, (lootBonus - 0.5) * 0.5)) {
-			Item coin = BuiltInRegistries.ITEM.getValue(BackroomsMod.id("lost_coin"));
+			Item coin = BuiltInRegistries.ITEM.getValue(BackroomsMod.id("lost_old_coin"));
 			if (coin != net.minecraft.world.item.Items.AIR) {
 				drops.add(new ItemStack(coin, 1));
 			}

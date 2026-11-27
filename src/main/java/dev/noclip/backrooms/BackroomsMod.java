@@ -39,6 +39,7 @@ public final class BackroomsMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		PlayerRpg.register();
+		dev.noclip.backrooms.core.rpg.Badges.register();
 		Floors.register();
 		dev.noclip.backrooms.core.floors.FloorDifficulty.register();
 		BackroomsProps.register();

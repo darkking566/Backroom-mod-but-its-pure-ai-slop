@@ -2,11 +2,19 @@ package dev.noclip.backrooms.core.rpg;
 
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import dev.noclip.backrooms.BackroomsMod;
+import dev.noclip.backrooms.core.Home;
+import dev.noclip.backrooms.items.BackroomsItems;
 import dev.noclip.backrooms.monsters.beastlevel5.BeastOfLevel5;
+import dev.noclip.backrooms.weapons.BackroomsFirearmItem;
+import dev.noclip.backrooms.weapons.BackroomsMeleeItem;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
@@ -15,12 +23,14 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -30,15 +40,20 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Core cross-level RPG stats, leveling, sanity drain/recovery, and C2S stat-allocation handler.
@@ -55,11 +70,16 @@ public final class PlayerRpg {
 	);
 
 	private static final Identifier MOD_STR = BackroomsMod.id("rpg_strength");
+	private static final Identifier MOD_STR_KNOCKBACK = BackroomsMod.id("rpg_strength_knockback");
+	private static final Identifier MOD_STR_HEAVY_ATK = BackroomsMod.id("rpg_strength_heavy_speed");
 	private static final Identifier MOD_AGI_MOVE = BackroomsMod.id("rpg_agility_move");
 	private static final Identifier MOD_AGI_ATK = BackroomsMod.id("rpg_agility_attack");
 	private static final Identifier MOD_VIT_HP = BackroomsMod.id("rpg_vitality_health");
 	private static final Identifier MOD_VIT_TOUGH = BackroomsMod.id("rpg_vitality_toughness");
 	private static final Identifier MOD_BACKROOMS_HP = BackroomsMod.id("backrooms_frailty");
+	private static final Identifier MOD_SCOUT_ADS = BackroomsMod.id("badge_scout_ads_speed");
+	private static final Set<String> PROTECTED_LOOT = Set.of(
+			"evidence_photo", "topology_tape", "meg_squad_report", "wretch_cure");
 	/** Half of the player's base 20 health, everywhere, once they have been in the Backrooms (docs/project/1-gameplay/README.md). */
 	public static final double FRAILTY = -10.0;
 	/** In the Backrooms, eating well heals at a quarter of the usual speed (mixin.FoodDataBackroomsRegen). */
@@ -86,7 +106,7 @@ public final class PlayerRpg {
 		ServerPlayNetworking.registerGlobalReceiver(AllocateStatPayload.TYPE, (payload, context) -> {
 			ServerPlayer player = context.player();
 			PlayerStats before = get(player);
-			if (before.statPoints() <= 0) return;
+			if (!before.canAllocate(payload.stat())) return;
 			PlayerStats after = before.allocate(payload.stat());
 			set(player, after);
 			if (payload.stat() == PlayerStats.StatKind.VITALITY) {
@@ -128,7 +148,31 @@ public final class PlayerRpg {
 			grantXp(killer, reward);
 		});
 
+		ServerTickEvents.END_SERVER_TICK.register(PlayerRpg::tickDynamicAndEffects);
 		ServerTickEvents.END_SERVER_TICK.register(PlayerRpg::tickVitalityAndSanity);
+		LootTableEvents.MODIFY_DROPS.register((table, context, drops) -> {
+			if (drops.isEmpty()) return;
+			ServerLevel level = context.getLevel();
+			ServerPlayer player = resolveLootPlayer(level, context);
+			if (player == null) return;
+			PlayerStats stats = get(player);
+			String ns = table.unwrapKey().map(k -> k.identifier().getNamespace()).orElse("");
+			String path = table.unwrapKey().map(k -> k.identifier().getPath()).orElse("");
+			if (path.startsWith("blocks/") && BackroomsMod.MOD_ID.equals(ns) && Home.inBackrooms(level.dimension())) {
+				double bonus = stats.engSalvageBonusChance() + Badges.extraLootChance(player);
+				if (bonus > 0.0 && context.getRandom().nextDouble() < bonus) {
+					grantBonusDrop(drops, context.getRandom());
+				}
+			} else if (path.contains("chest") || path.contains("crate") || path.startsWith("entities/")) {
+				double luck = stats.luckLootChance() + Badges.extraLootChance(player);
+				if (luck > 0.0 && context.getRandom().nextDouble() < luck) {
+					grantBonusDrop(drops, context.getRandom());
+					if ((path.contains("chest") || path.contains("crate")) && context.getRandom().nextFloat() < 0.25F) {
+						drops.add(new ItemStack(BackroomsItems.LOST_OLD_COIN, 1));
+					}
+				}
+			}
+		});
 		registerCommands();
 	}
 
@@ -153,11 +197,35 @@ public final class PlayerRpg {
 	public static void drainSanity(ServerPlayer player, float amount) {
 		if (amount <= 0.0F) return;
 		PlayerStats before = get(player);
-		float effective = amount * (1.0F - before.sanityDrainResistance());
+		float effective = amount * (1.0F - before.totalSanityDrainResistance());
 		PlayerStats after = before.addSanity(-effective);
 		if (Math.abs(after.sanity() - before.sanity()) > 0.01F) {
 			player.setAttached(STATS, after);
 		}
+	}
+
+	/**
+	 * Applies a Forbidden Scroll (Option 1): first read unlocks the hidden stat at 1;
+	 * repeat scrolls of an already-unlocked stat grant +1 free point directly.
+	 */
+	public static void applyForbiddenScroll(ServerPlayer player, PlayerStats.StatKind kind, ItemStack stack) {
+		PlayerStats before = get(player);
+		boolean already = before.isUnlocked(kind);
+		PlayerStats after = before.applyScroll(kind);
+		set(player, after);
+		String shortKey = switch (kind) {
+			case LUCK -> "ui.noclip_backrooms.rpg.luk";
+			case PSI -> "ui.noclip_backrooms.rpg.psy";
+			default -> "ui.noclip_backrooms.rpg.eng";
+		};
+		player.sendOverlayMessage(Component.translatable(
+				already ? "message.noclip_backrooms.scroll.boosted_stat" : "message.noclip_backrooms.scroll.unlocked_stat",
+				Component.translatable(shortKey), after.valueOf(kind)));
+		player.level().sendParticles(ParticleTypes.ENCHANT, player.getX(), player.getY() + 1.2, player.getZ(), 30, 0.6, 0.8, 0.6, 0.1);
+		player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+				SoundEvents.ENCHANTMENT_TABLE_USE, SoundSource.PLAYERS, 0.9F, already ? 1.35F : 1.15F);
+		if (!player.isCreative()) stack.shrink(1);
+		player.getCooldowns().addCooldown(stack, 20);
 	}
 
 	public static void grantXp(ServerPlayer player, int amount) {
@@ -174,6 +242,8 @@ public final class PlayerRpg {
 
 	public static void applyAttributes(ServerPlayer player, PlayerStats stats) {
 		updateModifier(player, Attributes.ATTACK_DAMAGE, MOD_STR, stats.attackDamageBonus(), AttributeModifier.Operation.ADD_VALUE);
+		updateModifier(player, Attributes.ATTACK_KNOCKBACK, MOD_STR_KNOCKBACK,
+				stats.knockbackBonus() * Badges.knockbackMultiplier(player), AttributeModifier.Operation.ADD_VALUE);
 		updateModifier(player, Attributes.MOVEMENT_SPEED, MOD_AGI_MOVE, stats.moveSpeedBonus(), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 		updateModifier(player, Attributes.ATTACK_SPEED, MOD_AGI_ATK, stats.attackSpeedBonus(), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
 		updateModifier(player, Attributes.MAX_HEALTH, MOD_VIT_HP, stats.maxHealthBonus(), AttributeModifier.Operation.ADD_VALUE);
@@ -183,8 +253,81 @@ public final class PlayerRpg {
 		updateModifier(player, Attributes.MAX_HEALTH, MOD_BACKROOMS_HP, frail ? FRAILTY : 0.0,
 				AttributeModifier.Operation.ADD_VALUE);
 		updateModifier(player, Attributes.ARMOR_TOUGHNESS, MOD_VIT_TOUGH, 0.0, AttributeModifier.Operation.ADD_VALUE);
+		applyDynamicAttributes(player, stats);
 		if (player.getHealth() > player.getMaxHealth()) {
 			player.setHealth(player.getMaxHealth());
+		}
+	}
+
+	private static void applyDynamicAttributes(ServerPlayer player, PlayerStats stats) {
+		ItemStack main = player.getMainHandItem();
+		double heavyBonus = (main.getItem() instanceof BackroomsMeleeItem melee && melee.isHeavyWeapon())
+				? stats.heavySwingSpeedBonus() : 0.0;
+		updateModifier(player, Attributes.ATTACK_SPEED, MOD_STR_HEAVY_ATK, heavyBonus, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+
+		double adsBonus = (Badges.active(player) == Badges.Badge.TACTICAL_SCOUT
+				&& main.getItem() instanceof BackroomsFirearmItem && player.isUsingItem()) ? 0.85 : 0.0;
+		updateModifier(player, Attributes.MOVEMENT_SPEED, MOD_SCOUT_ADS, adsBonus, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+	}
+
+	private static void tickDynamicAndEffects(MinecraftServer server) {
+		int tick = server.getTickCount();
+		if (tick % 5 != 0) return;
+		boolean shortenHarmful = tick % 20 == 0;
+		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+			if (!player.isAlive() || player.isSpectator()) continue;
+			PlayerStats stats = get(player);
+			applyDynamicAttributes(player, stats);
+			if (shortenHarmful && !player.isCreative()) {
+				shortenHarmfulEffects(player, stats);
+			}
+		}
+	}
+
+	private static void shortenHarmfulEffects(ServerPlayer player, PlayerStats stats) {
+		float red = stats.harmfulDurationReduction();
+		if (red < 0.02F) return;
+		List<MobEffectInstance> active = new ArrayList<>(player.getActiveEffects());
+		for (MobEffectInstance inst : active) {
+			if (inst.getEffect().value().getCategory() != MobEffectCategory.HARMFUL || inst.isInfiniteDuration()) continue;
+			int cur = inst.getDuration();
+			if (cur <= 25) continue;
+			int extraCut = Math.min(cur - 20, Math.max(1, Math.round(20.0F * (red / (1.0F - red)))));
+			if (extraCut <= 0) continue;
+			int nextDur = cur - extraCut;
+			player.removeEffect(inst.getEffect());
+			player.addEffect(new MobEffectInstance(
+					inst.getEffect(), nextDur, inst.getAmplifier(), inst.isAmbient(), inst.isVisible(), inst.showIcon()));
+		}
+	}
+
+	private static ServerPlayer resolveLootPlayer(ServerLevel level, net.minecraft.world.level.storage.loot.LootContext context) {
+		var attacker = context.getOptionalParameter(LootContextParams.ATTACKING_ENTITY);
+		if (attacker instanceof ServerPlayer sp) return sp;
+		var killer = context.getOptionalParameter(LootContextParams.LAST_DAMAGE_PLAYER);
+		if (killer instanceof ServerPlayer sp) return sp;
+		var target = context.getOptionalParameter(LootContextParams.THIS_ENTITY);
+		if (target instanceof ServerPlayer sp) return sp;
+		Vec3 origin = context.getOptionalParameter(LootContextParams.ORIGIN);
+		if (origin == null && target != null) origin = target.position();
+		if (origin == null) return null;
+		final Vec3 center = origin;
+		return level.players().stream()
+				.filter(p -> !p.isSpectator() && p.position().distanceToSqr(center) <= 48.0 * 48.0)
+				.min(Comparator.comparingDouble(p -> p.position().distanceToSqr(center)))
+				.orElse(null);
+	}
+
+	private static void grantBonusDrop(List<ItemStack> drops, net.minecraft.util.RandomSource random) {
+		List<ItemStack> eligible = new ArrayList<>();
+		for (ItemStack s : drops) {
+			if (s.isEmpty() || s.getMaxStackSize() <= 1 || s.getCount() >= s.getMaxStackSize()) continue;
+			String path = BuiltInRegistries.ITEM.getKey(s.getItem()).getPath();
+			if (!PROTECTED_LOOT.contains(path)) eligible.add(s);
+		}
+		if (!eligible.isEmpty()) {
+			ItemStack picked = eligible.get(random.nextInt(eligible.size()));
+			picked.grow(1);
 		}
 	}
 
@@ -209,10 +352,10 @@ public final class PlayerRpg {
 			ServerLevel level = player.level();
 			PlayerStats stats = get(player);
 
-			// Vitality passive health regeneration (0.5s tick step; not starving, and not hurt in the last five seconds).
+			// Vitality passive health regeneration (0.5s tick step; not starving, and not hurt in the last 5s / 3.5s).
 			long sinceHurt = level.getGameTime() - LAST_HURT.getOrDefault(player.getUUID(), Long.MIN_VALUE / 2);
 			if (stats.vitality() > 0 && player.getHealth() < player.getMaxHealth() && player.getFoodData().getFoodLevel() >= 6
-					&& sinceHurt >= REGEN_DELAY_TICKS) {
+					&& sinceHurt >= Badges.regenDelayTicks(player)) {
 				player.heal(stats.healthRegenPerSec() * 0.5F);
 			}
 
@@ -228,7 +371,7 @@ public final class PlayerRpg {
 						case 3 -> -0.28F;
 						default -> -0.42F;
 					};
-					delta = rejectDrain * (1.0F - stats.sanityDrainResistance());
+					delta = rejectDrain * (1.0F - stats.totalSanityDrainResistance());
 				} else {
 					// Overworld safe base steadily restores sanity, accelerated by SAN stat.
 					float baseRec = dev.noclip.backrooms.core.Home.isHome(level.dimension()) ? 0.85F : 0.25F;
@@ -253,9 +396,14 @@ public final class PlayerRpg {
 				float monsterDrain = Math.min(0.5F, nearby.size() * 0.15F);
 				// SAN passive composure helps stabilize sanity whenever not in pitch darkness next to monsters.
 				float passiveCalm = (blockLight > 4 && nearby.isEmpty()) ? stats.passiveSanityRegenPerSec() * 0.5F : 0.0F;
-				float raw = envDelta - monsterDrain + passiveCalm;
+				float scholarBonus = 0.0F;
+				float scholarPerSec = Badges.passiveAnomalySanityPerSec(player);
+				if (scholarPerSec > 0.0F && nearby.stream().noneMatch(m -> m.getTarget() == player)) {
+					scholarBonus = scholarPerSec * 0.5F;
+				}
+				float raw = envDelta - monsterDrain + passiveCalm + scholarBonus;
 				delta = raw < 0.0F
-						? raw * (1.0F - stats.sanityDrainResistance())
+						? raw * (1.0F - stats.totalSanityDrainResistance())
 						: raw * stats.sanityRegenMultiplier();
 			}
 
@@ -324,7 +472,22 @@ public final class PlayerRpg {
 									ctx.getSource().sendSuccess(() -> Component.translatable(
 											"message.noclip_backrooms.rpg.stats_reset"), false);
 									return 1;
-								})))
+								}))
+								.then(Commands.literal("unlock").then(Commands.argument("stat", StringArgumentType.word())
+										.executes(ctx -> {
+											ServerPlayer player = ctx.getSource().getPlayerOrException();
+											String raw = StringArgumentType.getString(ctx, "stat").toLowerCase(java.util.Locale.ROOT);
+											PlayerStats.StatKind kind = switch (raw) {
+												case "luck" -> PlayerStats.StatKind.LUCK;
+												case "psi", "psy" -> PlayerStats.StatKind.PSI;
+												case "eng", "engineering", "tech" -> PlayerStats.StatKind.ENGINEERING;
+												default -> null;
+											};
+											if (kind == null) return 0;
+											PlayerStats after = get(player).applyScroll(kind);
+											set(player, after);
+											return 1;
+										}))))
 		));
 	}
 }
