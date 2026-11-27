@@ -225,6 +225,25 @@ public final class Contracts {
 		return list;
 	}
 
+	/** Runtime anti-deadlock check that also respects conditional level gates for {@code player}. */
+	public static boolean isCompletableFor(Contract contract, ServerPlayer player) {
+		if (!isCompletable(contract)) return false;
+		if (player == null) return true;
+		for (String lvl : contract.requiredLevels) {
+			if (!dev.noclip.backrooms.core.LevelGates.isReachableFor(player, lvl)) return false;
+		}
+		return true;
+	}
+
+	/** All contracts currently reachable for {@code player} given unlocked levels and held gate credentials. */
+	public static List<Contract> availableFor(ServerPlayer player) {
+		List<Contract> list = new ArrayList<>();
+		for (Contract c : Contract.values()) {
+			if (isCompletableFor(c, player)) list.add(c);
+		}
+		return list;
+	}
+
 	/** What the commander says when spoken to: quota/clearance, safebox & insurance, and open contracts. */
 	public static void talk(ServerPlayer player) {
 		for (int i = 1; i <= 3; i++) player.sendSystemMessage(Component.translatable("guild.noclip_backrooms.master." + i));
@@ -241,7 +260,7 @@ public final class Contracts {
 			return;
 		}
 		player.sendSystemMessage(Component.translatable("contract.noclip_backrooms.header").withStyle(ChatFormatting.GOLD));
-		for (Contract contract : available()) {
+		for (Contract contract : availableFor(player)) {
 			player.sendSystemMessage(Component.translatable("contract.noclip_backrooms.line", contract.title(), contract.reward)
 					.append(" ").append(button("contract.noclip_backrooms.accept", "/meg contract accept " + contract.id, ChatFormatting.GREEN)));
 		}
@@ -281,7 +300,7 @@ public final class Contracts {
 	static boolean accept(ServerPlayer player, String id) {
 		Contract contract = Contract.byId(id);
 		String refusal = contract == null ? "message.noclip_backrooms.contract.unknown"
-				: !isCompletable(contract) ? "message.noclip_backrooms.contract.unavailable"
+				: !isCompletableFor(contract, player) ? "message.noclip_backrooms.contract.unavailable"
 				: player.hasAttached(ACTIVE) ? "message.noclip_backrooms.contract.already"
 				: !Home.isHome(player.level().dimension()) ? "message.noclip_backrooms.contract.not_home"
 				: !nearCommander(player) ? "message.noclip_backrooms.contract.no_commander"

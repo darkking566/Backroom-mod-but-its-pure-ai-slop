@@ -1059,3 +1059,19 @@
     - 4 種流派（異常學者、破陣重衛、戰術斥候、拾荒倖存者）採「正面專長＋輕微代價」，各以 6 枚 `lost_old_coin` 向武人兌換解鎖，僅於安全區（前室／主世界或安頓據點床旁 16 格）切換
   - **雙分頁角色面板與雙語驗證**（`InventoryStatsPanel.java`、`FloorsClient.java`、`zh_tw.json`、`en_us.json`、`PlayerStatsTest.java`、`HorrorClientTest.java`、`docs/project/2-player/README.md`）：
     - 維持 `132×166` 面板整合 `[能力 | 進階]` 雙分頁（3 項隱藏屬性解鎖／配點＋流派切換／卸下），左上角 HUD 同步顯示啟用流派；雙語 JSON 通過檢核；`.\gradlew.bat build compileGametestJava --no-daemon`（136 項單元測試全過）與 `.\gradlew.bat runClientGameTest "-Plevels=horror,floors,field" --no-daemon`（含 `HorrorClientTest` 步驟 `11a..11e` 與實機檢視 `0003_floors_inventory.png`、`0012_horror_rpg_advanced.png`）全數通過
+- 完成 **新順位三（方案 A：條件門禁框架／進階寶箱分級解封＋幸運雙軸加成／中繼付費捷徑＋修裝＋黑市／盲盒專業鑑定／受困倖存者支線）**（Antigravity；未修改 `frontrooms/`、`crafting/`、`monsters/`、`level0..4/`、`tools/film/` 與模型貼圖，已提交並推送至 GitHub）：
+  - **條件解鎖樓層與門禁框架**（`core/LevelGates.java`、`core/LevelExits.java`、`core/guild/Contracts.java`）：
+    - 新增 `LevelGates`（`Gate` 條件：1～4 階密碼門駭客器、鑰匙卡／憑證與消耗選項、世界進度旗標 `GateData`），接入 `LevelExits.use` 出口檢查、擊殺 Boss 自動記錄 `boss:<entity>` 旗標與 `/backrooms gate status|flag|unlock|clear`
+    - `Contracts` 新增 `isCompletableFor` 與 `availableFor`，接通已開放樓層與玩家持有的門禁資格過濾，防止指派進不去的委託（未對現有 0～4 層預設加鎖，不影響既有路線）
+  - **進階寶箱分級解封與雙軸＋幸運掉落強化**（新增 `props/ChestLockTier.java`，更新 `BackroomsLootChestBlock.java`、`BackroomsProps.java`、`core/floors/FloorDifficulty.java`）：
+    - `LOCKED_ARMORY_CRATE` 維持撬棍／開鎖組；`ANOMALY_VAULT_CHEST` 需持 2 階以上密碼門駭客器（扣 8 耐久）；`BOSS_TROPHY_CHEST` 檢查周圍 24 格無存活首領級守衛才能開啟
+    - `FloorDifficulty` 掉落倍率整合 `PlayerRpg.get(player).luckLootChance()`，並對三大高階箱強化主題鎖定疊加與遺失舊幣掉率
+  - **中繼站剩餘服務、分層黑市與專業盲盒鑑定**（`core/quota/Quota.java`、`core/trade/ShopRole.java`、`Shops.java`、`shops/black_market.json`、`core/trade/Appraisal.java`、`core/locker/RelayService.java`、`items/BackroomsConsumableItem.java`）：
+    - 新增 `ShopRole.BLACK_MARKET`（外觀 `speednoclipper`）與 `shops/black_market.json` 依當趟層數（1／3／5 層）解鎖貨單，擺脫 M.E.G. 欠債封鎖並提供 `/backrooms shop spawn_black_market`
+    - `RelayService` 補齊付費嚮導捷徑（`/meg shortcut [level]`，已測繪樓層 7 折）與現場簡易修裝（`/meg repair [all]`，依耐久與工程等級折扣最多 30%）；`Shift+右鍵` 寄物箱與黑市對話顯示快捷按鈕
+    - 新增 `Appraisal`（`/meg appraise [safe|drive]`）由收購商或黑市付點數鑑定 `rusted_office_safe`（35 點）與 `encrypted_hard_drive`（50 點），採幸運加成大獎率（12%～40%）；保留野外直接撬開並加幸運額外產出與提示
+  - **受困倖存者支線系統**（新增 `core/quest/Survivors.java`，註冊於 `BackroomsMod.java`）：
+    - 實作 `STRANDED -> SEEKING_ITEM -> ESCORTING -> RESCUED` 三段互動＋跟隨護送狀態機，內建 `little_girl`（可共用至後室與前室）與 `lost_surveyor` 兩組劇本；杏仁水／食物安撫 → 生成發光遺失信物與方位距離提示 → 護送至安頓床、中繼寄物箱或駐點安全區後發放生存經驗、點數、遺失舊幣、理智與對應樓層線索並授予 `quest:<id>` 旗標
+  - **文件與驗證**（`zh_tw.json`、`en_us.json`、`docs/project/1-gameplay/README.md`、`src/test/java/dev/noclip/backrooms/core/ExplorationSystemsTest.java`、`HorrorClientTest.java`）：
+    - 補齊雙語翻譯鍵與 JSON 語法檢核；`ExplorationSystemsTest` 驗證門禁純函式、寶箱分階、捷徑／修裝費用、鑑定大獎率與倖存者狀態轉換
+    - 執行 `.\gradlew.bat build compileGametestJava --no-daemon`（全部 150 項單元測試 0 失敗）與 `.\gradlew.bat runClientGameTest "-Plevels=horror,floors,field" --no-daemon`（含 `HorrorClientTest` 步驟 `12a..12e` 實機驗證且日誌零缺物警告）皆全數通過

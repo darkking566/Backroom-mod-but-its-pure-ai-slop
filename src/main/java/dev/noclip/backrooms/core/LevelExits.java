@@ -78,6 +78,9 @@ public final class LevelExits {
 			refuse(player, level, server.getTickCount());
 			return;
 		}
+		if (!LevelGates.tryPass(player, level)) {
+			return;
+		}
 		var from = player.level().dimension();
 		// Not in the middle of an interaction or a movement tick; and only once, however often it was asked for.
 		server.schedule(new TickTask(server.getTickCount(), () -> {

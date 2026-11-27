@@ -1,6 +1,7 @@
 package dev.noclip.backrooms.horror;
 
 import dev.noclip.backrooms.core.LevelExits;
+import dev.noclip.backrooms.core.LevelGates;
 import dev.noclip.backrooms.core.economy.Wallet;
 import dev.noclip.backrooms.core.floors.FloorDifficulty;
 import dev.noclip.backrooms.core.floors.Floors;
@@ -9,11 +10,13 @@ import dev.noclip.backrooms.core.guild.Contracts;
 import dev.noclip.backrooms.core.locker.Lockers;
 import dev.noclip.backrooms.core.locker.RelayService;
 import dev.noclip.backrooms.core.locker.Safebox;
+import dev.noclip.backrooms.core.quest.Survivors;
 import dev.noclip.backrooms.core.rpg.Badges;
 import dev.noclip.backrooms.core.rpg.InventoryStatsPanel;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
 import dev.noclip.backrooms.core.rpg.PlayerStats;
 import dev.noclip.backrooms.core.rpg.SurvivalXp;
+import dev.noclip.backrooms.core.trade.Appraisal;
 import dev.noclip.backrooms.core.trip.Pull;
 import dev.noclip.backrooms.core.trip.PullState;
 import dev.noclip.backrooms.core.trip.Trips;
@@ -29,10 +32,17 @@ import dev.noclip.backrooms.core.quota.QuotaMath;
 import dev.noclip.backrooms.core.trade.ShopRole;
 import dev.noclip.backrooms.core.trade.Shops;
 import dev.noclip.backrooms.items.BackroomsItems;
+import dev.noclip.backrooms.props.BackroomsProps;
 import java.util.List;
+import java.util.UUID;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import dev.noclip.backrooms.level0.Level0;
 import dev.noclip.backrooms.level1.Level1;
 import dev.noclip.backrooms.level1.Level1Items;
@@ -583,6 +593,155 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			context.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
 			context.waitTicks(5);
 			context.runOnClient(client -> InventoryStatsPanel.selectTab(0));
+
+			// 12a. Conditional level gates framework & contract deadlock integration.
+			server.runCommand("gamemode survival @a");
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				LevelGates.registerGate(LevelGates.Gate.of("1", 2, "", false, "test:power", ""));
+				check(!LevelGates.tryPass(p, "1"), "gate should block without T2 hacker and flag");
+				check(!Contracts.isCompletableFor(Contracts.Contract.SURVEY, p),
+						"contract requiring gated Level 1 should be filtered as unreachable");
+
+				ItemStack t2 = new ItemStack(BackroomsItems.KEYPAD_HACKER_T2);
+				p.getInventory().add(t2);
+				LevelGates.grantFlag(s, "test:power");
+				check(Contracts.isCompletableFor(Contracts.Contract.SURVEY, p),
+						"contract should become reachable once gate requirements are met");
+				check(LevelGates.tryPass(p, "1"), "gate should allow passage with T2 hacker and flag");
+				check(LevelGates.isLevelUnlocked(s, "1"), "gate breach did not persist unlocked state");
+
+				LevelGates.clearGate("1");
+				LevelGates.clearAll(s);
+				p.getInventory().clearContent();
+			});
+
+			// 12b. Tiered chests: ANOMALY_VAULT_CHEST (T2+ hacker) and BOSS_TROPHY_CHEST (guardian kill flag).
+			toLevel0(server);
+			game.getConnection().waitForChunksRender();
+			context.waitTicks(10);
+			server.runCommand("kill @e[type=!player]");
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				ServerLevel lvl = p.level();
+				BlockPos vaultPos = new BlockPos(5, STAND_Y, 3);
+				BlockPos bossChestPos = new BlockPos(5, STAND_Y, 5);
+				lvl.setBlockAndUpdate(vaultPos, BackroomsProps.ANOMALY_VAULT_CHEST.defaultBlockState());
+				lvl.setBlockAndUpdate(bossChestPos, BackroomsProps.BOSS_TROPHY_CHEST.defaultBlockState());
+
+				BlockHitResult vaultHit = new BlockHitResult(Vec3.atCenterOf(vaultPos), Direction.UP, vaultPos, false);
+				p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+				p.gameMode.useItemOn(p, lvl, ItemStack.EMPTY, InteractionHand.MAIN_HAND, vaultHit);
+				check(lvl.getBlockState(vaultPos).is(BackroomsProps.ANOMALY_VAULT_CHEST),
+						"anomaly vault chest opened without a tool");
+
+				ItemStack t1 = new ItemStack(BackroomsItems.KEYPAD_HACKER_T1);
+				p.setItemInHand(InteractionHand.MAIN_HAND, t1);
+				p.gameMode.useItemOn(p, lvl, t1, InteractionHand.MAIN_HAND, vaultHit);
+				check(lvl.getBlockState(vaultPos).is(BackroomsProps.ANOMALY_VAULT_CHEST),
+						"anomaly vault chest should reject Tier 1 hacker");
+
+				ItemStack t2 = new ItemStack(BackroomsItems.KEYPAD_HACKER_T2);
+				p.setItemInHand(InteractionHand.MAIN_HAND, t2);
+				p.gameMode.useItemOn(p, lvl, t2, InteractionHand.MAIN_HAND, vaultHit);
+				check(!lvl.getBlockState(vaultPos).is(BackroomsProps.ANOMALY_VAULT_CHEST),
+						"anomaly vault chest failed to unseal with Tier 2 hacker");
+
+				Hound boss = Monsters.HOUND.create(lvl, EntitySpawnReason.EVENT);
+				check(boss != null, "failed to create boss hound");
+				boss.snapTo(5.5, STAND_Y, 6.5, 0.0F, 0.0F);
+				boss.addTag(LevelGates.BOSS_ENTITY_TAG);
+				lvl.addFreshEntity(boss);
+
+				BlockHitResult bossHit = new BlockHitResult(Vec3.atCenterOf(bossChestPos), Direction.UP, bossChestPos, false);
+				p.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+				p.gameMode.useItemOn(p, lvl, ItemStack.EMPTY, InteractionHand.MAIN_HAND, bossHit);
+				check(lvl.getBlockState(bossChestPos).is(BackroomsProps.BOSS_TROPHY_CHEST),
+						"boss trophy chest opened while nearby boss guardian was alive");
+
+				boss.hurtServer(lvl, lvl.damageSources().playerAttack(p), 9999.0F);
+				check(LevelGates.hasFlag(s, "boss:hound"), "defeating tagged boss did not grant boss flag");
+				p.gameMode.useItemOn(p, lvl, ItemStack.EMPTY, InteractionHand.MAIN_HAND, bossHit);
+				check(!lvl.getBlockState(bossChestPos).is(BackroomsProps.BOSS_TROPHY_CHEST),
+						"boss trophy chest stayed locked after guardian died");
+			});
+
+			// 12c. Black market floor scaling, field gear repair, and paid guide shortcut.
+			server.runOnServer(s -> {
+				check(Shops.offersForFloor(ShopRole.BLACK_MARKET, 1).size()
+						< Shops.offersForFloor(ShopRole.BLACK_MARKET, 3).size(),
+						"black market should unlock new offers by Floor 3");
+				check(Shops.offersForFloor(ShopRole.BLACK_MARKET, 3).size()
+						< Shops.offersForFloor(ShopRole.BLACK_MARKET, 5).size(),
+						"black market should unlock top offers by Floor 5");
+				LevelExits.fallInto(player(s), "1");
+			});
+			server.waitFor(s -> player(s).level().dimension() == Level1.LEVEL_1, 300);
+			game.getConnection().waitForChunksRender();
+			context.waitTicks(10);
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				Shops.spawnBlackMarket(p.level(), p.getX() + 1.5, p.getY(), p.getZ());
+				Wallet.set(p, 1000L);
+				ItemStack bat = new ItemStack(BackroomsItems.BLUNT_NAILED_BAT);
+				bat.setDamageValue(80);
+				p.setItemInHand(InteractionHand.MAIN_HAND, bat);
+				check(RelayService.repairMainHand(p, true), "field repair failed near black market");
+				check(p.getMainHandItem().getDamageValue() == 0 && Wallet.of(p) < 1000L,
+						"field repair did not reset durability and charge credits");
+				check(RelayService.shortcutTargets(p).contains("0"), "visited Level 0 missing from shortcut targets");
+				check(RelayService.shortcut(p, "0", true), "paid guide shortcut from Level 1 to Level 0 failed");
+			});
+			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 300);
+			game.getConnection().waitForChunksRender();
+			context.waitTicks(10);
+
+			// 12d. Paid geode appraisal at Black Market / Buyer.
+			server.runCommand("kill @e[type=!player]");
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				Shops.spawnBlackMarket(p.level(), p.getX() + 1.5, p.getY(), p.getZ());
+				Wallet.set(p, 500L);
+				p.getInventory().add(new ItemStack(BackroomsItems.RUSTED_OFFICE_SAFE, 1));
+				p.getInventory().add(new ItemStack(BackroomsItems.ENCRYPTED_HARD_DRIVE, 1));
+				check(Appraisal.hasAppraisable(p), "player should carry appraisable geodes");
+				check(Appraisal.appraise(p, "safe", true), "safe appraisal failed");
+				check(Appraisal.appraise(p, "drive", true), "encrypted drive appraisal failed");
+				check(!Appraisal.hasAppraisable(p), "geodes were not consumed by appraisal");
+				long expectedCredits = 500L - Appraisal.SAFE_FEE - Appraisal.DRIVE_FEE;
+				check(Wallet.of(p) == expectedCredits, "expected wallet " + expectedCredits + " after appraisal, got " + Wallet.of(p));
+			});
+
+			// 12e. Trapped survivor side-quest (feed supply -> return keepsake -> escort to relay -> rewards & quest flag).
+			server.runCommand("kill @e[type=!player]");
+			UUID girlId = server.computeOnServer(s -> {
+				ServerPlayer p = player(s);
+				Person girl = Survivors.spawn(p.level(), p.getX() + 1.5, p.getY(), p.getZ(), Survivors.Script.LITTLE_GIRL);
+				check(girl != null && Survivors.stageOf(p.level(), girl.getUUID()) == Survivors.Stage.STRANDED,
+						"survivor did not initialize in STRANDED stage");
+				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Level1Items.ALMOND_WATER));
+				UseEntityCallback.EVENT.invoker().interact(p, p.level(), InteractionHand.MAIN_HAND, girl, null);
+				check(Survivors.stageOf(p.level(), girl.getUUID()) == Survivors.Stage.SEEKING_ITEM,
+						"feeding almond water did not advance survivor to SEEKING_ITEM");
+				check(Survivors.keepsakePosOf(p.level(), girl.getUUID()) != null, "keepsake target spot missing");
+				return girl.getUUID();
+			});
+			context.waitTicks(6);
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				Person girl = (Person) p.level().getEntity(girlId);
+				check(girl != null, "survivor missing before keepsake hand-in");
+				ItemStack keepsake = Survivors.createKeepsake(girlId, Survivors.Script.LITTLE_GIRL);
+				p.setItemInHand(InteractionHand.MAIN_HAND, keepsake);
+				UseEntityCallback.EVENT.invoker().interact(p, p.level(), InteractionHand.MAIN_HAND, girl, null);
+				check(Survivors.stageOf(p.level(), girlId) == Survivors.Stage.ESCORTING,
+						"returning keepsake did not advance survivor to ESCORTING");
+				// Spawn a relay box beside the player to mark a valid safe point and trigger escort completion on tick.
+				p.level().setBlockAndUpdate(p.blockPosition().north(), BackroomsProps.RELAY_DROPOFF_BOX.defaultBlockState());
+			});
+			server.waitFor(s -> Survivors.stageOf(player(s).level(), girlId) == Survivors.Stage.RESCUED, 80);
+			check(server.computeOnServer(s -> LevelGates.hasFlag(s, "quest:little_girl")),
+					"completing little_girl rescue did not grant quest progression flag");
 		}
 	}
 

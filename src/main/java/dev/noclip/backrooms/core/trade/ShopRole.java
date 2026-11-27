@@ -17,7 +17,9 @@ public enum ShopRole {
 	/** The institute's medic, in the medical wing (open once the team has met a quota): treatment and medicine. */
 	MEDIC("medic", "medic"),
 	/** Martial Master inside Level 0's Manila Room: exchanges specialization badges for Lost Old Coins. */
-	MARTIAL_MASTER("martial_master", "tom");
+	MARTIAL_MASTER("martial_master", "tom"),
+	/** Underground Backrooms black market & relay dealer: sells floor-tiered hardware, firearms, and field services. */
+	BLACK_MARKET("black_market", "speednoclipper");
 
 	private final String id, look;
 
