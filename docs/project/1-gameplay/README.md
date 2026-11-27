@@ -352,7 +352,86 @@ Claude 的建議（待使用者確認）：
 - **第一個發光出口**放在 Level 0 同一個場景裡、離落點約 120～150 格（Level 0 是 300×300 的環面，最遠約 212 格），遠遠就看得到光；只在第一趟出現。
 - Gemini 2026-11-27 在本機（尚未提交）做的合約擴充（獵殺、拍微笑者、測繪 Level 0、回收杏仁水、0→1→2 連續跑腿）可以當作選做任務的底。
 
-待討論：結局、每層的任務清單（從 wiki 與 Steam 遊戲整理）、任務主線由誰做。
+### 第一趟：跟著纜線走（2026-11-27 使用者構想）【定】
+
+使用者的構想：
+
+- **第一次進後室不會有其他門**，只有通往 M.E.G. 研究所那一扇。
+- 引導玩家找到它的方法：
+  - **研究員的纜線**：後室的設定裡有 4 個研究員牽著纜線探勘（wiki 原文細節做的時候再查清楚對照）。地上有一條纜線，玩家只要跟著纜線走，就會走到門口。
+  - **牆上的塗鴉**：剛進後室就能在牆上看到一些字，例如「快逃離這裡」「跟著纜線走」「好像有什麼東西生活在這裡」。
+- **第二次以後進後室，才開始能去其他 Level。**
+
+Claude 的建議（待確認）：
+
+- **纜線**：
+  - 從落點附近鋪到發光的門，約 120～150 格（在 Level 0 同一個 300×300 場景裡，複製品照樣同步）。
+  - 黑黃相間，平貼在地毯上，轉角順著走廊轉；中間偶爾有一捲纜線盤、接頭貼著膠帶。
+- **4 個研究員**：
+  - 沿路放他們留下的東西：頭盔、無線電、寫到一半的筆記，接上故事裡「失蹤的小隊」；
+  - 第四個人的東西找不到，或出現在不該出現的地方，當作第一個伏筆。
+- **塗鴉**：
+  - 沿著纜線每隔一段寫在牆上；
+  - 一開始字很亂、很絕望，越接近門越清楚、越像在指路；
+  - 最後幾句開始讓人懷疑研究所，埋 M.E.G. 秘密的伏筆。
+- **第一趟其他的門怎麼處理**：
+  - 世界生成的出口門（綠色 EXIT 門、異常出口）照樣在，但第一趟打不開；
+  - 碰了會提示「門的另一邊好像什麼都沒有。地上的纜線一路延伸……」；
+  - 這樣不用改朋友的 Level 0 生成器。
+- **第一趟的門**：只對還沒去過研究所的人發光、打得開；走進去就到研究所的接收室，指揮官做第一次任務簡報。
+- **第一趟死掉**：照現有規則，在這一趟的落點醒來，纜線還在。
+- **多人**：「去過研究所沒有」每個人分開算；老手帶新人進來時，新人那一趟照樣有纜線。
+
+塗鴉的字（先寫一批，做的時候挑著用，每句附英文）：
+
+| 類別 | 中文 | English |
+| --- | --- | --- |
+| 指路 | 快逃離這裡 | GET OUT OF HERE |
+| 指路 | 跟著纜線走 | FOLLOW THE CABLE |
+| 指路 | 纜線會帶你出去 | THE CABLE LEADS OUT |
+| 指路 | 不要離開纜線 | DON'T LEAVE THE CABLE |
+| 指路 | 只有亮著的那扇門是真的 | ONLY THE LIT DOOR IS REAL |
+| 指路 | 別碰其他的門，它們不是門 | THE OTHER DOORS AREN'T DOORS |
+| 指路 | 往光的方向走 | WALK TOWARD THE LIGHT |
+| 指路 | 不要回頭 | DON'T LOOK BACK |
+| 指路 | 纜線斷了就往回走 | IF THE CABLE ENDS, GO BACK |
+| 指路 | 快到了 | ALMOST THERE |
+| 有東西 | 好像有什麼東西生活在這裡 | SOMETHING LIVES HERE |
+| 有東西 | 它在聽 | IT'S LISTENING |
+| 有東西 | 燈熄的時候不要動 | WHEN THE LIGHTS GO OUT, DON'T MOVE |
+| 有東西 | 牆後面有聲音 | THERE ARE SOUNDS BEHIND THE WALL |
+| 有東西 | 它學會了我的聲音 | IT LEARNED MY VOICE |
+| 有東西 | 聽到自己的名字，不要回答 | IF YOU HEAR YOUR NAME, DON'T ANSWER |
+| 有東西 | 有人在笑 | SOMEONE IS LAUGHING |
+| 有東西 | 它不喜歡光 | IT DOESN'T LIKE THE LIGHT |
+| 有東西 | 不要相信嗡嗡聲 | DON'T TRUST THE HUM |
+| 有東西 | 地毯是濕的。為什麼是濕的？ | THE CARPET IS WET. WHY IS IT WET? |
+| 迷失 | 我走了 600 步，又回到這面牆 | 600 STEPS AND I'M BACK AT THIS WALL |
+| 迷失 | 這面牆昨天不在這裡 | THIS WALL WASN'T HERE YESTERDAY |
+| 迷失 | 第 3 天，還是同一條走廊 | DAY 3. SAME HALLWAY |
+| 迷失 | 今天是星期幾？ | WHAT DAY IS IT? |
+| 迷失 | 不要睡著 | DON'T FALL ASLEEP |
+| 迷失 | 這不是夢 | THIS IS NOT A DREAM |
+| 迷失 | 我還記得天空的顏色 | I STILL REMEMBER THE COLOUR OF THE SKY |
+| 迷失 | 我把名字寫在這裡，免得忘記：＿＿＿ | MY NAME, SO I DON'T FORGET: ______ |
+| 迷失 | 救命 | HELP |
+| 迷失 | 媽媽，我想回家 | MOM I WANT TO GO HOME |
+| 迷失 | 你不是第一個 | YOU'RE NOT THE FIRST |
+| 迷失 | 這裡也有人寫過一樣的字 | SOMEONE WROTE THIS HERE BEFORE |
+| 迷失 | 正字記號（數天數） | tally marks |
+| 研究員 | M.E.G. 四人小隊經過此處 → | M.E.G. TEAM OF 4 PASSED HERE → |
+| 研究員 | 纜線的另一端有人 | SOMEONE IS AT THE OTHER END OF THE CABLE |
+| 研究員 | 第四個人沒有回來 | THE FOURTH ONE NEVER CAME BACK |
+| 研究員 | 他們說會回來接我們 | THEY SAID THEY'D COME BACK FOR US |
+| 研究員 | 我們只剩三個人了 | THERE ARE ONLY THREE OF US NOW |
+| 伏筆 | 研究所會救你。研究所不會放你走。 | THE INSTITUTE WILL SAVE YOU. IT WON'T LET YOU GO. |
+| 伏筆 | 他們不是在救我們，他們在收集我們 | THEY'RE NOT SAVING US. THEY'RE COLLECTING US |
+| 伏筆 | 不要告訴他們你看到了什麼 | DON'T TELL THEM WHAT YOU SAW |
+| 伏筆 | 抬頭看 | LOOK UP |
+
+順序（建議）：落點附近多放「迷失」與「有東西」，中段放「研究員」，接近門的地方放「指路」，門旁邊最後一句放「伏筆」。
+
+待討論：結局、每層的任務清單（從 wiki 與 Steam 遊戲整理；使用者說的「拍笑臉、拍一直閃的燈」是哪一款遊戲還要確認）。任務主線由 Claude 做（2026-11-27 定）；受困倖存者支線（含小女孩）由 Gemini 做。
 
 ## 後室進階玩法與創新機制（2026-11-26）【定】
 

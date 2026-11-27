@@ -624,6 +624,7 @@
   - Antigravity 仍有未提交的改動在工作區，只提交我的檔案
 - 398 的夜晚變暗：新增 `Night398Payload`（伺服器在夜晚狀態改變時告訴前室裡的人）與客戶端 `frontrooms/Night398Client`；`core/look/Look` 多一種 `NIGHT_398`（霧 4～34 格、暗紅、光照衰減 0.14），前室在 398 的夜晚也套用（開光影時不套）；`BackroomsClient` 加一行註冊；`runClientGameTest -Plevels=frontrooms` 通過，夜景截圖換成新的
 - 使用者同意後推送：抓過 GitHub，沒有新提交要合併；推送前用另開的 git worktree 只拿已提交的程式編譯並跑單元測試（147 個全過，工作區裡 Antigravity 未提交的改動不算進去），把 `main` 推送到 GitHub（眷舍小鎮 `8cb578ec`、398 的夜晚 `f0d71c0c`、夜晚變暗 `38ee0823`）；Antigravity 未提交的改動沒有推；沒有強制推送、沒有改寫歷史
+- 使用者說了第一趟的構想（第一次進後室沒有其他門；跟著研究員的纜線走到 M.E.G. 的門；牆上有塗鴉；第二次以後才能去其他 Level）：寫進 `docs/project/1-gameplay/README.md` 任務主線一節的新小節「第一趟：跟著纜線走」，含 Claude 的建議（纜線長度與樣子、4 個研究員的遺物接「失蹤的小隊」、塗鴉越接近門越清楚、第一趟其他門打不開並提示纜線、第一趟的門只對新人開）與 42 句塗鴉（中英對照、分五類、建議擺放順序）；只改文件
 
 ## 動作記錄（Antigravity）
 
