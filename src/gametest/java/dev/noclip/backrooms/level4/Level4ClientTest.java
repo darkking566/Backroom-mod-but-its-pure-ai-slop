@@ -1081,6 +1081,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					"expected ladder down into stalled freight cab");
 			check(l4.getBlockState(new BlockPos(fe[0] + 2, Level4ChunkGenerator.FLOOR_Y - 3, fe[2] + 1)).is(Blocks.REDSTONE_TORCH),
 					"expected emergency redstone torch inside stalled freight cab");
+			check(l4.getBlockState(new BlockPos(fe[0] + 4, STAND + 1, fe[2] + 2)).is(Level4Blocks.CAUTION_TAPE_BARRIER),
+					"expected caution tape barrier across freight elevator gap");
 			p.teleportTo(fe[0] + 3.5, Level4ChunkGenerator.FLOOR_Y - 3, fe[2] + 1.5);
 			p.getInventory().clearContent();
 			BlockPos barrelPos = new BlockPos(fe[0] + 4, Level4ChunkGenerator.FLOOR_Y - 3, fe[2] + 1);
@@ -1230,8 +1232,12 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			ServerPlayer p = player(s);
 			check(l4.getBlockState(new BlockPos(abyss[0] + 1, Level4ChunkGenerator.FLOOR_Y - 16, abyss[2] + 6))
 					.is(Blocks.CONCRETE.black()), "expected black concrete abyss pit floor at FLOOR_Y - 16");
-			check(l4.getBlockState(new BlockPos(abyss[0] + 6, Level4ChunkGenerator.FLOOR_Y - 8, abyss[2] + 6))
-					.is(Level4Blocks.OFFICE_BASEMENT_71), "expected abyss exit door at stair bottom");
+			check(l4.getBlockState(new BlockPos(abyss[0] + 1, Level4ChunkGenerator.FLOOR_Y - 5, abyss[2] + 5))
+					.is(Level4Blocks.OFFICE_ELEVATOR_FRAME), "expected gunmetal chiller tower at abyss threshold");
+			check(l4.getBlockState(new BlockPos(abyss[0] + 3, Level4ChunkGenerator.FLOOR_Y - 9, abyss[2] + 8))
+					.is(Blocks.STONE_BRICK_STAIRS), "expected 3-wide descending stone stairs above abyss chasm");
+			check(l4.getBlockState(new BlockPos(abyss[0] + 3, Level4ChunkGenerator.FLOOR_Y - 11, abyss[2] + 12))
+					.is(Level4Blocks.OFFICE_BASEMENT_71), "expected abyss exit door at deep south landing");
 
 			p.getInventory().clearContent();
 			BlockPos barrelPos = new BlockPos(abyss[0] + 2, Level4ChunkGenerator.FLOOR_Y - 5, abyss[2] + 4);
@@ -1271,6 +1277,22 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					.is(BackroomsProps.PROP_DESKTOP_COMPUTER), "expected desktop computer sitting on desk in Frozen Friday 1998");
 			check(l4.getBlockState(new BlockPos(frozen[0] + 2, STAND, frozen[2] + 3))
 					.is(BackroomsProps.PROP_OFFICE_CHAIR), "expected OFFICE_CHAIR facing desk in Frozen Friday 1998");
+			int frozenSecondary = 0;
+			boolean sawSecondaryDeskPc = false;
+			for (int dci = -2; dci <= 2; dci++) {
+				for (int dcj = -2; dcj <= 2; dcj++) {
+					if (dci == 0 && dcj == 0) continue;
+					int fsx = frozen[0] + dci * Level4Plan.CELL;
+					int fsz = frozen[2] + dcj * Level4Plan.CELL;
+					if (!Level4PoiPlan.isFrozenFriday(seed, fsx + 3, fsz + 3)) continue;
+					frozenSecondary++;
+					if (l4.getBlockState(new BlockPos(fsx + 2, STAND, fsz + 4)).is(Level1Blocks.OFFICE_DESK)
+							&& l4.getBlockState(new BlockPos(fsx + 2, STAND + 1, fsz + 4)).is(BackroomsProps.PROP_DESKTOP_COMPUTER)) {
+						sawSecondaryDeskPc = true;
+					}
+				}
+			}
+			check(frozenSecondary == 0 || sawSecondaryDeskPc, "expected secondary Frozen Friday cells to be furnished with desk + PC");
 			p.getInventory().clearContent();
 			BlockPos barrelPos = new BlockPos(frozen[0] + 5, STAND, frozen[2] + 2);
 			check(l4.getBlockState(barrelPos).is(Level4Blocks.OFFICE_STEEL_SAFE),
@@ -1289,10 +1311,10 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		});
 		server.runCommand("gamemode spectator @a");
 
-		// 19. Inverted Mirror Lightwell (upside-down mirrored upper floors + permanent Level 13 exit + cache)
+		// 19. Inverted Mirror Lightwell (double-height mirrored gallery + eye-level upside-down shaft + permanent Level 13 exit + cache)
 		int[] inv = findPoi(seed, from, PoiKind.INVERTED_MIRROR_LIGHTWELL);
 		check(inv != null, "no INVERTED_MIRROR_LIGHTWELL POI found");
-		shoot(context, game, inv[0] + 4.5, STAND, inv[2] + 4.5, -45, -28, false, "level4_poi_inverted_well");
+		shoot(context, game, inv[0] + 4.5, STAND, inv[2] + 4.5, -45, -16, false, "level4_poi_inverted_well");
 		server.runCommand("gamemode survival @a");
 		server.runOnServer(s -> {
 			ServerLevel l4 = level4(s);
@@ -1303,6 +1325,10 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					"expected isInvertedLightwell across shaft center");
 			check(l4.getBlockState(new BlockPos(inv[0] + 2, STAND, inv[2] + 1)).is(Level4Blocks.OFFICE_DOOR_13),
 					"expected permanent OFFICE_DOOR_13 inside inverted lightwell");
+			check(l4.getBlockState(new BlockPos(inv[0] + 1, STAND, inv[2] + 1)).is(Level4Blocks.OFFICE_DARK_MIRROR),
+					"expected dark mirror portal frame around Level 13 exit door");
+			check(l4.getBlockState(new BlockPos(inv[0] + 3, Level4ChunkGenerator.FLOOR_Y + 10, inv[2] + 3))
+					.is(Level4Blocks.OFFICE_CARPET), "expected upside-down carpet ceiling over inverted lightwell ring");
 			check(l4.getBlockState(new BlockPos(inv[0] + Level4Plan.CELL + 1, Level4ChunkGenerator.FLOOR_Y + 13, inv[2] + Level4Plan.CELL + 3))
 					.is(Level4Blocks.OFFICE_CARPET), "expected inverted ceiling carpet overhead in lightwell shaft rim");
 			var rimMirror = l4.getBlockState(new BlockPos(inv[0] + Level4Plan.CELL + 1, Level4ChunkGenerator.FLOOR_Y + 12, inv[2] + Level4Plan.CELL + 3));
@@ -1336,6 +1362,25 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			ServerPlayer p = player(s);
 			check(l4.getBlockState(new BlockPos(exec[0] + 3, Level4ChunkGenerator.FLOOR_Y, exec[2] + 3))
 					.is(Blocks.DARK_OAK_PLANKS), "expected mahogany dark_oak_planks executive floor");
+			check(l4.getBlockState(new BlockPos(exec[0] + 2, STAND, exec[2] + 3))
+					.is(Blocks.DARK_OAK_STAIRS), "expected carved dark_oak_stairs desk wing in executive suite");
+			boolean hasBroadcastScreen = false;
+			for (int cx = 0; cx < Level4Plan.CELL && !hasBroadcastScreen; cx++) {
+				for (int cz = 0; cz < Level4Plan.CELL; cz++) {
+					if (l4.getBlockState(new BlockPos(exec[0] + cx, STAND + 1, exec[2] + cz))
+							.is(Level4Blocks.EXECUTIVE_BROADCAST_SCREEN)) {
+						hasBroadcastScreen = true;
+						break;
+					}
+				}
+			}
+			check(hasBroadcastScreen, "expected glowing EXECUTIVE_BROADCAST_SCREEN monitor wall in executive suite");
+			int audDir = Level4Plan.opposite(exec[3]);
+			int ax = exec[0] + (audDir == Level4Plan.WEST ? 0 : audDir == Level4Plan.EAST ? Level4Plan.CELL : 3);
+			int az = exec[2] + (audDir == Level4Plan.NORTH ? 0 : audDir == Level4Plan.SOUTH ? Level4Plan.CELL : 3);
+			var audWall = l4.getBlockState(new BlockPos(ax, STAND + 1, az));
+			check(audWall.is(Level4Blocks.OFFICE_GLASS_WALL) || audWall.isAir() || audWall.is(Level4Blocks.OFFICE_FIRE_DOOR),
+					"expected panoramic glass overlook or archway facing Auditorium at " + ax + "," + az + ", got " + audWall);
 			BlockPos phonePos = new BlockPos(exec[0] + 3, STAND, exec[2] + 3);
 			check(l4.getBlockState(phonePos).is(Level4Blocks.EXECUTIVE_RED_PHONE),
 					"expected EXECUTIVE_RED_PHONE on executive desk");
@@ -1444,7 +1489,7 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					"poi.frozen_enter", "poi.frozen_loot", "poi.frozen_empty", "poi.frozen_email",
 					"poi.mirror_well_loot", "poi.mirror_well_empty", "poi.exec_phone_wait",
 					"poi.exec_broadcast_landmark", "poi.exec_broadcast_omega",
-					"poi.exec_vault_loot", "poi.exec_vault_empty"}) {
+					"poi.exec_vault_loot", "poi.exec_vault_empty", "poi.exec_screen_static"}) {
 				check(lang.has("message.noclip_backrooms.level4." + msg), "missing wanderer message: " + msg);
 			}
 		});

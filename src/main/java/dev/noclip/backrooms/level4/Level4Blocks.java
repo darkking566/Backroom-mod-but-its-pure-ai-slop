@@ -203,6 +203,12 @@ public final class Level4Blocks {
 					.strength(4.0F, 8.0F).sound(SoundType.METAL).noOcclusion(),
 			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(1, 0, 1, 15, 15, 15)));
 
+	// Route B landmark monitor wall
+	public static final Block EXECUTIVE_BROADCAST_SCREEN = register("executive_broadcast_screen",
+			Properties.of().mapColor(MapColor.COLOR_GREEN)
+					.strength(2.5F).sound(SoundType.GLASS).lightLevel(s -> 9),
+			p -> new Level4FacingBlock(p, Level4FacingBlock.full()));
+
 	private Level4Blocks() {
 	}
 

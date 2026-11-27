@@ -522,6 +522,61 @@ def draw_office_steel_safe():
     return (front, n_front, spec_front), (side, n_side, spec_side)
 
 
+def draw_executive_broadcast_screen():
+    # Glowing emerald CRT/projection broadcast monitor wall + gunmetal vented housing
+    side = Image.new("RGBA", (SIZE, SIZE), (34, 38, 44, 255))
+    spx = side.load()
+    for y in range(SIZE):
+        for x in range(SIZE):
+            br = int(math.sin(y * 0.6 + math.sin(x * 0.1)) * 3)
+            spx[x, y] = (34 + br, 38 + br, 44 + br, 255)
+    sd = ImageDraw.Draw(side)
+    sd.rectangle([0, 0, SIZE - 1, SIZE - 1], outline=(20, 22, 26, 255), width=4)
+    for vy in range(28, 100, 10):
+        sd.rectangle([22, vy, SIZE - 23, vy + 4], fill=(16, 18, 22, 255))
+    n_side = make_bevel_normal(4, 22)
+    s_side = Image.new("RGBA", (SIZE, SIZE), (105, 160, 0, 255))
+
+    front = Image.new("RGBA", (SIZE, SIZE), (24, 27, 32, 255))
+    fd = ImageDraw.Draw(front)
+    fd.rectangle([0, 0, SIZE - 1, SIZE - 1], outline=(42, 46, 54, 255), width=3)
+    fd.rectangle([7, 7, SIZE - 8, SIZE - 8], fill=(12, 34, 26, 255), outline=(62, 68, 76, 255), width=2)
+    fpx = front.load()
+    for y in range(10, SIZE - 10):
+        scan = -6 if (y % 4 == 0) else 4
+        for x in range(10, SIZE - 10):
+            glow = int(10 * math.exp(-((x - 64) ** 2 + (y - 64) ** 2) / 2800.0))
+            fpx[x, y] = (10, max(0, min(255, 40 + scan + glow)), max(0, min(255, 28 + scan // 2 + glow)), 255)
+    # Grid lines
+    for gx in range(20, SIZE - 12, 18):
+        fd.line([(gx, 10), (gx, SIZE - 11)], fill=(18, 62, 46, 255), width=1)
+    for gy in range(20, SIZE - 12, 18):
+        fd.line([(10, gy), (SIZE - 11, gy)], fill=(18, 62, 46, 255), width=1)
+    # 4 vertical signal telemetry bars on left
+    for k, h_bar in enumerate((38, 62, 50, 74)):
+        bx0 = 16 + k * 7
+        fd.rectangle([bx0, 106 - h_bar, bx0 + 4, 106], fill=(56, 224, 142, 255))
+    # Sine-wave carrier waveform across middle
+    pts = []
+    for x in range(44, SIZE - 14, 2):
+        amp = 22.0 * math.sin((x - 44) * 0.19) * (0.65 + 0.35 * math.cos((x - 44) * 0.07))
+        pts.append((x, int(64 + amp)))
+    fd.line(pts, fill=(84, 255, 168, 255), width=3)
+    pts2 = [(px_x, int(64 + (py_y - 64) * 0.45)) for px_x, py_y in pts]
+    fd.line(pts2, fill=(238, 198, 72, 255), width=1)
+    # LIVE status indicator in top-right corner
+    fd.ellipse([102, 15, 112, 25], fill=(236, 48, 52, 255), outline=(120, 18, 20, 255), width=1)
+
+    n_front = make_bevel_normal(7, 26)
+    s_front = Image.new("RGBA", (SIZE, SIZE), (230, 85, 0, 255))
+    sfd = ImageDraw.Draw(s_front)
+    sfd.rectangle([0, 0, SIZE - 1, 7], fill=(95, 145, 0, 255))
+    sfd.rectangle([0, SIZE - 8, SIZE - 1, SIZE - 1], fill=(95, 145, 0, 255))
+    sfd.rectangle([0, 0, 7, SIZE - 1], fill=(95, 145, 0, 255))
+    sfd.rectangle([SIZE - 8, 0, SIZE - 1, SIZE - 1], fill=(95, 145, 0, 255))
+    return (front, n_front, s_front), (side, n_side, s_side)
+
+
 def main():
     # 1. meg_chalk_sign (normal + slashed)
     save_cutout_pbr("meg_chalk_sign", draw_meg_chalk_sign(False), smooth=18, f0=8, porosity=65)
@@ -742,7 +797,32 @@ def main():
     })
     write_item_files("office_steel_safe")
     write_loot_self("office_steel_safe")
-    print("Generated Level 4 Batch 1..4 + Route A POI assets complete")
+
+    # 8. Route B landmark monitor wall (executive_broadcast_screen)
+    (scr_front, scr_fn, scr_fs), (scr_side, scr_sn, scr_ss) = draw_executive_broadcast_screen()
+    save_pbr_pair("executive_broadcast_screen_front", scr_front, scr_fn, scr_fs)
+    save_pbr_pair("executive_broadcast_screen_side", scr_side, scr_sn, scr_ss)
+    write_json(MODELS / "executive_broadcast_screen.json", {
+        "parent": "minecraft:block/cube",
+        "textures": {
+            "north": NS + "executive_broadcast_screen_front",
+            "south": NS + "executive_broadcast_screen_side",
+            "east": NS + "executive_broadcast_screen_side",
+            "west": NS + "executive_broadcast_screen_side",
+            "up": NS + "executive_broadcast_screen_side",
+            "down": NS + "executive_broadcast_screen_side",
+            "particle": NS + "executive_broadcast_screen_front"
+        }
+    })
+    write_json(BLOCKSTATES / "executive_broadcast_screen.json", {
+        "variants": {
+            f"facing={facing}": {"model": NS + "executive_broadcast_screen", **({"y": y} if y else {})}
+            for facing, y in [("north", 0), ("east", 90), ("south", 180), ("west", 270)]
+        }
+    })
+    write_item_files("executive_broadcast_screen")
+    write_loot_self("executive_broadcast_screen")
+    print("Generated Level 4 Batch 1..4 + Route A/B POI assets complete")
 
 
 if __name__ == "__main__":

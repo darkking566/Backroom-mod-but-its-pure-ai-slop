@@ -2193,6 +2193,7 @@
   "block.noclip_backrooms.office_supply_crate": "M.E.G. 野戰金屬物資箱",
   "block.noclip_backrooms.industrial_toolbox": "工業工具箱",
   "block.noclip_backrooms.office_steel_safe": "辦公室保險箱",
+  "block.noclip_backrooms.executive_broadcast_screen": "總裁室無源廣播螢幕",
   "message.noclip_backrooms.level4.poi.frozen_enter": "雨聲與冷氣嗡鳴驟然消逝——牆上時鐘的秒針停在 1998 年最後一個週五微微抖動。",
   "message.noclip_backrooms.level4.poi.frozen_loot": "打開 1998 年的辦公抽屜：取出 1998 年桌曆、遺失舊幣與未開封杏仁水。",
   "message.noclip_backrooms.level4.poi.frozen_empty": "桌面只剩滿杯不再冒煙的咖啡與一塵不染的空白打卡單。",
@@ -2203,5 +2204,6 @@
   "message.noclip_backrooms.level4.poi.exec_broadcast_landmark": "無源廣播穿透靜電穩住你的心神——偵測到罕見奇觀座標：%s 方向約 %sm。",
   "message.noclip_backrooms.level4.poi.exec_broadcast_omega": "總裁專線短暫傳出清楚座標：「M.E.G. Omega 基地訊號位於 %s 方向（約 %sm）……」",
   "message.noclip_backrooms.level4.poi.exec_vault_loot": "打開總裁室防盜保險箱：搜出純化杏仁精華、合金、微晶片與高壓線圈！",
-  "message.noclip_backrooms.level4.poi.exec_vault_empty": "深木總裁室的保險櫃裡空無一物。"
+  "message.noclip_backrooms.level4.poi.exec_vault_empty": "深木總裁室的保險櫃裡空無一物。",
+  "message.noclip_backrooms.level4.poi.exec_screen_static": "無源綠光螢幕不斷循環波形：「第 4 層持續營運廣播——未獲指示切勿離開崗位。」"
 }

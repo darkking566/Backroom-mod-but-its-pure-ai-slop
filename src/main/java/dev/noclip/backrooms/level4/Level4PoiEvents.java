@@ -213,6 +213,23 @@ final class Level4PoiEvents {
 				return InteractionResult.SUCCESS;
 			}
 
+			// #20 EXECUTIVE_BROADCAST_SCREEN monitor wall
+			if (state.is(Level4Blocks.EXECUTIVE_BROADCAST_SCREEN)) {
+				sl.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 0.7F, 0.9F);
+				sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.exec_screen_static"));
+				return InteractionResult.SUCCESS;
+			}
+
+			// #17 SUBTUNNEL_ABYSS_DOOR exit door (sits inside underground south chamber beyond tunnel cell)
+			if (state.is(Level4Blocks.OFFICE_BASEMENT_71) && pos.getY() <= Level4ChunkGenerator.FLOOR_Y - 6
+					&& Level4PoiPlan.subtunnelAbyssAt(seed, pos.getX(), pos.getZ()) != null) {
+				String dest = LevelExits.isOpen("71") ? "71" : "2";
+				sl.playSound(null, pos, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 0.9F, 0.7F);
+				sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.abyss_exit", dest));
+				LevelExits.use(sp, dest);
+				return InteractionResult.SUCCESS;
+			}
+
 			PlacedPoi poi = Level4PoiPlan.atCell(seed, pos.getX(), pos.getZ());
 			if (poi == null) return InteractionResult.PASS;
 			BlockPos anchor = cellAnchor(pos, poi.baseY());
@@ -638,11 +655,14 @@ final class Level4PoiEvents {
 						}
 						case SUBTUNNEL_ABYSS_DOOR -> {
 							if (sp.getBlockY() > Level4ChunkGenerator.FLOOR_Y - 3) continue;
-							BlockPos pit = new BlockPos(gi * Level4Plan.CELL + 1, Level4ChunkGenerator.FLOOR_Y - 10, gj * Level4Plan.CELL + 6);
-							if (!level.isLoaded(pit) || pit.distSqr(sp.blockPosition()) > 16 * 16) continue;
+							BlockPos pit = new BlockPos(gi * Level4Plan.CELL + 1, Level4ChunkGenerator.FLOOR_Y - 13, gj * Level4Plan.CELL + 8);
+							if (!level.isLoaded(pit) || pit.distSqr(sp.blockPosition()) > 18 * 18) continue;
 							level.sendParticles(ParticleTypes.SMOKE,
 									pit.getX() + 0.5, pit.getY() + 1.0, pit.getZ() + 0.5,
-									3, 0.3, 0.8, 0.3, 0.02);
+									3, 0.3, 1.0, 0.3, 0.02);
+							level.sendParticles(ParticleTypes.SMOKE,
+									gi * Level4Plan.CELL + 5.5, pit.getY() + 1.0, pit.getZ() + 0.5,
+									3, 0.3, 1.0, 0.3, 0.02);
 							if (level.getRandom().nextInt(4) == 0) {
 								level.playSound(null, pit, SoundEvents.ANVIL_LAND, SoundSource.AMBIENT, 0.18F, 0.5F);
 							}

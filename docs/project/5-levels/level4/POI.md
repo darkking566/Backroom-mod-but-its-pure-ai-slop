@@ -39,10 +39,10 @@
 | # | 常數（`PoiKind`） | 名稱 | 出現位置 | 視覺長相與構成 | 玩法與收益／風險 |
 |---|---|---|---|---|---|
 | **13** | `STORM_BREACH_CORRIDOR` | 暴風雨決堤的碎窗走廊 | 高架 `skybridge` 或大樓外緣廊道 | 保留 1 格高散熱片矮窗台（防墜落），上方窗格破開、地面大片 `office_damp_carpet`、燈管熄滅 | 強化暴風雨聲與閃電粒子、對側 `office_trap_window` 風險較高；地上遺落被沖刷出的 `battery_cell`／`glass_bottle`／散落杏仁水瓶 |
-| **14** | `STALLED_FREIGHT_ELEVATOR` | 卡死在半層的生鏽懸停貨梯 | `ELEVATOR_LOBBY` 其中一道垂直井道 | 半層鐵製貨梯廂、掀開的頂部鐵地板門與垂落鋼纜、微亮紅光、內藏 `locked_armory_crate` | 須藉助側面階梯／維修梯跳上梯頂再鑽入內部；開出較多 `alloy`、`bandage` 與 `purified_almond_essence` |
+| **14** | `STALLED_FREIGHT_ELEVATOR` | 卡死在半層的生鏽懸停貨梯 | `ELEVATOR_LOBBY` 其中一道垂直井道 | 深灰金屬導軌＋裂紋混凝土井壁、雙條垂落鋼纜＋懸吊作業燈、破口黃黑封鎖線、掀開的頂蓋與 `office_supply_crate` | 須藉助側面階梯／維修梯跳上梯頂再鑽入內部；開出較多 `alloy`、`bandage` 與 `purified_almond_essence` |
 | **15** | `EVACUATED_OUTPOST` | M.E.G. 撤離前哨殘點 | 遠離 `OMEGA_BASE` 之 `AUDITORIUM` 旁或獨立 2×2 翼區 | 歪斜 `omega_barricade`、塗黑窗、1 張臨時軍床、拆解台與殘留 `omega_locker` | **無 NPC 駐守**之次級避風港：右鍵軍床僅回復血量與理智（120s 冷卻），**絕不覆蓋 Omega 基地重生點**；置物櫃可拿一次殘留物資 |
 | **16** | `CORRUPTED_RED_ATRIUM` | 變質「紅霧泉眼」中庭 | 低機率（~14%）取代遠離起點的 `ATRIUM` | 吊頂昏暗壞燈、枯萎植物、中央水池換成 **[NEW]** `corrupted_fountain_pool`（暗沉泛紅水池） | 直接飲用或普通裝瓶會中毒（`POISON`＋`NAUSEA`＋扣理智）；蹲下右鍵或高感知識破後可取 1 份變質樣本（沿用既有 `toxic_spore_sac`／`red_room_shard`） |
-| **17** | `SUBTUNNEL_ABYSS_DOOR` | 地下機電盡頭的深淵暗門 | `subTunnel` 機電廊最深端側向機房 | 兩座巨型冷水機組夾著鐵鍊門與通往漆黑霧井的無底石階 | 可拆得 `electric_motor`／`pipe_valve`；凝視深井聽見金屬回音，最底端設稀有地下出口門，透過 `LevelExits` 通往 `"2"` 或 `"71"` |
+| **17** | `SUBTUNNEL_ABYSS_DOOR` | 地下機電盡頭的深淵暗門 | `subTunnel` 機電廊中段南側地下室 | 深灰金屬冷水機塔＋紅漆 `industrial_toolbox`、鐵欄門框打開通往南側深處的三格寬懸空石階（兩側鏤空深淵黑洞＋鐵欄扶手＋懸吊燈籠），最底端接 `office_basement_71` 門 | 可拆得 `electric_motor`／`pipe_valve`；凝視深淵黑坑聽見金屬回音，踏下深淵石階盡頭可通往第 `"2"` 或 `"71"` 層 |
 
 ---
 
@@ -50,9 +50,9 @@
 
 | # | 常數（`PoiKind`） | 名稱 | 出現位置 | 視覺長相與構成 | 玩法與收益／風險 |
 |---|---|---|---|---|---|
-| **18** | `FROZEN_FRIDAY_1998` | 「1998 最後一個週五」靜止樓層 | 超低機率（~4%）取代一整座 `SUITE`＋相鄰 `OPEN_OFFICE` | 全亮暖光燈具、雙組 `office_desk` 桌上擺 `prop_desktop_computer`＋對坐 `prop_office_chair`＋盆栽＋檔案櫃＋飲水機＋`office_steel_safe`＋未拆封杏仁水瓶群 | 踏入後**絕對無怪**且**全區徹底靜音（關雨聲與冷氣嗡鳴）**；右鍵保險箱得 `calendar_1998`／`lost_coin`／杏仁水，點桌上電腦讀未寄出週五排班郵件 |
-| **19** | `INVERTED_MIRROR_LIGHTWELL` | 上下鏡像倒錯的「天窗深淵庭」 | 超低機率（~8%）取代一座完整 `LIGHTWELL` | 貫通天井上下對稱延伸至白霧：天花板上方鏡像建構倒掛日光燈、倒掛地毯、純暗鏡井框與落地窗樓層 | 視覺奇觀地標；環廊死角固定藏有一條**永不消失**的 `MIRROR_13` 安全出口與 `office_supply_crate` |
-| **20** | `EXECUTIVE_BROADCAST_SUITE` | 仍在運作的總裁室與無源廣播廳 | 超低機率（~10%）附著於 `AUDITORIUM` 後側或高層夾層 | 深木牆面＋會議桌＋CRT 電視＋**[NEW]** `executive_red_phone`，角落配 `office_steel_safe` | 接聽紅色電話觸發專屬無源廣播事件（指路遠處稀有地標／永久出口，或進行理智考驗）；打開保險箱得濃縮杏仁精華、合金與高階零件 |
+| **18** | `FROZEN_FRIDAY_1998` | 「1998 最後一個週五」靜止樓層 | 超低機率（~4%）取代一整座 `SUITE`＋相鄰 `OPEN_OFFICE` | **全區多格皆擺滿**整齊 `office_desk`＋桌上 `prop_desktop_computer`＋對坐 `prop_office_chair`＋盆栽＋檔案櫃＋飲水機＋`office_steel_safe`＋未拆封杏仁水瓶群 | 踏入後**絕對無怪**且**全區徹底靜音（關雨聲與冷氣嗡鳴）**；右鍵保險箱得 `calendar_1998`／`lost_coin`／杏仁水，點桌上電腦讀未寄出週五排班郵件 |
+| **19** | `INVERTED_MIRROR_LIGHTWELL` | 上下鏡像倒錯的「天窗深淵庭」 | 超低機率（~8%）取代一座完整 `LIGHTWELL` | **10 格挑高鏡像迴廊＋人眼高度倒掛天井架構**：`y=42` 倒掛地毯與倒懸燈管，中段嵌 `office_dark_mirror` 對稱軸、天井內懸掛倒立窗框與支柱，`MIRROR_13` 出口框於暗鏡拱門內 | 視覺奇觀地標；環廊死角固定藏有一條**永不消失**的 `MIRROR_13` 安全出口與 `office_supply_crate` |
+| **20** | `EXECUTIVE_BROADCAST_SUITE` | 仍在運作的總裁室與無源廣播廳 | 超低機率（~10%）附著於 `AUDITORIUM` 後側或高層夾層 | 完整封閉式深橡木包廂（原木角柱＋拱門維持動線）、**面朝簡報廳之 `3×2` 落地玻璃觀景窗**、整排發光 **[NEW]** `executive_broadcast_screen` 無源廣播牆、深木倒階梯主官長桌＋紅地毯＋**[NEW]** `executive_red_phone`＋`office_steel_safe` | 接聽紅色電話觸發專屬無源廣播事件（指路遠處稀有地標／永久出口，或進行理智考驗），點擊廣播螢幕讀出無源波形提示；打開保險箱得濃縮杏仁精華、合金與高階零件 |
 
 ---
 
@@ -65,6 +65,7 @@
 | **Batch 3** | #13, #16, #17（3 種） | `corrupted_fountain_pool` | 【已實作】 |
 | **Batch 4** | #18, #19, #20（3 種） | `executive_red_phone` | 【已實作】 |
 | **Route A 精修** | 消滅全部 11 處原版木桶＋#8/#9/#11/#18/#20 精緻化 | `office_supply_crate`、`industrial_toolbox`、`office_steel_safe`、`office_dark_mirror`（3 態剪影） | 【已實作】 |
+| **Route B 精修** | 空間格局重做（#14/#17/#18/#19/#20） | `executive_broadcast_screen` | 【已實作】 |
 
 每批驗收基準：
 1. `Level4PoiPlanTest` + `Level4LayoutTest` 全部通過（機率覆蓋、零據點／出口重疊、100% 連通性）。

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "noclip_backrooms:block/level4/executive_broadcast_screen_front",
+    "south": "noclip_backrooms:block/level4/executive_broadcast_screen_side",
+    "east": "noclip_backrooms:block/level4/executive_broadcast_screen_side",
+    "west": "noclip_backrooms:block/level4/executive_broadcast_screen_side",
+    "up": "noclip_backrooms:block/level4/executive_broadcast_screen_side",
+    "down": "noclip_backrooms:block/level4/executive_broadcast_screen_side",
+    "particle": "noclip_backrooms:block/level4/executive_broadcast_screen_front"
+  }
+}

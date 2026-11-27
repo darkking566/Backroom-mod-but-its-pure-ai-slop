@@ -1091,3 +1091,9 @@
     - **#18 1998 靜止樓層擺設修復**：改採 `Level1Blocks.OFFICE_DESK` 雙人辦公桌讓兩台 `PROP_DESKTOP_COMPUTER` 正確架於桌上，並排除桌椅座標撞車讓兩把 `PROP_OFFICE_CHAIR` 順利落地
     - **#8 總機房雙開關同步**：`Level4PoiEvents` 同時接通 `INDUSTRIAL_FUSE_BOX` 與牆上 `OFFICE_BREAKER`，並以 `cellAnchor` 共用 30 秒冷卻時間
   - **文件與驗證**：更新 `docs/project/5-levels/level4/POI.md`、`Level4ClientTest.java`；驗證 JSON 語法、單元測試、全專案建置與實機 GameTest 截圖（`-Pshaders` 尚未單獨執行）；僅於本機 `main` 提交 Route A 自身改動（刻意排除既有未暫存之 `Level4Plan.java` 與 `Level4LayoutTest.java`，未推送）
+- 完成 **Level 4 POI 精緻化路線 B（極稀有地標與稀有空間規模重做：#14/#17/#18/#19/#20）**（Antigravity）：
+  - **#20 總裁室與無源廣播廳完整包廂化**（`Level4Blocks.java`、`tools/make_level4_pois.py`、`Level4PoiPlan.java`、`Level4ChunkGenerator.java`、`Level4PoiEvents.java`、`en_us.json`、`zh_tw.json`）：新增發光 `executive_broadcast_screen`（128px 綠光無源載波示波螢幕與金屬機殼 labPBR），於總裁室四周建構深橡木牆面＋去皮原木角柱＋門洞拱樑（維持連通性）、面朝 `AUDITORIUM` 的 `3×2` 落地玻璃觀景窗、倒橡木階梯主官長桌＋紅地毯走廊，點擊螢幕顯示營運廣播訊息
+  - **#19 鏡像天窗深淵庭挑高倒掛奇觀**（`Level4ChunkGenerator.java`）：迴廊擴增為 10 格挑高鏡像空間（`y=37` 嵌暗鏡對稱軸、`y=42` 倒掛地毯＋`y=41` 倒懸燈管），並將天井內側倒立窗框／支柱／暗鏡下拉至 `y=39..42` 平視可見高度，同時替 `OFFICE_DOOR_13` 加上暗鏡拱門框
+  - **#18「1998 最後一個週五」全區鋪滿家具**（`Level4ChunkGenerator.java`、`Level4Props.java`）：`FROZEN_FRIDAY_1998` 涵蓋之所有鄰接格子皆配置雙人 `OFFICE_DESK`、桌上 `PROP_DESKTOP_COMPUTER`、對坐 `PROP_OFFICE_CHAIR`、盆栽、檔案櫃與杏仁水瓶群
+  - **#17 深淵暗門與 #14 懸停貨梯空間升級**（`Level4PoiPlan.java`、`Level4ChunkGenerator.java`、`Level4PoiEvents.java`）：#17 改用深灰金屬冷水機塔與向下延伸 6 格的三寬石磚懸空深淵階梯（兩側鐵欄扶手＋`y=16` 黑混凝土裂谷＋懸吊燈籠＋南端深處 `OFFICE_BASEMENT_71` 門）；#14 加入鋼製井壁導軌、雙條垂落鋼纜、井道維修燈與破口黃黑封鎖線
+  - **驗證**：更新 `Level4ClientTest.java` 與 `POI.md`；驗證 JSON、單元測試、`build` 與 `runClientGameTest "-Plevels=4" "-Psections=pois,blocks"` 全數通過並肉眼檢視升級後實機截圖（`-Pshaders` 尚未單獨執行）；僅於本機 `main` 提交 Route B 自身改動（未推送）

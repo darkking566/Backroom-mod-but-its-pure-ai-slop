@@ -133,6 +133,48 @@ final class Level4PoiPlan {
 		return poi != null && poi.kind() == PoiKind.INVERTED_MIRROR_LIGHTWELL;
 	}
 
+	static PlacedPoi subtunnelAbyssAt(long seed, int x, int z) {
+		PlacedPoi here = atCell(seed, x, z);
+		if (here != null && here.kind() == PoiKind.SUBTUNNEL_ABYSS_DOOR) return here;
+		PlacedPoi north = atCell(seed, x, z - CELL);
+		if (north != null && north.kind() == PoiKind.SUBTUNNEL_ABYSS_DOOR) return north;
+		return null;
+	}
+
+	/**
+	 * Returns whether (x, z) lies on a shared wall between an EXECUTIVE_BROADCAST_SUITE and an AUDITORIUM:
+	 * 0 = none, 1 = mahogany frame border, 2 = 3-wide panoramic glass overlook window.
+	 */
+	static int executiveAuditoriumEdgeKind(long seed, int x, int z) {
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		int cx = lx % CELL, cz = lz % CELL;
+		if (cz == 0 && cx >= 1 && cx <= 5) {
+			PlacedPoi here = atCell(seed, x, z);
+			if (here != null && here.kind() == PoiKind.EXECUTIVE_BROADCAST_SUITE
+					&& Level4Plan.opposite(here.dir()) == NORTH) {
+				return (cx >= 2 && cx <= 4) ? 2 : 1;
+			}
+			PlacedPoi north = atCell(seed, x, z - CELL);
+			if (north != null && north.kind() == PoiKind.EXECUTIVE_BROADCAST_SUITE
+					&& Level4Plan.opposite(north.dir()) == SOUTH) {
+				return (cx >= 2 && cx <= 4) ? 2 : 1;
+			}
+		}
+		if (cx == 0 && cz >= 1 && cz <= 5) {
+			PlacedPoi here = atCell(seed, x, z);
+			if (here != null && here.kind() == PoiKind.EXECUTIVE_BROADCAST_SUITE
+					&& Level4Plan.opposite(here.dir()) == WEST) {
+				return (cz >= 2 && cz <= 4) ? 2 : 1;
+			}
+			PlacedPoi west = atCell(seed, x - CELL, z);
+			if (west != null && west.kind() == PoiKind.EXECUTIVE_BROADCAST_SUITE
+					&& Level4Plan.opposite(west.dir()) == EAST) {
+				return (cz >= 2 && cz <= 4) ? 2 : 1;
+			}
+		}
+		return 0;
+	}
+
 	private Level4PoiPlan(long seed, int rx, int rz) {
 		Level4Plan plan = Level4Plan.of(seed, rx, rz);
 		SplittableRandom rng = new SplittableRandom(Level4Layout.hash(seed, rx, rz, POI_SALT));

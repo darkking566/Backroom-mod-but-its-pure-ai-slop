@@ -2193,6 +2193,7 @@
   "block.noclip_backrooms.office_supply_crate": "M.E.G. Field Supply Case",
   "block.noclip_backrooms.industrial_toolbox": "Industrial Toolbox",
   "block.noclip_backrooms.office_steel_safe": "Office Steel Safe",
+  "block.noclip_backrooms.executive_broadcast_screen": "Executive Broadcast Screen",
   "message.noclip_backrooms.level4.poi.frozen_enter": "Rain and HVAC hum vanish completely — the wall clock's second hand trembles in place on Friday, 1998.",
   "message.noclip_backrooms.level4.poi.frozen_loot": "Opened the 1998 desk drawer: found a 1998 desk calendar, old coins, and sealed Almond Water.",
   "message.noclip_backrooms.level4.poi.frozen_empty": "Only cold coffee mugs and spotless blank timesheets sit on the desk.",
@@ -2203,5 +2204,6 @@
   "message.noclip_backrooms.level4.poi.exec_broadcast_landmark": "Sourceless executive broadcast steadies your mind — anomaly coordinates detected %s (%sm away).",
   "message.noclip_backrooms.level4.poi.exec_broadcast_omega": "Static briefly resolves on the executive line: 'M.E.G. Base Omega signal %s (%sm away)...'",
   "message.noclip_backrooms.level4.poi.exec_vault_loot": "Cracked the executive vault safe: Purified Almond Essence, Alloy, Microchip, and High Voltage Coil!",
-  "message.noclip_backrooms.level4.poi.exec_vault_empty": "The mahogany executive safe is empty."
+  "message.noclip_backrooms.level4.poi.exec_vault_empty": "The mahogany executive safe is empty.",
+  "message.noclip_backrooms.level4.poi.exec_screen_static": "A sourceless green waveform loops endlessly — 'FLOOR 4 CONTINUITY BROADCAST: DO NOT LEAVE YOUR STATION.'"
 }
