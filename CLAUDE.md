@@ -28,7 +28,7 @@
 
 ## 測試開關
 
-- `gradlew build`：單元測試；`runClientGameTest -Plevels=0,1,0.1,look,horror,floors,field,frontrooms,film,itemlook,guild,props,...`（依套件挑測試類別）
+- `gradlew build`：單元測試；`runClientGameTest -Plevels=0,1,0.1,2,3,4,look,horror,floors,field,frontrooms,film,itemlook,props,story`（依套件挑測試類別）
 - `-Psections=a,b`：只跑某層的指定段落（Level 0.1、1、3 有分段）；`-Pshaders`：測試時複製 `run/` 的 Iris、Sodium、光影包並套推薦設定
 - 舊的環境變數 `NOCLIP_TEST`、`NOCLIP_ONLY` 仍可用
 - 已知偶發：Level 0 隨機事件檢查（黑影時有怪物、卡住的落點）、Level 1 `hounds`／`secrets` 段、Level 1 開頭閃爍牆；重跑通常會過

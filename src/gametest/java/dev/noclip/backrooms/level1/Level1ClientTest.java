@@ -36,6 +36,8 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		if (!dev.noclip.backrooms.TestFilter.level("level1")) return;
 		try (TestSingleplayerContext game = context.worldBuilder().create()) {
 			var server = game.getServer();
+			// Not a newcomer: the first trip's cable (core.story.FirstTrip) belongs to the story test.
+			server.runOnServer(s -> s.getPlayerList().getPlayers().forEach(p -> p.setAttached(dev.noclip.backrooms.core.story.FirstTrip.DONE, true)));
 			game.getConnection().waitForChunksRender();
 			server.runCommand("gamerule send_command_feedback false");
 			// Level 0 reshaping itself is tested on its own; here it would only move the flickering wall away.
@@ -955,8 +957,11 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		server.runCommand("gamemode spectator @a");
 		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_1 run tp @s %.1f %d %.1f %.1f 0", spot[0] + 0.5, STAND, spot[1] + 0.5, yaw));
 		game.getConnection().waitForChunksDownload();
+		server.waitFor(s -> level1(s).isPositionEntityTicking(BlockPos.containing(hx, STAND, hz)), 100);
 		server.runCommand(String.format(Locale.ROOT,
 				"execute in noclip_backrooms:level_1 run summon noclip_backrooms:hound %.1f %d %.1f {NoAI:1b,Tags:[\"test_hound\"]}", hx, STAND, hz));
+		server.waitFor(s -> !level1(s).getEntitiesOfClass(dev.noclip.backrooms.monsters.hound.Hound.class,
+				new AABB(player(s).blockPosition()).inflate(16), h -> h.entityTags().contains("test_hound")).isEmpty(), 100);
 		server.runOnServer(s -> {
 			var hound = testHound(s);
 			float facing = yaw + 180 + 35; // turned a little, to see its side
@@ -1007,7 +1012,7 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		server.runCommand("gamemode spectator @a");
 	}
 
-	/** Verifies the Shepherd Snake stoops cleanly in 3-block Level 0 without suffocating, and stands tall in 5-block Level 1 halls. */
+	/** Verifies the Shepherd Snake stoops cleanly under a 3-block ceiling without suffocating, and stands tall in 5-block Level 1 halls. */
 	private static void shepherdSnake(ClientGameTestContext context, TestSingleplayerContext game, long seed) {
 		var server = game.getServer();
 		server.runCommand("gamemode spectator @a");
@@ -1018,6 +1023,12 @@ public final class Level1ClientTest implements FabricClientGameTest {
 
 		server.runOnServer(s -> {
 			ServerLevel level0 = s.getLevel(dev.noclip.backrooms.level0.Level0.LEVEL_0);
+			// Level 0 now has a 5-block ceiling; place a 3-block test ceiling at y=36 to test crouching clearance.
+			for (int cx = 1; cx <= 5; cx++) {
+				for (int cz = 2; cz <= 6; cz++) {
+					level0.setBlock(new BlockPos(cx, 36, cz), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), 3);
+				}
+			}
 			var snake = dev.noclip.backrooms.monsters.Monsters.SHEPHERD_SNAKE.create(level0, net.minecraft.world.entity.EntitySpawnReason.COMMAND);
 			check(snake != null, "could not create shepherd snake");
 			snake.setPos(3.5, 33.0, 4.5);
@@ -1058,6 +1069,14 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			check(!snake.isInWall(), "shepherd snake stuck in wall in level 0");
 		});
 		server.runCommand("kill @e[tag=test_snake]");
+		server.runOnServer(s -> {
+			ServerLevel level0 = s.getLevel(dev.noclip.backrooms.level0.Level0.LEVEL_0);
+			for (int cx = 1; cx <= 5; cx++) {
+				for (int cz = 2; cz <= 6; cz++) {
+					level0.setBlock(new BlockPos(cx, 36, cz), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+				}
+			}
+		});
 
 		// Also verify it stands tall in a 5-block Level 1 hall.
 		int[] spot = Level1Layout.landing(seed, 0, 0);

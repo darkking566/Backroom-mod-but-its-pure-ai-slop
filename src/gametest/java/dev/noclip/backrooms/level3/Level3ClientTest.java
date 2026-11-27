@@ -162,24 +162,40 @@ public final class Level3ClientTest implements FabricClientGameTest {
 		server.runCommand("gamemode spectator @a");
 	}
 
-	/** The ways out: an elevator, Base Gamma's door, a car. None of their levels exists yet, so each refuses. */
+	/** The ways out: an elevator (Level 4 open, Level 5 still closed), Base Gamma's door (11) and a car (69). */
 	private static void exits(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
 		var server = game.getServer();
 		int[] elevator = nearest(seed, from, t -> t.kind() == Kind.EXIT && t.exit() == Level3Exit.ELEVATOR, (x, z) -> true);
-		int[] door = nearest(seed, from, t -> t.kind() == Kind.EXIT && t.exit() == Level3Exit.BASE_GAMMA_DOOR, (x, z) -> true);
-		for (int[] at : new int[][] {elevator, door}) {
-			int out = Level3Layout.tile(seed, at[0], at[1]).dir();
-			String name = at == elevator ? "level3_exit_elevator" : "level3_exit_base_gamma";
-			shoot(context, game, at[0] + 0.5 + Level3Plan.DX[out] * 2.2, STAND, at[1] + 0.5 + Level3Plan.DZ[out] * 2.2, yaw(Level3Plan.opposite(out)), 10, name);
-			context.waitTicks(45); // exits only say "not open yet" every two seconds
-			int refused = LevelExits.refusals();
-			useBlockFrom(context, game, at, out, 1.5);
+		int elevOut = Level3Layout.tile(seed, elevator[0], elevator[1]).dir();
+		shoot(context, game, elevator[0] + 0.5 + Level3Plan.DX[elevOut] * 2.2, STAND, elevator[1] + 0.5 + Level3Plan.DZ[elevOut] * 2.2,
+				yaw(Level3Plan.opposite(elevOut)), 10, "level3_exit_elevator");
+		context.waitTicks(45);
+		int elevRefused = LevelExits.refusals();
+		useBlockFrom(context, game, elevator, elevOut, 1.5);
+		boolean wentTo4 = server.computeOnServer(s -> player(s).level().dimension() == dev.noclip.backrooms.level4.Level4.LEVEL_4);
+		if (wentTo4) {
+			server.runOnServer(s -> LevelExits.use(player(s), "3"));
+			server.waitFor(s -> player(s).level().dimension() == Level3.LEVEL_3, 100);
+		} else {
 			server.runOnServer(s -> {
-				check(LevelExits.refusals() > refused, name + " did not refuse");
-				check(player(s).level().dimension() == Level3.LEVEL_3, name + " let the player through");
+				check(LevelExits.refusals() > elevRefused, "level3_exit_elevator neither went to Level 4 nor refused for Level 5");
+				check(player(s).level().dimension() == Level3.LEVEL_3, "level3_exit_elevator sent the player somewhere unexpected");
 			});
-			server.runCommand("gamemode spectator @a");
 		}
+		server.runCommand("gamemode spectator @a");
+
+		int[] door = nearest(seed, from, t -> t.kind() == Kind.EXIT && t.exit() == Level3Exit.BASE_GAMMA_DOOR, (x, z) -> true);
+		int doorOut = Level3Layout.tile(seed, door[0], door[1]).dir();
+		shoot(context, game, door[0] + 0.5 + Level3Plan.DX[doorOut] * 2.2, STAND, door[1] + 0.5 + Level3Plan.DZ[doorOut] * 2.2,
+				yaw(Level3Plan.opposite(doorOut)), 10, "level3_exit_base_gamma");
+		context.waitTicks(45); // exits only say "not open yet" every two seconds
+		int doorRefused = LevelExits.refusals();
+		useBlockFrom(context, game, door, doorOut, 1.5);
+		server.runOnServer(s -> {
+			check(LevelExits.refusals() > doorRefused, "level3_exit_base_gamma did not refuse");
+			check(player(s).level().dimension() == Level3.LEVEL_3, "level3_exit_base_gamma let the player through");
+		});
+		server.runCommand("gamemode spectator @a");
 		int[] car = nearest(seed, from, t -> t.kind() == Kind.HALL && t.hall().kind() == HallKind.CAR, (x, z) -> true);
 		BlockPos carBlock = server.computeOnServer(s -> {
 			ServerLevel level = level3(s);
