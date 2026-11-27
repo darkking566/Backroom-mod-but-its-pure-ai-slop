@@ -189,6 +189,7 @@ public final class Evidence {
 			photo.set(DataComponents.CUSTOM_NAME, Component.translatable("item.noclip_backrooms.evidence_photo.of", name,
 					where == null ? "?" : where, value).withStyle(style -> style.withItalic(false)));
 			if (!player.getInventory().add(photo)) player.drop(photo, false);
+			dev.noclip.backrooms.core.guild.Contracts.onPhoto(serverPlayer, id, where == null ? "" : where);
 			flash(server, serverPlayer);
 			camera.hurtAndBreak(1, player, hand);
 			player.getCooldowns().addCooldown(camera, 40);
@@ -401,7 +402,10 @@ public final class Evidence {
 			level.addFreshEntity(new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.3, pos.getZ() + 0.5, tape));
 			level.addFreshEntity(new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.3, pos.getZ() + 0.5, new ItemStack(FieldKit.BEACON)));
 			level.playSound(null, pos, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 1.0F, 1.4F);
-			if (owner != null) owner.sendSystemMessage(Component.translatable("message.noclip_backrooms.field.beacon_done", scan.level()).withStyle(ChatFormatting.AQUA));
+			if (owner != null) {
+				owner.sendSystemMessage(Component.translatable("message.noclip_backrooms.field.beacon_done", scan.level()).withStyle(ChatFormatting.AQUA));
+				dev.noclip.backrooms.core.guild.Contracts.onTape(owner, scan.level());
+			}
 		}
 	}
 

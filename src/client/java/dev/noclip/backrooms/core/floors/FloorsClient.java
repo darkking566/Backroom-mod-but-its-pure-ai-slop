@@ -1,6 +1,10 @@
 package dev.noclip.backrooms.core.floors;
 
 import dev.noclip.backrooms.BackroomsMod;
+import dev.noclip.backrooms.core.trip.AnomalyClient;
+import java.util.Locale;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.DeltaTracker;
@@ -12,17 +16,24 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 
 /**
- * What the player sees of the floor count (docs/project/1-gameplay/README.md): "Floor 3" at the top left while in the Backrooms, and
- * "Level 0 · The Lobby" above the inventory. The title on arrival comes from the server (Floors.announce).
+ * What the player sees of the floor count & dual-axis difficulty (docs/project/1-gameplay/README.md):
+ * "Floor 3" and active Band / Distance / Threat multiplier at the top left while in the Backrooms,
+ * plus "Level 0 · The Lobby" above the inventory.
  */
 public final class FloorsClient {
 	private static final float SCALE = 1.5F;
 	private static final int TEXT = 0xE6F2F0E6;
+	private static final String[] BAND_ROMAN = {"I", "II", "III", "IV"};
+	private static final int[] BAND_COLORS = {0xFFB8C4CE, 0xFFF2D16B, 0xFFF28E42, 0xFFFF5A5A};
+
+	private static DifficultyPayload difficulty = DifficultyPayload.NONE;
 
 	private FloorsClient() {
 	}
 
 	public static void register() {
+		ClientPlayNetworking.registerGlobalReceiver(DifficultyPayload.TYPE, (payload, context) -> difficulty = payload);
+		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> difficulty = DifficultyPayload.NONE);
 		HudElementRegistry.addLast(BackroomsMod.id("floor"), FloorsClient::hud);
 		ScreenEvents.AFTER_INIT.register((client, screen, width, height) -> {
 			if (screen instanceof InventoryScreen || screen instanceof CreativeModeInventoryScreen) {
@@ -38,6 +49,10 @@ public final class FloorsClient {
 		return client.player.getAttachedOrElse(Floors.RUN, FloorRun.NONE).floor();
 	}
 
+	public static DifficultyPayload difficulty() {
+		return difficulty;
+	}
+
 	private static void hud(GuiGraphicsExtractor graphics, DeltaTracker delta) {
 		Minecraft client = Minecraft.getInstance();
 		int floor = floor();
@@ -46,6 +61,20 @@ public final class FloorsClient {
 		graphics.pose().scale(SCALE, SCALE);
 		graphics.text(client.font, Component.translatable("hud.noclip_backrooms.floor", floor), 10, 8, TEXT, true);
 		graphics.pose().popMatrix();
+
+		if (difficulty.active()) {
+			int y = AnomalyClient.affix().isEmpty() ? 28 : 40;
+			int bandIdx = Math.clamp(difficulty.band(), 0, BAND_ROMAN.length - 1);
+			Component label = Component.translatable("hud.noclip_backrooms.difficulty",
+					BAND_ROMAN[bandIdx],
+					difficulty.distance(),
+					String.format(Locale.ROOT, "%.1f", difficulty.threatMult()));
+			if (difficulty.farmPenalty() > 0) {
+				label = label.copy().append(Component.translatable("hud.noclip_backrooms.difficulty.anti_farm", difficulty.farmPenalty()));
+			}
+			int color = difficulty.farmPenalty() > 0 ? 0xFFFF5555 : BAND_COLORS[bandIdx];
+			graphics.text(client.font, label, 15, y, color, true);
+		}
 	}
 
 	private static void header(Screen screen, GuiGraphicsExtractor graphics) {

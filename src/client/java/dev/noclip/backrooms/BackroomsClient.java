@@ -84,6 +84,7 @@ public final class BackroomsClient implements ClientModInitializer {
 		FloorsClient.register();
 		ShopClient.register();
 		WalletClient.register();
+		dev.noclip.backrooms.core.locker.SafeboxClient.register();
 		RpgClient.register();
 		PullClient.register();
 		dev.noclip.backrooms.core.quota.QuotaClient.register();

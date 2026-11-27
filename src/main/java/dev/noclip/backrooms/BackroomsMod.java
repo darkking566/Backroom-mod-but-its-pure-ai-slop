@@ -40,6 +40,7 @@ public final class BackroomsMod implements ModInitializer {
 	public void onInitialize() {
 		PlayerRpg.register();
 		Floors.register();
+		dev.noclip.backrooms.core.floors.FloorDifficulty.register();
 		BackroomsProps.register();
 		// The film's Level 0 objects (after the props, whose block entity they share).
 		dev.noclip.backrooms.level0.film.FilmProps.register();
@@ -58,6 +59,8 @@ public final class BackroomsMod implements ModInitializer {
 		SurvivalXp.register();
 		dev.noclip.backrooms.core.quota.Quota.register();
 		dev.noclip.backrooms.core.locker.Lockers.register();
+		dev.noclip.backrooms.core.locker.Safebox.register();
+		dev.noclip.backrooms.core.locker.RelayService.register();
 		dev.noclip.backrooms.core.trip.Expedition.register();
 		dev.noclip.backrooms.core.trip.Extraction.register();
 		dev.noclip.backrooms.core.trip.Report.register();

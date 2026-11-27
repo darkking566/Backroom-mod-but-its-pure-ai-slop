@@ -950,3 +950,19 @@
     - **3D 正前方模型與即時光照**：以 `tools/make_flashlights.py` 產出 64×64 貼圖與雙款 3D 筒狀水平朝前模型；將動態方塊光源提速至 20Hz（每 2.5 格步進、近距亮度 12／13），並於 `camcorder.fsh` 疊加 60+ FPS 客戶端即時雙層聚光燈錐
     - **五格電量 HUD 與 Tooltip**（`FlashlightHud.java`、`ItemTooltips.java`）：左下角 `SP 0:00:00` 上方顯示 5 格電池電量條 `[■ ■ ■ ■ ■]+ ON/OFF`（汲能手電筒顯示青色 `∞` 電池圖示），物品 Tooltip 同步顯示即時格數與百分比
   - **驗證**：更新 `Level0ClientTest.checkFlashlight`（驗收初始手電筒、5 格無耐久條、`Shift+右鍵` 裝填 `battery_cell` 1→3 格、`ambient_flashlight` 無限電量零消耗與雙款實機截圖）；`.\gradlew.bat build compileGametestJava --no-daemon`、`.\gradlew.bat runClientGameTest "-Plevels=look,0" --no-daemon`、`.\gradlew.bat runClientGameTest "-Plevels=field" --no-daemon` 與 `.\gradlew.bat test --no-daemon` 全數通過並已實機檢視截圖（依使用者要求提交並推送至 GitHub `main`）
+- 完成 **企劃書核心玩法順位一系統（雙軸難度與反刷懲罰／可攜保險箱／中繼投放箱與單次投保／合約擴充與防卡死過濾）**（Antigravity；僅改動 `core/`、i18n 與測試，未動樓層地圖、模型、合成周邊與怪物機制）：
+  - **雙軸難度與防反覆刷層懲罰**（`core/floors/FloorDifficulty.java`、`DifficultyPayload.java`、`Floors.java`、`src/client/.../core/floors/FloorsClient.java`）：
+    - 縱軸依 `FloorRun#floor()`、橫軸依目前樓層落地點水平距離分 4 段（`<250`、`250..749`、`750..1599`、`>=1600`，Level 0 採環面拓樸最短距計算）；`Band 0` 第 1 層保持 1.0x 原基準不變，隨段位與層數縮放怪物血量／攻擊與主題鎖定可堆疊戰利品掉率（保護關鍵證明物不倍率複製、不混出跨層素材）
+    - 新增 3 分鐘（3600 tick）視窗的 `A -> B -> A -> B` 來回反刷偵測：允許單次回頭（`0 -> 1 -> 0`），第四跳快速折返時凍結樓層推進、提升怪物威脅並遞減戰利品倍率，透過 `DifficultyPayload` 同步至左上角 HUD 顯示探索距離段位與空間抗拒狀態
+  - **可攜保險箱**（`core/locker/Safebox.java`、`SafeboxOpenPayload.java`、`src/client/.../core/locker/SafeboxClient.java`）：
+    - 初始 2 格隨身死亡保護格（於後室死亡不掉落、於主世界或前室死亡也不會被 `Lockers.collect` 抽走），可於基地／主世界透過指令 `/meg safebox upgrade` 或指揮官對話按鈕依序擴充至 6 格（費用 `300 / 600 / 1000 / 1600` 信用點）
+    - 客戶端於玩家背包畫面下方新增原生風格 `Safebox (N/6)` 快捷按鈕，並支援 `/meg safebox`；未解鎖格位以紅色鐵欄杆鎖定占位、第 6～8 格以灰玻璃補白並完整攔截拖曳／Shift 移動與點擊
+  - **中繼投放箱與單次裝備投保**（`core/locker/RelayService.java`、`core/locker/Lockers.java`）：
+    - 對 `BackroomsProps.RELAY_DROPOFF_BOX` 右鍵開啟 27 格單向中繼箱（`Shift+右鍵` 顯示功能與 `/meg relay`、`/meg insure` 按鈕），關閉時以每格 `15 cr` 透過 `Lockers.deposit` 寄回基地置物櫃；點數不足時退回物品
+    - 基地 NPC（司令官／補給官／軍需官）或後室中繼箱旁可以 `120 cr` 購買單次裝備投保（`/meg insure`）；保險生效期間於後室死亡免掉落並自動回收背包至基地置物櫃，並於結算報告（`Report.onReport`）匯報寄回格數或未理賠到期
+  - **合約類型擴充與防卡死過濾**（`core/guild/Contracts.java`、`core/field/Evidence.java`）：
+    - 保留既有抵達類合約並新增獵殺（`HUNT_HOUNDS`）、攝影（`PHOTO_SMILER`）、測繪拓樸（`MAP_LEVEL0`）、物資回收（`COLLECT_ALMOND`）與多層連貫跑腿（`COURIER_012`：`0->1->2`），串接 `Evidence` 拍照／信標掃描、`AFTER_DEATH` 與返家扣繳檢核，補齊 `/meg contract status`
+    - 實作 `completableWith`／`isCompletable`，依 `LevelExits.openLevels()` 與物品／實體註冊表過濾尚未開放樓層，避免指派無法完成的死鎖合約
+  - **雙語翻譯與驗證**（`zh_tw.json`、`en_us.json`、`FloorDifficultyTest.java`、`HorrorClientTest.java`）：
+    - 補齊 39 組雙語鍵並通過 JSON 語法檢核；`FloorDifficultyTest` 覆蓋距離段位、單次回頭 vs `A->B->A->B` 懲罰、保險箱擴充階梯與合約防卡死；`HorrorClientTest` 步驟 `10a..10e` 覆蓋雙軸縮放、防刷懲罰、保險箱死亡保護與升級、中繼投放與投保理賠、新增合約並於 `0011_horror_safebox.png` 實機檢視畫面
+    - 已執行 `.\gradlew.bat build compileGametestJava --no-daemon`（含全部 133 項單元測試通過）與 `.\gradlew.bat runClientGameTest "-Plevels=horror,floors,field" --no-daemon` 全數通過，已提交於本機 main（未推送）

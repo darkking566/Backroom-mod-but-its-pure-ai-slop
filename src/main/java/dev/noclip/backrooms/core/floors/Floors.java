@@ -97,14 +97,20 @@ public final class Floors {
 			return;
 		}
 		boolean starting = key(from) == null || run.floor() == 0;
-		FloorRun next = starting ? run.start(level) : run.enter(level);
+		if (starting) {
+			FloorDifficulty.reset(player);
+			FloorDifficulty.recordTransition(player, level);
+		}
+		boolean pingPong = !starting && FloorDifficulty.recordTransition(player, level);
+		FloorRun next = starting ? run.start(level) : (pingPong ? run : run.enter(level));
 		player.setAttached(RUN, next);
 		announce(player, level);
-		boolean newLevel = !starting && next.distinct() > run.distinct();
+		boolean newLevel = !starting && !pingPong && next.distinct() > run.distinct();
 		for (var listener : ARRIVALS) listener.arrived(player, level, next, newLevel);
 	}
 
 	private static void end(ServerPlayer player) {
+		FloorDifficulty.reset(player);
 		FloorRun run = of(player);
 		if (run.floor() != 0) player.setAttached(RUN, run.end());
 	}
