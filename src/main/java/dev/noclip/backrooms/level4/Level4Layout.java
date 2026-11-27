@@ -29,6 +29,9 @@ final class Level4Layout {
 		CUBICLE_GLASS,
 		UNFINISHED_STUB,
 		UNFINISHED_PILLAR,
+		BALCONY_RAIL,
+		BALCONY_FLOOR,
+		BALCONY_CANOPY,
 		OMEGA_WALL,
 		OMEGA_SIGN,
 		WINDOW_BLACKED,
@@ -60,7 +63,8 @@ final class Level4Layout {
 
 	record Tile(Kind kind, ZoneKind zone, int dir, int ceilingHeight, Level4Exit exit, boolean exitSign) {
 		boolean walkable() {
-			return kind == Kind.AIR || kind == Kind.ATRIUM_ARCH || kind == Kind.FIRE_DOOR || kind == Kind.EXIT_HATCH;
+			return kind == Kind.AIR || kind == Kind.ATRIUM_ARCH || kind == Kind.FIRE_DOOR || kind == Kind.EXIT_HATCH
+					|| kind == Kind.BALCONY_FLOOR || kind == Kind.BALCONY_CANOPY;
 		}
 	}
 
@@ -146,6 +150,10 @@ final class Level4Layout {
 			}
 		}
 
+		// Check balcony overrides before cell corners/edges/interiors so cheek walls stay seamless
+		Tile balcony = balconyTile(seed, plan, i, j, cx, cz, zone, ceilH);
+		if (balcony != null) return balcony;
+
 		// Corner column at (0, 0) of each 7x7 cell where walls don't already cover it
 		if (cx == 0 && cz == 0) {
 			return cornerTile(seed, plan, i, j, zone, ceilH);
@@ -177,16 +185,73 @@ final class Level4Layout {
 		if (cz == 0 && northIndoor) {
 			ZoneKind nz = plan.zones[Level4Plan.cell(i, j - 1)];
 			int ceil = nz == ZoneKind.ATRIUM ? ATRIUM_HEIGHT : OPEN_HEIGHT;
+			if (plan.balconyDir[Level4Plan.cell(i, j - 1)] == Level4Plan.SOUTH) {
+				Kind wk = (cx >= 1 && cx <= 5) ? Kind.BALCONY_RAIL : Kind.DRYWALL;
+				return new Tile(wk, ZoneKind.OUTSIDE, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+			}
 			Kind wk = (cx >= 1 && cx <= 5) ? exteriorWindowKind(seed, plan, i, j - 1, Level4Plan.SOUTH, cx, x, z) : Kind.DRYWALL;
 			return new Tile(wk, ZoneKind.OUTSIDE, Level4Plan.NORTH, ceil, null, false);
 		}
 		if (cx == 0 && westIndoor) {
 			ZoneKind wz = plan.zones[Level4Plan.cell(i - 1, j)];
 			int ceil = wz == ZoneKind.ATRIUM ? ATRIUM_HEIGHT : OPEN_HEIGHT;
+			if (plan.balconyDir[Level4Plan.cell(i - 1, j)] == Level4Plan.EAST) {
+				Kind wk = (cz >= 1 && cz <= 5) ? Kind.BALCONY_RAIL : Kind.DRYWALL;
+				return new Tile(wk, ZoneKind.OUTSIDE, Level4Plan.WEST, OPEN_HEIGHT, null, false);
+			}
 			Kind wk = (cz >= 1 && cz <= 5) ? exteriorWindowKind(seed, plan, i - 1, j, Level4Plan.EAST, cz, x, z) : Kind.DRYWALL;
 			return new Tile(wk, ZoneKind.OUTSIDE, Level4Plan.WEST, ceil, null, false);
 		}
 		return new Tile(Kind.OUTSIDE_AIR, ZoneKind.OUTSIDE, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+	}
+
+	private static Tile balconyTile(long seed, Level4Plan plan, int i, int j, int cx, int cz, ZoneKind zone, int ceilH) {
+		int bdir = plan.balconyDir[Level4Plan.cell(i, j)];
+		if (bdir < 0) return null;
+
+		if (bdir == Level4Plan.NORTH || bdir == Level4Plan.SOUTH) {
+			boolean north = bdir == Level4Plan.NORTH;
+			int depth = north ? cz : (CELL - cz);
+			if (depth < 0 || depth > 3) return null;
+			if (cx == 0 && cz == 0) return new Tile(Kind.PILLAR, zone, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+			if (cx == 0) return new Tile(Kind.DRYWALL, zone, Level4Plan.WEST, OPEN_HEIGHT, null, false);
+			if (depth == 0) {
+				Kind k = (cx >= 1 && cx <= 5) ? Kind.BALCONY_RAIL : Kind.DRYWALL;
+				return new Tile(k, zone, Level4Plan.SOUTH, OPEN_HEIGHT, null, false);
+			}
+			if (depth == 1) return new Tile(cx <= 5 ? Kind.BALCONY_FLOOR : Kind.DRYWALL, zone, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+			if (depth == 2) return new Tile(cx <= 5 ? Kind.BALCONY_CANOPY : Kind.DRYWALL, zone, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+			int doorFace = north ? Level4Plan.SOUTH : Level4Plan.NORTH;
+			if (cx == 3) return new Tile(Kind.FIRE_DOOR, zone, doorFace, OPEN_HEIGHT, null, false);
+			if (cx == 2 || cx == 4) return new Tile(Kind.WINDOW_RAIN, zone, doorFace, OPEN_HEIGHT, null, false);
+			return new Tile(Kind.DRYWALL, zone, doorFace, OPEN_HEIGHT, null, false);
+		}
+
+		boolean west = bdir == Level4Plan.WEST;
+		int depth = west ? cx : (CELL - cx);
+		if (depth < 0 || depth > 3) return null;
+		if (cx == 0 && cz == 0) return new Tile(Kind.PILLAR, zone, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+		if (cz == 0) return new Tile(Kind.DRYWALL, zone, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+		if (depth == 0) {
+			Kind k = (cz >= 1 && cz <= 5) ? Kind.BALCONY_RAIL : Kind.DRYWALL;
+			return new Tile(k, zone, Level4Plan.EAST, OPEN_HEIGHT, null, false);
+		}
+		if (depth == 1) return new Tile(cz <= 5 ? Kind.BALCONY_FLOOR : Kind.DRYWALL, zone, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+		if (depth == 2) return new Tile(cz <= 5 ? Kind.BALCONY_CANOPY : Kind.DRYWALL, zone, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+		int doorFace = west ? Level4Plan.EAST : Level4Plan.WEST;
+		if (cz == 3) return new Tile(Kind.FIRE_DOOR, zone, doorFace, OPEN_HEIGHT, null, false);
+		if (cz == 2 || cz == 4) return new Tile(Kind.WINDOW_RAIN, zone, doorFace, OPEN_HEIGHT, null, false);
+		return new Tile(Kind.DRYWALL, zone, doorFace, OPEN_HEIGHT, null, false);
+	}
+
+	/** Whether (x, z) lies inside the open-sky central shaft of a tower {@link ZoneKind#LIGHTWELL}. */
+	static boolean isLightwellShaft(long seed, int x, int z) {
+		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		int i = lx / CELL, j = lz / CELL;
+		if (Level4Plan.isSkybridgeCell(i, j)) return false;
+		Level4Plan plan = Level4Plan.of(seed, rx, rz);
+		return plan.zones[Level4Plan.cell(i, j)] == ZoneKind.OUTSIDE && tile(seed, x, z).kind() == Kind.OUTSIDE_AIR;
 	}
 
 	private static boolean onEdgeCenter(int cx, int cz, int d) {

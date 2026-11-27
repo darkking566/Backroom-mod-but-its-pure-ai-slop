@@ -161,7 +161,7 @@ public final class Level4Client {
 		for (int i = 0; i < 18; i++) {
 			int x = px + rng.nextInt(29) - 14;
 			int z = pz + rng.nextInt(29) - 14;
-			if (level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z) > Level4ChunkGenerator.FLOOR_Y) continue;
+			if (level.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z) > Level4ChunkGenerator.FLOOR_Y + 1) continue;
 			int y = baseY + rng.nextInt(12);
 			pos.set(x, y, z);
 			if (!level.isLoaded(pos) || !level.getBlockState(pos).isAir()) continue;

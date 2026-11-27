@@ -72,7 +72,16 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 	private static BlockState blockAtColumn(long seed, int x, int y, int z, Tile tile,
 			Level4Layout.ExitStruct es, Level4Layout.BridgeInfo bridge, boolean exterior, int topY) {
 		if (y <= MIN_Y) return Blocks.BEDROCK.defaultBlockState();
-		if (tile.kind() == Kind.OUTSIDE_AIR) return Blocks.AIR.defaultBlockState();
+		if (tile.kind() == Kind.OUTSIDE_AIR) {
+			if (Level4Layout.isLightwellShaft(seed, x, z)) {
+				if (y < FLOOR_Y) return Blocks.CONCRETE.gray().defaultBlockState();
+				if (y == FLOOR_Y) return Blocks.WATER.defaultBlockState();
+			}
+			return Blocks.AIR.defaultBlockState();
+		}
+		if (tile.kind() == Kind.BALCONY_RAIL || tile.kind() == Kind.BALCONY_FLOOR || tile.kind() == Kind.BALCONY_CANOPY) {
+			return balconyColumn(y, tile.kind(), exterior);
+		}
 		if (y >= MAX_Y) return Blocks.BEDROCK.defaultBlockState();
 
 		if (bridge != null && !exterior) {
@@ -106,6 +115,27 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 			return (lit ? Level4Blocks.OFFICE_TROFFER_DIM : Level4Blocks.OFFICE_BLACKED_WINDOW).defaultBlockState();
 		}
 		return Blocks.CONCRETE.gray().defaultBlockState();
+	}
+
+	private static BlockState balconyColumn(int y, Kind kind, boolean exterior) {
+		if (y < FLOOR_Y) {
+			if (exterior) {
+				int sh = Math.floorMod(y - FLOOR_Y, 5);
+				if (sh == 0 || sh == 4) return Blocks.CONCRETE.gray().defaultBlockState();
+				return Blocks.CONCRETE.lightGray().defaultBlockState();
+			}
+			return Blocks.CONCRETE.gray().defaultBlockState();
+		}
+		if (y == FLOOR_Y) return Blocks.CONCRETE.gray().defaultBlockState();
+		if (kind == Kind.BALCONY_RAIL) {
+			if (y == FLOOR_Y + 1) return Blocks.CONCRETE.lightGray().defaultBlockState();
+			if (y == FLOOR_Y + 2) return Blocks.IRON_BARS.defaultBlockState();
+			return Blocks.AIR.defaultBlockState();
+		}
+		if (kind == Kind.BALCONY_CANOPY && y == FLOOR_Y + 5) {
+			return Blocks.CONCRETE.lightGray().defaultBlockState();
+		}
+		return Blocks.AIR.defaultBlockState();
 	}
 
 	private static BlockState bridgeColumn(long seed, int x, int y, int z, Tile tile, Level4Layout.BridgeInfo bridge) {
@@ -307,7 +337,7 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 				}
 				yield (tile.zone() == ZoneKind.OMEGA_BASE ? Level4Blocks.OMEGA_WALL : Level4Blocks.OFFICE_DRYWALL_UPPER).defaultBlockState();
 			}
-			case EXIT_STRUCTURE, EXIT_HATCH -> Blocks.AIR.defaultBlockState();
+			case EXIT_STRUCTURE, EXIT_HATCH, BALCONY_FLOOR, BALCONY_CANOPY, BALCONY_RAIL -> Blocks.AIR.defaultBlockState();
 			case WATER_COOLER -> h == 1
 					? Level4Blocks.OFFICE_WATER_COOLER.defaultBlockState().setValue(Level4WaterSourceBlock.FACING, dir).setValue(Level4WaterSourceBlock.BOTTLES, 2)
 					: Blocks.AIR.defaultBlockState();

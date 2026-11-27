@@ -964,6 +964,11 @@
   - **施工毛坯結構翼區**（`Level4Plan.ZoneKind.UNFINISHED_WING`、`Level4Layout.Kind.UNFINISHED_STUB`／`UNFINISHED_PILLAR`、`Level4ChunkGenerator`）：約 38% 區域生成 `2×2` 或 `2×3` 毛坯水泥空間，地面為雙色裸露灰混凝土（無地毯）、天花板為混凝土樑架搭配高故障率燈具，內部設灰混凝土柱與鐵欄圍籬半成品隔斷
   - **高低錯層與觀景玻璃天橋**（`Level4Layout.skybridgeInfo`、`Level4ChunkGenerator.bridgeColumn`、`Level4Windows`）：約半數空中走廊升級為抬升 `+2` 格的高架全景玻璃天橋（兩端以磨製安山岩階梯上下銜接、橋底懸空貫穿峽谷、四面全高落地雨窗）；平層天橋中段則擴為三格高落地雨窗並於中央增設玻璃分流脊柱；`Level4Windows` 同步支援依玩家實際站立高度偵測上層陷阱窗
   - **驗證**：更新 `Level4LayoutTest.batch1StructuresCubiclesUnfinishedAndVariedSkybridgesAppear` 與 `Level4ClientTest.views`（實機檢查格子間、毛坯地坪、高架天橋底懸空／橋面與拍攝 `level4_cubicles`／`level4_unfinished_wing`／`level4_elevated_bridge`），`.\gradlew.bat test --no-daemon` 與 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 通過；僅提交本批改動於本機 `main`（未推送）
+- **Level 4 建築結構擴充第二批——貫通天空採光天井與凹入式避雨陽台**（Antigravity）：
+  - **貫通天空採光天井**（`Level4Plan.ZoneKind.LIGHTWELL`、`Level4Layout.isLightwellShaft`、`Level4ChunkGenerator`）：約 42% 區域生成 `3×3` 格環形玻璃走廊（四面皆設開放拱門與鄰區連通），中央 `1×1` 格（`7×7` 方塊）垂直開天貫穿至 `MAX_Y` 讓真實雨水直落至 `y=32` 積水井底，周邊圍以全透明雨景窗並與據點塗黑窗規則相容
+  - **凹入式避雨陽台**（`Level4Plan.balconyDir`、`Level4Layout.Kind.BALCONY_RAIL`／`BALCONY_FLOOR`／`BALCONY_CANOPY`、`Level4ChunkGenerator.balconyColumn`、`Level4Client`、`Level4Events`）：高樓四面外緣（避開據點、出口與非開放側壁）約 22% 符合單元向內凹入 2 格成半戶外灰水泥露台：外側以輕灰水泥矮牆＋鐵欄護欄隔絕街谷墜落風險，上方延 `MAX_Y` 開天淋雨並保留門口 1 格挑出雨棚，室內門牆同步配防火門與雙側雨窗，玩家走上露台即可觸發戶外級雨聲（`0.90F`）與 `Heightmap` 降雨粒子
+  - 順手修復 `Level4Bases.populateNear` 跨未載入區塊邊界時可能只生成部分陣營成員的問題（要求據點四角區塊皆已載入才開始放置人員，避免 `AMOR_CAMP` 只刷出 7 人）
+  - **驗證**：新增 `Level4LayoutTest.batch2StructuresLightwellAndRainBalconiesAppear` 與 `Level4ClientTest.views` 天井積水／開天及露台淋雨開天實機檢查（並拍攝 `level4_lightwell`、`level4_balcony`），`.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本批改動於本機 `main`（未推送）
 - 完成 **手電筒系統翻修、3D 雙款手電筒與五格電量 HUD、濾鏡／光照／光影相容與 F7 卡頓修復、紅霧滲透細節修正**（Antigravity）：
   - **紅霧滲透細節修正**（`core/trip/Anomalies.java`、`zh_tw.json`、`en_us.json`）：`infestRedRoomNear` 加入最小生成距離 ≥ 14 格（不再直接凝結在玩家腳邊）；紅霧區 `ANOMALY_VAULT_CHEST` 與 `supply_crate` 改為優先於 `RED_ANOMALY_CLUSTER` 東西兩側對稱生成，避免補給箱擋住正面視線與拍照；更新 `anomaly.noclip_backrooms.red_mist.desc` 雙語說明對齊局部紅霧與異常寶箱區機制
   - **濾鏡／迷霧／光照／Iris 光影相容與 F7 零延遲切換**（`src/client/.../core/look/Look.java`、`shaders/post/camcorder.fsh`、`post_effect/camcorder.json`、`dimension_type/level_{0..3}.json`）：

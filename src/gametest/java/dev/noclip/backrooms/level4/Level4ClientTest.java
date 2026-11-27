@@ -146,6 +146,31 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			});
 		}
 
+		// Batch 2 structures: open-sky lightwell & recessed rain balcony
+		int[] lightwell = findZone(seed, from, ZoneKind.LIGHTWELL);
+		if (lightwell != null) {
+			shoot(context, game, lightwell[0] + 0.5, STAND, lightwell[1] + 0.5, 45, 5, false, "level4_lightwell");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				int[] shaft = findLightwellShaft(seed, new BlockPos(lightwell[0], STAND, lightwell[1]));
+				check(shaft != null, "expected open-sky shaft inside lightwell");
+				check(l4.canSeeSky(new BlockPos(shaft[0], STAND, shaft[1])), "lightwell shaft should see sky");
+				check(l4.getBlockState(new BlockPos(shaft[0], Level4ChunkGenerator.FLOOR_Y, shaft[1])).is(net.minecraft.world.level.block.Blocks.WATER),
+						"lightwell shaft bottom should hold rain water pool");
+			});
+		}
+
+		int[] balcony = findKind(seed, from, Kind.BALCONY_FLOOR);
+		if (balcony != null) {
+			shoot(context, game, balcony[0] + 0.5, STAND, balcony[1] + 0.5, 0, 0, false, "level4_balcony");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				check(l4.canSeeSky(new BlockPos(balcony[0], STAND, balcony[1])), "recessed rain balcony should see open sky");
+				check(!l4.getBlockState(new BlockPos(balcony[0], Level4ChunkGenerator.FLOOR_Y, balcony[1])).isAir(),
+						"balcony floor should be solid concrete");
+			});
+		}
+
 		int[] rainView = findRainWindowView(seed, from);
 		if (rainView != null) {
 			shoot(context, game, rainView[0] + 0.5, STAND, rainView[1] + 0.5, rainView[2], 2, false, "level4_rain_window_view");
@@ -642,6 +667,11 @@ public final class Level4ClientTest implements FabricClientGameTest {
 						int x = (rx0 + dx) * Level4Plan.SIZE + box.cx() * Level4Plan.CELL + 3;
 						int z = (rz0 + dz) * Level4Plan.SIZE + box.cz() * Level4Plan.CELL + 3;
 						if (Level4Layout.tile(seed, x, z).kind() == Kind.AIR) return new int[] {x, z};
+						if (target == ZoneKind.LIGHTWELL) {
+							int cornerX = (rx0 + dx) * Level4Plan.SIZE + box.i() * Level4Plan.CELL + 3;
+							int cornerZ = (rz0 + dz) * Level4Plan.SIZE + box.j() * Level4Plan.CELL + 3;
+							if (Level4Layout.tile(seed, cornerX, cornerZ).kind() == Kind.AIR) return new int[] {cornerX, cornerZ};
+						}
 						return new int[] {x - 2, z - 2};
 					}
 				}
@@ -668,6 +698,16 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		for (int[] d : dirs) {
 			int sx = wx + d[0], sz = wz + d[1];
 			if (Level4Layout.tile(seed, sx, sz).kind() == Kind.AIR) return new int[] {sx, sz};
+		}
+		return null;
+	}
+
+	private static int[] findLightwellShaft(long seed, BlockPos from) {
+		for (int dx = -14; dx <= 14; dx++) {
+			for (int dz = -14; dz <= 14; dz++) {
+				int x = from.getX() + dx, z = from.getZ() + dz;
+				if (Level4Layout.isLightwellShaft(seed, x, z)) return new int[] {x, z};
+			}
 		}
 		return null;
 	}

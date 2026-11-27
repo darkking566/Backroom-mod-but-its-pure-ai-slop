@@ -147,7 +147,7 @@ final class Level4Events {
 				if (now >= RAIN_SILENT_UNTIL.getOrDefault(sp.getUUID(), 0)) {
 					var tile = Level4Layout.tile(seed, sp.getBlockX(), sp.getBlockZ());
 					boolean nearAtrium = tile.zone() == ZoneKind.ATRIUM;
-					boolean outdoors = tile.kind() == Kind.OUTSIDE_AIR;
+					boolean outdoors = tile.kind() == Kind.OUTSIDE_AIR || tile.kind() == Kind.BALCONY_FLOOR || tile.kind() == Kind.BALCONY_CANOPY;
 					BlockPos nearWindow = findNearbyWindowOrRain(level, seed, sp.blockPosition(), 9);
 					if (rng.nextInt(1000) < (nearAtrium ? 22 : 8)) {
 						RAIN_SILENT_UNTIL.put(sp.getUUID(), now + 120);

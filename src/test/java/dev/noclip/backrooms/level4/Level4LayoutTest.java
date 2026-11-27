@@ -295,4 +295,32 @@ final class Level4LayoutTest {
 		assertTrue(sawUnfinished && sawStub, "expected unfinished concrete wing");
 		assertTrue(sawElevatedBridge && sawFlatBridge, "expected both elevated and flat skybridges");
 	}
+
+	@Test
+	void batch2StructuresLightwellAndRainBalconiesAppear() {
+		boolean sawLightwell = false, sawShaft = false;
+		boolean sawBalconyFloor = false, sawBalconyRail = false, sawBalconyCanopy = false;
+		for (long seed = 10; seed <= 16; seed++) {
+			for (int rx = -1; rx <= 1; rx++) {
+				for (int rz = -1; rz <= 1; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					for (ZoneKind z : plan.zones) {
+						if (z == ZoneKind.LIGHTWELL) sawLightwell = true;
+					}
+					for (int lx = 0; lx < Level4Plan.SIZE; lx++) {
+						for (int lz = 0; lz < Level4Plan.SIZE; lz++) {
+							int x = rx * Level4Plan.SIZE + lx, z = rz * Level4Plan.SIZE + lz;
+							Tile t = Level4Layout.tile(seed, x, z);
+							if (Level4Layout.isLightwellShaft(seed, x, z)) sawShaft = true;
+							if (t.kind() == Kind.BALCONY_FLOOR) sawBalconyFloor = true;
+							if (t.kind() == Kind.BALCONY_RAIL) sawBalconyRail = true;
+							if (t.kind() == Kind.BALCONY_CANOPY) sawBalconyCanopy = true;
+						}
+					}
+				}
+			}
+		}
+		assertTrue(sawLightwell && sawShaft, "expected open-sky central lightwell shaft");
+		assertTrue(sawBalconyFloor && sawBalconyRail && sawBalconyCanopy, "expected recessed rain balconies");
+	}
 }

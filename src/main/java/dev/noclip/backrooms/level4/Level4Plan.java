@@ -28,6 +28,8 @@ final class Level4Plan {
 		SUITE,
 		/** Double-height rainy atrium with a central Almond Water fountain. */
 		ATRIUM,
+		/** Open-sky central rain shaft ringed by glass perimeter corridors. */
+		LIGHTWELL,
 		/** Unlit/flickering abandoned wing where rare entities lurk. */
 		DARK_WING,
 		/** Half-built bare-concrete office wing abandoned mid-renovation. */
@@ -69,6 +71,7 @@ final class Level4Plan {
 
 	final ZoneKind[] zones = new ZoneKind[N * N];
 	final int[] roomId = new int[N * N];
+	final int[] balconyDir = new int[N * N];
 	final Edge[] edges = new Edge[N * N * 4];
 	final List<RoomBox> rooms = new ArrayList<>();
 	final List<PlacedExit> exits = new ArrayList<>();
@@ -86,6 +89,7 @@ final class Level4Plan {
 		SplittableRandom rng = new SplittableRandom(Level4Layout.hash(seed, rx, rz, PLAN_SALT));
 		Arrays.fill(zones, ZoneKind.OPEN_OFFICE);
 		Arrays.fill(roomId, -1);
+		Arrays.fill(balconyDir, -1);
 		Arrays.fill(edges, Edge.OPEN);
 
 		// Carve a 2-cell outdoor misty canyon around the 12x12 skyscraper core, keeping 2 skybridges per side
@@ -116,6 +120,7 @@ final class Level4Plan {
 		this.hasOmega = isOmegaRegion(seed, rx, rz);
 		boolean omegaPlaced = hasOmega && placeBox(rng, 5, 5, ZoneKind.OMEGA_BASE, 5, 5);
 		this.hasAtrium = rng.nextInt(100) < 55 && placeExteriorAtrium(rng);
+		if (rng.nextInt(100) < 42) placeLightwell(rng);
 		this.hasAmor = !hasOmega && rng.nextInt(100) < 24 && placeBox(rng, 3, 3, ZoneKind.AMOR_CAMP, -1, -1);
 		this.hasTbd = rng.nextInt(100) < 28 && placeBox(rng, 2, 3, ZoneKind.TBD_ROOM, -1, -1);
 		if (rng.nextInt(100) < 42) placeBox(rng, 3, 3, ZoneKind.DARK_WING, -1, -1);
@@ -134,6 +139,7 @@ final class Level4Plan {
 		buildEdges(rng, seed, rx, rz);
 		ensureConnected(rng);
 		placeExits(rng, omegaPlaced);
+		placeBalconies(rng);
 	}
 
 	static boolean isOmegaRegion(long seed, int rx, int rz) {
@@ -187,6 +193,72 @@ final class Level4Plan {
 		edges[c * 4 + d] = e;
 		int i = c % N + DX[d], j = c / N + DZ[d];
 		if (inside(i, j)) edges[cell(i, j) * 4 + opposite(d)] = e;
+	}
+
+	private boolean placeLightwell(SplittableRandom rng) {
+		for (int attempt = 0; attempt < 30; attempt++) {
+			int i = (MARGIN + 1) + rng.nextInt((N - MARGIN - 1) - (MARGIN + 1) - 3 + 1);
+			int j = (MARGIN + 1) + rng.nextInt((N - MARGIN - 1) - (MARGIN + 1) - 3 + 1);
+			if (!free(i - 1, j - 1, 5, 5)) continue;
+			int id = rooms.size();
+			rooms.add(new RoomBox(i, j, 3, 3, ZoneKind.LIGHTWELL));
+			for (int a = i; a < i + 3; a++) {
+				for (int b = j; b < j + 3; b++) {
+					int c = cell(a, b);
+					if (a == i + 1 && b == j + 1) {
+						zones[c] = ZoneKind.OUTSIDE;
+						roomId[c] = -1;
+					} else {
+						zones[c] = ZoneKind.LIGHTWELL;
+						roomId[c] = id;
+					}
+				}
+			}
+			return true;
+		}
+		return false;
+	}
+
+	private void placeBalconies(SplittableRandom rng) {
+		for (int i = MARGIN; i < N - MARGIN; i++) {
+			for (int j = MARGIN; j < N - MARGIN; j++) {
+				int dir = -1;
+				if (i == MARGIN) dir = WEST;
+				else if (i == N - MARGIN - 1) dir = EAST;
+				else if (j == MARGIN) dir = NORTH;
+				else if (j == N - MARGIN - 1) dir = SOUTH;
+				else continue;
+
+				int c = cell(i, j);
+				if (zones[c] != ZoneKind.OPEN_OFFICE || nearHumanBase(i, j)) continue;
+				int ni = i + DX[dir], nj = j + DZ[dir];
+				if (!inside(ni, nj) || zones[cell(ni, nj)] != ZoneKind.OUTSIDE) continue;
+				boolean hasExit = false;
+				for (PlacedExit pe : exits) {
+					if (pe.cell() == c) {
+						hasExit = true;
+						break;
+					}
+				}
+				if (hasExit) continue;
+
+				boolean openSides = true;
+				for (int d = 0; d < 4; d++) {
+					if (d == dir) continue;
+					if (edge(c, d) != Edge.OPEN) {
+						openSides = false;
+						break;
+					}
+					int ai = i + DX[d], aj = j + DZ[d];
+					if (inside(ai, aj) && balconyDir[cell(ai, aj)] >= 0) {
+						openSides = false;
+						break;
+					}
+				}
+				if (!openSides) continue;
+				if (rng.nextInt(100) < 22) balconyDir[c] = dir;
+			}
+		}
 	}
 
 	private boolean placeExteriorAtrium(SplittableRandom rng) {
@@ -304,8 +376,8 @@ final class Level4Plan {
 				setEdge(cell(room.i() + room.w() - 1, room.cz()), EAST, Edge.OPEN);
 				continue;
 			}
-			if (room.kind() == ZoneKind.ATRIUM) {
-				// Wide open archways into the atrium (only toward indoor walkable neighbors)
+			if (room.kind() == ZoneKind.ATRIUM || room.kind() == ZoneKind.LIGHTWELL) {
+				// Wide open archways into the atrium or lightwell ring (only toward indoor walkable neighbors)
 				if (walkable(room.cx(), room.j() - 1)) setEdge(cell(room.cx(), room.j()), NORTH, Edge.OPEN);
 				if (walkable(room.cx(), room.j() + room.h())) setEdge(cell(room.cx(), room.j() + room.h() - 1), SOUTH, Edge.OPEN);
 				if (walkable(room.i() - 1, room.cz())) setEdge(cell(room.i(), room.cz()), WEST, Edge.OPEN);
