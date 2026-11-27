@@ -4,24 +4,32 @@ import com.mojang.serialization.MapCodec;
 import dev.noclip.backrooms.level4.Level4Layout.Kind;
 import dev.noclip.backrooms.level4.Level4Layout.Tile;
 import dev.noclip.backrooms.level4.Level4Plan.ZoneKind;
+import dev.noclip.backrooms.level4.Level4PoiPlan.PlacedPoi;
+import dev.noclip.backrooms.level4.Level4PoiPlan.PoiKind;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.NoiseColumn;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.BiomeSource;
+import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.LadderBlock;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
+import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoorHingeSide;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -80,7 +88,12 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 			}
 			return Blocks.AIR.defaultBlockState();
 		}
+		PlacedPoi poi = es == null ? Level4PoiPlan.atCell(seed, x, z) : null;
 		if (tile.kind() == Kind.BALCONY_RAIL || tile.kind() == Kind.BALCONY_FLOOR || tile.kind() == Kind.BALCONY_CANOPY) {
+			if (poi != null && poi.kind() == PoiKind.MISSING_WANDERER_CAMP) {
+				BlockState p = poiBlock(x, y, z, tile, poi);
+				if (p != null) return p;
+			}
 			return balconyColumn(y, tile.kind(), exterior);
 		}
 		if (y >= MAX_Y) return Blocks.BEDROCK.defaultBlockState();
@@ -114,6 +127,10 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 		}
 		Level4Layout.MezzanineInfo mezz = tile.kind() == Kind.AIR ? Level4Layout.mezzanineInfo(seed, x, z) : null;
 		if (mezz != null && y >= FLOOR_Y && y <= roofY) {
+			if (poi != null && poi.kind() == PoiKind.MISSING_WANDERER_CAMP && poi.baseY() == FLOOR_Y + 6) {
+				BlockState p = poiBlock(x, y, z, tile, poi);
+				if (p != null) return p;
+			}
 			return mezzanineColumn(seed, x, y, z, tile, mezz, roofY);
 		}
 		Level4Layout.AuditoriumInfo aud = tile.kind() == Kind.AIR ? Level4Layout.auditoriumInfo(seed, x, z) : null;
@@ -122,12 +139,24 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 		}
 
 		if (y >= FLOOR_Y && y <= roofY) {
+			if (poi != null) {
+				BlockState p = poiBlock(x, y, z, tile, poi);
+				if (p != null) return p;
+			}
+			if (tile.kind() == Kind.FIRE_DOOR && (y == FLOOR_Y + 1 || y == FLOOR_Y + 2) && isSealedMeetingDoor(seed, x, z)) {
+				return Level4Blocks.CAUTION_TAPE_BARRIER.defaultBlockState()
+						.setValue(Level4FacingBlock.FACING, dirFrom(tile.dir()));
+			}
 			if (y == FLOOR_Y) return floor(seed, x, z, tile);
 			if (y == roofY) return ceiling(seed, x, z, tile);
 			if (tile.kind() == Kind.ELEVATOR_THRESHOLD) {
 				return elevatorThresholdBlock(x, y - FLOOR_Y);
 			}
 			return columnBlock(tile, y - FLOOR_Y);
+		}
+		if (poi != null && poi.kind() == PoiKind.CEILING_DRIP_SPOT && !poi.variantFlag()
+				&& y == FLOOR_Y + 6 && Math.floorMod(x, Level4Plan.CELL) == 3 && Math.floorMod(z, Level4Plan.CELL) == 3) {
+			return Blocks.IRON_BARS.defaultBlockState();
 		}
 
 		if (exterior) {
@@ -666,6 +695,140 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 			case Level4Plan.EAST -> Direction.EAST;
 			case Level4Plan.SOUTH -> Direction.SOUTH;
 			default -> Direction.WEST;
+		};
+	}
+
+	private static int[] uvFromLocal(int dirIntoRoom, int cx, int cz) {
+		return switch (dirIntoRoom) {
+			case Level4Plan.SOUTH -> new int[] {cx, cz};
+			case Level4Plan.NORTH -> new int[] {cx, Level4Plan.CELL - cz};
+			case Level4Plan.EAST -> new int[] {cz, cx};
+			default -> new int[] {cz, Level4Plan.CELL - cx};
+		};
+	}
+
+	private static boolean isSealedMeetingDoor(long seed, int x, int z) {
+		int rx = Math.floorDiv(x, Level4Plan.SIZE), rz = Math.floorDiv(z, Level4Plan.SIZE);
+		int lx = Math.floorMod(x, Level4Plan.SIZE), lz = Math.floorMod(z, Level4Plan.SIZE);
+		int i = lx / Level4Plan.CELL, j = lz / Level4Plan.CELL;
+		int cx = lx % Level4Plan.CELL, cz = lz % Level4Plan.CELL;
+		Level4Plan plan = Level4Plan.of(seed, rx, rz);
+		Level4PoiPlan poiPlan = Level4PoiPlan.of(seed, rx, rz);
+		if (poiPlan.isSealedSuiteRoom(plan.roomId[Level4Plan.cell(i, j)])) return true;
+		if (cz == 0 && j > 0 && poiPlan.isSealedSuiteRoom(plan.roomId[Level4Plan.cell(i, j - 1)])) return true;
+		if (cx == 0 && i > 0 && poiPlan.isSealedSuiteRoom(plan.roomId[Level4Plan.cell(i - 1, j)])) return true;
+		return false;
+	}
+
+	private static BlockState greenCarpet() {
+		return BuiltInRegistries.BLOCK.getValue(Identifier.withDefaultNamespace("green_carpet")).defaultBlockState();
+	}
+
+	private static BlockState poiBlock(int x, int y, int z, Tile tile, PlacedPoi poi) {
+		if (!tile.walkable()) return null;
+		int cx = Math.floorMod(x, Level4Plan.CELL);
+		int cz = Math.floorMod(z, Level4Plan.CELL);
+		return switch (poi.kind()) {
+			case BREAKROOM_CORNER -> {
+				int[] uv = uvFromLocal(poi.dir(), cx, cz);
+				if (y == FLOOR_Y && uv[0] >= 1 && uv[0] <= 3 && uv[1] >= 1 && uv[1] <= 2) {
+					yield Level4Blocks.OFFICE_DAMP_CARPET.defaultBlockState();
+				}
+				if (y == FLOOR_Y + 1 && uv[1] == 1) {
+					if (uv[0] == 1 || uv[0] == 2) {
+						yield Blocks.QUARTZ_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.TOP);
+					}
+					if (uv[0] == 3) {
+						yield Blocks.CAULDRON.defaultBlockState();
+					}
+				}
+				yield null;
+			}
+			case MEG_CHALK_WALL -> {
+				if (y != FLOOR_Y + 2) yield null;
+				if (poi.roomId() == -2) {
+					if (cx == 1 && cz == 0) {
+						yield Level4Blocks.MEG_CHALK_SIGN.defaultBlockState()
+								.setValue(Level4FacingBlock.FACING, Direction.EAST)
+								.setValue(Level4Blocks.MegChalkSignBlock.SLASHED, poi.variantFlag());
+					}
+					yield null;
+				}
+				int[] uv = uvFromLocal(poi.dir(), cx, cz);
+				if (uv[0] == 2 && uv[1] == 1) {
+					yield Level4Blocks.MEG_CHALK_SIGN.defaultBlockState()
+							.setValue(Level4FacingBlock.FACING, dirFrom(poi.dir()))
+							.setValue(Level4Blocks.MegChalkSignBlock.SLASHED, poi.variantFlag());
+				}
+				yield null;
+			}
+			case CEILING_DRIP_SPOT -> {
+				if (y == FLOOR_Y && cx >= 2 && cx <= 4 && cz >= 2 && cz <= 4) {
+					yield Level4Blocks.OFFICE_DAMP_CARPET.defaultBlockState();
+				}
+				if (cx == 3 && cz == 3) {
+					if (y == FLOOR_Y + 1) {
+						yield Blocks.WATER_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 2);
+					}
+					if (y == FLOOR_Y + 5) {
+						yield Blocks.AIR.defaultBlockState();
+					}
+				}
+				yield null;
+			}
+			case WINDOW_PAINT_CART -> {
+				int[] uv = uvFromLocal(poi.dir(), cx, cz);
+				if (y == FLOOR_Y && uv[0] >= 2 && uv[0] <= 4 && uv[1] >= 1 && uv[1] <= 2) {
+					yield Level4Blocks.OFFICE_DAMP_CARPET.defaultBlockState();
+				}
+				if (y == FLOOR_Y + 1 && uv[1] == 1) {
+					if (uv[0] == 2) yield Blocks.CAULDRON.defaultBlockState();
+					if (uv[0] == 3) yield Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
+				}
+				yield null;
+			}
+			case MISSING_WANDERER_CAMP -> {
+				if (y != poi.baseY() + 1) yield null;
+				if (tile.kind() == Kind.BALCONY_FLOOR || tile.kind() == Kind.BALCONY_CANOPY) {
+					int along = (poi.dir() == Level4Plan.NORTH || poi.dir() == Level4Plan.SOUTH) ? cx : cz;
+					int depth = switch (poi.dir()) {
+						case Level4Plan.NORTH -> cz;
+						case Level4Plan.SOUTH -> Level4Plan.CELL - cz;
+						case Level4Plan.WEST -> cx;
+						default -> Level4Plan.CELL - cx;
+					};
+					if (depth == 1 && along == 1) yield greenCarpet();
+					if (depth == 2 && along == 1) yield Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
+					if (depth == 2 && along == 2) yield Blocks.LANTERN.defaultBlockState();
+					if (depth == 1 && along == 5) yield Level4Blocks.ALMOND_BOTTLE_CLUSTER.defaultBlockState();
+					yield null;
+				}
+				if (poi.variantFlag() && poi.baseY() == FLOOR_Y + 6) {
+					if ((cx == 3 || cx == 4) && cz == 2) yield greenCarpet();
+					if (cx == 5 && cz == 2) yield Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
+					if (cx == 5 && cz == 3) yield Blocks.LANTERN.defaultBlockState();
+					if (cx == 3 && cz == 3) yield Level4Blocks.ALMOND_BOTTLE_CLUSTER.defaultBlockState();
+					yield null;
+				}
+				if ((cx == 1 || cx == 2) && cz == 1) yield greenCarpet();
+				if (cx == 1 && cz == 2) yield Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
+				if (cx == 2 && cz == 2) yield Blocks.LANTERN.defaultBlockState();
+				if (cx == 1 && cz == 3) yield Level4Blocks.ALMOND_BOTTLE_CLUSTER.defaultBlockState();
+				yield null;
+			}
+			case AMOR_FIELD_SHRINE -> {
+				if ((cx == 3 || cx == 4) && cz == 3) {
+					if (y == FLOOR_Y) yield Level4Blocks.AMOR_PLANTER.defaultBlockState();
+					if (y == FLOOR_Y + 1) {
+						yield (cx == 3 ? Level4Blocks.AMOR_MUSHROOM : Level4Blocks.AMOR_MUSHROOM_VEIL).defaultBlockState();
+					}
+				}
+				if (y == FLOOR_Y && cx >= 2 && cx <= 4 && cz >= 2 && cz <= 4) {
+					yield Level4Blocks.OFFICE_DAMP_CARPET.defaultBlockState();
+				}
+				yield null;
+			}
+			default -> null;
 		};
 	}
 

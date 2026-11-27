@@ -4,17 +4,22 @@ import dev.noclip.backrooms.TestFilter;
 import dev.noclip.backrooms.core.LevelExits;
 import dev.noclip.backrooms.core.economy.Economy;
 import dev.noclip.backrooms.core.people.Person;
+import dev.noclip.backrooms.items.BackroomsItems;
 import dev.noclip.backrooms.level1.Level1Items;
 import dev.noclip.backrooms.level4.Level4Layout.Kind;
 import dev.noclip.backrooms.level4.Level4Layout.Tile;
 import dev.noclip.backrooms.level4.Level4Plan.PlacedExit;
 import dev.noclip.backrooms.level4.Level4Plan.ZoneKind;
+import dev.noclip.backrooms.level4.Level4PoiPlan.PlacedPoi;
+import dev.noclip.backrooms.level4.Level4PoiPlan.PoiKind;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.locale.Language;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -70,6 +75,7 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			if (TestFilter.section("vanish")) vanishingExits(context, game, seed, arrival);
 			if (TestFilter.section("wanderers")) wanderers(context, game, seed, arrival);
 			if (TestFilter.section("extras")) extras(context, game, seed, arrival);
+			if (TestFilter.section("pois")) pois(context, game, seed, arrival);
 			if (TestFilter.section("blocks")) checkBlocks(game);
 		}
 	}
@@ -689,6 +695,210 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		server.runCommand("gamemode spectator @a");
 	}
 
+	private static void pois(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
+		var server = game.getServer();
+
+		// 1. Breakroom corner
+		int[] breakroom = findPoi(seed, from, PoiKind.BREAKROOM_CORNER);
+		check(breakroom != null, "no BREAKROOM_CORNER POI found");
+		shoot(context, game, breakroom[0] + 3.5, STAND, breakroom[2] + 3.5, poiYawTo(breakroom[3]), 14, false, "level4_poi_breakroom");
+
+		// 2. M.E.G. chalk wall
+		int[] chalk = findPoi(seed, from, PoiKind.MEG_CHALK_WALL);
+		check(chalk != null, "no MEG_CHALK_WALL POI found");
+		int chalkDir = chalk[3], chalkRoom = chalk[5];
+		int sx, sz;
+		float chalkYaw;
+		if (chalkRoom == -2) {
+			sx = chalk[0] + 1;
+			sz = chalk[2];
+			chalkYaw = 90;
+		} else {
+			int[] uv = Level4PoiPlan.uvToLocal(chalkDir, 2, 1);
+			sx = chalk[0] + uv[0];
+			sz = chalk[2] + uv[1];
+			chalkYaw = poiYawTo(chalkDir);
+		}
+		shoot(context, game, sx + (chalkRoom == -2 ? 1.5 : Level4Plan.DX[chalkDir] * 1.6 + 0.5),
+				STAND, sz + (chalkRoom == -2 ? 0.5 : Level4Plan.DZ[chalkDir] * 1.6 + 0.5),
+				chalkYaw, 0, false, "level4_poi_chalk");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			BlockPos signPos = new BlockPos(sx, STAND + 1, sz);
+			check(l4.getBlockState(signPos).is(Level4Blocks.MEG_CHALK_SIGN), "expected meg_chalk_sign at " + signPos);
+			ServerPlayer p = player(s);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(signPos), Direction.UP, signPos, false));
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 3. Sealed meeting room (screenshot + tear caution tape)
+		int[] meeting = findPoi(seed, from, PoiKind.SEALED_MEETING_ROOM);
+		check(meeting != null, "no SEALED_MEETING_ROOM POI found");
+		int doorDir = Level4Plan.opposite(meeting[3]);
+		int dx = meeting[0] + (doorDir == Level4Plan.WEST ? 0 : doorDir == Level4Plan.EAST ? Level4Plan.CELL : 3);
+		int dz = meeting[2] + (doorDir == Level4Plan.NORTH ? 0 : doorDir == Level4Plan.SOUTH ? Level4Plan.CELL : 3);
+		shoot(context, game, dx + Level4Plan.DX[doorDir] * 2.2 + 0.5, STAND, dz + Level4Plan.DZ[doorDir] * 2.2 + 0.5,
+				poiYawTo(doorDir), 6, false, "level4_poi_meeting");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			BlockPos tapePos = new BlockPos(dx, STAND, dz);
+			check(l4.getBlockState(tapePos).is(Level4Blocks.CAUTION_TAPE_BARRIER), "expected caution_tape_barrier at " + tapePos);
+			ServerPlayer p = player(s);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(tapePos), Direction.UP, tapePos, false));
+			check(l4.getBlockState(tapePos).isAir() && l4.getBlockState(tapePos.above()).isAir(), "expected caution tape torn to air");
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 4. Ceiling drip spot (screenshot + bottle murky water)
+		int[] drip = findPoi(seed, from, PoiKind.CEILING_DRIP_SPOT);
+		check(drip != null, "no CEILING_DRIP_SPOT POI found");
+		shoot(context, game, drip[0] + 1.2, STAND, drip[2] + 1.2, -45, 2, false, "level4_poi_drip");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			p.getInventory().clearContent();
+			p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.GLASS_BOTTLE));
+			BlockPos cauldron = new BlockPos(drip[0] + 3, STAND, drip[2] + 3);
+			p.gameMode.useItemOn(p, l4, p.getMainHandItem(), InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(cauldron), Direction.UP, cauldron, false));
+			check(p.getInventory().countItem(BackroomsItems.MURKY_WATER_VIAL) >= 1, "expected murky_water_vial from drip cauldron");
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 5. Active terminal island
+		int[] terminal = findPoi(seed, from, PoiKind.ACTIVE_TERMINAL_ISLAND);
+		check(terminal != null, "no ACTIVE_TERMINAL_ISLAND POI found");
+		shoot(context, game, terminal[0] + 1.4, STAND, terminal[2] + 1.4, -45, 14, false, "level4_poi_terminal");
+
+		// 6. Window paint cart (screenshot + grab dye & paint adjacent trap window)
+		int[] cart = findPoi(seed, from, PoiKind.WINDOW_PAINT_CART);
+		check(cart != null, "no WINDOW_PAINT_CART POI found");
+		int[] barrelUv = Level4PoiPlan.uvToLocal(cart[3], 3, 1);
+		int bx = cart[0] + barrelUv[0], bz = cart[2] + barrelUv[1];
+		shoot(context, game, bx + Level4Plan.DX[cart[3]] * 2.0 + 0.5, STAND, bz + Level4Plan.DZ[cart[3]] * 2.0 + 0.5,
+				poiYawTo(cart[3]), 10, false, "level4_poi_paint_cart");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			p.getInventory().clearContent();
+			BlockPos barrel = new BlockPos(bx, STAND, bz);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrel), Direction.UP, barrel, false));
+			var blackDye = BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace("black_dye"));
+			check(p.getInventory().countItem(blackDye) >= 2 && p.getInventory().countItem(Items.CHARCOAL) >= 1,
+					"expected black dye and charcoal from paint cart");
+			int[] trapUv = Level4PoiPlan.uvToLocal(cart[3], 3, 0);
+			int wallDir = Level4Plan.opposite(cart[3]);
+			int wx = cart[0] + (wallDir == Level4Plan.SOUTH ? 3 : wallDir == Level4Plan.EAST ? Level4Plan.CELL : trapUv[0]);
+			int wz = cart[2] + (wallDir == Level4Plan.SOUTH ? Level4Plan.CELL : wallDir == Level4Plan.EAST ? 3 : trapUv[1]);
+			BlockPos trapPos = new BlockPos(wx, STAND + 1, wz);
+			check(l4.getBlockState(trapPos).is(Level4Blocks.OFFICE_TRAP_WINDOW), "expected trap window near paint cart at " + trapPos);
+			p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(blackDye));
+			p.gameMode.useItemOn(p, l4, p.getMainHandItem(), InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(trapPos), Direction.UP, trapPos, false));
+			check(l4.getBlockState(trapPos).is(Level4Blocks.OFFICE_BLACKED_WINDOW), "expected trap window painted black");
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 7. Missing wanderer camp (screenshot + 1-time loot)
+		int[] camp = findPoi(seed, from, PoiKind.MISSING_WANDERER_CAMP);
+		check(camp != null, "no MISSING_WANDERER_CAMP POI found");
+		int campStandY = camp[4] + 1;
+		BlockPos[] campBarrelRef = new BlockPos[1];
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			player(s).teleportTo(camp[0] + 3.5, campStandY, camp[2] + 3.5);
+			for (int x = camp[0]; x < camp[0] + Level4Plan.CELL && campBarrelRef[0] == null; x++) {
+				for (int z = camp[2]; z < camp[2] + Level4Plan.CELL; z++) {
+					BlockPos cand = new BlockPos(x, campStandY, z);
+					if (l4.getBlockState(cand).is(net.minecraft.world.level.block.Blocks.BARREL)) {
+						campBarrelRef[0] = cand;
+						break;
+					}
+				}
+			}
+			check(campBarrelRef[0] != null, "expected camp barrel inside MISSING_WANDERER_CAMP");
+		});
+		game.getConnection().waitForChunksDownload();
+		BlockPos cb = campBarrelRef[0];
+		double camX = cb.getX() + 0.5 + (cb.getX() - camp[0] <= 2 ? 1.8 : -1.8);
+		double camZ = cb.getZ() + 0.5 + (cb.getZ() - camp[2] <= 2 ? 1.8 : -1.8);
+		float campYaw = (float) (Math.toDegrees(Math.atan2((cb.getZ() + 0.5) - camZ, (cb.getX() + 0.5) - camX)) - 90.0);
+		shoot(context, game, camX, campStandY, camZ, campYaw, 18, false, "level4_poi_camp");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			p.getInventory().clearContent();
+			BlockPos campBarrel = cb;
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(campBarrel), Direction.UP, campBarrel, false));
+			int firstBandages = p.getInventory().countItem(Level1Items.BANDAGE);
+			check(firstBandages >= 1, "expected bandage from wanderer camp barrel");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(campBarrel), Direction.UP, campBarrel, false));
+			check(p.getInventory().countItem(Level1Items.BANDAGE) == firstBandages, "camp barrel loot must be one-time only");
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 10. Amor field shrine (screenshot + breaking planter triggers desecration flag)
+		int[] shrine = findPoi(seed, from, PoiKind.AMOR_FIELD_SHRINE);
+		check(shrine != null, "no AMOR_FIELD_SHRINE POI found");
+		shoot(context, game, shrine[0] + 1.5, STAND, shrine[2] + 1.5, -45, 18, false, "level4_poi_amor_shrine");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			BlockPos planterPos = new BlockPos(shrine[0] + 3, Level4ChunkGenerator.FLOOR_Y, shrine[2] + 3);
+			check(l4.getBlockState(planterPos).is(Level4Blocks.AMOR_PLANTER), "expected amor_planter at " + planterPos);
+			p.teleportTo(planterPos.getX() + 0.5, STAND, planterPos.getZ() + 1.5);
+			check(p.gameMode.destroyBlock(planterPos), "failed to break shrine planter in survival");
+			check(Level4PoiEvents.isAmorDesecrated(l4, p.getUUID()), "breaking shrine must mark player as Amor desecrated");
+		});
+		server.runCommand("gamemode spectator @a");
+	}
+
+	/** Returns {cellOriginX, cellOriginZ, dir, baseY, roomId} for the nearest matching POI. */
+	private static int[] findPoi(long seed, BlockPos from, PoiKind target) {
+		int rx0 = Math.floorDiv(from.getX(), Level4Plan.SIZE), rz0 = Math.floorDiv(from.getZ(), Level4Plan.SIZE);
+		for (int r = 0; r <= 3; r++) {
+			for (int dx = -r; dx <= r; dx++) {
+				for (int dz = -r; dz <= r; dz++) {
+					if (Math.abs(dx) != r && Math.abs(dz) != r) continue;
+					int rx = rx0 + dx, rz = rz0 + dz;
+					Level4PoiPlan poiPlan = Level4PoiPlan.of(seed, rx, rz);
+					for (PlacedPoi poi : poiPlan.pois) {
+						if (poi.kind() != target) continue;
+						return new int[] {
+								rx * Level4Plan.SIZE + poi.cellI() * Level4Plan.CELL,
+								poi.baseY(),
+								rz * Level4Plan.SIZE + poi.cellJ() * Level4Plan.CELL,
+								poi.dir(),
+								poi.baseY(),
+								poi.roomId()
+						};
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	private static float poiYawTo(int dirIntoRoom) {
+		return switch (dirIntoRoom) {
+			case Level4Plan.SOUTH -> 180.0F;
+			case Level4Plan.NORTH -> 0.0F;
+			case Level4Plan.EAST -> 90.0F;
+			default -> 270.0F;
+		};
+	}
+
 	private static void checkBlocks(TestSingleplayerContext game) {
 		game.getServer().runOnServer(s -> {
 			Language lang = Language.getInstance();
@@ -712,7 +922,15 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					"wanderer_aid_cartographer", "wanderer_aid_restless",
 					"amor_offered", "tbd_hoard_refuse",
 					"window_lure", "window_rain_lure", "window_grab", "window_touch_grab",
-					"almond_pickup", "returned_omega"}) {
+					"almond_pickup", "returned_omega",
+					"poi.chalk_slashed", "poi.chalk_omega", "poi.chalk_safe", "poi.tape_torn",
+					"poi.breakroom_empty", "poi.breakroom_almond", "poi.breakroom_note",
+					"poi.meeting_memo_wait", "poi.meeting_memo_breaker", "poi.meeting_memo_exit",
+					"poi.meeting_memo_empty", "poi.drip_murky", "poi.drip_plenum_hint",
+					"poi.drip_hint", "poi.terminal_notice", "poi.terminal_salvage",
+					"poi.paint_cart_empty", "poi.paint_cart_take", "poi.camp_empty",
+					"poi.camp_loot", "poi.amor_shrine_broken", "poi.amor_desecrated",
+					"poi.amor_forgiven"}) {
 				check(lang.has("message.noclip_backrooms.level4." + msg), "missing wanderer message: " + msg);
 			}
 		});

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,slashed=false": {
+      "model": "noclip_backrooms:block/level4/meg_chalk_sign"
+    },
+    "facing=north,slashed=true": {
+      "model": "noclip_backrooms:block/level4/meg_chalk_sign_slashed"
+    },
+    "facing=east,slashed=false": {
+      "model": "noclip_backrooms:block/level4/meg_chalk_sign",
+      "y": 90
+    },
+    "facing=east,slashed=true": {
+      "model": "noclip_backrooms:block/level4/meg_chalk_sign_slashed",
+      "y": 90
+    },
+    "facing=south,slashed=false": {
+      "model": "noclip_backrooms:block/level4/meg_chalk_sign",
+      "y": 180
+    },
+    "facing=south,slashed=true": {
+      "model": "noclip_backrooms:block/level4/meg_chalk_sign_slashed",
+      "y": 180
+    },
+    "facing=west,slashed=false": {
+      "model": "noclip_backrooms:block/level4/meg_chalk_sign",
+      "y": 270
+    },
+    "facing=west,slashed=true": {
+      "model": "noclip_backrooms:block/level4/meg_chalk_sign_slashed",
+      "y": 270
+    }
+  }
+}

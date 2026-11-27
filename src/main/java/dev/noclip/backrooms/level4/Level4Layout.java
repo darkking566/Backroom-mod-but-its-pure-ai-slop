@@ -166,15 +166,15 @@ final class Level4Layout {
 
 		// North wall band (cz == 0, cx in 1..6)
 		if (cz == 0) {
-			return edgeTile(seed, plan, i, j, Level4Plan.NORTH, cx, zone, ceilH);
+			return edgeTile(seed, rx, rz, plan, i, j, Level4Plan.NORTH, cx, zone, ceilH);
 		}
 		// West wall band (cx == 0, cz in 1..6)
 		if (cx == 0) {
-			return edgeTile(seed, plan, i, j, Level4Plan.WEST, cz, zone, ceilH);
+			return edgeTile(seed, rx, rz, plan, i, j, Level4Plan.WEST, cz, zone, ceilH);
 		}
 
 		// Interior fixtures by zone
-		return interiorTile(seed, plan, i, j, cx, cz, zone, ceilH);
+		return interiorTile(seed, plan, Level4PoiPlan.of(seed, rx, rz), i, j, cx, cz, zone, ceilH);
 	}
 
 	private static Tile outsideTile(long seed, Level4Plan plan, int i, int j, int cx, int cz, int x, int z) {
@@ -301,7 +301,7 @@ final class Level4Layout {
 		return new Tile(Kind.PILLAR, zone, Level4Plan.NORTH, cornerCeil, null, false);
 	}
 
-	private static Tile edgeTile(long seed, Level4Plan plan, int i, int j, int dir, int along, ZoneKind zone, int ceilH) {
+	private static Tile edgeTile(long seed, int rx, int rz, Level4Plan plan, int i, int j, int dir, int along, ZoneKind zone, int ceilH) {
 		int c = Level4Plan.cell(i, j);
 		Edge e = plan.edge(c, dir);
 		int ni = i + Level4Plan.DX[dir], nj = j + Level4Plan.DZ[dir];
@@ -338,8 +338,8 @@ final class Level4Layout {
 		}
 		if (neighbor == ZoneKind.OUTSIDE) {
 			if (along >= 1 && along <= 5) {
-				int wx = dir == Level4Plan.NORTH ? i * CELL + along : i * CELL;
-				int wz = dir == Level4Plan.NORTH ? j * CELL : j * CELL + along;
+				int wx = rx * SIZE + (dir == Level4Plan.NORTH ? i * CELL + along : i * CELL);
+				int wz = rz * SIZE + (dir == Level4Plan.NORTH ? j * CELL : j * CELL + along);
 				return new Tile(exteriorWindowKind(seed, plan, i, j, dir, along, wx, wz), zone, facingInto, edgeCeil, null, false);
 			}
 			return new Tile(Kind.DRYWALL, zone, facingInto, edgeCeil, null, false);
@@ -353,11 +353,20 @@ final class Level4Layout {
 				&& plan.zones[Level4Plan.cell(i + Level4Plan.DX[dir], j + Level4Plan.DZ[dir])] == ZoneKind.OMEGA_BASE);
 	}
 
+	static boolean isTrapBay(long seed, int rx, int rz, int roomI, int roomJ, int dir) {
+		return Math.floorMod(hash(seed, rx * 31 + roomI, rz * 31 + roomJ, 421 + dir), 100) < 10;
+	}
+
 	private static Kind exteriorWindowKind(long seed, Level4Plan plan, int roomI, int roomJ, int dir, int along, int x, int z) {
 		if (plan.nearHumanBase(roomI, roomJ)) return Kind.WINDOW_BLACKED;
 		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
-		int bayHash = Math.floorMod(hash(seed, rx * 31 + roomI, rz * 31 + roomJ, 421 + dir), 100);
-		if (bayHash < 10 && along >= 2 && along <= 4) return Kind.WINDOW_TRAP;
+		Level4PoiPlan.PlacedPoi poi = Level4PoiPlan.of(seed, rx, rz).atCellIndex(Level4Plan.cell(roomI, roomJ));
+		if (poi != null && poi.kind() == Level4PoiPlan.PoiKind.WINDOW_PAINT_CART && poi.dir() == Level4Plan.opposite(dir)) {
+			if (along <= 2) return Kind.WINDOW_BLACKED;
+			if (along <= 4) return Kind.WINDOW_TRAP;
+			return Kind.WINDOW_RAIN;
+		}
+		if (isTrapBay(seed, rx, rz, roomI, roomJ, dir) && along >= 2 && along <= 4) return Kind.WINDOW_TRAP;
 		return Kind.WINDOW_RAIN;
 	}
 
@@ -540,9 +549,10 @@ final class Level4Layout {
 		return skybridgeInfo(seed, x, z) != null;
 	}
 
-	private static Tile interiorTile(long seed, Level4Plan plan, int i, int j, int cx, int cz, ZoneKind zone, int ceilH) {
+	private static Tile interiorTile(long seed, Level4Plan plan, Level4PoiPlan poiPlan, int i, int j, int cx, int cz, ZoneKind zone, int ceilH) {
 		int c = Level4Plan.cell(i, j);
 		RoomBox room = plan.roomId[c] >= 0 ? plan.rooms.get(plan.roomId[c]) : null;
+		boolean hasPoi = poiPlan.atCellIndex(c) != null;
 
 		if (zone == ZoneKind.ATRIUM && room != null && i == room.cx() && j == room.cz()) {
 			// Central 3x3 Almond Water Fountain inside the Atrium
@@ -646,7 +656,7 @@ final class Level4Layout {
 			}
 		}
 
-		if (zone == ZoneKind.SUITE && room != null) {
+		if (zone == ZoneKind.SUITE && room != null && !hasPoi) {
 			int roll = Math.floorMod(hash(seed, i, j, 433), 100);
 			if (cx == 2 && cz == 2 && roll < 14) {
 				if (roll < 5) return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
@@ -657,7 +667,7 @@ final class Level4Layout {
 		}
 
 		// Very rare water cooler / vending machine along open office pillars, plus half-height cubicle mazes
-		if (zone == ZoneKind.OPEN_OFFICE && !Level4Plan.isSkybridgeCell(i, j)) {
+		if (zone == ZoneKind.OPEN_OFFICE && !Level4Plan.isSkybridgeCell(i, j) && !hasPoi) {
 			int roll = Math.floorMod(hash(seed, i, j, 444), 100);
 			if (cx == 1 && cz == 1) {
 				if (roll < 2) return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
@@ -731,7 +741,7 @@ final class Level4Layout {
 							if (plan.isTunnelCell(i, j)) continue;
 							int wx = (baseRx + dx) * SIZE + i * CELL + 3;
 							int wz = (baseRz + dz) * SIZE + j * CELL + 3;
-							if (tile(seed, wx, wz).kind() == Kind.AIR) return new int[] {wx, wz};
+							if (tile(seed, wx, wz).kind() == Kind.AIR && Level4PoiPlan.atCell(seed, wx, wz) == null) return new int[] {wx, wz};
 						}
 					}
 				}

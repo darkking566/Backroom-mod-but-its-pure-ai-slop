@@ -2,6 +2,7 @@ package dev.noclip.backrooms.level4;
 
 import dev.noclip.backrooms.level4.Level4Layout.Kind;
 import dev.noclip.backrooms.level4.Level4Plan.ZoneKind;
+import dev.noclip.backrooms.level4.Level4PoiPlan.PlacedPoi;
 import dev.noclip.backrooms.props.BackroomsProps;
 import dev.noclip.backrooms.props.BlenderSinglePropBlock;
 import dev.noclip.backrooms.props.MultiPartPropBlock;
@@ -60,6 +61,20 @@ final class Level4Props {
 			if (benchesPlaced >= 2) break;
 		}
 
+		// Batch 1 POI 3D furniture inside single-chunk bounds
+		int i0 = Math.floorDiv(minX, Level4Plan.CELL), i1 = Math.floorDiv(minX + 15, Level4Plan.CELL);
+		int j0 = Math.floorDiv(minZ, Level4Plan.CELL), j1 = Math.floorDiv(minZ + 15, Level4Plan.CELL);
+		for (int gi = i0; gi <= i1; gi++) {
+			for (int gj = j0; gj <= j1; gj++) {
+				int rx = Math.floorDiv(gi, Level4Plan.N), rz = Math.floorDiv(gj, Level4Plan.N);
+				int ci = Math.floorMod(gi, Level4Plan.N), cj = Math.floorMod(gj, Level4Plan.N);
+				PlacedPoi poi = Level4PoiPlan.of(seed, rx, rz).atCellIndex(Level4Plan.cell(ci, cj));
+				if (poi == null || poi.cellI() != ci || poi.cellJ() != cj) continue;
+				int bx = gi * Level4Plan.CELL, bz = gj * Level4Plan.CELL;
+				if (populatePoiProps(chunk, minX, minZ, bx, bz, poi)) placed = true;
+			}
+		}
+
 		// Very sparse abandoned office leftovers (~5% of chunks get 1 small prop or leftover desk)
 		if (roll < 5) {
 			Block prop = pickOfficeProp(h >>> 8);
@@ -69,6 +84,7 @@ final class Level4Props {
 				int cell = (startIdx + attempt * 13) % 196;
 				int x = minX + 1 + (cell % 14);
 				int z = minZ + 1 + (cell / 14);
+				if (Level4PoiPlan.atCell(seed, x, z) != null) continue;
 				var tile = Level4Layout.tile(seed, x, z);
 				if (tile.kind() != Kind.AIR || (tile.zone() != ZoneKind.OPEN_OFFICE && tile.zone() != ZoneKind.SUITE)) continue;
 				BlockPos pos = new BlockPos(x, Level4ChunkGenerator.FLOOR_Y + 1, z);
@@ -89,6 +105,7 @@ final class Level4Props {
 				int cell = (wStart + attempt * 17) % 196;
 				int x = minX + 1 + (cell % 14);
 				int z = minZ + 1 + (cell / 14);
+				if (Level4PoiPlan.atCell(seed, x, z) != null) continue;
 				var tile = Level4Layout.tile(seed, x, z);
 				if (tile.kind() != Kind.AIR || (tile.zone() != ZoneKind.OPEN_OFFICE && tile.zone() != ZoneKind.SUITE)) continue;
 				BlockPos pos = new BlockPos(x, Level4ChunkGenerator.FLOOR_Y + 1, z);
@@ -100,6 +117,48 @@ final class Level4Props {
 			}
 		}
 		if (placed) chunk.markUnsaved();
+	}
+
+	private static boolean populatePoiProps(LevelChunk chunk, int minX, int minZ, int bx, int bz, PlacedPoi poi) {
+		int y = poi.baseY() + 1;
+		boolean any = false;
+		switch (poi.kind()) {
+			case BREAKROOM_CORNER -> {
+				int[] uv = Level4PoiPlan.uvToLocal(poi.dir(), 4, 1);
+				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + uv[0], y, bz + uv[1]),
+						BackroomsProps.PROP_POTTED_PLANT_PLASTIC, Direction.SOUTH);
+			}
+			case SEALED_MEETING_ROOM -> {
+				// Folding table (2x1 facing NORTH occupies x, x+1), chairs, cabinet, and damaged PC
+				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 2, y, bz + 3), BackroomsProps.PROP_FOLDING_TABLE, Direction.NORTH);
+				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 2, y, bz + 2), BackroomsProps.PROP_OFFICE_CHAIR, Direction.SOUTH);
+				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 4), BackroomsProps.PROP_OFFICE_CHAIR, Direction.NORTH);
+				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 5, y, bz + 1), BackroomsProps.PROP_FILE_CABINET, Direction.SOUTH);
+				any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 5, y, bz + 5), BackroomsProps.PROP_DESKTOP_COMPUTER_DAMAGED, Direction.WEST);
+			}
+			case ACTIVE_TERMINAL_ISLAND -> {
+				if (poi.dir() == Level4Plan.SOUTH) {
+					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 2, y, bz + 3), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.EAST);
+					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 4, y, bz + 3), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.WEST);
+					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 1, y, bz + 3), BackroomsProps.PROP_OFFICE_CHAIR, Direction.EAST);
+					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 5, y, bz + 3), BackroomsProps.PROP_OFFICE_CHAIR, Direction.WEST);
+				} else {
+					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 2), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.SOUTH);
+					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 4), BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.NORTH);
+					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 1), BackroomsProps.PROP_OFFICE_CHAIR, Direction.SOUTH);
+					any |= tryPlacePoi(chunk, minX, minZ, new BlockPos(bx + 3, y, bz + 5), BackroomsProps.PROP_OFFICE_CHAIR, Direction.NORTH);
+				}
+			}
+			default -> {
+			}
+		}
+		return any;
+	}
+
+	private static boolean tryPlacePoi(LevelChunk chunk, int minX, int minZ, BlockPos pos, Block block, Direction facing) {
+		if (!canPlace(chunk, minX, minZ, pos, block, facing, 1)) return false;
+		place(chunk, pos, block, facing);
+		return true;
 	}
 
 	private static Block pickOfficeProp(long r) {
@@ -122,6 +181,10 @@ final class Level4Props {
 	}
 
 	private static boolean canPlace(LevelChunk chunk, int minX, int minZ, BlockPos masterPos, Block block, Direction facing) {
+		return canPlace(chunk, minX, minZ, masterPos, block, facing, 3);
+	}
+
+	private static boolean canPlace(LevelChunk chunk, int minX, int minZ, BlockPos masterPos, Block block, Direction facing, int minOpen) {
 		int maxX = minX + 15, maxZ = minZ + 15;
 		if (block instanceof MultiPartPropBlock multi) {
 			List<BlockPos> cells = multi.occupiedPositions(masterPos, facing);
@@ -141,7 +204,7 @@ final class Level4Props {
 		for (Direction d : HORIZONTALS) {
 			if (chunk.getBlockState(masterPos.relative(d)).isAir()) open++;
 		}
-		return open >= 3;
+		return open >= minOpen;
 	}
 
 	private static void place(LevelChunk chunk, BlockPos masterPos, Block block, Direction facing) {

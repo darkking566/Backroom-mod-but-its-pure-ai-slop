@@ -17,7 +17,10 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.TransparentBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -159,6 +162,13 @@ public final class Level4Blocks {
 	public static final Block ALMOND_BOTTLE_CLUSTER = register("almond_bottle_cluster", Properties.of().mapColor(MapColor.SAND)
 			.strength(0.2F).sound(SoundType.GLASS).noOcclusion(), AlmondBottleClusterBlock::new);
 
+	// Batch 1 POI blocks
+	public static final Block MEG_CHALK_SIGN = register("meg_chalk_sign", Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE)
+			.strength(0.3F).sound(SoundType.STONE).noOcclusion().noCollision(), MegChalkSignBlock::new);
+	public static final Block CAUTION_TAPE_BARRIER = register("caution_tape_barrier", Properties.of().mapColor(MapColor.COLOR_YELLOW)
+			.strength(0.2F).sound(SoundType.WOOL).noOcclusion().pushReaction(PushReaction.DESTROY),
+			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(0, 4, 7, 16, 15, 9)));
+
 	private Level4Blocks() {
 	}
 
@@ -239,6 +249,26 @@ public final class Level4Blocks {
 				sp.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("message.noclip_backrooms.level4.almond_pickup"));
 			}
 			return net.minecraft.world.InteractionResult.SUCCESS;
+		}
+	}
+
+	static final class MegChalkSignBlock extends Level4FacingBlock {
+		static final BooleanProperty SLASHED = BooleanProperty.create("slashed");
+
+		MegChalkSignBlock(Properties properties) {
+			super(properties, Level4FacingBlock.northBox(1, 2, 15, 15, 14, 16));
+			registerDefaultState(defaultBlockState().setValue(SLASHED, false));
+		}
+
+		@Override
+		public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+			return super.getStateForPlacement(context).setValue(SLASHED, false);
+		}
+
+		@Override
+		protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+			super.createBlockStateDefinition(builder);
+			builder.add(SLASHED);
 		}
 	}
 }
