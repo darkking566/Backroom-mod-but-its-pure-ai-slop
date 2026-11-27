@@ -12,7 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * The mission report on getting back to the institute (docs/project/1-gameplay/README.md, "任務報告畫面"): the trip,
+ * The mission report on getting back to the institute (docs/企劃書/1-遊戲玩法/README.md, "任務報告畫面"): the trip,
  * the haul and what M.E.G. would pay for it, the quota, the institute's clearance, and M.E.G.'s notes. Closing it shows
  * "Day N of the mission" in yellow.
  */

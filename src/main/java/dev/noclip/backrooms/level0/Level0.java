@@ -29,6 +29,7 @@ public final class Level0 {
 		RedRoomLoop.register();
 		EdgeShift.register();
 		ShadowHallucination.register();
+		Level0Bacteria.register();
 		PitEffects.register();
 		FlashlightLight.register();
 		StaircaseBreaker.register();

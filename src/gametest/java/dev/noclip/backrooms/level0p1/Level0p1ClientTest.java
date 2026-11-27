@@ -34,6 +34,8 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 		if (!dev.noclip.backrooms.TestFilter.level("level0p1")) return;
 		try (TestSingleplayerContext game = context.worldBuilder().create()) {
 			var server = game.getServer();
+			// Not a newcomer: the first trip's cable (core.story.FirstTrip) belongs to the story test.
+			server.runOnServer(s -> s.getPlayerList().getPlayers().forEach(p -> p.setAttached(dev.noclip.backrooms.core.story.FirstTrip.DONE, true)));
 			game.getConnection().waitForChunksRender();
 			server.runCommand("gamerule send_command_feedback false");
 			server.runCommand("gamerule noclip_backrooms:edge_shift false");
@@ -78,7 +80,8 @@ public final class Level0p1ClientTest implements FabricClientGameTest {
 		game.getConnection().waitForChunksDownload();
 		context.waitTicks(20);
 		server.runOnServer(s -> check(LevelExits.isOpen("0.1"), "Level 0.1 did not open its way in"));
-		server.runCommand("give @a noclip_backrooms:bntg_beacon");
+		server.runCommand("clear @a");
+		server.runCommand("item replace entity @a weapon.mainhand with noclip_backrooms:bntg_beacon 1");
 		context.waitTicks(5);
 		context.getInput().pressMouse(1);
 		server.waitFor(s -> player(s).level().dimension() == Level0p1.LEVEL_0_1, 200);

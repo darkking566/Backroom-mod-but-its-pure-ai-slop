@@ -65,7 +65,7 @@ final class Level4VanishingExits {
 			for (int dx = -SCAN_RADIUS; dx <= SCAN_RADIUS; dx++) {
 				for (int dz = -SCAN_RADIUS; dz <= SCAN_RADIUS; dz++) {
 					int x = player.getBlockX() + dx, z = player.getBlockZ() + dz;
-					if (Level4Layout.inOmegaBase(seed, x, z)) continue;
+					if (Level4Layout.inOmegaBase(seed, x, z) || Level4PoiPlan.isInvertedLightwell(seed, x, z)) continue;
 					for (int y = Level4ChunkGenerator.FLOOR_Y - 1; y <= Level4ChunkGenerator.FLOOR_Y + 3; y++) {
 						scan.set(x, y, z);
 						if (!level.isLoaded(scan)) continue;
@@ -92,7 +92,9 @@ final class Level4VanishingExits {
 				continue;
 			}
 			BlockState st = level.getBlockState(pos);
-			if (!(st.getBlock() instanceof Level4ExitBlock eb) || !eb.exit.vanishing || Level4Layout.inOmegaBase(seed, pos.getX(), pos.getZ())) {
+			if (!(st.getBlock() instanceof Level4ExitBlock eb) || !eb.exit.vanishing
+					|| Level4Layout.inOmegaBase(seed, pos.getX(), pos.getZ())
+					|| Level4PoiPlan.isInvertedLightwell(seed, pos.getX(), pos.getZ())) {
 				it.remove();
 				continue;
 			}

@@ -92,7 +92,7 @@ class GammaTest {
 		}
 	}
 
-	/** Only the gate goes through the outer wall. */
+	/** Only the north gate and three locked side doors go through the outer wall. */
 	@Test
 	void theOuterWallIsWhole() {
 		for (int y = 1; y < Y - 1; y++) {
@@ -100,7 +100,12 @@ class GammaTest {
 				for (int v = 0; v < D; v++) {
 					if (u != 0 && v != 0 && u != W - 1 && v != D - 1) continue;
 					boolean gate = v == 0 && u >= GammaLayout.GATE_U && u <= GammaLayout.GATE_U + 1 && y >= 33 && y <= 35;
-					if (!gate) assertEquals(Thing.BRICK, GammaLayout.thing(u, y, v), "a hole in the wall at " + u + ", " + y + ", " + v);
+					boolean sideDoor = (y == 33 || y == 34) && (
+							(u == 0 && v == GammaLayout.SIDE_V)
+									|| (u == W - 1 && v == GammaLayout.SIDE_V)
+									|| (v == D - 1 && u == GammaLayout.GATE_U));
+					if (sideDoor) assertEquals(Thing.SIDE_DOOR, GammaLayout.thing(u, y, v), "side door missing at " + u + ", " + y + ", " + v);
+					else if (!gate) assertEquals(Thing.BRICK, GammaLayout.thing(u, y, v), "a hole in the wall at " + u + ", " + y + ", " + v);
 				}
 			}
 		}
@@ -119,8 +124,8 @@ class GammaTest {
 
 	private static boolean passable(int u, int y, int v) {
 		Thing thing = GammaLayout.thing(u, y, v);
-		// The admin door stays locked; the metal detector lets you through.
-		return thing.open() && thing != Thing.IRON_DOOR;
+		// The admin door and outer side doors stay locked from outside; the metal detector lets you through.
+		return thing.open() && thing != Thing.IRON_DOOR && thing != Thing.SIDE_DOOR;
 	}
 
 	/** Feet at y: room for feet and head, something to stand on. */

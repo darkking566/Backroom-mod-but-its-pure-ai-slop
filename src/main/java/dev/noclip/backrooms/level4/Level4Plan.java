@@ -18,7 +18,7 @@ final class Level4Plan {
 	static final int NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3;
 	static final int[] DX = {0, 1, 0, -1}, DZ = {-1, 0, 1, 0};
 	private static final int PLAN_SALT = 401, EDGE_SALT = 402, OMEGA_SALT = 409;
-	private static final int OMEGA_SPREAD = 3;
+	static final int OMEGA_SPREAD = 8;
 	private static final ConcurrentHashMap<Key, Level4Plan> CACHE = new ConcurrentHashMap<>();
 
 	enum ZoneKind {
@@ -130,8 +130,8 @@ final class Level4Plan {
 		boolean omegaPlaced = hasOmega && placeBox(rng, 5, 5, ZoneKind.OMEGA_BASE, 5, 5);
 		this.hasAtrium = rng.nextInt(100) < 55 && placeExteriorAtrium(rng);
 		if (rng.nextInt(100) < 42) placeLightwell(rng);
-		this.hasAmor = !hasOmega && rng.nextInt(100) < 24 && placeBox(rng, 3, 3, ZoneKind.AMOR_CAMP, -1, -1);
-		this.hasTbd = rng.nextInt(100) < 28 && placeBox(rng, 2, 3, ZoneKind.TBD_ROOM, -1, -1);
+		this.hasAmor = !hasOmega && rng.nextInt(100) < 3 && placeBox(rng, 3, 3, ZoneKind.AMOR_CAMP, -1, -1);
+		this.hasTbd = !hasOmega && !hasAmor && rng.nextInt(100) < 4 && placeBox(rng, 2, 3, ZoneKind.TBD_ROOM, -1, -1);
 		if (rng.nextInt(100) < 42) placeBox(rng, 3, 3, ZoneKind.DARK_WING, -1, -1);
 		if (rng.nextInt(100) < 38) placeBox(rng, rng.nextBoolean() ? 3 : 2, 2, ZoneKind.UNFINISHED_WING, -1, -1);
 		if (rng.nextInt(100) < 34) placeBox(rng, 3, 3, ZoneKind.AUDITORIUM, -1, -1);
@@ -187,11 +187,15 @@ final class Level4Plan {
 		return null;
 	}
 
+	static int[] omegaRegionInBlock(long seed, int bx, int bz) {
+		int pick = Math.floorMod(Level4Layout.hash(seed, bx, bz, OMEGA_SALT), OMEGA_SPREAD * OMEGA_SPREAD);
+		return new int[] {bx * OMEGA_SPREAD + pick % OMEGA_SPREAD, bz * OMEGA_SPREAD + pick / OMEGA_SPREAD};
+	}
+
 	static boolean isOmegaRegion(long seed, int rx, int rz) {
 		int bx = Math.floorDiv(rx, OMEGA_SPREAD), bz = Math.floorDiv(rz, OMEGA_SPREAD);
-		int pick = Math.floorMod(Level4Layout.hash(seed, bx, bz, OMEGA_SALT), OMEGA_SPREAD * OMEGA_SPREAD);
-		return Math.floorMod(rx, OMEGA_SPREAD) == pick % OMEGA_SPREAD
-				&& Math.floorMod(rz, OMEGA_SPREAD) == pick / OMEGA_SPREAD;
+		int[] picked = omegaRegionInBlock(seed, bx, bz);
+		return rx == picked[0] && rz == picked[1];
 	}
 
 	static int cell(int i, int j) {

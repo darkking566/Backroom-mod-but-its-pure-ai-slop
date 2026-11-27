@@ -34,7 +34,7 @@ import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * A trip into the Backrooms and back (docs/project/1-gameplay/README.md, "死亡" and "安頓與撤離"):
+ * A trip into the Backrooms and back (docs/企劃書/1-遊戲玩法/README.md, "死亡" and "安頓與撤離"):
  * <ul>
  * <li>settling at a base (a cot in a settlement) makes it where the player wakes up, for the rest of the trip; from
  * there they can call the people of the base, whichever group runs it, for a pickup ({@code /meg extract}, offered in

@@ -52,7 +52,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Field evidence for M.E.G.'s quota (docs/project/1-gameplay/README.md, "高風險現場取證"):
+ * Field evidence for M.E.G.'s quota (docs/企劃書/1-遊戲玩法/README.md, "高風險現場取證"):
  * <ul>
  * <li>the camera: a photo of whatever is in the frame within sixteen blocks, worth more the closer and the worse the
  * subject, three times as much when it is this cycle's photo target; its flash draws the light-seekers (smilers,
@@ -190,6 +190,7 @@ public final class Evidence {
 					where == null ? "?" : where, value).withStyle(style -> style.withItalic(false)));
 			if (!player.getInventory().add(photo)) player.drop(photo, false);
 			dev.noclip.backrooms.core.guild.Contracts.onPhoto(serverPlayer, id, where == null ? "" : where);
+			dev.noclip.backrooms.core.story.MainQuest.onPhoto(serverPlayer, id, where == null ? "" : where);
 			flash(server, serverPlayer);
 			camera.hurtAndBreak(1, player, hand);
 			player.getCooldowns().addCooldown(camera, 40);
@@ -405,6 +406,7 @@ public final class Evidence {
 			if (owner != null) {
 				owner.sendSystemMessage(Component.translatable("message.noclip_backrooms.field.beacon_done", scan.level()).withStyle(ChatFormatting.AQUA));
 				dev.noclip.backrooms.core.guild.Contracts.onTape(owner, scan.level());
+				dev.noclip.backrooms.core.story.MainQuest.onTape(owner, scan.level());
 			}
 		}
 	}

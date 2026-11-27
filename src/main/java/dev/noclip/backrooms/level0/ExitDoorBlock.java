@@ -60,8 +60,10 @@ final class ExitDoorBlock extends Block {
 		if (player.isRemoved() || player.hasDisconnected() || !player.isAlive()) return;
 		// A double click queues this twice.
 		if (player.level().dimension() != Level0.LEVEL_0) return;
+		// On a newcomer's first trip the door does not open (core.story.FirstTrip): the cable leads somewhere else.
+		if (dev.noclip.backrooms.core.story.FirstTrip.refuse(player)) return;
 
-		// Every known way out is watched by M.E.G. (docs/project/1-gameplay/README.md): the door is a pickup point. Hold out
+		// Every known way out is watched by M.E.G. (docs/企劃書/1-遊戲玩法/README.md): the door is a pickup point. Hold out
 		// beside it until they come, and they take you to the institute in the Frontrooms (core.trip.Extraction, core.Home).
 		dev.noclip.backrooms.core.trip.Extraction.start(player, player.position(), 6.0);
 	}

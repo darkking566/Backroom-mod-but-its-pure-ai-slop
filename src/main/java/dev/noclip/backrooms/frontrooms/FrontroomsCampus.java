@@ -1,7 +1,7 @@
 package dev.noclip.backrooms.frontrooms;
 
 /**
- * The research grounds around the institute (docs/project/1-gameplay/README.md, "研究所改版"), as plain numbers: a
+ * The research grounds around the institute (docs/企劃書/1-遊戲玩法/README.md, "研究所改版"), as plain numbers: a
  * forecourt with the M.E.G. emblem and flagpoles under the entrance canopy, an avenue with sodium lamps down to the
  * welded-shut gate in the quarantine wall, a car park, a power plant with its stack and two cooling towers, a water
  * tower, storage silos, a radio mast, and guard towers along the wall. A real research site of the eighties, only too

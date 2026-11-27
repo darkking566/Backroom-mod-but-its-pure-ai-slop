@@ -1,8 +1,8 @@
 """Writes the crafting part of the plan straight from the game's data, so it never drifts from what is in the game:
 
-  docs/project/3-crafting/recipes.md       every recipe, grouped by where it is made, and an index of every item
+  docs/企劃書/3-合成/配方與物品索引.md       every recipe, grouped by where it is made, and an index of every item
                                            (what makes it, what it goes into, which monsters drop it)
-  docs/project/3-crafting/recipe-graph.svg the whole network (vector: zoom in a browser): monsters and furniture on the left, materials, parts,
+  docs/企劃書/3-合成/合成網狀圖.svg the whole network (vector: zoom in a browser): monsters and furniture on the left, materials, parts,
                                            and finished gear further right; lines coloured by workstation
 
 Reads data/noclip_backrooms/backrooms_recipes/station_recipes.json (the workstations), data/noclip_backrooms/recipe/
@@ -20,7 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "src/main/resources/data/noclip_backrooms"
 LANG = ROOT / "src/main/resources/assets/noclip_backrooms/lang/zh_tw.json"
-OUT = ROOT / "docs/project/3-crafting"
+OUT = ROOT / "docs/企劃書/3-合成"
 
 STATIONS = {
     "crafting_table": ("原版工作台 3×3", "#7f7f7f"),
@@ -108,11 +108,11 @@ def fmt(counter):
     return "、".join(f"{name(k)} ×{v}" for k, v in sorted(counter.items(), key=lambda kv: name(kv[0])))
 
 
-# ---------------------------------------------------------------- recipes.md
+# ---------------------------------------------------------------- 配方與物品索引.md
 
 OUT.mkdir(parents=True, exist_ok=True)
 lines = ["# 全部配方與物品索引（由 `tools/make_recipe_docs.py` 從遊戲資料產生，不要手改）", "",
-         "配方改了以後執行 `py -I tools/make_recipe_docs.py` 重新產生。網狀圖見 [recipe-graph.svg](recipe-graph.svg)（用瀏覽器打開可以放大、可以用 Ctrl+F 找物品）。", ""]
+         "配方改了以後執行 `py -I tools/make_recipe_docs.py` 重新產生。網狀圖見 [合成網狀圖.svg](合成網狀圖.svg)（用瀏覽器打開可以放大、可以用 Ctrl+F 找物品）。", ""]
 count = collections.Counter(r.station for r in recipes)
 lines += ["## 各工作站的配方數", "", "| 工作站 | 配方數 |", "| --- | --- |"]
 for st, (label, _) in STATIONS.items():
@@ -141,9 +141,9 @@ for item in items:
     used = sorted({name(o) for i in used_in.get(item, []) for o in recipes[i].outputs})
     used_text = "、".join(used[:12]) + (f" 等 {len(used)} 樣" if len(used) > 12 else "")
     lines.append(f"| {name(item)} | `{item.split(':')[1]}` | {'；'.join(how)} | {used_text or '—'} |")
-(OUT / "recipes.md").write_text("\n".join(lines) + "\n", encoding="utf8")
+(OUT / "配方與物品索引.md").write_text("\n".join(lines) + "\n", encoding="utf8")
 
-# ---------------------------------------------------------------- recipe-graph.png
+# ---------------------------------------------------------------- 合成網狀圖.svg
 
 import matplotlib
 
@@ -210,5 +210,5 @@ ax.legend(handles=handles, loc="upper right", fontsize=14, frameon=True)
 ax.set_title("後室合成網狀圖：左邊是來源（怪物、原版材料、家具），越往右做得越深；線的顏色是在哪個工作站做的", fontsize=20)
 ax.axis("off")
 fig.tight_layout()
-fig.savefig(OUT / "recipe-graph.svg")
+fig.savefig(OUT / "合成網狀圖.svg")
 print(f"{len(recipes)} recipes, {len(items)} items, {g.number_of_nodes()} nodes, {max(by_layer) + 1} layers -> {OUT}")

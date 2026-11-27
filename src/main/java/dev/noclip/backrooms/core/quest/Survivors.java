@@ -55,7 +55,7 @@ import net.minecraft.world.level.saveddata.SavedDataType;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Reusable Trapped Survivor side-quest system (docs/project/1-gameplay/README.md, "受困倖存者支線" & "小女孩事件"):
+ * Reusable Trapped Survivor side-quest system (docs/企劃書/1-遊戲玩法/README.md, "受困倖存者支線" & "小女孩事件"):
  * <ol>
  *   <li><b>STRANDED</b>: calm the survivor by handing over Almond Water or food;</li>
  *   <li><b>SEEKING_ITEM</b>: recover their dropped keepsake nearby (guided by compass direction &amp; distance);</li>

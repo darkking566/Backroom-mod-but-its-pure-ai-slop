@@ -199,7 +199,7 @@ if __name__ == "__main__":
     for i, name in enumerate(("lost_coin", "static_tape", "meg_squad_report", "meg_radio")):
         icon = Image.open(ASSETS / "textures/item/core" / f"{name}.png").resize((S * 4, S * 4), Image.NEAREST)
         sheet.alpha_composite(icon, (4 + i * (S * 4 + 4), 4))
-    out = ROOT / "docs/project/1-gameplay/images/items.png"
+    out = ROOT / "docs/企劃書/1-遊戲玩法/圖片/items.png"
     out.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(out)
     print("wrote", out)

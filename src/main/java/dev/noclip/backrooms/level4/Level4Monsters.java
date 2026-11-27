@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level4;
 
+import dev.noclip.backrooms.core.floors.FloorDifficulty;
 import dev.noclip.backrooms.level4.Level4Layout.Kind;
 import dev.noclip.backrooms.level4.Level4Plan.ZoneKind;
 import dev.noclip.backrooms.monsters.Monsters;
@@ -53,10 +54,11 @@ final class Level4Monsters {
 		for (ServerPlayer player : level.players()) {
 			if (player.isCreative() || player.isSpectator()) continue;
 			if (Level4Layout.inOmegaBase(seed, player.getBlockX(), player.getBlockZ())) continue;
-			if (countNear(level, player) >= MAX_NEAR) continue;
+			if (Level4PoiPlan.isFrozenFriday(seed, player.getBlockX(), player.getBlockZ())) continue;
+			if (countNear(level, player) >= FloorDifficulty.scaledCap(player, MAX_NEAR)) continue;
 
 			int light = level.getBrightness(LightLayer.BLOCK, player.blockPosition());
-			int chance = light < 4 ? 14 : 3;
+			int chance = FloorDifficulty.scaledChance(player, light < 4 ? 14 : 3);
 			if (rng.nextInt(100) >= chance) continue;
 
 			if (rng.nextInt(100) < 55) {
@@ -85,7 +87,8 @@ final class Level4Monsters {
 			int x = (int) Math.floor(player.getX() + Math.cos(angle) * dist);
 			int z = (int) Math.floor(player.getZ() + Math.sin(angle) * dist);
 			var tile = Level4Layout.tile(seed, x, z);
-			if (tile.kind() != Kind.AIR || tile.zone() == ZoneKind.OMEGA_BASE || tile.zone() == ZoneKind.AMOR_CAMP) continue;
+			if (tile.kind() != Kind.AIR || tile.zone() == ZoneKind.OMEGA_BASE || tile.zone() == ZoneKind.AMOR_CAMP
+					|| Level4PoiPlan.isFrozenFriday(seed, x, z)) continue;
 			BlockPos pos = new BlockPos(x, Level4ChunkGenerator.FLOOR_Y + 1, z);
 			if (!level.isLoaded(pos) || !level.getBlockState(pos).isAir()) continue;
 			if (level.getBrightness(LightLayer.BLOCK, pos) > 7 && tile.zone() != ZoneKind.DARK_WING) continue;

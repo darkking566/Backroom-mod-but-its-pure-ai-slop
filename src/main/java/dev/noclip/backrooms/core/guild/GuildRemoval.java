@@ -33,7 +33,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
 /**
- * The stone guilds beside the Overworld's villages are gone (docs/project/1-gameplay/README.md, 2026-11-26: M.E.G.'s
+ * The stone guilds beside the Overworld's villages are gone (docs/企劃書/1-遊戲玩法/README.md, 2026-11-26: M.E.G.'s
  * institute in the Frontrooms took their place). New worlds no longer get them; in older worlds each one is pulled down
  * as its chunks load: the hall to its floor, which turns back to grass (sand in the desert), the road's path and lamp
  * posts back to ground. Whatever players left in its chests drops where the chests stood; its people leave.

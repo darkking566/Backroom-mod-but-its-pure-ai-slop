@@ -3,7 +3,7 @@
 Generates 512px textures + labPBR _n/_s maps (using cached CC0 ambientCG substrates in
 tools/.cache/ambientcg/ when available, or high-frequency procedural grain otherwise), then
 resizes surfaces to 128px and props to 64px via tools/resize_realistic.py to comply with
-STYLE_GUIDE.md.
+docs/畫面規範/風格規範.md.
 
 Run: python tools/make_level4_realistic.py
 """
@@ -21,7 +21,7 @@ OLD = ROOT / "src/main/resources/assets/noclip_backrooms/textures/block/level4"
 PACK = ROOT / "src/main/resources/resourcepacks/realistic"
 OUT = PACK / "assets/noclip_backrooms/textures/block/level4"
 CACHE = TOOLS / ".cache/ambientcg"
-PREVIEW = ROOT / "docs/look/level4_realistic.png"
+PREVIEW = ROOT / "docs/畫面規範/level4_realistic.png"
 S = 512
 
 MATERIAL = [
@@ -33,7 +33,9 @@ MATERIAL = [
 ]
 PLAIN = ("troffer", "window", "glass_wall", "exit_sign", "cooler_jug", "almond_liquid", "almond_bottle",
          "amor_mushroom", "amor_substrate", "desk_phone", "omega_sign",
-         "stairwell", "door_4p3", "door_11", "door_13", "basement_71")
+         "stairwell", "door_4p3", "door_11", "door_13", "basement_71",
+         "meg_chalk_sign", "caution_tape_barrier", "office_dark_mirror", "corrupted_fountain",
+         "executive_red_phone", "executive_desk_wood")
 
 
 def kind(name):

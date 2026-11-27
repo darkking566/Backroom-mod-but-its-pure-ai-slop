@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "noclip_backrooms:item/level3/frantic_note"
+  }
+}

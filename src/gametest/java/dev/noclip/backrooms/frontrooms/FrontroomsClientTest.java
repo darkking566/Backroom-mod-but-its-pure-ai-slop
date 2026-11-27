@@ -32,7 +32,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * The Frontrooms and M.E.G.'s institute (docs/project/1-gameplay/README.md, "前室"), in a real game: getting out of
+ * The Frontrooms and M.E.G.'s institute (docs/企劃書/1-遊戲玩法/README.md, "前室"), in a real game: getting out of
  * Level 0 lands in the lobby with a report; its people are at their posts; the building cannot be broken but its work
  * area can be built in; the quarantine wall keeps everyone in; the locker; the medic and the blast doors open as quotas
  * are met (1: medical wing, 3: armoury, 5: B1 and its transport pads, which send people in); a tier 3 keypad hacker opens
@@ -46,6 +46,8 @@ public final class FrontroomsClientTest implements FabricClientGameTest {
 	public void runTest(ClientGameTestContext context) {
 		try (TestSingleplayerContext game = context.worldBuilder().create()) {
 			var server = game.getServer();
+			// Not a newcomer: the first trip's cable (core.story.FirstTrip) belongs to the story test.
+			server.runOnServer(s -> s.getPlayerList().getPlayers().forEach(p -> p.setAttached(dev.noclip.backrooms.core.story.FirstTrip.DONE, true)));
 			server.runCommand("gamerule send_command_feedback false");
 			server.runCommand("gamerule noclip_backrooms:edge_shift false");
 			server.runCommand("gamemode survival @a");

@@ -1,4 +1,4 @@
-"""The staff town's houses in the Frontrooms (docs/project/1-gameplay/README.md, "前室的夜晚：398"): clapboard siding in
+"""The staff town's houses in the Frontrooms (docs/企劃書/1-遊戲玩法/README.md, "前室的夜晚：398"): clapboard siding in
 three colours, white trim, asphalt shingles (and their stairs for the roofs), six-pane windows, a garage door. A 1990s
 American street, from CC0 photos (ambientCG, cached in tools/.cache/ambientcg) like the institute's surfaces.
 

@@ -35,7 +35,7 @@ final class SkinStealers {
 		RandomSource random = level.getRandom();
 		for (ServerPlayer player : level.players()) {
 			if (player.isCreative() || player.isSpectator()) continue;
-			if (random.nextInt(100) >= 28) continue;
+			if (random.nextInt(100) >= dev.noclip.backrooms.core.floors.FloorDifficulty.scaledChance(player, 28)) continue;
 			AABB near = player.getBoundingBox().inflate(48, 16, 48);
 			if (!level.getEntitiesOfClass(SkinStealer.class, near).isEmpty()) continue;
 			spawnNear(level, seed, player, random);

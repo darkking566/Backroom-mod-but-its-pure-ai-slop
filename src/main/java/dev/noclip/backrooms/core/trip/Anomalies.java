@@ -60,7 +60,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.AABB;
 
 /**
- * The one strange thing about this trip (docs/project/1-gameplay/README.md, "每趟隨機樓層異常現象"). Whenever the team
+ * The one strange thing about this trip (docs/企劃書/1-遊戲玩法/README.md, "每趟隨機樓層異常現象"). Whenever the team
  * opens a new stretch of the Backrooms (core.trip.Expedition), one anomaly is drawn for the whole trip:
  * <ul>
  * <li>static overload: lights spark and burst, flashlights drain twice as fast, but electronics salvage doubles;</li>

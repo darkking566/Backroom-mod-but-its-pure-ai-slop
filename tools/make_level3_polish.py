@@ -1,6 +1,6 @@
 """Finishing pass over Level 3's base assets (without overwriting unrelated files):
 
-1. Adds the fourth lamp state `dim_station_light` (warm, aging tube with darkened ends) to match STYLE_GUIDE.md.
+1. Adds the fourth lamp state `dim_station_light` (warm, aging tube with darkened ends) to match docs/畫面規範/風格規範.md.
 2. Adds 4-variant brick/tile walls (no mirroring so mortar stays aligned), 3-variant x 4-turn dusty_floor, and
    3-variant x 0/180-turn station_ceiling so long passages do not repeat a single block texture.
 

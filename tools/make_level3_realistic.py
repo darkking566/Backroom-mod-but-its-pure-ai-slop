@@ -22,7 +22,7 @@ ROOT = R.ROOT
 OLD = ROOT / "src/main/resources/assets/noclip_backrooms/textures/block/level3"
 R.OUT = R.PACK / "assets/noclip_backrooms/textures/block/level3"
 R.OLD = OLD
-R.PREVIEW = ROOT / "docs/look/level3_realistic.png"
+R.PREVIEW = ROOT / "docs/畫面規範/level3_realistic.png"
 Z.OLD = OLD
 
 MATERIAL = [

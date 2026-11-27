@@ -74,6 +74,12 @@ final class Level4Events {
 			int now = sp.level().getServer().getTickCount();
 
 			if (state.is(Level4Blocks.OFFICE_BREAKER)) {
+				ServerLevel sl = (ServerLevel) world;
+				long seed = Level4ChunkGenerator.planSeed(sl.getChunkSource().randomState());
+				var poi = Level4PoiPlan.atCell(seed, pos.getX(), pos.getZ());
+				if (poi != null && poi.kind() == Level4PoiPlan.PoiKind.LOCKED_PBX_ROOM) {
+					return Level4PoiEvents.togglePbxBreaker(sl, sp, pos, now);
+				}
 				if (now < BREAKER_NEXT.getOrDefault(pos, 0)) {
 					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.breaker_cooldown"));
 					return InteractionResult.SUCCESS;
@@ -141,8 +147,10 @@ final class Level4Events {
 		for (ServerPlayer sp : level.players()) {
 			if (sp.isSpectator()) continue;
 
+			boolean frozenSilence = Level4PoiPlan.isFrozenFriday(seed, sp.getBlockX(), sp.getBlockZ());
+
 			// Continuous rain patter near windows/outdoors/atriums (softened deep indoors) + rare sudden rain-silence omen
-			if (now >= NEXT_AMBIENT.computeIfAbsent(sp.getUUID(), k -> now + 10)) {
+			if (!frozenSilence && now >= NEXT_AMBIENT.computeIfAbsent(sp.getUUID(), k -> now + 10)) {
 				NEXT_AMBIENT.put(sp.getUUID(), now + 22 + rng.nextInt(10));
 				if (now >= RAIN_SILENT_UNTIL.getOrDefault(sp.getUUID(), 0)) {
 					var tile = Level4Layout.tile(seed, sp.getBlockX(), sp.getBlockZ());
@@ -186,7 +194,7 @@ final class Level4Events {
 			}
 
 			// Subtle 60Hz HVAC hum indoors
-			if (now >= NEXT_HUM.computeIfAbsent(sp.getUUID(), k -> now + 50 + rng.nextInt(60))) {
+			if (!frozenSilence && now >= NEXT_HUM.computeIfAbsent(sp.getUUID(), k -> now + 50 + rng.nextInt(60))) {
 				NEXT_HUM.put(sp.getUUID(), now + 110 + rng.nextInt(80));
 				if (Level4Layout.tile(seed, sp.getBlockX(), sp.getBlockZ()).kind() != Kind.OUTSIDE_AIR) {
 					double a = rng.nextDouble() * Math.PI * 2;
@@ -280,15 +288,18 @@ final class Level4Events {
 
 	static int[] nearestOmega(long seed, int x, int z) {
 		int rx0 = Math.floorDiv(x, Level4Plan.SIZE), rz0 = Math.floorDiv(z, Level4Plan.SIZE);
+		int bx0 = Math.floorDiv(rx0, Level4Plan.OMEGA_SPREAD), bz0 = Math.floorDiv(rz0, Level4Plan.OMEGA_SPREAD);
 		int[] best = null;
 		double bestDist = Double.MAX_VALUE;
-		for (int dx = -3; dx <= 3; dx++) {
-			for (int dz = -3; dz <= 3; dz++) {
-				Level4Plan plan = Level4Plan.of(seed, rx0 + dx, rz0 + dz);
+		for (int dbx = -1; dbx <= 1; dbx++) {
+			for (int dbz = -1; dbz <= 1; dbz++) {
+				int[] reg = Level4Plan.omegaRegionInBlock(seed, bx0 + dbx, bz0 + dbz);
+				int rx = reg[0], rz = reg[1];
+				Level4Plan plan = Level4Plan.of(seed, rx, rz);
 				for (RoomBox room : plan.rooms) {
 					if (room.kind() != ZoneKind.OMEGA_BASE) continue;
-					int ox = (rx0 + dx) * Level4Plan.SIZE + room.cx() * Level4Plan.CELL + 3;
-					int oz = (rz0 + dz) * Level4Plan.SIZE + room.cz() * Level4Plan.CELL + 3;
+					int ox = rx * Level4Plan.SIZE + room.cx() * Level4Plan.CELL + 3;
+					int oz = rz * Level4Plan.SIZE + room.cz() * Level4Plan.CELL + 3;
 					double d = Math.hypot(ox - x, oz - z);
 					if (d < bestDist) {
 						bestDist = d;

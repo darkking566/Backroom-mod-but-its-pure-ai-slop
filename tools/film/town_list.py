@@ -1,4 +1,4 @@
-"""The staff town's objects in the Frontrooms (docs/project/1-gameplay/README.md, "前室的夜晚：398"): a street of
+"""The staff town's objects in the Frontrooms (docs/企劃書/1-遊戲玩法/README.md, "前室的夜晚：398"): a street of
 houses for M.E.G.'s people, a park, a corner store. After 狐霖's Frontrooms ("Earth" by day, Level 398 by night): the
 mailbox full of letters, the picnic in the park, the clock that runs slow, the swings.
 

@@ -52,7 +52,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.gamerules.GameRules;
 
 /**
- * Mid-run relay & outpost logistics services (docs/project/1-gameplay/README.md, "中繼站"):
+ * Mid-run relay & outpost logistics services (docs/企劃書/1-遊戲玩法/README.md, "中繼站"):
  * <ul>
  *   <li><b>One-way Relay Drop-off Box</b> ({@link BackroomsProps#RELAY_DROPOFF_BOX}): ships placed items directly back
  *       to the player's M.E.G. locker in the institute for {@value #FEE_PER_STACK} credits per stack;</li>

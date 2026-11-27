@@ -20,7 +20,7 @@ public final class Level0Arrival {
 	public static boolean arrive(ServerPlayer player) {
 		ServerLevel level0 = player.level().getServer().getLevel(LEVEL_0);
 		if (level0 == null) return false;
-		// Through an exit, a fresh stretch of Level 0 (docs/project/1-gameplay/README.md); falling in from the Overworld, under the player.
+		// Through an exit, a fresh stretch of Level 0 (docs/企劃書/1-遊戲玩法/README.md); falling in from the Overworld, under the player.
 		int[] at = dev.noclip.backrooms.core.LevelExits.anchor(player);
 		// Land in the region's centre Stage (Level 0 repeats it all around; StageLoop keeps players there).
 		int cx = Math.floorDiv(Level0Space.template(at[0]), CELL), cz = Math.floorDiv(Level0Space.template(at[1]), CELL);

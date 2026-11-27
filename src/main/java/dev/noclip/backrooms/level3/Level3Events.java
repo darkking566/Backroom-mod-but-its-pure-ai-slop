@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level3;
 
+import dev.noclip.backrooms.core.floors.FloorDifficulty;
 import dev.noclip.backrooms.level3.Level3Plan.Hall;
 import dev.noclip.backrooms.level3.Level3Plan.HallKind;
 import dev.noclip.backrooms.monsters.Monsters;
@@ -91,7 +92,7 @@ final class Level3Events {
 			for (ServerPlayer player : level.players()) {
 				if (player.isCreative() || player.isSpectator()) continue;
 				if (level.getBrightness(LightLayer.BLOCK, player.blockPosition()) >= DARK) continue;
-				if (random.nextInt(100) < PACK_CHANCE) spawnPack(player);
+				if (random.nextInt(100) < FloorDifficulty.scaledChance(player, PACK_CHANCE)) spawnPack(player);
 			}
 		}
 	}
@@ -201,7 +202,7 @@ final class Level3Events {
 	static int spawnPack(ServerPlayer player) {
 		ServerLevel level = player.level();
 		long seed = Level3ChunkGenerator.planSeed(level.getChunkSource().randomState());
-		if (level.getEntitiesOfClass(Hound.class, new AABB(player.blockPosition()).inflate(NEAR)).size() >= MAX_NEAR) return 0;
+		if (level.getEntitiesOfClass(Hound.class, new AABB(player.blockPosition()).inflate(NEAR)).size() >= FloorDifficulty.scaledCap(player, MAX_NEAR)) return 0;
 		RandomSource random = level.getRandom();
 		for (int attempt = 0; attempt < 120; attempt++) {
 			double angle = random.nextDouble() * Math.PI * 2, distance = NEAREST + random.nextDouble() * (FARTHEST - NEAREST);

@@ -10,7 +10,7 @@ import java.util.*;
 
 /**
  * Standalone JDK 25 studio 3D preview renderer that outputs an individual crisp anti-aliased PNG
- * into docs/project/3-crafting/items/ for EVERY Backrooms item (369), 3D block/furniture/workstation (58),
+ * into docs/企劃書/3-合成/物品圖/ for EVERY Backrooms item (369), 3D block/furniture/workstation (58),
  * Blender true-curved weapon mesh (22 + 3 Cycles showcases), and worn 3D armor set (6).
  *
  * Run with:
@@ -18,19 +18,19 @@ import java.util.*;
  */
 public final class render_docs_items {
 	private static final Path ASSETS = Path.of("src/main/resources/assets/noclip_backrooms");
-	private static final Path DOCS_OUT = Path.of("docs/project/3-crafting/items");
+	private static final Path DOCS_OUT = Path.of("docs/企劃書/3-合成/物品圖");
 
 	public static void main(String[] args) throws Exception {
-		Path outItems = DOCS_OUT.resolve("items");
-		Path outBlocks = DOCS_OUT.resolve("blocks");
-		Path outBlender = DOCS_OUT.resolve("weapons_blender");
-		Path outArmor = DOCS_OUT.resolve("armor");
+		Path outItems = DOCS_OUT.resolve("物品");
+		Path outBlocks = DOCS_OUT.resolve("方塊");
+		Path outBlender = DOCS_OUT.resolve("武器-Blender");
+		Path outArmor = DOCS_OUT.resolve("護甲");
 		Files.createDirectories(outItems);
 		Files.createDirectories(outBlocks);
 		Files.createDirectories(outBlender);
 		Files.createDirectories(outArmor);
 
-		// 1. Copy Cycles Blender showcase renders into docs/project/3-crafting/items/weapons_blender/
+		// 1. Copy Cycles Blender showcase renders into docs/企劃書/3-合成/物品圖/武器-Blender/
 		Path artWeapons = Path.of("art/weapons");
 		for (String preview : List.of("preview_hero_railgun.png", "preview_void_staff_evolution.png", "preview_void_staff_tier3_closeup.png")) {
 			Path src = artWeapons.resolve(preview);
@@ -39,7 +39,7 @@ public final class render_docs_items {
 			}
 		}
 
-		// 2. Render all 22 Blender true-curved weapon .obj meshes at 512x360 into docs/project/3-crafting/items/weapons_blender/
+		// 2. Render all 22 Blender true-curved weapon .obj meshes at 512x360 into docs/企劃書/3-合成/物品圖/武器-Blender/
 		Path blenderDir = ASSETS.resolve("models/blender");
 		Map<String, ObjMesh> objCache = new HashMap<>();
 		List<Path> objFiles;
@@ -58,7 +58,7 @@ public final class render_docs_items {
 		}
 		System.out.println("Rendered " + objFiles.size() + " Blender weapon showcase PNGs -> " + outBlender);
 
-		// 3. Render ALL 369 individual items into docs/project/3-crafting/items/items/<id>.png (256x256)
+		// 3. Render ALL 369 individual items into docs/企劃書/3-合成/物品圖/物品/<id>.png (256x256)
 		//    - The 80 Backrooms weapons render their actual Blender curved mesh + signature elemental glow!
 		//    - The other 289 3D items render their exact 3D cuboid JSON model + 128x128 texture + light_emission bloom!
 		Path itemModelsDir = ASSETS.resolve("models/item/crafting");
@@ -88,7 +88,7 @@ public final class render_docs_items {
 		}
 		System.out.println("Rendered " + itemModels.size() + " item PNGs (" + blenderWeaponItems + " Blender weapons + " + cuboidItems + " 3D items) -> " + outItems);
 
-		// 4. Render ALL 59 individual 3D blocks/workstations/furniture/chests into docs/project/3-crafting/items/blocks/<id>.png (256x256)
+		// 4. Render ALL 59 individual 3D blocks/workstations/furniture/chests into docs/企劃書/3-合成/物品圖/方塊/<id>.png (256x256)
 		//    - Uses the TRUE multi-block & half-sliced Blender .obj mesh whenever available in models/blender_props/!
 		Path blockModelsDir = ASSETS.resolve("models/block/crafting");
 		Path blockTexDir = ASSETS.resolve("textures/block/crafting3d");
@@ -118,7 +118,7 @@ public final class render_docs_items {
 		}
 		System.out.println("Rendered " + blockModels.size() + " block PNGs (" + blenderPropCount + " Blender multi-block/sliced props) -> " + outBlocks);
 
-		// 5. Render ALL 6 worn 3D armor set full-suit previews into docs/project/3-crafting/items/armor/<set>.png (256x256)
+		// 5. Render ALL 6 worn 3D armor set full-suit previews into docs/企劃書/3-合成/物品圖/護甲/<set>.png (256x256)
 		Map<String, List<String>> armorSetPieces = new LinkedHashMap<>();
 		armorSetPieces.put("improvised_office", List.of("magazine_armor_chestplate", "silent_carpet_boots"));
 		armorSetPieces.put("almond_gas_mask", List.of("almond_gas_mask"));
@@ -131,7 +131,7 @@ public final class render_docs_items {
 			ImageIO.write(img, "PNG", outArmor.resolve(entry.getKey() + ".png").toFile());
 		}
 		System.out.println("Rendered " + armorSetPieces.size() + " 3D armor set PNGs -> " + outArmor);
-		System.out.println("DONE! Total PNGs written under docs/project/3-crafting/items/: " + (objFiles.size() + 3 + itemModels.size() + blockModels.size() + armorSetPieces.size()));
+		System.out.println("DONE! Total PNGs written under docs/企劃書/3-合成/物品圖/: " + (objFiles.size() + 3 + itemModels.size() + blockModels.size() + armorSetPieces.size()));
 	}
 
 	private static String stripExt(String fn) {

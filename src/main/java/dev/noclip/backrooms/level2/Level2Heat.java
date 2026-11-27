@@ -31,11 +31,20 @@ final class Level2Heat {
 	private static final int POISON_AFTER = 10;
 	private static final int LOOP_COOLDOWN_SECONDS = 45;
 	private static final int LOOP_EXIT_TRIGGERS = 3;
+	private static final int HOUSE_EXIT_SECONDS = 4;
+	/** Konami walk sequence (N, N, S, S, W, E, W, E) between Level 2 tunnel cells -> The Hub. */
+	private static final int[] KONAMI = {
+			Level2Plan.NORTH, Level2Plan.NORTH, Level2Plan.SOUTH, Level2Plan.SOUTH,
+			Level2Plan.WEST, Level2Plan.EAST, Level2Plan.WEST, Level2Plan.EAST
+	};
 	private static final Map<UUID, Integer> HOT_SECONDS = new HashMap<>();
 	private static final Map<UUID, Integer> COLD_SECONDS = new HashMap<>();
 	private static final Map<UUID, Integer> GAS_SECONDS = new HashMap<>();
 	private static final Map<UUID, Integer> LOOP_COOLDOWN = new HashMap<>();
 	private static final Map<UUID, Integer> LOOP_COUNT = new HashMap<>();
+	private static final Map<UUID, Integer> HOUSE_SECONDS = new HashMap<>();
+	private static final Map<UUID, long[]> LAST_CELL = new HashMap<>();
+	private static final Map<UUID, Integer> KONAMI_STEP = new HashMap<>();
 
 	private Level2Heat() {
 	}
@@ -48,6 +57,9 @@ final class Level2Heat {
 			GAS_SECONDS.clear();
 			LOOP_COOLDOWN.clear();
 			LOOP_COUNT.clear();
+			HOUSE_SECONDS.clear();
+			LAST_CELL.clear();
+			KONAMI_STEP.clear();
 		});
 	}
 
@@ -66,6 +78,8 @@ final class Level2Heat {
 			tickCold(level, seed, player, x, z);
 			tickGas(level, seed, player, x, z);
 			tickOfficeLoop(level, seed, player, x, z);
+			tickHouseRoom(seed, player, x, z);
+			tickKonamiRoute(level, player, x, z);
 		}
 	}
 
@@ -73,6 +87,9 @@ final class Level2Heat {
 		HOT_SECONDS.remove(id);
 		COLD_SECONDS.remove(id);
 		GAS_SECONDS.remove(id);
+		HOUSE_SECONDS.remove(id);
+		LAST_CELL.remove(id);
+		KONAMI_STEP.remove(id);
 	}
 
 	private static void tickHeat(long seed, ServerPlayer player, int x, int z) {
@@ -154,6 +171,62 @@ final class Level2Heat {
 		player.teleportTo(level, tx + 0.5, player.getY(), tz + 0.5, java.util.Set.of(), player.getYRot(), player.getXRot(), false);
 		player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level2.loop"));
 		level.playSound(null, tx, player.getY(), tz, SoundEvents.ENDERMAN_TELEPORT, SoundSource.AMBIENT, 0.35F, 0.7F);
+	}
+
+	/** Rare empty rooms that feel eerily residential lead to Level 64 if you linger inside. */
+	private static void tickHouseRoom(long seed, ServerPlayer player, int x, int z) {
+		if (!isResidentialAnomalyRoom(seed, x, z)) {
+			HOUSE_SECONDS.remove(player.getUUID());
+			return;
+		}
+		int seconds = HOUSE_SECONDS.merge(player.getUUID(), 1, Integer::sum);
+		if (seconds == 1) player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level2.house_room"));
+		if (seconds >= HOUSE_EXIT_SECONDS && (seconds - HOUSE_EXIT_SECONDS) % 5 == 0) {
+			LevelExits.use(player, "64");
+		}
+	}
+
+	static boolean isResidentialAnomalyRoom(long seed, int x, int z) {
+		Level2Plan plan = Level2Layout.plan(seed, x, z);
+		int lx = Math.floorMod(x, Level2Plan.SIZE), lz = Math.floorMod(z, Level2Plan.SIZE);
+		int r = plan.roomOf[Level2Plan.cell(lx / Level2Plan.CELL, lz / Level2Plan.CELL)];
+		if (r < 0) return false;
+		Level2Plan.Room room = plan.rooms.get(r);
+		if (room.kind() != Level2Plan.RoomKind.EMPTY) return false;
+		int rx = Math.floorDiv(x, Level2Plan.SIZE), rz = Math.floorDiv(z, Level2Plan.SIZE);
+		return Math.floorMod(Level2Layout.hash(seed, rx * 31 + room.i(), rz * 31 + room.j(), 264), 16) == 0;
+	}
+
+	/** Walking the Konami cell sequence (N, N, S, S, W, E, W, E) in Level 2 opens the way to The Hub. */
+	private static void tickKonamiRoute(ServerLevel level, ServerPlayer player, int x, int z) {
+		int gx = Math.floorDiv(x, Level2Plan.CELL), gz = Math.floorDiv(z, Level2Plan.CELL);
+		UUID id = player.getUUID();
+		long[] prev = LAST_CELL.get(id);
+		if (prev == null) {
+			LAST_CELL.put(id, new long[] {gx, gz});
+			return;
+		}
+		int dx = (int) (gx - prev[0]), dz = (int) (gz - prev[1]);
+		if (dx == 0 && dz == 0) return;
+		LAST_CELL.put(id, new long[] {gx, gz});
+		int dir = Math.abs(dx) + Math.abs(dz) != 1 ? -1
+				: dz == -1 ? Level2Plan.NORTH : dx == 1 ? Level2Plan.EAST : dz == 1 ? Level2Plan.SOUTH : Level2Plan.WEST;
+		int step = KONAMI_STEP.getOrDefault(id, 0);
+		if (dir == KONAMI[step]) {
+			step++;
+		} else if (dir == KONAMI[0]) {
+			step = 1;
+		} else {
+			step = 0;
+		}
+		if (step >= KONAMI.length) {
+			KONAMI_STEP.remove(id);
+			level.playSound(null, x, player.getY(), z, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.AMBIENT, 0.9F, 0.85F);
+			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level2.konami_hub"));
+			LevelExits.use(player, "hub");
+		} else {
+			KONAMI_STEP.put(id, step);
+		}
 	}
 
 	static boolean feelingIt(ServerPlayer player) {

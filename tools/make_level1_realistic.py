@@ -21,7 +21,7 @@ ROOT = R.ROOT
 OLD = ROOT / "src/main/resources/assets/noclip_backrooms/textures/block/level1"
 R.OUT = R.PACK / "assets/noclip_backrooms/textures/block/level1"
 R.OLD = OLD
-R.PREVIEW = ROOT / "docs/look/level1_realistic.png"
+R.PREVIEW = ROOT / "docs/畫面規範/level1_realistic.png"
 Z.OLD = OLD  # Z.composite reads the 128 px drawing and its _s map from here
 
 # What each texture is made of: the first name fragment that matches wins.

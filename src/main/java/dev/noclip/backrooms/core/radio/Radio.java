@@ -35,7 +35,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * The M.E.G. radio (docs/project/1-gameplay/README.md, "M.E.G. 無線電" and "失真無線電"). Carried into the Backrooms,
+ * The M.E.G. radio (docs/企劃書/1-遊戲玩法/README.md, "M.E.G. 無線電" and "失真無線電"). Carried into the Backrooms,
  * it picks up broken broadcasts every few minutes: what is left of the missing squad's traffic, what this cycle's quota
  * wants, how many days the team has left. Deep down, out of one's mind, or with a skin stealer close by, some of what it
  * says is false: a teammate's voice calling them somewhere that is not there.

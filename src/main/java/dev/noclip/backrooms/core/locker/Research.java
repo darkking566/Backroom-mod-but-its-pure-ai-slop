@@ -26,7 +26,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
 /**
- * Team-wide research-pack progression (docs/project/3-crafting/README.md):
+ * Team-wide research-pack progression (docs/企劃書/3-合成/README.md):
  * loading science packs into the institute's {@code anomaly_research_terminal} and returning from a trip
  * permanently unlocks higher-tier Spiderweb Crafting Table recipes:
  * <ul>

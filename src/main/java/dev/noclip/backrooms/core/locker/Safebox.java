@@ -44,7 +44,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomData;
 
 /**
- * Portable protected safebox (docs/project/1-gameplay/README.md, "保險箱"):
+ * Portable protected safebox (docs/企劃書/1-遊戲玩法/README.md, "保險箱"):
  * starts at 2 slots, persists through death anywhere (never dropped in the Backrooms and never moved into
  * M.E.G. lockers on surface death), and can be expanded up to 6 slots at the institute.
  */

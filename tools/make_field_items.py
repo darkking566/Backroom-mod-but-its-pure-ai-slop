@@ -1,4 +1,4 @@
-"""The investigator's field kit (docs/project/1-gameplay/README.md, "後室進階玩法"): 32x32 item icons for the camera,
+"""The investigator's field kit (docs/企劃書/1-遊戲玩法/README.md, "後室進階玩法"): 32x32 item icons for the camera,
 photos, topology tape, chalk, glow sticks, the guide-line spool, barricade planks, the tripwire alarm, the emergency lamp
 and the mapping beacon; and the textures and models of the blocks they place (chalk marks, glow sticks, the red line,
 barricades, the alarm, the lamp, the beacon). Simple icons for now; Gemini may replace them with 3D models.
@@ -329,7 +329,7 @@ def main():
     for i, name in enumerate(all_icons):
         icon = Image.open(ITEM_TEX / f"{name}.png").resize((S * 3, S * 3), Image.NEAREST)
         sheet.alpha_composite(icon, (4 + i * (S * 3 + 4), 4))
-    out = ROOT / "docs/project/1-gameplay/images/field_items.png"
+    out = ROOT / "docs/企劃書/1-遊戲玩法/圖片/field_items.png"
     sheet.save(out)
     print("wrote", out)
 

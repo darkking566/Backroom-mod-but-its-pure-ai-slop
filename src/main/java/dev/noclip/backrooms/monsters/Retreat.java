@@ -13,7 +13,7 @@ import net.minecraft.world.phys.Vec3;
 /**
  * A badly hurt creature does not stand there and die: below 30% health it breaks off, backs away from the players into
  * the darkest place it can find, and heals out of sight; at 60% it comes back. Killing one means chasing it into the dark
- * (docs/project/1-gameplay/README.md). Bosses, neutral creatures and ones that cannot walk don't use this.
+ * (docs/企劃書/1-遊戲玩法/README.md). Bosses, neutral creatures and ones that cannot walk don't use this.
  *
  * Added from a creature's registerGoals with {@code Retreat.add(this, goalSelector, targetSelector)}: one goal takes
  * over moving, the other keeps every other target goal from picking a target while it lasts.

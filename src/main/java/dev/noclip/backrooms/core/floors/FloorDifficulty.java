@@ -46,7 +46,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Dual-axis Backrooms difficulty & anti-farm system (docs/project/1-gameplay/README.md, "雙軸難度"):
+ * Dual-axis Backrooms difficulty & anti-farm system (docs/企劃書/1-遊戲玩法/README.md, "雙軸難度"):
  * <ul>
  * <li>Vertical axis: {@link FloorRun#floor()} visited on this trip;</li>
  * <li>Horizontal axis: distance walked from the current level's landing spot
@@ -216,6 +216,20 @@ public final class FloorDifficulty {
 		double dist = distanceFromLanding(player);
 		int penalty = farmPenalty(player);
 		return compute(floor, dist, penalty);
+	}
+
+	/** Scales a percentage spawn chance (0..100) by the player's dual-axis {@code spawnRateMult}; unchanged at baseline. */
+	public static int scaledChance(ServerPlayer player, int baseChance) {
+		double mult = of(player).spawnRateMult();
+		if (mult <= 1.001) return baseChance;
+		return Math.min(95, (int) Math.round(baseChance * mult));
+	}
+
+	/** Scales a nearby monster cap by the player's dual-axis {@code spawnRateMult} (up to 2x); unchanged at baseline. */
+	public static int scaledCap(ServerPlayer player, int baseCap) {
+		double mult = of(player).spawnRateMult();
+		if (mult <= 1.001) return baseCap;
+		return Math.max(baseCap, (int) Math.round(baseCap * Math.min(2.0, mult)));
 	}
 
 	public static int farmPenalty(ServerPlayer player) {

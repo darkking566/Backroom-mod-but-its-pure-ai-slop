@@ -1,4 +1,4 @@
-"""The Frontrooms' own blocks (docs/project/1-gameplay/README.md, "前室"): the M.E.G. institute's walls, floors,
+"""The Frontrooms' own blocks (docs/企劃書/1-遊戲玩法/README.md, "前室"): the M.E.G. institute's walls, floors,
 ceilings and lights, its blast doors and their lamps, lockers, transport pads, the sealed archive hatch and files, and
 the quarantine wall around the grounds with its fence, floodlights and warning signs.
 

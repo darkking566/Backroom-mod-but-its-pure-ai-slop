@@ -8,7 +8,7 @@ import net.minecraft.world.food.FoodData;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-/** In the Backrooms a full stomach heals at a quarter of the usual speed (docs/project/1-gameplay/README.md). */
+/** In the Backrooms a full stomach heals at a quarter of the usual speed (docs/企劃書/1-遊戲玩法/README.md). */
 @Mixin(FoodData.class)
 public abstract class FoodDataBackroomsRegen {
 	@WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;heal(F)V"))

@@ -3,7 +3,7 @@
     py tools/make_level3.py
 
 Uses the helpers of make_textures.py, make_level1.py and make_level2.py (Pillow, NumPy).
-Textures go to textures/block/level3/, models to models/block/level3/. Also writes docs/project/5-levels/level3/textures.png.
+Textures go to textures/block/level3/, models to models/block/level3/. Also writes docs/企劃書/5-樓層/Level3-發電站/textures.png.
 Looks follow the photos on the Wikidot Level 3 page: orange-red brick, cream glazed tile and grey cinder block,
 white cage bars and black iron bars, grey conduits and electrical boxes, green switchgear with porcelain
 insulators, brass boilers, a bronze angel, stained glass, and black sludge.
@@ -877,7 +877,7 @@ def preview(textures):
         for dx in (0, SIZE):
             for dy in (0, SIZE):
                 sheet.paste(tile, (gap + i % columns * (side + gap) + dx, gap + i // columns * (side + gap) + dy))
-    out = mt.ROOT / "docs/project/5-levels/level3/textures.png"
+    out = mt.ROOT / "docs/企劃書/5-樓層/Level3-發電站/textures.png"
     out.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(out, optimize=True)
 

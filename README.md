@@ -5,7 +5,7 @@ Fabric 模組，Minecraft 26.2、Java 25，模組代號 `noclip_backrooms`。在
 - 開遊戲試玩：雙擊 `play.bat`
 - 編譯並跑單元測試：`.\gradlew.bat build`
 - 真實遊戲自動測試：`.\gradlew.bat runClientGameTest`；只跑某幾層加 `-Plevels=1,3`（Level 0.1 寫 `0.1`，畫面風格測試寫 `look`），Level 1 只跑某幾段再加 `-Psections=people,secrets`
-- 進度與試玩方法：[NEXT.md](NEXT.md)；協作規則：[AGENTS.md](AGENTS.md)；素材授權：[CREDITS.md](CREDITS.md)
+- 進度與試玩方法：[tasks/todo.md](tasks/todo.md)；協作規則：[CLAUDE.md](CLAUDE.md)；素材授權：[CREDITS.md](CREDITS.md)
 
 ## 資料夾怎麼分：一層一個資料夾，跨樓層的放 core
 
@@ -14,8 +14,8 @@ src/main/java/dev/noclip/backrooms/
 ├─ BackroomsMod.java        模組入口：依序呼叫每一層的 register()；也放共用的 MOD_ID、id()
 ├─ core/                    好幾層都會用到的機制
 │  └─ LevelExits.java       出口登記處：每個出口寫著通往哪一層，這裡決定通不通
-│     （客戶端的 src/client/.../core/look/ 是畫面風格：寫實材質包與攝影機濾鏡，見 docs/look/README.md）
-├─ core/floors/             第幾層（狐霖式層數）、換 Level 時的標題、走出口落在全新的一片；見 docs/project/1-gameplay/README.md
+│     （客戶端的 src/client/.../core/look/ 是畫面風格：寫實材質包與攝影機濾鏡，見 docs/畫面規範/README.md）
+├─ core/floors/             第幾層（狐霖式層數）、換 Level 時的標題、走出口落在全新的一片；見 docs/企劃書/1-遊戲玩法/README.md
 ├─ level0/                  Level 0「大廳」（入口檔 Level0.java）
 ├─ level1/                  Level 1「停車場」（入口檔 Level1.java）
 ├─ core/people/             人物（居民、巡邏隊、施工影子）：Person、People 登記八種造型；模型 `monsters/people.json`、貼圖 `textures/entity/people/`、Blender 原檔 `art/people/`，由 `tools/make_people.py` 與 `tools/blender_people.py` 產生
@@ -47,7 +47,7 @@ src/test/java/dev/noclip/backrooms/level0/  level1/        單元測試（迷宮
 src/gametest/java/dev/noclip/backrooms/level0/  level1/    真實遊戲測試；新增的要登記在 src/gametest/resources/fabric.mod.json
 
 tools/make_textures.py      畫 Level 0 的貼圖，也是共用的繪圖工具
-tools/make_level0_realistic.py  寫實材質包（`resourcepacks/realistic/`）的 Level 0 照片材質；見 docs/look/README.md
+tools/make_level0_realistic.py  寫實材質包（`resourcepacks/realistic/`）的 Level 0 照片材質；見 docs/畫面規範/README.md
 tools/make_level1.py        畫 Level 1 的貼圖，並寫出 Level 1 的模型、blockstates、物品模型
 tools/make_level2.py        畫 Level 2 的貼圖，並寫出 Level 2 的模型、blockstates、物品模型、掉落物表
 tools/make_level3.py        Level 3 的同上
@@ -55,13 +55,13 @@ tools/make_hound.py         獵犬的發光眼睛貼圖與生怪蛋
 
 art/monsters/hound/         怪物的原始檔（Blender .blend、.glb、預覽圖、交接說明），不會打包進模組
 
-docs/project/               全部企劃書（總目錄 docs/project/README.md）
-  1-gameplay/               遊戲玩法（故事、循環、配額、層數、死亡與撤離、前哨）
-  2-player/                 玩家能力值（RPG）
-  3-crafting/               合成（工作站、材料、武器、全部配方表與網狀圖、物品預覽圖）
-  4-monsters/               怪物
-  5-levels/                 樓層：316 層的索引；每層一個資料夾（已做好的 0、0.1、1、2、3 有說明、截圖與貼圖預覽）
-docs/look/                  畫面規範（貼圖尺寸、光影設定、每層流程、寫實物品）
+docs/企劃書/                全部企劃書（總目錄 docs/企劃書/README.md）
+  1-遊戲玩法/               遊戲玩法（故事、循環、配額、層數、死亡與撤離、前哨）
+  2-玩家能力值/             玩家能力值（RPG）
+  3-合成/                   合成（工作站、材料、武器、全部配方表與網狀圖、物品預覽圖）
+  4-怪物/                   怪物
+  5-樓層/                   樓層：316 層的索引；每層一個資料夾，名稱是「Level編號-中文名」（已做好的 0、0.1、1、2、3、4 有說明、截圖與貼圖預覽）
+docs/畫面規範/              畫面規範（貼圖尺寸、光影設定、每層流程、寫實物品）
 ```
 
 **每一層自己管自己**：方塊、物品、音效、維度、地形、事件都放在那一層的資料夾，那層的入口檔負責全部註冊。所以擴充 Level 0 只會動到 `level0/` 和 Level 0 的資源資料夾，不會碰到別層。
@@ -83,7 +83,7 @@ docs/look/                  畫面規範（貼圖尺寸、光影設定、每層�
 
 出口只要寫上目的地的層號（例如 `"188"`）就好。那層還沒做的話，出口會顯示「尚未開放」；等那層用 `LevelExits.open` 登記，所有通往它的出口就一起接通，不用回頭改。
 
-git 分支不是用來分樓層的：大家都在 `Desktop\Backroom - Claude`（`claude` 分支）工作，`main` 是整合好、推上 GitHub 的版本（規則見 AGENTS.md）。`src/main` 是 Gradle 的「主程式」資料夾，跟 git 的 `main` 分支無關。
+git 分支不是用來分樓層的：大家都在同一個資料夾的 `main` 輪流工作（規則見 CLAUDE.md）。`src/main` 是 Gradle 的「主程式」資料夾，跟 git 的 `main` 分支無關。
 
 ## 新增一層（以 Level 2 為例）
 

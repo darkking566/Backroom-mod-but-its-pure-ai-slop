@@ -174,6 +174,11 @@ final class Level3ChunkGenerator extends ChunkGenerator {
 							.setValue(Level3SignBlock.RIGHT, sign.right());
 				}
 			}
+			if (h == 3 && against >= 0 && clearance >= 3
+					&& GammaPlan.in(seed, Math.floorDiv(x, Level3Plan.SIZE), Math.floorDiv(z, Level3Plan.SIZE))
+					&& Level3Layout.roll(seed, x, 3, z) < 10) {
+				return mounted(Level3Blocks.SECURITY_CAMERA);
+			}
 			if (h == 2 && against >= 0 && clearance >= 3 && Level3Layout.roll(seed, x, 2, z) < 5) return mounted(Level3Blocks.ELECTRICAL_BOX);
 			return air();
 		}
@@ -246,6 +251,7 @@ final class Level3ChunkGenerator extends ChunkGenerator {
 				case AIR -> air();
 				case BEDROCK -> Blocks.BEDROCK.defaultBlockState();
 				case BRICK -> state(Level3Blocks.RED_BRICK_WALL);
+				case TITANIUM -> state(Level3Blocks.TITANIUM_WALL);
 				case WALL -> state(Level3Blocks.MEG_WALL);
 				case FLOOR -> state(Level3Blocks.DUSTY_FLOOR);
 				case MALL_FLOOR -> state(Level3Blocks.GLAZED_TILE_WALL);
@@ -267,7 +273,7 @@ final class Level3ChunkGenerator extends ChunkGenerator {
 				case CAMERA -> Level3Blocks.SECURITY_CAMERA.defaultBlockState().setValue(Level3FacingBlock.FACING, facing);
 				case MEG_SIGN -> state(Level3Blocks.MEG_SIGN);
 				case LECTERN -> Blocks.LECTERN.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, facing);
-				case IRON_DOOR -> Blocks.IRON_DOOR.defaultBlockState().setValue(DoorBlock.FACING, facing)
+				case IRON_DOOR, SIDE_DOOR -> Blocks.IRON_DOOR.defaultBlockState().setValue(DoorBlock.FACING, facing)
 						.setValue(DoorBlock.HALF, bit.part() == 0 ? DoubleBlockHalf.LOWER : DoubleBlockHalf.UPPER);
 				case CAGE_GATE -> Level3Blocks.CAGE_GATE.defaultBlockState().setValue(Level3GateBlock.AXIS, along)
 						.setValue(Level3GateBlock.HALF, bit.part() == 0 ? DoubleBlockHalf.LOWER : DoubleBlockHalf.UPPER);
@@ -284,6 +290,9 @@ final class Level3ChunkGenerator extends ChunkGenerator {
 				case SCREEN -> Blocks.SEA_LANTERN.defaultBlockState();
 				case JUKEBOX -> Blocks.JUKEBOX.defaultBlockState();
 				case SMOKER -> Blocks.SMOKER.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, facing);
+				case BARBED_WIRE -> state(Level3Blocks.BARBED_WIRE);
+				case ELECTRIC_FENCE -> Level3Blocks.ELECTRIC_FENCE.defaultBlockState().setValue(Level3AxisBlock.AXIS, along);
+				case RELAY_BOX -> BackroomsProps.RELAY_DROPOFF_BOX.defaultBlockState().trySetValue(BlockStateProperties.HORIZONTAL_FACING, facing);
 			};
 		}
 

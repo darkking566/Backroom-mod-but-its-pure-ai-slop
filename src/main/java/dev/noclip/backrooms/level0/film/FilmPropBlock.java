@@ -2,6 +2,7 @@ package dev.noclip.backrooms.level0.film;
 
 import com.mojang.serialization.MapCodec;
 import dev.noclip.backrooms.props.PropBlockEntity;
+import dev.noclip.backrooms.props.PropShapes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -63,6 +64,9 @@ public final class FilmPropBlock extends HorizontalDirectionalBlock implements E
 
 	@Override
 	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+		if (PropShapes.hasShape(this)) {
+			return PropShapes.outline(this, state.getValue(FACING));
+		}
 		return switch (mount) {
 			case FLOOR -> FLOOR;
 			case SMALL -> SMALL;
@@ -79,7 +83,12 @@ public final class FilmPropBlock extends HorizontalDirectionalBlock implements E
 
 	@Override
 	protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-		return mount == Mount.FLOOR || mount == Mount.SMALL ? getShape(state, level, pos, context) : Shapes.empty();
+		if (mount != Mount.FLOOR && mount != Mount.SMALL) {
+			return Shapes.empty();
+		}
+		return PropShapes.hasShape(this)
+				? PropShapes.collisionAt(this, state.getValue(FACING), 0, 0, 0)
+				: getShape(state, level, pos, context);
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level2;
 
+import dev.noclip.backrooms.core.floors.FloorDifficulty;
 import dev.noclip.backrooms.level2.Level2Layout.Kind;
 import dev.noclip.backrooms.monsters.Monsters;
 import dev.noclip.backrooms.monsters.hound.Hound;
@@ -47,14 +48,14 @@ final class Level2Hounds {
 		for (ServerPlayer player : level.players()) {
 			if (player.isCreative() || player.isSpectator()) continue;
 			if (level.getBrightness(LightLayer.BLOCK, player.blockPosition()) >= DARK) continue;
-			if (random.nextInt(100) < CHANCE) spawnPack(player);
+			if (random.nextInt(100) < FloorDifficulty.scaledChance(player, CHANCE)) spawnPack(player);
 		}
 	}
 
 	/** Two hounds somewhere in the tunnels behind the player; returns how many came. */
 	static int spawnPack(ServerPlayer player) {
 		ServerLevel level = player.level();
-		if (level.getEntitiesOfClass(Hound.class, new AABB(player.blockPosition()).inflate(NEAR)).size() >= MAX_NEAR) return 0;
+		if (level.getEntitiesOfClass(Hound.class, new AABB(player.blockPosition()).inflate(NEAR)).size() >= FloorDifficulty.scaledCap(player, MAX_NEAR)) return 0;
 		BlockPos spot = findSpot(player);
 		if (spot == null) return 0;
 		int came = 0;

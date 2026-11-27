@@ -4,6 +4,7 @@ import dev.noclip.backrooms.core.Home;
 import dev.noclip.backrooms.core.LevelExits;
 import dev.noclip.backrooms.core.ending.Endings;
 import dev.noclip.backrooms.core.people.Person;
+import dev.noclip.backrooms.core.story.StoryBlocks;
 import dev.noclip.backrooms.monsters.Monsters;
 import dev.noclip.backrooms.monsters.faceling.Faceling;
 import dev.noclip.backrooms.monsters.smiler.Smiler;
@@ -17,6 +18,7 @@ import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
 import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
@@ -30,12 +32,15 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.phys.AABB;
 
 /**
- * The nights of Level 398, "a cruel prank" (docs/project/1-gameplay/README.md, "前室的夜晚：398"; after 狐霖's
+ * The nights of Level 398, "a cruel prank" (docs/企劃書/1-遊戲玩法/README.md, "前室的夜晚：398"; after 狐霖's
  * Frontrooms): once someone in the Frontrooms knows the truth of the B2 files, the town's nights are 398's.
  * <ul>
  * <li>a title at nightfall; the picnic's people and the shopkeeper are gone, and people without faces (the Faceling)
@@ -43,11 +48,14 @@ import net.minecraft.world.phys.AABB;
  * <li>the nightmare: the friend's Smiler, stronger, one for each person in the town, until dawn;</li>
  * <li>the two bad choices of 398, either of which is the bad ending "never left": waiting under a streetlight for the
  * morning, or going into a house and shutting the door. You wake in Level 0.</li>
+ * <li>the good one, "home at last" (as 狐霖's has it, a check of the letters and of the people without faces before the
+ * door opens): someone who has had every letter from home walks past every one of the people without faces, laying no
+ * hand on any, and a lit door stands at the street's end; through it is Ending B (core.ending.Endings.homecoming).</li>
  * </ul>
  * At dawn everything of the night is gone again.
  */
 public final class Nights398 {
-	static final String TAG = "noclip_backrooms_398";
+	public static final String TAG = "noclip_backrooms_398";
 	/** How long under a lamp, and how long behind a shut door, before the night has you (ticks). */
 	static int lampTicks = 60 * 20, houseTicks = 10 * 20;
 	private static final Map<UUID, Integer> UNDER_LAMP = new HashMap<>();
@@ -56,6 +64,13 @@ public final class Nights398 {
 	private static final Map<UUID, Integer> TAKEN = new HashMap<>();
 	/** What each player was last told about the night. */
 	private static final Map<UUID, Boolean> SENT = new HashMap<>();
+	/** The people without faces each player has walked past tonight (their lawn tags), and who has struck one. */
+	private static final Map<UUID, java.util.Set<String>> PASSED = new HashMap<>();
+	private static final java.util.Set<UUID> STRUCK = new java.util.HashSet<>();
+	/** How near a person without a face counts as walking past them. */
+	private static final double PAST = 2.5;
+	/** Where the lit door stands on a night someone has earned it: the street's west end, facing up the street. */
+	public static final BlockPos DOOR = new BlockPos(FrontroomsTown.MIN_X + 1, FrontroomsTown.G + 1, FrontroomsTown.STREET_MIN_Z + 1);
 	private static final AABB NEAR_TOWN = new AABB(FrontroomsTown.MIN_X - 24, FrontroomsTown.G - 4, FrontroomsTown.MIN_Z - 24,
 			FrontroomsTown.MAX_X + 24, FrontroomsTown.G + 20, FrontroomsTown.MAX_Z + 24);
 
@@ -68,6 +83,14 @@ public final class Nights398 {
 			if (server.getTickCount() % 20 != 0) return;
 			ServerLevel level = server.getLevel(Home.FRONTROOMS);
 			if (level != null) tick(level);
+		});
+		// Lay a hand on one of the people without faces and they no longer make way for you, tonight.
+		net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents.ALLOW_DAMAGE.register((entity, source, amount) -> {
+			if (entity instanceof Faceling && entity.entityTags().contains(TAG) && source.getEntity() instanceof ServerPlayer player
+					&& STRUCK.add(player.getUUID())) {
+				player.sendSystemMessage(Component.translatable("message.noclip_backrooms.398.faceless_struck").withStyle(ChatFormatting.DARK_RED));
+			}
+			return true;
 		});
 	}
 
@@ -103,6 +126,12 @@ public final class Nights398 {
 			for (Entity entity : nightThings(level)) entity.discard();
 			UNDER_LAMP.clear();
 			BEHIND_DOOR.clear();
+			PASSED.clear();
+			STRUCK.clear();
+			if (level.isLoaded(DOOR) && level.getBlockState(DOOR).is(StoryBlocks.GUIDE_DOOR)) {
+				level.setBlock(DOOR.above(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+				level.setBlock(DOOR, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+			}
 			return;
 		}
 		// The town's own people are not there at night.
@@ -113,7 +142,48 @@ public final class Nights398 {
 			if (TownLife.onceToday(player, "398_night")) title(player);
 			nightmare(level, player);
 			choices(level, player);
+			walkPast(level, player);
 		}
+	}
+
+	/** The people without faces the player walks past; once past them all, with every letter had, the door at the end. */
+	private static void walkPast(ServerLevel level, ServerPlayer player) {
+		if (STRUCK.contains(player.getUUID())) return;
+		java.util.Set<String> passed = PASSED.computeIfAbsent(player.getUUID(), id -> new java.util.HashSet<>());
+		int before = passed.size();
+		for (Faceling faceling : level.getEntitiesOfClass(Faceling.class, player.getBoundingBox().inflate(PAST), f -> f.entityTags().contains(TAG))) {
+			for (String tag : faceling.entityTags()) if (tag.startsWith(TAG + "_lawn_")) passed.add(tag);
+		}
+		int all = FrontroomsTown.houses().size();
+		if (passed.size() == before) return;
+		player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.398.faceless_passed", Math.min(passed.size(), all), all)
+				.withStyle(ChatFormatting.GRAY));
+		if (passed.size() < all) return;
+		if (!TownLife.allLetters(player)) {
+			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.398.letters_missing").withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		level.getChunk(DOOR);
+		BlockState door = StoryBlocks.GUIDE_DOOR.defaultBlockState().setValue(StoryBlocks.Door.FACING, Direction.EAST);
+		level.setBlock(DOOR, door.setValue(StoryBlocks.Door.HALF, DoubleBlockHalf.LOWER), Block.UPDATE_ALL);
+		level.setBlock(DOOR.above(), door.setValue(StoryBlocks.Door.HALF, DoubleBlockHalf.UPPER), Block.UPDATE_ALL);
+		player.sendSystemMessage(Component.translatable("message.noclip_backrooms.398.door_lit").withStyle(ChatFormatting.GOLD));
+	}
+
+	/** Whether the player has earned the door tonight: every letter, every person without a face walked past, none struck. */
+	public static boolean earned(ServerPlayer player) {
+		java.util.Set<String> passed = PASSED.get(player.getUUID());
+		return Endings.truthKnown(player) && TownLife.allLetters(player) && !STRUCK.contains(player.getUUID())
+				&& passed != null && passed.size() >= FrontroomsTown.houses().size();
+	}
+
+	/** The lit door at the street's end: on a night of 398, for someone who has earned it, the way home. */
+	public static void throughDoor(ServerPlayer player) {
+		if (!(player.level() instanceof ServerLevel level) || !active(level) || !earned(player)) {
+			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.398.door_shut").withStyle(ChatFormatting.GRAY));
+			return;
+		}
+		Endings.homecoming(player);
 	}
 
 	private static List<Entity> nightThings(ServerLevel level) {

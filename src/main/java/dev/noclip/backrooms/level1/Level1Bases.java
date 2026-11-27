@@ -2,9 +2,11 @@ package dev.noclip.backrooms.level1;
 
 import dev.noclip.backrooms.level1.BasePlan.Piece;
 import dev.noclip.backrooms.level1.Level1Layout.Base;
+import dev.noclip.backrooms.props.BackroomsProps;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 /** The blocks of the settlements (BasePlan has where they stand); null where the ordinary hall shows through. */
 final class Level1Bases {
@@ -40,6 +42,7 @@ final class Level1Bases {
 			case COUNTER_TOM -> y == FLOOR + 1 ? state(Level1Blocks.TOM_COUNTER) : null;
 			case CLINIC_BED -> y == FLOOR + 1 ? state(Level1Blocks.CLINIC_BED) : null;
 			case SIGNUP_BOOTH -> y == FLOOR + 1 ? state(Level1Blocks.SIGNUP_BOOTH) : y == FLOOR + 2 ? state(Level1Blocks.SIGNUP_SIGN) : null;
+			case RELAY_BOX -> y == FLOOR + 1 ? BackroomsProps.RELAY_DROPOFF_BOX.defaultBlockState().trySetValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH) : null;
 			case TENT_BEDROLL -> y == FLOOR + 1 ? state(Level1Blocks.BEDROLL) : y == TENT_ROOF ? state(Level1Blocks.TARP) : null;
 		};
 	}

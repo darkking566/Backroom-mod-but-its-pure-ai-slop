@@ -2,6 +2,7 @@ package dev.noclip.backrooms.level1;
 
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.people.Person;
+import dev.noclip.backrooms.core.trade.ShopRole;
 import dev.noclip.backrooms.level1.Level1Layout.Base;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -150,10 +151,12 @@ final class Residents {
 		int came = 0;
 		for (String who : people) {
 			boolean hostile = who.equals("justice");
+			boolean blackMarket = who.equals("black_market");
+			String look = blackMarket ? ShopRole.BLACK_MARKET.look() : who;
 			for (int attempt = 0; attempt < 60; attempt++) {
 				BlockPos at = new BlockPos(x0 + 26 + random.nextInt(13), Level1ChunkGenerator.FLOOR_Y + 1, z0 + 24 + random.nextInt(14));
 				if (!level.isLoaded(at) || !free(level, at)) continue;
-				EntityType<? extends Mob> type = hostile ? EntityTypes.PILLAGER : People.type(who);
+				EntityType<? extends Mob> type = hostile ? EntityTypes.PILLAGER : People.type(look);
 				Mob mob = type.create(level, EntitySpawnReason.EVENT);
 				if (mob == null) break;
 				float yaw = random.nextFloat() * 360;
@@ -166,11 +169,12 @@ final class Residents {
 					mob.setNoAi(true);
 					mob.setInvulnerable(true);
 				}
-				mob.setCustomName(Component.translatable("resident.noclip_backrooms." + who));
+				mob.setCustomName(blackMarket ? ShopRole.BLACK_MARKET.title() : Component.translatable("resident.noclip_backrooms." + who));
 				mob.setCustomNameVisible(true);
 				mob.setPersistenceRequired();
-				mob.addTag(TAG);
 				level.addFreshEntity(mob);
+				mob.addTag(TAG);
+				if (blackMarket) mob.addTag(ShopRole.BLACK_MARKET.tag());
 				came++;
 				break;
 			}
@@ -183,10 +187,10 @@ final class Residents {
 		return switch (base) {
 			case FIRST_LIGHT -> List.of("meg_patrol", "meg_patrol");
 			case BLINK -> List.of("colonist", "colonist");
-			case TRADERS_KEEP -> List.of("trader", "trader");
+			case TRADERS_KEEP -> List.of("trader", "trader", "black_market");
 			case HIPPOCRATES -> List.of("medic", "medic");
 			case TOMS -> List.of("tom", "aiko");
-			case SIGNUP -> List.of("speednoclipper", "speednoclipper");
+			case SIGNUP -> List.of("speednoclipper", "speednoclipper", "black_market");
 			case CORNUCOPIA -> List.of("justice", "justice", "justice");
 			case NONE -> List.of();
 		};

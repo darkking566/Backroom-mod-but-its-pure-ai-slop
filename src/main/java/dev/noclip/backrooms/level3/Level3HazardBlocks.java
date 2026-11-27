@@ -138,4 +138,53 @@ final class Level3HazardBlocks {
 			if (!entity.isShiftKeyDown()) entity.setDeltaMovement(entity.getDeltaMovement().add(way.getStepX() * 0.05, 0, way.getStepZ() * 0.05));
 		}
 	}
+
+	/** Coiled razor wire atop Base Gamma's perimeter walls: slows and cuts anything pushing into it. */
+	static final class BarbedWire extends Block {
+		private static final VoxelShape SHAPE = Block.box(1, 0, 1, 15, 13, 15);
+
+		BarbedWire(Properties properties) {
+			super(properties);
+		}
+
+		@Override
+		protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+			return SHAPE;
+		}
+
+		@Override
+		protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effects, boolean intersects) {
+			entity.makeStuckInBlock(state, new Vec3(0.35, 0.5, 0.35));
+			if (level instanceof ServerLevel server && exposed(entity)) {
+				((LivingEntity) entity).hurtServer(server, server.damageSources().cactus(), 1.0F);
+			}
+		}
+	}
+
+	/** High-voltage perimeter fence around Base Gamma: sparks visibly and shocks anyone touching it. */
+	static final class ElectricFence extends Level3AxisBlock {
+		private static final VoxelShape[] FENCE_SHAPE = Level3Shapes.axis(0, 0, 6.5, 16, 16, 9.5);
+
+		ElectricFence(Properties properties) {
+			super(properties, FENCE_SHAPE);
+		}
+
+		@Override
+		protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+			if (level instanceof ServerLevel server && exposed(player)) shock(server, player, pos, 2.0F);
+			return InteractionResult.SUCCESS;
+		}
+
+		@Override
+		protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effects, boolean intersects) {
+			if (level instanceof ServerLevel server && exposed(entity)) shock(server, (LivingEntity) entity, pos, 2.0F);
+		}
+
+		@Override
+		public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+			if (random.nextInt(8) != 0) return;
+			level.addParticle(ParticleTypes.ELECTRIC_SPARK, pos.getX() + 0.5, pos.getY() + 0.5 + random.nextDouble() * 0.4, pos.getZ() + 0.5,
+					(random.nextDouble() - 0.5) * 0.12, 0.05, (random.nextDouble() - 0.5) * 0.12);
+		}
+	}
 }

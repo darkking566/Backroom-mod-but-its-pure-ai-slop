@@ -22,7 +22,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 
 /**
- * The floor count of docs/project/1-gameplay/README.md. Every time a player comes into a Backrooms level from another one it is one floor
+ * The floor count of docs/企劃書/1-遊戲玩法/README.md. Every time a player comes into a Backrooms level from another one it is one floor
  * more (going back counts too); falling in from the Overworld starts a trip at floor 1; being back in the Overworld ends
  * it. Each arrival puts the level's number and name in the middle of the screen; the client shows the floor at the top
  * left and the level in the inventory (core.floors.FloorsClient).

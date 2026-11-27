@@ -34,7 +34,7 @@ final class Dullers {
 		RandomSource random = level.getRandom();
 		for (ServerPlayer player : level.players()) {
 			if (player.isCreative() || player.isSpectator()) continue;
-			if (random.nextInt(100) >= 26) continue;
+			if (random.nextInt(100) >= dev.noclip.backrooms.core.floors.FloorDifficulty.scaledChance(player, 26)) continue;
 			AABB near = player.getBoundingBox().inflate(48, 16, 48);
 			if (!level.getEntitiesOfClass(Duller.class, near).isEmpty()) continue;
 			spawnNear(level, seed, player, random);

@@ -65,7 +65,7 @@ import net.minecraft.world.level.storage.LevelData;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * The horror direction (docs/project/1-gameplay/README.md) end to end:
+ * The horror direction (docs/企劃書/1-遊戲玩法/README.md) end to end:
  * <ol>
  * <li>half health everywhere, and a heart and 10 sanity every five levels;</li>
  * <li>eating well heals a quarter as fast in the Backrooms;</li>
@@ -85,6 +85,8 @@ public final class HorrorClientTest implements FabricClientGameTest {
 	public void runTest(ClientGameTestContext context) {
 		try (TestSingleplayerContext game = context.worldBuilder().create()) {
 			var server = game.getServer();
+			// Not a newcomer: the first trip's cable (core.story.FirstTrip) belongs to the story test.
+			server.runOnServer(s -> s.getPlayerList().getPlayers().forEach(p -> p.setAttached(dev.noclip.backrooms.core.story.FirstTrip.DONE, true)));
 			server.runCommand("gamerule send_command_feedback false");
 			server.runCommand("gamerule noclip_backrooms:edge_shift false");
 			server.runCommand("gamemode survival @a");
@@ -200,7 +202,7 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
 			context.runOnClient(client -> client.gui.screen().onClose());
 
-			// 6. The M.E.G. cycle (docs/project/1-gameplay/README.md): day 1 on getting out, the clock runs only at home,
+			// 6. The M.E.G. cycle (docs/企劃書/1-遊戲玩法/README.md): day 1 on getting out, the clock runs only at home,
 			//    a night slept through counts, the rejection follows the days, a serum only holds it back, selling to the
 			//    buyer hands things in, meeting the quota pays out, missing it means debt, a closed outpost and a drop
 			//    into the Backrooms at dawn.

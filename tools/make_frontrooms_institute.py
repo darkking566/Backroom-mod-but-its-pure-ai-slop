@@ -1,4 +1,4 @@
-"""The M.E.G. institute's new look (docs/project/1-gameplay/README.md, "研究所改版"), after the research facility at the
+"""The M.E.G. institute's new look (docs/企劃書/1-遊戲玩法/README.md, "研究所改版"), after the research facility at the
 end of the film (A24's Backrooms, 2026): white walls over a mustard wainscot, an acoustic tile ceiling with troffers,
 vinyl tile floors, terrazzo in the halls, dark one-way observation windows, a hospital wing in mint with an orange rail;
 outside, exposed-aggregate precast panels, bronze-tinted ribbon windows, asphalt, sodium lamps.
@@ -331,7 +331,7 @@ def preview():
         tile = Image.open(TEXTURES / f"{name}.png").convert("RGBA").resize((side - 8, side - 8), Image.NEAREST)
         back = Image.new("RGBA", tile.size, (150, 170, 190, 255))
         sheet.paste(Image.alpha_composite(back, tile).convert("RGB"), ((i % cols) * side + 4, (i // cols) * side + 4))
-    out = Path(__file__).resolve().parent.parent / "docs/project/1-gameplay/images/institute_textures.png"
+    out = Path(__file__).resolve().parent.parent / "docs/企劃書/1-遊戲玩法/圖片/institute_textures.png"
     sheet.save(out, optimize=True)
 
 

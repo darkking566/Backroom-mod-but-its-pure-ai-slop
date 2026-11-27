@@ -43,7 +43,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 
 /**
- * The M.E.G. quota cycle (docs/project/1-gameplay/README.md): the Wretch countdown of the body and the quota of the
+ * The M.E.G. quota cycle (docs/企劃書/1-遊戲玩法/README.md): the Wretch countdown of the body and the quota of the
  * employer, on one clock that runs only while someone of the team is out of the Backrooms (the Backrooms have no time):
  * at the institute in the Frontrooms, or in the Overworld. The team is everyone who has been in the Backrooms.
  *
@@ -472,7 +472,7 @@ public final class Quota {
 	public static void deployOptions(ServerPlayer player) {
 		QuotaData d = data(player.level().getServer());
 		MutableComponent line = Component.translatable("message.noclip_backrooms.quota.deploy_header").withStyle(ChatFormatting.GRAY);
-		for (String level : deployable(d)) {
+		for (String level : deployable(d, player.level().getServer())) {
 			long price = price(d, level);
 			line.append(" ").append(button(price == 0 ? "message.noclip_backrooms.quota.deploy_free" : "message.noclip_backrooms.quota.deploy_paid",
 					"/meg deploy " + level, ChatFormatting.AQUA, level, price));
@@ -488,11 +488,16 @@ public final class Quota {
 		return d.mapped.contains(level) ? 0 : DEPLOY_PRICE.getOrDefault(level, DEFAULT_DEPLOY_PRICE);
 	}
 
-	/** Levels M.E.G. can send the team to: Level 0, and open levels they have been to (deep ones from B1 only). */
-	static List<String> deployable(QuotaData d) {
+	/**
+	 * Levels M.E.G. can send the team to: Level 0, and open levels they have been to or that M.E.G. has assigned them
+	 * (core.story.MainQuest), deep ones from B1 only.
+	 */
+	static List<String> deployable(QuotaData d, MinecraftServer server) {
 		List<String> list = new ArrayList<>();
 		if (LevelExits.isOpen("0")) list.add("0");
-		List<String> been = new ArrayList<>(d.visited);
+		java.util.Set<String> known = new java.util.HashSet<>(d.visited);
+		known.addAll(dev.noclip.backrooms.core.story.MainQuest.assigned(server));
+		List<String> been = new ArrayList<>(known);
 		Collections.sort(been);
 		for (String level : been) {
 			if (level.equals("0") || !LevelExits.isOpen(level)) continue;
@@ -529,7 +534,7 @@ public final class Quota {
 		QuotaData d = data(server);
 		String refusal = !Home.isHome(player.level().dimension()) ? "message.noclip_backrooms.quota.deploy_not_home"
 				: checkCommander && !nearCommander(player) && !atPad(player) ? "message.noclip_backrooms.quota.deploy_no_commander"
-				: !deployable(d).contains(level) ? "message.noclip_backrooms.quota.deploy_unknown" : null;
+				: !deployable(d, server).contains(level) ? "message.noclip_backrooms.quota.deploy_unknown" : null;
 		long price = price(d, level);
 		if (refusal == null && price > 0 && !Wallet.take(player, price)) refusal = "message.noclip_backrooms.quota.deploy_no_credits";
 		if (refusal != null) {

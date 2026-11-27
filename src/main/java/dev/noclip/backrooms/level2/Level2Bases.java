@@ -2,6 +2,7 @@ package dev.noclip.backrooms.level2;
 
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.people.Person;
+import dev.noclip.backrooms.core.trade.ShopRole;
 import dev.noclip.backrooms.level2.Level2Plan.Room;
 import dev.noclip.backrooms.level2.Level2Plan.RoomKind;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -69,23 +70,26 @@ final class Level2Bases {
 							rz * Level2Plan.SIZE + room.z0(), rx * Level2Plan.SIZE + room.x1() + 1,
 							Level2ChunkGenerator.CEILING_Y, rz * Level2Plan.SIZE + room.z1() + 1);
 					if (!level.getEntitiesOfClass(Person.class, box).isEmpty()) continue;
-					spawned += spawnStaff(level, spot, "trader", "B.N.T.G. Trader");
-					spawned += spawnStaff(level, spot.offset(0, 0, 2), "colonist", "B.N.T.G. Clerk");
+					spawned += spawnStaff(level, spot, "trader", "B.N.T.G. Trader", ShopRole.BUYER);
+					spawned += spawnStaff(level, spot.offset(0, 0, 2), "colonist", "B.N.T.G. Clerk", ShopRole.SUPPLIER);
+					spawned += spawnStaff(level, spot.offset(2, 0, 2), ShopRole.BLACK_MARKET.look(), null, ShopRole.BLACK_MARKET);
 				}
 			}
 		}
 		return spawned;
 	}
 
-	private static int spawnStaff(ServerLevel level, BlockPos spot, String look, String name) {
+	private static int spawnStaff(ServerLevel level, BlockPos spot, String look, String name, ShopRole role) {
 		if (!level.getBlockState(spot).isAir() || !level.getBlockState(spot.above()).isAir()) return 0;
 		Person person = People.type(look).create(level, EntitySpawnReason.NATURAL);
 		if (person == null) return 0;
 		person.snapTo(spot.getX() + 0.5, spot.getY(), spot.getZ() + 0.5, level.getRandom().nextFloat() * 360, 0);
 		person.setPersistenceRequired();
-		person.setCustomName(Component.literal(name));
-		person.addTag(STAFF_TAG);
+		person.setCustomName(name != null ? Component.literal(name) : role.title());
+		person.setCustomNameVisible(true);
 		level.addFreshEntity(person);
+		person.addTag(STAFF_TAG);
+		if (role != null) person.addTag(role.tag());
 		return 1;
 	}
 

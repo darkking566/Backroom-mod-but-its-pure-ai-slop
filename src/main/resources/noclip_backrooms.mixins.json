@@ -4,10 +4,12 @@
 	"package": "dev.noclip.backrooms.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"BlockEntityMirror",
 		"FoodDataBackroomsRegen",
 		"LivingEntityWeaponBalance",
 		"LevelSetBlockMirror",
 		"PlayerSprintExhaustionMixin",
+		"ServerLevelMirrorEffects",
 		"TrackedEntityTorus"
 	],
 	"injectors": {

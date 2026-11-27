@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "noclip_backrooms:block/level3/gamma_razor_wire"
+  }
+}

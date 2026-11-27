@@ -24,7 +24,7 @@ import net.minecraft.world.level.material.MapColor;
 
 /**
  * The objects of the film's Level 0 (A24's Backrooms, 2026): the 1991 bargain furniture store the Backrooms copied
- * without understanding it, and the VHS tapes of the games. Plan: docs/project/5-levels/level0/README.md, section 8.
+ * without understanding it, and the VHS tapes of the games. Plan: docs/企劃書/5-樓層/Level0-大廳/README.md, section 8.
  *
  * Every prop is a Blender mesh with a baked texture (tools/film/), drawn through the props' shared block entity
  * (props.PropBlockEntity). Multi-block ones use the props' MultiPartPropBlock (every cell solid, breaking one breaks

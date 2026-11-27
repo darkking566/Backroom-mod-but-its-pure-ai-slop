@@ -14,7 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * The horror balance of the weapons (docs/project/1-gameplay/README.md, "裝備與武器在恐怖玩法下的定位原則"), in one
+ * The horror balance of the weapons (docs/企劃書/1-遊戲玩法/README.md, "裝備與武器在恐怖玩法下的定位原則"), in one
  * place over Gemini's numbers: weapons are not for mowing down the ordinary creatures. Against them, the better the
  * weapon the less of its damage counts (tiers 0 and 1 keep 90%, tier 4 only 55%); the big guns and the end-game gear are for
  * bosses (tier 3 does 130%, tier 4 160% against them) and for holding out while a pickup comes (half again on top).

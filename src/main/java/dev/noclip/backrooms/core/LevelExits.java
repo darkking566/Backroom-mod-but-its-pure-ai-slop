@@ -62,6 +62,8 @@ public final class LevelExits {
 
 	/** Takes the player through an exit to the given level, or tells them nothing is there yet. */
 	public static void use(ServerPlayer player, String level) {
+		// A newcomer's first trip: only the glowing door at the end of the cable opens (core.story.FirstTrip).
+		if (dev.noclip.backrooms.core.story.FirstTrip.refuse(player)) return;
 		MinecraftServer server = player.level().getServer();
 		for (var listener : LISTENERS) listener.accept(player, level);
 		Integer lockedUntil = LOCKED_UNTIL.get(player.getUUID());
@@ -109,18 +111,20 @@ public final class LevelExits {
 			if (player.level().dimension() != from) return;
 			// The team's stretch of that level (core.trip.Expedition): whoever falls in after the first lands near them.
 			ANCHORS.put(player.getUUID(), dev.noclip.backrooms.core.trip.Expedition.zone(server, level));
+			boolean arrived;
 			try {
-				arrival.arrive(player);
+				arrived = arrival.arrive(player);
 			} finally {
 				ANCHORS.remove(player.getUUID());
 			}
+			if (arrived && level.equals("0")) dev.noclip.backrooms.core.story.FirstTrip.fellIn(player);
 		}));
 		return true;
 	}
 
 	/**
 	 * Where a level should put a player who is arriving, as {x, z}. Through an exit it is a stretch of the level far
-	 * from the exit, so that coming back to a level is coming to a new part of it, as in 狐霖's Backrooms (docs/project/1-gameplay/README.md);
+	 * from the exit, so that coming back to a level is coming to a new part of it, as in 狐霖's Backrooms (docs/企劃書/1-遊戲玩法/README.md);
 	 * it depends only on where the exit is and where it leads, so whoever takes the same exit lands together.
 	 * Falling in from outside (core.trip.Expedition) it is the team's stretch of that level; otherwise (commands) it is
 	 * where the player stands.

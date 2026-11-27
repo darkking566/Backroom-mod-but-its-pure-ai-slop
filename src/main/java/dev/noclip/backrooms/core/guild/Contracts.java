@@ -39,7 +39,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 
 /**
- * M.E.G. contracts (docs/project/1-gameplay/README.md): reach orders, entity hunts, field photography,
+ * M.E.G. contracts (docs/企劃書/1-遊戲玩法/README.md): reach orders, entity hunts, field photography,
  * topology mapping, supply recovery, and multi-level uninterrupted courier runs, filtered by deadlock prevention
  * so only currently reachable levels & registered targets are ever offered.
  */
@@ -56,7 +56,12 @@ public final class Contracts {
 		PHOTO_SMILER("photo_smiler", "1", 300, Kind.PHOTO, "smiler", 1, List.of("0", "1")),
 		MAP_LEVEL0("map_level0", "0", 280, Kind.MAP, "0", 1, List.of("0")),
 		COLLECT_ALMOND("collect_almond", "1", 220, Kind.COLLECT, "noclip_backrooms:almond_water", 4, List.of("0", "1")),
-		COURIER_012("courier_0_1_2", "2", 520, Kind.COURIER, "0->1->2", 3, List.of("0", "1", "2"));
+		COURIER_012("courier_0_1_2", "2", 520, Kind.COURIER, "0->1->2", 3, List.of("0", "1", "2")),
+		// More optional jobs, so each level has two or three (2026-11-28).
+		PHOTO_BLACKOUT("photo_blackout_level0", "0", 240, Kind.PHOTO, "blackout_moment", 1, List.of("0")),
+		SURVEY_ZENITH("survey_level0p1", "0.1", 180, Kind.REACH, "0.1", 1, List.of("0", "0.1")),
+		PHOTO_DULLER("photo_duller", "4", 650, Kind.PHOTO, "duller", 1, List.of("0", "1", "2", "3", "4")),
+		SURVEY_OFFICE("survey_level4", "4", 900, Kind.REACH, "4", 1, List.of("0", "1", "2", "3", "4"));
 
 		public final String id, level;
 		public final long reward;
@@ -247,6 +252,8 @@ public final class Contracts {
 	/** What the commander says when spoken to: quota/clearance, safebox & insurance, and open contracts. */
 	public static void talk(ServerPlayer player) {
 		for (int i = 1; i <= 3; i++) player.sendSystemMessage(Component.translatable("guild.noclip_backrooms.master." + i));
+		// The main quest first; the contracts below are the optional jobs.
+		dev.noclip.backrooms.core.story.MainQuest.talk(player);
 		dev.noclip.backrooms.core.quota.Quota.talk(player);
 		if (dev.noclip.backrooms.core.quota.Quota.locked(player.level().getServer())) return;
 		Safebox.talk(player);

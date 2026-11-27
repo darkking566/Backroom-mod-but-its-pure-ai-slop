@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-/** The numbers of the M.E.G. quota cycle (docs/project/1-gameplay/README.md). */
+/** The numbers of the M.E.G. quota cycle (docs/企劃書/1-遊戲玩法/README.md). */
 final class QuotaMathTest {
 	private static final long DAY = QuotaMath.DAY;
 

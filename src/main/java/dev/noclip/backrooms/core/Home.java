@@ -12,7 +12,7 @@ import net.minecraft.world.level.portal.TeleportTransition;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Where "home" is (docs/project/1-gameplay/README.md, "流程與前室總部定案"). Once someone has fallen into the
+ * Where "home" is (docs/企劃書/1-遊戲玩法/README.md, "流程與前室總部定案"). Once someone has fallen into the
  * Backrooms, every way out takes them to the M.E.G. institute in the Frontrooms, not back to the Overworld; time runs
  * there (and in the Overworld) and stops in the Backrooms. Someone who has never been in plays the Overworld as it is.
  */

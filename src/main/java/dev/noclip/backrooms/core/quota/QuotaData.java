@@ -16,7 +16,7 @@ import net.minecraft.world.level.saveddata.SavedDataType;
 
 /**
  * The team's M.E.G. cycle, saved with the world (on the Overworld): one team per server, every player on it
- * (docs/project/1-gameplay/README.md). Nothing runs until someone first comes home from the Backrooms.
+ * (docs/企劃書/1-遊戲玩法/README.md). Nothing runs until someone first comes home from the Backrooms.
  */
 public final class QuotaData extends SavedData {
 	/** Whether the cycle has started: the first time anyone walked out of the Backrooms alive. */

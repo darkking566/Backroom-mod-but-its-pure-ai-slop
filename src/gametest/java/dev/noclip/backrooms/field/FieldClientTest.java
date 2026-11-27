@@ -59,7 +59,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * What a trip into the Backrooms brings now (docs/project/1-gameplay/README.md, "後室進階玩法與創新機制"): the trip's
+ * What a trip into the Backrooms brings now (docs/企劃書/1-遊戲玩法/README.md, "後室進階玩法與創新機制"): the trip's
  * anomaly (red mist, mimics, absolute silence), the field kit (chalk, glow sticks, the guide line, a battery lamp, a
  * tripwire alarm, a barricade a hound batters down), evidence (a photo of a smiler and a mapping beacon's tape, sold to
  * the buyer), the institute's machines working while the player was away, and the weapons' horror balance.
@@ -70,6 +70,8 @@ public final class FieldClientTest implements FabricClientGameTest {
 	public void runTest(ClientGameTestContext context) {
 		try (TestSingleplayerContext game = context.worldBuilder().create()) {
 			var server = game.getServer();
+			// Not a newcomer: the first trip's cable (core.story.FirstTrip) belongs to the story test.
+			server.runOnServer(s -> s.getPlayerList().getPlayers().forEach(p -> p.setAttached(dev.noclip.backrooms.core.story.FirstTrip.DONE, true)));
 			server.runCommand("gamerule send_command_feedback false");
 			server.runCommand("gamerule noclip_backrooms:edge_shift false");
 			server.runCommand("gamerule do_mob_spawning false");
@@ -436,11 +438,12 @@ public final class FieldClientTest implements FabricClientGameTest {
 				}
 				check(menu.getSlot(menu.outputSlotStart()).getItem().is(BackroomsItems.WRETCH_CURE), "unlocked 9x9 wretch_cure did not appear in result slot");
 
-				// Drink Wretch Cure -> cured + full 20 max HP restored!
+				// Drink Wretch Cure -> cured and healed to full; max health stays halved (CLAUDE.md, 2026-11-28).
 				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(BackroomsItems.WRETCH_CURE));
 				p.gameMode.useItem(p, p.level(), p.getMainHandItem(), InteractionHand.MAIN_HAND);
 				check(Endings.isCured(p), "Wretch Cure did not mark player cured");
-				check(p.getMaxHealth() >= 20.0F, "Wretch Cure did not restore full 20 HP: " + p.getMaxHealth());
+				check(p.getHealth() >= p.getMaxHealth() - 0.01F && p.getMaxHealth() < 20.0F,
+						"Wretch Cure should heal to full and keep max health halved: " + p.getHealth() + " / " + p.getMaxHealth());
 
 				// Ending A: grant clearance 5 & call contract release -> real Overworld
 				while (Quota.clearance(s) < Quota.DEEP_CLEARANCE) {

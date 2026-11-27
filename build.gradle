@@ -79,13 +79,13 @@ tasks.named("processGametestResources") {
 	}
 }
 
-// -Pshaders runs the real-client tests through a shader pack, the way the look is also meant to be seen (docs/look/SOP.md):
+// -Pshaders runs the real-client tests through a shader pack, the way the look is also meant to be seen (docs/畫面規範/每層流程.md):
 // it copies Iris, Sodium and the shader packs from run/ (where play.bat keeps them) into the test game, puts the
-// recommended settings from docs/look/shaders/ over the pack's own, and switches the pack named there on.
+// recommended settings from docs/畫面規範/光影設定/ over the pack's own, and switches the pack named there on.
 def testShaders = providers.gradleProperty("shaders").isPresent()
 def devRun = file("run")
 def testRun = file("build/run/clientGameTest")
-def shaderSettings = file("docs/look/shaders")
+def shaderSettings = file("docs/畫面規範/光影設定")
 
 tasks.named("runClientGameTest") {
 	if (!testSections.isBlank()) environment "NOCLIP_ONLY", testSections

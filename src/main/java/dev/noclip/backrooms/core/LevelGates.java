@@ -37,7 +37,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
 /**
- * Conditional level unlock & gate framework (docs/project/1-gameplay/README.md, "條件解鎖的樓層"):
+ * Conditional level unlock & gate framework (docs/企劃書/1-遊戲玩法/README.md, "條件解鎖的樓層"):
  * <ul>
  *   <li>Supports multi-tier Keypad Hackers (Tier 1..4), keycards/credentials (optionally consumed),
  *       and world progression flags (defeated Bosses, restored power generators, rescued survivors);</li>
