@@ -626,6 +626,11 @@
 - 使用者同意後推送：抓過 GitHub，沒有新提交要合併；推送前用另開的 git worktree 只拿已提交的程式編譯並跑單元測試（147 個全過，工作區裡 Antigravity 未提交的改動不算進去），把 `main` 推送到 GitHub（眷舍小鎮 `8cb578ec`、398 的夜晚 `f0d71c0c`、夜晚變暗 `38ee0823`）；Antigravity 未提交的改動沒有推；沒有強制推送、沒有改寫歷史
 - 使用者說了第一趟的構想（第一次進後室沒有其他門；跟著研究員的纜線走到 M.E.G. 的門；牆上有塗鴉；第二次以後才能去其他 Level）：寫進 `docs/project/1-gameplay/README.md` 任務主線一節的新小節「第一趟：跟著纜線走」，含 Claude 的建議（纜線長度與樣子、4 個研究員的遺物接「失蹤的小隊」、塗鴉越接近門越清楚、第一趟其他門打不開並提示纜線、第一趟的門只對新人開）與 42 句塗鴉（中英對照、分五類、建議擺放順序）；只改文件
 
+### 2026-11-28
+- 使用者要求推送：抓 GitHub 合併朋友新推的 7 個提交（前室眷舍小鎮、398 的夜晚、條件門禁與寶箱分級、夜視修正）；衝突在 `CLAUDE.md`、兩個語言檔、`BackroomsLootChestBlock`（兩邊都只是新增，全部保留）；`gradlew build` 通過
+- 發現 Antigravity 已提交的 Level 4 POI 提交（`7045d51f` 起）用到沒提交的 `Level4Plan.OMEGA_SPREAD`、`omegaRegionInBlock` 與 `office_elevator_frame` 方塊資源，乾淨抓下來編譯不過；使用者同意後代為提交這 12 個檔案（`Level4Plan`、`Level4LayoutTest`、10 個 `office_elevator_frame` 資源；內容也包括 Omega 間距 3→8、Amor 24%→3%、T.B.D. 28%→4%）並推送
+  - 已知問題（沒修）：`runClientGameTest -Plevels=props,4` 失敗在「elevator shaft should rise high above FLOOR_Y」，原因沒查
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23
