@@ -62,6 +62,8 @@ public final class LevelExits {
 
 	/** Takes the player through an exit to the given level, or tells them nothing is there yet. */
 	public static void use(ServerPlayer player, String level) {
+		// A newcomer's first trip: only the glowing door at the end of the cable opens (core.story.FirstTrip).
+		if (dev.noclip.backrooms.core.story.FirstTrip.refuse(player)) return;
 		MinecraftServer server = player.level().getServer();
 		for (var listener : LISTENERS) listener.accept(player, level);
 		Integer lockedUntil = LOCKED_UNTIL.get(player.getUUID());
@@ -109,11 +111,13 @@ public final class LevelExits {
 			if (player.level().dimension() != from) return;
 			// The team's stretch of that level (core.trip.Expedition): whoever falls in after the first lands near them.
 			ANCHORS.put(player.getUUID(), dev.noclip.backrooms.core.trip.Expedition.zone(server, level));
+			boolean arrived;
 			try {
-				arrival.arrive(player);
+				arrived = arrival.arrive(player);
 			} finally {
 				ANCHORS.remove(player.getUUID());
 			}
+			if (arrived && level.equals("0")) dev.noclip.backrooms.core.story.FirstTrip.fellIn(player);
 		}));
 		return true;
 	}

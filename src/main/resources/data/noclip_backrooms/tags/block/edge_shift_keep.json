@@ -9,6 +9,8 @@
     "noclip_backrooms:hollow_plaster_exit",
     "noclip_backrooms:giant_mirror_exit",
     "noclip_backrooms:anomaly_portal_door",
-    "noclip_backrooms:locked_utility_door"
+    "noclip_backrooms:locked_utility_door",
+    "noclip_backrooms:guide_cable",
+    "noclip_backrooms:guide_door"
   ]
 }

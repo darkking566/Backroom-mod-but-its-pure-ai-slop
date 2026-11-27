@@ -1,0 +1,26 @@
+{
+  "variants": {
+    "run=north_south": {
+      "model": "noclip_backrooms:block/story/guide_cable_straight"
+    },
+    "run=east_west": {
+      "model": "noclip_backrooms:block/story/guide_cable_straight",
+      "y": 90
+    },
+    "run=north_east": {
+      "model": "noclip_backrooms:block/story/guide_cable_corner"
+    },
+    "run=east_south": {
+      "model": "noclip_backrooms:block/story/guide_cable_corner",
+      "y": 90
+    },
+    "run=south_west": {
+      "model": "noclip_backrooms:block/story/guide_cable_corner",
+      "y": 180
+    },
+    "run=west_north": {
+      "model": "noclip_backrooms:block/story/guide_cable_corner",
+      "y": 270
+    }
+  }
+}

@@ -39,9 +39,12 @@ import net.minecraft.world.phys.AABB;
  * <ul>
  * <li>a mailbox: leafing through the stack of letters gives one letter from home (and now and then a coin), once a day;</li>
  * <li>the picnic in the park: sitting down with them fills you and steadies you, once a day;</li>
- * <li>the street clock tells the day of the cycle, and runs slow;</li>
- * <li>its people: three at the picnic, and the corner store's shopkeeper, who cannot sleep (the supplier's goods).</li>
+ * <li>the street clock tells the day of the cycle, and runs slow: as the Wretch rejection climbs, the days at home pass
+ * more slowly (the sun, not the cycle's count), down to a tenth of their pace at the worst;</li>
+ * <li>its people: three at the picnic, the corner store's shopkeeper, who cannot sleep (the supplier's goods), and at
+ * the back of the store a gun counter (the quartermaster's goods, once the armoury has opened).</li>
  * </ul>
+ * The letters come in order, so the twelfth is the last; 398's good ending asks for all of them (Nights398).
  * The nights of Level 398 come later (the same section of the plan).
  */
 public final class TownLife {
@@ -54,6 +57,15 @@ public final class TownLife {
 			FrontroomsTown.MAX_X + 1, FrontroomsTown.G + 12, FrontroomsTown.MAX_Z + 1);
 	private static final String[] PICNIC_LOOKS = {"colonist", "trader", "aiko"};
 	private static final float[] PICNIC_YAWS = {-90, 90, 180};
+	/** Which letters from home each player has had (a bit for each). */
+	public static final net.fabricmc.fabric.api.attachment.v1.AttachmentType<Integer> LETTERS_HAD =
+			net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry.create(BackroomsMod.id("home_letters"),
+					builder -> builder.persistent(com.mojang.serialization.Codec.INT).copyOnDeath());
+	/** Where the gun counter's keeper stands, at the back of the corner store. */
+	static final int[] GUN_COUNTER = {-43, 61};
+	/** How slow the days at home get at the worst of the rejection (a tenth of their pace). */
+	static final float SLOWEST = 0.9F;
+	private static float lag;
 
 	private TownLife() {
 	}
@@ -103,6 +115,7 @@ public final class TownLife {
 			};
 		});
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
+			slowDays(server);
 			if (server.getTickCount() % 40 != 0) return;
 			ServerLevel level = server.getLevel(Home.FRONTROOMS);
 			if (level != null) people(level);
@@ -130,7 +143,10 @@ public final class TownLife {
 			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.town.mailbox_empty").withStyle(ChatFormatting.GRAY));
 			return;
 		}
-		int which = player.getRandom().nextInt(LETTERS);
+		// In order: the letters get stranger the further on they are; once all twelve have come, any of them.
+		int had = player.getAttachedOrElse(LETTERS_HAD, 0), which = Integer.numberOfTrailingZeros(~had);
+		if (which >= LETTERS) which = player.getRandom().nextInt(LETTERS);
+		player.setAttached(LETTERS_HAD, had | (1 << which));
 		ItemStack letter = new ItemStack(HOME_LETTER);
 		letter.set(DataComponents.LORE, new ItemLore(List.of(
 				Component.translatable("item.noclip_backrooms.home_letter.text." + which).withStyle(ChatFormatting.GRAY))));
@@ -161,6 +177,30 @@ public final class TownLife {
 		player.sendSystemMessage(Component.translatable("message.noclip_backrooms.town.picnic").withStyle(ChatFormatting.GREEN));
 	}
 
+	/** Whether the player has had every letter from home. */
+	public static boolean allLetters(ServerPlayer player) {
+		int all = (1 << LETTERS) - 1;
+		return (player.getAttachedOrElse(LETTERS_HAD, 0) & all) == all;
+	}
+
+	/**
+	 * "日子變慢了": while someone is in the Frontrooms and the rejection has set in, the sun goes slower, by a tick taken
+	 * back now and then, down to a tenth of its pace at the worst. The cycle's count of days is kept by ticks spent at
+	 * home (core.quota.Quota) and does not slow; only the day outside the window does.
+	 */
+	private static void slowDays(MinecraftServer server) {
+		ServerLevel level = server.getLevel(Home.FRONTROOMS);
+		float rejection = level == null || level.players().isEmpty() ? 0 : Quota.rejection(server);
+		if (rejection <= 0) {
+			lag = 0;
+			return;
+		}
+		lag += SLOWEST * Math.min(rejection, 100F) / 100F;
+		if (lag < 1) return;
+		lag -= 1;
+		level.dimensionType().defaultClock().ifPresent(clock -> server.overworld().clockManager().addTicks(clock, -1));
+	}
+
 	/** The clock: the day of the cycle, and that the days are getting slower. */
 	static void clock(ServerPlayer player) {
 		MinecraftServer server = player.level().getServer();
@@ -182,6 +222,7 @@ public final class TownLife {
 			keep(level, "noclip_backrooms_town_picnic_" + i, PICNIC_LOOKS[i], spot, PICNIC_YAWS[i], null, true);
 		}
 		keep(level, "noclip_backrooms_town_shopkeeper", ShopRole.SUPPLIER.look(), FrontroomsTown.SHOPKEEPER, 0, ShopRole.SUPPLIER, false);
+		keep(level, "noclip_backrooms_town_gunsmith", ShopRole.QUARTERMASTER.look(), GUN_COUNTER, 0, ShopRole.QUARTERMASTER, false);
 	}
 
 	private static void keep(ServerLevel level, String tag, String look, int[] spot, float yaw, ShopRole role, boolean picnic) {
@@ -202,7 +243,8 @@ public final class TownLife {
 		if (role != null) {
 			person.addTag(role.tag());
 			person.addTag(Guilds.MEMBER_TAG);
-			person.setCustomName(Component.translatable("entity.noclip_backrooms.town_shopkeeper"));
+			person.setCustomName(Component.translatable(role == ShopRole.QUARTERMASTER ? "entity.noclip_backrooms.town_gunsmith"
+					: "entity.noclip_backrooms.town_shopkeeper"));
 			person.setCustomNameVisible(true);
 		}
 		level.addFreshEntity(person);

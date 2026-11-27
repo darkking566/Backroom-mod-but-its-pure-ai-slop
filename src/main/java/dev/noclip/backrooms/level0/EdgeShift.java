@@ -291,6 +291,8 @@ final class EdgeShift {
 		if (ZonePoiPlan.isProtectedCell(seed, cx, cz)) return false;
 		if (StaircasePlan.isProtectedCell(seed, cx, cz)) return false;
 		if (Maze.isStairwellCell(seed, cx, cz)) return false;
+		// The first trip's cable, the writing beside it and its door stay where they were laid (Level0Guide).
+		if (Level0Guide.cabled(level, rawCx * Maze.CELL, rawCz * Maze.CELL)) return false;
 
 		// Keep Red Room perimeter rings sealed so trapped players never get an unexpected opening out.
 		if (zone == Maze.Zone.RED_ROOM && !Maze.isRedRoomInteriorCell(seed, cx, cz)) {

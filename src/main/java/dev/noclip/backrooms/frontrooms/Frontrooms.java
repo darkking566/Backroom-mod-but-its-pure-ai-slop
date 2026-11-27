@@ -31,5 +31,6 @@ public final class Frontrooms {
 		Nights398.register();
 		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, id("frontrooms"), FrontroomsChunkGenerator.CODEC);
 		Institute.register();
+		Containment.register();
 	}
 }

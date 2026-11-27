@@ -304,6 +304,19 @@ public final class Endings {
 		}
 	}
 
+	/**
+	 * Ending B by way of 398's good ending (frontrooms.Nights398): the lit door at the end of the street, for someone who
+	 * knows the truth, has had every letter from home and walked past the people without faces. Titled "home at last".
+	 */
+	public static void homecoming(ServerPlayer player) {
+		if (!truthKnown(player) || isFree(player)) return;
+		completeEnding(player, ENDING_TRUE_ESCAPE);
+		player.connection.send(new ClientboundSetSubtitleTextPacket(Component.translatable("ending.noclip_backrooms.home.subtitle")
+				.withStyle(ChatFormatting.WHITE)));
+		player.connection.send(new ClientboundSetTitleTextPacket(Component.translatable("ending.noclip_backrooms.home.title")
+				.withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD)));
+	}
+
 	/** Finalizes Ending A or B, plays celebration title/audio, grants freedom, and sends player to the real Overworld. */
 	private static void completeEnding(ServerPlayer player, String type) {
 		State cur = of(player);

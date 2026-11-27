@@ -74,6 +74,8 @@ public final class BackroomsMod implements ModInitializer {
 		dev.noclip.backrooms.core.locker.Processing.register();
 		dev.noclip.backrooms.core.ending.Endings.register();
 		dev.noclip.backrooms.core.radio.Radio.register();
+		dev.noclip.backrooms.core.story.FirstTrip.register();
+		dev.noclip.backrooms.core.story.MainQuest.register();
 		dev.noclip.backrooms.core.trade.Treatment.register();
 		dev.noclip.backrooms.core.guild.GuildRemoval.register();
 		dev.noclip.backrooms.frontrooms.Frontrooms.register();

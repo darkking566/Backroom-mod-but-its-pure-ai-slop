@@ -190,6 +190,7 @@ public final class Evidence {
 					where == null ? "?" : where, value).withStyle(style -> style.withItalic(false)));
 			if (!player.getInventory().add(photo)) player.drop(photo, false);
 			dev.noclip.backrooms.core.guild.Contracts.onPhoto(serverPlayer, id, where == null ? "" : where);
+			dev.noclip.backrooms.core.story.MainQuest.onPhoto(serverPlayer, id, where == null ? "" : where);
 			flash(server, serverPlayer);
 			camera.hurtAndBreak(1, player, hand);
 			player.getCooldowns().addCooldown(camera, 40);
@@ -405,6 +406,7 @@ public final class Evidence {
 			if (owner != null) {
 				owner.sendSystemMessage(Component.translatable("message.noclip_backrooms.field.beacon_done", scan.level()).withStyle(ChatFormatting.AQUA));
 				dev.noclip.backrooms.core.guild.Contracts.onTape(owner, scan.level());
+				dev.noclip.backrooms.core.story.MainQuest.onTape(owner, scan.level());
 			}
 		}
 	}

@@ -35,6 +35,8 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		try (TestSingleplayerContext game = context.worldBuilder().create()) {
 			save = game.getWorldSave();
 			var server = game.getServer();
+			// Not a newcomer: the first trip's cable (core.story.FirstTrip) belongs to the story test.
+			server.runOnServer(s -> s.getPlayerList().getPlayers().forEach(p -> p.setAttached(dev.noclip.backrooms.core.story.FirstTrip.DONE, true)));
 			game.getConnection().waitForChunksRender();
 			server.runCommand("gamerule send_command_feedback false");
 			server.runCommand("gamerule noclip_backrooms:edge_shift false");

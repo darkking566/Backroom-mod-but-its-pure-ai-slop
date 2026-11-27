@@ -66,6 +66,7 @@ final class Noclip {
 			player.teleportTo(level0, landing.x, landing.y, landing.z, Set.of(), player.getYRot(), 0, true);
 			player.setDeltaMovement(Vec3.ZERO);
 			player.resetFallDistance();
+			dev.noclip.backrooms.core.story.FirstTrip.fellIn(player);
 			return;
 		}
 		LOGGER.warn("No free landing spot in Level 0 near cell {}, {}", cellX, cellZ);

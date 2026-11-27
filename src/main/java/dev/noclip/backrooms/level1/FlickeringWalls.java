@@ -74,7 +74,8 @@ final class FlickeringWalls {
 		for (ServerPlayer player : server.getPlayerList().getPlayers()) {
 			UUID id = player.getUUID();
 			Wall wall = WALLS.get(id);
-			if (player.level() != level0 || player.isSpectator()) {
+			// No wall for a newcomer on their first trip: the cable is their way (core.story.FirstTrip).
+			if (player.level() != level0 || player.isSpectator() || dev.noclip.backrooms.core.story.FirstTrip.following(player)) {
 				if (wall != null) close(level0, WALLS.remove(id));
 				TIME_INSIDE.remove(id);
 				DUE.remove(id);
