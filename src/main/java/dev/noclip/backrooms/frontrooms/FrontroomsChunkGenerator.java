@@ -25,6 +25,11 @@ import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CrossCollisionBlock;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.state.properties.DoorHingeSide;
+import net.minecraft.world.level.block.state.properties.Half;
+import net.minecraft.world.level.block.state.properties.StairsShape;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.block.StairBlock;
@@ -68,6 +73,8 @@ final class FrontroomsChunkGenerator extends ChunkGenerator {
 
 	static BlockState blockAt(long seed, int x, int y, int z) {
 		if (FrontroomsTerrain.beyond(x, z)) return AIR;
+		FrontroomsTown.Piece piece = FrontroomsTown.piece(x, y, z);
+		if (piece != null) return town(piece);
 		FrontroomsCampus.Part part = FrontroomsCampus.part(x, y, z);
 		if (part != FrontroomsCampus.Part.NONE) return campus(part);
 		if (FrontroomsTerrain.wall(x, z)) return wall(x, y, z);
@@ -136,6 +143,47 @@ final class FrontroomsChunkGenerator extends ChunkGenerator {
 			case RED_LIGHT -> FrontroomsBlocks.EMERGENCY_LIGHT.defaultBlockState();
 			case BARS -> Blocks.IRON_BARS.defaultBlockState();
 			case POLE -> FrontroomsBlocks.STEEL_POLE.defaultBlockState();
+		};
+	}
+
+	/** What the town's pieces are made of. */
+	private static BlockState town(FrontroomsTown.Piece piece) {
+		Direction facing = Direction.from2DDataValue(piece.facing());
+		return switch (piece.kind()) {
+			case AIR -> AIR;
+			case SIDING -> (piece.variant() == 0 ? FrontroomsBlocks.TOWN_SIDING_GRAY : piece.variant() == 1 ? FrontroomsBlocks.TOWN_SIDING_BLUE
+					: FrontroomsBlocks.TOWN_SIDING_CREAM).defaultBlockState();
+			case TRIM -> FrontroomsBlocks.TOWN_TRIM.defaultBlockState();
+			case FOUNDATION -> FrontroomsBlocks.QUARANTINE_WALL.defaultBlockState();
+			case CARPET -> Level0.CARPET;
+			case WALLPAPER -> Level0.WALLPAPER;
+			case PLASTER -> FrontroomsBlocks.INSTITUTE_WALL.defaultBlockState();
+			case WINDOW -> FrontroomsBlocks.TOWN_WINDOW.defaultBlockState();
+			case DOOR -> Blocks.BIRCH_DOOR.defaultBlockState().setValue(DoorBlock.FACING, facing)
+					.setValue(DoorBlock.HALF, piece.variant() == 1 ? DoubleBlockHalf.UPPER : DoubleBlockHalf.LOWER)
+					.setValue(DoorBlock.HINGE, DoorHingeSide.LEFT).setValue(DoorBlock.OPEN, false);
+			case GARAGE -> FrontroomsBlocks.TOWN_GARAGE_DOOR.defaultBlockState();
+			case GARAGE_TOP -> FrontroomsBlocks.TOWN_GARAGE_DOOR_TOP.defaultBlockState();
+			case SHINGLES -> FrontroomsBlocks.TOWN_SHINGLES.defaultBlockState();
+			case ROOF_STAIR -> FrontroomsBlocks.TOWN_SHINGLE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, facing)
+					.setValue(StairBlock.HALF, Half.BOTTOM).setValue(StairBlock.SHAPE, StairsShape.STRAIGHT);
+			case FLAT_ROOF -> FrontroomsBlocks.INSTITUTE_CONCRETE.defaultBlockState();
+			case STORE_WALL -> FrontroomsBlocks.PRECAST_PANEL.defaultBlockState();
+			case STORE_FLOOR -> FrontroomsBlocks.INSTITUTE_FLOOR.defaultBlockState();
+			case STORE_CEILING -> FrontroomsBlocks.INSTITUTE_CEILING.defaultBlockState();
+			case STORE_LIGHT -> FrontroomsBlocks.INSTITUTE_LIGHT.defaultBlockState();
+			case COUNTER -> FrontroomsBlocks.INSTITUTE_COUNTER.defaultBlockState();
+			case ASPHALT -> FrontroomsBlocks.CAMPUS_ASPHALT.defaultBlockState();
+			case SIDEWALK -> FrontroomsBlocks.CAMPUS_SIDEWALK.defaultBlockState();
+			case POLE -> FrontroomsBlocks.STEEL_POLE.defaultBlockState();
+			case SODIUM -> FrontroomsBlocks.SODIUM_LAMP.defaultBlockState();
+			case LOG -> Blocks.OAK_LOG.defaultBlockState();
+			case LEAVES -> Blocks.OAK_LEAVES.defaultBlockState().setValue(LeavesBlock.PERSISTENT, true);
+			case PROP -> {
+				FrontroomsTown.Place place = FrontroomsTown.places().get(piece.variant());
+				yield BuiltInRegistries.BLOCK.getValue(BackroomsMod.id(place.id())).defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, facing);
+			}
+			case PROP_PART -> BackroomsProps.PROP_PART.defaultBlockState();
 		};
 	}
 
@@ -263,7 +311,7 @@ final class FrontroomsChunkGenerator extends ChunkGenerator {
 
 	/** The highest block that may be anything but air in a column. */
 	private static int columnTop(int x, int z) {
-		int top = Math.max(FrontroomsTerrain.WALL_TOP + 2, FrontroomsCampus.top(x, z));
+		int top = Math.max(FrontroomsTerrain.WALL_TOP + 2, Math.max(FrontroomsCampus.top(x, z), FrontroomsTown.top(x, z)));
 		return InstituteLayout.inside(x, z) ? Math.max(top, InstituteLayout.TOP) : top;
 	}
 
@@ -272,7 +320,8 @@ final class FrontroomsChunkGenerator extends ChunkGenerator {
 		ChunkPos pos = chunk.getPos();
 		int x0 = pos.getMinBlockX(), z0 = pos.getMinBlockZ(), x1 = pos.getMaxBlockX(), z1 = pos.getMaxBlockZ();
 		boolean nearBuilding = x1 >= InstituteLayout.MIN_X - CLEAR && x0 <= InstituteLayout.MAX_X + CLEAR
-				&& z1 >= InstituteLayout.MIN_Z - CLEAR && z0 <= InstituteLayout.MAX_Z + CLEAR || FrontroomsCampus.busy(x0, z0, x1, z1);
+				&& z1 >= InstituteLayout.MIN_Z - CLEAR && z0 <= InstituteLayout.MAX_Z + CLEAR || FrontroomsCampus.busy(x0, z0, x1, z1)
+				|| FrontroomsTown.busy(x0, z0, x1, z1);
 		boolean allBeyond = FrontroomsTerrain.beyond(x0, z0) && FrontroomsTerrain.beyond(x1, z0) && FrontroomsTerrain.beyond(x0, z1)
 				&& FrontroomsTerrain.beyond(x1, z1) && Math.min(Math.abs(x0), Math.abs(x1)) > 0 && Math.min(Math.abs(z0), Math.abs(z1)) > 0;
 		if (nearBuilding || allBeyond) return;
@@ -292,8 +341,8 @@ final class FrontroomsChunkGenerator extends ChunkGenerator {
 		if (FrontroomsTerrain.beyond(x, z)) return 0;
 		if (FrontroomsTerrain.wall(x, z)) return FrontroomsTerrain.WALL_TOP + 3;
 		if (InstituteLayout.inside(x, z)) return InstituteLayout.ROOF + 1;
-		for (int y = FrontroomsCampus.top(x, z); y > FrontroomsTerrain.GROUND; y--) {
-			if (FrontroomsCampus.structure(x, y, z)) return y + 1;
+		for (int y = Math.max(FrontroomsCampus.top(x, z), FrontroomsTown.top(x, z)); y > FrontroomsTerrain.GROUND; y--) {
+			if (FrontroomsCampus.structure(x, y, z) || FrontroomsTown.structure(x, y, z)) return y + 1;
 		}
 		int h = FrontroomsTerrain.height(seed(randomState), x, z);
 		boolean water = type == Heightmap.Types.WORLD_SURFACE_WG || type == Heightmap.Types.WORLD_SURFACE || type == Heightmap.Types.MOTION_BLOCKING;

@@ -100,6 +100,13 @@ final class InstituteBlocks {
 	 * A transport pad: on the ground-floor lobby it directly returns anyone to Level 0 (free, open from quota 0);
 	 * in B1 M.E.G. uses it to send teams down to any visited/deep level.
 	 */
+	/** The town's roofs: shingle stairs (vanilla keeps its stairs' constructor to itself). */
+	static final class Stair extends net.minecraft.world.level.block.StairBlock {
+		Stair(BlockState base, Properties properties) {
+			super(base, properties);
+		}
+	}
+
 	/** A thin steel pole: lamp posts, flagpoles, the radio mast's legs. */
 	static final class Pole extends Block {
 		private static final VoxelShape SHAPE = Block.box(6, 0, 6, 10, 16, 10);

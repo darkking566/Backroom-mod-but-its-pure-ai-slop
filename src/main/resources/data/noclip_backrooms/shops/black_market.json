@@ -1,0 +1,28 @@
+{
+  "sells": [
+    {"min_floor": 1, "item": "noclip_backrooms:sterile_bandage", "count": 2, "price": 55},
+    {"min_floor": 1, "item": "noclip_backrooms:almond_elixir", "count": 1, "price": 110},
+    {"min_floor": 1, "item": "noclip_backrooms:lockpick_set", "count": 2, "price": 65},
+    {"min_floor": 1, "item": "noclip_backrooms:ammo_9mm", "count": 16, "price": 55},
+    {"min_floor": 1, "item": "noclip_backrooms:ammo_12g_buck", "count": 10, "price": 70},
+    {"min_floor": 1, "item": "noclip_backrooms:blueprint_scrap", "count": 2, "price": 95},
+    {"min_floor": 1, "item": "noclip_backrooms:keypad_hacker_t2", "count": 1, "price": 260, "extra": {"item": "noclip_backrooms:red_circuit", "count": 2}},
+
+    {"min_floor": 3, "item": "noclip_backrooms:gun_revolver", "count": 1, "price": 420, "extra": {"item": "noclip_backrooms:gun_receiver_precision", "count": 1}},
+    {"min_floor": 3, "item": "noclip_backrooms:gun_pump_shotgun", "count": 1, "price": 480, "extra": {"item": "noclip_backrooms:gun_pump_action", "count": 1}},
+    {"min_floor": 3, "item": "noclip_backrooms:gun_tactical_smg", "count": 1, "price": 540, "extra": {"item": "noclip_backrooms:microchip", "count": 1}},
+    {"min_floor": 3, "item": "noclip_backrooms:ammo_556_phosphor", "count": 16, "price": 110},
+    {"min_floor": 3, "item": "noclip_backrooms:ammo_308", "count": 12, "price": 95},
+    {"min_floor": 3, "item": "noclip_backrooms:mod_silencer", "count": 1, "price": 240},
+    {"min_floor": 3, "item": "noclip_backrooms:mod_red_dot", "count": 1, "price": 180},
+    {"min_floor": 3, "item": "noclip_backrooms:keypad_hacker_t3", "count": 1, "price": 460, "extra": {"item": "noclip_backrooms:microchip", "count": 2}},
+
+    {"min_floor": 5, "item": "noclip_backrooms:gun_assault_rifle", "count": 1, "price": 780, "extra": {"item": "noclip_backrooms:gun_mag_rifle", "count": 2}},
+    {"min_floor": 5, "item": "noclip_backrooms:gun_bolt_sniper", "count": 1, "price": 820, "extra": {"item": "noclip_backrooms:mod_sniper_scope", "count": 1}},
+    {"min_floor": 5, "item": "noclip_backrooms:ammo_308_ap", "count": 12, "price": 160},
+    {"min_floor": 5, "item": "noclip_backrooms:weapon_blueprint_blank", "count": 1, "price": 340, "extra": {"item": "noclip_backrooms:noclip_shard", "count": 1}},
+    {"min_floor": 5, "item": "noclip_backrooms:forbidden_scroll_luck", "count": 1, "price": 650, "extra": {"item": "noclip_backrooms:lost_old_coin", "count": 3}},
+    {"min_floor": 5, "item": "noclip_backrooms:forbidden_scroll_psy", "count": 1, "price": 650, "extra": {"item": "noclip_backrooms:almond_mana_cell", "count": 2}},
+    {"min_floor": 5, "item": "noclip_backrooms:forbidden_scroll_tech", "count": 1, "price": 650, "extra": {"item": "noclip_backrooms:microchip", "count": 2}}
+  ]
+}

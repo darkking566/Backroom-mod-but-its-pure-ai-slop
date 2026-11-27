@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.core.Home;
+import dev.noclip.backrooms.core.rpg.PlayerRpg;
 import dev.noclip.backrooms.level0.Level0;
 import dev.noclip.backrooms.level0.Level0Space;
 import java.util.ArrayDeque;
@@ -123,10 +124,16 @@ public final class FloorDifficulty {
 			Scale scale = of(player);
 			if (scale.farmPenalty() > 0) {
 				degradeDrops(drops, scale.farmPenalty(), context.getRandom());
-			} else if (scale.lootBonus() > 0.0) {
-				String tablePath = table.unwrapKey().map(k -> k.identifier().getPath()).orElse("");
-				boolean isContainer = tablePath.contains("chest") || tablePath.contains("crate");
-				amplifyDrops(drops, scale.lootBonus(), isContainer, context.getRandom());
+			} else {
+				double effectiveLootBonus = scale.lootBonus() + PlayerRpg.get(player).luckLootChance();
+				if (effectiveLootBonus > 0.0) {
+					String tablePath = table.unwrapKey().map(k -> k.identifier().getPath()).orElse("");
+					boolean isContainer = tablePath.contains("chest") || tablePath.contains("crate");
+					boolean isHighTierChest = tablePath.equals("blocks/locked_armory_crate")
+							|| tablePath.equals("blocks/anomaly_vault_chest")
+							|| tablePath.equals("blocks/boss_trophy_chest");
+					amplifyDrops(drops, effectiveLootBonus, isContainer, isHighTierChest, context.getRandom());
+				}
 			}
 		});
 		registerCommands();
@@ -355,8 +362,33 @@ public final class FloorDifficulty {
 		});
 	}
 
-	private static void amplifyDrops(List<ItemStack> drops, double lootBonus, boolean isContainer,
+	private static void amplifyDrops(List<ItemStack> drops, double lootBonus, boolean isContainer, boolean isHighTierChest,
 			net.minecraft.util.RandomSource random) {
+		List<ItemStack> stackable = collectAmplifiable(drops);
+		if (!stackable.isEmpty() && random.nextDouble() < Math.min(0.85, lootBonus)) {
+			ItemStack picked = stackable.get(random.nextInt(stackable.size()));
+			int extra = lootBonus >= 1.1 ? 2 : 1;
+			picked.setCount(Math.min(picked.getMaxStackSize(), picked.getCount() + extra));
+		}
+		if (isHighTierChest && lootBonus >= 0.70) {
+			List<ItemStack> secondPass = collectAmplifiable(drops);
+			if (!secondPass.isEmpty() && random.nextDouble() < Math.min(0.75, lootBonus - 0.35)) {
+				ItemStack picked = secondPass.get(random.nextInt(secondPass.size()));
+				picked.setCount(Math.min(picked.getMaxStackSize(), picked.getCount() + 1));
+			}
+		}
+		Item coin = BuiltInRegistries.ITEM.getValue(BackroomsMod.id("lost_old_coin"));
+		if (coin == net.minecraft.world.item.Items.AIR) return;
+		if (isHighTierChest && lootBonus >= 0.35) {
+			if (random.nextDouble() < Math.min(0.45, lootBonus * 0.45)) {
+				drops.add(new ItemStack(coin, lootBonus >= 1.15 ? 2 : 1));
+			}
+		} else if (isContainer && lootBonus >= 0.65 && random.nextDouble() < Math.min(0.35, (lootBonus - 0.5) * 0.5)) {
+			drops.add(new ItemStack(coin, 1));
+		}
+	}
+
+	private static List<ItemStack> collectAmplifiable(List<ItemStack> drops) {
 		List<ItemStack> stackable = new ArrayList<>();
 		for (ItemStack stack : drops) {
 			if (!stack.isEmpty() && !isProtected(stack) && stack.getMaxStackSize() > 1
@@ -364,17 +396,7 @@ public final class FloorDifficulty {
 				stackable.add(stack);
 			}
 		}
-		if (!stackable.isEmpty() && random.nextDouble() < Math.min(0.85, lootBonus)) {
-			ItemStack picked = stackable.get(random.nextInt(stackable.size()));
-			int extra = lootBonus >= 1.1 ? 2 : 1;
-			picked.setCount(Math.min(picked.getMaxStackSize(), picked.getCount() + extra));
-		}
-		if (isContainer && lootBonus >= 0.65 && random.nextDouble() < Math.min(0.35, (lootBonus - 0.5) * 0.5)) {
-			Item coin = BuiltInRegistries.ITEM.getValue(BackroomsMod.id("lost_old_coin"));
-			if (coin != net.minecraft.world.item.Items.AIR) {
-				drops.add(new ItemStack(coin, 1));
-			}
-		}
+		return stackable;
 	}
 
 	private static void registerCommands() {

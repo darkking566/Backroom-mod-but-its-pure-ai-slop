@@ -70,6 +70,17 @@ public final class FrontroomsBlocks {
 	public static final Block CAMPUS_SIDEWALK = register("campus_sidewalk", building(MapColor.STONE));
 	public static final Block SODIUM_LAMP = register("sodium_lamp", building(MapColor.COLOR_ORANGE).sound(SoundType.GLASS).lightLevel(s -> 15)
 			.noOcclusion(), InstituteBlocks.LampHead::new);
+	// The staff town's houses (2026-11-27)
+	public static final Block TOWN_SIDING_GRAY = register("town_siding_gray", building(MapColor.COLOR_LIGHT_GRAY).sound(SoundType.WOOD));
+	public static final Block TOWN_SIDING_BLUE = register("town_siding_blue", building(MapColor.COLOR_LIGHT_BLUE).sound(SoundType.WOOD));
+	public static final Block TOWN_SIDING_CREAM = register("town_siding_cream", building(MapColor.SAND).sound(SoundType.WOOD));
+	public static final Block TOWN_TRIM = register("town_trim", building(MapColor.SNOW).sound(SoundType.WOOD));
+	public static final Block TOWN_SHINGLES = register("town_shingles", building(MapColor.COLOR_GRAY));
+	public static final Block TOWN_SHINGLE_STAIRS = register("town_shingle_stairs", building(MapColor.COLOR_GRAY).noOcclusion(),
+			p -> new InstituteBlocks.Stair(TOWN_SHINGLES.defaultBlockState(), p));
+	public static final Block TOWN_WINDOW = register("town_window", glass(MapColor.COLOR_GRAY), TransparentBlock::new);
+	public static final Block TOWN_GARAGE_DOOR = register("town_garage_door", building(MapColor.SNOW).sound(SoundType.METAL));
+	public static final Block TOWN_GARAGE_DOOR_TOP = register("town_garage_door_top", building(MapColor.SNOW).sound(SoundType.METAL));
 	public static final Block STEEL_POLE = register("steel_pole", building(MapColor.COLOR_GRAY).sound(SoundType.METAL).noOcclusion(),
 			InstituteBlocks.Pole::new);
 

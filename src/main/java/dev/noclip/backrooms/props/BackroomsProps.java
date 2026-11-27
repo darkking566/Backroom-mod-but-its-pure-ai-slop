@@ -62,9 +62,9 @@ public final class BackroomsProps {
 	public static final Block RELAY_DROPOFF_BOX = prop("relay_dropoff_box", SoundType.METAL, 4.5F, 4);
 
 	// 3 Tiered Loot Chests
-	public static final Block LOCKED_ARMORY_CRATE = chest("locked_armory_crate", true, SoundType.METAL, 4.5F, 0);
-	public static final Block ANOMALY_VAULT_CHEST = chest("anomaly_vault_chest", false, SoundType.AMETHYST, 5.0F, 6);
-	public static final Block BOSS_TROPHY_CHEST = chest("boss_trophy_chest", false, SoundType.GILDED_BLACKSTONE, 4.0F, 10);
+	public static final Block LOCKED_ARMORY_CRATE = chest("locked_armory_crate", ChestLockTier.ARMORY, SoundType.METAL, 4.5F, 0);
+	public static final Block ANOMALY_VAULT_CHEST = chest("anomaly_vault_chest", ChestLockTier.ANOMALY_VAULT, SoundType.AMETHYST, 5.0F, 6);
+	public static final Block BOSS_TROPHY_CHEST = chest("boss_trophy_chest", ChestLockTier.BOSS_TROPHY, SoundType.GILDED_BLACKSTONE, 4.0F, 10);
 
 	// 24 No-Clipped Props (P01..P24: large appliances/furniture are real multi-block structures!)
 	public static final Block NOCLIPPED_WOOD_CHAIR = blenderProp("noclipped_wood_chair", SoundType.WOOD, 1.4F, 0);
@@ -164,8 +164,8 @@ public final class BackroomsProps {
 				BlockBehaviour.Properties.of().mapColor(MapColor.METAL).sound(sound).strength(strength, 8.0F).lightLevel(s -> light).noOcclusion());
 	}
 
-	private static Block chest(String id, boolean locked, SoundType sound, float strength, int light) {
-		return register(id, props -> new BackroomsLootChestBlock(locked, props),
+	private static Block chest(String id, ChestLockTier lockTier, SoundType sound, float strength, int light) {
+		return register(id, props -> new BackroomsLootChestBlock(lockTier, props),
 				BlockBehaviour.Properties.of().mapColor(MapColor.METAL).sound(sound).strength(strength, 10.0F).lightLevel(s -> light).noOcclusion());
 	}
 

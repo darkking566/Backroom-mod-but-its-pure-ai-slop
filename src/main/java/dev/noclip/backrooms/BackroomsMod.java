@@ -42,6 +42,7 @@ public final class BackroomsMod implements ModInitializer {
 		dev.noclip.backrooms.core.rpg.Badges.register();
 		Floors.register();
 		dev.noclip.backrooms.core.floors.FloorDifficulty.register();
+		dev.noclip.backrooms.core.LevelGates.register();
 		BackroomsProps.register();
 		// The film's Level 0 objects (after the props, whose block entity they share).
 		dev.noclip.backrooms.level0.film.FilmProps.register();
@@ -52,6 +53,8 @@ public final class BackroomsMod implements ModInitializer {
 		People.register();
 		Economy.register();
 		Shops.register();
+		dev.noclip.backrooms.core.trade.Appraisal.register();
+		dev.noclip.backrooms.core.quest.Survivors.register();
 		Guilds.register();
 		// The horror direction (docs/project/1-gameplay/README.md): trips in and out, being pulled back, contracts, experience.
 		Trips.register();

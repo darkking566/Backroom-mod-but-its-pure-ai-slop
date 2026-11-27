@@ -6,6 +6,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.core.economy.Wallet;
+import dev.noclip.backrooms.core.floors.Floors;
+import dev.noclip.backrooms.core.locker.RelayService;
+import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.people.Person;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,17 +19,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.commands.Commands;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -37,15 +44,17 @@ import org.slf4j.LoggerFactory;
  * The merchants' shops. Right-click a merchant (a person tagged with a ShopRole) and the server sends their offers;
  * the shop screen asks to trade, and the server checks the player is still at that merchant, has the credits or the
  * goods, and makes the trade. Offers are data: {@code data/noclip_backrooms/shops/<role>.json} with a "sells" list (the
- * merchant sells: item, count, price, and an optional "extra" item cost) and a "buys" list (the merchant buys: item,
- * count, price). Items that do not exist (renamed, removed) are skipped with a warning.
+ * merchant sells: item, count, price, an optional "extra" item cost, and an optional "min_floor" tier) and a "buys" list.
  */
 public final class Shops {
 	private static final Logger LOGGER = LoggerFactory.getLogger("noclip_backrooms/shops");
 	/** How near the merchant a player has to stand to trade. */
 	private static final double REACH = 8;
 	private static final Map<UUID, Long> LAST_OPEN = new ConcurrentHashMap<>();
-	private static Map<ShopRole, List<ShopOffer>> offers;
+	private static Map<ShopRole, List<OfferEntry>> entries;
+
+	private record OfferEntry(ShopOffer offer, int minFloor) {
+	}
 
 	public enum Outcome {
 		DONE, NO_CREDITS, NO_GOODS, TOO_FAR, NO_SUCH_OFFER, LOCKED, WING_LOCKED
@@ -75,24 +84,81 @@ public final class Shops {
 				dev.noclip.backrooms.core.rpg.Badges.talk(serverPlayer);
 			} else {
 				if (role == ShopRole.MEDIC) Treatment.offer(serverPlayer);
-				ServerPlayNetworking.send(serverPlayer, new ShopOpenPayload(role.id(), offers(role)));
+				if ((role == ShopRole.BUYER || role == ShopRole.BLACK_MARKET) && Appraisal.hasAppraisable(serverPlayer)) {
+					Appraisal.offer(serverPlayer);
+				}
+				if (role == ShopRole.BLACK_MARKET) {
+					RelayService.offerBlackMarketExtras(serverPlayer);
+				}
+				ServerPlayNetworking.send(serverPlayer, new ShopOpenPayload(role.id(), offersFor(serverPlayer, role)));
 			}
 			return InteractionResult.SUCCESS;
 		});
+		CommandRegistrationCallback.EVENT.register((dispatcher, registry, environment) -> dispatcher.register(
+				Commands.literal("backrooms")
+						.requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+						.then(Commands.literal("shop")
+								.then(Commands.literal("spawn_black_market").executes(ctx -> {
+									ServerPlayer p = ctx.getSource().getPlayerOrException();
+									spawnBlackMarket(p.level(), p.getX(), p.getY(), p.getZ());
+									return 1;
+								})))));
 	}
 
-	/** A merchant's offers, read once from the data files. */
-	public static synchronized List<ShopOffer> offers(ShopRole role) {
-		if (offers == null) {
-			offers = new EnumMap<>(ShopRole.class);
-			for (ShopRole each : ShopRole.values()) offers.put(each, load(each));
+	/** Spawns an underground Backrooms Black Market merchant NPC (floor-tiered hardware & field services). */
+	public static Person spawnBlackMarket(ServerLevel level, double x, double y, double z) {
+		Person person = People.type(ShopRole.BLACK_MARKET.look()).create(level, EntitySpawnReason.EVENT);
+		if (person == null) return null;
+		person.snapTo(x, y, z, 0.0F, 0.0F);
+		person.setNoAi(true);
+		person.setInvulnerable(true);
+		person.setPersistenceRequired();
+		person.addTag(ShopRole.BLACK_MARKET.tag());
+		person.setCustomName(ShopRole.BLACK_MARKET.title());
+		person.setCustomNameVisible(true);
+		level.addFreshEntity(person);
+		return person;
+	}
+
+	/** Returns true if {@code player} is standing within interaction reach of any NPC carrying {@code role}. */
+	public static boolean near(ServerPlayer player, ShopRole role) {
+		if (player == null || role == null) return false;
+		return !player.level().getEntitiesOfClass(Person.class, player.getBoundingBox().inflate(REACH),
+				p -> p.entityTags().contains(role.tag())).isEmpty();
+	}
+
+	private static synchronized List<OfferEntry> entriesFor(ShopRole role) {
+		if (entries == null) {
+			entries = new EnumMap<>(ShopRole.class);
+			for (ShopRole each : ShopRole.values()) entries.put(each, load(each));
 		}
-		return offers.get(role);
+		return entries.get(role);
 	}
 
-	private static List<ShopOffer> load(ShopRole role) {
+	/** Base merchant offers unlocked from Floor 1 (identical to full offer list for non-tiered roles). */
+	public static List<ShopOffer> offers(ShopRole role) {
+		return offersForFloor(role, 1);
+	}
+
+	/** Offers unlocked at {@code floor} depth (filters entries with {@code min_floor <= floor}). */
+	public static List<ShopOffer> offersForFloor(ShopRole role, int floor) {
+		int effective = Math.max(1, floor);
+		List<ShopOffer> filtered = new ArrayList<>();
+		for (OfferEntry entry : entriesFor(role)) {
+			if (entry.minFloor() <= effective) filtered.add(entry.offer());
+		}
+		return List.copyOf(filtered);
+	}
+
+	/** Active offers visible to {@code player} (Black Market scales by current trip floor depth). */
+	public static List<ShopOffer> offersFor(ServerPlayer player, ShopRole role) {
+		int floor = (role == ShopRole.BLACK_MARKET && player != null) ? Math.max(1, Floors.of(player).floor()) : 1;
+		return offersForFloor(role, floor);
+	}
+
+	private static List<OfferEntry> load(ShopRole role) {
 		String path = "data/" + BackroomsMod.MOD_ID + "/shops/" + role.id() + ".json";
-		List<ShopOffer> list = new ArrayList<>();
+		List<OfferEntry> list = new ArrayList<>();
 		try (InputStream stream = Shops.class.getClassLoader().getResourceAsStream(path)) {
 			if (stream == null) return List.of();
 			JsonObject root = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
@@ -104,7 +170,7 @@ public final class Shops {
 		return List.copyOf(list);
 	}
 
-	private static void read(JsonArray array, boolean fromPlayer, List<ShopOffer> into, String path) {
+	private static void read(JsonArray array, boolean fromPlayer, List<OfferEntry> into, String path) {
 		if (array == null) return;
 		for (JsonElement element : array) {
 			JsonObject o = element.getAsJsonObject();
@@ -116,7 +182,8 @@ public final class Shops {
 				extra = stack(e.get("item").getAsString(), e.has("count") ? e.get("count").getAsInt() : 1, path);
 				if (extra.isEmpty()) continue;
 			}
-			into.add(new ShopOffer(goods, o.get("price").getAsInt(), extra, fromPlayer));
+			int minFloor = o.has("min_floor") ? Math.max(1, o.get("min_floor").getAsInt()) : 1;
+			into.add(new OfferEntry(new ShopOffer(goods, o.get("price").getAsInt(), extra, fromPlayer), minFloor));
 		}
 	}
 
@@ -141,16 +208,15 @@ public final class Shops {
 	}
 
 	private static Outcome tryTrade(ServerPlayer player, ShopRole role, int index, int times) {
-		List<ShopOffer> list = offers(role);
+		List<ShopOffer> list = offersFor(player, role);
 		if (index < 0 || index >= list.size()) return Outcome.NO_SUCH_OFFER;
-		boolean near = !player.level().getEntitiesOfClass(Person.class, player.getBoundingBox().inflate(REACH),
-				p -> p.entityTags().contains(role.tag())).isEmpty();
-		if (!near) return Outcome.TOO_FAR;
+		if (!near(player, role)) return Outcome.TOO_FAR;
 		// At the institute, the medic and the quartermaster only serve a team that has met enough quotas.
 		if (role.clearance() > 0 && player.level().dimension() == dev.noclip.backrooms.core.Home.FRONTROOMS
 				&& dev.noclip.backrooms.core.quota.Quota.clearance(player.level().getServer()) < role.clearance()) return Outcome.WING_LOCKED;
-		// A team in debt to M.E.G. finds the outpost closed, all but the buyer (selling is how the debt gets paid).
-		if (role != ShopRole.BUYER && dev.noclip.backrooms.core.quota.Quota.locked(player.level().getServer())) return Outcome.LOCKED;
+		// A team in debt to M.E.G. finds the outpost closed (buyer still takes goods; Backrooms black market is independent).
+		if (role != ShopRole.BUYER && role != ShopRole.BLACK_MARKET
+				&& dev.noclip.backrooms.core.quota.Quota.locked(player.level().getServer())) return Outcome.LOCKED;
 		ShopOffer offer = list.get(index);
 		Inventory inventory = player.getInventory();
 		long price = (long) offer.price() * times;

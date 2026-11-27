@@ -608,6 +608,23 @@
   - 測試：`InstituteLayoutTest` 走路時把物件當障礙（人、門、樓梯照樣走得到）並新增物件檢查；`FrontroomsClientTest` 檢查詢問桌在位置上、另一半接到主方塊，加 6 張室內照
   - 驗證：`gradlew build`（139 個單元測試）、`runClientGameTest -Plevels=frontrooms,film` 與 `-Plevels=frontrooms,horror` 通過；截圖與物件總覽存到 `docs/project/1-gameplay/images/`；`CREDITS.md` 補上這次用到的照片
 - 使用者同意後推送：抓 GitHub 合併朋友新推的 11 個 Level 4 提交（結構變化四批、流浪者與窗戶調整等），沒有衝突；合併後 `gradlew build`（144 個單元測試）通過；把 `main` 推送到 GitHub（研究所改版兩批 `a1c05caf`、`2155210e` 與企劃文件，以及 Antigravity 先前在本機提交的 `4a9f0aee`、`8cb6cbc4`）；沒有強制推送、沒有改寫歷史
+- 前室眷舍小鎮第一批（狐霖前室的「地球」白天）：
+  - 新增 `frontrooms/FrontroomsTown`（純資料：一條街、八棟房子南北對稱、雜貨店、公園、路燈、樹；房子的物件與公園物件的位置）、`TownLife`（信箱給「家裡寄來的信」與硬幣、野餐回飢餓與理智、路邊時鐘、野餐的三個人與「睡不好的店主」；一天一次用玩家標籤記）；新物品 `home_letter`（12 種信的內容）
+  - 房子裡用電影家具店的家具，鋪 Level 0 的地毯與壁紙（白天像家，細看是後室）
+  - 9 種小鎮物件用 Blender 做（`tools/film/town_list.py`、`make_town_props.py`；`make_institute_data.py` 加 `town` 參數），9 種房子方塊（木板牆三色、飾條、瀝青瓦與瓦屋頂樓梯、六格窗、車庫門上下）由新工具 `tools/make_frontrooms_town.py` 產生（樓梯的方塊狀態照原版規則產生，先跟原版 oak_stairs 比對過一致）；`institute_prints.py` 多了時鐘面、貨架商品、雜貨店招牌
+  - 接線：生成器先問小鎮；地形在小鎮範圍保持平坦；小鎮建物不能破壞；區塊載入時把小鎮多格物件的其他格接到主方塊；`BlenderPropRenderer` 一行加 `town_`；`FilmLook` 依前綴找 `models/town`
+  - 測試：新增 `FrontroomsTownTest`（物件放在空處且有東西撐著、每棟房子的門與屋內、店的櫃台、野餐的位置都從街上走得到、物件清單跟工具的一致）；`FrontroomsClientTest` 加門、居民、信箱一天一封、野餐回飢餓的檢查與 4 張小鎮照
+  - 驗證：前室的 11 個單元測試、`runClientGameTest -Plevels=frontrooms,horror,film` 通過；`gradlew build` 有 1 個失敗在 Antigravity 進行中的 `ExplorationSystemsTest`（它同時在改 `RelayService` 等，與小鎮無關）
+  - 同時 Antigravity 在同一資料夾改程式（任務／LevelGates、RPG、商店、語言檔、遊戲玩法企劃），只提交我的檔案；語言檔與企劃只放我的那幾段
+- 398 的夜晚（使用者確認微笑夢魘直接用朋友做的微笑者）：
+  - 新增 `frontrooms/Nights398`：前室入夜且有人讀完 B2 檔案時變成 Level 398；標題、白天的人消失、草坪上站著無面靈、每人一隻調強的微笑者（血量 2 倍、速度 1.15 倍）；在路燈下待 60 秒或晚上進屋關門待 10 秒是壞結局「從來沒有離開過」，3 秒後在 Level 0 醒來；天亮全部清掉
+  - `FrontroomsTown` 多了房子與路燈的位置清單；`TownLife` 在 398 的夜晚不放白天的人、時鐘停住
+  - 測試：`FrontroomsClientTest` 最後加 398 的檢查（讀完檔案、入夜、無面靈與微笑者出現、白天的人不在、拍夜景、站在路燈下被送到 Level 0、天亮全部消失）；第一次把這段放在中間，讓玩家去 Level 0 再回來，打亂了後面「交滿三期」的檢查，移到最後就通過了
+  - 驗證：`runClientGameTest -Plevels=frontrooms` 通過；截圖 `docs/project/1-gameplay/images/town_398.jpg`；企劃寫上已做與還沒做（畫面再暗、好結局「回家了」怎麼接結局 B、小女孩、槍店、時鐘真的變慢）
+  - Antigravity 仍有未提交的改動在工作區，只提交我的檔案
+- 398 的夜晚變暗：新增 `Night398Payload`（伺服器在夜晚狀態改變時告訴前室裡的人）與客戶端 `frontrooms/Night398Client`；`core/look/Look` 多一種 `NIGHT_398`（霧 4～34 格、暗紅、光照衰減 0.14），前室在 398 的夜晚也套用（開光影時不套）；`BackroomsClient` 加一行註冊；`runClientGameTest -Plevels=frontrooms` 通過，夜景截圖換成新的
+- 使用者同意後推送：抓過 GitHub，沒有新提交要合併；推送前用另開的 git worktree 只拿已提交的程式編譯並跑單元測試（147 個全過，工作區裡 Antigravity 未提交的改動不算進去），把 `main` 推送到 GitHub（眷舍小鎮 `8cb578ec`、398 的夜晚 `f0d71c0c`、夜晚變暗 `38ee0823`）；Antigravity 未提交的改動沒有推；沒有強制推送、沒有改寫歷史
+- 使用者說了第一趟的構想（第一次進後室沒有其他門；跟著研究員的纜線走到 M.E.G. 的門；牆上有塗鴉；第二次以後才能去其他 Level）：寫進 `docs/project/1-gameplay/README.md` 任務主線一節的新小節「第一趟：跟著纜線走」，含 Claude 的建議（纜線長度與樣子、4 個研究員的遺物接「失蹤的小隊」、塗鴉越接近門越清楚、第一趟其他門打不開並提示纜線、第一趟的門只對新人開）與 42 句塗鴉（中英對照、分五類、建議擺放順序）；只改文件
 
 ## 動作記錄（Antigravity）
 
@@ -1097,3 +1114,25 @@
   - **#18「1998 最後一個週五」全區鋪滿家具**（`Level4ChunkGenerator.java`、`Level4Props.java`）：`FROZEN_FRIDAY_1998` 涵蓋之所有鄰接格子皆配置雙人 `OFFICE_DESK`、桌上 `PROP_DESKTOP_COMPUTER`、對坐 `PROP_OFFICE_CHAIR`、盆栽、檔案櫃與杏仁水瓶群
   - **#17 深淵暗門與 #14 懸停貨梯空間升級**（`Level4PoiPlan.java`、`Level4ChunkGenerator.java`、`Level4PoiEvents.java`）：#17 改用深灰金屬冷水機塔與向下延伸 6 格的三寬石磚懸空深淵階梯（兩側鐵欄扶手＋`y=16` 黑混凝土裂谷＋懸吊燈籠＋南端深處 `OFFICE_BASEMENT_71` 門）；#14 加入鋼製井壁導軌、雙條垂落鋼纜、井道維修燈與破口黃黑封鎖線
   - **驗證**：更新 `Level4ClientTest.java` 與 `POI.md`；驗證 JSON、單元測試、`build` 與 `runClientGameTest "-Plevels=4" "-Psections=pois,blocks"` 全數通過並肉眼檢視升級後實機截圖（`-Pshaders` 尚未單獨執行）；僅於本機 `main` 提交 Route B 自身改動（未推送）
+- 完成 **新順位三（方案 A：條件門禁框架／進階寶箱分級解封＋幸運雙軸加成／中繼付費捷徑＋修裝＋黑市／盲盒專業鑑定／受困倖存者支線）**（Antigravity；未修改 `frontrooms/`、`crafting/`、`monsters/`、`level0..4/`、`tools/film/` 與模型貼圖，已提交並推送至 GitHub）：
+  - **條件解鎖樓層與門禁框架**（`core/LevelGates.java`、`core/LevelExits.java`、`core/guild/Contracts.java`）：
+    - 新增 `LevelGates`（`Gate` 條件：1～4 階密碼門駭客器、鑰匙卡／憑證與消耗選項、世界進度旗標 `GateData`），接入 `LevelExits.use` 出口檢查、擊殺 Boss 自動記錄 `boss:<entity>` 旗標與 `/backrooms gate status|flag|unlock|clear`
+    - `Contracts` 新增 `isCompletableFor` 與 `availableFor`，接通已開放樓層與玩家持有的門禁資格過濾，防止指派進不去的委託（未對現有 0～4 層預設加鎖，不影響既有路線）
+  - **進階寶箱分級解封與雙軸＋幸運掉落強化**（新增 `props/ChestLockTier.java`，更新 `BackroomsLootChestBlock.java`、`BackroomsProps.java`、`core/floors/FloorDifficulty.java`）：
+    - `LOCKED_ARMORY_CRATE` 維持撬棍／開鎖組；`ANOMALY_VAULT_CHEST` 需持 2 階以上密碼門駭客器（扣 8 耐久）；`BOSS_TROPHY_CHEST` 檢查周圍 24 格無存活首領級守衛才能開啟
+    - `FloorDifficulty` 掉落倍率整合 `PlayerRpg.get(player).luckLootChance()`，並對三大高階箱強化主題鎖定疊加與遺失舊幣掉率
+  - **中繼站剩餘服務、分層黑市與專業盲盒鑑定**（`core/quota/Quota.java`、`core/trade/ShopRole.java`、`Shops.java`、`shops/black_market.json`、`core/trade/Appraisal.java`、`core/locker/RelayService.java`、`items/BackroomsConsumableItem.java`）：
+    - 新增 `ShopRole.BLACK_MARKET`（外觀 `speednoclipper`）與 `shops/black_market.json` 依當趟層數（1／3／5 層）解鎖貨單，擺脫 M.E.G. 欠債封鎖並提供 `/backrooms shop spawn_black_market`
+    - `RelayService` 補齊付費嚮導捷徑（`/meg shortcut [level]`，已測繪樓層 7 折）與現場簡易修裝（`/meg repair [all]`，依耐久與工程等級折扣最多 30%）；`Shift+右鍵` 寄物箱與黑市對話顯示快捷按鈕
+    - 新增 `Appraisal`（`/meg appraise [safe|drive]`）由收購商或黑市付點數鑑定 `rusted_office_safe`（35 點）與 `encrypted_hard_drive`（50 點），採幸運加成大獎率（12%～40%）；保留野外直接撬開並加幸運額外產出與提示
+  - **受困倖存者支線系統**（新增 `core/quest/Survivors.java`，註冊於 `BackroomsMod.java`）：
+    - 實作 `STRANDED -> SEEKING_ITEM -> ESCORTING -> RESCUED` 三段互動＋跟隨護送狀態機，內建 `little_girl`（可共用至後室與前室）與 `lost_surveyor` 兩組劇本；杏仁水／食物安撫 → 生成發光遺失信物與方位距離提示 → 護送至安頓床、中繼寄物箱或駐點安全區後發放生存經驗、點數、遺失舊幣、理智與對應樓層線索並授予 `quest:<id>` 旗標
+  - **文件與驗證**（`zh_tw.json`、`en_us.json`、`docs/project/1-gameplay/README.md`、`src/test/java/dev/noclip/backrooms/core/ExplorationSystemsTest.java`、`HorrorClientTest.java`）：
+    - 補齊雙語翻譯鍵與 JSON 語法檢核；`ExplorationSystemsTest` 驗證門禁純函式、寶箱分階、捷徑／修裝費用、鑑定大獎率與倖存者狀態轉換
+    - 執行 `.\gradlew.bat build compileGametestJava --no-daemon`（全部 150 項單元測試 0 失敗）與 `.\gradlew.bat runClientGameTest "-Plevels=horror,floors,field" --no-daemon`（含 `HorrorClientTest` 步驟 `12a..12e` 實機驗證且日誌零缺物警告）皆全數通過
+- 修復 **非光影模式下夜視效果（杏仁水／`/effect give`）無效問題**（Antigravity，已提交並推送至 GitHub）：
+  - **問題原因**：無光影時 `Look.falloff`（`src/client/.../core/look/Look.java`）未檢查 `state.nightVisionEffectIntensity`，無條件把 `state.brightness` 設為負值壓暗光圖；`Look.darken`（及各層 `dimension_type`）亦無條件把近距離純黑迷霧壓在 6～30 格內，將夜視視野整段吞掉
+  - **修復內容**（`src/client/.../core/look/Look.java`、`mixin/client/FogRendererDarkness.java`、`camcorder.fsh` 控制貼圖）：
+    - `Look.falloff` 依 `state.nightVisionEffectIntensity` 將 `state.brightness` 平滑拉回夜視亮度（保留最後 10 秒閃爍）
+    - `Look.darken` 傳入 `partialTick`，有 `MobEffects.NIGHT_VISION` 時依 `GameRenderer.nightVisionScale` 將迷霧起訖距離向外拉開並柔化黑霧，同時衰減送入 `camcorder.fsh` 的 falloff 係數；沒有夜視時完全維持原本暗黑迷霧與光照衰減
+  - **驗證**：`src/gametest/.../look/LookClientTest.java` 新增 `checkNightVision` 回歸檢核（夜視前後光圖／霧距斷言與清除還原）；已執行 `.\gradlew.bat build compileGametestJava --no-daemon` 與 `.\gradlew.bat runClientGameTest "-Plevels=look" --no-daemon` 通過，並實機檢視 `0012_look_level0_0_camcorder.png`、`0018_look_level0_0_night_vision.png`、`0019_look_level0_0_night_vision_clean.png` 確認夜視正常明亮且不破圖

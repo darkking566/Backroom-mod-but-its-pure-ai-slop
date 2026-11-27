@@ -346,9 +346,19 @@ public final class BackroomsConsumableItem extends Item {
 						: new Item[]{BackroomsItems.GREEN_CIRCUIT, BackroomsItems.RED_CIRCUIT, BackroomsItems.MICROCHIP, BackroomsItems.SCIENCE_PACK_YELLOW, BackroomsItems.FORBIDDEN_SCROLL_TECH};
 				int roll = player.getRandom().nextInt(pool.length);
 				int qty = (roll == 0) ? 3 : 1;
+				if (player instanceof ServerPlayer sp && pool[roll].getDefaultMaxStackSize() > 1) {
+					double luckBonus = PlayerRpg.get(sp).luckLootChance();
+					if (luckBonus > 0.0 && player.getRandom().nextDouble() < luckBonus) {
+						qty++;
+					}
+				}
 				ItemStack reward = new ItemStack(pool[roll], qty);
 				if (!player.getInventory().add(reward)) player.drop(reward, false);
 				server.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.IRON_DOOR_OPEN, SoundSource.PLAYERS, 0.85F, 1.25F);
+				if (player instanceof ServerPlayer sp) {
+					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.appraisal.wild_hint")
+							.withStyle(ChatFormatting.GRAY));
+				}
 				if (!player.isCreative()) stack.shrink(1);
 				player.getCooldowns().addCooldown(stack, 15);
 			}

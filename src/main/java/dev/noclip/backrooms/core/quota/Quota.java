@@ -338,6 +338,18 @@ public final class Quota {
 		return data(server).paid;
 	}
 
+	public static boolean hasVisited(MinecraftServer server, String level) {
+		return server != null && level != null && data(server).visited.contains(level);
+	}
+
+	public static boolean hasMapped(MinecraftServer server, String level) {
+		return server != null && level != null && data(server).mapped(level);
+	}
+
+	public static java.util.Set<String> visitedLevels(MinecraftServer server) {
+		return server == null ? java.util.Set.of() : java.util.Set.copyOf(data(server).visited);
+	}
+
 	/** Told whenever the team meets a quota, with the new clearance. */
 	public static void onClearance(java.util.function.ObjIntConsumer<MinecraftServer> listener) {
 		CLEARANCE.add(listener);
