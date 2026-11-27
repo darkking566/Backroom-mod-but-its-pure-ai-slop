@@ -958,3 +958,16 @@
   - **修復 `cornerTile` 區域接縫打穿外牆問題**（`Level4Layout.java`）：`Level4Layout.cornerTile` 殘留早期全樓連通時期的 `i == 0` / `j == 0` 邊界 `Edge.OPEN` 特例，導致空中走廊跨區域接縫處（`cx == 0, cz == 0`）的轉角柱被設為 `Kind.AIR`（鋪地毯與天花板卻直接貫穿至 `OUTSIDE_AIR`），形成面向戶外雨幕的 1 格垂直裂縫；移除該特例後統一補齊 `Kind.PILLAR` 結構柱，密閉空中走廊牆角
   - **修復東／南向塔樓外牆空中走廊交界缺口**（`Level4ChunkGenerator.java`）：`blockAtColumn` 調整為 `if (skybridge && !exterior)`，避免塔樓外牆皮膚（`isExteriorSkin`）與空中走廊交會處在走廊上方／下方被挖出直通缺口
   - **驗證**：於 `Level4LayoutTest` 新增 `indoorWalkableSpacesNeverTouchOutsideAir`（掃描多組種子與相鄰 3×3 區域驗證所有室內可行走格八鄰域皆不與 `OUTSIDE_AIR` 相接），執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本項改動於本機 `main`（未推送）
+- 完成 **手電筒系統翻修、3D 雙款手電筒與五格電量 HUD、濾鏡／光照／光影相容與 F7 卡頓修復、紅霧滲透細節修正**（Antigravity）：
+  - **紅霧滲透細節修正**（`core/trip/Anomalies.java`、`zh_tw.json`、`en_us.json`）：`infestRedRoomNear` 加入最小生成距離 ≥ 14 格（不再直接凝結在玩家腳邊）；紅霧區 `ANOMALY_VAULT_CHEST` 與 `supply_crate` 改為優先於 `RED_ANOMALY_CLUSTER` 東西兩側對稱生成，避免補給箱擋住正面視線與拍照；更新 `anomaly.noclip_backrooms.red_mist.desc` 雙語說明對齊局部紅霧與異常寶箱區機制
+  - **濾鏡／迷霧／光照／Iris 光影相容與 F7 零延遲切換**（`src/client/.../core/look/Look.java`、`shaders/post/camcorder.fsh`、`post_effect/camcorder.json`、`dimension_type/level_{0..3}.json`）：
+    - 將後室暗度／迷霧／光照衰減與 F7 錄影機濾鏡完全解耦，並將 Level 0～3 維度預設迷霧改為深暗色調，關閉 F7 不再出現白黃色濃霧
+    - 針對 5 格層高重調非光影光照衰減（`falloff = 0.16F`）並於 `camcorder.fsh` 加入發光燈具自發光溢光，使無光影模式燈光明亮、暗處維持陰暗
+    - 透過反射快取自動偵測 Iris 光影包（`IrisApi.getInstance().isShaderPackInUse()`），開光影時自動退讓衝突的負向 lightmap 與後製濾鏡，避免每 tick 重複呼叫 `setPostEffect` 導致卡頓
+    - `ClockSampler` 擴充為 `4×1` 貼圖，F7 改由單一旗標位元即時開關 VHS 效果（0ms 不重建管線），並一次清空連按佇列避免畫面延遲造成雙重切換
+  - **手電筒系統翻修與 3D 雙款手電筒**（`level0/ModItems.java`、`FlashlightItem.java`、`FlashlightLight.java`、`items/BackroomsConsumableItem.java`、`level1/Smilers.java`、`recipe/flashlight_recharge.json`、`tools/make_flashlights.py`、`src/client/.../core/look/FlashlightHud.java`、`ItemTooltips.java`）：
+    - **標準手電筒**（`flashlight`）：改用自訂 `battery` 數值（`0..1200` 秒＝20 分鐘，分為 5 格，移除原版耐久條並相容舊存檔資料遷移）；玩家首次進世界自動發放 1 支滿電初始手電筒（`STARTER_TAG`）；實作三種裝電池方式：`Shift + 右鍵` 從背包自動裝填（`battery_cell` +2 格、`flashlight_battery_pack` 補滿）、背包內直接拿電池右鍵拖放點到手電筒（`overrideOtherStackedOnMe`）、2×2 無序合成（`flashlight_recharge.json` 改用 `battery_cell`）
+    - **Level 3 汲能手電筒**（`ambient_flashlight`）：無限電量、不受靜電過載耗電影響、光束 24 格，說明為「此手電筒可以汲取空氣中的能量轉換為電力」（依使用者指示**不放入世界生成**，保留給 Claude 後續擺放）
+    - **3D 正前方模型與即時光照**：以 `tools/make_flashlights.py` 產出 64×64 貼圖與雙款 3D 筒狀水平朝前模型；將動態方塊光源提速至 20Hz（每 2.5 格步進、近距亮度 12／13），並於 `camcorder.fsh` 疊加 60+ FPS 客戶端即時雙層聚光燈錐
+    - **五格電量 HUD 與 Tooltip**（`FlashlightHud.java`、`ItemTooltips.java`）：左下角 `SP 0:00:00` 上方顯示 5 格電池電量條 `[■ ■ ■ ■ ■]+ ON/OFF`（汲能手電筒顯示青色 `∞` 電池圖示），物品 Tooltip 同步顯示即時格數與百分比
+  - **驗證**：更新 `Level0ClientTest.checkFlashlight`（驗收初始手電筒、5 格無耐久條、`Shift+右鍵` 裝填 `battery_cell` 1→3 格、`ambient_flashlight` 無限電量零消耗與雙款實機截圖）；`.\gradlew.bat build compileGametestJava --no-daemon`、`.\gradlew.bat runClientGameTest "-Plevels=look,0" --no-daemon`、`.\gradlew.bat runClientGameTest "-Plevels=field" --no-daemon` 與 `.\gradlew.bat test --no-daemon` 全數通過並已實機檢視截圖（依使用者要求提交並推送至 GitHub `main`）

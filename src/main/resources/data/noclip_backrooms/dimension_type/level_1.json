@@ -10,9 +10,9 @@
     "minecraft:gameplay/respawn_anchor_works": false,
     "minecraft:visual/ambient_light_color": "#1d1f20",
     "minecraft:visual/block_light_tint": "#eef2ff",
-    "minecraft:visual/fog_color": "#56595a",
-    "minecraft:visual/fog_start_distance": 10.0,
-    "minecraft:visual/fog_end_distance": 60.0,
+    "minecraft:visual/fog_color": "#0d0e0f",
+    "minecraft:visual/fog_start_distance": 8.0,
+    "minecraft:visual/fog_end_distance": 44.0,
     "minecraft:visual/sky_light_factor": 0.0
   },
   "coordinate_scale": 1.0,

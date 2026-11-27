@@ -343,20 +343,63 @@ public final class Level0ClientTest implements FabricClientGameTest {
 		var server = game.getServer();
 		double originC = Maze.CENTER + 0.5;
 		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s " + originC + " " + standY + " " + originC + " 0 0");
+		// Every player starts with a limited-battery flashlight on join (custom 5-bar battery, no vanilla durability).
+		check(server.computeOnServer(s -> player(s).entityTags().contains(FlashlightItem.STARTER_TAG)),
+				"starter flashlight tag not granted on join");
+
 		server.runCommand("item replace entity @a weapon.mainhand with noclip_backrooms:flashlight");
 		context.waitTicks(3);
+		check(server.computeOnServer(s -> {
+			ItemStack fl = player(s).getMainHandItem();
+			return FlashlightItem.isFlashlight(fl) && !FlashlightItem.isInfinite(fl)
+					&& FlashlightItem.bars(fl) == FlashlightItem.BARS && !fl.isDamaged();
+		}), "fresh standard flashlight should have 5 full bars and no vanilla damage");
 
 		context.getInput().pressMouse(1);
 		server.waitFor(s -> {
 			ServerPlayer p = player(s);
 			return FlashlightItem.isLit(p.getMainHandItem()) && FlashlightLight.hasActiveBeam(p);
 		}, 40);
+		context.waitTicks(6);
+		context.takeScreenshot("level0_flashlight_3d_on");
+
+		// Test custom battery drain + Shift+Right-click battery_cell reload (+2 bars) + battery pack reload (full)
+		server.runOnServer(s -> {
+			ServerPlayer p = player(s);
+			ItemStack fl = p.getMainHandItem();
+			FlashlightItem.setBattery(fl, FlashlightItem.SECONDS_PER_BAR); // 1 bar (20%)
+			check(FlashlightItem.bars(fl) == 1, "expected 1 bar after draining to 240s");
+			p.getInventory().add(new ItemStack(dev.noclip.backrooms.items.BackroomsItems.BATTERY_CELL));
+			p.setShiftKeyDown(true);
+			fl.use(p.level(), p, net.minecraft.world.InteractionHand.MAIN_HAND);
+			p.setShiftKeyDown(false);
+			check(FlashlightItem.bars(fl) == 3, "battery_cell Shift+Right-click should add +2 bars (1 -> 3), got " + FlashlightItem.bars(fl));
+		});
 
 		context.getInput().pressMouse(1);
 		server.waitFor(s -> {
 			ServerPlayer p = player(s);
 			return !FlashlightItem.isLit(p.getMainHandItem()) && !FlashlightLight.hasActiveBeam(p);
 		}, 40);
+
+		// Verify Level 3 infinite ambient-energy flashlight: toggles on/off, never drains, has localization
+		server.runCommand("item replace entity @a weapon.mainhand with noclip_backrooms:ambient_flashlight");
+		context.waitTicks(3);
+		context.getInput().pressMouse(1);
+		server.waitFor(s -> {
+			ServerPlayer p = player(s);
+			ItemStack fl = p.getMainHandItem();
+			return FlashlightItem.isInfinite(fl) && FlashlightItem.isLit(fl) && FlashlightLight.hasActiveBeam(p);
+		}, 40);
+		context.waitTicks(6);
+		context.takeScreenshot("level0_ambient_flashlight_3d_on");
+		server.runOnServer(s -> {
+			ItemStack fl = player(s).getMainHandItem();
+			check(!FlashlightItem.drain(fl, 500) && FlashlightItem.battery(fl) == FlashlightItem.MAX_BATTERY,
+					"infinite ambient flashlight should never lose battery");
+		});
+		context.getInput().pressMouse(1);
+		server.waitFor(s -> !FlashlightItem.isLit(player(s).getMainHandItem()) && !FlashlightLight.hasActiveBeam(player(s)), 40);
 
 		server.runCommand("item replace entity @a weapon.mainhand with minecraft:air");
 	}
@@ -376,6 +419,7 @@ public final class Level0ClientTest implements FabricClientGameTest {
 				check(block.asItem().getDescriptionId().equals(block.getDescriptionId()), "wrong item name key for " + block);
 			}
 			check(Language.getInstance().has(ModItems.FLASHLIGHT.getDescriptionId()), "no name for flashlight");
+			check(Language.getInstance().has(ModItems.AMBIENT_FLASHLIGHT.getDescriptionId()), "no name for ambient_flashlight");
 			check(Language.getInstance().has(Level1Items.ALMOND_WATER.getDescriptionId()), "no name for almond water");
 		});
 	}

@@ -3,7 +3,7 @@
   "category": "equipment",
   "ingredients": [
     "noclip_backrooms:flashlight",
-    "minecraft:redstone"
+    "noclip_backrooms:battery_cell"
   ],
   "result": {
     "id": "noclip_backrooms:flashlight"
