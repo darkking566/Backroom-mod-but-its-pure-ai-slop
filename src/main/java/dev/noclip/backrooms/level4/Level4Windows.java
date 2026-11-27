@@ -115,10 +115,10 @@ final class Level4Windows {
 		ServerLevel level = server.getLevel(Level4.LEVEL_4);
 		if (level == null) return;
 		for (ServerPlayer player : level.players()) {
+			if (player.isCreative() || player.isSpectator()) continue;
 			if (now % 20 == 0) {
 				spawnNearbyWindowEntities(level, player);
 			}
-			if (player.isCreative() || player.isSpectator()) continue;
 			BlockPos window = nearestTrapWindow(level, player);
 			if (window == null) continue;
 			Vec3 center = Vec3.atCenterOf(window);
@@ -168,12 +168,20 @@ final class Level4Windows {
 	}
 
 	static void spawnNearbyWindowEntities(ServerLevel level, ServerPlayer player) {
+		// Never clutter corridors/courtyards with a row of WindowEntities; at most one active near the player.
+		if (!level.getEntitiesOfClass(WindowEntity.class, player.getBoundingBox().inflate(28.0)).isEmpty()) {
+			return;
+		}
 		long seed = Level4ChunkGenerator.planSeed(level.getChunkSource().randomState());
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 		int y = Level4ChunkGenerator.FLOOR_Y + 2;
 		int px = player.getBlockX(), pz = player.getBlockZ();
-		for (int x = px - 22; x <= px + 22; x++) {
-			for (int z = pz - 22; z <= pz + 22; z++) {
+		BlockPos bestPos = null;
+		Direction bestOut = null;
+		double bestDistSq = 12.5 * 12.5;
+
+		for (int x = px - 12; x <= px + 12; x++) {
+			for (int z = pz - 12; z <= pz + 12; z++) {
 				int cx = Math.floorMod(x, Level4Plan.CELL);
 				int cz = Math.floorMod(z, Level4Plan.CELL);
 				if (cx != 3 && cz != 3) continue;
@@ -181,19 +189,32 @@ final class Level4Windows {
 				if (!level.isLoaded(pos) || !level.getBlockState(pos).is(Level4Blocks.OFFICE_TRAP_WINDOW)) continue;
 				Direction outDir = outsideDir(level, seed, pos);
 				if (outDir == null) continue;
-				double sx = x + 0.5 + outDir.getStepX() * 1.15;
-				double sz = z + 0.5 + outDir.getStepZ() * 1.15;
-				double sy = Level4ChunkGenerator.FLOOR_Y + 1.05;
-				AABB check = new AABB(sx - 2.5, sy - 2.0, sz - 2.5, sx + 2.5, sy + 2.5, sz + 2.5);
-				if (!level.getEntitiesOfClass(WindowEntity.class, check).isEmpty()) continue;
-				WindowEntity entity = Monsters.WINDOW_ENTITY.create(level, EntitySpawnReason.NATURAL);
-				if (entity == null) continue;
-				entity.snapTo(sx, sy, sz, outDir.getOpposite().toYRot(), 0.0F);
-				entity.bindToWindow(pos, outDir.getOpposite());
-				level.addFreshEntity(entity);
-				entity.addTag(WindowEntity.LEVEL4_WINDOW_TAG);
+				Direction inDir = outDir.getOpposite();
+				double dx = player.getX() - (x + 0.5);
+				double dz = player.getZ() - (z + 0.5);
+				// Only manifest when the player is on the indoor side looking toward this window
+				if (dx * inDir.getStepX() + dz * inDir.getStepZ() <= 0.35) continue;
+				double dSq = dx * dx + dz * dz;
+				if (dSq < bestDistSq) {
+					bestDistSq = dSq;
+					bestPos = pos.immutable();
+					bestOut = outDir;
+				}
 			}
 		}
+		if (bestPos == null || bestOut == null) return;
+
+		// Tuck slightly deeper into the mist & subtly off-center, low enough to hide floating feet
+		double side = ((Math.floorMod(bestPos.getX() * 31 + bestPos.getZ() * 17, 2) == 0) ? 1.0 : -1.0) * 0.22;
+		double sx = bestPos.getX() + 0.5 + bestOut.getStepX() * 1.35 + (-bestOut.getStepZ()) * side;
+		double sz = bestPos.getZ() + 0.5 + bestOut.getStepZ() * 1.35 + bestOut.getStepX() * side;
+		double sy = Level4ChunkGenerator.FLOOR_Y + 0.85;
+		WindowEntity entity = Monsters.WINDOW_ENTITY.create(level, EntitySpawnReason.NATURAL);
+		if (entity == null) return;
+		entity.snapTo(sx, sy, sz, bestOut.getOpposite().toYRot(), 0.0F);
+		entity.bindToWindow(bestPos, bestOut.getOpposite());
+		level.addFreshEntity(entity);
+		entity.addTag(WindowEntity.LEVEL4_WINDOW_TAG);
 	}
 
 	private static Direction outsideDir(ServerLevel level, long seed, BlockPos pos) {

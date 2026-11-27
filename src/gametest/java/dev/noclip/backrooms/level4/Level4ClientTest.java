@@ -309,6 +309,26 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		game.getConnection().waitForChunksRender();
 		context.takeScreenshot("level4_trap_window");
 
+		// Verify walking around to the outdoor/opposite side causes the window-bound entity to vanish rather than hover staring backward
+		server.runOnServer(s -> {
+			ServerPlayer p = player(s);
+			double outX = win[0] + 0.5 + (win[0] + 0.5 - standX) * 4.0;
+			double outZ = win[1] + 0.5 + (win[1] + 0.5 - standZ) * 4.0;
+			p.teleportTo(outX, STAND, outZ);
+		});
+		context.waitTicks(6);
+		server.runOnServer(s -> {
+			var leftover = level4(s).getEntitiesOfClass(
+					dev.noclip.backrooms.monsters.windowentity.WindowEntity.class,
+					new AABB(new BlockPos(win[0], STAND + 1, win[1])).inflate(6.0));
+			check(leftover.isEmpty(), "expected WindowEntity to vanish when viewed from opposite/outside side");
+			player(s).teleportTo(standX, STAND, standZ);
+			player(s).setDeltaMovement(Vec3.ZERO);
+			player(s).resetFallDistance();
+			player(s).setHealth(player(s).getMaxHealth());
+		});
+		context.waitTicks(2);
+
 		server.runOnServer(s -> {
 			ServerPlayer p = player(s);
 			BlockPos pos = new BlockPos(win[0], STAND + 1, win[1]);

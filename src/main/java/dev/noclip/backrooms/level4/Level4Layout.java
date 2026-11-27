@@ -269,7 +269,7 @@ final class Level4Layout {
 		if (plan.nearHumanBase(roomI, roomJ)) return Kind.WINDOW_BLACKED;
 		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
 		int bayHash = Math.floorMod(hash(seed, rx * 31 + roomI, rz * 31 + roomJ, 421 + dir), 100);
-		if (bayHash < 24 && along >= 2 && along <= 4) return Kind.WINDOW_TRAP;
+		if (bayHash < 10 && along >= 2 && along <= 4) return Kind.WINDOW_TRAP;
 		return Kind.WINDOW_RAIN;
 	}
 

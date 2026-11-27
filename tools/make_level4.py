@@ -584,19 +584,19 @@ def save_cutout_glass():
     strip_s.save(TEXTURES / "office_rain_window_s.png", optimize=True)
     write_json(TEXTURES / "office_rain_window.png.mcmeta", {"animation": {"frametime": 1, "interpolate": False}})
 
-    # Clean translucent Entity 2 trap window: pale misty glass pane (no 2D stick figure; 3D WindowEntity spawns outside)
-    trap_img = Image.new("RGBA", (SIZE, SIZE), (210, 224, 232, 52))
+    # Clean translucent Entity 2 trap window: pale misty frosted glass pane (no 2D stick figure; 3D WindowEntity spawns outside)
+    trap_img = Image.new("RGBA", (SIZE, SIZE), (186, 202, 212, 82))
     td = ImageDraw.Draw(trap_img)
     # Subtle corner condensation frost
     for cx, cy in ((10, 10), (SIZE - 11, 10), (10, SIZE - 11), (SIZE - 11, SIZE - 11)):
-        td.ellipse([cx - 12, cy - 12, cx + 12, cy + 12], fill=(226, 236, 242, 34))
-    td.rectangle([0, 0, SIZE - 1, 4], fill=(74, 80, 88, 255))
-    td.rectangle([0, SIZE - 5, SIZE - 1, SIZE - 1], fill=(74, 80, 88, 255))
-    td.rectangle([0, 0, 4, SIZE - 1], fill=(74, 80, 88, 255))
-    td.rectangle([SIZE - 5, 0, SIZE - 1, SIZE - 1], fill=(74, 80, 88, 255))
+        td.ellipse([cx - 14, cy - 14, cx + 14, cy + 14], fill=(210, 224, 232, 42))
+    td.rectangle([0, 0, SIZE - 1, 4], fill=(68, 76, 84, 255))
+    td.rectangle([0, SIZE - 5, SIZE - 1, SIZE - 1], fill=(68, 76, 84, 255))
+    td.rectangle([0, 0, 4, SIZE - 1], fill=(68, 76, 84, 255))
+    td.rectangle([SIZE - 5, 0, SIZE - 1, SIZE - 1], fill=(68, 76, 84, 255))
     trap_img.save(TEXTURES / "office_trap_window.png", optimize=True)
-    mt_trap = flat((210, 224, 232), smooth=0.88, f0=20, porosity=0)
-    mt_trap.glow[:] = 0.15
+    mt_trap = flat((186, 202, 212), smooth=0.88, f0=20, porosity=0)
+    mt_trap.glow[:] = 0.06
     mt.save("office_trap_window_tmp", mt_trap)
     for suf in ("_n", "_s"):
         (TEXTURES / f"office_trap_window_tmp{suf}.png").replace(TEXTURES / f"office_trap_window{suf}.png")
@@ -740,12 +740,12 @@ def all_models():
         m[f"office_drywall_{v}"] = cube(f"office_drywall_{v}")
         m[f"office_drywall_upper_{v}"] = cube(f"office_drywall_upper_{v}")
 
-    # Trap window emits strong bright light
+    # Trap window emits subtle pale light instead of a bright spotlight
     m["office_trap_window"] = {
         "textures": {"all": NS + "office_trap_window", "particle": NS + "office_trap_window"},
         "elements": [{
             "from": [0, 0, 0], "to": [16, 16, 16],
-            "faces": {f: {"uv": [0, 0, 16, 16], "texture": "#all", "light_emission": 12} for f in ("north", "south", "east", "west", "up", "down")}
+            "faces": {f: {"uv": [0, 0, 16, 16], "texture": "#all", "light_emission": 5} for f in ("north", "south", "east", "west", "up", "down")}
         }]
     }
 
