@@ -123,6 +123,10 @@ final class FlickeringWalls {
 			if (ax * look.x + az * look.z > 0.3) continue;
 			BlockPos bottom = BlockPos.containing(player.getX() + ax * distance, feet, player.getZ() + az * distance);
 			if (!level.isLoaded(bottom)) continue;
+			// Level 0 repeats its centre Stage and keeps players in it (level0.Level0Space): a wall in a copy past a
+			// seam could be seen but never reached.
+			if (!dev.noclip.backrooms.level0.Level0Space.original(bottom.getX())
+					|| !dev.noclip.backrooms.level0.Level0Space.original(bottom.getZ())) continue;
 			BlockState lower = level.getBlockState(bottom), upper = level.getBlockState(bottom.above());
 			if (!lower.is(LEVEL_0_WALLS) || !upper.is(LEVEL_0_WALLS) || !facesOpenFloor(level, bottom)) continue;
 

@@ -189,6 +189,7 @@ public final class Evidence {
 			photo.set(DataComponents.CUSTOM_NAME, Component.translatable("item.noclip_backrooms.evidence_photo.of", name,
 					where == null ? "?" : where, value).withStyle(style -> style.withItalic(false)));
 			if (!player.getInventory().add(photo)) player.drop(photo, false);
+			dev.noclip.backrooms.core.guild.Contracts.onPhoto(serverPlayer, id, where == null ? "" : where);
 			flash(server, serverPlayer);
 			camera.hurtAndBreak(1, player, hand);
 			player.getCooldowns().addCooldown(camera, 40);
@@ -347,7 +348,10 @@ public final class Evidence {
 			if (where == null) refusal = "message.noclip_backrooms.field.beacon_not_here";
 			else if (entry == null || !entry.dimension().equals(level.dimension().identifier().toString())) refusal = "message.noclip_backrooms.field.beacon_no_entry";
 			else {
-				distance = (int) Math.sqrt(Math.pow(entry.pos().getX() - at.getX(), 2) + Math.pow(entry.pos().getZ() - at.getZ(), 2));
+				// As walked: Level 0 is a torus and carries players round it (level0.Level0Space).
+				int atX = dev.noclip.backrooms.level0.Level0Space.walkedX(player, at.getX());
+				int atZ = dev.noclip.backrooms.level0.Level0Space.walkedZ(player, at.getZ());
+				distance = (int) Math.sqrt(Math.pow(entry.pos().getX() - atX, 2) + Math.pow(entry.pos().getZ() - atZ, 2));
 				if (distance < MIN_DISTANCE) refusal = "message.noclip_backrooms.field.beacon_too_near";
 			}
 			if (refusal != null) {
@@ -398,7 +402,10 @@ public final class Evidence {
 			level.addFreshEntity(new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.3, pos.getZ() + 0.5, tape));
 			level.addFreshEntity(new ItemEntity(level, pos.getX() + 0.5, pos.getY() + 0.3, pos.getZ() + 0.5, new ItemStack(FieldKit.BEACON)));
 			level.playSound(null, pos, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 1.0F, 1.4F);
-			if (owner != null) owner.sendSystemMessage(Component.translatable("message.noclip_backrooms.field.beacon_done", scan.level()).withStyle(ChatFormatting.AQUA));
+			if (owner != null) {
+				owner.sendSystemMessage(Component.translatable("message.noclip_backrooms.field.beacon_done", scan.level()).withStyle(ChatFormatting.AQUA));
+				dev.noclip.backrooms.core.guild.Contracts.onTape(owner, scan.level());
+			}
 		}
 	}
 

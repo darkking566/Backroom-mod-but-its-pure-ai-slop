@@ -86,13 +86,34 @@ public final class FieldClientTest implements FabricClientGameTest {
 			server.runCommand("execute as @a run backrooms quota start");
 			server.runCommand("kill @e[type=!player]");
 
-			// Red mist: the mind goes faster, under a red haze.
+			// Red mist: localized to Red Mist enclaves (safe outside, sanity drains + red haze inside, with guaranteed vault chest).
 			server.runCommand("execute as @a run backrooms anomaly set red_mist");
 			context.waitFor(client -> AnomalyClient.affix().equals("red_mist"), 60);
+			BlockPos clearOut = stand(server);
+			check(!server.computeOnServer(s -> Anomalies.isInRedMistZone(level(s), clearOut)), "normal hallway should not be a red mist zone");
+			context.waitTicks(45);
+			check(!AnomalyClient.inZone(), "red mist overlay should stay off outside red mist enclaves");
+			BlockPos earlyEnclave = server.computeOnServer(s -> {
+				ServerLevel sl = level(s);
+				BlockPos at = Anomalies.infestRedRoomAt(sl, clearOut.north(2));
+				if (at == null) at = Anomalies.infestRedRoomAt(sl, clearOut);
+				if (at == null) at = Anomalies.infestRedRoomNear(sl, clearOut);
+				return at;
+			});
+			check(earlyEnclave != null, "failed to form red mist enclave near player at " + clearOut);
+			server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+					+ (earlyEnclave.getX() + 0.5) + " " + earlyEnclave.getY() + " " + (earlyEnclave.getZ() + 2.5) + " 180 12");
+			check(server.computeOnServer(s -> {
+				for (Direction d : Direction.Plane.HORIZONTAL) {
+					if (level(s).getBlockState(earlyEnclave.relative(d)).is(BackroomsProps.ANOMALY_VAULT_CHEST)) return true;
+				}
+				return false;
+			}), "red mist enclave did not spawn an anomaly vault chest");
+			context.waitFor(client -> AnomalyClient.inZone(), 80);
 			float sanity = server.computeOnServer(s -> PlayerRpg.get(player(s)).sanity());
 			context.waitTicks(80);
 			context.takeScreenshot("field_red_mist");
-			check(server.computeOnServer(s -> PlayerRpg.get(player(s)).sanity()) < sanity - 1.0F, "the red mist took nothing from the mind");
+			check(server.computeOnServer(s -> PlayerRpg.get(player(s)).sanity()) < sanity - 1.0F, "standing inside a red mist enclave took nothing from the mind");
 
 			// Mimics: some unopened crates are not crates.
 			server.runCommand("execute as @a run backrooms anomaly set mimics");
@@ -152,7 +173,9 @@ public final class FieldClientTest implements FabricClientGameTest {
 			server.runCommand("execute as @a at @s run tp @s ~ ~ ~ 0 0");
 			context.getInput().holdKeyFor(options -> options.keyUp, 30);
 			int lines = server.computeOnServer(s -> count(level(s), player(s).blockPosition(), FieldKit.RED_LINE));
-			check(lines >= 2, "the guide line laid " + lines + " blocks");
+			String where = server.computeOnServer(s -> player(s).position() + " onGround=" + player(s).onGround()
+					+ " hand=" + player(s).getMainHandItem());
+			check(lines >= 2, "the guide line laid " + lines + " blocks (player at " + where + ")");
 
 			// A battery lamp steadies the mind.
 			BlockPos here1 = stand(server);
@@ -282,10 +305,17 @@ public final class FieldClientTest implements FabricClientGameTest {
 			// 1. Dynamic Red Mist room infestation & Red Room Altar scene photo
 			server.runCommand("execute as @a run backrooms anomaly set red_mist");
 			BlockPos enclaveSpot = stand(server);
-			BlockPos altarAt = server.computeOnServer(s -> Anomalies.infestRedRoomAt(level(s), enclaveSpot.north(3)));
+			BlockPos altarAt = server.computeOnServer(s -> {
+				ServerLevel sl = level(s);
+				BlockPos at = Anomalies.infestRedRoomAt(sl, enclaveSpot.north(3));
+				if (at == null) at = Anomalies.infestRedRoomAt(sl, enclaveSpot);
+				if (at == null) at = Anomalies.infestRedRoomNear(sl, enclaveSpot);
+				return at;
+			});
 			check(altarAt != null, "red mist failed to condense a Red Room enclave");
 			check(server.computeOnServer(s -> level(s).getBlockState(altarAt).is(BackroomsProps.RED_ANOMALY_CLUSTER)), "no red anomaly cluster in red mist enclave");
-			server.runCommand("execute as @a at @s run tp @s ~ ~ ~ 180 12");
+			server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s "
+					+ (altarAt.getX() + 0.5) + " " + altarAt.getY() + " " + (altarAt.getZ() + 3.5) + " 180 12");
 			context.waitTicks(5);
 			server.runCommand("clear @a");
 			server.runOnServer(s -> {

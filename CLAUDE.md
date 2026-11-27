@@ -570,6 +570,45 @@
 - 使用者定下新方向（只改企劃，程式沒動）：第 0 層以電影版為主；分工改成朋友做新樓層、Claude 專心做物件建模、Gemini 做物品分布與擺放；建模順序是先把每一層（主要樓層）會敲掉變成資源的物品做完（第 0 層先，部分物件如辦公椅移到 Level 4），之後才做武器、醫療等；合成表等建模都定了再整個重做（先想每層物品敲掉變成什麼、同時列醫療與武器等成品，最後才想怎麼組成）。寫進 `docs/project/README.md`（分工）、`AGENTS.md`（分工一行）、`docs/project/3-crafting/README.md`（重做方向）、`docs/project/5-levels/level0/README.md`（第八節第 6 點：哪些換成電影版、哪些由 Claude 重做、手機待決定）
 - 使用者同意後，把 `main` 推送到 GitHub（電影版物件 `3139b0bc` 與新方向）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
+### 2026-11-27
+- 使用者問 Gemini 的「有限第 0 層」是否真的有用環面：查了 `StageLoop`，原本只在生存／冒險模式把走到邊緣的玩家傳到對面，地形不重複（邊界外是隔壁不同的場景），傳送落在對面某格中央、四周會突然變樣；旁觀者與創造模式完全不循環（朋友用旁觀者，所以一直看到新地形）。使用者要求做成真正看不出接縫的環面：
+  - 先合併朋友新推的 9 個 Level 4 提交（衝突在 `sounds.json` 與 `CLAUDE.md`，兩邊都保留）
+  - 新增 `level0/Level0Space`：每 5×5 塊場景為一區，區內每塊都是中央那塊的複製（`template()`）；生成器寫進世界的方塊改用 `worldBlockAt`（計畫 `blockAt` 本身不變，單元測試照舊）
+  - 改 Gemini 的 `StageLoop`：所有模式都循環；玩家一律待在中央場景，跨過邊緣剛好平移 300 格（面向、速度不變）；靠近邊緣 48 格時用 PORTAL 票先載入對面；`/backrooms stage info` 顯示是否在複製品裡；拿掉原本找落點失敗時讓玩家跑出去的漏洞
+  - 改朋友／Gemini 的程式：`Level0Arrival`（落點選在中央場景、紅室判斷用範本座標）、`EdgeShift`（以原始格為準，同時改寫附近每份複製，任一份被看著就不變形；狀態以原始格記錄）
+  - 改我自己的：`level1/FlickeringWalls`（閃爍牆只開在中央場景）、`level0p1/ZenithEntrance`（白色艙門改成每兩塊場景藏一扇，位置從計畫算出，每份複製都在同一處）、`core/field/Evidence`（測繪信標距離用走過的距離：`Level0Space.walkedX/Z`）
+  - 測試：Gemini 的 `Level0ClientTest` 新增「邊界外的複製品與場景逐格相同」「旁觀者、創造、生存跨過邊緣都剛好平移 300 格」，地標搜尋改成只找中央場景裡的（擴大搜尋範圍），世界比對改成跟 `worldBlockAt` 比，觀察模式變形等待改成前方任一格；`ExitClientChecks` 只找中央場景的門；`Level1ClientTest` 閃爍牆段改站在場景內；`Level0p1ClientTest` 艙門段改用新的找法
+  - 驗證：`gradlew build`、`runClientGameTest -Plevels=0`（通過；另外兩次各失敗在不同的隨機檢查「黑影時有怪物」「卡住的落點沒跳過」，看起來是第 0 層隨機事件造成的偶發，第三次通過）、`-Plevels=horror,floors,field,frontrooms,film,1 -Psections=leaveThroughDoor`、`-Plevels=0.1 -Psections=hatch,ways` 通過
+  - 企劃寫進 `docs/project/5-levels/level0/README.md` 第三節第 4 點（含給 Gemini 擺放家具的注意：要照範本座標放，不能照區塊掃描）
+  - 限制：在中央場景改動的方塊不會出現在遠處複製品上；複製品裡看不到另一側的隊友、怪物、掉落物
+- 使用者要求把環面的三個限制都處理掉（完整鏡像），並問每層都這樣做負擔重不重（回答：執行負擔小；開發上每層的生成器與擺放系統都要改成範本座標，工作量不小，建議只用在設計上要有限的樓層）：
+  - 新增 `level0/Level0Mirror`＋mixin `LevelSetBlockMirror`（`Level.setBlock`）：第 0 層任何方塊改變同時寫進所有已載入的複製品（不觸發鄰格更新），記進存檔 `level0_mirror`，複製品之後載入時補上；非玩家的實體（怪物、掉落物、箭）跨過邊緣也平移回中央場景
+  - 新增 mixin `TrackedEntityTorus`（`ChunkMap$TrackedEntity.updatePlayer`）：第 0 層照環面上的距離決定要不要把實體送給玩家、不管區塊有沒有送過
+  - 新增客戶端 `level0/Level0Ghosts`＋mixin `WalkAnimationStateAccess`：在邊緣外畫出玩家（含自己）、怪物、掉落物的分身（負數 id 的客戶端實體，每刻跟著本尊的位置、姿勢、走路動畫、同步資料，每 10 刻同步裝備）；玩家分身用新的 UUID（一開始沿用玩家的 UUID，兩個實體同一個 id 讓田野工具測試走路放紅線失敗，改掉後通過）
+  - 測試：`Level0ClientTest` 加「中央場景放的方塊同時出現在已載入與之後才載入的複製品」「邊緣外的盔甲座被移回」「邊緣外看得到分身」（截圖 `level0_seam_ghost`）；修朋友的「卡住的落點」檢查：第一格中央是坑洞時 Noclip 本來就落在同一格的走道上；`HorrorClientTest` 獵犬段改站在場景內（受傷的獵犬會往暗處退、跨過接縫）；`FieldClientTest` 紅線失敗訊息加上玩家位置
+  - 驗證：`gradlew build`、`runClientGameTest -Plevels=0,horror,floors,field,frontrooms,film,1 -Psections=leaveThroughDoor`（分兩次跑完都通過）
+  - 還沒鏡像：音效、粒子、方塊實體的內容（箱子內容、告示牌字）
+- 使用者同意後，把 `main` 推送到 GitHub（合併朋友的 Level 4、第 0 層環面 `af5e82dd`、完整鏡像 `1a751068`）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
+- 使用者把「物品擺進各層」從 Gemini 改給 Claude（接在建模之後）：改 `docs/project/README.md` 的分工表與順序、`AGENTS.md` 的分工一行、`docs/project/5-levels/level0/README.md`（第三節給擺放的人、第八節分工、第 5、6 點）；只改文件
+- 使用者說了 M.E.G. 任務主線的構想、要求研究所照劇照重做（寫實、3D 模型、壯觀、範圍變大）、狐霖前室的點子全部採用：寫進 `docs/project/1-gameplay/README.md`（新的「M.E.G. 任務主線」一節含使用者原話與 Claude 的建議；「研究所改版：照電影結尾的研究機構」；「前室的夜晚：398」對照表；戶外區半徑改約 196）；只改文件。參考了暫存區的電影截圖（結尾的研究機構：白牆、芥末黃腰牆、深色觀察窗、雙開門、防護衣）；用參照頁標頭重抓原圖被權限擋下，沒有再試。當時工作區有 Antigravity 未提交的改動（雙軸難度、保險箱、中繼箱、合約擴充），沒有動，提交時只放自己的部分
+- 使用者確定任務主線由 Claude 做，並補上故事背景（M.E.G. 在地下室做恐怖實驗、用玩家做的任務研究出有多種怪物能力的 Boss、玩家最後要反過來打倒 M.E.G.）：寫進 `docs/project/1-gameplay/README.md` 故事背景的新一節「M.E.G. 的秘密」，含原話與 Claude 的建議（任務成果變成 Boss 的能力、觀察窗後看得到收容區、結局改反轉版、反抗後 M.E.G. 斷資源）；只改文件
+- 前室研究所照電影結尾的研究機構重做（第一批）：
+  - 新工具 `tools/make_institute_plans.py` 畫五層平面圖（輸出 `frontrooms/InstitutePlans.java`），`InstituteLayout` 重寫：主館 96×72、B2／B1／地上三層、三層挑高中庭與 Level 0 標本艙、樓梯（`Flight`）、電影風接收室（白牆、黃腰牆、單面鏡觀察室）、薄荷綠醫療翼、B1 地下收容區格間、預鑄外牆與帶狀窗、「M.E.G.」大字、屋頂直升機坪與雷達罩；分期開門、人員位置、置物櫃、傳送台、B2 艙口都照舊
+  - 新 `FrontroomsCampus`：前廣場、大道與鈉燈、停車場、發電廠與煙囪、兩座冷卻塔、水塔、儲存槽、通訊塔、8 座哨塔、焊死的南大門；`FrontroomsTerrain` 圍牆半徑 100→196、150 格內平坦；生成器加園區、欄杆連接、每柱高度、園區附近不長樹；`Institute` 的保護範圍加上園區建物、醫官改朝北
+  - 新方塊 14 個（水磨石、薄荷牆與扶手牆、觀察窗、收容玻璃、預鑄板、帶狀窗、鋼構、招牌字板、柏油、標線、人行道、鈉燈燈頭、細鋼桿），舊的 5 個換貼圖（ID 不變）；新工具 `tools/make_frontrooms_institute.py`，照片材質新下載 ambientCG CC0：PaintedPlaster017、Terrazzo004、Asphalt031、OfficeCeiling001、Tiles107、Concrete049（另抓了幾個候選沒用到）
+  - 測試：`InstituteLayoutTest` 改寫並新增（每段樓梯一階一格有頭頂空間、兩端接得到、上樓梯從大廳走得到、園區不蓋進主館）；`FrontroomsClientTest` 改座標、回大廳後關任務報告、加 8 張風景照（拍照時藏介面）
+  - 驗證：`gradlew build`（138 個單元測試）、`runClientGameTest -Plevels=frontrooms` 與 `-Plevels=horror` 通過，log 沒有缺模型或貼圖；截圖存到 `docs/project/1-gameplay/images/institute_*.jpg`，企劃「研究所改版」一節標上已做與還沒做（室內 3D 物件、眷舍小鎮與 398、收容區的怪物）
+  - 同時 Antigravity 有未提交的改動（RPG、武器、合約等，也改了兩個語言檔），只提交我的檔案。Antigravity 在我提交前先提交了它的部分（`8cb6cbc4`），當時語言檔裡已經有我加的 13 個方塊名稱，所以那 13 個跟著它的提交進去了，我的提交只多了「細鋼桿」一個
+- 研究所第二批：室內 3D 物件（使用者要先做 3D 物件再推）：
+  - 18 種物件用 Blender 建模、照片材質烘焙：新增 `tools/film/institute_list.py`（清單、掉落、亮度）、`institute_prints.py`（X 光片、綠字螢幕、M.E.G. 標誌、生物危害標籤、標本、門裡的 Level 0）、`make_institute_props.py`（沿用電影家具的工具，`make_film_props.py` 最後一行改成 `if __name__ == "__main__"` 才能被匯入）、`make_institute_data.py`（模型 `models/institute/`、貼圖 `textures/institute/`、圖示、方塊狀態、掉落表、名稱、十字鎬標籤）
+  - 第一版有四個問題改掉重烤：CRT 螢幕被外框蓋住、烤漆面出現迷彩斑（改用塑膠照片加掉漆）、該是不鏽鋼的地方生鏽、防護衣太方
+  - 擺放：`make_institute_plans.py` 新增 `furnish()`（318 件，檢查每件都在地板上、不重疊、壁掛的背後是牆），寫進 `InstitutePlans.PROPS` 與 `PROP_TYPES`；新增 `frontrooms/InstituteFurnishing`（純資料）、`InstituteProps`（註冊方塊，掛到共用的方塊實體）；`InstituteLayout` 多 `PROP`／`PROP_PART`，生成器放方塊，`Institute` 在區塊載入時把多格物件的其他格接到主方塊
+  - 改到別人的：Gemini 的 `BlenderPropRenderer` 一行（`inst_` 開頭也畫網格）；我的 `FilmLook` 依前綴換資料夾
+  - 觀察窗改成半透明（亮的那邊只看到黑、暗的那邊看得到亮的房間）
+  - 測試：`InstituteLayoutTest` 走路時把物件當障礙（人、門、樓梯照樣走得到）並新增物件檢查；`FrontroomsClientTest` 檢查詢問桌在位置上、另一半接到主方塊，加 6 張室內照
+  - 驗證：`gradlew build`（139 個單元測試）、`runClientGameTest -Plevels=frontrooms,film` 與 `-Plevels=frontrooms,horror` 通過；截圖與物件總覽存到 `docs/project/1-gameplay/images/`；`CREDITS.md` 補上這次用到的照片
+- 使用者同意後推送：抓 GitHub 合併朋友新推的 11 個 Level 4 提交（結構變化四批、流浪者與窗戶調整等），沒有衝突；合併後 `gradlew build`（144 個單元測試）通過；把 `main` 推送到 GitHub（研究所改版兩批 `a1c05caf`、`2155210e` 與企劃文件，以及 Antigravity 先前在本機提交的 `4a9f0aee`、`8cb6cbc4`）；沒有強制推送、沒有改寫歷史
+
 ## 動作記錄（Antigravity）
 
 ### 2026-11-23
@@ -866,6 +905,15 @@
   - **驗證**：更新 `MazeTest`、`ZonePoiPlanTest`、`ExitsTest` 與 `Level0ClientTest`（新增 `checkOverhaulFeatures` 實測撕 1980 海報接 `LevelExits("161")`、Pitfalls 下層梯井、配電箱解鎖密室、多米諾熄燈與方案 C 邊界回繞）；執行 `.\gradlew.bat build --no-daemon`（全部 122 項單元測試 0 失敗）與 `.\gradlew.bat runClientGameTest -Plevels=0 --no-daemon` 全部通過、日誌零缺模型／缺貼圖錯誤，並逐一檢視實機截圖確認 5 格淨高、海報、下層梯井、M.E.G. 隔離站、深淵前哨與紅室／昏暗區 3D 物件渲染正常；僅留於本機工作目錄（未提交、未推送）
 - 依使用者要求以觀察者模式拍攝 Level 0 實機截圖與 300×300 平面鳥瞰圖供使用者手機檢視（暫時的拍攝程式 `Level0SpectatorTour.java` 拍完即刪除，未留在專案）；拍攝時發現挑高中庭／超大廳緊鄰 5 格高房間時高處會露出基岩，尚未修正（Antigravity）
 - 依使用者要求推送至 GitHub：先提交 Level 0 大改版（`0a49ee4a`），抓取並合併遠端 `origin/main` 3 個提交（含 Claude 的 `d1ff5605`「區塊載入時補建缺少的方塊實體」）；衝突只在 `Level0ClientTest.java`（遠端的玻璃辦公室／前人失蹤現場／異常補給角檢查是改版前座標，改版後這三處已由 `ZonePoiPlanTest` 涵蓋，保留遠端新增的「客戶端有收到方塊實體」檢查並換成改版後座標）；合併後 `compileJava compileClientJava compileTestJava compileGametestJava` 通過，正常推送 `main`（`de303fb7..59684341`，無強制推送、無改寫歷史）（Antigravity）
+- 依使用者統整之朋友實測回饋完成全數核准項目調整（未動 `getShape` 碰撞框、未動手電筒／光影／濾鏡、未推送）（Antigravity）：
+  - **撤除 Level 0 隨機家具、刪除 M.E.G. 臨時隔離哨站、停用 Level 1 巡邏隊**（`level0/Level0.java`、`level0/ZonePoiPlan.java`、`level0/Maze.java`、`level1/Level1.java`）：註解停用 `Level0Props.register()`（保留模型與配方待 Claude 建模完成後重新分配樓層）；從 `ZonePoiPlan` 移除 `MEG_ISOLATION_POST` 場景；於 `Level1.java` 註解停用 `Patrols.register()` 並同步更新 `ZonePoiPlanTest`、`Level0ClientTest` 與 `Level1ClientTest`
+  - **物件破壞特效**（新增 `props/PropBreakEffects.java`，接入 `BlenderSinglePropBlock.java`、`MultiPartPropBlock.java`、`NoClipPropBlock.java`）：依材質音效（木／金屬／玻璃／布料／紫水晶／骨塊／草植／石材）在破壞單格與多格 3D 家具的全部佔用格噴發對應材質碎片粒子、火花／煙塵與輔助破壞音效（不更動 `getShape`）
+  - **全模組道具說明**（新增 `src/client/.../core/look/ItemTooltips.java`，於 `BackroomsClient.java` 註冊，補齊 `zh_tw.json`／`en_us.json`）：透過 `ItemTooltipCallback` 為所有未帶 `lore.noclip_backrooms.*` 的工具、消耗品、野戰裝備、護甲、研究瓶、工作站、戰利品箱與分類素材（彈藥／槍件／首領核心／改裝配件／實體掉落／家具物件）加上繁中與英文說明
+  - **事件降頻與區域／POI 化、移除走廊迴圈、重做馬尼拉房間**（`level0/Level0ChunkGenerator.java`、`level0/Level0MicroEvents.java`）：保留 `StageLoop` 邊界回繞與 Level 1 `Warps`，移除 `tickMiniCorridorLoop` 與地毯衝刺滑倒；為環境微事件加入 60 秒開場緩衝與 2～4 分鐘冷卻，並將延遲腳步、電話／電視、多米諾熄燈與綠光誘餌綁定至對應區域／POI；馬尼拉房間進入時持續賦予生命回復與理智恢復、離開立刻清除回復效果，並於房內新增安全防爆床鋪（右鍵提示、6 秒內再按確認入睡並隨機傳送至 Level 1 或 Level 2）
+  - **區域化紅霧滲透與寶箱區**（`core/trip/Anomalies.java`、`AnomalyPayload.java`、`src/client/.../core/trip/AnomalyClient.java`）：`RED_MIST` 改為局部紅霧滲透區（掃描至 `dy=5` 齊平吸頂紅燈，必生 `RED_ANOMALY_CLUSTER` 與 `ANOMALY_VAULT_CHEST` 及附帶補給箱，遠處可見紅霧孢子）；僅玩家踏入紅霧區（半徑 10 格或原生紅室）時才顯示紅色濾鏡與扣理智，離開即恢復正常
+  - **前室 1F 大廳 Level 0 返回傳送台**（`frontrooms/InstituteLayout.java`、`Institute.java`、`InstituteBlocks.java`）：於前室研究所 1F 大廳中央（到達點正前方）新增 0 期權限即開放的 `2×2` `TRANSPORT_PAD`（`lobbyPads`），右鍵兩次確認即可免費直接返回 Level 0；B1 深層傳送台與 5 期權限解鎖維持不變
+  - **低理智分層怪物池與開源 CC0 音效替換**（`core/rpg/PlayerRpg.java`、`src/client/.../core/rpg/SanityHallucinations.java`、`sounds.json`、`CREDITS.md`）：改為依維度決定幻覺怪物池（Level 0 僅偶爾出現短暫 5～7.5 秒 `BACTERIA` 單體幻覺；Level 0.1 與前室為空；Level 1／2／3 各對應該層怪物）；從 Freesound 取得 4 個驗證為 CC0 1.0 的開源音檔（`szegvari`、`deleted_user_9482149`、`SoundEffectsForAll`）以 `ffmpeg` 轉為單聲道 OGG 放於 `sounds/sanity/`，替換原版終界使者／伏守者音效，並將低理智音效間隔拉長至 26～54 秒附 11 秒全域防重疊冷卻
+  - **驗證**：`.\gradlew.bat build compileGametestJava --no-daemon`、`.\gradlew.bat runClientGameTest "-Plevels=0,frontrooms,field" --no-daemon` 與 `.\gradlew.bat test --no-daemon` 全數通過，日誌零模型／貼圖／音效缺失；已於本機 `main` 提交（未推送）
 - 完成 **Level 4（廢棄辦公室 / Abandoned Office）** 首版完整實作與雙組實機驗證（Antigravity）：
   - **規劃、空間尺度與區域架構**（`level4/Level4Plan.java`、`Level4Layout.java`、`Level4ChunkGenerator.java`、`Level4Travel.java`、維度/生物群系 JSON）：
     - 112×112 格區域網格（16×16 格 `7×7` 單元，一般辦公室淨高 4 格、挑高雙層雨窗中庭淨高 8 格並含 `ATRIUM_ARCH` 門楣與中央 3×3 杏仁水噴泉、無燈暗區 `DARK_WING`、實心建築核與玻璃隔間套房），接入 `LevelExits.open("4", Level4Travel::enter)` 打通 Level 2 出口門與 Level 3 電梯進階路線；修復中庭東南鄰格牆高至 8 格並修正 `amor_planter` 高度使培養菌貼合無懸空
@@ -920,3 +968,92 @@
   - **Blender 5.3 模型與資源**（`tools/make_window_entity.py`、`tools/blender_window_entity.py`）：依循 Route A 標準建立 30 關節、106 盒、4 段 24fps 動畫（`idle_hover`、`beckon_lure`、`lunge_grab`、`recoil_banish`）之 `BoxRig` 規格、`512×512` 寫實髒污圖集與發光雙眼圖層（`EyesLayer`）、生怪蛋與 `art/monsters/window_entity/`（`.blend`、`.glb`、EEVEE 預覽圖）
   - **實體實作與串接**（`monsters/windowentity/WindowEntity.java`、`WindowEntityModel.java`、`WindowEntityRenderer.java`、`Monsters.java`、`BackroomsClient.java`、`loot_table/entities/window_entity.json`、`Level4Windows.java`）：於 `Monsters` 註冊為第 19 隻怪物（掉 `false_glass` 與 `lure_cornea`）；Level 4 陷阱窗外側自動懸停生成綁定實體，對室內玩家歪頭舉手招喚、靠太近或空手觸碰觸發撲抓動畫、整組窗格塗黑時觸發退散動畫並消失
   - **驗證**：更新雙語翻譯、`docs/project/4-monsters/README.md`／`planned.md`、`docs/project/5-levels/level4/README.md` 與 `Level4ClientTest.trapWindows`；`.\gradlew.bat test --tests "dev.noclip.backrooms.level4.*" --no-daemon`、`.\gradlew.bat cleanTest build --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=4 --no-daemon` 全部通過，並檢視 Blender 預覽圖 `window_entity_preview.png` 及實機截圖 `0009_level4_rain_window_view.png`、`0010_level4_trap_window.png`（僅提交本項改動，未推送）
+### 2026-11-27
+- 修正 **Level 4 下雨窗戶與雨景／雨聲不明顯問題**（Antigravity）：
+  - **修復窗戶雨滴「斜斜往上」與「玻璃雨滴無變化」**（`tools/make_level4.py`、`office_rain_window.png`／`_n.png`／`_s.png`／`.png.mcmeta`）：原 4 格貼圖間距 40px 卻每格位移 `+32px` 造成 `-8px/格` 逆向頻閃錯覺（雨滴往右上方倒退），且 4 格樣式單調並使用平面 `_n`/`_s`。改為 **32 格無縫下墜動畫**（`frametime: 1`、`interpolate: false`），結合三層動態：斜左下急落雨絲（每格 `(-4, +8)` 精準對齊 `128px` 循環、無頻閃）、附著玻璃表面緩慢垂直滑落的水珠與漸消濕痕（每格 `+4px` 帶微幅蛇行），以及錯相出現／擴散／淡出的玻璃撞擊水花小水珠，並同步生成對應幀的 labPBR 法線凸起 `_n` 與光滑反光 `_s`
+  - **修復建築外街谷天空與原版下雨完全失效**（`Level4ChunkGenerator.java`）：原 `y >= MAX_Y` 基岩層壓在 `OUTSIDE_AIR` 判斷之前，導致整層連戶外街谷 `y=127` 都封滿基岩、`canSeeSky` 恆為 `false` 且 `MOTION_BLOCKING` 高度恆為 `128`，使原版雨幕與窗外雨滴粒子完全無法生成；調整為 `OUTSIDE_AIR` 保留 `MIN_Y` 基岩底、開放 `MAX_Y` 天空，讓戶外雨幕與自然天光貫穿整座街谷
+  - **強化窗外雨幕粒子與連續立體雨聲**（`Level4Client.java`、`Level4Events.java`、`sounds.json`）：伺服器端持續維持 `Level4` 下雨天氣（`WeatherData` + `setRainLevel(1.0F)`），`Level4Client` 每 tick 以 `MOTION_BLOCKING <= FLOOR_Y` 嚴格僅於戶外與窗外投放密集下墜雨滴；`sounds.json` 的 `level4.rain` 音量由 `0.35` 提升至 `0.9`，`Level4Events` 改為每 `22..31` tick（約 1.1～1.55 秒）於玩家附近窗戶／戶外位置連續播放雨聲（窗邊／戶外 `0.85..0.90`、室內深處柔和 `0.34`，並保留「雨聲驟停」異象與獨立空調低鳴）
+  - **驗證**：於 `Level4ClientTest.views` 新增 `isRaining()`、`OUTSIDE_AIR` `canSeeSky` 與 `MAX_Y` 開天檢查，執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過，並檢視 `0009_level4_rain_window_view.png` 與 `0010_level4_trap_window.png` 確認玻璃水珠滑落與窗外雨幕正常渲染且室內無誤生粒子；僅提交本項改動於本機 `main`（未推送）
+- 改善 **Level 4 窗戶怪物（Entity 2 / `WindowEntity`）呈現方式與刷新率**（Antigravity）：
+  - **大幅降低出現頻率並杜絕「一排人站窗外」**：`Level4Layout.exteriorWindowKind` 陷阱窗機率由 `24%` 降至 `10%`；`Level4Windows.spawnNearbyWindowEntities` 改為跳過觀察者模式、將偵測半徑從 `22` 縮至 `12.5` 格、限制玩家 `28` 格內至多同時存在 **1 隻** 窗戶怪物，且僅在玩家位於室內面對該窗時於最近一扇窗外生成（略偏窗框一側、退後 `1.35` 格並壓低至 `FLOOR_Y + 0.85` 隱藏懸空雙腳）
+  - **修正跨中庭對望與「在空中轉身盯著玩家」**：`WindowEntity` 偵測半徑縮為 `16` 格；當玩家繞到窗外或對面中庭（`sideDot <= 0.1`）時直接消散，不再飄在對面空中轉身回頭盯著玩家；室內面對時身體始終朝向窗內（`yBodyRot` 鎖在 `±10°`、頭部微轉 `±32°`），並縮小誘引距離至 `10` 格
+  - **降低違和感與突兀感**：`office_trap_window` 調柔為磨砂霧面（貼圖與寫實包同步，`light_emission: 12→5`、`lightLevel: 4→2`）；`WindowEntityModel` 與 `WindowEntityRenderer` 加入微幅左右搖晃、遠距（`> 5.5` 格）壓低躲在窗台與霧後、以及超過 `9` 格隱藏自發光雙眼（靠近才浮現並起身招手）
+  - **驗證**：`Level4ClientTest.trapWindows` 補上「移動到窗外對面後 `WindowEntity` 自動消散」檢查；執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 與 `-Psections=windows` 通過並檢視 `0000_level4_trap_window.png` 確認磨砂霧氣遮罩下的怪物姿態自然；僅提交本項改動於本機 `main`（未推送）
+- 巨幅降低 **Level 4 物件、販賣機、飲水機與散落杏仁水刷新率**（Antigravity）：
+  - `Level4Layout.interiorTile`：隔間套房（`SUITE`）中心擺設機率由 `100%` 巨幅降至 `14%`（飲水機 5%、販賣機 2%、影印機 4%、桌機 3%，其餘 `86%` 保持空曠）；開放辦公區（`OPEN_OFFICE`）飲水機由 `9%→2%`、販賣機由 `6%→1%`（Omega 基地內部配置不變）
+  - `Level4Props.populateChunk`：每區塊散落 3D 辦公家具殘留由 `24%→5%`、散落杏仁水瓶群（`almond_bottle_cluster`）由 `30%→4%`
+  - **驗證**：執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本項改動於本機 `main`（未推送）
+- 減少 **Level 4 流浪者（`Level4Wanderers`）人數並賦予實用職業支援與以物易物功能**（Antigravity）：
+  - **人數與刷新率調降**：附近人數上限由 `5` 降至 **`2`**（偵測半徑由 `48→64`、消失距離由 `64→80`、出生距離由 `10..34→20..44`），生成間隔由 `12` 秒拉長至 **`40` 秒**且每次僅 `45%` 機率生成
+  - **實用職業支援（空手首次互動）**：每位流浪者依身分提供一次實戰協助——`drifter` 贈 2 塊塗窗用木炭＋理智 +8、`barterer` 贈 12 信用點＋手電筒電池組、`scout` 贈 2 份磷粉＋45 秒加速與夜視、`cartographer` 贈 15 經驗＋1 枚遺失舊幣＋理智 +10、`restless` 治療 3 顆心並清除負面狀態＋簡易繃帶＋理智 +10
+  - **擴充實用交換（每人上限提高至 `3` 次）**：遺失舊幣換杏仁水＋空瓶＋電池（並有機會拿聖像框）、合金換純化杏仁精華＋無菌繃帶＋2 份黑染料、2 份紙／廢紙換 2 塊木炭＋簡易繃帶、舊電路板／鍵盤換舊幣＋電池，並新增**收購 T.B.D.「無用」奇物換 20 信用點＋無菌繃帶**
+  - **驗證**：更新 `zh_tw.json`／`en_us.json` 並於 `Level4ClientTest` 補齊奇物交換實測與新譯名檢查，執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本項改動於本機 `main`（未推送）
+- 修復 **Level 4 空中走廊／外牆轉角 1 格裂縫缺口**（Antigravity）：
+  - **修復 `cornerTile` 區域接縫打穿外牆問題**（`Level4Layout.java`）：`Level4Layout.cornerTile` 殘留早期全樓連通時期的 `i == 0` / `j == 0` 邊界 `Edge.OPEN` 特例，導致空中走廊跨區域接縫處（`cx == 0, cz == 0`）的轉角柱被設為 `Kind.AIR`（鋪地毯與天花板卻直接貫穿至 `OUTSIDE_AIR`），形成面向戶外雨幕的 1 格垂直裂縫；移除該特例後統一補齊 `Kind.PILLAR` 結構柱，密閉空中走廊牆角
+  - **修復東／南向塔樓外牆空中走廊交界缺口**（`Level4ChunkGenerator.java`）：`blockAtColumn` 調整為 `if (skybridge && !exterior)`，避免塔樓外牆皮膚（`isExteriorSkin`）與空中走廊交會處在走廊上方／下方被挖出直通缺口
+  - **驗證**：於 `Level4LayoutTest` 新增 `indoorWalkableSpacesNeverTouchOutsideAir`（掃描多組種子與相鄰 3×3 區域驗證所有室內可行走格八鄰域皆不與 `OUTSIDE_AIR` 相接），執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本項改動於本機 `main`（未推送）
+- **Level 4 建築結構擴充第一批——半高格子間迷宮、毛坯結構翼區與高低錯層天橋**（Antigravity）：
+  - 更新企劃文件 `docs/project/5-levels/level4/README.md`，納入分四批實作的 10 項建築結構變化方案
+  - **半高格子間迷宮**（`Level4Layout.Kind.CUBICLE_WALL`／`CUBICLE_GLASS`、`Level4ChunkGenerator`）：約 37% 非出口且非天橋的 `OPEN_OFFICE` 單元內生成 4 種對稱／錯位 2 格高矮隔間（下層石膏板＋上層半截牆或透明玻璃），保留上方燈具視線同時切割地面視距與走道節奏
+  - **施工毛坯結構翼區**（`Level4Plan.ZoneKind.UNFINISHED_WING`、`Level4Layout.Kind.UNFINISHED_STUB`／`UNFINISHED_PILLAR`、`Level4ChunkGenerator`）：約 38% 區域生成 `2×2` 或 `2×3` 毛坯水泥空間，地面為雙色裸露灰混凝土（無地毯）、天花板為混凝土樑架搭配高故障率燈具，內部設灰混凝土柱與鐵欄圍籬半成品隔斷
+  - **高低錯層與觀景玻璃天橋**（`Level4Layout.skybridgeInfo`、`Level4ChunkGenerator.bridgeColumn`、`Level4Windows`）：約半數空中走廊升級為抬升 `+2` 格的高架全景玻璃天橋（兩端以磨製安山岩階梯上下銜接、橋底懸空貫穿峽谷、四面全高落地雨窗）；平層天橋中段則擴為三格高落地雨窗並於中央增設玻璃分流脊柱；`Level4Windows` 同步支援依玩家實際站立高度偵測上層陷阱窗
+  - **驗證**：更新 `Level4LayoutTest.batch1StructuresCubiclesUnfinishedAndVariedSkybridgesAppear` 與 `Level4ClientTest.views`（實機檢查格子間、毛坯地坪、高架天橋底懸空／橋面與拍攝 `level4_cubicles`／`level4_unfinished_wing`／`level4_elevated_bridge`），`.\gradlew.bat test --no-daemon` 與 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 通過；僅提交本批改動於本機 `main`（未推送）
+- **Level 4 建築結構擴充第二批——貫通天空採光天井與凹入式避雨陽台**（Antigravity）：
+  - **貫通天空採光天井**（`Level4Plan.ZoneKind.LIGHTWELL`、`Level4Layout.isLightwellShaft`、`Level4ChunkGenerator`）：約 42% 區域生成 `3×3` 格環形玻璃走廊（四面皆設開放拱門與鄰區連通），中央 `1×1` 格（`7×7` 方塊）垂直開天貫穿至 `MAX_Y` 讓真實雨水直落至 `y=32` 積水井底，周邊圍以全透明雨景窗並與據點塗黑窗規則相容
+  - **凹入式避雨陽台**（`Level4Plan.balconyDir`、`Level4Layout.Kind.BALCONY_RAIL`／`BALCONY_FLOOR`／`BALCONY_CANOPY`、`Level4ChunkGenerator.balconyColumn`、`Level4Client`、`Level4Events`）：高樓四面外緣（避開據點、出口與非開放側壁）約 22% 符合單元向內凹入 2 格成半戶外灰水泥露台：外側以輕灰水泥矮牆＋鐵欄護欄隔絕街谷墜落風險，上方延 `MAX_Y` 開天淋雨並保留門口 1 格挑出雨棚，室內門牆同步配防火門與雙側雨窗，玩家走上露台即可觸發戶外級雨聲（`0.90F`）與 `Heightmap` 降雨粒子
+  - 順手修復 `Level4Bases.populateNear` 跨未載入區塊邊界時可能只生成部分陣營成員的問題（要求據點四角區塊皆已載入才開始放置人員，避免 `AMOR_CAMP` 只刷出 7 人）
+  - **驗證**：新增 `Level4LayoutTest.batch2StructuresLightwellAndRainBalconiesAppear` 與 `Level4ClientTest.views` 天井積水／開天及露台淋雨開天實機檢查（並拍攝 `level4_lightwell`、`level4_balcony`），`.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本批改動於本機 `main`（未推送）
+- **Level 4 建築結構擴充第三批——開放垂直電梯井大廳與下沉階梯簡報廳**（Antigravity）：
+  - **開放垂直電梯井大廳**（`Level4Plan.ZoneKind.ELEVATOR_LOBBY`、`Level4Layout.Kind.ELEVATOR_SHAFT`／`ELEVATOR_CABLE`／`ELEVATOR_SHAFT_WALL`／`ELEVATOR_THRESHOLD`、`Level4ChunkGenerator`）：約 45% 區域生成 `2×1` 電梯等待大廳，北側設有半開破敗電梯門檻（防墜鐵欄柵與可窺視暗井之門縫）直通貫穿 `50` 格深（`y=10..60`）的黑洞垂直電梯井，井心垂懸垂直鋼纜鐵欄
+  - **下沉階梯式大型簡報廳 / 廢棄禮堂**（`Level4Plan.ZoneKind.AUDITORIUM`、`Level4Layout.auditoriumInfo`、`Level4ChunkGenerator.auditoriumColumn`）：約 34% 區域生成 `3×3` 挑高 `8` 格的階梯報告廳；後排入口於 `y=32` 無段差接入，經由多排磨製安山岩觀眾階梯逐級下沉至 `y=29` 坑道與 `y=30` 講台（附灰白布幕牆與後暗前明聚光燈）
+  - **驗證**：新增 `Level4LayoutTest.batch3StructuresElevatorShaftsAndAuditoriumAppear` 與 `Level4ClientTest.views` 電梯深井上下通透及簡報廳下沉地坪實機檢查（拍攝 `level4_elevator_lobby`、`level4_auditorium`），`.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本批改動於本機 `main`（未推送）
+- **Level 4 建築結構擴充第四批（最終批）——二樓挑高夾層、天花板維修夾層與地下冰水機電管廊**（Antigravity）：
+  - **局部二樓夾層與連通安全梯**（`Level4Plan.ZoneKind.MEZZANINE`、`Level4Layout.mezzanineInfo`、`Level4ChunkGenerator.mezzanineColumn`）：約 38% 區域生成 `3×2` 挑高 `10` 格雙層空間（1F `y=32` 附吊頂燈管＋2F `y=38` 地毯夾層與玻璃辦公室隔間），西側以 `6` 階磨製安山岩大梯階無段差連通 1F/2F，東南角開設雙層挑高天井口搭配 2F 玻璃護欄俯瞰下層
+  - **天花板維修夾層與 HVAC 風管通道**（`Level4Layout.plenumInfo`、`Level4ChunkGenerator.plenumBlock`）：於 `DARK_WING` 上方 `y=38..40` 開放可攀爬的設備維修夾層，兩端設直通 `y=33..39` 的靠牆爬梯井口（附 `IRON_BARS` 中央天花板窺視格柵、淺灰混凝土懸吊風管與昏黃檢修燈）
+  - **地下冰水機電連通長廊**（`Level4Plan.findMepTunnel`、`Level4Layout.subTunnelInfo`、`Level4ChunkGenerator.subTunnelBlock`）：每區最高 65% 機率沿未跨出室外與出口之列位貫通 `5～7` 格單元地下設備長廊（`y=26..29`，潮濕中溝、兩側淺灰混凝土與管線鐵柵、昏黃應急燈），兩端以鐵欄護欄包圍石磚階梯對稱下潛與回返地面翼區
+  - 同步更新 `docs/project/5-levels/level4/README.md` 標記全 10 項建築擴充已實作；新增 `Level4LayoutTest.batch4StructuresMezzaninePlenumAndSubTunnelAppear` 與 `Level4ClientTest.views` 實機驗證（拍攝 `level4_mezzanine`、`level4_sub_tunnel`），`.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本批改動於本機 `main`（未推送）
+- 完成 **手電筒系統翻修、3D 雙款手電筒與五格電量 HUD、濾鏡／光照／光影相容與 F7 卡頓修復、紅霧滲透細節修正**（Antigravity）：
+  - **紅霧滲透細節修正**（`core/trip/Anomalies.java`、`zh_tw.json`、`en_us.json`）：`infestRedRoomNear` 加入最小生成距離 ≥ 14 格（不再直接凝結在玩家腳邊）；紅霧區 `ANOMALY_VAULT_CHEST` 與 `supply_crate` 改為優先於 `RED_ANOMALY_CLUSTER` 東西兩側對稱生成，避免補給箱擋住正面視線與拍照；更新 `anomaly.noclip_backrooms.red_mist.desc` 雙語說明對齊局部紅霧與異常寶箱區機制
+  - **濾鏡／迷霧／光照／Iris 光影相容與 F7 零延遲切換**（`src/client/.../core/look/Look.java`、`shaders/post/camcorder.fsh`、`post_effect/camcorder.json`、`dimension_type/level_{0..3}.json`）：
+    - 將後室暗度／迷霧／光照衰減與 F7 錄影機濾鏡完全解耦，並將 Level 0～3 維度預設迷霧改為深暗色調，關閉 F7 不再出現白黃色濃霧
+    - 針對 5 格層高重調非光影光照衰減（`falloff = 0.16F`）並於 `camcorder.fsh` 加入發光燈具自發光溢光，使無光影模式燈光明亮、暗處維持陰暗
+    - 透過反射快取自動偵測 Iris 光影包（`IrisApi.getInstance().isShaderPackInUse()`），開光影時自動退讓衝突的負向 lightmap 與後製濾鏡，避免每 tick 重複呼叫 `setPostEffect` 導致卡頓
+    - `ClockSampler` 擴充為 `4×1` 貼圖，F7 改由單一旗標位元即時開關 VHS 效果（0ms 不重建管線），並一次清空連按佇列避免畫面延遲造成雙重切換
+  - **手電筒系統翻修與 3D 雙款手電筒**（`level0/ModItems.java`、`FlashlightItem.java`、`FlashlightLight.java`、`items/BackroomsConsumableItem.java`、`level1/Smilers.java`、`recipe/flashlight_recharge.json`、`tools/make_flashlights.py`、`src/client/.../core/look/FlashlightHud.java`、`ItemTooltips.java`）：
+    - **標準手電筒**（`flashlight`）：改用自訂 `battery` 數值（`0..1200` 秒＝20 分鐘，分為 5 格，移除原版耐久條並相容舊存檔資料遷移）；玩家首次進世界自動發放 1 支滿電初始手電筒（`STARTER_TAG`）；實作三種裝電池方式：`Shift + 右鍵` 從背包自動裝填（`battery_cell` +2 格、`flashlight_battery_pack` 補滿）、背包內直接拿電池右鍵拖放點到手電筒（`overrideOtherStackedOnMe`）、2×2 無序合成（`flashlight_recharge.json` 改用 `battery_cell`）
+    - **Level 3 汲能手電筒**（`ambient_flashlight`）：無限電量、不受靜電過載耗電影響、光束 24 格，說明為「此手電筒可以汲取空氣中的能量轉換為電力」（依使用者指示**不放入世界生成**，保留給 Claude 後續擺放）
+    - **3D 正前方模型與即時光照**：以 `tools/make_flashlights.py` 產出 64×64 貼圖與雙款 3D 筒狀水平朝前模型；將動態方塊光源提速至 20Hz（每 2.5 格步進、近距亮度 12／13），並於 `camcorder.fsh` 疊加 60+ FPS 客戶端即時雙層聚光燈錐
+    - **五格電量 HUD 與 Tooltip**（`FlashlightHud.java`、`ItemTooltips.java`）：左下角 `SP 0:00:00` 上方顯示 5 格電池電量條 `[■ ■ ■ ■ ■]+ ON/OFF`（汲能手電筒顯示青色 `∞` 電池圖示），物品 Tooltip 同步顯示即時格數與百分比
+  - **驗證**：更新 `Level0ClientTest.checkFlashlight`（驗收初始手電筒、5 格無耐久條、`Shift+右鍵` 裝填 `battery_cell` 1→3 格、`ambient_flashlight` 無限電量零消耗與雙款實機截圖）；`.\gradlew.bat build compileGametestJava --no-daemon`、`.\gradlew.bat runClientGameTest "-Plevels=look,0" --no-daemon`、`.\gradlew.bat runClientGameTest "-Plevels=field" --no-daemon` 與 `.\gradlew.bat test --no-daemon` 全數通過並已實機檢視截圖（依使用者要求提交並推送至 GitHub `main`）
+- 完成 **企劃書核心玩法順位一系統（雙軸難度與反刷懲罰／可攜保險箱／中繼投放箱與單次投保／合約擴充與防卡死過濾）**（Antigravity；僅改動 `core/`、i18n 與測試，未動樓層地圖、模型、合成周邊與怪物機制）：
+  - **雙軸難度與防反覆刷層懲罰**（`core/floors/FloorDifficulty.java`、`DifficultyPayload.java`、`Floors.java`、`src/client/.../core/floors/FloorsClient.java`）：
+    - 縱軸依 `FloorRun#floor()`、橫軸依目前樓層落地點水平距離分 4 段（`<250`、`250..749`、`750..1599`、`>=1600`，Level 0 採環面拓樸最短距計算）；`Band 0` 第 1 層保持 1.0x 原基準不變，隨段位與層數縮放怪物血量／攻擊與主題鎖定可堆疊戰利品掉率（保護關鍵證明物不倍率複製、不混出跨層素材）
+    - 新增 3 分鐘（3600 tick）視窗的 `A -> B -> A -> B` 來回反刷偵測：允許單次回頭（`0 -> 1 -> 0`），第四跳快速折返時凍結樓層推進、提升怪物威脅並遞減戰利品倍率，透過 `DifficultyPayload` 同步至左上角 HUD 顯示探索距離段位與空間抗拒狀態
+  - **可攜保險箱**（`core/locker/Safebox.java`、`SafeboxOpenPayload.java`、`src/client/.../core/locker/SafeboxClient.java`）：
+    - 初始 2 格隨身死亡保護格（於後室死亡不掉落、於主世界或前室死亡也不會被 `Lockers.collect` 抽走），可於基地／主世界透過指令 `/meg safebox upgrade` 或指揮官對話按鈕依序擴充至 6 格（費用 `300 / 600 / 1000 / 1600` 信用點）
+    - 客戶端於玩家背包畫面下方新增原生風格 `Safebox (N/6)` 快捷按鈕，並支援 `/meg safebox`；未解鎖格位以紅色鐵欄杆鎖定占位、第 6～8 格以灰玻璃補白並完整攔截拖曳／Shift 移動與點擊
+  - **中繼投放箱與單次裝備投保**（`core/locker/RelayService.java`、`core/locker/Lockers.java`）：
+    - 對 `BackroomsProps.RELAY_DROPOFF_BOX` 右鍵開啟 27 格單向中繼箱（`Shift+右鍵` 顯示功能與 `/meg relay`、`/meg insure` 按鈕），關閉時以每格 `15 cr` 透過 `Lockers.deposit` 寄回基地置物櫃；點數不足時退回物品
+    - 基地 NPC（司令官／補給官／軍需官）或後室中繼箱旁可以 `120 cr` 購買單次裝備投保（`/meg insure`）；保險生效期間於後室死亡免掉落並自動回收背包至基地置物櫃，並於結算報告（`Report.onReport`）匯報寄回格數或未理賠到期
+  - **合約類型擴充與防卡死過濾**（`core/guild/Contracts.java`、`core/field/Evidence.java`）：
+    - 保留既有抵達類合約並新增獵殺（`HUNT_HOUNDS`）、攝影（`PHOTO_SMILER`）、測繪拓樸（`MAP_LEVEL0`）、物資回收（`COLLECT_ALMOND`）與多層連貫跑腿（`COURIER_012`：`0->1->2`），串接 `Evidence` 拍照／信標掃描、`AFTER_DEATH` 與返家扣繳檢核，補齊 `/meg contract status`
+    - 實作 `completableWith`／`isCompletable`，依 `LevelExits.openLevels()` 與物品／實體註冊表過濾尚未開放樓層，避免指派無法完成的死鎖合約
+  - **雙語翻譯與驗證**（`zh_tw.json`、`en_us.json`、`FloorDifficultyTest.java`、`HorrorClientTest.java`）：
+    - 補齊 39 組雙語鍵並通過 JSON 語法檢核；`FloorDifficultyTest` 覆蓋距離段位、單次回頭 vs `A->B->A->B` 懲罰、保險箱擴充階梯與合約防卡死；`HorrorClientTest` 步驟 `10a..10e` 覆蓋雙軸縮放、防刷懲罰、保險箱死亡保護與升級、中繼投放與投保理賠、新增合約並於 `0011_horror_safebox.png` 實機檢視畫面
+    - 已執行 `.\gradlew.bat build compileGametestJava --no-daemon`（含全部 133 項單元測試通過）與 `.\gradlew.bat runClientGameTest "-Plevels=horror,floors,field" --no-daemon` 全數通過，已提交於本機 main（未推送）
+- 完成 **企劃書核心玩法順位二系統（3 項隱藏能力值／四維進階效果／高風險近戰扣血／方案 B 流派徽章與馬尼拉房間武人／額外生存經驗／雙分頁角色面板）**（Antigravity；嚴格未修改 `crafting/`、`monsters/`、`Level0ChunkGenerator.java`、`level1..4/` 與模型貼圖，已提交於本機 main（未推送））：
+  - **隱藏能力值與禁忌卷軸方案一**（`core/rpg/PlayerStats.java`、`PlayerRpg.java`、`items/BackroomsConsumableItem.java`、`core/guild/Contracts.java`、`core/floors/FloorDifficulty.java`）：
+    - `PlayerStats` 向下相容新增 `LUCK`（幸運）、`PSI`（靈能）、`ENGINEERING`（工程）解鎖旗標與等級（皆採 `optionalFieldOf` 預設與遞減曲線），保留原 8 參數建構子不變
+    - 使用 3 種禁忌知識卷軸永久解鎖對應欄位為 1 級，**已解鎖後重複使用直接免費 `+1`**（方案一）；並接通稀有掉落／委託紅利／命運骰加權、額外理智流失減免（與 `SAN` 乘法疊加）＆法術半徑倍率、槍械機率省彈＆拆解增產；順手修正 `FloorDifficulty` 容器獎勵 `lost_coin` 筆誤為 `lost_old_coin`
+  - **四維進階戰鬥與生存效果**（`PlayerRpg.java`、`PlayerSprintExhaustionMixin.java`、`noclip_backrooms.mixins.json`、`BackroomsFirearmItem.java`、`WeaponAnimState.java`、`BackroomsMagicItem.java`、`BackroomsMeleeItem.java`）：
+    - `STR` 新增擊退距離加成（最多 `+0.8` 格）與重武器（`baseAttackSpeed <= 1.2F`）揮速補償（最多 `+20%`）；負重限制定案暫不實作
+    - `AGI` 新增槍械冷卻縮短（最多 `-30%`）、擴散與客戶端後座力同步縮減（最多 `-35%`）、槍械／近戰暴擊率（最多 `20%`，1.35×）與衝刺耗飢餓減少（`PlayerSprintExhaustionMixin`，最多 `-35%`）
+    - `VIT` 每秒定期縮短非永久有害狀態（中毒／凋零／流血等）剩餘時間最多 `-45%`；`SAN` 新增法杖施法理智消耗額外減免（最多 `-35%`）
+  - **高風險特定近戰武器扣血機制**（`BackroomsMeleeItem.java`、`BackroomsItems.java`、`SurvivalXp.java`、`core/trade/Shops.java`）：
+    - 僅對 5 把高風險武器（`blunt_crimson_crusher`、`blunt_thunder_colossus`、`west_hotel_greatsword`、`west_void_greatsword`、`cn_alpha_tangdao`）設定特技生命代價（`2.0` / `2.5`）；血量過低（`<= effCost + 1.0F`）自動鎖定並提示不扣死
+    - `SurvivalXp` 新增首次細讀筆記／現場檔案（`manila_note`、`field_note`、`WrittenBook`、`MEG_SQUAD_REPORT`）`+15` 經驗（去重防刷）與基地買家交付收購經驗（`onBuyerSale`）；**【待辦備忘】「首次合成新物品給經驗」依分工暫刻意未修改 `crafting/BackroomsStationMenu.java`，待日後合成周邊定案再接上**
+  - **方案 B 流派徽章與 Level 0 馬尼拉房間武人 NPC**（`core/rpg/Badges.java`、`BadgeActionPayload.java`、`core/trade/ShopRole.java`、`level0/Level0Ambience.java`、`core/combat/WeaponBalance.java`）：
+    - 新增 `ShopRole.MARTIAL_MASTER`（`martial_master`，外觀 `tom`）並於現行 Level 0 馬尼拉房間室內自動生成（透過公開介面 `Badges.spawnVendor(level, x, y, z)`，日後 Claude 重設計 Level 0 地圖時可直接沿用同一介面擺放）
+    - 4 種流派（異常學者、破陣重衛、戰術斥候、拾荒倖存者）採「正面專長＋輕微代價」，各以 6 枚 `lost_old_coin` 向武人兌換解鎖，僅於安全區（前室／主世界或安頓據點床旁 16 格）切換
+  - **雙分頁角色面板與雙語驗證**（`InventoryStatsPanel.java`、`FloorsClient.java`、`zh_tw.json`、`en_us.json`、`PlayerStatsTest.java`、`HorrorClientTest.java`、`docs/project/2-player/README.md`）：
+    - 維持 `132×166` 面板整合 `[能力 | 進階]` 雙分頁（3 項隱藏屬性解鎖／配點＋流派切換／卸下），左上角 HUD 同步顯示啟用流派；雙語 JSON 通過檢核；`.\gradlew.bat build compileGametestJava --no-daemon`（136 項單元測試全過）與 `.\gradlew.bat runClientGameTest "-Plevels=horror,floors,field" --no-daemon`（含 `HorrorClientTest` 步驟 `11a..11e` 與實機檢視 `0003_floors_inventory.png`、`0012_horror_rpg_advanced.png`）全數通過

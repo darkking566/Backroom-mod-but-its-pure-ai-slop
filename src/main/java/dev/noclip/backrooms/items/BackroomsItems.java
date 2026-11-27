@@ -416,8 +416,8 @@ public final class BackroomsItems {
 	public static final Item BLUNT_CLUMP_FLAIL = melee("blunt_clump_flail", Style.BLUNT, 2, 12.0F, 1.0F, 0.8F, 720, Trait.ARMOR_PIERCE_35, Rarity.RARE);
 	public static final Item BLUNT_TWOHAND_MAUL = melee("blunt_twohand_maul", Style.BLUNT, 2, 14.5F, 0.85F, 0.4F, 880, Trait.HEAVY_SLAM, Rarity.RARE);
 	public static final Item BLUNT_LUCERNE_HAMMER = melee("blunt_lucerne_hammer", Style.BLUNT, 3, 13.5F, 0.95F, 1.5F, 1250, Trait.BOSS_BREAKER, Rarity.RARE);
-	public static final Item BLUNT_CRIMSON_CRUSHER = melee("blunt_crimson_crusher", Style.BLUNT, 3, 17.0F, 0.85F, 0.6F, 1650, Trait.CRIMSON_SHOCKWAVE, Rarity.EPIC);
-	public static final Item BLUNT_THUNDER_COLOSSUS = melee("blunt_thunder_colossus", Style.BLUNT, 4, 20.0F, 0.9F, 0.8F, 2400, Trait.THUNDER_AOE, Rarity.EPIC);
+	public static final Item BLUNT_CRIMSON_CRUSHER = melee("blunt_crimson_crusher", Style.BLUNT, 3, 17.0F, 0.85F, 0.6F, 1650, 2.0F, Trait.CRIMSON_SHOCKWAVE, Rarity.EPIC);
+	public static final Item BLUNT_THUNDER_COLOSSUS = melee("blunt_thunder_colossus", Style.BLUNT, 4, 20.0F, 0.9F, 0.8F, 2400, 2.0F, Trait.THUNDER_AOE, Rarity.EPIC);
 
 	// Western (14)
 	public static final Item WEST_SCRAP_KNIFE = melee("west_scrap_knife", Style.WESTERN, 0, 4.5F, 2.4F, 0.0F, 160, Trait.NONE, Rarity.COMMON);
@@ -432,8 +432,8 @@ public final class BackroomsItems {
 	public static final Item WEST_ZWEIHANDER = melee("west_zweihander", Style.WESTERN, 3, 15.5F, 0.95F, 0.9F, 1450, Trait.CLEAVE, Rarity.RARE);
 	public static final Item WEST_ACID_SCIMITAR = melee("west_acid_scimitar", Style.WESTERN, 3, 12.0F, 1.65F, 0.2F, 1150, Trait.ACID_CORRODE, Rarity.RARE);
 	public static final Item WEST_HALLOWED_BLADE = melee("west_hallowed_blade", Style.WESTERN, 3, 14.0F, 1.65F, 0.3F, 1500, Trait.UNDEAD_SMILER_BANE, Rarity.RARE);
-	public static final Item WEST_HOTEL_GREATSWORD = melee("west_hotel_greatsword", Style.WESTERN, 3, 17.5F, 1.05F, 0.7F, 1850, Trait.VAMPIRIC_CLEANSE, Rarity.EPIC);
-	public static final Item WEST_VOID_GREATSWORD = melee("west_void_greatsword", Style.WESTERN, 4, 22.0F, 1.1F, 0.9F, 2600, Trait.VOID_WAVE, Rarity.EPIC);
+	public static final Item WEST_HOTEL_GREATSWORD = melee("west_hotel_greatsword", Style.WESTERN, 3, 17.5F, 1.05F, 0.7F, 1850, 2.0F, Trait.VAMPIRIC_CLEANSE, Rarity.EPIC);
+	public static final Item WEST_VOID_GREATSWORD = melee("west_void_greatsword", Style.WESTERN, 4, 22.0F, 1.1F, 0.9F, 2600, 2.5F, Trait.VOID_WAVE, Rarity.EPIC);
 
 	// Chinese (16)
 	public static final Item CN_WOOD_STAFF = melee("cn_wood_staff", Style.CHINESE, 0, 5.0F, 1.7F, 0.8F, 200, Trait.KNOCKBACK, Rarity.COMMON);
@@ -451,7 +451,7 @@ public final class BackroomsItems {
 	public static final Item CN_GUANDAO = melee("cn_guandao", Style.CHINESE, 3, 16.0F, 0.95F, 1.6F, 1400, Trait.CLEAVE, Rarity.RARE);
 	public static final Item CN_FANGTIAN_JI = melee("cn_fangtian_ji", Style.CHINESE, 3, 17.5F, 1.15F, 1.8F, 1750, Trait.STOPMOTION_FREEZE, Rarity.EPIC);
 	public static final Item CN_COIN_SWORD = melee("cn_coin_sword", Style.CHINESE, 3, 11.5F, 1.75F, 0.3F, 1350, Trait.COIN_WARD, Rarity.RARE);
-	public static final Item CN_ALPHA_TANGDAO = melee("cn_alpha_tangdao", Style.CHINESE, 4, 21.0F, 1.2F, 0.9F, 2500, Trait.ALPHA_BLOODLUST, Rarity.EPIC);
+	public static final Item CN_ALPHA_TANGDAO = melee("cn_alpha_tangdao", Style.CHINESE, 4, 21.0F, 1.2F, 0.9F, 2500, 2.0F, Trait.ALPHA_BLOODLUST, Rarity.EPIC);
 
 	// =========================================================================
 	// 6. FIREARMS (18), AMMO (11), TACTICAL MODS (6) (05_weapons_firearms.md)
@@ -628,8 +628,13 @@ public final class BackroomsItems {
 	}
 
 	private static Item melee(String id, Style style, int tier, float dmg, float spd, float reach, int durability, Trait trait, Rarity rarity) {
+		return melee(id, style, tier, dmg, spd, reach, durability, 0.0F, trait, rarity);
+	}
+
+	private static Item melee(String id, Style style, int tier, float dmg, float spd, float reach, int durability,
+			float healthCost, Trait trait, Rarity rarity) {
 		Item.Properties props = new Item.Properties().stacksTo(1).durability(durability).rarity(rarity);
-		Item item = register(id, props, p -> new BackroomsMeleeItem(p, style, tier, dmg, spd, reach, trait, "lore.noclip_backrooms." + id));
+		Item item = register(id, props, p -> new BackroomsMeleeItem(p, style, tier, dmg, spd, reach, healthCost, trait, "lore.noclip_backrooms." + id));
 		TAB_MELEE.add(item);
 		return item;
 	}

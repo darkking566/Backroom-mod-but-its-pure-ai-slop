@@ -5,7 +5,10 @@
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
 		"FoodDataBackroomsRegen",
-		"LivingEntityWeaponBalance"
+		"LivingEntityWeaponBalance",
+		"LevelSetBlockMirror",
+		"PlayerSprintExhaustionMixin",
+		"TrackedEntityTorus"
 	],
 	"injectors": {
 		"defaultRequire": 1

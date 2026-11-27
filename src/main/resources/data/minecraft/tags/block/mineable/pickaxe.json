@@ -253,6 +253,22 @@
     "noclip_backrooms:film_chair_pile",
     "noclip_backrooms:film_fax_machine",
     "noclip_backrooms:film_tv_vcr",
-    "noclip_backrooms:film_tv_wall"
+    "noclip_backrooms:film_tv_wall",
+    "noclip_backrooms:inst_gurney",
+    "noclip_backrooms:inst_interview_table",
+    "noclip_backrooms:inst_stacking_chair",
+    "noclip_backrooms:inst_waiting_chairs",
+    "noclip_backrooms:inst_xray_viewer",
+    "noclip_backrooms:inst_iv_stand",
+    "noclip_backrooms:inst_wheelchair",
+    "noclip_backrooms:inst_water_fountain",
+    "noclip_backrooms:inst_decon_shower",
+    "noclip_backrooms:inst_monitor_console",
+    "noclip_backrooms:inst_office_desk",
+    "noclip_backrooms:inst_file_cabinet",
+    "noclip_backrooms:inst_tape_drive",
+    "noclip_backrooms:inst_lab_bench",
+    "noclip_backrooms:inst_specimen_tank",
+    "noclip_backrooms:inst_deployment_gate"
   ]
 }

@@ -137,14 +137,22 @@ public class WindowEntity extends Monster {
 			return;
 		}
 
-		Player nearest = level.getNearestPlayer(this, isWindowBound() ? 36.0 : 18.0);
+		Player nearest = level.getNearestPlayer(this, isWindowBound() ? 16.0 : 18.0);
 		if (isWindowBound()) {
 			setDeltaMovement(Vec3.ZERO);
-			if (nearest == null) {
+			if (nearest == null || boundWindowPos == null || boundInwardDir == null) {
 				discard();
 				return;
 			}
-			if (boundWindowPos != null && level.isLoaded(boundWindowPos)) {
+			// If the player walked around to the opposite/outside side (e.g. across a courtyard), vanish instead of
+			// spinning around in mid-air behind the window.
+			double sideDot = (nearest.getX() - (boundWindowPos.getX() + 0.5)) * boundInwardDir.getStepX()
+					+ (nearest.getZ() - (boundWindowPos.getZ() + 0.5)) * boundInwardDir.getStepZ();
+			if (sideDot <= 0.1) {
+				discard();
+				return;
+			}
+			if (level.isLoaded(boundWindowPos)) {
 				BlockState st = level.getBlockState(boundWindowPos);
 				if (st.isAir() || st.getBlock().getDescriptionId().endsWith("office_blacked_window")) {
 					triggerBanish();
@@ -152,8 +160,8 @@ public class WindowEntity extends Monster {
 				}
 			}
 			double dist = distanceTo(nearest);
-			entityData.set(DATA_BECKONING, dist <= 16.0);
-			facePosition(nearest.getX(), nearest.getZ());
+			entityData.set(DATA_BECKONING, dist <= 10.0);
+			faceWindowClamped(nearest.getX(), nearest.getZ());
 			return;
 		}
 
@@ -174,6 +182,17 @@ public class WindowEntity extends Monster {
 				playSound(SoundEvents.PLAYER_ATTACK_STRONG, 0.85F, 0.55F);
 			}
 		}
+	}
+
+	private void faceWindowClamped(double tx, double tz) {
+		float baseYaw = boundInwardDir.toYRot();
+		float targetYaw = (float) (Mth.atan2(tz - getZ(), tx - getX()) * Mth.RAD_TO_DEG) - 90.0F;
+		float delta = Mth.wrapDegrees(targetYaw - baseYaw);
+		float headYaw = baseYaw + Mth.clamp(delta, -32.0F, 32.0F);
+		float bodyYaw = baseYaw + Mth.clamp(delta, -10.0F, 10.0F);
+		setYRot(headYaw);
+		setYHeadRot(headYaw);
+		yBodyRot = bodyYaw;
 	}
 
 	private void facePosition(double tx, double tz) {

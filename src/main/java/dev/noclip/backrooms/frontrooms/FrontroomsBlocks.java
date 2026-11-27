@@ -16,6 +16,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.TransparentBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
@@ -54,11 +55,35 @@ public final class FrontroomsBlocks {
 	public static final Block WARNING_SIGN = register("warning_sign", building(MapColor.COLOR_YELLOW).sound(SoundType.METAL).noCollision().noOcclusion(),
 			InstituteBlocks.Sign::new);
 
+	// The institute after the film's research facility (2026-11-27), and its grounds
+	public static final Block LOBBY_TERRAZZO = register("lobby_terrazzo", building(MapColor.QUARTZ));
+	public static final Block MINT_WALL = register("mint_wall", building(MapColor.COLOR_LIGHT_GREEN));
+	public static final Block MINT_WAINSCOT = register("mint_wainscot", building(MapColor.COLOR_LIGHT_GREEN));
+	public static final Block OBSERVATION_WINDOW = register("observation_window", glass(MapColor.COLOR_BLACK), TransparentBlock::new);
+	public static final Block CONTAINMENT_GLASS = register("containment_glass", glass(MapColor.COLOR_LIGHT_BLUE), TransparentBlock::new);
+	public static final Block PRECAST_PANEL = register("precast_panel", building(MapColor.SAND));
+	public static final Block RIBBON_WINDOW = register("ribbon_window", glass(MapColor.COLOR_GRAY), TransparentBlock::new);
+	public static final Block STEEL_FRAME = register("steel_frame", building(MapColor.COLOR_GRAY).sound(SoundType.METAL));
+	public static final Block FACADE_SIGN = register("facade_sign", building(MapColor.COLOR_BLUE).sound(SoundType.METAL));
+	public static final Block CAMPUS_ASPHALT = register("campus_asphalt", building(MapColor.COLOR_BLACK));
+	public static final Block CAMPUS_LINE = register("campus_line", building(MapColor.COLOR_BLACK));
+	public static final Block CAMPUS_SIDEWALK = register("campus_sidewalk", building(MapColor.STONE));
+	public static final Block SODIUM_LAMP = register("sodium_lamp", building(MapColor.COLOR_ORANGE).sound(SoundType.GLASS).lightLevel(s -> 15)
+			.noOcclusion(), InstituteBlocks.LampHead::new);
+	public static final Block STEEL_POLE = register("steel_pole", building(MapColor.COLOR_GRAY).sound(SoundType.METAL).noOcclusion(),
+			InstituteBlocks.Pole::new);
+
 	private FrontroomsBlocks() {
 	}
 
 	static void register() {
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.BUILDING_BLOCKS).register(output -> ALL.forEach(output::accept));
+	}
+
+	/** Glass that nothing breaks and that the eye and the light go through. */
+	private static Properties glass(MapColor color) {
+		return building(color).sound(SoundType.GLASS).noOcclusion().isViewBlocking((s, l, p) -> false).isSuffocating((s, l, p) -> false)
+				.isRedstoneConductor((s, l, p) -> false);
 	}
 
 	/** Cannot be broken by hand or blown up. */

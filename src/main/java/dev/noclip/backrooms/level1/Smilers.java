@@ -122,7 +122,8 @@ final class Smilers {
 
 	private static boolean lightSource(ItemStack stack) {
 		if (stack.getItem() instanceof BlockItem block && block.getBlock().defaultBlockState().getLightEmission() > 0) return true;
-		return BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath().equals("flashlight");
+		String path = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
+		return path.equals("flashlight") || path.equals("ambient_flashlight");
 	}
 
 	private static void vanish(ServerLevel level, Entity entity) {

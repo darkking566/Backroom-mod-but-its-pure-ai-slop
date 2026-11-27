@@ -24,11 +24,14 @@ final class ExitClientChecks {
 
 		int expectedZones = Maze.Zone.values().length - 1; // Exits never spawn inside RED_ROOM.
 		Map<Maze.Zone, Exits.Door> doors = new EnumMap<>(Maze.Zone.class);
-		for (int radius = 0; radius < 30 && doors.size() < expectedZones; radius++) {
+		// Level 0 repeats the centre Stage of each region (Level0Space): only doors there are in the world.
+		for (int radius = 0; radius < 200 && doors.size() < expectedZones; radius++) {
 			for (int rx = -radius; rx <= radius; rx++) {
 				for (int rz = -radius; rz <= radius; rz++) {
+					if (Math.max(Math.abs(rx), Math.abs(rz)) != radius) continue;
 					Exits.Door door = Exits.doorIn(seed, rx, rz);
-					if (door != null) {
+					if (door != null && Level0Space.originalCell(Math.floorDiv(door.x(), Maze.CELL), 2)
+							&& Level0Space.originalCell(Math.floorDiv(door.z(), Maze.CELL), 2)) {
 						Maze.Zone zone = Maze.zoneAt(seed, door.x(), door.z());
 						check(zone != Maze.Zone.RED_ROOM, "exit generated inside RED_ROOM at " + door);
 						doors.putIfAbsent(zone, door);

@@ -2,12 +2,15 @@ package dev.noclip.backrooms.frontrooms;
 
 import com.mojang.serialization.MapCodec;
 import dev.noclip.backrooms.frontrooms.InstituteLayout.Cell;
+import dev.noclip.backrooms.BackroomsMod;
+import dev.noclip.backrooms.level0p1.ZenithBlocks;
 import dev.noclip.backrooms.props.BackroomsProps;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
@@ -21,6 +24,7 @@ import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CrossCollisionBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.LadderBlock;
 import net.minecraft.world.level.block.StairBlock;
@@ -37,9 +41,9 @@ import net.minecraft.world.level.levelgen.WorldgenRandom;
 import net.minecraft.world.level.levelgen.blending.Blender;
 
 /**
- * The Frontrooms: the M.E.G. institute (InstituteLayout) in the middle of a patch of ordinary country (FrontroomsTerrain)
- * with a round quarantine wall around it and nothing beyond. Trees, flowers, ore and animals come from the biome, as in
- * the Overworld; none grow on the institute or its forecourt.
+ * The Frontrooms: the M.E.G. institute (InstituteLayout) and its research grounds (FrontroomsCampus) in the middle of a
+ * patch of ordinary country (FrontroomsTerrain), with a round quarantine wall around it and nothing beyond. Trees,
+ * flowers, ore and animals come from the biome, as in the Overworld; none grow on the institute or the grounds' works.
  */
 final class FrontroomsChunkGenerator extends ChunkGenerator {
 	static final MapCodec<FrontroomsChunkGenerator> CODEC = BiomeSource.CODEC.fieldOf("biome_source")
@@ -64,9 +68,11 @@ final class FrontroomsChunkGenerator extends ChunkGenerator {
 
 	static BlockState blockAt(long seed, int x, int y, int z) {
 		if (FrontroomsTerrain.beyond(x, z)) return AIR;
+		FrontroomsCampus.Part part = FrontroomsCampus.part(x, y, z);
+		if (part != FrontroomsCampus.Part.NONE) return campus(part);
 		if (FrontroomsTerrain.wall(x, z)) return wall(x, y, z);
 		Cell cell = InstituteLayout.cell(x, y, z);
-		if (cell.kind() != InstituteLayout.Kind.NONE) return building(cell);
+		if (cell.kind() != InstituteLayout.Kind.NONE) return building(cell, x, y, z);
 		int h = FrontroomsTerrain.height(seed, x, z);
 		if (y == 0) return Blocks.BEDROCK.defaultBlockState();
 		boolean shore = h <= FrontroomsTerrain.WATER + 1;
@@ -110,14 +116,85 @@ final class FrontroomsChunkGenerator extends ChunkGenerator {
 		return FrontroomsBlocks.WARNING_SIGN.defaultBlockState().setValue(InstituteBlocks.Facing.FACING, facing);
 	}
 
-	private static BlockState building(Cell cell) {
+	/** What the grounds' parts are made of. */
+	private static BlockState campus(FrontroomsCampus.Part part) {
+		return switch (part) {
+			case NONE, AIR -> AIR;
+			case ASPHALT -> FrontroomsBlocks.CAMPUS_ASPHALT.defaultBlockState();
+			case LINE -> FrontroomsBlocks.CAMPUS_LINE.defaultBlockState();
+			case SIDEWALK -> FrontroomsBlocks.CAMPUS_SIDEWALK.defaultBlockState();
+			case PRECAST -> FrontroomsBlocks.PRECAST_PANEL.defaultBlockState();
+			case RIBBON -> FrontroomsBlocks.RIBBON_WINDOW.defaultBlockState();
+			case STEEL -> FrontroomsBlocks.STEEL_FRAME.defaultBlockState();
+			case SIGN -> FrontroomsBlocks.FACADE_SIGN.defaultBlockState();
+			case BAND -> FrontroomsBlocks.QUARANTINE_BAND.defaultBlockState();
+			case CONCRETE -> FrontroomsBlocks.QUARANTINE_WALL.defaultBlockState();
+			case WATER -> Blocks.WATER.defaultBlockState();
+			case LIGHT -> FrontroomsBlocks.INSTITUTE_LIGHT.defaultBlockState();
+			case SODIUM -> FrontroomsBlocks.SODIUM_LAMP.defaultBlockState();
+			case FLOODLIGHT -> FrontroomsBlocks.QUARANTINE_FLOODLIGHT.defaultBlockState();
+			case RED_LIGHT -> FrontroomsBlocks.EMERGENCY_LIGHT.defaultBlockState();
+			case BARS -> Blocks.IRON_BARS.defaultBlockState();
+			case POLE -> FrontroomsBlocks.STEEL_POLE.defaultBlockState();
+		};
+	}
+
+	/** Level 0's own blocks, for the piece of it in the specimen chamber (looked up by name: they are Level 0's). */
+	private static final class Level0 {
+		static final BlockState CARPET = block("carpet"), WALLPAPER = block("wallpaper"), CEILING = block("ceiling_tile"),
+				LIGHT = block("fluorescent_light");
+
+		private static BlockState block(String name) {
+			return BuiltInRegistries.BLOCK.getValue(BackroomsMod.id(name)).defaultBlockState();
+		}
+	}
+
+	/** A railing joins the railings and walls beside it. */
+	private static BlockState rail(int x, int y, int z) {
+		BlockState state = Blocks.IRON_BARS.defaultBlockState();
+		for (Direction side : Direction.Plane.HORIZONTAL) {
+			InstituteLayout.Kind next = InstituteLayout.cell(x + side.getStepX(), y, z + side.getStepZ()).kind();
+			boolean joins = switch (next) {
+				case RAIL, WALL, PILLAR, WAINSCOT, MINT_WALL, MINT_WAINSCOT, GLASS, OBSERVATION -> true;
+				default -> false;
+			};
+			state = state.setValue(CrossCollisionBlock.PROPERTY_BY_DIRECTION.get(side), joins);
+		}
+		return state;
+	}
+
+	private static BlockState building(Cell cell, int x, int y, int z) {
 		Direction facing = Direction.from2DDataValue(cell.facing());
 		return switch (cell.kind()) {
 			case NONE, AIR -> AIR;
 			case SOLID, ROOF -> FrontroomsBlocks.INSTITUTE_CONCRETE.defaultBlockState();
 			case WALL, PILLAR -> FrontroomsBlocks.INSTITUTE_WALL.defaultBlockState();
 			case WAINSCOT -> FrontroomsBlocks.INSTITUTE_WAINSCOT.defaultBlockState();
+			case MINT_WALL -> FrontroomsBlocks.MINT_WALL.defaultBlockState();
+			case MINT_WAINSCOT -> FrontroomsBlocks.MINT_WAINSCOT.defaultBlockState();
 			case GLASS -> Blocks.GLASS.defaultBlockState();
+			case OBSERVATION -> FrontroomsBlocks.OBSERVATION_WINDOW.defaultBlockState();
+			case LOBBY_FLOOR -> FrontroomsBlocks.LOBBY_TERRAZZO.defaultBlockState();
+			case RAIL -> rail(x, y, z);
+			case PRECAST -> FrontroomsBlocks.PRECAST_PANEL.defaultBlockState();
+			case RIBBON -> FrontroomsBlocks.RIBBON_WINDOW.defaultBlockState();
+			case STEEL -> FrontroomsBlocks.STEEL_FRAME.defaultBlockState();
+			case SIGN -> FrontroomsBlocks.FACADE_SIGN.defaultBlockState();
+			case CONTAINMENT -> FrontroomsBlocks.CONTAINMENT_GLASS.defaultBlockState();
+			case BAND -> FrontroomsBlocks.QUARANTINE_BAND.defaultBlockState();
+			case LEVEL0_CARPET -> Level0.CARPET;
+			case LEVEL0_WALL -> Level0.WALLPAPER;
+			case LEVEL0_CEILING -> Level0.CEILING;
+			case LEVEL0_LIGHT -> Level0.LIGHT;
+			case BARS -> Blocks.IRON_BARS.defaultBlockState();
+			case COIL -> ZenithBlocks.BRIDGE_COIL.defaultBlockState();
+			case ASPHALT -> FrontroomsBlocks.CAMPUS_ASPHALT.defaultBlockState();
+			case PAINT -> FrontroomsBlocks.INSTITUTE_WALL.defaultBlockState();
+			case PROP -> {
+				InstituteFurnishing.Place place = InstituteFurnishing.places().get(cell.requires());
+				yield InstituteProps.block(place.type().id()).defaultBlockState().setValue(HorizontalDirectionalBlock.FACING, facing);
+			}
+			case PROP_PART -> BackroomsProps.PROP_PART.defaultBlockState();
 			case FLOOR -> FrontroomsBlocks.INSTITUTE_FLOOR.defaultBlockState();
 			case WORK_FLOOR -> FrontroomsBlocks.INSTITUTE_WORK_FLOOR.defaultBlockState();
 			case CEILING -> FrontroomsBlocks.INSTITUTE_CEILING.defaultBlockState();
@@ -128,7 +205,7 @@ final class FrontroomsChunkGenerator extends ChunkGenerator {
 					.setValue(BlastDoorBlock.AXIS, cell.facing() == 0 ? Direction.Axis.X : Direction.Axis.Z)
 					.setValue(BlastDoorBlock.REQUIRES, cell.requires());
 			case DOOR_LAMP -> FrontroomsBlocks.DOOR_LAMP.defaultBlockState().setValue(DoorLampBlock.REQUIRES, cell.requires());
-			case STAIR -> Blocks.POLISHED_ANDESITE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.NORTH);
+			case STAIR -> Blocks.POLISHED_ANDESITE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, facing);
 			case LADDER -> Blocks.LADDER.defaultBlockState().setValue(LadderBlock.FACING, Direction.SOUTH);
 			case HATCH -> FrontroomsBlocks.ARCHIVE_HATCH.defaultBlockState();
 			case COUNTER -> FrontroomsBlocks.INSTITUTE_COUNTER.defaultBlockState();
@@ -146,7 +223,7 @@ final class FrontroomsChunkGenerator extends ChunkGenerator {
 	private static BlockState station(char code, Direction facing) {
 		Block block = switch (code) {
 			case 'K' -> BackroomsProps.SALVAGE_BENCH;
-			case 'W' -> BackroomsProps.WORKSHOP_BENCH;
+			case 'V' -> BackroomsProps.WORKSHOP_BENCH;
 			case 'A' -> BackroomsProps.ALMOND_DISTILLER;
 			case 'R' -> BackroomsProps.ANOMALY_ALTAR;
 			case 'X' -> BackroomsProps.SCRAP_RECYCLER;
@@ -171,7 +248,7 @@ final class FrontroomsChunkGenerator extends ChunkGenerator {
 			for (int z = 0; z < 16; z++) {
 				int wx = minX + x, wz = minZ + z;
 				if (FrontroomsTerrain.beyond(wx, wz)) continue;
-				int top = Math.min(HEIGHT - 1, Math.max(InstituteLayout.TOP, FrontroomsTerrain.WALL_TOP + 2));
+				int top = Math.min(HEIGHT - 1, columnTop(wx, wz));
 				for (int y = 0; y <= top; y++) {
 					BlockState state = blockAt(seed, wx, y, wz);
 					if (state.isAir()) continue;
@@ -184,12 +261,18 @@ final class FrontroomsChunkGenerator extends ChunkGenerator {
 		return CompletableFuture.completedFuture(chunk);
 	}
 
+	/** The highest block that may be anything but air in a column. */
+	private static int columnTop(int x, int z) {
+		int top = Math.max(FrontroomsTerrain.WALL_TOP + 2, FrontroomsCampus.top(x, z));
+		return InstituteLayout.inside(x, z) ? Math.max(top, InstituteLayout.TOP) : top;
+	}
+
 	@Override
 	public void applyBiomeDecoration(WorldGenLevel level, ChunkAccess chunk, StructureManager structureManager) {
 		ChunkPos pos = chunk.getPos();
 		int x0 = pos.getMinBlockX(), z0 = pos.getMinBlockZ(), x1 = pos.getMaxBlockX(), z1 = pos.getMaxBlockZ();
 		boolean nearBuilding = x1 >= InstituteLayout.MIN_X - CLEAR && x0 <= InstituteLayout.MAX_X + CLEAR
-				&& z1 >= InstituteLayout.MIN_Z - CLEAR && z0 <= InstituteLayout.YARD_MAX_Z + CLEAR;
+				&& z1 >= InstituteLayout.MIN_Z - CLEAR && z0 <= InstituteLayout.MAX_Z + CLEAR || FrontroomsCampus.busy(x0, z0, x1, z1);
 		boolean allBeyond = FrontroomsTerrain.beyond(x0, z0) && FrontroomsTerrain.beyond(x1, z0) && FrontroomsTerrain.beyond(x0, z1)
 				&& FrontroomsTerrain.beyond(x1, z1) && Math.min(Math.abs(x0), Math.abs(x1)) > 0 && Math.min(Math.abs(z0), Math.abs(z1)) > 0;
 		if (nearBuilding || allBeyond) return;
@@ -209,6 +292,9 @@ final class FrontroomsChunkGenerator extends ChunkGenerator {
 		if (FrontroomsTerrain.beyond(x, z)) return 0;
 		if (FrontroomsTerrain.wall(x, z)) return FrontroomsTerrain.WALL_TOP + 3;
 		if (InstituteLayout.inside(x, z)) return InstituteLayout.ROOF + 1;
+		for (int y = FrontroomsCampus.top(x, z); y > FrontroomsTerrain.GROUND; y--) {
+			if (FrontroomsCampus.structure(x, y, z)) return y + 1;
+		}
 		int h = FrontroomsTerrain.height(seed(randomState), x, z);
 		boolean water = type == Heightmap.Types.WORLD_SURFACE_WG || type == Heightmap.Types.WORLD_SURFACE || type == Heightmap.Types.MOTION_BLOCKING;
 		return (water ? Math.max(h, FrontroomsTerrain.WATER) : h) + 1;

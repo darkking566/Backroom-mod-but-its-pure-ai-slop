@@ -15,7 +15,9 @@ public enum ShopRole {
 	/** Mason, in the tunnels under Base Gamma: gas masks. */
 	MASON("mason", "aiko"),
 	/** The institute's medic, in the medical wing (open once the team has met a quota): treatment and medicine. */
-	MEDIC("medic", "medic");
+	MEDIC("medic", "medic"),
+	/** Martial Master inside Level 0's Manila Room: exchanges specialization badges for Lost Old Coins. */
+	MARTIAL_MASTER("martial_master", "tom");
 
 	private final String id, look;
 

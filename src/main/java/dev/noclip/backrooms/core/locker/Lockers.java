@@ -94,6 +94,21 @@ public final class Lockers {
 		return taken;
 	}
 
+	/** Deposits items directly into the player's locker (overflow goes to relics). Returns stacks accepted. */
+	public static int deposit(ServerPlayer player, List<ItemStack> items) {
+		List<ItemStack> contents = contents(player);
+		List<ItemStack> relics = relics(player);
+		int added = 0;
+		for (ItemStack item : items) {
+			if (item.isEmpty()) continue;
+			added++;
+			ItemStack rest = insert(contents, item.copy());
+			if (!rest.isEmpty()) relics.add(rest);
+		}
+		if (added > 0) store(player, contents, relics);
+		return added;
+	}
+
 	private static void store(ServerPlayer player, List<ItemStack> contents, List<ItemStack> relics) {
 		player.setAttached(LOCKER, List.copyOf(contents));
 		if (relics.isEmpty()) player.removeAttached(RELICS);

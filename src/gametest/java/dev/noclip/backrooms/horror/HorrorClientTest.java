@@ -2,9 +2,18 @@ package dev.noclip.backrooms.horror;
 
 import dev.noclip.backrooms.core.LevelExits;
 import dev.noclip.backrooms.core.economy.Wallet;
+import dev.noclip.backrooms.core.floors.FloorDifficulty;
 import dev.noclip.backrooms.core.floors.Floors;
+import dev.noclip.backrooms.core.floors.FloorsClient;
 import dev.noclip.backrooms.core.guild.Contracts;
+import dev.noclip.backrooms.core.locker.Lockers;
+import dev.noclip.backrooms.core.locker.RelayService;
+import dev.noclip.backrooms.core.locker.Safebox;
+import dev.noclip.backrooms.core.rpg.Badges;
+import dev.noclip.backrooms.core.rpg.InventoryStatsPanel;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
+import dev.noclip.backrooms.core.rpg.PlayerStats;
+import dev.noclip.backrooms.core.rpg.SurvivalXp;
 import dev.noclip.backrooms.core.trip.Pull;
 import dev.noclip.backrooms.core.trip.PullState;
 import dev.noclip.backrooms.core.trip.Trips;
@@ -19,12 +28,18 @@ import dev.noclip.backrooms.core.quota.QuotaClient;
 import dev.noclip.backrooms.core.quota.QuotaMath;
 import dev.noclip.backrooms.core.trade.ShopRole;
 import dev.noclip.backrooms.core.trade.Shops;
+import dev.noclip.backrooms.items.BackroomsItems;
+import java.util.List;
+import net.minecraft.client.gui.screens.inventory.ContainerScreen;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import dev.noclip.backrooms.level0.Level0;
 import dev.noclip.backrooms.level1.Level1;
+import dev.noclip.backrooms.level1.Level1Items;
+import dev.noclip.backrooms.level2.Level2;
 import dev.noclip.backrooms.monsters.Monsters;
 import dev.noclip.backrooms.monsters.hound.Hound;
+import dev.noclip.backrooms.weapons.BackroomsMeleeItem;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestServerContext;
@@ -32,9 +47,12 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContex
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.LevelData;
+import org.lwjgl.glfw.GLFW;
 
 /**
  * The horror direction (docs/project/1-gameplay/README.md) end to end:
@@ -79,7 +97,7 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			check(server.computeOnServer(s -> PlayerRpg.get(player(s)).maxSanity()) == 60.0F, "level 5 is not 60 max sanity");
 
 			// 3. A hound, hurt to a quarter of its health by the player, stops hunting and backs away.
-			server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + STAND_Y + " 3.5");
+			server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 55.5 " + STAND_Y + " 55.5"); // inside Stage (0,0), away from its seams (Level0Space)
 			game.getConnection().waitForChunksRender();
 			int id = server.computeOnServer(s -> {
 				ServerPlayer p = player(s);
@@ -315,6 +333,256 @@ public final class HorrorClientTest implements FabricClientGameTest {
 				for (int i = 0; i < menu.inputSlotCount(); i++) menu.inputGrid().setItem(i, ItemStack.EMPTY);
 				p.getInventory().clearContent();
 			});
+
+			// 10. Priority-1 core exploration loop: dual-axis difficulty & anti-farm, safebox, relay & gear insurance, and expanded contracts.
+			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 120 0");
+			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
+			context.waitTicks(45);
+			context.runOnClient(client -> {
+				if (client.gui.screen() != null) client.gui.screen().onClose();
+			});
+			context.waitTicks(5);
+
+			// 10a. Dual-axis scaling: walking >250 blocks from landing raises Band to 1 and scales hound health.
+			server.runCommand("effect give @a resistance infinite 4 true");
+			toLevel0(server);
+			check(server.computeOnServer(s -> FloorDifficulty.of(player(s)).band()) == 0, "fresh landing was not Band 0");
+			server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 455.5 " + STAND_Y + " 3.5");
+			game.getConnection().waitForChunksRender();
+			context.waitFor(client -> FloorsClient.difficulty().active() && FloorsClient.difficulty().band() == 1, 80);
+			int scaledHoundId = server.computeOnServer(s -> {
+				ServerPlayer p = player(s);
+				Hound h = Monsters.HOUND.create(p.level(), EntitySpawnReason.COMMAND);
+				h.snapTo(p.getX() + 3, STAND_Y, p.getZ(), 0, 0);
+				h.setNoAi(true);
+				p.level().addFreshEntity(h);
+				return h.getId();
+			});
+			float scaledHp = server.computeOnServer(s -> hound(s, scaledHoundId).getMaxHealth());
+			check(Math.abs(scaledHp - 75.0F * 1.35F) < 0.5F, "Band 1 hound max health expected ~101.25, got " + scaledHp);
+			server.runCommand("kill @e[type=noclip_backrooms:hound]");
+
+			// 10b. Anti-farm ping-pong: 0 -> 1 -> 0 reaches floor 3 with 0 penalty; bouncing back to 1 freezes floor & adds penalty.
+			server.runOnServer(s -> LevelExits.use(player(s), "1"));
+			server.waitFor(s -> player(s).level().dimension() == Level1.LEVEL_1, 400);
+			check(server.computeOnServer(s -> Floors.of(player(s)).floor()) == 2 && server.computeOnServer(s -> FloorDifficulty.farmPenalty(player(s))) == 0,
+					"0 -> 1 did not advance cleanly to floor 2");
+			server.runOnServer(s -> LevelExits.use(player(s), "0"));
+			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 400);
+			check(server.computeOnServer(s -> Floors.of(player(s)).floor()) == 3 && server.computeOnServer(s -> FloorDifficulty.farmPenalty(player(s))) == 0,
+					"single backtrack 0 -> 1 -> 0 should still reach floor 3 cleanly");
+			server.runOnServer(s -> LevelExits.use(player(s), "1"));
+			server.waitFor(s -> player(s).level().dimension() == Level1.LEVEL_1, 400);
+			check(server.computeOnServer(s -> Floors.of(player(s)).floor()) == 3 && server.computeOnServer(s -> FloorDifficulty.farmPenalty(player(s))) >= 1,
+					"rapid A->B->A->B bounce did not freeze floor or apply anti-farm penalty");
+
+			// 10c. Portable safebox: keeps protected items on death in Backrooms, expands at home for credits.
+			game.getConnection().waitForChunksRender();
+			context.waitTicks(10);
+			check(server.computeOnServer(s -> Safebox.capacity(player(s))) == 2, "initial safebox capacity was not 2");
+			server.runOnServer(s -> Safebox.put(player(s), 0, new ItemStack(Items.DIAMOND, 1)));
+			server.runCommand("item replace entity @a hotbar.0 with minecraft:dirt 1");
+			die(context, server);
+			server.waitFor(s -> player(s).isAlive() && player(s).level().dimension() == Level0.LEVEL_0, 200);
+			check(server.computeOnServer(s -> player(s).getInventory().countItem(Items.DIRT)) == 0, "unprotected dirt survived Backrooms death");
+			check(server.computeOnServer(s -> Safebox.count(player(s), Items.DIAMOND)) == 1, "safebox item was lost on Backrooms death");
+
+			server.runCommand("effect give @a resistance infinite 4 true");
+			server.runOnServer(s -> Institute.receive(player(s)));
+			server.waitFor(s -> player(s).level().dimension() == Home.FRONTROOMS, 200);
+			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
+			context.runOnClient(client -> client.gui.screen().onClose());
+			context.waitTicks(5);
+			server.runOnServer(s -> Wallet.set(player(s), 500));
+			check(server.computeOnServer(s -> Safebox.upgrade(player(s), false)), "safebox upgrade failed");
+			check(server.computeOnServer(s -> Safebox.capacity(player(s))) == 3 && server.computeOnServer(s -> Wallet.of(player(s))) == 200,
+					"safebox capacity/cost mismatch after upgrade");
+			server.runOnServer(s -> Safebox.open(player(s)));
+			context.waitFor(client -> client.gui.screen() instanceof ContainerScreen, 100);
+			context.waitTicks(5);
+			context.takeScreenshot("horror_safebox");
+			context.runOnClient(client -> client.gui.screen().onClose());
+			context.waitTicks(5);
+
+			// 10d. Relay drop-off box + single-trip gear insurance: ship mid-run and recover inventory on death.
+			toLevel0(server);
+			game.getConnection().waitForChunksRender();
+			context.waitTicks(10);
+			check(server.computeOnServer(s -> RelayService.shipToLocker(player(s),
+					List.of(new ItemStack(Items.APPLE, 3), new ItemStack(Items.COAL, 2)))), "relay drop-off failed");
+			check(server.computeOnServer(s -> Wallet.of(player(s))) == 170
+					&& server.computeOnServer(s -> Lockers.count(player(s), Items.APPLE)) == 3
+					&& server.computeOnServer(s -> Lockers.count(player(s), Items.COAL)) == 2,
+					"relayed items or fee did not reach institute locker");
+			check(server.computeOnServer(s -> RelayService.buyInsurance(player(s), false)), "failed to buy single-trip gear insurance");
+			check(server.computeOnServer(s -> RelayService.isInsured(player(s))) && server.computeOnServer(s -> Wallet.of(player(s))) == 50,
+					"insurance state or fee mismatch");
+			server.runCommand("item replace entity @a hotbar.0 with minecraft:emerald 1");
+			die(context, server);
+			server.waitFor(s -> player(s).isAlive() && player(s).level().dimension() == Level0.LEVEL_0, 200);
+			check(server.computeOnServer(s -> !RelayService.isInsured(player(s))), "gear insurance remained active after payout");
+			check(server.computeOnServer(s -> Lockers.count(player(s), Items.EMERALD)) == 1, "insured inventory was not rescued to locker");
+			check(server.computeOnServer(s -> Safebox.count(player(s), Items.DIAMOND)) == 1, "safebox item lost during insured death");
+
+			// 10e. Expanded contracts: hunt hounds, courier 0 -> 1 -> 2, and collect delivery.
+			server.runCommand("effect give @a resistance infinite 4 true");
+			server.runCommand("clear @a");
+			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 120 0");
+			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
+			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
+			context.runOnClient(client -> client.gui.screen().onClose());
+			context.waitTicks(5);
+
+			// Hunt 2 hounds contract
+			check(Contracts.available().contains(Contracts.Contract.HUNT_HOUNDS), "HUNT_HOUNDS missing from available contracts");
+			long creditsBeforeHunt = server.computeOnServer(s -> Wallet.of(player(s)));
+			server.runOnServer(s -> Contracts.start(player(s), Contracts.Contract.HUNT_HOUNDS));
+			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 200);
+			for (int k = 0; k < 2; k++) {
+				server.runOnServer(s -> {
+					ServerPlayer p = player(s);
+					Hound target = Monsters.HOUND.create(p.level(), EntitySpawnReason.COMMAND);
+					target.snapTo(p.getX() + 1.5, STAND_Y, p.getZ(), 0, 0);
+					target.setNoAi(true);
+					p.level().addFreshEntity(target);
+					target.setHealth(1.0F);
+					target.hurtServer(p.level(), p.level().damageSources().playerAttack(p), 50.0F);
+				});
+			}
+			check(server.computeOnServer(s -> player(s).getAttached(Contracts.ACTIVE) != null && player(s).getAttached(Contracts.ACTIVE).reached()),
+					"killing 2 hounds did not complete HUNT_HOUNDS contract");
+			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 120 0");
+			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
+			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
+			context.runOnClient(client -> client.gui.screen().onClose());
+			context.waitTicks(5);
+			check(server.computeOnServer(s -> Wallet.of(player(s))) > creditsBeforeHunt, "HUNT_HOUNDS contract did not pay out");
+
+			// Multi-level courier 0 -> 1 -> 2 contract
+			server.runOnServer(s -> Contracts.start(player(s), Contracts.Contract.COURIER_012));
+			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 200);
+			check(server.computeOnServer(s -> player(s).getAttached(Contracts.ACTIVE).progress()) == 1, "courier leg 1 (Level 0) failed");
+			server.runOnServer(s -> LevelExits.use(player(s), "1"));
+			server.waitFor(s -> player(s).level().dimension() == Level1.LEVEL_1, 400);
+			check(server.computeOnServer(s -> player(s).getAttached(Contracts.ACTIVE).progress()) == 2, "courier leg 2 (Level 1) failed");
+			server.runOnServer(s -> LevelExits.use(player(s), "2"));
+			server.waitFor(s -> player(s).level().dimension() == Level2.LEVEL_2, 400);
+			check(server.computeOnServer(s -> player(s).getAttached(Contracts.ACTIVE).reached()), "courier leg 3 (Level 2) did not complete");
+			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 120 0");
+			server.waitFor(s -> player(s).level().dimension() == Level.OVERWORLD, 200);
+			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
+			context.runOnClient(client -> client.gui.screen().onClose());
+			context.waitTicks(5);
+
+			// Collect delivery contract (4 almond water -> keeps remaining 1, pays out)
+			long creditsBeforeCollect = server.computeOnServer(s -> Wallet.of(player(s)));
+			server.runOnServer(s -> Contracts.start(player(s), Contracts.Contract.COLLECT_ALMOND));
+			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 200);
+			server.runOnServer(s -> player(s).getInventory().add(new ItemStack(Level1Items.ALMOND_WATER, 5)));
+			server.runOnServer(s -> Institute.receive(player(s)));
+			server.waitFor(s -> player(s).level().dimension() == Home.FRONTROOMS, 200);
+			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
+			context.runOnClient(client -> client.gui.screen().onClose());
+			check(server.computeOnServer(s -> player(s).getInventory().countItem(Level1Items.ALMOND_WATER)) == 1,
+					"COLLECT_ALMOND did not consume exact goal count (4 of 5)");
+			check(server.computeOnServer(s -> Wallet.of(player(s))) > creditsBeforeCollect, "COLLECT_ALMOND contract did not pay out");
+			context.waitTicks(5);
+
+			// 11. Priority-2 RPG depth: hidden stats via scrolls (Option 1), high-risk health cost melee,
+			// Martial Master badge unlock & safe-zone switch, extra survival XP, and Inventory [Adv.] tab.
+			server.runCommand("clear @a");
+			server.runCommand("gamemode survival @a");
+
+			// 11a. Hidden stats: first scroll unlocks at 1, repeat scroll grants +1 free point; unlocked stat accepts points.
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				PlayerRpg.set(p, PlayerRpg.get(p).addStatPoints(1));
+				ItemStack luckA = new ItemStack(BackroomsItems.FORBIDDEN_SCROLL_LUCK, 2);
+				ItemStack psy = new ItemStack(BackroomsItems.FORBIDDEN_SCROLL_PSY, 1);
+				ItemStack tech = new ItemStack(BackroomsItems.FORBIDDEN_SCROLL_TECH, 1);
+				PlayerRpg.applyForbiddenScroll(p, PlayerStats.StatKind.LUCK, luckA);
+				PlayerRpg.applyForbiddenScroll(p, PlayerStats.StatKind.LUCK, luckA);
+				PlayerRpg.applyForbiddenScroll(p, PlayerStats.StatKind.PSI, psy);
+				PlayerRpg.applyForbiddenScroll(p, PlayerStats.StatKind.ENGINEERING, tech);
+				PlayerRpg.set(p, PlayerRpg.get(p).allocate(PlayerStats.StatKind.ENGINEERING));
+			});
+			check(server.computeOnServer(s -> {
+				PlayerStats st = PlayerRpg.get(player(s));
+				return st.luckUnlocked() && st.luck() == 2 && st.psiUnlocked() && st.psi() == 1
+						&& st.engUnlocked() && st.eng() == 2;
+			}), "forbidden scroll Option 1 unlock/boost or hidden stat allocation failed");
+
+			// 11b. High-risk heavy melee health toll locks when health is too low and drains safely when healthy.
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(BackroomsItems.WEST_VOID_GREATSWORD));
+				p.setHealth(2.0F);
+				InteractionResult lowRes = ((BackroomsMeleeItem) p.getMainHandItem().getItem())
+						.use(p.level(), p, InteractionHand.MAIN_HAND);
+				check(lowRes == InteractionResult.FAIL && Math.abs(p.getHealth() - 2.0F) < 0.05F,
+						"high-risk weapon did not lock when player health was critically low");
+				p.setHealth(10.0F);
+				InteractionResult okRes = ((BackroomsMeleeItem) p.getMainHandItem().getItem())
+						.use(p.level(), p, InteractionHand.MAIN_HAND);
+				check(okRes != InteractionResult.FAIL && Math.abs(p.getHealth() - 7.5F) < 0.05F,
+						"high-risk weapon did not deduct 2.5 HP: " + p.getHealth());
+			});
+
+			// 11c. Martial Master badge unlock with Lost Old Coins, safe-zone toggle & Vanguard Breaker 50% toll cut.
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				Badges.spawnVendor(p.level(), p.getX() + 1.5, p.getY(), p.getZ());
+				p.getInventory().add(new ItemStack(BackroomsItems.LOST_OLD_COIN, 12));
+				check(Badges.unlock(p, Badges.Badge.VANGUARD_BREAKER, true), "failed to unlock Vanguard Breaker");
+				check(Badges.unlock(p, Badges.Badge.ANOMALY_SCHOLAR, true), "failed to unlock Anomaly Scholar");
+				check(Badges.countCoins(p.getInventory()) == 0, "coins were not deducted cleanly on badge unlock");
+				check(Badges.equip(p, Badges.Badge.VANGUARD_BREAKER, true), "failed to equip badge inside safe zone");
+			});
+			context.waitTicks(45); // Wait out VOID_GREATSWORD 40-tick cooldown
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				p.setHealth(10.0F);
+				InteractionResult res = ((BackroomsMeleeItem) p.getMainHandItem().getItem())
+						.use(p.level(), p, InteractionHand.MAIN_HAND);
+				check(res != InteractionResult.FAIL && Math.abs(p.getHealth() - 8.75F) < 0.05F,
+						"Vanguard Breaker did not halve high-risk weapon health cost: " + p.getHealth());
+			});
+			toLevel0(server);
+			game.getConnection().waitForChunksRender();
+			context.waitTicks(10);
+			check(server.computeOnServer(s -> !Badges.inSafeZone(player(s))
+					&& !Badges.equip(player(s), Badges.Badge.ANOMALY_SCHOLAR, true)
+					&& Badges.active(player(s)) == Badges.Badge.VANGUARD_BREAKER),
+					"badge swap should be blocked outside safe zones");
+
+			server.runOnServer(s -> Institute.receive(player(s)));
+			server.waitFor(s -> player(s).level().dimension() == Home.FRONTROOMS, 200);
+			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
+			context.runOnClient(client -> client.gui.screen().onClose());
+			context.waitTicks(5);
+
+			// 11d. Survival XP: first-time field note read (+15 XP once) & buyer delivery XP.
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				long xpBeforeNote = (long) PlayerRpg.get(p).level() * 10000L + PlayerRpg.get(p).xp();
+				check(SurvivalXp.recordNoteRead(p, "test:manila_manual"), "first note read did not grant XP");
+				check(!SurvivalXp.recordNoteRead(p, "test:manila_manual"), "duplicate note read granted XP twice");
+				long afterNote = (long) PlayerRpg.get(p).level() * 10000L + PlayerRpg.get(p).xp();
+				check(afterNote != xpBeforeNote, "note read did not change player XP");
+				long xpBeforeSale = afterNote;
+				SurvivalXp.onBuyerSale(p, 200L);
+				long afterSale = (long) PlayerRpg.get(p).level() * 10000L + PlayerRpg.get(p).xp();
+				check(afterSale > xpBeforeSale, "buyer sale did not grant survival XP");
+			});
+
+			// 11e. Open inventory switched to [Adv.] tab to inspect hidden stats & Specialization Badge UI.
+			context.runOnClient(client -> InventoryStatsPanel.selectTab(1));
+			context.getInput().pressKey(GLFW.GLFW_KEY_E);
+			context.waitTicks(5);
+			context.takeScreenshot("horror_rpg_advanced");
+			context.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
+			context.waitTicks(5);
+			context.runOnClient(client -> InventoryStatsPanel.selectTab(0));
 		}
 	}
 
@@ -349,9 +617,11 @@ public final class HorrorClientTest implements FabricClientGameTest {
 
 	private static void die(ClientGameTestContext context, TestServerContext server) {
 		server.runCommand("kill @a");
-		context.waitTicks(20);
+		server.waitFor(s -> !player(s).isAlive(), 100);
+		context.waitTicks(10);
 		context.runOnClient(client -> client.player.respawn());
-		context.waitTicks(20);
+		server.waitFor(s -> player(s).isAlive(), 100);
+		context.waitTicks(10);
 	}
 
 	private static float maxHealth(TestServerContext server) {

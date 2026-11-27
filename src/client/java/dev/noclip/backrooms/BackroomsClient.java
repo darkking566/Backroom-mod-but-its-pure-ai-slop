@@ -5,6 +5,7 @@ import dev.noclip.backrooms.core.floors.FloorsClient;
 import dev.noclip.backrooms.core.trade.ShopClient;
 import dev.noclip.backrooms.core.look.Look;
 import dev.noclip.backrooms.core.look.ItemLook;
+import dev.noclip.backrooms.core.look.ItemTooltips;
 import dev.noclip.backrooms.core.people.People;
 import dev.noclip.backrooms.core.people.PersonModel;
 import dev.noclip.backrooms.core.people.PersonRenderer;
@@ -76,11 +77,14 @@ public final class BackroomsClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		Look.register();
 		ItemLook.register();
+		ItemTooltips.register();
 		dev.noclip.backrooms.level0.film.FilmLook.register();
+		dev.noclip.backrooms.level0.Level0Ghosts.register();
 		dev.noclip.backrooms.level4.Level4Client.register();
 		FloorsClient.register();
 		ShopClient.register();
 		WalletClient.register();
+		dev.noclip.backrooms.core.locker.SafeboxClient.register();
 		RpgClient.register();
 		PullClient.register();
 		dev.noclip.backrooms.core.quota.QuotaClient.register();

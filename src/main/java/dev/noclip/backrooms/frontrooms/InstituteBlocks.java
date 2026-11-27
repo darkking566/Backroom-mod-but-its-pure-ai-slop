@@ -96,9 +96,41 @@ final class InstituteBlocks {
 		}
 	}
 
-	/** A transport pad in B1: from here M.E.G. sends people down, to the levels the team has been to. */
+	/**
+	 * A transport pad: on the ground-floor lobby it directly returns anyone to Level 0 (free, open from quota 0);
+	 * in B1 M.E.G. uses it to send teams down to any visited/deep level.
+	 */
+	/** A thin steel pole: lamp posts, flagpoles, the radio mast's legs. */
+	static final class Pole extends Block {
+		private static final VoxelShape SHAPE = Block.box(6, 0, 6, 10, 16, 10);
+
+		Pole(Properties properties) {
+			super(properties);
+		}
+
+		@Override
+		protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+			return SHAPE;
+		}
+	}
+
+	/** A street lamp's head on top of its pole: a flat housing, the orange lens underneath. */
+	static final class LampHead extends Block {
+		private static final VoxelShape SHAPE = Block.box(1, 9, 1, 15, 14, 15);
+
+		LampHead(Properties properties) {
+			super(properties);
+		}
+
+		@Override
+		protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+			return SHAPE;
+		}
+	}
+
 	static final class Pad extends Block {
 		private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 2, 16);
+		private static final java.util.Map<java.util.UUID, Integer> LOBBY_CONFIRM = new java.util.HashMap<>();
 
 		Pad(Properties properties) {
 			super(properties);
@@ -113,6 +145,7 @@ final class InstituteBlocks {
 		protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
 				BlockHitResult hit) {
 			if (player instanceof ServerPlayer serverPlayer && player.isShiftKeyDown()
+					&& pos.getY() < InstituteLayout.FLOOR
 					&& (stack.is(BackroomsItems.KEYPAD_HACKER_T3) || stack.is(BackroomsItems.KEYPAD_HACKER_T4))) {
 				dev.noclip.backrooms.core.ending.Endings.tryTrueEscape(serverPlayer, true);
 				return InteractionResult.SUCCESS;
@@ -122,7 +155,24 @@ final class InstituteBlocks {
 
 		@Override
 		protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-			if (player instanceof ServerPlayer serverPlayer) Quota.deployOptions(serverPlayer);
+			if (player instanceof ServerPlayer serverPlayer) {
+				if (pos.getY() >= InstituteLayout.FLOOR) {
+					int now = serverPlayer.level().getServer().getTickCount();
+					int until = LOBBY_CONFIRM.getOrDefault(serverPlayer.getUUID(), -1);
+					if (now <= until) {
+						LOBBY_CONFIRM.remove(serverPlayer.getUUID());
+						level.playSound(null, pos, SoundEvents.PORTAL_TRIGGER, SoundSource.BLOCKS, 0.7F, 1.15F);
+						Quota.deploy(serverPlayer, "0", false);
+					} else {
+						LOBBY_CONFIRM.put(serverPlayer.getUUID(), now + 100);
+						level.playSound(null, pos, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 0.7F, 1.1F);
+						serverPlayer.sendOverlayMessage(Component.translatable("message.noclip_backrooms.institute.lobby_pad_confirm")
+								.withStyle(ChatFormatting.AQUA));
+					}
+				} else {
+					Quota.deployOptions(serverPlayer);
+				}
+			}
 			return InteractionResult.SUCCESS;
 		}
 

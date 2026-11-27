@@ -1,8 +1,9 @@
 package dev.noclip.backrooms.frontrooms;
 
 /**
- * The ground of the Frontrooms, as plain numbers: gentle hills and a few ponds inside a round quarantine wall, level
- * with the institute's ground floor around the building. Past the wall there is nothing.
+ * The ground of the Frontrooms, as plain numbers: the research grounds level with the institute's ground floor out to
+ * {@link #FLAT_RADIUS} (and along the avenue to the gate), then gentle hills, woods and a few ponds out to a round
+ * quarantine wall. Past the wall there is nothing.
  */
 public final class FrontroomsTerrain {
 	/** The grass around the institute is level with its ground floor. */
@@ -10,11 +11,13 @@ public final class FrontroomsTerrain {
 	/** Ponds fill up to here. */
 	public static final int WATER = GROUND - 2;
 	/** The quarantine wall stands between these distances from the middle; nothing is past it. */
-	public static final int WALL_IN = 100, WALL_OUT = 103;
+	public static final int WALL_IN = 196, WALL_OUT = 199;
+	/** The research grounds are flat out to here. */
+	public static final int FLAT_RADIUS = 150;
 	/** The wall's top course; the fence and floodlights stand on it. */
 	public static final int WALL_TOP = 100;
-	/** How far around the building the ground is kept flat, and how far it takes to rise into the hills. */
-	private static final int FLAT = 8, BLEND = 20;
+	/** How far it takes the flat grounds to rise into the hills. */
+	private static final int BLEND = 22;
 
 	private FrontroomsTerrain() {
 	}
@@ -41,9 +44,9 @@ public final class FrontroomsTerrain {
 	/** The top block of the ground (grass, sand, or a pond's bed). */
 	public static int height(long seed, int x, int z) {
 		double n = 4.6 * noise(seed, x / 52.0, z / 52.0) + 1.8 * noise(seed ^ 0x5DEECE66DL, x / 17.0, z / 17.0);
-		int dx = Math.max(Math.max(InstituteLayout.MIN_X - FLAT - x, x - InstituteLayout.MAX_X - FLAT), 0);
-		int dz = Math.max(Math.max(InstituteLayout.MIN_Z - FLAT - z, z - InstituteLayout.YARD_MAX_Z - FLAT), 0);
-		double d = Math.hypot(dx, dz);
+		// Out of the flat grounds; the avenue keeps a flat strip all the way to the gate.
+		double d = Math.max(radius(x, z) - FLAT_RADIUS, 0);
+		if (z > 0) d = Math.min(d, Math.max(Math.abs(x + 0.5) - 12, 0));
 		double t = Math.clamp(d / BLEND, 0.0, 1.0);
 		t = t * t * (3 - 2 * t);
 		return GROUND + (int) Math.round(n * t);

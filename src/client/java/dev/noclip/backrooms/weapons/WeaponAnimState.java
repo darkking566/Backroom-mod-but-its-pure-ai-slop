@@ -1,5 +1,7 @@
 package dev.noclip.backrooms.weapons;
 
+import dev.noclip.backrooms.core.rpg.PlayerRpg;
+import dev.noclip.backrooms.core.rpg.PlayerStats;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
@@ -186,10 +188,11 @@ public final class WeaponAnimState {
 			clientFireDelay = 8;
 			return;
 		}
-		clientFireDelay = Math.max(2, gun.cooldownTicks());
+		PlayerStats stats = PlayerRpg.get(mc.player);
+		clientFireDelay = Math.max(2, Math.round(gun.cooldownTicks() * stats.firearmCooldownScale()));
 
 		// Immediate zero-latency client recoil + slight camera pitch kick + muzzle flash!
-		float strength = gun.recoilStrength() * (aiming ? 0.58F : 1.0F);
+		float strength = gun.recoilStrength() * (aiming ? 0.58F : 1.0F) * stats.firearmRecoilScale();
 		recoilKick = Math.min(1.6F, recoilKick + 0.55F * strength);
 		recoilPitch = Math.min(2.2F, recoilPitch + 0.85F * strength);
 		recoilRoll = (mc.player.getRandom().nextFloat() - 0.5F) * 0.45F * strength;

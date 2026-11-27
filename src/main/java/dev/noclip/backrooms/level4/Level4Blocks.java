@@ -58,7 +58,7 @@ public final class Level4Blocks {
 	public static final Block OFFICE_BLACKED_WINDOW = register("office_blacked_window", unbreakable(MapColor.COLOR_BLACK, SoundType.GLASS));
 	public static final Block OFFICE_TRAP_WINDOW = register("office_trap_window",
 			unbreakable(MapColor.SNOW, SoundType.GLASS).noOcclusion()
-					.isViewBlocking((s, l, p) -> false).isSuffocating((s, l, p) -> false).lightLevel(s -> 4),
+					.isViewBlocking((s, l, p) -> false).isSuffocating((s, l, p) -> false).lightLevel(s -> 2),
 			TransparentBlock::new);
 	public static final Block OFFICE_RAIN_WINDOW = register("office_rain_window",
 			unbreakable(MapColor.COLOR_LIGHT_BLUE, SoundType.GLASS).noOcclusion()

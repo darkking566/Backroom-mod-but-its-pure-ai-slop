@@ -66,6 +66,18 @@ public final class FrontroomsClientTest implements FabricClientGameTest {
 			context.waitTicks(40);
 			context.takeScreenshot("frontrooms_lobby");
 
+			// The objects stand where the plans put them, and a multi-block one's other blocks know the one that draws it.
+			InstituteFurnishing.Place table = InstituteFurnishing.places().stream()
+					.filter(p -> p.type().id().equals("inst_interview_table")).findFirst().orElseThrow();
+			server.runOnServer(s -> {
+				BlockPos master = new BlockPos(table.x(), InstituteLayout.FLOOR + 1, table.z());
+				check(level(s).getBlockState(master).is(InstituteProps.block("inst_interview_table")), "no interview table in the receiving room");
+				int[] part = InstituteFurnishing.cells(table).get(1);
+				BlockPos partPos = new BlockPos(part[0], InstituteLayout.FLOOR + 1 + part[1], part[2]);
+				check(level(s).getBlockEntity(partPos) instanceof dev.noclip.backrooms.props.PropBlockEntity be && be.masterPos().equals(master),
+						"the table's other half does not know its master");
+			});
+
 			// Its people, each at their post.
 			server.waitFor(s -> people(s) >= 5, 400);
 			for (ShopRole role : new ShopRole[] {ShopRole.MASTER, ShopRole.BUYER, ShopRole.SUPPLIER, ShopRole.MEDIC, ShopRole.QUARTERMASTER}) {
@@ -77,7 +89,7 @@ public final class FrontroomsClientTest implements FabricClientGameTest {
 			check(!open(server, medical) && !open(server, armoury) && !open(server, deep), "a wing is open before any quota");
 			InstituteLayout.Spot medic = InstituteLayout.spot('n');
 			server.runOnServer(s -> Wallet.set(player(s), 1000));
-			stand(server, medic.x(), medic.z() + 2);
+			stand(server, medic.x(), medic.z() - 2);
 			check(server.computeOnServer(s -> Shops.trade(player(s), ShopRole.MEDIC, 0, 1)) == Shops.Outcome.WING_LOCKED, "the medic serves before any quota");
 
 			// The building cannot be broken; its work area can be built in.
@@ -86,7 +98,7 @@ public final class FrontroomsClientTest implements FabricClientGameTest {
 			stand(server, a.x(), a.z());
 			check(!server.computeOnServer(s -> player(s).gameMode.destroyBlock(lobbyFloor.east())), "the lobby floor broke");
 			check(server.computeOnServer(s -> level(s).getBlockState(lobbyFloor.east()).is(FrontroomsBlocks.INSTITUTE_FLOOR)), "the lobby floor is gone");
-			BlockPos work = new BlockPos(-20, InstituteLayout.FLOOR + 1, 10);
+			BlockPos work = new BlockPos(-36, InstituteLayout.FLOOR + 1, -25);
 			check(InstituteLayout.workArea(work.getX(), work.getY(), work.getZ()), "the test's work spot is not in a work area");
 			server.runOnServer(s -> level(s).setBlockAndUpdate(work, Blocks.CHEST.defaultBlockState()));
 			stand(server, work.getX(), work.getZ() + 2);
@@ -99,37 +111,64 @@ public final class FrontroomsClientTest implements FabricClientGameTest {
 			context.takeScreenshot("frontrooms_locker");
 			context.runOnClient(client -> client.gui.screen().onClose());
 
+			// 1F lobby Level 0 return pad works even at 0 quotas: right-clicking twice sends the player straight back to Level 0.
+			InstituteLayout.Spot lobbyPad = InstituteLayout.lobbyPads().getFirst();
+			BlockPos lobbyPadPos = new BlockPos(lobbyPad.x(), InstituteLayout.FLOOR, lobbyPad.z());
+			check(server.computeOnServer(s -> level(s).getBlockState(lobbyPadPos).is(FrontroomsBlocks.TRANSPORT_PAD)), "no 1F lobby return pad block");
+			stand(server, lobbyPad.x(), lobbyPad.z() + 2);
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				BlockState st = level(s).getBlockState(lobbyPadPos);
+				BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(lobbyPadPos), Direction.UP, lobbyPadPos, false);
+				st.useWithoutItem(level(s), p, hit); // 1st click: confirmation prompt
+				check(p.level().dimension() == Home.FRONTROOMS, "1F lobby pad teleported on first accidental click");
+				st.useWithoutItem(level(s), p, hit); // 2nd click: confirmed deploy to Level 0
+			});
+			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 200);
+			// Return to institute lobby for the remaining Frontrooms checks
+			server.runOnServer(s -> Institute.receive(player(s)));
+			server.waitFor(s -> player(s).level().dimension() == Home.FRONTROOMS, 200);
+			context.waitFor(client -> client.gui.screen() instanceof MissionReportScreen, 200);
+			context.runOnClient(client -> client.gui.screen().onClose());
+
 			// The quarantine wall: whoever gets past it is walked back in.
 			server.runCommand("gamemode spectator @a");
-			server.runCommand("execute as @a in noclip_backrooms:frontrooms run tp @s 0.5 96 70.5 0 5");
+			server.runCommand("execute as @a in noclip_backrooms:frontrooms run tp @s 0.5 80 160.5 0 -5");
 			game.getConnection().waitForChunksRender();
 			context.waitTicks(60);
 			context.takeScreenshot("frontrooms_wall");
 			server.runCommand("gamemode survival @a");
-			server.runCommand("execute as @a in noclip_backrooms:frontrooms run tp @s 0.5 70 130.5");
+			server.runCommand("execute as @a in noclip_backrooms:frontrooms run tp @s 0.5 70 230.5");
 			server.waitFor(s -> player(s).position().distanceTo(Institute.arrival()) < 3, 100);
 
 			// The building from its forecourt, and the grounds.
 			server.runCommand("gamemode spectator @a");
-			server.runCommand("execute as @a in noclip_backrooms:frontrooms run tp @s 0.5 66 42.5 180 -5");
-			game.getConnection().waitForChunksRender();
-			context.waitTicks(30);
-			context.takeScreenshot("frontrooms_institute_outside");
-			server.runCommand("execute as @a in noclip_backrooms:frontrooms run tp @s 40.5 90 70.5 135 25");
-			game.getConnection().waitForChunksRender();
-			context.waitTicks(30);
-			context.takeScreenshot("frontrooms_grounds");
+			shoot(context, server, game, "frontrooms_institute_outside", 0.5, 67, 70.5, 180, -12);
+			shoot(context, server, game, "frontrooms_grounds", 75.5, 125, 125.5, 145, 28);
+			shoot(context, server, game, "frontrooms_towers", -40.5, 90, -20.5, 120, 10);
+			// Inside: the atrium with the specimen chamber, the balconies, the receiving room, the containment cells.
+			shoot(context, server, game, "frontrooms_atrium", 0.5, InstituteLayout.FLOOR + 1, 21.5, 180, -28);
+			shoot(context, server, game, "frontrooms_balcony", -19.5, InstituteLayout.F2_FLOOR + 1, 19.5, 225, 8);
+			shoot(context, server, game, "frontrooms_atrium_top", 9.5, InstituteLayout.F3_FLOOR + 1, 9.5, 135, 35);
+			shoot(context, server, game, "frontrooms_receiving", -28.5, InstituteLayout.FLOOR + 1, 31.5, 135, 5);
+			shoot(context, server, game, "frontrooms_cells", 0.5, InstituteLayout.B1_FLOOR + 1, 2.5, 0, 5);
+			shoot(context, server, game, "frontrooms_gate", 1.5, InstituteLayout.B1_FLOOR + 2, -10.5, 180, 5);
+			shoot(context, server, game, "frontrooms_observation", -46.5, InstituteLayout.FLOOR + 1, 23.5, -100, 5);
+			shoot(context, server, game, "frontrooms_lockers", -44.5, InstituteLayout.FLOOR + 1, 6.5, -75, 5);
+			shoot(context, server, game, "frontrooms_operations", 8.5, InstituteLayout.FLOOR + 1, -30.5, 140, 5);
+			shoot(context, server, game, "frontrooms_labs", -42.5, InstituteLayout.F2_FLOOR + 1, -8.5, 180, 0);
+			shoot(context, server, game, "frontrooms_tanks", -36.5, InstituteLayout.F3_FLOOR + 1, 4.5, 20, 0);
 			server.runCommand("gamemode survival @a");
 
 			// Quotas open the wings: one the medical wing, three the armoury, five B1.
 			meet(server);
 			check(open(server, medical) && !open(server, armoury), "one quota did not open just the medical wing");
-			stand(server, medic.x(), medic.z() + 2);
+			stand(server, medic.x(), medic.z() - 2);
 			check(server.computeOnServer(s -> Shops.trade(player(s), ShopRole.MEDIC, 0, 1)) == Shops.Outcome.DONE, "the medic does not serve after a quota");
 			server.runOnServer(s -> player(s).setHealth(4.0F));
 			check(server.computeOnServer(s -> Treatment.treat(player(s))), "no treatment");
 			check(server.computeOnServer(s -> player(s).getHealth() == player(s).getMaxHealth()), "the treatment did not heal");
-			look(server, medic.x() - 4.5, medic.z() + 8.5, 160);
+			look(server, medic.x() + 0.5, medic.z() - 4.5, 0);
 			context.waitTicks(20);
 			context.takeScreenshot("frontrooms_medical_wing");
 			meet(server);
@@ -176,6 +215,17 @@ public final class FrontroomsClientTest implements FabricClientGameTest {
 			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 200);
 			check(!server.computeOnServer(s -> Extraction.running(player(s))), "a pickup is still running");
 		}
+	}
+
+	/** A spectator's picture from a place, looking a way. */
+	private static void shoot(ClientGameTestContext context, TestServerContext server, TestSingleplayerContext game, String name,
+			double x, double y, double z, float yaw, float pitch) {
+		server.runCommand("execute as @a in noclip_backrooms:frontrooms run tp @s %.1f %.1f %.1f %.1f %.1f".formatted(x, y, z, yaw, pitch));
+		game.getConnection().waitForChunksRender();
+		context.runOnClient(client -> { if (!client.gui.hud.isHidden()) client.gui.hud.toggle(); });
+		context.waitTicks(30);
+		context.takeScreenshot(name);
+		context.runOnClient(client -> { if (client.gui.hud.isHidden()) client.gui.hud.toggle(); });
 	}
 
 	/** Hands in what this cycle wants, as if sold, and waits for the doors to follow. */

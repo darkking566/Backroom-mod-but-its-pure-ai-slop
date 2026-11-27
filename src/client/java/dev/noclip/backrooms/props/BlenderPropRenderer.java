@@ -67,7 +67,7 @@ public final class BlenderPropRenderer implements BlockEntityRenderer<PropBlockE
 		state.trialMesh = null;
 		state.trialCentred = false;
 		// The film's Level 0 objects: a Blender mesh with a baked texture (level0.film.FilmLook).
-		if (state.propId.startsWith("film_")) {
+		if (state.propId.startsWith("film_") || state.propId.startsWith("inst_")) {
 			var film = dev.noclip.backrooms.level0.film.FilmLook.mesh(state.propId);
 			if (!film.isEmpty()) {
 				state.trialMesh = film;

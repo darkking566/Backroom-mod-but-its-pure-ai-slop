@@ -41,7 +41,8 @@ public final class Level1 {
 		Residents.register();
 		Warps.register();
 		Thresholds.register();
-		Patrols.register();
+		// M.E.G. escort patrols disabled per playtest feedback.
+		// Patrols.register();
 		Workers.register();
 		Smoke.register();
 		Locks.register();

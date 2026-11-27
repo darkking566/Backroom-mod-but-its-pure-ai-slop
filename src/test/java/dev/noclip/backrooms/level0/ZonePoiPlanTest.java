@@ -123,7 +123,7 @@ class ZonePoiPlanTest {
 	}
 
 	@Test
-	void sectorVignettesGenerateAllNineTypesCleanlyAndStayOpen() {
+	void sectorVignettesGenerateAllEightTypesCleanlyAndStayOpen() {
 		long seed = 12345L;
 		EnumSet<ZonePoiPlan.VignetteType> seen = EnumSet.noneOf(ZonePoiPlan.VignetteType.class);
 

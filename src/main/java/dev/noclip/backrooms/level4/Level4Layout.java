@@ -17,6 +17,7 @@ final class Level4Layout {
 	static final int FLOOR_Y = 32;
 	static final int OPEN_HEIGHT = 4;
 	static final int ATRIUM_HEIGHT = 8;
+	static final int MEZZANINE_HEIGHT = 10;
 
 	enum Kind {
 		AIR,
@@ -25,6 +26,17 @@ final class Level4Layout {
 		PILLAR,
 		DRYWALL,
 		GLASS_WALL,
+		CUBICLE_WALL,
+		CUBICLE_GLASS,
+		UNFINISHED_STUB,
+		UNFINISHED_PILLAR,
+		BALCONY_RAIL,
+		BALCONY_FLOOR,
+		BALCONY_CANOPY,
+		ELEVATOR_SHAFT,
+		ELEVATOR_CABLE,
+		ELEVATOR_SHAFT_WALL,
+		ELEVATOR_THRESHOLD,
 		OMEGA_WALL,
 		OMEGA_SIGN,
 		WINDOW_BLACKED,
@@ -56,7 +68,8 @@ final class Level4Layout {
 
 	record Tile(Kind kind, ZoneKind zone, int dir, int ceilingHeight, Level4Exit exit, boolean exitSign) {
 		boolean walkable() {
-			return kind == Kind.AIR || kind == Kind.ATRIUM_ARCH || kind == Kind.FIRE_DOOR || kind == Kind.EXIT_HATCH;
+			return kind == Kind.AIR || kind == Kind.ATRIUM_ARCH || kind == Kind.FIRE_DOOR || kind == Kind.EXIT_HATCH
+					|| kind == Kind.BALCONY_FLOOR || kind == Kind.BALCONY_CANOPY;
 		}
 	}
 
@@ -115,7 +128,7 @@ final class Level4Layout {
 		int cx = lx % CELL, cz = lz % CELL;
 		int c = Level4Plan.cell(i, j);
 		ZoneKind zone = plan.zones[c];
-		int ceilH = zone == ZoneKind.ATRIUM ? ATRIUM_HEIGHT : OPEN_HEIGHT;
+		int ceilH = zoneCeilHeight(zone);
 
 		if (zone == ZoneKind.SOLID_CORE) {
 			return new Tile(Kind.DRYWALL, zone, Level4Plan.NORTH, ceilH, null, false);
@@ -141,6 +154,10 @@ final class Level4Layout {
 				return new Tile(Kind.EXIT_DOOR, zone, Level4Plan.opposite(pe.dir()), ceilH, pe.exit(), false);
 			}
 		}
+
+		// Check balcony overrides before cell corners/edges/interiors so cheek walls stay seamless
+		Tile balcony = balconyTile(seed, plan, i, j, cx, cz, zone, ceilH);
+		if (balcony != null) return balcony;
 
 		// Corner column at (0, 0) of each 7x7 cell where walls don't already cover it
 		if (cx == 0 && cz == 0) {
@@ -173,16 +190,73 @@ final class Level4Layout {
 		if (cz == 0 && northIndoor) {
 			ZoneKind nz = plan.zones[Level4Plan.cell(i, j - 1)];
 			int ceil = nz == ZoneKind.ATRIUM ? ATRIUM_HEIGHT : OPEN_HEIGHT;
+			if (plan.balconyDir[Level4Plan.cell(i, j - 1)] == Level4Plan.SOUTH) {
+				Kind wk = (cx >= 1 && cx <= 5) ? Kind.BALCONY_RAIL : Kind.DRYWALL;
+				return new Tile(wk, ZoneKind.OUTSIDE, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+			}
 			Kind wk = (cx >= 1 && cx <= 5) ? exteriorWindowKind(seed, plan, i, j - 1, Level4Plan.SOUTH, cx, x, z) : Kind.DRYWALL;
 			return new Tile(wk, ZoneKind.OUTSIDE, Level4Plan.NORTH, ceil, null, false);
 		}
 		if (cx == 0 && westIndoor) {
 			ZoneKind wz = plan.zones[Level4Plan.cell(i - 1, j)];
 			int ceil = wz == ZoneKind.ATRIUM ? ATRIUM_HEIGHT : OPEN_HEIGHT;
+			if (plan.balconyDir[Level4Plan.cell(i - 1, j)] == Level4Plan.EAST) {
+				Kind wk = (cz >= 1 && cz <= 5) ? Kind.BALCONY_RAIL : Kind.DRYWALL;
+				return new Tile(wk, ZoneKind.OUTSIDE, Level4Plan.WEST, OPEN_HEIGHT, null, false);
+			}
 			Kind wk = (cz >= 1 && cz <= 5) ? exteriorWindowKind(seed, plan, i - 1, j, Level4Plan.EAST, cz, x, z) : Kind.DRYWALL;
 			return new Tile(wk, ZoneKind.OUTSIDE, Level4Plan.WEST, ceil, null, false);
 		}
 		return new Tile(Kind.OUTSIDE_AIR, ZoneKind.OUTSIDE, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+	}
+
+	private static Tile balconyTile(long seed, Level4Plan plan, int i, int j, int cx, int cz, ZoneKind zone, int ceilH) {
+		int bdir = plan.balconyDir[Level4Plan.cell(i, j)];
+		if (bdir < 0) return null;
+
+		if (bdir == Level4Plan.NORTH || bdir == Level4Plan.SOUTH) {
+			boolean north = bdir == Level4Plan.NORTH;
+			int depth = north ? cz : (CELL - cz);
+			if (depth < 0 || depth > 3) return null;
+			if (cx == 0 && cz == 0) return new Tile(Kind.PILLAR, zone, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+			if (cx == 0) return new Tile(Kind.DRYWALL, zone, Level4Plan.WEST, OPEN_HEIGHT, null, false);
+			if (depth == 0) {
+				Kind k = (cx >= 1 && cx <= 5) ? Kind.BALCONY_RAIL : Kind.DRYWALL;
+				return new Tile(k, zone, Level4Plan.SOUTH, OPEN_HEIGHT, null, false);
+			}
+			if (depth == 1) return new Tile(cx <= 5 ? Kind.BALCONY_FLOOR : Kind.DRYWALL, zone, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+			if (depth == 2) return new Tile(cx <= 5 ? Kind.BALCONY_CANOPY : Kind.DRYWALL, zone, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+			int doorFace = north ? Level4Plan.SOUTH : Level4Plan.NORTH;
+			if (cx == 3) return new Tile(Kind.FIRE_DOOR, zone, doorFace, OPEN_HEIGHT, null, false);
+			if (cx == 2 || cx == 4) return new Tile(Kind.WINDOW_RAIN, zone, doorFace, OPEN_HEIGHT, null, false);
+			return new Tile(Kind.DRYWALL, zone, doorFace, OPEN_HEIGHT, null, false);
+		}
+
+		boolean west = bdir == Level4Plan.WEST;
+		int depth = west ? cx : (CELL - cx);
+		if (depth < 0 || depth > 3) return null;
+		if (cx == 0 && cz == 0) return new Tile(Kind.PILLAR, zone, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+		if (cz == 0) return new Tile(Kind.DRYWALL, zone, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+		if (depth == 0) {
+			Kind k = (cz >= 1 && cz <= 5) ? Kind.BALCONY_RAIL : Kind.DRYWALL;
+			return new Tile(k, zone, Level4Plan.EAST, OPEN_HEIGHT, null, false);
+		}
+		if (depth == 1) return new Tile(cz <= 5 ? Kind.BALCONY_FLOOR : Kind.DRYWALL, zone, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+		if (depth == 2) return new Tile(cz <= 5 ? Kind.BALCONY_CANOPY : Kind.DRYWALL, zone, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+		int doorFace = west ? Level4Plan.EAST : Level4Plan.WEST;
+		if (cz == 3) return new Tile(Kind.FIRE_DOOR, zone, doorFace, OPEN_HEIGHT, null, false);
+		if (cz == 2 || cz == 4) return new Tile(Kind.WINDOW_RAIN, zone, doorFace, OPEN_HEIGHT, null, false);
+		return new Tile(Kind.DRYWALL, zone, doorFace, OPEN_HEIGHT, null, false);
+	}
+
+	/** Whether (x, z) lies inside the open-sky central shaft of a tower {@link ZoneKind#LIGHTWELL}. */
+	static boolean isLightwellShaft(long seed, int x, int z) {
+		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		int i = lx / CELL, j = lz / CELL;
+		if (Level4Plan.isSkybridgeCell(i, j)) return false;
+		Level4Plan plan = Level4Plan.of(seed, rx, rz);
+		return plan.zones[Level4Plan.cell(i, j)] == ZoneKind.OUTSIDE && tile(seed, x, z).kind() == Kind.OUTSIDE_AIR;
 	}
 
 	private static boolean onEdgeCenter(int cx, int cz, int d) {
@@ -194,25 +268,35 @@ final class Level4Layout {
 		};
 	}
 
-	private static boolean isAtrium(Level4Plan plan, int i, int j) {
-		return Level4Plan.inside(i, j) && plan.zones[Level4Plan.cell(i, j)] == ZoneKind.ATRIUM;
+	private static int zoneCeilHeight(ZoneKind zone) {
+		return switch (zone) {
+			case MEZZANINE -> MEZZANINE_HEIGHT;
+			case ATRIUM, AUDITORIUM -> ATRIUM_HEIGHT;
+			default -> OPEN_HEIGHT;
+		};
+	}
+
+	private static boolean isTallZone(ZoneKind zone) {
+		return zone == ZoneKind.ATRIUM || zone == ZoneKind.AUDITORIUM || zone == ZoneKind.MEZZANINE;
+	}
+
+	private static int tallBorderHeight(Level4Plan plan, int i, int j) {
+		return Level4Plan.inside(i, j) ? zoneCeilHeight(plan.zones[Level4Plan.cell(i, j)]) : OPEN_HEIGHT;
 	}
 
 	private static Tile cornerTile(long seed, Level4Plan plan, int i, int j, ZoneKind zone, int ceilH) {
-		boolean nearAtrium = zone == ZoneKind.ATRIUM || isAtrium(plan, i - 1, j)
-				|| isAtrium(plan, i, j - 1) || isAtrium(plan, i - 1, j - 1);
-		int cornerCeil = nearAtrium ? ATRIUM_HEIGHT : ceilH;
+		int cornerCeil = Math.max(ceilH, Math.max(tallBorderHeight(plan, i - 1, j),
+				Math.max(tallBorderHeight(plan, i, j - 1), tallBorderHeight(plan, i - 1, j - 1))));
 		if (zone == ZoneKind.OMEGA_BASE) {
 			RoomBox room = plan.rooms.get(plan.roomId[Level4Plan.cell(i, j)]);
 			boolean outer = i == room.i() || j == room.j();
 			if (outer) return new Tile(Kind.OMEGA_WALL, zone, Level4Plan.NORTH, cornerCeil, null, false);
 		}
-		// Keep open doorway corners clear on region edges
-		if (i == 0 && plan.edge(Level4Plan.cell(0, j), Level4Plan.WEST) == Edge.OPEN) {
-			return new Tile(Kind.AIR, zone, Level4Plan.NORTH, cornerCeil, null, false);
-		}
-		if (j == 0 && plan.edge(Level4Plan.cell(i, 0), Level4Plan.NORTH) == Edge.OPEN) {
-			return new Tile(Kind.AIR, zone, Level4Plan.NORTH, cornerCeil, null, false);
+		if (zone == ZoneKind.AUDITORIUM) {
+			RoomBox room = plan.rooms.get(plan.roomId[Level4Plan.cell(i, j)]);
+			if (i > room.i() && j > room.j()) {
+				return new Tile(Kind.AIR, zone, Level4Plan.NORTH, ATRIUM_HEIGHT, null, false);
+			}
 		}
 		return new Tile(Kind.PILLAR, zone, Level4Plan.NORTH, cornerCeil, null, false);
 	}
@@ -223,10 +307,14 @@ final class Level4Layout {
 		int ni = i + Level4Plan.DX[dir], nj = j + Level4Plan.DZ[dir];
 		ZoneKind neighbor = Level4Plan.inside(ni, nj) ? plan.zones[Level4Plan.cell(ni, nj)] : ZoneKind.OPEN_OFFICE;
 		boolean omegaWall = zone == ZoneKind.OMEGA_BASE || neighbor == ZoneKind.OMEGA_BASE;
-		boolean atriumBorder = zone == ZoneKind.ATRIUM || neighbor == ZoneKind.ATRIUM;
-		int edgeCeil = atriumBorder ? ATRIUM_HEIGHT : ceilH;
+		boolean atriumBorder = isTallZone(zone) || isTallZone(neighbor);
+		int edgeCeil = Math.max(ceilH, zoneCeilHeight(neighbor));
 		int facingInto = dir == Level4Plan.NORTH ? Level4Plan.SOUTH : Level4Plan.EAST;
 		if (omegaWall && zone != ZoneKind.OMEGA_BASE) facingInto = Level4Plan.opposite(facingInto);
+
+		if (zone == ZoneKind.ELEVATOR_LOBBY && dir == Level4Plan.NORTH && along >= 1 && along <= 5) {
+			return new Tile(Kind.ELEVATOR_SHAFT_WALL, zone, facingInto, edgeCeil, null, false);
+		}
 
 		if (e == Edge.OPEN) {
 			if (atriumBorder && zone != neighbor) {
@@ -269,7 +357,7 @@ final class Level4Layout {
 		if (plan.nearHumanBase(roomI, roomJ)) return Kind.WINDOW_BLACKED;
 		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
 		int bayHash = Math.floorMod(hash(seed, rx * 31 + roomI, rz * 31 + roomJ, 421 + dir), 100);
-		if (bayHash < 24 && along >= 2 && along <= 4) return Kind.WINDOW_TRAP;
+		if (bayHash < 10 && along >= 2 && along <= 4) return Kind.WINDOW_TRAP;
 		return Kind.WINDOW_RAIN;
 	}
 
@@ -288,23 +376,168 @@ final class Level4Layout {
 		return false;
 	}
 
-	/** Whether (x, z) is part of a skybridge spanning the canyon between towers. */
-	static boolean isSkybridge(long seed, int x, int z) {
+	record BridgeInfo(boolean eastWest, boolean elevated, int spanPos, int perpPos) {
+	}
+
+	record AuditoriumInfo(int floorY, boolean stair, int stairDir, boolean stage, boolean screenWall, int rx) {
+	}
+
+	record MezzanineInfo(int stairStep, boolean stairRail, boolean overlookOpen, boolean overlookRail, boolean upperGlassWall) {
+	}
+
+	record PlenumInfo(boolean wallShell, int ladderDir, boolean ventGrate, boolean duct) {
+	}
+
+	record SubTunnelInfo(boolean stair, int stepY, int stairDir, boolean stairRail, boolean corridor, boolean wallSide, boolean light) {
+	}
+
+	/** Returns two-story mezzanine geometry inside {@link ZoneKind#MEZZANINE}, or null elsewhere. */
+	static MezzanineInfo mezzanineInfo(long seed, int x, int z) {
+		int rx0 = Math.floorDiv(x, SIZE), rz0 = Math.floorDiv(z, SIZE);
+		Level4Plan plan = Level4Plan.of(seed, rx0, rz0);
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		int i = lx / CELL, j = lz / CELL;
+		int c = Level4Plan.cell(i, j);
+		if (plan.zones[c] != ZoneKind.MEZZANINE || plan.roomId[c] < 0) return null;
+		RoomBox room = plan.rooms.get(plan.roomId[c]);
+		int rx = lx - room.i() * CELL;
+		int rz = lz - room.j() * CELL;
+		int stairStep = ((rz == 3 || rz == 4) && rx >= 1 && rx <= 6) ? rx : 0;
+		boolean stairRail = (rz == 2 || rz == 5) && rx >= 1 && rx <= 6;
+		boolean overlookOpen = rx >= 14 && rx <= 18 && rz >= 8 && rz <= 12;
+		boolean overlookRail = !overlookOpen && (rx >= 13 && rx <= 19 && rz >= 7 && rz <= 13);
+		boolean upperGlassWall = (rx == 12 && rz >= 2 && rz <= 6 && rz != 4);
+		return new MezzanineInfo(stairStep, stairRail, overlookOpen, overlookRail, upperGlassWall);
+	}
+
+	/** Returns ceiling plenum / HVAC crawlway geometry above {@link ZoneKind#DARK_WING}, or null elsewhere. */
+	static PlenumInfo plenumInfo(long seed, int x, int z) {
+		int rx0 = Math.floorDiv(x, SIZE), rz0 = Math.floorDiv(z, SIZE);
+		Level4Plan plan = Level4Plan.of(seed, rx0, rz0);
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		int i = lx / CELL, j = lz / CELL;
+		int c = Level4Plan.cell(i, j);
+		if (plan.zones[c] != ZoneKind.DARK_WING || plan.roomId[c] < 0) return null;
+		RoomBox room = plan.rooms.get(plan.roomId[c]);
+		int rx = lx - room.i() * CELL;
+		int rz = lz - room.j() * CELL;
+		boolean wallShell = (rx == 0 || rx == 20 || rz == 0 || rz == 20);
+		int ladderDir = -1;
+		if (rx == 4 && rz == 1 && !hasExitInCell(plan, Level4Plan.cell(room.i(), room.j()))) {
+			ladderDir = Level4Plan.SOUTH;
+		} else if (rx == 18 && rz == 20 && !hasExitInCell(plan, Level4Plan.cell(room.i() + 2, room.j() + 2))) {
+			ladderDir = Level4Plan.NORTH;
+		}
+		boolean ventGrate = (rx == 10 && rz == 10);
+		boolean duct = !wallShell && ladderDir < 0
+				&& (((rx == 7 || rx == 14) && rz >= 2 && rz <= 18)
+						|| ((rz == 7 || rz == 14) && rx >= 2 && rx <= 18 && rx != 4 && rx != 18));
+		return new PlenumInfo(wallShell, ladderDir, ventGrate, duct);
+	}
+
+	/** Returns sub-level MEP chiller corridor & stairwell geometry, or null outside tunnel cells. */
+	static SubTunnelInfo subTunnelInfo(long seed, int x, int z) {
+		int rx0 = Math.floorDiv(x, SIZE), rz0 = Math.floorDiv(z, SIZE);
+		Level4Plan plan = Level4Plan.of(seed, rx0, rz0);
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		int i = lx / CELL, j = lz / CELL;
+		int cx = lx % CELL, cz = lz % CELL;
+		if (!plan.isTunnelCell(i, j) || cz < 1 || cz > 5) return null;
+
+		boolean wallSide = (cz == 1 || cz == 5);
+		if (i == plan.tunnelI0 && cx >= 1) {
+			if (cz == 3) {
+				int stepY = FLOOR_Y + 1 - cx;
+				return new SubTunnelInfo(true, stepY, Level4Plan.WEST, false, false, false, false);
+			}
+			return new SubTunnelInfo(false, 0, Level4Plan.WEST, cx >= 1 && (cz == 2 || cz == 4), false, wallSide, false);
+		}
+		if (i == plan.tunnelI1 && cx >= 1) {
+			if (cz == 3) {
+				int stepY = FLOOR_Y - 6 + cx;
+				return new SubTunnelInfo(true, stepY, Level4Plan.EAST, false, false, false, false);
+			}
+			return new SubTunnelInfo(false, 0, Level4Plan.EAST, cx >= 1 && (cz == 2 || cz == 4), false, wallSide, false);
+		}
+		if (i > plan.tunnelI0 && (i < plan.tunnelI1 || cx == 0)) {
+			boolean corridor = cz >= 2 && cz <= 4;
+			boolean light = corridor && cz == 3 && cx == 3;
+			return new SubTunnelInfo(false, 0, Level4Plan.EAST, false, corridor, wallSide, light);
+		}
+		return null;
+	}
+
+	/** Returns tiered seating/stage geometry inside a {@link ZoneKind#AUDITORIUM} room, or null elsewhere. */
+	static AuditoriumInfo auditoriumInfo(long seed, int x, int z) {
+		int rx0 = Math.floorDiv(x, SIZE), rz0 = Math.floorDiv(z, SIZE);
+		Level4Plan plan = Level4Plan.of(seed, rx0, rz0);
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		int i = lx / CELL, j = lz / CELL;
+		int c = Level4Plan.cell(i, j);
+		if (plan.zones[c] != ZoneKind.AUDITORIUM || plan.roomId[c] < 0) return null;
+		RoomBox room = plan.rooms.get(plan.roomId[c]);
+		int rx = lx - room.i() * CELL;
+		int rz = lz - room.j() * CELL;
+		boolean screen = (rz == 19 && rx >= 5 && rx <= 15);
+		if (rz <= 3) return new AuditoriumInfo(FLOOR_Y, false, Level4Plan.NORTH, false, screen, rx);
+		if (rz <= 6) return new AuditoriumInfo(FLOOR_Y - 1, rz == 4 && rx >= 2 && rx <= 18, Level4Plan.NORTH, false, screen, rx);
+		if (rz <= 9) return new AuditoriumInfo(FLOOR_Y - 2, rz == 7 && rx >= 2 && rx <= 18, Level4Plan.NORTH, false, screen, rx);
+		if (rz <= 12) return new AuditoriumInfo(FLOOR_Y - 3, rz == 10 && rx >= 2 && rx <= 18, Level4Plan.NORTH, false, screen, rx);
+		if (rz <= 15) return new AuditoriumInfo(FLOOR_Y - 3, false, Level4Plan.NORTH, false, screen, rx);
+		if (rz == 16 && rx >= 8 && rx <= 12) {
+			return new AuditoriumInfo(FLOOR_Y - 3, true, Level4Plan.SOUTH, true, screen, rx);
+		}
+		return new AuditoriumInfo(FLOOR_Y - 2, false, Level4Plan.SOUTH, true, screen, rx);
+	}
+
+	/** Returns bridge geometry metadata if (x, z) lies on or forms a wall of an exterior skybridge. */
+	static BridgeInfo skybridgeInfo(long seed, int x, int z) {
 		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
 		Level4Plan plan = Level4Plan.of(seed, rx, rz);
 		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
 		int i = lx / CELL, j = lz / CELL;
 		int cx = lx % CELL, cz = lz % CELL;
-		if (Level4Plan.isSkybridgeCell(i, j) && plan.zones[Level4Plan.cell(i, j)] != ZoneKind.OUTSIDE) return true;
-		if (cz == 0 && j > 0 && Level4Plan.isSkybridgeCell(i, j - 1)
-				&& plan.zones[Level4Plan.cell(i, j - 1)] != ZoneKind.OUTSIDE && Level4Plan.isSkybridgeCell(i, j)) {
-			return true;
+
+		// Check if (i, j) or its N/W border cell belongs to an E-W bridge
+		int bridgeJ = j;
+		boolean ewFloor = (i >= N - Level4Plan.MARGIN || i < Level4Plan.MARGIN)
+				&& plan.zones[Level4Plan.cell(i, j)] != ZoneKind.OUTSIDE;
+		boolean ewSouthWall = !ewFloor && cz == 0 && j > 0
+				&& (i >= N - Level4Plan.MARGIN || i < Level4Plan.MARGIN)
+				&& plan.zones[Level4Plan.cell(i, j - 1)] != ZoneKind.OUTSIDE;
+		if (ewFloor || ewSouthWall) {
+			if (ewSouthWall) bridgeJ = j - 1;
+			boolean firstHalf = i >= N - Level4Plan.MARGIN;
+			int brx = firstHalf ? rx : rx - 1;
+			int spanPos = firstHalf ? lx - (N - Level4Plan.MARGIN) * CELL : Level4Plan.MARGIN * CELL + lx;
+			int perpPos = ewSouthWall ? CELL : cz;
+			boolean elevated = Math.floorMod(hash(seed, brx, rz, 471 + bridgeJ), 2) == 0;
+			return new BridgeInfo(true, elevated, spanPos, perpPos);
 		}
-		if (cx == 0 && i > 0 && Level4Plan.isSkybridgeCell(i - 1, j)
-				&& plan.zones[Level4Plan.cell(i - 1, j)] != ZoneKind.OUTSIDE && Level4Plan.isSkybridgeCell(i, j)) {
-			return true;
+
+		// Check if (i, j) or its W border cell belongs to a N-S bridge
+		int bridgeI = i;
+		boolean nsFloor = (j >= N - Level4Plan.MARGIN || j < Level4Plan.MARGIN)
+				&& plan.zones[Level4Plan.cell(i, j)] != ZoneKind.OUTSIDE;
+		boolean nsEastWall = !nsFloor && cx == 0 && i > 0
+				&& (j >= N - Level4Plan.MARGIN || j < Level4Plan.MARGIN)
+				&& plan.zones[Level4Plan.cell(i - 1, j)] != ZoneKind.OUTSIDE;
+		if (nsFloor || nsEastWall) {
+			if (nsEastWall) bridgeI = i - 1;
+			boolean firstHalf = j >= N - Level4Plan.MARGIN;
+			int brz = firstHalf ? rz : rz - 1;
+			int spanPos = firstHalf ? lz - (N - Level4Plan.MARGIN) * CELL : Level4Plan.MARGIN * CELL + lz;
+			int perpPos = nsEastWall ? CELL : cx;
+			boolean elevated = Math.floorMod(hash(seed, rx, brz, 473 + bridgeI), 2) == 0;
+			return new BridgeInfo(false, elevated, spanPos, perpPos);
 		}
-		return false;
+
+		return null;
+	}
+
+	/** Whether (x, z) is part of a skybridge spanning the canyon between towers. */
+	static boolean isSkybridge(long seed, int x, int z) {
+		return skybridgeInfo(seed, x, z) != null;
 	}
 
 	private static Tile interiorTile(long seed, Level4Plan plan, int i, int j, int cx, int cz, ZoneKind zone, int ceilH) {
@@ -390,24 +623,85 @@ final class Level4Layout {
 			return new Tile(Kind.BREAKER, zone, Level4Plan.EAST, ceilH, null, false);
 		}
 
+		if (zone == ZoneKind.ELEVATOR_LOBBY && room != null) {
+			if (cz == 0 && cx >= 1 && cx <= 5) {
+				return new Tile(Kind.ELEVATOR_SHAFT_WALL, zone, Level4Plan.SOUTH, ceilH, null, false);
+			}
+			if (cz == 1) {
+				if (cx == 1 || cx == 5) return new Tile(Kind.ELEVATOR_SHAFT_WALL, zone, Level4Plan.SOUTH, ceilH, null, false);
+				if (cx == 3) return new Tile(Kind.ELEVATOR_CABLE, zone, Level4Plan.SOUTH, ceilH, null, false);
+				if (cx == 2 || cx == 4) return new Tile(Kind.ELEVATOR_SHAFT, zone, Level4Plan.SOUTH, ceilH, null, false);
+			}
+			if (cz == 2 && cx >= 1 && cx <= 5) {
+				return new Tile(Kind.ELEVATOR_THRESHOLD, zone, Level4Plan.SOUTH, ceilH, null, false);
+			}
+		}
+
+		if (zone == ZoneKind.UNFINISHED_WING && room != null) {
+			if ((cx == 3 && (cz == 2 || cz == 5)) || (cz == 3 && cx == 2 && (i + j) % 2 == 0)) {
+				return new Tile(Kind.UNFINISHED_PILLAR, zone, Level4Plan.NORTH, ceilH, null, false);
+			}
+			if ((cx == 2 && cz == 4) || (cx == 4 && cz == 2) || (cx == 5 && cz == 4 && (i + j) % 2 == 1)) {
+				return new Tile(Kind.UNFINISHED_STUB, zone, Level4Plan.NORTH, ceilH, null, false);
+			}
+		}
+
 		if (zone == ZoneKind.SUITE && room != null) {
 			int roll = Math.floorMod(hash(seed, i, j, 433), 100);
-			if (cx == 2 && cz == 2) {
-				if (roll < 35) return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
-				if (roll < 58) return new Tile(Kind.VENDING, zone, Level4Plan.SOUTH, ceilH, null, false);
-				if (roll < 78) return new Tile(Kind.PHOTOCOPIER, zone, Level4Plan.SOUTH, ceilH, null, false);
+			if (cx == 2 && cz == 2 && roll < 14) {
+				if (roll < 5) return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
+				if (roll < 7) return new Tile(Kind.VENDING, zone, Level4Plan.SOUTH, ceilH, null, false);
+				if (roll < 11) return new Tile(Kind.PHOTOCOPIER, zone, Level4Plan.SOUTH, ceilH, null, false);
 				return new Tile(Kind.DESK_PHONE, zone, Level4Plan.SOUTH, ceilH, null, false);
 			}
 		}
 
-		// Occasional water cooler / vending machine along open office pillars
-		if (zone == ZoneKind.OPEN_OFFICE && cx == 1 && cz == 1) {
+		// Very rare water cooler / vending machine along open office pillars, plus half-height cubicle mazes
+		if (zone == ZoneKind.OPEN_OFFICE && !Level4Plan.isSkybridgeCell(i, j)) {
 			int roll = Math.floorMod(hash(seed, i, j, 444), 100);
-			if (roll < 9) return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
-			if (roll < 15) return new Tile(Kind.VENDING, zone, Level4Plan.SOUTH, ceilH, null, false);
+			if (cx == 1 && cz == 1) {
+				if (roll < 2) return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
+				if (roll == 2) return new Tile(Kind.VENDING, zone, Level4Plan.SOUTH, ceilH, null, false);
+			}
+			if (roll >= 15 && roll < 52 && !hasExitInCell(plan, c) && !plan.isTunnelCell(i, j)) {
+				Kind cubicle = cubicleTile(cx, cz, Math.floorMod(roll, 4));
+				if (cubicle != null) return new Tile(cubicle, zone, Level4Plan.NORTH, ceilH, null, false);
+			}
 		}
 
 		return new Tile(Kind.AIR, zone, Level4Plan.NORTH, ceilH, null, false);
+	}
+
+	private static boolean hasExitInCell(Level4Plan plan, int c) {
+		for (PlacedExit pe : plan.exits) {
+			if (pe.cell() == c) return true;
+		}
+		return false;
+	}
+
+	private static Kind cubicleTile(int cx, int cz, int variant) {
+		return switch (variant) {
+			case 0 -> {
+				if (cx == 3 && cz == 3) yield Kind.CUBICLE_GLASS;
+				if ((cx == 2 || cx == 4) && cz >= 2 && cz <= 4) yield Kind.CUBICLE_WALL;
+				yield null;
+			}
+			case 1 -> {
+				if ((cz == 2 && cx == 3) || (cz == 4 && cx == 4)) yield Kind.CUBICLE_GLASS;
+				if ((cz == 2 && cx >= 2 && cx <= 4) || (cz == 4 && cx >= 3 && cx <= 5)) yield Kind.CUBICLE_WALL;
+				yield null;
+			}
+			case 2 -> {
+				if (cz == 3 && (cx == 2 || cx == 4)) yield Kind.CUBICLE_GLASS;
+				if (cx == 3 && (cz == 2 || cz == 4)) yield Kind.CUBICLE_WALL;
+				yield null;
+			}
+			default -> {
+				if ((cx == 2 || cx == 5) && cz == 3) yield Kind.CUBICLE_GLASS;
+				if ((cx == 2 || cx == 5) && (cz == 2 || cz == 5)) yield Kind.CUBICLE_WALL;
+				yield null;
+			}
+		};
 	}
 
 	/** Whether this floor cell has carpet indentations from long-vanished desks/chairs. */
@@ -434,6 +728,7 @@ final class Level4Layout {
 						for (int j = 1; j < N - 1; j++) {
 							int c = Level4Plan.cell(i, j);
 							if (plan.zones[c] != ZoneKind.OPEN_OFFICE && plan.zones[c] != ZoneKind.SUITE) continue;
+							if (plan.isTunnelCell(i, j)) continue;
 							int wx = (baseRx + dx) * SIZE + i * CELL + 3;
 							int wz = (baseRz + dz) * SIZE + j * CELL + 3;
 							if (tile(seed, wx, wz).kind() == Kind.AIR) return new int[] {wx, wz};

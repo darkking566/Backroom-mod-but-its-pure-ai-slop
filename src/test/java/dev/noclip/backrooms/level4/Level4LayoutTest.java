@@ -235,4 +235,168 @@ final class Level4LayoutTest {
 		assertTrue(seenStructs.contains(Level4Exit.STAIRS_5));
 		assertTrue(seenStructs.contains(Level4Exit.BASEMENT_71));
 	}
+
+	@Test
+	void indoorWalkableSpacesNeverTouchOutsideAir() {
+		for (long seed = 1; seed <= 6; seed++) {
+			for (int x = -Level4Plan.SIZE; x < Level4Plan.SIZE * 2; x++) {
+				for (int z = -Level4Plan.SIZE; z < Level4Plan.SIZE * 2; z++) {
+					Tile center = Level4Layout.tile(seed, x, z);
+					if (!center.walkable()) continue;
+					for (int dx = -1; dx <= 1; dx++) {
+						for (int dz = -1; dz <= 1; dz++) {
+							if (dx == 0 && dz == 0) continue;
+							Tile neighbor = Level4Layout.tile(seed, x + dx, z + dz);
+							assertTrue(neighbor.kind() != Kind.OUTSIDE_AIR,
+									"wall gap between indoor walkable tile and OUTSIDE_AIR at seed=" + seed
+											+ " (" + x + "," + z + ") -> (" + (x + dx) + "," + (z + dz) + ")");
+						}
+					}
+				}
+			}
+		}
+	}
+
+	@Test
+	void batch1StructuresCubiclesUnfinishedAndVariedSkybridgesAppear() {
+		boolean sawCubicleWall = false, sawCubicleGlass = false;
+		boolean sawUnfinished = false, sawStub = false;
+		boolean sawElevatedBridge = false, sawFlatBridge = false;
+		for (long seed = 10; seed <= 16; seed++) {
+			for (int rx = -1; rx <= 1; rx++) {
+				for (int rz = -1; rz <= 1; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					for (ZoneKind z : plan.zones) {
+						if (z == ZoneKind.UNFINISHED_WING) sawUnfinished = true;
+					}
+					for (int lx = 0; lx < Level4Plan.SIZE; lx++) {
+						for (int lz = 0; lz < Level4Plan.SIZE; lz++) {
+							int x = rx * Level4Plan.SIZE + lx, z = rz * Level4Plan.SIZE + lz;
+							Tile t = Level4Layout.tile(seed, x, z);
+							if (t.kind() == Kind.CUBICLE_WALL) sawCubicleWall = true;
+							if (t.kind() == Kind.CUBICLE_GLASS) sawCubicleGlass = true;
+							if (t.kind() == Kind.UNFINISHED_STUB) sawStub = true;
+							Level4Layout.BridgeInfo bi = Level4Layout.skybridgeInfo(seed, x, z);
+							if (bi != null && t.walkable()) {
+								if (bi.elevated()) {
+									sawElevatedBridge = true;
+									assertTrue(bi.spanPos() >= 0 && bi.spanPos() <= 27,
+											"expected bridge spanPos in 0..27, got " + bi.spanPos());
+								} else {
+									sawFlatBridge = true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		assertTrue(sawCubicleWall && sawCubicleGlass, "expected cubicle partition mazes");
+		assertTrue(sawUnfinished && sawStub, "expected unfinished concrete wing");
+		assertTrue(sawElevatedBridge && sawFlatBridge, "expected both elevated and flat skybridges");
+	}
+
+	@Test
+	void batch2StructuresLightwellAndRainBalconiesAppear() {
+		boolean sawLightwell = false, sawShaft = false;
+		boolean sawBalconyFloor = false, sawBalconyRail = false, sawBalconyCanopy = false;
+		for (long seed = 10; seed <= 16; seed++) {
+			for (int rx = -1; rx <= 1; rx++) {
+				for (int rz = -1; rz <= 1; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					for (ZoneKind z : plan.zones) {
+						if (z == ZoneKind.LIGHTWELL) sawLightwell = true;
+					}
+					for (int lx = 0; lx < Level4Plan.SIZE; lx++) {
+						for (int lz = 0; lz < Level4Plan.SIZE; lz++) {
+							int x = rx * Level4Plan.SIZE + lx, z = rz * Level4Plan.SIZE + lz;
+							Tile t = Level4Layout.tile(seed, x, z);
+							if (Level4Layout.isLightwellShaft(seed, x, z)) sawShaft = true;
+							if (t.kind() == Kind.BALCONY_FLOOR) sawBalconyFloor = true;
+							if (t.kind() == Kind.BALCONY_RAIL) sawBalconyRail = true;
+							if (t.kind() == Kind.BALCONY_CANOPY) sawBalconyCanopy = true;
+						}
+					}
+				}
+			}
+		}
+		assertTrue(sawLightwell && sawShaft, "expected open-sky central lightwell shaft");
+		assertTrue(sawBalconyFloor && sawBalconyRail && sawBalconyCanopy, "expected recessed rain balconies");
+	}
+
+	@Test
+	void batch3StructuresElevatorShaftsAndAuditoriumAppear() {
+		boolean sawElevatorLobby = false, sawShaft = false, sawCable = false, sawThreshold = false;
+		boolean sawAuditorium = false, sawSunkenStage = false, sawStair = false, sawScreen = false;
+		for (long seed = 10; seed <= 16; seed++) {
+			for (int rx = -1; rx <= 1; rx++) {
+				for (int rz = -1; rz <= 1; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					for (ZoneKind z : plan.zones) {
+						if (z == ZoneKind.ELEVATOR_LOBBY) sawElevatorLobby = true;
+						if (z == ZoneKind.AUDITORIUM) sawAuditorium = true;
+					}
+					for (int lx = 0; lx < Level4Plan.SIZE; lx++) {
+						for (int lz = 0; lz < Level4Plan.SIZE; lz++) {
+							int x = rx * Level4Plan.SIZE + lx, z = rz * Level4Plan.SIZE + lz;
+							Tile t = Level4Layout.tile(seed, x, z);
+							if (t.kind() == Kind.ELEVATOR_SHAFT) sawShaft = true;
+							if (t.kind() == Kind.ELEVATOR_CABLE) sawCable = true;
+							if (t.kind() == Kind.ELEVATOR_THRESHOLD) sawThreshold = true;
+							Level4Layout.AuditoriumInfo aud = Level4Layout.auditoriumInfo(seed, x, z);
+							if (aud != null) {
+								if (aud.floorY() == Level4Layout.FLOOR_Y - 3) sawSunkenStage = true;
+								if (aud.stair()) sawStair = true;
+								if (aud.screenWall()) sawScreen = true;
+							}
+						}
+					}
+				}
+			}
+		}
+		assertTrue(sawElevatorLobby && sawShaft && sawCable && sawThreshold, "expected elevator lobby with open shafts");
+		assertTrue(sawAuditorium && sawSunkenStage && sawStair && sawScreen, "expected sunken tiered auditorium");
+	}
+
+	@Test
+	void batch4StructuresMezzaninePlenumAndSubTunnelAppear() {
+		boolean sawMezzanine = false, sawMezzStair = false, sawMezzOverlook = false;
+		boolean sawPlenum = false, sawLadder = false, sawDuct = false;
+		boolean sawTunnel = false, sawTunnelStair = false, sawTunnelCorridor = false;
+		for (long seed = 10; seed <= 16; seed++) {
+			for (int rx = -1; rx <= 1; rx++) {
+				for (int rz = -1; rz <= 1; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					for (ZoneKind z : plan.zones) {
+						if (z == ZoneKind.MEZZANINE) sawMezzanine = true;
+					}
+					if (plan.tunnelJ >= 0) sawTunnel = true;
+					for (int lx = 0; lx < Level4Plan.SIZE; lx++) {
+						for (int lz = 0; lz < Level4Plan.SIZE; lz++) {
+							int x = rx * Level4Plan.SIZE + lx, z = rz * Level4Plan.SIZE + lz;
+							Level4Layout.MezzanineInfo mezz = Level4Layout.mezzanineInfo(seed, x, z);
+							if (mezz != null) {
+								if (mezz.stairStep() > 0) sawMezzStair = true;
+								if (mezz.overlookOpen()) sawMezzOverlook = true;
+							}
+							Level4Layout.PlenumInfo plenum = Level4Layout.plenumInfo(seed, x, z);
+							if (plenum != null) {
+								sawPlenum = true;
+								if (plenum.ladderDir() >= 0) sawLadder = true;
+								if (plenum.duct()) sawDuct = true;
+							}
+							Level4Layout.SubTunnelInfo sub = Level4Layout.subTunnelInfo(seed, x, z);
+							if (sub != null) {
+								if (sub.stair()) sawTunnelStair = true;
+								if (sub.corridor()) sawTunnelCorridor = true;
+							}
+						}
+					}
+				}
+			}
+		}
+		assertTrue(sawMezzanine && sawMezzStair && sawMezzOverlook, "expected two-story mezzanine with stair and overlook");
+		assertTrue(sawPlenum && sawLadder && sawDuct, "expected ceiling plenum crawlway above dark wing");
+		assertTrue(sawTunnel && sawTunnelStair && sawTunnelCorridor, "expected connected sub-level MEP tunnel");
+	}
 }

@@ -33,6 +33,16 @@ public final class WeaponBalance {
 	/** The damage that counts, for a hit from {@code source} on {@code target}. */
 	public static float adjust(LivingEntity target, DamageSource source, float amount) {
 		if (!(source.getEntity() instanceof Player player) || target instanceof Player) return amount;
+		if (target instanceof net.minecraft.world.entity.monster.Monster) {
+			float badgeMult = dev.noclip.backrooms.core.rpg.Badges.monsterDamageMultiplier(player);
+			if (!source.is(net.minecraft.world.damagesource.DamageTypes.MAGIC) && !source.is(net.minecraft.world.damagesource.DamageTypes.INDIRECT_MAGIC)) {
+				Item held = player.getMainHandItem().getItem();
+				if (!(held instanceof BackroomsFirearmItem) && !(held instanceof BackroomsMagicItem)) {
+					badgeMult *= dev.noclip.backrooms.core.rpg.Badges.meleeDamageMultiplier(player);
+				}
+			}
+			amount *= badgeMult;
+		}
 		var key = BuiltInRegistries.ENTITY_TYPE.getKey(target.getType());
 		if (!key.getNamespace().equals("noclip_backrooms")) return amount;
 		int tier = tier(player.getMainHandItem());

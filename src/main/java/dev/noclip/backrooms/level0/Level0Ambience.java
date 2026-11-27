@@ -1,5 +1,8 @@
 package dev.noclip.backrooms.level0;
 
+import dev.noclip.backrooms.core.people.Person;
+import dev.noclip.backrooms.core.rpg.Badges;
+import dev.noclip.backrooms.core.trade.ShopRole;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -12,6 +15,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
@@ -68,6 +72,9 @@ final class Level0Ambience {
 			if (nearbyManila != null) {
 				PENDING_SURGE.remove(id);
 				PENDING_ECHO.remove(id);
+				if (now % 40 == 0) {
+					ensureManilaMartialMaster(level, nearbyManila);
+				}
 				if (nearbyManila.isInteriorBlock(player.getBlockX(), player.getBlockZ())
 						&& player.hasEffect(MobEffects.NAUSEA)) {
 					player.removeEffect(MobEffects.NAUSEA);
@@ -238,5 +245,37 @@ final class Level0Ambience {
 	}
 
 	private record PendingEcho(boolean scratch, int playAtTick) {
+	}
+
+	private static void ensureManilaMartialMaster(ServerLevel level, ManilaRoomPlan.Room room) {
+		int y = Level0ChunkGenerator.FLOOR_Y + 1;
+		AABB interiorBox = new AABB(
+				room.baseX() + 3, y - 1, room.baseZ() + 3,
+				room.baseX() + ManilaRoomPlan.SPAN_BLOCKS - 3, y + 4, room.baseZ() + ManilaRoomPlan.SPAN_BLOCKS - 3);
+		if (!level.getEntitiesOfClass(Person.class, interiorBox,
+				p -> ShopRole.of(p) == ShopRole.MARTIAL_MASTER).isEmpty()) {
+			return;
+		}
+		BlockPos preferred = new BlockPos(room.centerX() - 3, y, room.centerZ());
+		if (canStandVendor(level, preferred)) {
+			Badges.spawnVendor(level, preferred.getX() + 0.5, preferred.getY(), preferred.getZ() + 0.5);
+			return;
+		}
+		for (int dx = 4; dx <= ManilaRoomPlan.SPAN_BLOCKS - 5; dx++) {
+			for (int dz = 4; dz <= ManilaRoomPlan.SPAN_BLOCKS - 5; dz++) {
+				BlockPos candidate = new BlockPos(room.baseX() + dx, y, room.baseZ() + dz);
+				if (canStandVendor(level, candidate)) {
+					Badges.spawnVendor(level, candidate.getX() + 0.5, candidate.getY(), candidate.getZ() + 0.5);
+					return;
+				}
+			}
+		}
+	}
+
+	private static boolean canStandVendor(ServerLevel level, BlockPos pos) {
+		return level.hasChunkAt(pos)
+				&& !level.getBlockState(pos.below()).getCollisionShape(level, pos.below()).isEmpty()
+				&& level.getBlockState(pos).getCollisionShape(level, pos).isEmpty()
+				&& level.getBlockState(pos.above()).getCollisionShape(level, pos.above()).isEmpty();
 	}
 }

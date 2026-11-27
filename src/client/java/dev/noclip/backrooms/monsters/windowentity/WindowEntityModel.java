@@ -40,6 +40,16 @@ public final class WindowEntityModel extends EntityModel<WindowEntityRenderer.St
 		applyOneShot(lunge, state.lunge, state.ageInTicks);
 		applyOneShot(banish, state.banish, state.ageInTicks);
 
+		if (state.windowBound) {
+			ModelPart pelvis = joints.get("Pelvis");
+			if (pelvis != null) {
+				// Hunker low behind the sill when viewed from down the hall; slowly rise as the player nears
+				float farDrop = Mth.clamp((state.camDist - 5.5F) / 6.0F, 0.0F, 1.0F) * 8.0F;
+				pelvis.x += Mth.sin(timeSec * 0.9F) * 1.4F;
+				pelvis.y += Mth.cos(timeSec * 1.3F) * 0.55F + farDrop;
+			}
+		}
+
 		float yaw = Mth.clamp(state.yRot, -55, 55) * Mth.DEG_TO_RAD;
 		float pitch = Mth.clamp(state.xRot, -35, 35) * Mth.DEG_TO_RAD;
 		ModelPart neck = joints.get("NeckUpper"), head = joints.get("Head");

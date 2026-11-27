@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
  * 1. Macro-zone centerpieces: CHASM deep outpost, MEGATHALL skylight lounge, RED_ROOM shrine, DARKENED CRT signal.
  * 2. Rich sector micro-vignettes:
  *    - Classic 5: GLASS_OFFICE, WANDERER_SITE, NOCLIP_ALCOVE, BREAKER_NICHE, PEEK_CHAMBER
- *    - Overhaul 4: MEG_ISOLATION_POST, FAKE_DOOR_HALL, CEILING_CRAWLSPACE, LOCKED_UTILITY_ROOM
+ *    - Overhaul 3: FAKE_DOOR_HALL, CEILING_CRAWLSPACE, LOCKED_UTILITY_ROOM
  * 3. Rare foreshadowing Mystery Exits (HUB_DOOR, FUN_DOOR).
  */
 final class ZonePoiPlan {
@@ -33,7 +33,6 @@ final class ZonePoiPlan {
 		NOCLIP_ALCOVE,
 		BREAKER_NICHE,
 		PEEK_CHAMBER,
-		MEG_ISOLATION_POST,
 		FAKE_DOOR_HALL,
 		CEILING_CRAWLSPACE,
 		LOCKED_UTILITY_ROOM
@@ -507,41 +506,6 @@ final class ZonePoiPlan {
 				}
 				yield null;
 			}
-			case MEG_ISOLATION_POST -> {
-				// M.E.G. temporary plastic-curtain field outpost
-				if (y == fy && ix >= c - 2 && ix <= c + 2 && iz >= c - 2 && iz <= c + 2) {
-					yield Level1Blocks.GARAGE_FLOOR.defaultBlockState();
-				}
-				boolean curtain = ((ix == c - 2 || ix == c + 2) && iz >= c - 2 && iz <= c + 1)
-						|| (iz == c - 2 && ix >= c - 2 && ix <= c + 2);
-				if (curtain && y >= fy + 1 && y <= fy + 4) {
-					yield Blocks.STAINED_GLASS_PANE.lightBlue().defaultBlockState();
-				}
-				if (y == fy + 1) {
-					if (ix == c && iz == c - 1) yield Level1Blocks.OFFICE_DESK.defaultBlockState();
-					if (ix == c - 1 && iz == c - 1) yield Level1Blocks.OFFICE_DESK.defaultBlockState();
-					if (ix == c + 1 && iz == c - 1) yield Level1Blocks.SUPPLY_CRATE.defaultBlockState();
-					if (ix == c + 1 && iz == c) {
-						yield BackroomsProps.NOCLIPPED_FILE_CABINET.defaultBlockState()
-								.setValue(NoClipPropBlock.FACING, Direction.WEST);
-					}
-					if (ix == c && iz == c) {
-						yield BackroomsProps.NOCLIPPED_OFFICE_CHAIR.defaultBlockState()
-								.setValue(NoClipPropBlock.FACING, Direction.NORTH);
-					}
-				} else if (y == fy + 2) {
-					if (ix == c && iz == c - 1) {
-						yield Level1Blocks.OLD_COMPUTER.defaultBlockState()
-								.setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH);
-					}
-					if (ix == c - 1 && iz == c - 1) {
-						yield ModBlocks.FIELD_NOTE.defaultBlockState()
-								.setValue(FieldNoteBlock.FACING, Direction.SOUTH)
-								.setValue(FieldNoteBlock.VARIANT, 0);
-					}
-				}
-				yield null;
-			}
 			case FAKE_DOOR_HALL -> {
 				// Row of 3 identical wooden doors backed immediately by solid wallpaper/rough wall
 				if (iz == c - 1 && ix >= c - 2 && ix <= c + 2 && y >= fy + 1 && y < cy) {
@@ -663,10 +627,9 @@ final class ZonePoiPlan {
 
 			int typeRoll = Math.floorMod(hash(seed, cx, cz, VIGNETTE_SALT + 2), 100);
 			VignetteType type = switch (zone) {
-				case CUBICLES -> typeRoll < 30 ? VignetteType.GLASS_OFFICE
-						: (typeRoll < 48 ? VignetteType.MEG_ISOLATION_POST
-						: (typeRoll < 65 ? VignetteType.LOCKED_UTILITY_ROOM
-						: (typeRoll < 80 ? VignetteType.BREAKER_NICHE : VignetteType.NOCLIP_ALCOVE)));
+				case CUBICLES -> typeRoll < 34 ? VignetteType.GLASS_OFFICE
+						: (typeRoll < 60 ? VignetteType.LOCKED_UTILITY_ROOM
+						: (typeRoll < 80 ? VignetteType.BREAKER_NICHE : VignetteType.NOCLIP_ALCOVE));
 				case ARCHES -> typeRoll < 28 ? VignetteType.PEEK_CHAMBER
 						: (typeRoll < 52 ? VignetteType.GLASS_OFFICE
 						: (typeRoll < 74 ? VignetteType.WANDERER_SITE : VignetteType.CEILING_CRAWLSPACE));
@@ -674,11 +637,10 @@ final class ZonePoiPlan {
 						: (typeRoll < 50 ? VignetteType.NOCLIP_ALCOVE
 						: (typeRoll < 70 ? VignetteType.BREAKER_NICHE
 						: (typeRoll < 86 ? VignetteType.LOCKED_UTILITY_ROOM : VignetteType.PEEK_CHAMBER)));
-				case PILLARS, CLASSIC -> typeRoll < 18 ? VignetteType.MEG_ISOLATION_POST
-						: (typeRoll < 36 ? VignetteType.WANDERER_SITE
-						: (typeRoll < 52 ? VignetteType.CEILING_CRAWLSPACE
-						: (typeRoll < 68 ? VignetteType.NOCLIP_ALCOVE
-						: (typeRoll < 84 ? VignetteType.BREAKER_NICHE : VignetteType.PEEK_CHAMBER))));
+				case PILLARS, CLASSIC -> typeRoll < 22 ? VignetteType.WANDERER_SITE
+						: (typeRoll < 42 ? VignetteType.CEILING_CRAWLSPACE
+						: (typeRoll < 62 ? VignetteType.NOCLIP_ALCOVE
+						: (typeRoll < 82 ? VignetteType.BREAKER_NICHE : VignetteType.PEEK_CHAMBER)));
 				default -> VignetteType.WANDERER_SITE;
 			};
 			return new Vignette(cx, cz, type);
