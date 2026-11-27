@@ -130,10 +130,14 @@ public final class Level0ClientTest implements FabricClientGameTest {
 				s.getLevel(Level0.LEVEL_0).getChunk(new BlockPos(landX, standY, landZ));
 				s.getLevel(Level0.LEVEL_0).setBlockAndUpdate(new BlockPos(landX, standY, landZ), Blocks.STONE.defaultBlockState());
 			});
+			// A pit hole under the first cell's centre (a PITS zone): Noclip lands on that cell's walkway, the stone not in the way.
+			boolean pitCentre = server.computeOnServer(s -> s.getLevel(Level0.LEVEL_0).getBlockState(new BlockPos(landX, standY - 1, landZ)).isAir());
 			suffocate(context, game);
 			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 400);
 			context.waitTicks(20);
-			server.runOnServer(s -> check(Math.floorDiv(player(s).getBlockX(), Maze.CELL) >= Math.floorDiv(landX, Maze.CELL) + 1
+			if (pitCentre) server.runOnServer(s -> check(Math.floorDiv(player(s).getBlockX(), Maze.CELL) == Math.floorDiv(landX, Maze.CELL) && !player(s).isInWall(),
+					"pit landing not on the first cell's walkway: " + player(s).position()));
+			else server.runOnServer(s -> check(Math.floorDiv(player(s).getBlockX(), Maze.CELL) >= Math.floorDiv(landX, Maze.CELL) + 1
 					&& Math.floorDiv(player(s).getBlockX(), Maze.CELL) < Math.floorDiv(landX, Maze.CELL) + 64
 					&& Math.floorDiv(player(s).getBlockZ(), Maze.CELL) == Math.floorDiv(landZ, Maze.CELL) && !player(s).isInWall(),
 					"blocked landing not skipped: " + player(s).position() + ", first cell " + landX + ", " + landZ));
@@ -883,6 +887,34 @@ public final class Level0ClientTest implements FabricClientGameTest {
 					mode + " crossing the west edge landed at " + after[0] + ", " + after[1] + " (want " + (Level0Space.PERIOD - 1.5) + ")");
 			check(Math.abs(after[2] - 90) < 0.01, mode + " crossing the edge turned the player to " + after[2]);
 		}
+		// The copies are kept the same as the Stage (Level0Mirror): a block set in the Stage is in the copy past the
+		// edge at once, and in a copy loaded only later...
+		server.runCommand("gamemode creative @a");
+		server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 2.5 " + standY + " " + (freeZ + 0.5) + " 90 10");
+		context.waitTicks(5);
+		server.runOnServer(s -> s.getLevel(Level0.LEVEL_0).setBlockAndUpdate(new BlockPos(6, standY + 3, freeZ), Blocks.GOLD_BLOCK.defaultBlockState()));
+		server.runOnServer(s -> {
+			ServerLevel level = s.getLevel(Level0.LEVEL_0);
+			check(level.getBlockState(new BlockPos(6 - Level0Space.PERIOD, standY + 3, freeZ)).is(Blocks.GOLD_BLOCK),
+					"a block set in the Stage is not in the copy past its west edge");
+			check(level.getBlockState(new BlockPos(6 + 2 * Level0Space.PERIOD, standY + 3, freeZ)).is(Blocks.GOLD_BLOCK),
+					"a copy loaded later did not get the block set in the Stage");
+		});
+		// ...a thing over the edge comes back like a player...
+		server.runCommand("execute in noclip_backrooms:level_0 run summon minecraft:armor_stand 297.5 " + standY + " " + (freeZ + 0.5) + " {NoGravity:1b}");
+		server.runCommand("execute in noclip_backrooms:level_0 run summon minecraft:armor_stand -3.5 " + standY + " " + (freeZ + 0.5) + " {NoGravity:1b,Invisible:1b}");
+		server.waitFor(s -> {
+			for (var entity : s.getLevel(Level0.LEVEL_0).getAllEntities()) {
+				if (entity.getType() == net.minecraft.world.entity.EntityTypes.ARMOR_STAND && entity.getX() < 0) return false;
+			}
+			return true;
+		}, 40);
+		// ...and what stands in the Stage is seen again past the edge (a ghost of the stand by the east edge, just west of here).
+		context.waitTicks(10);
+		game.getConnection().waitForChunksRender();
+		check(context.computeOnClient(client -> Level0Ghosts.count()) > 0, "no ghosts past the edge");
+		context.takeScreenshot("level0_seam_ghost");
+		server.runCommand("kill @e[type=minecraft:armor_stand]");
 		server.runCommand("gamemode survival @a");
 		server.runCommand("gamerule noclip_backrooms:stage_loop false");
 

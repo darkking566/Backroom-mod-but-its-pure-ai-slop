@@ -581,6 +581,13 @@
   - 驗證：`gradlew build`、`runClientGameTest -Plevels=0`（通過；另外兩次各失敗在不同的隨機檢查「黑影時有怪物」「卡住的落點沒跳過」，看起來是第 0 層隨機事件造成的偶發，第三次通過）、`-Plevels=horror,floors,field,frontrooms,film,1 -Psections=leaveThroughDoor`、`-Plevels=0.1 -Psections=hatch,ways` 通過
   - 企劃寫進 `docs/project/5-levels/level0/README.md` 第三節第 4 點（含給 Gemini 擺放家具的注意：要照範本座標放，不能照區塊掃描）
   - 限制：在中央場景改動的方塊不會出現在遠處複製品上；複製品裡看不到另一側的隊友、怪物、掉落物
+- 使用者要求把環面的三個限制都處理掉（完整鏡像），並問每層都這樣做負擔重不重（回答：執行負擔小；開發上每層的生成器與擺放系統都要改成範本座標，工作量不小，建議只用在設計上要有限的樓層）：
+  - 新增 `level0/Level0Mirror`＋mixin `LevelSetBlockMirror`（`Level.setBlock`）：第 0 層任何方塊改變同時寫進所有已載入的複製品（不觸發鄰格更新），記進存檔 `level0_mirror`，複製品之後載入時補上；非玩家的實體（怪物、掉落物、箭）跨過邊緣也平移回中央場景
+  - 新增 mixin `TrackedEntityTorus`（`ChunkMap$TrackedEntity.updatePlayer`）：第 0 層照環面上的距離決定要不要把實體送給玩家、不管區塊有沒有送過
+  - 新增客戶端 `level0/Level0Ghosts`＋mixin `WalkAnimationStateAccess`：在邊緣外畫出玩家（含自己）、怪物、掉落物的分身（負數 id 的客戶端實體，每刻跟著本尊的位置、姿勢、走路動畫、同步資料，每 10 刻同步裝備）；玩家分身用新的 UUID（一開始沿用玩家的 UUID，兩個實體同一個 id 讓田野工具測試走路放紅線失敗，改掉後通過）
+  - 測試：`Level0ClientTest` 加「中央場景放的方塊同時出現在已載入與之後才載入的複製品」「邊緣外的盔甲座被移回」「邊緣外看得到分身」（截圖 `level0_seam_ghost`）；修朋友的「卡住的落點」檢查：第一格中央是坑洞時 Noclip 本來就落在同一格的走道上；`HorrorClientTest` 獵犬段改站在場景內（受傷的獵犬會往暗處退、跨過接縫）；`FieldClientTest` 紅線失敗訊息加上玩家位置
+  - 驗證：`gradlew build`、`runClientGameTest -Plevels=0,horror,floors,field,frontrooms,film,1 -Psections=leaveThroughDoor`（分兩次跑完都通過）
+  - 還沒鏡像：音效、粒子、方塊實體的內容（箱子內容、告示牌字）
 
 ## 動作記錄（Antigravity）
 

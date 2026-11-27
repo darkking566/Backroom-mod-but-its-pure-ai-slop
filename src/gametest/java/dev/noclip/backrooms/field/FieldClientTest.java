@@ -173,7 +173,9 @@ public final class FieldClientTest implements FabricClientGameTest {
 			server.runCommand("execute as @a at @s run tp @s ~ ~ ~ 0 0");
 			context.getInput().holdKeyFor(options -> options.keyUp, 30);
 			int lines = server.computeOnServer(s -> count(level(s), player(s).blockPosition(), FieldKit.RED_LINE));
-			check(lines >= 2, "the guide line laid " + lines + " blocks");
+			String where = server.computeOnServer(s -> player(s).position() + " onGround=" + player(s).onGround()
+					+ " hand=" + player(s).getMainHandItem());
+			check(lines >= 2, "the guide line laid " + lines + " blocks (player at " + where + ")");
 
 			// A battery lamp steadies the mind.
 			BlockPos here1 = stand(server);

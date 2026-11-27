@@ -79,7 +79,7 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			check(server.computeOnServer(s -> PlayerRpg.get(player(s)).maxSanity()) == 60.0F, "level 5 is not 60 max sanity");
 
 			// 3. A hound, hurt to a quarter of its health by the player, stops hunting and backs away.
-			server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 3.5 " + STAND_Y + " 3.5");
+			server.runCommand("execute as @a in noclip_backrooms:level_0 run tp @s 55.5 " + STAND_Y + " 55.5"); // inside Stage (0,0), away from its seams (Level0Space)
 			game.getConnection().waitForChunksRender();
 			int id = server.computeOnServer(s -> {
 				ServerPlayer p = player(s);

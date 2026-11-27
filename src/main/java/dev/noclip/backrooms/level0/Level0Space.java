@@ -68,6 +68,11 @@ public final class Level0Space {
 		return centre * PERIOD + Math.floorMod(coord, PERIOD);
 	}
 
+	/** The shortest way across the torus: a difference of coordinates brought within half a Stage. */
+	public static double nearest(double delta) {
+		return delta - PERIOD * Math.rint(delta / PERIOD);
+	}
+
 	/** Whether the coordinate lies in a centre Stage (the original, not a copy). */
 	public static boolean original(int coord) {
 		return template(coord) == coord;

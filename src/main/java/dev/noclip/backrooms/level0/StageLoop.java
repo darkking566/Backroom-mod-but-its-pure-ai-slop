@@ -89,6 +89,8 @@ final class StageLoop {
 		java.util.Set<UUID> here = new java.util.HashSet<>();
 		for (ServerPlayer player : level.players()) here.add(player.getUUID());
 		Level0Space.keepOnly(here);
+		// Monsters, items, arrows over an edge come back too (Level0Mirror).
+		Level0Mirror.keepThingsIn(level);
 		for (ServerPlayer player : level.players()) {
 			if (!player.isAlive() || RedRoomLoop.isTrapped(player)) continue;
 			int bx = Mth.floor(player.getX()), bz = Mth.floor(player.getZ());

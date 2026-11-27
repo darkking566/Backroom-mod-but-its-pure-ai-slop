@@ -13,7 +13,8 @@
 		"ItemInHandRendererWeaponAnimation",
 		"LightmapFalloff",
 		"MinecraftFirearmInput",
-		"SpecialModelRenderersAccess"
+		"SpecialModelRenderersAccess",
+		"WalkAnimationStateAccess"
 	],
 	"injectors": {
 		"defaultRequire": 1
