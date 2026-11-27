@@ -469,6 +469,21 @@ public final class Level4ClientTest implements FabricClientGameTest {
 				if (st.is(Items.GLASS_BOTTLE)) bottles += st.getCount();
 			}
 			check(almond >= 1 && bottles >= 1, "expected Almond Water and Glass Bottle from wanderer barter");
+
+			// Also verify T.B.D. curios can be sold to wanderers for credits + sterile bandage
+			long creditsBefore = dev.noclip.backrooms.core.economy.Wallet.of(p);
+			p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Level4Items.CALENDAR_1998));
+			var curioRes = net.fabricmc.fabric.api.event.player.UseEntityCallback.EVENT.invoker()
+					.interact(p, level4(s), InteractionHand.MAIN_HAND, w, null);
+			check(curioRes == net.minecraft.world.InteractionResult.SUCCESS, "expected wanderer curio trade to succeed");
+			check(!p.getMainHandItem().is(Level4Items.CALENDAR_1998), "expected wanderer curio trade to consume calendar_1998");
+			check(dev.noclip.backrooms.core.economy.Wallet.of(p) >= creditsBefore + 20,
+					"expected wanderer curio trade to grant 20 credits");
+			boolean hasBandage = false;
+			for (int i = 0; i < p.getInventory().getContainerSize(); i++) {
+				if (p.getInventory().getItem(i).is(dev.noclip.backrooms.items.BackroomsItems.STERILE_BANDAGE)) hasBandage = true;
+			}
+			check(hasBandage, "expected wanderer curio trade to grant sterile_bandage");
 		});
 		server.runCommand("gamemode spectator @a");
 	}
@@ -566,7 +581,10 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			}
 			for (String msg : new String[] {"wanderer_tip_omega", "wanderer_tip_atrium", "wanderer_tip_windows",
 					"wanderer_tip_exits", "wanderer_tip_amor", "wanderer_tip_tbd", "wanderer_tip_barter",
-					"wanderer_barter_coin", "wanderer_barter_alloy", "wanderer_barter_paper", "wanderer_barter_done",
+					"wanderer_barter_coin", "wanderer_barter_alloy", "wanderer_barter_paper", "wanderer_barter_curio",
+					"wanderer_barter_tech", "wanderer_barter_done",
+					"wanderer_aid_drifter", "wanderer_aid_barterer", "wanderer_aid_scout",
+					"wanderer_aid_cartographer", "wanderer_aid_restless",
 					"amor_offered", "tbd_hoard_refuse",
 					"window_lure", "window_rain_lure", "window_grab", "window_touch_grab",
 					"almond_pickup", "returned_omega"}) {
