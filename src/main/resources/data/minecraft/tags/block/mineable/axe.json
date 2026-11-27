@@ -87,6 +87,10 @@
     "noclip_backrooms:film_furniture_pile",
     "noclip_backrooms:film_sofa_pile",
     "noclip_backrooms:film_ottoman_pile",
-    "noclip_backrooms:film_vhs_shelf"
+    "noclip_backrooms:film_vhs_shelf",
+    "noclip_backrooms:town_picnic_table",
+    "noclip_backrooms:town_park_bench",
+    "noclip_backrooms:town_store_shelf",
+    "noclip_backrooms:town_store_sign"
   ]
 }

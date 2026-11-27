@@ -608,6 +608,14 @@
   - 測試：`InstituteLayoutTest` 走路時把物件當障礙（人、門、樓梯照樣走得到）並新增物件檢查；`FrontroomsClientTest` 檢查詢問桌在位置上、另一半接到主方塊，加 6 張室內照
   - 驗證：`gradlew build`（139 個單元測試）、`runClientGameTest -Plevels=frontrooms,film` 與 `-Plevels=frontrooms,horror` 通過；截圖與物件總覽存到 `docs/project/1-gameplay/images/`；`CREDITS.md` 補上這次用到的照片
 - 使用者同意後推送：抓 GitHub 合併朋友新推的 11 個 Level 4 提交（結構變化四批、流浪者與窗戶調整等），沒有衝突；合併後 `gradlew build`（144 個單元測試）通過；把 `main` 推送到 GitHub（研究所改版兩批 `a1c05caf`、`2155210e` 與企劃文件，以及 Antigravity 先前在本機提交的 `4a9f0aee`、`8cb6cbc4`）；沒有強制推送、沒有改寫歷史
+- 前室眷舍小鎮第一批（狐霖前室的「地球」白天）：
+  - 新增 `frontrooms/FrontroomsTown`（純資料：一條街、八棟房子南北對稱、雜貨店、公園、路燈、樹；房子的物件與公園物件的位置）、`TownLife`（信箱給「家裡寄來的信」與硬幣、野餐回飢餓與理智、路邊時鐘、野餐的三個人與「睡不好的店主」；一天一次用玩家標籤記）；新物品 `home_letter`（12 種信的內容）
+  - 房子裡用電影家具店的家具，鋪 Level 0 的地毯與壁紙（白天像家，細看是後室）
+  - 9 種小鎮物件用 Blender 做（`tools/film/town_list.py`、`make_town_props.py`；`make_institute_data.py` 加 `town` 參數），9 種房子方塊（木板牆三色、飾條、瀝青瓦與瓦屋頂樓梯、六格窗、車庫門上下）由新工具 `tools/make_frontrooms_town.py` 產生（樓梯的方塊狀態照原版規則產生，先跟原版 oak_stairs 比對過一致）；`institute_prints.py` 多了時鐘面、貨架商品、雜貨店招牌
+  - 接線：生成器先問小鎮；地形在小鎮範圍保持平坦；小鎮建物不能破壞；區塊載入時把小鎮多格物件的其他格接到主方塊；`BlenderPropRenderer` 一行加 `town_`；`FilmLook` 依前綴找 `models/town`
+  - 測試：新增 `FrontroomsTownTest`（物件放在空處且有東西撐著、每棟房子的門與屋內、店的櫃台、野餐的位置都從街上走得到、物件清單跟工具的一致）；`FrontroomsClientTest` 加門、居民、信箱一天一封、野餐回飢餓的檢查與 4 張小鎮照
+  - 驗證：前室的 11 個單元測試、`runClientGameTest -Plevels=frontrooms,horror,film` 通過；`gradlew build` 有 1 個失敗在 Antigravity 進行中的 `ExplorationSystemsTest`（它同時在改 `RelayService` 等，與小鎮無關）
+  - 同時 Antigravity 在同一資料夾改程式（任務／LevelGates、RPG、商店、語言檔、遊戲玩法企劃），只提交我的檔案；語言檔與企劃只放我的那幾段
 
 ## 動作記錄（Antigravity）
 

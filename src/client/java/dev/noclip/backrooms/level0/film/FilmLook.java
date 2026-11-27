@@ -12,7 +12,7 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 /**
  * The film props' meshes (models/film/<id>.obj, baked in Blender by tools/film/) and their textures
  * (textures/film/<id>.png), drawn by props.BlenderPropRenderer; the institute's objects, made the same way, are in
- * models/institute and textures/institute ("inst_" ids). Loaded the first time a prop is seen, dropped when the resource
+ * models/institute and textures/institute ("inst_" ids), the staff town's in models/town and textures/town ("town_"). Loaded the first time a prop is seen, dropped when the resource
  * packs reload.
  */
 public final class FilmLook {
@@ -36,6 +36,6 @@ public final class FilmLook {
 	}
 
 	private static String folder(String id) {
-		return id.startsWith("inst_") ? "institute" : "film";
+		return id.startsWith("inst_") ? "institute" : id.startsWith("town_") ? "town" : "film";
 	}
 }

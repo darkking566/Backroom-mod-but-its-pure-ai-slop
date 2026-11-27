@@ -269,6 +269,11 @@
     "noclip_backrooms:inst_tape_drive",
     "noclip_backrooms:inst_lab_bench",
     "noclip_backrooms:inst_specimen_tank",
-    "noclip_backrooms:inst_deployment_gate"
+    "noclip_backrooms:inst_deployment_gate",
+    "noclip_backrooms:town_mailbox",
+    "noclip_backrooms:town_swing_set",
+    "noclip_backrooms:town_street_clock",
+    "noclip_backrooms:town_fire_hydrant",
+    "noclip_backrooms:town_trash_can"
   ]
 }

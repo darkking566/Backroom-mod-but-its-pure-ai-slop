@@ -64,9 +64,12 @@ public final class Institute {
 		ServerChunkEvents.CHUNK_LOAD.register((level, chunk, generated) -> {
 			if (level.dimension() != Home.FRONTROOMS) return;
 			ChunkPos pos = chunk.getPos();
+			MinecraftServer server = level.getServer();
+			if (FrontroomsTown.busy(pos.getMinBlockX(), pos.getMinBlockZ(), pos.getMaxBlockX(), pos.getMaxBlockZ())) {
+				server.schedule(new TickTask(server.getTickCount(), () -> linkParts(level, pos)));
+			}
 			if (pos.getMaxBlockX() < InstituteLayout.MIN_X || pos.getMinBlockX() > InstituteLayout.MAX_X
 					|| pos.getMaxBlockZ() < InstituteLayout.MIN_Z || pos.getMinBlockZ() > InstituteLayout.MAX_Z) return;
-			MinecraftServer server = level.getServer();
 			server.schedule(new TickTask(server.getTickCount(), () -> syncDoors(level)));
 			server.schedule(new TickTask(server.getTickCount(), () -> linkParts(level, pos)));
 		});
@@ -121,11 +124,24 @@ public final class Institute {
 				}
 			}
 		}
+		// And the town's (its houses' furniture, its swings and tables).
+		for (FrontroomsTown.Place place : FrontroomsTown.places()) {
+			if (!FrontroomsTown.type(place.id()).mount().equals("multi")) continue;
+			BlockPos master = new BlockPos(place.x(), place.y(), place.z());
+			for (int[] cell : FrontroomsTown.cells(place)) {
+				if (cell[0] >> 4 != chunk.x() || cell[2] >> 4 != chunk.z()) continue;
+				BlockPos at = new BlockPos(cell[0], cell[1], cell[2]);
+				if (at.equals(master) || !level.isLoaded(at)) continue;
+				if (level.getBlockEntity(at) instanceof dev.noclip.backrooms.props.PropBlockEntity part && part.masterPos().equals(at)) {
+					part.setMasterPos(master);
+				}
+			}
+		}
 	}
 
 	/** The building and the grounds' works (towers, mast, roads, the gate): M.E.G.'s, not to be broken or built on. */
 	static boolean protectedBlock(int x, int y, int z) {
-		return InstituteLayout.building(x, y, z) || FrontroomsCampus.structure(x, y, z);
+		return InstituteLayout.building(x, y, z) || FrontroomsCampus.structure(x, y, z) || FrontroomsTown.structure(x, y, z);
 	}
 
 	/** The institute's walls, floors and fittings, which answer no click. */

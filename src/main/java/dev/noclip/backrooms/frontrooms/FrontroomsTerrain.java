@@ -47,6 +47,10 @@ public final class FrontroomsTerrain {
 		// Out of the flat grounds; the avenue keeps a flat strip all the way to the gate.
 		double d = Math.max(radius(x, z) - FLAT_RADIUS, 0);
 		if (z > 0) d = Math.min(d, Math.max(Math.abs(x + 0.5) - 12, 0));
+		// The staff town keeps its ground flat too.
+		int tx = Math.max(Math.max(FrontroomsTown.MIN_X - 6 - x, x - FrontroomsTown.MAX_X - 6), 0);
+		int tz = Math.max(Math.max(FrontroomsTown.MIN_Z - 6 - z, z - FrontroomsTown.MAX_Z - 6), 0);
+		d = Math.min(d, Math.hypot(tx, tz));
 		double t = Math.clamp(d / BLEND, 0.0, 1.0);
 		t = t * t * (3 - 2 * t);
 		return GROUND + (int) Math.round(n * t);

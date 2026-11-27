@@ -27,6 +27,7 @@ public final class Frontrooms {
 	public static void register() {
 		FrontroomsBlocks.register();
 		InstituteProps.register();
+		TownLife.register();
 		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, id("frontrooms"), FrontroomsChunkGenerator.CODEC);
 		Institute.register();
 	}

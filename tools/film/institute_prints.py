@@ -152,10 +152,76 @@ def threshold():
     img.save(OUT / "inst_threshold.png")
 
 
+def clock_face():
+    """The street clock's dial: black numerals on white, the hands at two minutes to midnight."""
+    w = 256
+    img = Image.new("RGB", (w, w), (236, 232, 220))
+    d = ImageDraw.Draw(img)
+    c = w // 2
+    d.ellipse((6, 6, w - 7, w - 7), outline=(30, 30, 30), width=8)
+    f = font(30, True)
+    for h in range(1, 13):
+        a = math.radians(90 - h * 30)
+        x, y = c + 92 * math.cos(a), c - 92 * math.sin(a)
+        text = str(h)
+        box = d.textbbox((0, 0), text, font=f)
+        d.text((x - (box[2] - box[0]) / 2, y - (box[3] - box[1]) / 2 - 4), text, fill=(24, 24, 24), font=f)
+    for m in range(60):
+        a = math.radians(90 - m * 6)
+        r0 = 110 if m % 5 else 104
+        d.line((c + r0 * math.cos(a), c - r0 * math.sin(a), c + 116 * math.cos(a), c - 116 * math.sin(a)), fill=(30, 30, 30), width=2)
+    for angle, length, width in ((90 - 359 * 0.5, 58, 8), (90 - 58 * 6, 90, 5)):
+        a = math.radians(angle)
+        d.line((c, c, c + length * math.cos(a), c - length * math.sin(a)), fill=(20, 20, 20), width=width)
+    d.ellipse((c - 7, c - 7, c + 7, c + 7), fill=(160, 30, 24))
+    img.save(OUT / "town_clock_face.png")
+
+
+def shelf_goods():
+    """A shelf front of tins and boxes: faded labels, a few gaps."""
+    w, h = 256, 128
+    img = Image.new("RGB", (w, h), (70, 60, 48))
+    d = ImageDraw.Draw(img)
+    rng = random.Random(11)
+    x = 4
+    colours = [(170, 40, 34), (210, 180, 60), (60, 110, 150), (200, 200, 190), (90, 140, 70), (220, 120, 40)]
+    while x < w - 10:
+        wide = rng.choice((14, 18, 22, 30))
+        if rng.random() < 0.12:
+            x += wide
+            continue
+        top = rng.randrange(18, 50)
+        colour = rng.choice(colours)
+        d.rectangle((x, top, x + wide - 2, h - 4), fill=colour)
+        d.rectangle((x, top + (h - top) // 3, x + wide - 2, top + (h - top) // 3 + 8), fill=(235, 230, 215))
+        x += wide
+    img = img.filter(ImageFilter.GaussianBlur(0.6))
+    img.save(OUT / "town_shelf_goods.png")
+
+
+def store_sign():
+    """The corner store's sign: cream letters on a faded red board, OPEN 24 HRS under them."""
+    w, h = 640, 160
+    img = Image.new("RGB", (w, h), (150, 34, 30))
+    d = ImageDraw.Draw(img)
+    d.rectangle((6, 6, w - 7, h - 7), outline=(230, 222, 196), width=6)
+    f = font(78, True)
+    box = d.textbbox((0, 0), "CORNER STORE", font=f)
+    d.text(((w - (box[2] - box[0])) / 2, 14), "CORNER STORE", fill=(236, 228, 200), font=f)
+    g = font(30, True)
+    box = d.textbbox((0, 0), "OPEN 24 HRS", font=g)
+    d.text(((w - (box[2] - box[0])) / 2, 106), "OPEN 24 HRS", fill=(236, 228, 200), font=g)
+    img = img.filter(ImageFilter.GaussianBlur(0.5))
+    img.save(OUT / "town_store_sign.png")
+
+
 xray()
 crt_text()
 decal()
 biohazard()
 specimen()
 threshold()
+clock_face()
+shelf_goods()
+store_sign()
 print("institute prints written to", OUT)

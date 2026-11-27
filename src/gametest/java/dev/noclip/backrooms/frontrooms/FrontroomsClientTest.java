@@ -158,6 +158,36 @@ public final class FrontroomsClientTest implements FabricClientGameTest {
 			shoot(context, server, game, "frontrooms_operations", 8.5, InstituteLayout.FLOOR + 1, -30.5, 140, 5);
 			shoot(context, server, game, "frontrooms_labs", -42.5, InstituteLayout.F2_FLOOR + 1, -8.5, 180, 0);
 			shoot(context, server, game, "frontrooms_tanks", -36.5, InstituteLayout.F3_FLOOR + 1, 4.5, 20, 0);
+			// The staff town: the street, a house inside (the film's furniture on Level 0's carpet), the park, the store.
+			shoot(context, server, game, "frontrooms_town_street", -40.5, 70, 80.5, 90, 8);
+			shoot(context, server, game, "frontrooms_town_house", -71.5, FrontroomsTown.G + 2, 67.5, 160, 10);
+			shoot(context, server, game, "frontrooms_town_park", -33.5, 71, 111.5, 180, 18);
+			shoot(context, server, game, "frontrooms_town_store", -37.5, FrontroomsTown.G + 1, 68.5, 180, 5);
+			server.runCommand("gamemode survival @a");
+			server.runCommand("execute as @a in noclip_backrooms:frontrooms run tp @s -40.5 %d 90.5".formatted(FrontroomsTown.G + 1));
+			game.getConnection().waitForChunksRender();
+			// Its doors are doors; its people come to the picnic and to the store.
+			server.runOnServer(s -> check(level(s).getBlockState(new BlockPos(FrontroomsTown.LOTS[0] + 4, FrontroomsTown.G + 1, 69))
+					.is(net.minecraft.world.level.block.Blocks.BIRCH_DOOR), "a house has no front door"));
+			server.waitFor(s -> level(s).getEntitiesOfClass(Person.class, new net.minecraft.world.phys.AABB(-60, 60, 50, -10, 80, 110),
+					p -> p.entityTags().contains(TownLife.TAG)).size() >= 4, 400);
+			// The mailbox: a letter from home, once a day.
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				TownLife.mailbox(p);
+				check(p.getInventory().countItem(TownLife.HOME_LETTER) == 1, "the mailbox gave no letter");
+				TownLife.mailbox(p);
+				check(p.getInventory().countItem(TownLife.HOME_LETTER) == 1, "the mailbox gave two letters in a day");
+			});
+			// The picnic: sitting down with them fills you up, once a day.
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				p.getFoodData().setFoodLevel(4);
+				TownLife.picnic(p, level(s), new BlockPos(-42, FrontroomsTown.G + 1, 88));
+				check(p.getFoodData().getFoodLevel() > 4, "the picnic did not feed the player");
+				TownLife.clock(p);
+			});
+			server.runCommand("gamemode spectator @a");
 			server.runCommand("gamemode survival @a");
 
 			// Quotas open the wings: one the medical wing, three the armoury, five B1.

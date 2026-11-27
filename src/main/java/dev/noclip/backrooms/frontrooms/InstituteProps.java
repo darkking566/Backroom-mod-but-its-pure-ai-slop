@@ -35,6 +35,15 @@ public final class InstituteProps {
 		for (InstituteFurnishing.Type type : InstituteFurnishing.types().values()) {
 			BLOCKS.put(type.id(), block(type));
 		}
+		// The staff town's own objects (the houses' furniture is the film's).
+		for (String id : new String[] {"town_mailbox", "town_picnic_table", "town_park_bench", "town_swing_set", "town_street_clock",
+				"town_fire_hydrant", "town_trash_can", "town_store_shelf", "town_store_sign"}) {
+			FrontroomsTown.Type t = FrontroomsTown.type(id);
+			String material = id.equals("town_picnic_table") || id.equals("town_park_bench") || id.equals("town_store_shelf")
+					|| id.equals("town_store_sign") ? "wood" : "metal";
+			BLOCKS.put(id, block(new InstituteFurnishing.Type(id, t.width(), t.height(), t.depth(), t.mount(), material,
+					id.equals("town_street_clock") ? 6 : 0)));
+		}
 	}
 
 	private InstituteProps() {
@@ -59,6 +68,7 @@ public final class InstituteProps {
 	private static SoundType sound(String material) {
 		return switch (material) {
 			case "plastic", "hazmat" -> SoundType.WOOL;
+			case "wood" -> SoundType.WOOD;
 			case "lab" -> SoundType.GLASS;
 			default -> SoundType.METAL;
 		};
