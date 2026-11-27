@@ -598,7 +598,7 @@
   - 新方塊 14 個（水磨石、薄荷牆與扶手牆、觀察窗、收容玻璃、預鑄板、帶狀窗、鋼構、招牌字板、柏油、標線、人行道、鈉燈燈頭、細鋼桿），舊的 5 個換貼圖（ID 不變）；新工具 `tools/make_frontrooms_institute.py`，照片材質新下載 ambientCG CC0：PaintedPlaster017、Terrazzo004、Asphalt031、OfficeCeiling001、Tiles107、Concrete049（另抓了幾個候選沒用到）
   - 測試：`InstituteLayoutTest` 改寫並新增（每段樓梯一階一格有頭頂空間、兩端接得到、上樓梯從大廳走得到、園區不蓋進主館）；`FrontroomsClientTest` 改座標、回大廳後關任務報告、加 8 張風景照（拍照時藏介面）
   - 驗證：`gradlew build`（138 個單元測試）、`runClientGameTest -Plevels=frontrooms` 與 `-Plevels=horror` 通過，log 沒有缺模型或貼圖；截圖存到 `docs/project/1-gameplay/images/institute_*.jpg`，企劃「研究所改版」一節標上已做與還沒做（室內 3D 物件、眷舍小鎮與 398、收容區的怪物）
-  - 同時 Antigravity 有未提交的改動（RPG、武器、合約等，也改了兩個語言檔），只提交我的檔案；語言檔只提交我加的 14 個名稱
+  - 同時 Antigravity 有未提交的改動（RPG、武器、合約等，也改了兩個語言檔），只提交我的檔案。Antigravity 在我提交前先提交了它的部分（`8cb6cbc4`），當時語言檔裡已經有我加的 13 個方塊名稱，所以那 13 個跟著它的提交進去了，我的提交只多了「細鋼桿」一個
 
 ## 動作記錄（Antigravity）
 
