@@ -392,19 +392,19 @@ final class Level4Layout {
 
 		if (zone == ZoneKind.SUITE && room != null) {
 			int roll = Math.floorMod(hash(seed, i, j, 433), 100);
-			if (cx == 2 && cz == 2) {
-				if (roll < 35) return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
-				if (roll < 58) return new Tile(Kind.VENDING, zone, Level4Plan.SOUTH, ceilH, null, false);
-				if (roll < 78) return new Tile(Kind.PHOTOCOPIER, zone, Level4Plan.SOUTH, ceilH, null, false);
+			if (cx == 2 && cz == 2 && roll < 14) {
+				if (roll < 5) return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
+				if (roll < 7) return new Tile(Kind.VENDING, zone, Level4Plan.SOUTH, ceilH, null, false);
+				if (roll < 11) return new Tile(Kind.PHOTOCOPIER, zone, Level4Plan.SOUTH, ceilH, null, false);
 				return new Tile(Kind.DESK_PHONE, zone, Level4Plan.SOUTH, ceilH, null, false);
 			}
 		}
 
-		// Occasional water cooler / vending machine along open office pillars
+		// Very rare water cooler / vending machine along open office pillars
 		if (zone == ZoneKind.OPEN_OFFICE && cx == 1 && cz == 1) {
 			int roll = Math.floorMod(hash(seed, i, j, 444), 100);
-			if (roll < 9) return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
-			if (roll < 15) return new Tile(Kind.VENDING, zone, Level4Plan.SOUTH, ceilH, null, false);
+			if (roll < 2) return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
+			if (roll == 2) return new Tile(Kind.VENDING, zone, Level4Plan.SOUTH, ceilH, null, false);
 		}
 
 		return new Tile(Kind.AIR, zone, Level4Plan.NORTH, ceilH, null, false);

@@ -60,8 +60,8 @@ final class Level4Props {
 			if (benchesPlaced >= 2) break;
 		}
 
-		// Sparse abandoned office leftovers (~24% of chunks get 1 small prop or leftover desk)
-		if (roll < 24) {
+		// Very sparse abandoned office leftovers (~5% of chunks get 1 small prop or leftover desk)
+		if (roll < 5) {
 			Block prop = pickOfficeProp(h >>> 8);
 			int startIdx = Math.floorMod((int) (h >>> 16), 196);
 			int facingBase = Math.floorMod((int) (h >>> 24), 4);
@@ -81,9 +81,9 @@ final class Level4Props {
 			}
 		}
 
-		// Scattered Almond Water bottle clusters (~30% of chunks in open office / suites)
+		// Rare scattered Almond Water bottle clusters (~4% of chunks in open office / suites)
 		int waterRoll = Math.floorMod((int) (h >>> 32), 100);
-		if (waterRoll < 30) {
+		if (waterRoll < 4) {
 			int wStart = Math.floorMod((int) (h >>> 40), 196);
 			for (int attempt = 0; attempt < 18; attempt++) {
 				int cell = (wStart + attempt * 17) % 196;

@@ -945,3 +945,7 @@
   - **修正跨中庭對望與「在空中轉身盯著玩家」**：`WindowEntity` 偵測半徑縮為 `16` 格；當玩家繞到窗外或對面中庭（`sideDot <= 0.1`）時直接消散，不再飄在對面空中轉身回頭盯著玩家；室內面對時身體始終朝向窗內（`yBodyRot` 鎖在 `±10°`、頭部微轉 `±32°`），並縮小誘引距離至 `10` 格
   - **降低違和感與突兀感**：`office_trap_window` 調柔為磨砂霧面（貼圖與寫實包同步，`light_emission: 12→5`、`lightLevel: 4→2`）；`WindowEntityModel` 與 `WindowEntityRenderer` 加入微幅左右搖晃、遠距（`> 5.5` 格）壓低躲在窗台與霧後、以及超過 `9` 格隱藏自發光雙眼（靠近才浮現並起身招手）
   - **驗證**：`Level4ClientTest.trapWindows` 補上「移動到窗外對面後 `WindowEntity` 自動消散」檢查；執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 與 `-Psections=windows` 通過並檢視 `0000_level4_trap_window.png` 確認磨砂霧氣遮罩下的怪物姿態自然；僅提交本項改動於本機 `main`（未推送）
+- 巨幅降低 **Level 4 物件、販賣機、飲水機與散落杏仁水刷新率**（Antigravity）：
+  - `Level4Layout.interiorTile`：隔間套房（`SUITE`）中心擺設機率由 `100%` 巨幅降至 `14%`（飲水機 5%、販賣機 2%、影印機 4%、桌機 3%，其餘 `86%` 保持空曠）；開放辦公區（`OPEN_OFFICE`）飲水機由 `9%→2%`、販賣機由 `6%→1%`（Omega 基地內部配置不變）
+  - `Level4Props.populateChunk`：每區塊散落 3D 辦公家具殘留由 `24%→5%`、散落杏仁水瓶群（`almond_bottle_cluster`）由 `30%→4%`
+  - **驗證**：執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本項改動於本機 `main`（未推送）
