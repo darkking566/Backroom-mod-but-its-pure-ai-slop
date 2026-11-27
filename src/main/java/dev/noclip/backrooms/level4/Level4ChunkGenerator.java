@@ -71,8 +71,9 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 
 	private static BlockState blockAtColumn(long seed, int x, int y, int z, Tile tile,
 			Level4Layout.ExitStruct es, boolean skybridge, boolean exterior, int topY) {
-		if (y <= MIN_Y || y >= MAX_Y) return Blocks.BEDROCK.defaultBlockState();
+		if (y <= MIN_Y) return Blocks.BEDROCK.defaultBlockState();
 		if (tile.kind() == Kind.OUTSIDE_AIR) return Blocks.AIR.defaultBlockState();
+		if (y >= MAX_Y) return Blocks.BEDROCK.defaultBlockState();
 
 		if (skybridge) {
 			int roofY = FLOOR_Y + tile.ceilingHeight() + 1;

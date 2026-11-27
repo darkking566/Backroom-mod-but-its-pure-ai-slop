@@ -934,3 +934,9 @@
   - `Level4Travel.java`：從其他樓層進入 Level 4 時，若玩家曾於 M.E.G. Omega 基地行軍床安頓（重生點在 `Level4.LEVEL_4`），直接傳送回已安頓基地旁並顯示提示，還原「很容易返回」
   - `Level4Monsters.java` 調降實戰刷怪頻率並移除伺服器笑魘；新增 `src/client/java/dev/noclip/backrooms/level4/Level4Client.java`（於 `BackroomsClient.java` 註冊），於暗處以負 ID 生成 100% 純客戶端本地笑魘幻影（走近或盯視即煙散，伺服器零實體、隊友無法證實）
   - 補齊雙語翻譯、`docs/project/5-levels/level4/README.md` 與 `Level4ClientTest.extras`（實測散落瓶群撿取、純客戶端笑魘零伺服器實體、以及於 Omega 行軍床安頓後從 Level 2 返回直接落回基地）；`.\gradlew.bat cleanTest build --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=4 --no-daemon` 全部通過（僅提交本項 Level 4 改動，未推送）
+### 2026-11-27
+- 修正 **Level 4 下雨窗戶與雨景／雨聲不明顯問題**（Antigravity）：
+  - **修復窗戶雨滴「斜斜往上」與「玻璃雨滴無變化」**（`tools/make_level4.py`、`office_rain_window.png`／`_n.png`／`_s.png`／`.png.mcmeta`）：原 4 格貼圖間距 40px 卻每格位移 `+32px` 造成 `-8px/格` 逆向頻閃錯覺（雨滴往右上方倒退），且 4 格樣式單調並使用平面 `_n`/`_s`。改為 **32 格無縫下墜動畫**（`frametime: 1`、`interpolate: false`），結合三層動態：斜左下急落雨絲（每格 `(-4, +8)` 精準對齊 `128px` 循環、無頻閃）、附著玻璃表面緩慢垂直滑落的水珠與漸消濕痕（每格 `+4px` 帶微幅蛇行），以及錯相出現／擴散／淡出的玻璃撞擊水花小水珠，並同步生成對應幀的 labPBR 法線凸起 `_n` 與光滑反光 `_s`
+  - **修復建築外街谷天空與原版下雨完全失效**（`Level4ChunkGenerator.java`）：原 `y >= MAX_Y` 基岩層壓在 `OUTSIDE_AIR` 判斷之前，導致整層連戶外街谷 `y=127` 都封滿基岩、`canSeeSky` 恆為 `false` 且 `MOTION_BLOCKING` 高度恆為 `128`，使原版雨幕與窗外雨滴粒子完全無法生成；調整為 `OUTSIDE_AIR` 保留 `MIN_Y` 基岩底、開放 `MAX_Y` 天空，讓戶外雨幕與自然天光貫穿整座街谷
+  - **強化窗外雨幕粒子與連續立體雨聲**（`Level4Client.java`、`Level4Events.java`、`sounds.json`）：伺服器端持續維持 `Level4` 下雨天氣（`WeatherData` + `setRainLevel(1.0F)`），`Level4Client` 每 tick 以 `MOTION_BLOCKING <= FLOOR_Y` 嚴格僅於戶外與窗外投放密集下墜雨滴；`sounds.json` 的 `level4.rain` 音量由 `0.35` 提升至 `0.9`，`Level4Events` 改為每 `22..31` tick（約 1.1～1.55 秒）於玩家附近窗戶／戶外位置連續播放雨聲（窗邊／戶外 `0.85..0.90`、室內深處柔和 `0.34`，並保留「雨聲驟停」異象與獨立空調低鳴）
+  - **驗證**：於 `Level4ClientTest.views` 新增 `isRaining()`、`OUTSIDE_AIR` `canSeeSky` 與 `MAX_Y` 開天檢查，執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過，並檢視 `0009_level4_rain_window_view.png` 與 `0010_level4_trap_window.png` 確認玻璃水珠滑落與窗外雨幕正常渲染且室內無誤生粒子；僅提交本項改動於本機 `main`（未推送）

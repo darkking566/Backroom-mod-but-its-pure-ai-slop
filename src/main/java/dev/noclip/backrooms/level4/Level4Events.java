@@ -27,6 +27,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Quiet psychological micro-events and ambient atmosphere for Level 4:
@@ -41,6 +42,7 @@ final class Level4Events {
 	private static final int COPIER_COOLDOWN = 20 * 90;
 	private static final int BREAKER_COOLDOWN = 20 * 60;
 	private static final Map<UUID, Integer> NEXT_AMBIENT = new HashMap<>();
+	private static final Map<UUID, Integer> NEXT_HUM = new HashMap<>();
 	private static final Map<UUID, Integer> NEXT_PHONE = new HashMap<>();
 	private static final Map<UUID, Integer> NEXT_DENT_STEP = new HashMap<>();
 	private static final Map<UUID, Integer> RAIN_SILENT_UNTIL = new HashMap<>();
@@ -53,6 +55,7 @@ final class Level4Events {
 	static void register() {
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> {
 			NEXT_AMBIENT.clear();
+			NEXT_HUM.clear();
 			NEXT_PHONE.clear();
 			NEXT_DENT_STEP.clear();
 			RAIN_SILENT_UNTIL.clear();
@@ -125,28 +128,71 @@ final class Level4Events {
 		ServerLevel level = server.getLevel(Level4.LEVEL_4);
 		if (level == null || level.players().isEmpty()) return;
 		int now = server.getTickCount();
+		if (now % 100 == 0 || !level.isRaining()) {
+			var weather = level.getWeatherData();
+			weather.setClearWeatherTime(0);
+			weather.setRainTime(24000);
+			weather.setRaining(true);
+			level.setRainLevel(1.0F);
+		}
 		RandomSource rng = level.getRandom();
 		long seed = Level4ChunkGenerator.planSeed(level.getChunkSource().randomState());
 
 		for (ServerPlayer sp : level.players()) {
 			if (sp.isSpectator()) continue;
 
-			// Ambient rain / HVAC hum + sudden rain-silence omen
-			if (now >= NEXT_AMBIENT.computeIfAbsent(sp.getUUID(), k -> now + 40 + rng.nextInt(80))) {
-				NEXT_AMBIENT.put(sp.getUUID(), now + 90 + rng.nextInt(110));
+			// Continuous rain patter near windows/outdoors/atriums (softened deep indoors) + rare sudden rain-silence omen
+			if (now >= NEXT_AMBIENT.computeIfAbsent(sp.getUUID(), k -> now + 10)) {
+				NEXT_AMBIENT.put(sp.getUUID(), now + 22 + rng.nextInt(10));
 				if (now >= RAIN_SILENT_UNTIL.getOrDefault(sp.getUUID(), 0)) {
 					var tile = Level4Layout.tile(seed, sp.getBlockX(), sp.getBlockZ());
 					boolean nearAtrium = tile.zone() == ZoneKind.ATRIUM;
-					if (rng.nextInt(100) < (nearAtrium ? 12 : 5)) {
+					boolean outdoors = tile.kind() == Kind.OUTSIDE_AIR;
+					BlockPos nearWindow = findNearbyWindowOrRain(level, seed, sp.blockPosition(), 9);
+					if (rng.nextInt(1000) < (nearAtrium ? 22 : 8)) {
 						RAIN_SILENT_UNTIL.put(sp.getUUID(), now + 120);
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.rain_stops"));
 					} else {
-						double a = rng.nextDouble() * Math.PI * 2;
-						double d = 4 + rng.nextDouble() * 8;
-						level.playSound(null, sp.getX() + Math.cos(a) * d, sp.getEyeY(), sp.getZ() + Math.sin(a) * d,
-								nearAtrium || rng.nextInt(100) < 45 ? Level4Sounds.RAIN : Level4Sounds.HUM,
-								SoundSource.AMBIENT, 0.45F, 0.85F + rng.nextFloat() * 0.2F);
+						double sx, sy, sz;
+						float vol;
+						if (outdoors) {
+							sx = sp.getX() + (rng.nextDouble() - 0.5) * 4.0;
+							sy = sp.getEyeY() + 0.5;
+							sz = sp.getZ() + (rng.nextDouble() - 0.5) * 4.0;
+							vol = 0.90F;
+						} else if (nearWindow != null) {
+							Vec3 delta = Vec3.atCenterOf(nearWindow).subtract(sp.getEyePosition());
+							double d = delta.length();
+							Vec3 clamped = d > 4.5 ? sp.getEyePosition().add(delta.scale(4.5 / d)) : Vec3.atCenterOf(nearWindow);
+							sx = clamped.x;
+							sy = sp.getEyeY();
+							sz = clamped.z;
+							vol = d <= 5.0 ? 0.85F : 0.60F;
+						} else if (nearAtrium) {
+							sx = sp.getX() + (rng.nextDouble() - 0.5) * 5.0;
+							sy = sp.getEyeY() + 1.0;
+							sz = sp.getZ() + (rng.nextDouble() - 0.5) * 5.0;
+							vol = 0.65F;
+						} else {
+							sx = sp.getX() + (rng.nextDouble() - 0.5) * 6.0;
+							sy = sp.getEyeY() + 1.5;
+							sz = sp.getZ() + (rng.nextDouble() - 0.5) * 6.0;
+							vol = 0.34F;
+						}
+						level.playSound(null, sx, sy, sz, Level4Sounds.RAIN,
+								SoundSource.AMBIENT, vol, 0.90F + rng.nextFloat() * 0.16F);
 					}
+				}
+			}
+
+			// Subtle 60Hz HVAC hum indoors
+			if (now >= NEXT_HUM.computeIfAbsent(sp.getUUID(), k -> now + 50 + rng.nextInt(60))) {
+				NEXT_HUM.put(sp.getUUID(), now + 110 + rng.nextInt(80));
+				if (Level4Layout.tile(seed, sp.getBlockX(), sp.getBlockZ()).kind() != Kind.OUTSIDE_AIR) {
+					double a = rng.nextDouble() * Math.PI * 2;
+					double d = 3 + rng.nextDouble() * 5;
+					level.playSound(null, sp.getX() + Math.cos(a) * d, sp.getEyeY(), sp.getZ() + Math.sin(a) * d,
+							Level4Sounds.HUM, SoundSource.AMBIENT, 0.30F, 0.92F + rng.nextFloat() * 0.14F);
 				}
 			}
 
@@ -194,6 +240,31 @@ final class Level4Events {
 			}
 		}
 		return fixed;
+	}
+
+	private static BlockPos findNearbyWindowOrRain(ServerLevel level, long seed, BlockPos around, int r) {
+		BlockPos best = null;
+		double bestDist = Double.MAX_VALUE;
+		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+		for (int dx = -r; dx <= r; dx++) {
+			for (int dz = -r; dz <= r; dz++) {
+				int x = around.getX() + dx, z = around.getZ() + dz;
+				Kind k = Level4Layout.tile(seed, x, z).kind();
+				if (k != Kind.WINDOW_RAIN && k != Kind.WINDOW_TRAP && k != Kind.OUTSIDE_AIR) continue;
+				if (k != Kind.OUTSIDE_AIR) {
+					pos.set(x, Level4ChunkGenerator.FLOOR_Y + 2, z);
+					if (!level.isLoaded(pos)) continue;
+					BlockState st = level.getBlockState(pos);
+					if (!st.is(Level4Blocks.OFFICE_RAIN_WINDOW) && !st.is(Level4Blocks.OFFICE_TRAP_WINDOW)) continue;
+				}
+				double d = dx * dx + dz * dz;
+				if (d < bestDist) {
+					bestDist = d;
+					best = new BlockPos(x, Level4ChunkGenerator.FLOOR_Y + 2, z);
+				}
+			}
+		}
+		return best;
 	}
 
 	private static BlockPos findNearby(ServerLevel level, BlockPos around, net.minecraft.world.level.block.Block block, int r) {

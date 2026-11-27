@@ -109,7 +109,19 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		if (base71 != null) shoot(context, game, base71[2] + 0.5, STAND, base71[3] + 0.5, base71[4], 18, false, "level4_basement");
 
 		int[] rainView = findRainWindowView(seed, from);
-		if (rainView != null) shoot(context, game, rainView[0] + 0.5, STAND, rainView[1] + 0.5, rainView[2], 2, false, "level4_rain_window_view");
+		if (rainView != null) {
+			shoot(context, game, rainView[0] + 0.5, STAND, rainView[1] + 0.5, rainView[2], 2, false, "level4_rain_window_view");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				check(l4.isRaining(), "Level 4 server should be raining");
+				int[] out = findKind(seed, new BlockPos(rainView[0], STAND, rainView[1]), Kind.OUTSIDE_AIR);
+				check(out != null, "expected OUTSIDE_AIR near rain window");
+				BlockPos outPos = new BlockPos(out[0], STAND + 1, out[1]);
+				check(l4.canSeeSky(outPos), "OUTSIDE_AIR should see sky for rain rendering at " + outPos);
+				check(l4.getBlockState(new BlockPos(out[0], Level4ChunkGenerator.MAX_Y, out[1])).isAir(),
+						"OUTSIDE_AIR MAX_Y should remain open air");
+			});
+		}
 	}
 
 	private static void waterSources(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {

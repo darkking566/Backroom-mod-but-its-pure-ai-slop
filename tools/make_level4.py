@@ -14,6 +14,7 @@ Follows docs/look/STYLE_GUIDE.md:
 """
 
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -427,41 +428,161 @@ def save_cutout_glass():
         (TEXTURES / f"office_glass_wall_tmp{suf}.png").replace(TEXTURES / f"office_glass_wall{suf}.png")
     (TEXTURES / "office_glass_wall_tmp.png").unlink(missing_ok=True)
 
-    # Translucent exterior rain-view window (4-frame vertical strip) + translucent Entity 2 trap window
+    # Translucent exterior rain-view window (32-frame seamless downward rain + sliding glass beads + splashes)
+    FRAMES = 32
     frames = []
     n_frames = []
     s_frames = []
-    base_n = Image.open(TEXTURES / "office_glass_wall_n.png").convert("RGBA")
-    base_s = Image.open(TEXTURES / "office_glass_wall_s.png").convert("RGBA")
-    for frame in range(4):
-        f_img = Image.new("RGBA", (SIZE, SIZE), (188, 212, 224, 44))
+    base_n = np.asarray(Image.open(TEXTURES / "office_glass_wall_n.png").convert("RGBA"), dtype=np.float32)
+    base_s = np.asarray(Image.open(TEXTURES / "office_glass_wall_s.png").convert("RGBA"), dtype=np.float32)
+
+    # Fast exterior diagonal rain streaks: step (-4, +8) per frame -> (-128, +256) over 32 frames (exact 128px wrap)
+    streaks = [
+        (16, 10, 20, 115), (44, 54, 16, 95), (72, 24, 22, 125), (98, 86, 18, 105),
+        (118, 42, 15, 90), (28, 96, 18, 100), (60, 74, 16, 95), (88, 114, 21, 120),
+    ]
+    # Glass-surface water beads + trailing rivulets: step (0, +4) per frame -> (0, +128) over 32 frames
+    beads = [
+        (19, 12, 20, 1.8, 0, 175),
+        (37, 68, 26, 2.1, 5, 190),
+        (56, 34, 16, 1.6, 11, 165),
+        (74, 92, 24, 2.0, 16, 185),
+        (93, 20, 22, 1.9, 21, 180),
+        (110, 76, 18, 1.7, 27, 170),
+        (46, 108, 15, 1.6, 8, 160),
+        (84, 52, 18, 1.8, 19, 175),
+    ]
+    # Dynamic condensation / splatter beads appearing and fading on the pane
+    splashes = [
+        (14, 28, 0, 1.5), (26, 82, 7, 1.6), (34, 48, 14, 1.4), (49, 18, 21, 1.7),
+        (63, 104, 3, 1.5), (71, 44, 10, 1.4), (79, 88, 17, 1.6), (90, 62, 24, 1.5),
+        (102, 34, 5, 1.5), (114, 96, 12, 1.4), (22, 114, 19, 1.4), (58, 72, 26, 1.7),
+        (106, 16, 29, 1.5), (40, 60, 9, 1.3),
+    ]
+
+    yy, xx = np.mgrid[0:SIZE, 0:SIZE].astype(np.float32)
+
+    def draw_wrapped_line(draw, x0, y0, x1, y1, fill, width):
+        for ox in (-SIZE, 0, SIZE):
+            for oy in (-SIZE, 0, SIZE):
+                draw.line([(x0 + ox, y0 + oy), (x1 + ox, y1 + oy)], fill=fill, width=width)
+
+    def add_wrapped_bump(hmap, wmap, cx, cy, r, strength, weight=1.0):
+        dx = ((xx - cx + SIZE * 0.5) % SIZE) - SIZE * 0.5
+        dy = ((yy - cy + SIZE * 0.5) % SIZE) - SIZE * 0.5
+        dist = np.hypot(dx, dy)
+        dome = np.clip(1.0 - (dist / r) ** 2, 0.0, 1.0)
+        hmap += dome * strength
+        wmap[:] = np.maximum(wmap, np.clip((r - dist) * 1.1, 0.0, 1.0) * weight)
+
+    for frame in range(FRAMES):
+        base_pane = Image.new("RGBA", (SIZE, SIZE), (148, 178, 196, 50))
+        overlay = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
+        fd = ImageDraw.Draw(overlay)
+        hmap = np.zeros((SIZE, SIZE), dtype=np.float32)
+        wmap = np.zeros((SIZE, SIZE), dtype=np.float32)
+
+        # 1. Fast falling diagonal rain streaks outside the glass (down-left)
+        for sx, sy, length, alpha in streaks:
+            x_top = (sx - frame * 4) % SIZE
+            y_top = (sy + frame * 8) % SIZE
+            x_bot = x_top - length * 0.5
+            y_bot = y_top + length
+            draw_wrapped_line(fd, x_top, y_top, x_bot, y_bot, (218, 236, 248, alpha), 1)
+
+        # 2. Sliding water beads + tapering wet trails running straight down the pane
+        for bx, by, tlen, br, wphase, alpha in beads:
+            y_head = (by + frame * 4) % SIZE
+            x_head = bx + math.sin(2.0 * math.pi * (frame + wphase) / FRAMES) * 1.5
+            steps = max(5, tlen)
+            for s in range(steps):
+                frac = s / float(steps)  # 0 at tail top, 1 at bead head
+                ty = (y_head - tlen * (1.0 - frac)) % SIZE
+                tx = bx + math.sin(2.0 * math.pi * ((frame - (1.0 - frac) * tlen / 4.0) + wphase) / FRAMES) * 1.5
+                ta = int(alpha * 0.52 * (frac ** 1.3))
+                if ta < 6:
+                    continue
+                tr = max(0.6, br * (0.28 + 0.40 * frac))
+                for ox in (-SIZE, 0, SIZE):
+                    for oy in (-SIZE, 0, SIZE):
+                        fd.ellipse([tx + ox - tr, ty + oy - tr, tx + ox + tr, ty + oy + tr],
+                                   fill=(208, 230, 244, ta))
+                add_wrapped_bump(hmap, wmap, tx, ty, tr + 0.4, 0.35 * frac, 0.6 * frac)
+
+            # Bead head at bottom (clearly marks downward travel)
+            for ox in (-SIZE, 0, SIZE):
+                for oy in (-SIZE, 0, SIZE):
+                    fd.ellipse([x_head + ox - br, y_head + oy - br, x_head + ox + br, y_head + oy + br],
+                               fill=(228, 244, 255, alpha))
+                    fd.ellipse([x_head + ox - br * 0.45, y_head + oy - br * 0.45, x_head + ox + 0.3, y_head + oy + 0.3],
+                               fill=(255, 255, 255, min(255, alpha + 35)))
+            add_wrapped_bump(hmap, wmap, x_head, y_head, br + 0.6, 1.35, 1.0)
+
+        # 3. Dynamic raindrop hits / condensation beads appearing & fading on the glass
+        for px, py, poff, max_r in splashes:
+            p = (frame + poff) % FRAMES
+            if p < 5:
+                fade = p / 4.0
+                r = max_r * (0.6 + 0.4 * fade)
+                dy = 0.0
+            elif p < 21:
+                fade = 1.0
+                r = max_r
+                dy = (p - 5) * 0.25
+            else:
+                fade = (FRAMES - 1 - p) / 10.0
+                r = max_r * (0.5 + 0.5 * fade)
+                dy = 4.0 + (p - 21) * 0.15
+            a = int(165 * fade)
+            if a <= 8:
+                continue
+            sx, sy = px, py + dy
+            fd.ellipse([sx - r, sy - r, sx + r, sy + r], fill=(224, 242, 255, a))
+            if p < 4:
+                rr = r + p * 0.75
+                fd.ellipse([sx - rr, sy - rr, sx + rr, sy + rr], outline=(235, 248, 255, int(105 * (1.0 - p / 4.0))), width=1)
+            add_wrapped_bump(hmap, wmap, sx, sy, r + 0.5, 0.9 * fade, fade)
+
+        f_img = Image.alpha_composite(base_pane, overlay)
         fd = ImageDraw.Draw(f_img)
-        # Subtle falling diagonal rain streaks on the pane
-        shift = frame * 32
-        for sx_base in (18, 42, 68, 94, 112):
-            for sy_base in (-24, 16, 56, 96):
-                y0 = (sy_base + shift) % (SIZE + 32) - 24
-                x0 = (sx_base - y0 // 4) % (SIZE - 16) + 8
-                fd.line([(x0, y0), (x0 - 4, y0 + 18)], fill=(224, 238, 246, 118), width=2)
-        # Crisp dark aluminum mullion border
-        fd.rectangle([0, 0, SIZE - 1, 4], fill=(74, 80, 88, 255))
-        fd.rectangle([0, SIZE - 5, SIZE - 1, SIZE - 1], fill=(74, 80, 88, 255))
-        fd.rectangle([0, 0, 4, SIZE - 1], fill=(74, 80, 88, 255))
-        fd.rectangle([SIZE - 5, 0, SIZE - 1, SIZE - 1], fill=(74, 80, 88, 255))
+
+        # 4. Crisp dark aluminum mullion border (covers seam edges cleanly)
+        fd.rectangle([0, 0, SIZE - 1, 4], fill=(68, 76, 84, 255))
+        fd.rectangle([0, SIZE - 5, SIZE - 1, SIZE - 1], fill=(68, 76, 84, 255))
+        fd.rectangle([0, 0, 4, SIZE - 1], fill=(68, 76, 84, 255))
+        fd.rectangle([SIZE - 5, 0, SIZE - 1, SIZE - 1], fill=(68, 76, 84, 255))
+        hmap[:5, :] = 0.0
+        hmap[-5:, :] = 0.0
+        hmap[:, :5] = 0.0
+        hmap[:, -5:] = 0.0
+        wmap[:5, :] = 0.0
+        wmap[-5:, :] = 0.0
+        wmap[:, :5] = 0.0
+        wmap[:, -5:] = 0.0
+
+        dx_h = (np.roll(hmap, -1, axis=1) - np.roll(hmap, 1, axis=1)) * 42.0
+        dy_h = (np.roll(hmap, -1, axis=0) - np.roll(hmap, 1, axis=0)) * 42.0
+        nf = base_n.copy()
+        nf[..., 0] = np.clip(nf[..., 0] - dx_h, 0, 255)
+        nf[..., 1] = np.clip(nf[..., 1] - dy_h, 0, 255)
+        sf = base_s.copy()
+        sf[..., 0] = np.clip(sf[..., 0] + wmap * 24.0, 0, 255)
+
         frames.append(f_img)
-        n_frames.append(base_n)
-        s_frames.append(base_s)
-    strip = Image.new("RGBA", (SIZE, SIZE * 4))
-    strip_n = Image.new("RGBA", (SIZE, SIZE * 4))
-    strip_s = Image.new("RGBA", (SIZE, SIZE * 4))
-    for idx in range(4):
+        n_frames.append(Image.fromarray(np.rint(nf).astype("uint8"), "RGBA"))
+        s_frames.append(Image.fromarray(np.rint(sf).astype("uint8"), "RGBA"))
+
+    strip = Image.new("RGBA", (SIZE, SIZE * FRAMES))
+    strip_n = Image.new("RGBA", (SIZE, SIZE * FRAMES))
+    strip_s = Image.new("RGBA", (SIZE, SIZE * FRAMES))
+    for idx in range(FRAMES):
         strip.paste(frames[idx], (0, idx * SIZE))
         strip_n.paste(n_frames[idx], (0, idx * SIZE))
         strip_s.paste(s_frames[idx], (0, idx * SIZE))
     strip.save(TEXTURES / "office_rain_window.png", optimize=True)
     strip_n.save(TEXTURES / "office_rain_window_n.png", optimize=True)
     strip_s.save(TEXTURES / "office_rain_window_s.png", optimize=True)
-    write_json(TEXTURES / "office_rain_window.png.mcmeta", {"animation": {"frametime": 3, "interpolate": True}})
+    write_json(TEXTURES / "office_rain_window.png.mcmeta", {"animation": {"frametime": 1, "interpolate": False}})
 
     # Clean translucent Entity 2 trap window: pale misty glass pane (no 2D stick figure; 3D WindowEntity spawns outside)
     trap_img = Image.new("RGBA", (SIZE, SIZE), (210, 224, 232, 52))
