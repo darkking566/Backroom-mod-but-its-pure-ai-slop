@@ -38,6 +38,8 @@ final class Level4Plan {
 		ELEVATOR_LOBBY,
 		/** Sunken tiered presentation auditorium with dimly lit front stage. */
 		AUDITORIUM,
+		/** Two-story mezzanine office wing with grand stairs and glass overlook. */
+		MEZZANINE,
 		/** M.E.G. Base Omega safe stronghold (with permanent Level 5 & 6 stairwells). */
 		OMEGA_BASE,
 		/** Amor Incrementum fungal greenhouse (hostile unless holding a religious item). */
@@ -83,6 +85,9 @@ final class Level4Plan {
 	final boolean hasAmor;
 	final boolean hasTbd;
 	final boolean hasAtrium;
+	final int tunnelJ;
+	final int tunnelI0;
+	final int tunnelI1;
 
 	static Level4Plan of(long seed, int rx, int rz) {
 		if (CACHE.size() > 512) CACHE.clear();
@@ -130,6 +135,7 @@ final class Level4Plan {
 		if (rng.nextInt(100) < 42) placeBox(rng, 3, 3, ZoneKind.DARK_WING, -1, -1);
 		if (rng.nextInt(100) < 38) placeBox(rng, rng.nextBoolean() ? 3 : 2, 2, ZoneKind.UNFINISHED_WING, -1, -1);
 		if (rng.nextInt(100) < 34) placeBox(rng, 3, 3, ZoneKind.AUDITORIUM, -1, -1);
+		if (rng.nextInt(100) < 38) placeBox(rng, 3, 2, ZoneKind.MEZZANINE, -1, -1);
 		if (rng.nextInt(100) < 45) placeBox(rng, 2, 1, ZoneKind.ELEVATOR_LOBBY, -1, -1);
 
 		// Add 2 structural solid cores inside the open office tower
@@ -146,6 +152,39 @@ final class Level4Plan {
 		ensureConnected(rng);
 		placeExits(rng, omegaPlaced);
 		placeBalconies(rng);
+
+		int[] tun = findMepTunnel(rng);
+		this.tunnelJ = tun != null ? tun[0] : -1;
+		this.tunnelI0 = tun != null ? tun[1] : -1;
+		this.tunnelI1 = tun != null ? tun[2] : -1;
+	}
+
+	boolean isTunnelCell(int i, int j) {
+		return tunnelJ >= 0 && j == tunnelJ && i >= tunnelI0 && i <= tunnelI1;
+	}
+
+	private int[] findMepTunnel(SplittableRandom rng) {
+		if (rng.nextInt(100) >= 65) return null;
+		int startJ = MARGIN + 1 + rng.nextInt((N - MARGIN - 1) - (MARGIN + 1));
+		for (int off = 0; off < N - 2 * MARGIN - 2; off++) {
+			int j = MARGIN + 1 + Math.floorMod(startJ + off - (MARGIN + 1), N - 2 * MARGIN - 2);
+			int runStart = -1;
+			for (int i = MARGIN + 1; i < N - MARGIN - 1; i++) {
+				int c = cell(i, j);
+				boolean ok = (zones[c] == ZoneKind.OPEN_OFFICE || zones[c] == ZoneKind.SUITE)
+						&& balconyDir[c] < 0
+						&& exits.stream().noneMatch(e -> e.cell() == c);
+				if (ok) {
+					if (runStart < 0) runStart = i;
+					if (i - runStart + 1 >= 5) {
+						return new int[] {j, runStart, i};
+					}
+				} else {
+					runStart = -1;
+				}
+			}
+		}
+		return null;
 	}
 
 	static boolean isOmegaRegion(long seed, int rx, int rz) {
@@ -409,6 +448,13 @@ final class Level4Plan {
 				if (walkable(room.cx(), room.j() - 1)) setEdge(cell(room.cx(), room.j()), NORTH, Edge.OPEN);
 				if (walkable(room.i() - 1, room.j())) setEdge(cell(room.i(), room.j()), WEST, Edge.DOOR);
 				if (walkable(room.i() + room.w(), room.j())) setEdge(cell(room.i() + room.w() - 1, room.j()), EAST, Edge.DOOR);
+				continue;
+			}
+			if (room.kind() == ZoneKind.MEZZANINE) {
+				if (walkable(room.cx(), room.j() - 1)) setEdge(cell(room.cx(), room.j()), NORTH, Edge.OPEN);
+				if (walkable(room.cx(), room.j() + room.h())) setEdge(cell(room.cx(), room.j() + room.h() - 1), SOUTH, Edge.OPEN);
+				if (walkable(room.i() - 1, room.j())) setEdge(cell(room.i(), room.j()), WEST, Edge.OPEN);
+				if (walkable(room.i() + room.w(), room.j())) setEdge(cell(room.i() + room.w() - 1, room.j()), EAST, Edge.OPEN);
 				continue;
 			}
 			// Suites, Amor Camp, T.B.D. Room get 1..2 fire doors

@@ -198,6 +198,41 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			});
 		}
 
+		// Batch 4 structures: 2-story mezzanine, dark wing ceiling plenum crawlway, sub-level MEP corridor
+		int[] mezzanine = findZone(seed, from, ZoneKind.MEZZANINE);
+		if (mezzanine != null) {
+			shoot(context, game, mezzanine[0] + 0.5, Level4ChunkGenerator.FLOOR_Y + 7.0, mezzanine[1] + 0.5, 135, 12, false, "level4_mezzanine");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				check(!l4.getBlockState(new BlockPos(mezzanine[0], Level4ChunkGenerator.FLOOR_Y + 6, mezzanine[1])).isAir(),
+						"mezzanine 2F floor slab should exist at FLOOR_Y + 6");
+				check(l4.getBlockState(new BlockPos(mezzanine[0], Level4ChunkGenerator.FLOOR_Y + 7, mezzanine[1])).isAir(),
+						"mezzanine 2F headroom should remain clear air");
+			});
+		}
+
+		int[] tunnelSpot = findSubTunnelCorridor(seed, from);
+		if (tunnelSpot != null) {
+			shoot(context, game, tunnelSpot[0] + 0.5, Level4ChunkGenerator.FLOOR_Y - 5.0, tunnelSpot[1] + 0.5, 90, 2, false, "level4_sub_tunnel");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				check(l4.getBlockState(new BlockPos(tunnelSpot[0], Level4ChunkGenerator.FLOOR_Y - 5, tunnelSpot[1])).isAir(),
+						"sub-level MEP tunnel corridor should be hollow at FLOOR_Y - 5");
+				check(!l4.getBlockState(new BlockPos(tunnelSpot[0], Level4ChunkGenerator.FLOOR_Y - 6, tunnelSpot[1])).isAir(),
+						"sub-level MEP tunnel floor should exist at FLOOR_Y - 6");
+			});
+		}
+
+		if (dark != null) {
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				int[] plenumSpot = findPlenumCrawl(seed, new BlockPos(dark[0], STAND, dark[1]));
+				check(plenumSpot != null, "expected plenum crawlspace above DARK_WING");
+				check(l4.getBlockState(new BlockPos(plenumSpot[0], Level4ChunkGenerator.FLOOR_Y + 6, plenumSpot[1])).isAir(),
+						"ceiling plenum crawlspace should be hollow at FLOOR_Y + 6");
+			});
+		}
+
 		int[] rainView = findRainWindowView(seed, from);
 		if (rainView != null) {
 			shoot(context, game, rainView[0] + 0.5, STAND, rainView[1] + 0.5, rainView[2], 2, false, "level4_rain_window_view");
@@ -725,6 +760,35 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		for (int[] d : dirs) {
 			int sx = wx + d[0], sz = wz + d[1];
 			if (Level4Layout.tile(seed, sx, sz).kind() == Kind.AIR) return new int[] {sx, sz};
+		}
+		return null;
+	}
+
+	private static int[] findPlenumCrawl(long seed, BlockPos from) {
+		for (int dx = -12; dx <= 12; dx++) {
+			for (int dz = -12; dz <= 12; dz++) {
+				int x = from.getX() + dx, z = from.getZ() + dz;
+				Level4Layout.PlenumInfo pi = Level4Layout.plenumInfo(seed, x, z);
+				if (pi != null && !pi.wallShell() && pi.ladderDir() < 0 && !pi.duct()) {
+					return new int[] {x, z};
+				}
+			}
+		}
+		return null;
+	}
+
+	private static int[] findSubTunnelCorridor(long seed, BlockPos from) {
+		int rx0 = Math.floorDiv(from.getX(), Level4Plan.SIZE), rz0 = Math.floorDiv(from.getZ(), Level4Plan.SIZE);
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				Level4Plan plan = Level4Plan.of(seed, rx0 + dx, rz0 + dz);
+				if (plan.tunnelJ < 0) continue;
+				int ci = (plan.tunnelI0 + plan.tunnelI1) / 2;
+				int x = (rx0 + dx) * Level4Plan.SIZE + ci * Level4Plan.CELL + 3;
+				int z = (rz0 + dz) * Level4Plan.SIZE + plan.tunnelJ * Level4Plan.CELL + 3;
+				Level4Layout.SubTunnelInfo sub = Level4Layout.subTunnelInfo(seed, x, z);
+				if (sub != null && sub.corridor()) return new int[] {x, z};
+			}
 		}
 		return null;
 	}

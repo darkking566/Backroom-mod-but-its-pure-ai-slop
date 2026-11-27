@@ -357,4 +357,46 @@ final class Level4LayoutTest {
 		assertTrue(sawElevatorLobby && sawShaft && sawCable && sawThreshold, "expected elevator lobby with open shafts");
 		assertTrue(sawAuditorium && sawSunkenStage && sawStair && sawScreen, "expected sunken tiered auditorium");
 	}
+
+	@Test
+	void batch4StructuresMezzaninePlenumAndSubTunnelAppear() {
+		boolean sawMezzanine = false, sawMezzStair = false, sawMezzOverlook = false;
+		boolean sawPlenum = false, sawLadder = false, sawDuct = false;
+		boolean sawTunnel = false, sawTunnelStair = false, sawTunnelCorridor = false;
+		for (long seed = 10; seed <= 16; seed++) {
+			for (int rx = -1; rx <= 1; rx++) {
+				for (int rz = -1; rz <= 1; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					for (ZoneKind z : plan.zones) {
+						if (z == ZoneKind.MEZZANINE) sawMezzanine = true;
+					}
+					if (plan.tunnelJ >= 0) sawTunnel = true;
+					for (int lx = 0; lx < Level4Plan.SIZE; lx++) {
+						for (int lz = 0; lz < Level4Plan.SIZE; lz++) {
+							int x = rx * Level4Plan.SIZE + lx, z = rz * Level4Plan.SIZE + lz;
+							Level4Layout.MezzanineInfo mezz = Level4Layout.mezzanineInfo(seed, x, z);
+							if (mezz != null) {
+								if (mezz.stairStep() > 0) sawMezzStair = true;
+								if (mezz.overlookOpen()) sawMezzOverlook = true;
+							}
+							Level4Layout.PlenumInfo plenum = Level4Layout.plenumInfo(seed, x, z);
+							if (plenum != null) {
+								sawPlenum = true;
+								if (plenum.ladderDir() >= 0) sawLadder = true;
+								if (plenum.duct()) sawDuct = true;
+							}
+							Level4Layout.SubTunnelInfo sub = Level4Layout.subTunnelInfo(seed, x, z);
+							if (sub != null) {
+								if (sub.stair()) sawTunnelStair = true;
+								if (sub.corridor()) sawTunnelCorridor = true;
+							}
+						}
+					}
+				}
+			}
+		}
+		assertTrue(sawMezzanine && sawMezzStair && sawMezzOverlook, "expected two-story mezzanine with stair and overlook");
+		assertTrue(sawPlenum && sawLadder && sawDuct, "expected ceiling plenum crawlway above dark wing");
+		assertTrue(sawTunnel && sawTunnelStair && sawTunnelCorridor, "expected connected sub-level MEP tunnel");
+	}
 }

@@ -973,6 +973,11 @@
   - **開放垂直電梯井大廳**（`Level4Plan.ZoneKind.ELEVATOR_LOBBY`、`Level4Layout.Kind.ELEVATOR_SHAFT`／`ELEVATOR_CABLE`／`ELEVATOR_SHAFT_WALL`／`ELEVATOR_THRESHOLD`、`Level4ChunkGenerator`）：約 45% 區域生成 `2×1` 電梯等待大廳，北側設有半開破敗電梯門檻（防墜鐵欄柵與可窺視暗井之門縫）直通貫穿 `50` 格深（`y=10..60`）的黑洞垂直電梯井，井心垂懸垂直鋼纜鐵欄
   - **下沉階梯式大型簡報廳 / 廢棄禮堂**（`Level4Plan.ZoneKind.AUDITORIUM`、`Level4Layout.auditoriumInfo`、`Level4ChunkGenerator.auditoriumColumn`）：約 34% 區域生成 `3×3` 挑高 `8` 格的階梯報告廳；後排入口於 `y=32` 無段差接入，經由多排磨製安山岩觀眾階梯逐級下沉至 `y=29` 坑道與 `y=30` 講台（附灰白布幕牆與後暗前明聚光燈）
   - **驗證**：新增 `Level4LayoutTest.batch3StructuresElevatorShaftsAndAuditoriumAppear` 與 `Level4ClientTest.views` 電梯深井上下通透及簡報廳下沉地坪實機檢查（拍攝 `level4_elevator_lobby`、`level4_auditorium`），`.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本批改動於本機 `main`（未推送）
+- **Level 4 建築結構擴充第四批（最終批）——二樓挑高夾層、天花板維修夾層與地下冰水機電管廊**（Antigravity）：
+  - **局部二樓夾層與連通安全梯**（`Level4Plan.ZoneKind.MEZZANINE`、`Level4Layout.mezzanineInfo`、`Level4ChunkGenerator.mezzanineColumn`）：約 38% 區域生成 `3×2` 挑高 `10` 格雙層空間（1F `y=32` 附吊頂燈管＋2F `y=38` 地毯夾層與玻璃辦公室隔間），西側以 `6` 階磨製安山岩大梯階無段差連通 1F/2F，東南角開設雙層挑高天井口搭配 2F 玻璃護欄俯瞰下層
+  - **天花板維修夾層與 HVAC 風管通道**（`Level4Layout.plenumInfo`、`Level4ChunkGenerator.plenumBlock`）：於 `DARK_WING` 上方 `y=38..40` 開放可攀爬的設備維修夾層，兩端設直通 `y=33..39` 的靠牆爬梯井口（附 `IRON_BARS` 中央天花板窺視格柵、淺灰混凝土懸吊風管與昏黃檢修燈）
+  - **地下冰水機電連通長廊**（`Level4Plan.findMepTunnel`、`Level4Layout.subTunnelInfo`、`Level4ChunkGenerator.subTunnelBlock`）：每區最高 65% 機率沿未跨出室外與出口之列位貫通 `5～7` 格單元地下設備長廊（`y=26..29`，潮濕中溝、兩側淺灰混凝土與管線鐵柵、昏黃應急燈），兩端以鐵欄護欄包圍石磚階梯對稱下潛與回返地面翼區
+  - 同步更新 `docs/project/5-levels/level4/README.md` 標記全 10 項建築擴充已實作；新增 `Level4LayoutTest.batch4StructuresMezzaninePlenumAndSubTunnelAppear` 與 `Level4ClientTest.views` 實機驗證（拍攝 `level4_mezzanine`、`level4_sub_tunnel`），`.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本批改動於本機 `main`（未推送）
 - 完成 **手電筒系統翻修、3D 雙款手電筒與五格電量 HUD、濾鏡／光照／光影相容與 F7 卡頓修復、紅霧滲透細節修正**（Antigravity）：
   - **紅霧滲透細節修正**（`core/trip/Anomalies.java`、`zh_tw.json`、`en_us.json`）：`infestRedRoomNear` 加入最小生成距離 ≥ 14 格（不再直接凝結在玩家腳邊）；紅霧區 `ANOMALY_VAULT_CHEST` 與 `supply_crate` 改為優先於 `RED_ANOMALY_CLUSTER` 東西兩側對稱生成，避免補給箱擋住正面視線與拍照；更新 `anomaly.noclip_backrooms.red_mist.desc` 雙語說明對齊局部紅霧與異常寶箱區機制
   - **濾鏡／迷霧／光照／Iris 光影相容與 F7 零延遲切換**（`src/client/.../core/look/Look.java`、`shaders/post/camcorder.fsh`、`post_effect/camcorder.json`、`dimension_type/level_{0..3}.json`）：

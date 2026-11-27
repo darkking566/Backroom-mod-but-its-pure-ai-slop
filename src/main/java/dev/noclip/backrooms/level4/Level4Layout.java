@@ -17,6 +17,7 @@ final class Level4Layout {
 	static final int FLOOR_Y = 32;
 	static final int OPEN_HEIGHT = 4;
 	static final int ATRIUM_HEIGHT = 8;
+	static final int MEZZANINE_HEIGHT = 10;
 
 	enum Kind {
 		AIR,
@@ -127,7 +128,7 @@ final class Level4Layout {
 		int cx = lx % CELL, cz = lz % CELL;
 		int c = Level4Plan.cell(i, j);
 		ZoneKind zone = plan.zones[c];
-		int ceilH = (zone == ZoneKind.ATRIUM || zone == ZoneKind.AUDITORIUM) ? ATRIUM_HEIGHT : OPEN_HEIGHT;
+		int ceilH = zoneCeilHeight(zone);
 
 		if (zone == ZoneKind.SOLID_CORE) {
 			return new Tile(Kind.DRYWALL, zone, Level4Plan.NORTH, ceilH, null, false);
@@ -267,18 +268,25 @@ final class Level4Layout {
 		};
 	}
 
-	private static boolean isTallZone(ZoneKind zone) {
-		return zone == ZoneKind.ATRIUM || zone == ZoneKind.AUDITORIUM;
+	private static int zoneCeilHeight(ZoneKind zone) {
+		return switch (zone) {
+			case MEZZANINE -> MEZZANINE_HEIGHT;
+			case ATRIUM, AUDITORIUM -> ATRIUM_HEIGHT;
+			default -> OPEN_HEIGHT;
+		};
 	}
 
-	private static boolean isAtrium(Level4Plan plan, int i, int j) {
-		return Level4Plan.inside(i, j) && isTallZone(plan.zones[Level4Plan.cell(i, j)]);
+	private static boolean isTallZone(ZoneKind zone) {
+		return zone == ZoneKind.ATRIUM || zone == ZoneKind.AUDITORIUM || zone == ZoneKind.MEZZANINE;
+	}
+
+	private static int tallBorderHeight(Level4Plan plan, int i, int j) {
+		return Level4Plan.inside(i, j) ? zoneCeilHeight(plan.zones[Level4Plan.cell(i, j)]) : OPEN_HEIGHT;
 	}
 
 	private static Tile cornerTile(long seed, Level4Plan plan, int i, int j, ZoneKind zone, int ceilH) {
-		boolean nearAtrium = isTallZone(zone) || isAtrium(plan, i - 1, j)
-				|| isAtrium(plan, i, j - 1) || isAtrium(plan, i - 1, j - 1);
-		int cornerCeil = nearAtrium ? ATRIUM_HEIGHT : ceilH;
+		int cornerCeil = Math.max(ceilH, Math.max(tallBorderHeight(plan, i - 1, j),
+				Math.max(tallBorderHeight(plan, i, j - 1), tallBorderHeight(plan, i - 1, j - 1))));
 		if (zone == ZoneKind.OMEGA_BASE) {
 			RoomBox room = plan.rooms.get(plan.roomId[Level4Plan.cell(i, j)]);
 			boolean outer = i == room.i() || j == room.j();
@@ -300,7 +308,7 @@ final class Level4Layout {
 		ZoneKind neighbor = Level4Plan.inside(ni, nj) ? plan.zones[Level4Plan.cell(ni, nj)] : ZoneKind.OPEN_OFFICE;
 		boolean omegaWall = zone == ZoneKind.OMEGA_BASE || neighbor == ZoneKind.OMEGA_BASE;
 		boolean atriumBorder = isTallZone(zone) || isTallZone(neighbor);
-		int edgeCeil = atriumBorder ? ATRIUM_HEIGHT : ceilH;
+		int edgeCeil = Math.max(ceilH, zoneCeilHeight(neighbor));
 		int facingInto = dir == Level4Plan.NORTH ? Level4Plan.SOUTH : Level4Plan.EAST;
 		if (omegaWall && zone != ZoneKind.OMEGA_BASE) facingInto = Level4Plan.opposite(facingInto);
 
@@ -372,6 +380,91 @@ final class Level4Layout {
 	}
 
 	record AuditoriumInfo(int floorY, boolean stair, int stairDir, boolean stage, boolean screenWall, int rx) {
+	}
+
+	record MezzanineInfo(int stairStep, boolean stairRail, boolean overlookOpen, boolean overlookRail, boolean upperGlassWall) {
+	}
+
+	record PlenumInfo(boolean wallShell, int ladderDir, boolean ventGrate, boolean duct) {
+	}
+
+	record SubTunnelInfo(boolean stair, int stepY, int stairDir, boolean stairRail, boolean corridor, boolean wallSide, boolean light) {
+	}
+
+	/** Returns two-story mezzanine geometry inside {@link ZoneKind#MEZZANINE}, or null elsewhere. */
+	static MezzanineInfo mezzanineInfo(long seed, int x, int z) {
+		int rx0 = Math.floorDiv(x, SIZE), rz0 = Math.floorDiv(z, SIZE);
+		Level4Plan plan = Level4Plan.of(seed, rx0, rz0);
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		int i = lx / CELL, j = lz / CELL;
+		int c = Level4Plan.cell(i, j);
+		if (plan.zones[c] != ZoneKind.MEZZANINE || plan.roomId[c] < 0) return null;
+		RoomBox room = plan.rooms.get(plan.roomId[c]);
+		int rx = lx - room.i() * CELL;
+		int rz = lz - room.j() * CELL;
+		int stairStep = ((rz == 3 || rz == 4) && rx >= 1 && rx <= 6) ? rx : 0;
+		boolean stairRail = (rz == 2 || rz == 5) && rx >= 1 && rx <= 6;
+		boolean overlookOpen = rx >= 14 && rx <= 18 && rz >= 8 && rz <= 12;
+		boolean overlookRail = !overlookOpen && (rx >= 13 && rx <= 19 && rz >= 7 && rz <= 13);
+		boolean upperGlassWall = (rx == 12 && rz >= 2 && rz <= 6 && rz != 4);
+		return new MezzanineInfo(stairStep, stairRail, overlookOpen, overlookRail, upperGlassWall);
+	}
+
+	/** Returns ceiling plenum / HVAC crawlway geometry above {@link ZoneKind#DARK_WING}, or null elsewhere. */
+	static PlenumInfo plenumInfo(long seed, int x, int z) {
+		int rx0 = Math.floorDiv(x, SIZE), rz0 = Math.floorDiv(z, SIZE);
+		Level4Plan plan = Level4Plan.of(seed, rx0, rz0);
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		int i = lx / CELL, j = lz / CELL;
+		int c = Level4Plan.cell(i, j);
+		if (plan.zones[c] != ZoneKind.DARK_WING || plan.roomId[c] < 0) return null;
+		RoomBox room = plan.rooms.get(plan.roomId[c]);
+		int rx = lx - room.i() * CELL;
+		int rz = lz - room.j() * CELL;
+		boolean wallShell = (rx == 0 || rx == 20 || rz == 0 || rz == 20);
+		int ladderDir = -1;
+		if (rx == 4 && rz == 1 && !hasExitInCell(plan, Level4Plan.cell(room.i(), room.j()))) {
+			ladderDir = Level4Plan.SOUTH;
+		} else if (rx == 18 && rz == 20 && !hasExitInCell(plan, Level4Plan.cell(room.i() + 2, room.j() + 2))) {
+			ladderDir = Level4Plan.NORTH;
+		}
+		boolean ventGrate = (rx == 10 && rz == 10);
+		boolean duct = !wallShell && ladderDir < 0
+				&& (((rx == 7 || rx == 14) && rz >= 2 && rz <= 18)
+						|| ((rz == 7 || rz == 14) && rx >= 2 && rx <= 18 && rx != 4 && rx != 18));
+		return new PlenumInfo(wallShell, ladderDir, ventGrate, duct);
+	}
+
+	/** Returns sub-level MEP chiller corridor & stairwell geometry, or null outside tunnel cells. */
+	static SubTunnelInfo subTunnelInfo(long seed, int x, int z) {
+		int rx0 = Math.floorDiv(x, SIZE), rz0 = Math.floorDiv(z, SIZE);
+		Level4Plan plan = Level4Plan.of(seed, rx0, rz0);
+		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
+		int i = lx / CELL, j = lz / CELL;
+		int cx = lx % CELL, cz = lz % CELL;
+		if (!plan.isTunnelCell(i, j) || cz < 1 || cz > 5) return null;
+
+		boolean wallSide = (cz == 1 || cz == 5);
+		if (i == plan.tunnelI0 && cx >= 1) {
+			if (cz == 3) {
+				int stepY = FLOOR_Y + 1 - cx;
+				return new SubTunnelInfo(true, stepY, Level4Plan.WEST, false, false, false, false);
+			}
+			return new SubTunnelInfo(false, 0, Level4Plan.WEST, cx >= 1 && (cz == 2 || cz == 4), false, wallSide, false);
+		}
+		if (i == plan.tunnelI1 && cx >= 1) {
+			if (cz == 3) {
+				int stepY = FLOOR_Y - 6 + cx;
+				return new SubTunnelInfo(true, stepY, Level4Plan.EAST, false, false, false, false);
+			}
+			return new SubTunnelInfo(false, 0, Level4Plan.EAST, cx >= 1 && (cz == 2 || cz == 4), false, wallSide, false);
+		}
+		if (i > plan.tunnelI0 && (i < plan.tunnelI1 || cx == 0)) {
+			boolean corridor = cz >= 2 && cz <= 4;
+			boolean light = corridor && cz == 3 && cx == 3;
+			return new SubTunnelInfo(false, 0, Level4Plan.EAST, false, corridor, wallSide, light);
+		}
+		return null;
 	}
 
 	/** Returns tiered seating/stage geometry inside a {@link ZoneKind#AUDITORIUM} room, or null elsewhere. */
@@ -570,7 +663,7 @@ final class Level4Layout {
 				if (roll < 2) return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
 				if (roll == 2) return new Tile(Kind.VENDING, zone, Level4Plan.SOUTH, ceilH, null, false);
 			}
-			if (roll >= 15 && roll < 52 && !hasExitInCell(plan, c)) {
+			if (roll >= 15 && roll < 52 && !hasExitInCell(plan, c) && !plan.isTunnelCell(i, j)) {
 				Kind cubicle = cubicleTile(cx, cz, Math.floorMod(roll, 4));
 				if (cubicle != null) return new Tile(cubicle, zone, Level4Plan.NORTH, ceilH, null, false);
 			}
@@ -635,6 +728,7 @@ final class Level4Layout {
 						for (int j = 1; j < N - 1; j++) {
 							int c = Level4Plan.cell(i, j);
 							if (plan.zones[c] != ZoneKind.OPEN_OFFICE && plan.zones[c] != ZoneKind.SUITE) continue;
+							if (plan.isTunnelCell(i, j)) continue;
 							int wx = (baseRx + dx) * SIZE + i * CELL + 3;
 							int wz = (baseRz + dz) * SIZE + j * CELL + 3;
 							if (tile(seed, wx, wz).kind() == Kind.AIR) return new int[] {wx, wz};
