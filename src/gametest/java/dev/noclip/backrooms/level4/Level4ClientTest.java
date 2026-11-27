@@ -193,7 +193,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 				check(shaft != null, "expected open vertical elevator shaft near lobby");
 				check(l4.getBlockState(new BlockPos(shaft[0], Level4ChunkGenerator.FLOOR_Y - 12, shaft[1])).isAir(),
 						"elevator shaft should drop deeply below FLOOR_Y");
-				check(l4.getBlockState(new BlockPos(shaft[0], Level4ChunkGenerator.FLOOR_Y + 12, shaft[1])).isAir(),
+				// +14: a stalled freight elevator hangs iron-bar cables up to FLOOR_Y + 12 in this column
+				check(l4.getBlockState(new BlockPos(shaft[0], Level4ChunkGenerator.FLOOR_Y + 14, shaft[1])).isAir(),
 						"elevator shaft should rise high above FLOOR_Y");
 			});
 		}
@@ -470,6 +471,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			ServerPlayer p = player(s);
 			BlockPos pos = new BlockPos(win[0], STAND + 1, win[1]);
 			check(level4(s).getBlockState(pos).is(Level4Blocks.OFFICE_TRAP_WINDOW), "expected trap window at " + pos);
+			// Standing within GRAB_DIST, the window's own periodic grab may have just hit; clear its hurt cooldown
+			p.invulnerableTime = 0;
 			float hpBefore = p.getHealth();
 			BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(pos), Direction.SOUTH, pos, false);
 			p.gameMode.useItemOn(p, level4(s), ItemStack.EMPTY, InteractionHand.MAIN_HAND, hit);
