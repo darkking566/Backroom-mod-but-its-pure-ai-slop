@@ -17,6 +17,6 @@ public class FogRendererDarkness {
 	@Inject(method = "setupFog", at = @At("RETURN"))
 	private void noclip_backrooms$darken(Camera camera, int renderDistance, DeltaTracker delta, float darkening, ClientLevel level,
 			CallbackInfoReturnable<FogData> result) {
-		Look.darken(camera, result.getReturnValue());
+		Look.darken(camera, result.getReturnValue(), delta.getGameTimeDeltaPartialTick(false));
 	}
 }

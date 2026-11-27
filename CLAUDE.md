@@ -1075,3 +1075,9 @@
   - **文件與驗證**（`zh_tw.json`、`en_us.json`、`docs/project/1-gameplay/README.md`、`src/test/java/dev/noclip/backrooms/core/ExplorationSystemsTest.java`、`HorrorClientTest.java`）：
     - 補齊雙語翻譯鍵與 JSON 語法檢核；`ExplorationSystemsTest` 驗證門禁純函式、寶箱分階、捷徑／修裝費用、鑑定大獎率與倖存者狀態轉換
     - 執行 `.\gradlew.bat build compileGametestJava --no-daemon`（全部 150 項單元測試 0 失敗）與 `.\gradlew.bat runClientGameTest "-Plevels=horror,floors,field" --no-daemon`（含 `HorrorClientTest` 步驟 `12a..12e` 實機驗證且日誌零缺物警告）皆全數通過
+- 修復 **非光影模式下夜視效果（杏仁水／`/effect give`）無效問題**（Antigravity，已提交並推送至 GitHub）：
+  - **問題原因**：無光影時 `Look.falloff`（`src/client/.../core/look/Look.java`）未檢查 `state.nightVisionEffectIntensity`，無條件把 `state.brightness` 設為負值壓暗光圖；`Look.darken`（及各層 `dimension_type`）亦無條件把近距離純黑迷霧壓在 6～30 格內，將夜視視野整段吞掉
+  - **修復內容**（`src/client/.../core/look/Look.java`、`mixin/client/FogRendererDarkness.java`、`camcorder.fsh` 控制貼圖）：
+    - `Look.falloff` 依 `state.nightVisionEffectIntensity` 將 `state.brightness` 平滑拉回夜視亮度（保留最後 10 秒閃爍）
+    - `Look.darken` 傳入 `partialTick`，有 `MobEffects.NIGHT_VISION` 時依 `GameRenderer.nightVisionScale` 將迷霧起訖距離向外拉開並柔化黑霧，同時衰減送入 `camcorder.fsh` 的 falloff 係數；沒有夜視時完全維持原本暗黑迷霧與光照衰減
+  - **驗證**：`src/gametest/.../look/LookClientTest.java` 新增 `checkNightVision` 回歸檢核（夜視前後光圖／霧距斷言與清除還原）；已執行 `.\gradlew.bat build compileGametestJava --no-daemon` 與 `.\gradlew.bat runClientGameTest "-Plevels=look" --no-daemon` 通過，並實機檢視 `0012_look_level0_0_camcorder.png`、`0018_look_level0_0_night_vision.png`、`0019_look_level0_0_night_vision_clean.png` 確認夜視正常明亮且不破圖

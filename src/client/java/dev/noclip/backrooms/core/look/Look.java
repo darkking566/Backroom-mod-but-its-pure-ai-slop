@@ -16,6 +16,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.state.LightmapRenderState;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -24,6 +25,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.material.FogType;
@@ -157,33 +159,70 @@ public final class Look {
 		}
 	}
 
+	private static float nightVisionScale(Minecraft client, float partialTick) {
+		LocalPlayer player = client.player;
+		if (player == null || !player.hasEffect(MobEffects.NIGHT_VISION)) return 0.0F;
+		return Mth.clamp(GameRenderer.nightVisionScale(player, partialTick), 0.0F, 1.0F);
+	}
+
 	/**
 	 * Applies Backrooms dark fog whenever inside a Backrooms level (non-shader mode), regardless of whether the
 	 * F7 VHS camcorder filter is on or off so toggling F7 never snaps back to white/washed fog.
+	 * When Night Vision is active, smoothly expands fog distances and lifts pitch-black haze so the corridor stays visible.
 	 */
 	public static void darken(Camera camera, FogData fog) {
+		darken(camera, fog, 1.0F);
+	}
+
+	public static void darken(Camera camera, FogData fog, float partialTick) {
 		Minecraft client = Minecraft.getInstance();
 		if (fog == null || !(inBackroomsView(client) || night398(client)) || shadersActive() || camera.getFluidInCamera() != FogType.NONE) return;
 		Mood mood = mood(client);
-		fog.environmentalStart = Math.min(fog.environmentalStart, mood.start());
-		fog.environmentalEnd = Math.min(fog.environmentalEnd, mood.end());
+		float darkStart = Math.min(fog.environmentalStart, mood.start());
+		float darkEnd = Math.min(fog.environmentalEnd, mood.end());
+		float r, g, b;
 		if (mood == Mood.NIGHT_398) {
-			fog.color.set(0.045F, 0.010F, 0.008F, 1.0F);
+			r = 0.045F;
+			g = 0.010F;
+			b = 0.008F;
 		} else if (mood == Mood.LEVEL_4) {
-			fog.color.set(0.80F, 0.84F, 0.87F, 1.0F);
+			r = 0.80F;
+			g = 0.84F;
+			b = 0.87F;
 		} else {
-			fog.color.set(0.018F, 0.016F, 0.012F, 1.0F);
+			r = 0.018F;
+			g = 0.016F;
+			b = 0.012F;
+		}
+
+		float nv = nightVisionScale(client, partialTick);
+		if (nv > 0.0F) {
+			float clearEnd = Math.max(Math.max(darkEnd, 96.0F), fog.renderDistanceEnd);
+			float clearStart = Math.max(Math.max(darkStart, 48.0F), clearEnd * 0.5F);
+			fog.environmentalStart = Mth.lerp(nv, darkStart, clearStart);
+			fog.environmentalEnd = Mth.lerp(nv, darkEnd, clearEnd);
+			float lr = mood == Mood.LEVEL_4 ? r : Math.max(r, 0.14F);
+			float lg = mood == Mood.LEVEL_4 ? g : Math.max(g, 0.14F);
+			float lb = mood == Mood.LEVEL_4 ? b : Math.max(b, 0.13F);
+			fog.color.set(Mth.lerp(nv, r, lr), Mth.lerp(nv, g, lg), Mth.lerp(nv, b, lb), 1.0F);
+		} else {
+			fog.environmentalStart = darkStart;
+			fog.environmentalEnd = darkEnd;
+			fog.color.set(r, g, b, 1.0F);
 		}
 	}
 
 	/**
 	 * Applies calibrated lightmap falloff whenever inside a Backrooms level without Iris shaders, independent of F7.
 	 * Skipped when Iris shaders are active so shader packs control cave lighting without double darkening.
+	 * Preserves vanilla Night Vision brightness boost (including last-10s flicker via {@code nightVisionEffectIntensity}).
 	 */
 	public static void falloff(LightmapRenderState state) {
 		Minecraft client = Minecraft.getInstance();
 		if (!(inBackroomsView(client) || night398(client)) || shadersActive()) return;
-		state.brightness = -mood(client).falloff();
+		float dark = -mood(client).falloff();
+		float nv = Mth.clamp(state.nightVisionEffectIntensity, 0.0F, 1.0F);
+		state.brightness = nv > 0.0F ? Mth.lerp(nv, dark, Math.max(state.brightness, 0.90F)) : dark;
 	}
 
 	static int recordingTicks() {
@@ -304,8 +343,10 @@ public final class Look {
 		int flCyByte = Mth.clamp(Math.round(((smoothCenterY - 0.5F) / 0.24F + 0.5F) * 255.0F), 0, 255);
 		int flDistByte = Mth.clamp(Math.round(smoothDist * 255.0F), 0, 255);
 
+		float effectiveFalloff = mood.falloff() * (1.0F - nightVisionScale(client, 1.0F));
+
 		clock.getPixels().setPixel(0, 0, 0xFF000000 | (ticks >> 8) << 16 | (ticks & 0xFF) << 8 | RANDOM.nextInt(256));
-		clock.getPixels().setPixel(1, 0, 0xFF000000 | Math.min(mood.start(), 255) << 16 | Math.min(mood.end(), 255) << 8 | Math.round(mood.falloff() * 255));
+		clock.getPixels().setPixel(1, 0, 0xFF000000 | Math.min(mood.start(), 255) << 16 | Math.min(mood.end(), 255) << 8 | Math.round(effectiveFalloff * 255));
 		clock.getPixels().setPixel(2, 0, 0xFF000000 | camByte << 16 | flStrByte << 8 | flStyleByte);
 		clock.getPixels().setPixel(3, 0, 0xFF000000 | flCxByte << 16 | flCyByte << 8 | flDistByte);
 		clock.upload();

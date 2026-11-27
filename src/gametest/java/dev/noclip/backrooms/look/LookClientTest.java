@@ -9,8 +9,11 @@ import java.util.concurrent.CompletableFuture;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
+import net.minecraft.client.renderer.fog.FogData;
+import net.minecraft.client.renderer.state.LightmapRenderState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffects;
 
 /**
  * The found-footage look (core.look.Look) in Level 0: the same views with the drawn textures, with the realistic
@@ -44,6 +47,7 @@ public final class LookClientTest implements FabricClientGameTest {
 			shoot(context, game, false, false, "drawn");
 			shoot(context, game, true, false, "realistic");
 			shoot(context, game, true, true, "camcorder");
+			checkNightVision(context, game);
 
 			// Out of the Backrooms the filter goes off.
 			server.runCommand("execute as @a in minecraft:overworld run tp @s 0 120 0");
@@ -65,6 +69,70 @@ public final class LookClientTest implements FabricClientGameTest {
 			context.waitTicks(12);
 			context.takeScreenshot("look_level0_" + i + "_" + label);
 		}
+	}
+
+	private static void checkNightVision(ClientGameTestContext context, TestSingleplayerContext game) {
+		var server = game.getServer();
+		float[] v = VIEWS[0];
+		server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_0 run tp @s %.1f %d %.1f %.0f %.0f",
+				v[0], STAND_Y, v[1], v[2], v[3]));
+		context.waitTicks(10);
+
+		check(context.computeOnClient(client -> {
+			LightmapRenderState light = new LightmapRenderState();
+			light.brightness = 0.5F;
+			light.nightVisionEffectIntensity = 0.0F;
+			Look.falloff(light);
+
+			FogData fog = new FogData();
+			fog.environmentalStart = 6.0F;
+			fog.environmentalEnd = 32.0F;
+			fog.renderDistanceEnd = 128.0F;
+			Look.darken(client.gameRenderer.mainCamera(), fog, 1.0F);
+			return light.brightness < 0.0F && fog.environmentalEnd <= 30.0F;
+		}), "normal Backrooms darkness/fog should stay active without Night Vision");
+
+		server.runCommand("effect give @a minecraft:night_vision 30 0 true");
+		context.waitFor(c -> c.player != null && c.player.hasEffect(MobEffects.NIGHT_VISION), 100);
+		context.waitTicks(12);
+
+		check(context.computeOnClient(client -> {
+			LightmapRenderState light = new LightmapRenderState();
+			light.brightness = 0.5F;
+			light.nightVisionEffectIntensity = 1.0F;
+			Look.falloff(light);
+
+			FogData fog = new FogData();
+			fog.environmentalStart = 6.0F;
+			fog.environmentalEnd = 32.0F;
+			fog.renderDistanceEnd = 128.0F;
+			Look.darken(client.gameRenderer.mainCamera(), fog, 1.0F);
+			return light.brightness >= 0.89F && fog.environmentalStart >= 48.0F && fog.environmentalEnd >= 120.0F;
+		}), "Night Vision should lift lightmap brightness and push Backrooms dark fog outward");
+
+		context.takeScreenshot("look_level0_0_night_vision");
+		context.runOnClient(client -> Look.setEnabled(false));
+		context.waitTicks(8);
+		context.takeScreenshot("look_level0_0_night_vision_clean");
+		context.runOnClient(client -> Look.setEnabled(true));
+
+		server.runCommand("effect clear @a");
+		context.waitFor(c -> c.player != null && !c.player.hasEffect(MobEffects.NIGHT_VISION), 100);
+		context.waitTicks(5);
+
+		check(context.computeOnClient(client -> {
+			LightmapRenderState light = new LightmapRenderState();
+			light.brightness = 0.5F;
+			light.nightVisionEffectIntensity = 0.0F;
+			Look.falloff(light);
+
+			FogData fog = new FogData();
+			fog.environmentalStart = 6.0F;
+			fog.environmentalEnd = 32.0F;
+			fog.renderDistanceEnd = 128.0F;
+			Look.darken(client.gameRenderer.mainCamera(), fog, 1.0F);
+			return light.brightness < 0.0F && fog.environmentalEnd <= 30.0F;
+		}), "clearing Night Vision should restore Backrooms darkness and close fog");
 	}
 
 	private static void setPack(ClientGameTestContext context, boolean on) {
