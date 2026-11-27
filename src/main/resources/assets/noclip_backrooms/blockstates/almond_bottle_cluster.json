@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "noclip_backrooms:block/level4/almond_bottle_cluster"
+      },
+      {
+        "model": "noclip_backrooms:block/level4/almond_bottle_cluster",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level4/almond_bottle_cluster",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level4/almond_bottle_cluster",
+        "y": 270
+      }
+    ]
+  }
+}

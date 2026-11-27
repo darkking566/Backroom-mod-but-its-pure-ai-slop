@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "noclip_backrooms:office_photocopier"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "noclip_backrooms:blocks/office_photocopier"
+}

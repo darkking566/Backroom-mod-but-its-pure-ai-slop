@@ -1,0 +1,78 @@
+{
+  "textures": {
+    "face": "noclip_backrooms:block/level4/office_troffer_flicker",
+    "ceil": "noclip_backrooms:block/level4/office_acoustic_ceiling",
+    "particle": "noclip_backrooms:block/level4/office_acoustic_ceiling"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        12,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#face",
+          "light_emission": 11
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#ceil"
+        },
+        "north": {
+          "uv": [
+            0,
+            12,
+            16,
+            16
+          ],
+          "texture": "#ceil"
+        },
+        "south": {
+          "uv": [
+            0,
+            12,
+            16,
+            16
+          ],
+          "texture": "#ceil"
+        },
+        "east": {
+          "uv": [
+            0,
+            12,
+            16,
+            16
+          ],
+          "texture": "#ceil"
+        },
+        "west": {
+          "uv": [
+            0,
+            12,
+            16,
+            16
+          ],
+          "texture": "#ceil"
+        }
+      }
+    }
+  ]
+}

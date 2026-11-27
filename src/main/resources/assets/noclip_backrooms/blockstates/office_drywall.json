@@ -1,0 +1,46 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "noclip_backrooms:block/level4/office_drywall",
+        "weight": 8
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_drywall_1",
+        "weight": 1
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_drywall_2",
+        "weight": 1
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_drywall_3",
+        "weight": 1
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_drywall_4",
+        "weight": 1
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_drywall_5",
+        "weight": 1
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_drywall_6",
+        "weight": 1
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_drywall_7",
+        "weight": 1
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_drywall_8",
+        "weight": 1
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_drywall_9",
+        "weight": 1
+      }
+    ]
+  }
+}

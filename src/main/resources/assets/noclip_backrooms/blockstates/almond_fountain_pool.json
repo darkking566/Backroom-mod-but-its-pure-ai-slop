@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "bottles=0": {
+      "model": "noclip_backrooms:block/level4/almond_fountain_pool_0"
+    },
+    "bottles=1": {
+      "model": "noclip_backrooms:block/level4/almond_fountain_pool_1"
+    },
+    "bottles=2": {
+      "model": "noclip_backrooms:block/level4/almond_fountain_pool_2"
+    }
+  }
+}

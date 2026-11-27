@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_bottom_left",
+  "textures": {
+    "bottom": "noclip_backrooms:block/level4/office_fire_door",
+    "top": "noclip_backrooms:block/level4/office_fire_door"
+  }
+}

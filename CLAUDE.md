@@ -875,3 +875,42 @@
   - **前室 1F 大廳 Level 0 返回傳送台**（`frontrooms/InstituteLayout.java`、`Institute.java`、`InstituteBlocks.java`）：於前室研究所 1F 大廳中央（到達點正前方）新增 0 期權限即開放的 `2×2` `TRANSPORT_PAD`（`lobbyPads`），右鍵兩次確認即可免費直接返回 Level 0；B1 深層傳送台與 5 期權限解鎖維持不變
   - **低理智分層怪物池與開源 CC0 音效替換**（`core/rpg/PlayerRpg.java`、`src/client/.../core/rpg/SanityHallucinations.java`、`sounds.json`、`CREDITS.md`）：改為依維度決定幻覺怪物池（Level 0 僅偶爾出現短暫 5～7.5 秒 `BACTERIA` 單體幻覺；Level 0.1 與前室為空；Level 1／2／3 各對應該層怪物）；從 Freesound 取得 4 個驗證為 CC0 1.0 的開源音檔（`szegvari`、`deleted_user_9482149`、`SoundEffectsForAll`）以 `ffmpeg` 轉為單聲道 OGG 放於 `sounds/sanity/`，替換原版終界使者／伏守者音效，並將低理智音效間隔拉長至 26～54 秒附 11 秒全域防重疊冷卻
   - **驗證**：`.\gradlew.bat build compileGametestJava --no-daemon`、`.\gradlew.bat runClientGameTest "-Plevels=0,frontrooms,field" --no-daemon` 與 `.\gradlew.bat test --no-daemon` 全數通過，日誌零模型／貼圖／音效缺失；已於本機 `main` 提交（未推送）
+- 完成 **Level 4（廢棄辦公室 / Abandoned Office）** 首版完整實作與雙組實機驗證（Antigravity）：
+  - **規劃、空間尺度與區域架構**（`level4/Level4Plan.java`、`Level4Layout.java`、`Level4ChunkGenerator.java`、`Level4Travel.java`、維度/生物群系 JSON）：
+    - 112×112 格區域網格（16×16 格 `7×7` 單元，一般辦公室淨高 4 格、挑高雙層雨窗中庭淨高 8 格並含 `ATRIUM_ARCH` 門楣與中央 3×3 杏仁水噴泉、無燈暗區 `DARK_WING`、實心建築核與玻璃隔間套房），接入 `LevelExits.open("4", Level4Travel::enter)` 打通 Level 2 出口門與 Level 3 電梯進階路線；修復中庭東南鄰格牆高至 8 格並修正 `amor_planter` 高度使培養菌貼合無懸空
+  - **材質、模型、寫實包與 7 件專屬 3D 物品**（`tools/make_level4.py`、`make_level4_realistic.py`、`make_level4_items.py`、`Level4Blocks.java`、`Level4Items.java`、`Look.Mood.LEVEL_4`）：
+    - 新增 43 種方塊與雙套 128px 基礎／寫實貼圖（含 labPBR `_n`/`_s`、四態燈具與髒舊變體），補齊 `en_us`/`zh_tw`/`sounds.json`/挖掘標籤與 `docs/project/3-crafting/by-level.md`、`5-levels/level4/README.md`
+    - 新增 7 件專屬 3D 模型物品：宗教護符 `brass_crucifix`（黃銅十字架）、`faded_icon_frame`（褪色聖像框）與 T.B.D. 古怪藏品 `broken_nw_compass`、`calendar_1998`、`blank_stamp`、`unlabeled_tape`、`rain_glass_orb`（右鍵播雨聲）
+  - **三大勢力、Entity 2 陷阱窗、供水上限、會消失野生出口與事件生態**（`Level4Bases.java`、`Level4WaterSourceBlock.java`、`Level4Windows.java`、`Level4VanishingExits.java`、`Level4Monsters.java`、`Level4Events.java`、`Level4Props.java`）：
+    - 飲水機與杏仁水噴泉（`Level4WaterSourceBlock`）持空玻璃瓶裝水或空手啜飲各限裝 **2 瓶**
+    - M.E.G. Base Omega（醫療員、警衛、商人、安全重生地行軍床、合金交換置物櫃、自動販賣機、拆解台）；T.B.D.（6 位隱居囤積者＋藏品櫃）；Amor Incrementum（蘑菇培養室、未持十字架/聖像框主動敵對，持護符轉為和睦並可用硬幣/合金交換淨化杏仁精華）
+    - Entity 2 明亮陷阱窗敲窗誘引並可用黑染料/墨囊/木炭塗黑化解；野生異常出口（Level 71/4.3/11/2/13 及非 Omega 5/6 樓梯）移開視線約 4 秒後消失並封成牆面（Omega 5/6 樓梯與 Level 3 電梯永久保留）；配電箱復電、影印機、拔線桌機電話、凹陷地毯椅聲、雨聲/停雨徵兆與稀疏獵犬/鈍人/瞬閃笑魘
+  - **驗證與合併**：新增 `Level4LayoutTest`（3 項）與 `Level4ClientTest`（進入 Level 4、雙模式 6 張實機截圖、飲水機 2 瓶上限、Amor 敵對→手持黃銅十字架交易消耗 1 枚遺失硬幣、墨囊塗黑陷阱窗、野生出口失視後消失、翻譯完整性）；先以無光影與 `-Pshaders` 通過 `Level4ClientTest`，並於合併遠端 `origin/main`（`6c57ce08`，Level 0 電影商店道具與 VHS 錄影帶）且解決 `CLAUDE.md`、`fabric.mod.json`、`en_us.json`、`zh_tw.json`、挖掘標籤等合併衝突後重跑 `.\gradlew.bat build --no-daemon` 驗證通過並依使用者要求正常推送 `main` 至 GitHub（無強制推送、無改寫歷史）
+- 為全數 135 項共用 3D 家具、工作站、寶箱與 Level 0 電影家具補齊貼合模型輪廓之 `VoxelShape`（Antigravity）：
+  - 新增 `tools/make_prop_shapes.py` 讀取 `BackroomsProps`（67 項）與 `FilmProps`（68 項）之 JSON 模型與 `.obj` 網格，經體素化與貪婪長方體合併產生 `src/main/resources/data/noclip_backrooms/prop_shapes.json`（每項 1～46 個方盒、平均 11.27 個）
+  - 新增 `props/PropShapes.java` 載入並快取四向旋轉後之統一外框與單格裁剪碰撞盒；接入 `BlenderSinglePropBlock`、`WorkstationBlock`、`BackroomsLootChestBlock`、`NoClipPropBlock`、`MultiPartPropBlock`、`PropPartBlock`（指到任一子格皆框出整座家具完整輪廓）與 `FilmPropBlock`（保留牆掛／低矮物件可穿過之碰撞行為），並於 `PropBlockEntity.setMasterPos` 補齊 `sendBlockUpdated` 同步
+  - 新增 `PropShapesTest` 與 `PropsClientTest`（`-Plevels=props`）；`.\gradlew.bat test --no-daemon --rerun-tasks`、`.\gradlew.bat runClientGameTest -Plevels=film --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=props --no-daemon` 皆通過，並實機檢視 `prop_outline_chair`、`prop_outline_sofa_part`、`prop_outline_lamp_part`、`prop_outline_bench` 截圖確認輪廓貼合；僅留於本機工作目錄（未提交、未推送、未動既有 Level 4 未提交檔案）
+- Level 4 還原原文第 1 項——加入「游蕩流浪者 NPC」（Antigravity，`Level4Wanderers`）：
+  - 新增 `level4/Level4Wanderers.java`（於 `Level4.register()` 註冊）並開放 `Level4Events.nearestOmega`／`compass` 供共用：於開放式辦公區（`OPEN_OFFICE`）、隔間套房（`SUITE`）與中庭（`ATRIUM`）動態生成最多 5 位會自行走動的友善流浪者（沿用 `People` 5 款造型與專屬角色譯名，避開 `OFFICE_TRAP_WINDOW`，先加入世界再打標籤以免被 `ENTITY_LOAD` 清除），靠近時停下轉向玩家
+  - 右鍵互動支援 7 則循環情報與導航（最近 Omega 基地與中庭噴泉方向距離、陷阱窗／失視消失出口／Amor 聖物／T.B.D. 提示，並每 60 秒可微幅回復 3 點理智），並支援以遺失舊幣、合金或 2 張紙／潮濕廢紙碎片以物易物換取杏仁水、空玻璃瓶與繃帶（每人上限 2 次）
+  - 補齊中英文雙語翻譯、`docs/project/5-levels/level4/README.md` 說明、單元測試 `Level4LayoutTest.wanderZonesOnlyAllowOpenSpacesAndAtrium` 與實機測試 `Level4ClientTest.wanderers`（驗證生成區域、實際行走距離、對話與遺失舊幣換杏仁水／玻璃瓶及實機截圖 `0006_level4_wanderers.png`）；`.\gradlew.bat test --tests "dev.noclip.backrooms.level4.*" --no-daemon`、`.\gradlew.bat build --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=4 --no-daemon` 全部通過（僅提交本項改動，未推送）
+- Level 4 還原原文第 2 項——擴建三大勢力規模、人數與特色（Antigravity）：
+  - 新增 4 個據點方塊與貼圖／模型／寫實材質（`tools/make_level4.py`、`make_level4_realistic.py`、`Level4Blocks.java`、`mineable/axe.json`）：`amor_planter_l1`（Level 1 水泥牆基質培養槽）、`amor_mushroom_moss`（牆面苔菌）、`amor_mushroom_veil`（壁紙薄紗菌）與 `tbd_hoard_crate`（T.B.D. 私人囤貨箱）
+  - 擴建版型與據點人數（`Level4Plan.java`、`Level4Layout.java`、`Level4ChunkGenerator.java`、`Level4Props.java`、`Level4Bases.java`、`Level4Events.java`）：
+    - **M.E.G. Omega 基地**：擴建為每 `3×3` 區域一座 `5×5`（`35×35` 格）大型基地，含 4 面入口路障、6 張營房床、南側醫療區、6 座置物櫃（含小機率宗教聖物）、雙工作台與 10 名人員，4 名守衛會主動巡邏並攻擊 16 格內怪物
+    - **神愛之繁生（Amor Incrementum）**：擴建為 `3×3` 培養室，補齊剛好 **10 位**可被玩家攻擊還手的成員，培養 3 種 Level 0/1 牆面菌類，除硬幣／合金交易外也支援直接獻上宗教聖物換取大量補給
+    - **T.B.D.（懸而未決）**：擴建為 `2×3` 囤物室，補齊剛好 **6 位**成員，新增不可購買的雙層私人囤貨箱，且販售與陳列架改成嚴格只出無用奇物（同步調整 `Level4Wanderers` 遺失舊幣交易小機率贈送聖像框及對話提示）
+  - 更新 `Level4LayoutTest.factionSizesAndDistinctFixturesMatchWiki` 與 `Level4ClientTest.factions`（實測 Omega 10 人與守衛打獵犬、Amor 10 人可攻擊／敵對／交易／獻聖物、T.B.D. 6 人／拒賣囤貨箱／只賣奇物，並檢視 `0002_level4_omega_base.png`、`0003_level4_amor_camp.png`、`0004_level4_tbd_room.png`）；`.\gradlew.bat test --tests "dev.noclip.backrooms.level4.*" --no-daemon`、`.\gradlew.bat cleanTest build --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=4 --no-daemon` 全部通過（僅提交本項 Level 4 改動，未推送）
+- Level 4 還原原文第 3 項——統一窗戶規則與強化 Entity 2 陷阱窗演出（Antigravity）：
+  - 貼圖更新（`tools/make_level4.py`、`make_level4_realistic.py`）：`office_trap_window` 刺眼白光後方加入抬手招手的暗色人影剪影；`office_rain_window` 雨幕後方加入微亮蒼白手印與輪廓
+  - 規則與機制對齊原文（`Level4Layout.java`、`Level4Windows.java`、`Level4Wanderers.java`）：塗黑窗提高為絕大多數（中庭 76%、其餘 88%）；新增 `Level4Windows.isTrapWindow` 將所有未塗黑窗戶（含 `office_trap_window` 與 `office_rain_window`）統一視為 Entity 2 陷阱，靠近誘引扣理智、過近拉扯傷血並附加黑暗與緩速、**空手右鍵碰觸直接被抓傷**，兩者皆可用黑染料／墨囊／木炭塗黑化解；游蕩流浪者同步避開全部未塗黑窗戶
+  - 補齊雙語翻譯、`docs/project/5-levels/level4/README.md`、單元測試 `Level4LayoutTest.mostWindowsAreBlackedOut` 與實機測試 `Level4ClientTest.trapWindows`（含 `office_trap_window` 與 `office_rain_window` 空手被抓＋墨囊／木炭塗黑實測及實機截圖）；`.\gradlew.bat test --tests "dev.noclip.backrooms.level4.*" --no-daemon`、`.\gradlew.bat cleanTest build --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=4 --no-daemon` 全部通過（僅提交本項 Level 4 改動，未推送）
+- Level 4 還原原文第 4 項——實體化出口結構與靜音機率消失（Antigravity）：
+  - `Level4Exit.java`、`Level4Plan.java`、`Level4Layout.java`、`Level4ChunkGenerator.java`：將原本貼在牆上的平面出口升級為可實際走入的 3D 結構——**電梯廂**（`ELEVATOR_3`，3×2 內凹照明電梯間）、**向上安全梯間**（`OMEGA_STAIRS_5`/`6` 與野外 `STAIRS_5`/`6`，磨製安山岩階梯往上通往出口門）與**極稀少向下地下室階梯**（`BASEMENT_71`，機率調降至 8%，石磚階梯往下沉入地下轉角），並保證同一格單元最多只放一座出口結構
+  - `Level4VanishingExits.java`：改為背對超過 4 秒後有 **55% 機率** 觸發，且完全靜音、無煙霧粒子與字幕提示，連同整座樓梯／地下室階梯結構一併還原回辦公牆面與地毯
+  - 更新 `Level4LayoutTest.physicalExitStructuresHaveValidFootprints` 與 `Level4ClientTest`（`views` 加拍電梯／樓梯間／地下室視角，`vanishingExits` 配合 3D 結構座標與 `setChanceForTest(100)` 驗證消失）；`.\gradlew.bat test --tests "dev.noclip.backrooms.level4.*" --no-daemon`、`.\gradlew.bat cleanTest build --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=4 --no-daemon` 全部通過（僅提交本項 Level 4 改動，未推送）
+- Level 4 還原原文第 5 項——散落杏仁水、安頓後輕鬆返回 Omega 基地與純客戶端笑魘幻影（Antigravity）：
+  - 新增 `almond_bottle_cluster`（散落的杏仁水瓶，`Level4Blocks.java`、`Level4Props.java`、`tools/make_level4.py`、`make_level4_realistic.py`）：於約 30% 開放式辦公區／套房區塊隨機散落 3D 瓶群，右鍵直接撿取 1～2 瓶杏仁水（並有機會附贈空玻璃瓶），打破亦掉落 `almond_water`
+  - `Level4Travel.java`：從其他樓層進入 Level 4 時，若玩家曾於 M.E.G. Omega 基地行軍床安頓（重生點在 `Level4.LEVEL_4`），直接傳送回已安頓基地旁並顯示提示，還原「很容易返回」
+  - `Level4Monsters.java` 調降實戰刷怪頻率並移除伺服器笑魘；新增 `src/client/java/dev/noclip/backrooms/level4/Level4Client.java`（於 `BackroomsClient.java` 註冊），於暗處以負 ID 生成 100% 純客戶端本地笑魘幻影（走近或盯視即煙散，伺服器零實體、隊友無法證實）
+  - 補齊雙語翻譯、`docs/project/5-levels/level4/README.md` 與 `Level4ClientTest.extras`（實測散落瓶群撿取、純客戶端笑魘零伺服器實體、以及於 Omega 行軍床安頓後從 Level 2 返回直接落回基地）；`.\gradlew.bat cleanTest build --no-daemon` 與 `.\gradlew.bat runClientGameTest -Plevels=4 --no-daemon` 全部通過（僅提交本項 Level 4 改動，未推送）
