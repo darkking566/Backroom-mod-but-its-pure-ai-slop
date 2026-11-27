@@ -104,11 +104,17 @@ final class Level4Bases {
 				return InteractionResult.PASS;
 			}
 			if (world.dimension() != Level4.LEVEL_4) return InteractionResult.PASS;
+			ServerLevel sl = (ServerLevel) world;
 			BlockPos pos = hit.getBlockPos();
 			BlockState state = world.getBlockState(pos);
 			int now = sp.level().getServer().getTickCount();
 
 			if (state.is(Level4Blocks.OMEGA_COT)) {
+				long seed = Level4ChunkGenerator.planSeed(sl.getChunkSource().randomState());
+				var poi = Level4PoiPlan.atCell(seed, pos.getX(), pos.getZ());
+				if (poi != null && poi.kind() == Level4PoiPlan.PoiKind.EVACUATED_OUTPOST) {
+					return Level4PoiEvents.useOutpostCot(sl, sp, pos, now);
+				}
 				LevelData.RespawnData spot = LevelData.RespawnData.of(world.dimension(), sp.blockPosition(), sp.getYRot(), 0);
 				Trips.settle(sp, spot);
 				world.playSound(null, pos, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 0.8F, 0.8F);
@@ -118,6 +124,11 @@ final class Level4Bases {
 			}
 
 			if (state.is(Level4Blocks.OMEGA_LOCKER)) {
+				long seed = Level4ChunkGenerator.planSeed(sl.getChunkSource().randomState());
+				var poi = Level4PoiPlan.atCell(seed, pos.getX(), pos.getZ());
+				if (poi != null && poi.kind() == Level4PoiPlan.PoiKind.EVACUATED_OUTPOST) {
+					return Level4PoiEvents.useOutpostLocker(sl, sp, pos);
+				}
 				ItemStack held = sp.getMainHandItem();
 				boolean alloySwap = held.is(Level1Items.ALLOY);
 				int next = LOCKER_NEXT.getOrDefault(pos, 0);
@@ -192,11 +203,24 @@ final class Level4Bases {
 			}
 
 			if (person.entityTags().contains(AMOR_TAG)) {
+				ServerLevel sl = (ServerLevel) world;
+				boolean desecrated = Level4PoiEvents.isAmorDesecrated(sl, sp.getUUID());
+				ItemStack mainHand = sp.getMainHandItem();
+				if (desecrated) {
+					if (Level4Items.isReligious(mainHand)) {
+						if (!sp.getAbilities().instabuild) mainHand.shrink(1);
+						Level4PoiEvents.clearAmorDesecrated(sl, sp.getUUID());
+						world.playSound(null, person.blockPosition(), SoundEvents.VILLAGER_YES, SoundSource.NEUTRAL, 0.8F, 1.0F);
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.amor_forgiven"));
+					} else {
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.amor_desecrated"));
+					}
+					return InteractionResult.SUCCESS;
+				}
 				if (!Level4Items.isReligiousRelic(sp)) {
 					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.amor_hostile"));
 					return InteractionResult.SUCCESS;
 				}
-				ItemStack mainHand = sp.getMainHandItem();
 				ItemStack offHand = sp.getOffhandItem();
 				ItemStack otherHand = Level4Items.isReligious(mainHand) ? offHand : mainHand;
 				if (otherHand.is(Economy.LOST_COIN) || otherHand.is(Level1Items.ALLOY)) {
@@ -304,7 +328,8 @@ final class Level4Bases {
 					p -> p.isAlive() && p.entityTags().contains(AMOR_TAG));
 			if (cultists.isEmpty()) continue;
 
-			if (Level4Items.isReligiousRelic(sp)) {
+			boolean desecrated = Level4PoiEvents.isAmorDesecrated(level, sp.getUUID());
+			if (!desecrated && Level4Items.isReligiousRelic(sp)) {
 				for (Person cultist : cultists) face(cultist, sp.position());
 				if (now >= AMOR_PACIFY_NEXT.getOrDefault(sp.getUUID(), 0)) {
 					AMOR_PACIFY_NEXT.put(sp.getUUID(), now + 240);
@@ -315,7 +340,9 @@ final class Level4Bases {
 
 			if (now >= AMOR_WARN_NEXT.getOrDefault(sp.getUUID(), 0)) {
 				AMOR_WARN_NEXT.put(sp.getUUID(), now + 140);
-				sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.amor_hostile"));
+				sp.sendOverlayMessage(Component.translatable(desecrated
+						? "message.noclip_backrooms.level4.poi.amor_desecrated"
+						: "message.noclip_backrooms.level4.amor_hostile"));
 			}
 			for (Person cultist : cultists) {
 				moveToward(cultist, sp.position(), 0.12);
@@ -345,7 +372,8 @@ final class Level4Bases {
 
 	private static boolean nearbyOutsider(ServerLevel level, Person cultist) {
 		return level.players().stream().anyMatch(p -> !p.isCreative() && !p.isSpectator()
-				&& p.distanceTo(cultist) <= 9.0 && !Level4Items.isReligiousRelic(p));
+				&& p.distanceTo(cultist) <= 9.0
+				&& (Level4PoiEvents.isAmorDesecrated(level, p.getUUID()) || !Level4Items.isReligiousRelic(p)));
 	}
 
 	private static void strollInsideZone(ServerLevel level, long seed, Person person, int now) {

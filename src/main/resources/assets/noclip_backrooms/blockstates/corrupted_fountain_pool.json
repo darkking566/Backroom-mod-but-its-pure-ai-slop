@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "sampled=false": {
+      "model": "noclip_backrooms:block/level4/corrupted_fountain_pool"
+    },
+    "sampled=true": {
+      "model": "noclip_backrooms:block/level4/corrupted_fountain_pool_sampled"
+    }
+  }
+}

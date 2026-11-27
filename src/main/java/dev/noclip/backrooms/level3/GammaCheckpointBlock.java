@@ -3,6 +3,7 @@ package dev.noclip.backrooms.level3;
 import dev.noclip.backrooms.weapons.BackroomsFirearmItem;
 import dev.noclip.backrooms.weapons.BackroomsMagicItem;
 import dev.noclip.backrooms.weapons.BackroomsMeleeItem;
+import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -20,6 +21,7 @@ import net.minecraft.world.item.TridentItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * The metal detector at Base Gamma's checkpoint (CN wiki: a finger-prick blood test, a metal detector, and no weapons
@@ -27,8 +29,28 @@ import net.minecraft.world.phys.BlockHitResult;
  * weapons in. Going out is always allowed. The lockers beside it are for leaving weapons behind.
  */
 final class GammaCheckpointBlock extends Level3PartBlock {
+	@SuppressWarnings("unchecked")
+	private static final Map<Direction, VoxelShape>[] OUTLINE_PARTS = new Map[] {
+			Level3Shapes.facing(
+					new double[] {0, 0, 6, 3, 16, 10},
+					new double[] {13, 0, 6, 16, 16, 10},
+					new double[] {3, 7, 7, 13, 9, 9}
+			),
+			Level3Shapes.facing(
+					new double[] {0, 0, 6, 3, 16, 10},
+					new double[] {13, 0, 6, 16, 16, 10},
+					new double[] {3, 12, 6, 13, 16, 10}
+			)
+	};
+
+	@SuppressWarnings("unchecked")
+	private static final Map<Direction, VoxelShape>[] COLLISION_PARTS = new Map[] {
+			Level3Shapes.facing(0, 0, 6, 16, 16, 10),
+			Level3Shapes.facing(0, 0, 6, 16, 16, 10)
+	};
+
 	GammaCheckpointBlock(Properties properties) {
-		super(properties, null);
+		super(properties, null, OUTLINE_PARTS, COLLISION_PARTS);
 	}
 
 	@Override

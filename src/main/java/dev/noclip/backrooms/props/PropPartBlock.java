@@ -6,15 +6,20 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * Invisible collision filler block for multi-block Backrooms furniture (2x3 fridge, 2x2 vending
@@ -31,6 +36,46 @@ public final class PropPartBlock extends Block implements EntityBlock {
 	@Override
 	protected MapCodec<? extends Block> codec() {
 		return CODEC;
+	}
+
+	@Override
+	protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+		if (level.getBlockEntity(pos) instanceof PropBlockEntity be) {
+			BlockPos masterPos = be.masterPos();
+			if (!masterPos.equals(pos)) {
+				BlockState masterState = level.getBlockState(masterPos);
+				if (masterState.getBlock() instanceof MultiPartPropBlock multi) {
+					return PropShapes.outlineAt(
+							multi,
+							masterState.getValue(HorizontalDirectionalBlock.FACING),
+							masterPos.getX() - pos.getX(),
+							masterPos.getY() - pos.getY(),
+							masterPos.getZ() - pos.getZ()
+					);
+				}
+			}
+		}
+		return Shapes.block();
+	}
+
+	@Override
+	protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+		if (level.getBlockEntity(pos) instanceof PropBlockEntity be) {
+			BlockPos masterPos = be.masterPos();
+			if (!masterPos.equals(pos)) {
+				BlockState masterState = level.getBlockState(masterPos);
+				if (masterState.getBlock() instanceof MultiPartPropBlock multi) {
+					return PropShapes.collisionAt(
+							multi,
+							masterState.getValue(HorizontalDirectionalBlock.FACING),
+							masterPos.getX() - pos.getX(),
+							masterPos.getY() - pos.getY(),
+							masterPos.getZ() - pos.getZ()
+					);
+				}
+			}
+		}
+		return Shapes.block();
 	}
 
 	@Override

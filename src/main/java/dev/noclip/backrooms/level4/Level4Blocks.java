@@ -17,7 +17,11 @@ import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.TransparentBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -74,6 +78,8 @@ public final class Level4Blocks {
 			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(3, 10, 14, 13, 15, 16)));
 	public static final Block OFFICE_ELEVATOR = register("office_elevator", unbreakable(MapColor.METAL, SoundType.METAL).lightLevel(s -> 3),
 			p -> Level4ExitBlock.create(p, Level4Exit.ELEVATOR_3, false));
+	public static final Block OFFICE_ELEVATOR_FRAME = register("office_elevator_frame",
+			unbreakable(MapColor.COLOR_GRAY, SoundType.METAL));
 	public static final Block OFFICE_STAIRWELL_5 = register("office_stairwell_5", unbreakable(MapColor.COLOR_RED, SoundType.METAL),
 			p -> Level4ExitBlock.create(p, Level4Exit.STAIRS_5, false));
 	public static final Block OFFICE_STAIRWELL_6 = register("office_stairwell_6", unbreakable(MapColor.COLOR_BLACK, SoundType.METAL),
@@ -159,6 +165,50 @@ public final class Level4Blocks {
 	public static final Block ALMOND_BOTTLE_CLUSTER = register("almond_bottle_cluster", Properties.of().mapColor(MapColor.SAND)
 			.strength(0.2F).sound(SoundType.GLASS).noOcclusion(), AlmondBottleClusterBlock::new);
 
+	// Batch 1 POI blocks
+	public static final Block MEG_CHALK_SIGN = register("meg_chalk_sign", Properties.of().mapColor(MapColor.COLOR_LIGHT_BLUE)
+			.strength(0.3F).sound(SoundType.STONE).noOcclusion().noCollision(), MegChalkSignBlock::new);
+	public static final Block CAUTION_TAPE_BARRIER = register("caution_tape_barrier", Properties.of().mapColor(MapColor.COLOR_YELLOW)
+			.strength(0.2F).sound(SoundType.WOOL).noOcclusion().pushReaction(PushReaction.DESTROY),
+			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(0, 4, 7, 16, 15, 9)));
+
+	// Batch 2 POI blocks
+	public static final Block OFFICE_DARK_MIRROR = register("office_dark_mirror",
+			unbreakable(MapColor.COLOR_BLACK, SoundType.GLASS), OfficeDarkMirrorBlock::new);
+
+	// Batch 3 POI blocks
+	public static final Block CORRUPTED_FOUNTAIN_POOL = register("corrupted_fountain_pool",
+			Properties.of().mapColor(MapColor.COLOR_RED)
+					.strength(-1.0F, 3600000.0F).noLootTable().sound(SoundType.HONEY_BLOCK)
+					.noOcclusion().lightLevel(s -> 3),
+			CorruptedFountainPoolBlock::new);
+
+	// Batch 4 POI blocks
+	public static final Block EXECUTIVE_RED_PHONE = register("executive_red_phone",
+			Properties.of().mapColor(MapColor.COLOR_RED)
+					.strength(2.0F).sound(SoundType.METAL).noOcclusion().lightLevel(s -> 4),
+			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(1, 0, 2, 15, 14, 14)));
+
+	// Route A POI container blocks
+	public static final Block MEG_SUPPLY_CRATE = register("office_supply_crate",
+			Properties.of().mapColor(MapColor.COLOR_BLUE)
+					.strength(2.5F, 6.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(1, 0, 2, 15, 11, 14)));
+	public static final Block INDUSTRIAL_TOOLBOX = register("industrial_toolbox",
+			Properties.of().mapColor(MapColor.COLOR_RED)
+					.strength(2.5F, 5.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(1, 0, 3, 15, 10, 13)));
+	public static final Block OFFICE_STEEL_SAFE = register("office_steel_safe",
+			Properties.of().mapColor(MapColor.COLOR_GRAY)
+					.strength(4.0F, 8.0F).sound(SoundType.METAL).noOcclusion(),
+			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(1, 0, 1, 15, 15, 15)));
+
+	// Route B landmark monitor wall
+	public static final Block EXECUTIVE_BROADCAST_SCREEN = register("executive_broadcast_screen",
+			Properties.of().mapColor(MapColor.COLOR_GREEN)
+					.strength(2.5F).sound(SoundType.GLASS).lightLevel(s -> 9),
+			p -> new Level4FacingBlock(p, Level4FacingBlock.full()));
+
 	private Level4Blocks() {
 	}
 
@@ -239,6 +289,80 @@ public final class Level4Blocks {
 				sp.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("message.noclip_backrooms.level4.almond_pickup"));
 			}
 			return net.minecraft.world.InteractionResult.SUCCESS;
+		}
+	}
+
+	static final class MegChalkSignBlock extends Level4FacingBlock {
+		static final BooleanProperty SLASHED = BooleanProperty.create("slashed");
+
+		MegChalkSignBlock(Properties properties) {
+			super(properties, Level4FacingBlock.northBox(1, 2, 15, 15, 14, 16));
+			registerDefaultState(defaultBlockState().setValue(SLASHED, false));
+		}
+
+		@Override
+		public BlockState getStateForPlacement(net.minecraft.world.item.context.BlockPlaceContext context) {
+			return super.getStateForPlacement(context).setValue(SLASHED, false);
+		}
+
+		@Override
+		protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+			super.createBlockStateDefinition(builder);
+			builder.add(SLASHED);
+		}
+	}
+
+	static final class CorruptedFountainPoolBlock extends Block {
+		static final BooleanProperty SAMPLED = BooleanProperty.create("sampled");
+		private static final VoxelShape POOL_FULL = Block.box(0, 0, 0, 16, 12, 16);
+		private static final VoxelShape POOL_SAMPLED = Block.box(0, 0, 0, 16, 7, 16);
+
+		CorruptedFountainPoolBlock(Properties properties) {
+			super(properties);
+			registerDefaultState(defaultBlockState().setValue(SAMPLED, false));
+		}
+
+		@Override
+		protected VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level,
+				net.minecraft.core.BlockPos pos, net.minecraft.world.phys.shapes.CollisionContext context) {
+			return state.getValue(SAMPLED) ? POOL_SAMPLED : POOL_FULL;
+		}
+
+		@Override
+		protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
+				BlockState state, net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos,
+				net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
+				net.minecraft.world.phys.BlockHitResult hit) {
+			if (hand != net.minecraft.world.InteractionHand.MAIN_HAND) {
+				return net.minecraft.world.InteractionResult.PASS;
+			}
+			return Level4PoiEvents.interactCorruptedPool(level, pos, state, player, stack);
+		}
+
+		@Override
+		protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state,
+				net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos,
+				net.minecraft.world.entity.player.Player player, net.minecraft.world.phys.BlockHitResult hit) {
+			return Level4PoiEvents.interactCorruptedPool(level, pos, state, player, net.minecraft.world.item.ItemStack.EMPTY);
+		}
+
+		@Override
+		protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+			builder.add(SAMPLED);
+		}
+	}
+
+	static final class OfficeDarkMirrorBlock extends Block {
+		static final IntegerProperty SILHOUETTE = IntegerProperty.create("silhouette", 0, 2);
+
+		OfficeDarkMirrorBlock(Properties properties) {
+			super(properties);
+			registerDefaultState(defaultBlockState().setValue(SILHOUETTE, 0));
+		}
+
+		@Override
+		protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+			builder.add(SILHOUETTE);
 		}
 	}
 }

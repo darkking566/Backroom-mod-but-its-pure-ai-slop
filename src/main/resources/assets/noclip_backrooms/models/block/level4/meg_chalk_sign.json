@@ -1,0 +1,40 @@
+{
+  "textures": {
+    "tex": "noclip_backrooms:block/level4/meg_chalk_sign",
+    "particle": "noclip_backrooms:block/level4/meg_chalk_sign"
+  },
+  "elements": [
+    {
+      "from": [
+        1,
+        2,
+        15.4
+      ],
+      "to": [
+        15,
+        14,
+        15.6
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#tex"
+        },
+        "south": {
+          "uv": [
+            16,
+            0,
+            0,
+            16
+          ],
+          "texture": "#tex"
+        }
+      }
+    }
+  ]
+}

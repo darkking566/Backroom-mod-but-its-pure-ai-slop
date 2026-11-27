@@ -57,8 +57,8 @@ final class Level4LayoutTest {
 		Set<ZoneKind> zonesSeen = EnumSet.noneOf(ZoneKind.class);
 		Set<Level4Exit> exitsSeen = EnumSet.noneOf(Level4Exit.class);
 		for (long seed = 10; seed <= 14; seed++) {
-			for (int rx = -2; rx <= 2; rx++) {
-				for (int rz = -2; rz <= 2; rz++) {
+			for (int rx = -4; rx <= 4; rx++) {
+				for (int rz = -4; rz <= 4; rz++) {
 					Level4Plan plan = Level4Plan.of(seed, rx, rz);
 					for (ZoneKind z : plan.zones) zonesSeen.add(z);
 					for (PlacedExit pe : plan.exits) exitsSeen.add(pe.exit());
@@ -108,8 +108,8 @@ final class Level4LayoutTest {
 		Set<Kind> amorKinds = EnumSet.noneOf(Kind.class);
 		Set<Kind> tbdKinds = EnumSet.noneOf(Kind.class);
 		for (long seed = 10; seed <= 16; seed++) {
-			for (int rx = -2; rx <= 2; rx++) {
-				for (int rz = -2; rz <= 2; rz++) {
+			for (int rx = -4; rx <= 4; rx++) {
+				for (int rz = -4; rz <= 4; rz++) {
 					Level4Plan plan = Level4Plan.of(seed, rx, rz);
 					for (Level4Plan.RoomBox room : plan.rooms) {
 						int x0 = rx * Level4Plan.SIZE + room.i() * Level4Plan.CELL;
@@ -156,8 +156,8 @@ final class Level4LayoutTest {
 		int wildRain = 0, wildTrap = 0, wildBlacked = 0, baseBlacked = 0, baseNonBlacked = 0;
 		boolean sawOutside = false;
 		for (long seed = 1; seed <= 8; seed++) {
-			for (int rx = -1; rx <= 1; rx++) {
-				for (int rz = -1; rz <= 1; rz++) {
+			for (int rx = -2; rx <= 2; rx++) {
+				for (int rz = -2; rz <= 2; rz++) {
 					Level4Plan plan = Level4Plan.of(seed, rx, rz);
 					for (int i = 0; i < Level4Plan.N; i++) {
 						for (int j = 0; j < Level4Plan.N; j++) {
@@ -204,8 +204,8 @@ final class Level4LayoutTest {
 	void physicalExitStructuresHaveValidFootprints() {
 		Set<Level4Exit> seenStructs = EnumSet.noneOf(Level4Exit.class);
 		for (long seed = 10; seed <= 16; seed++) {
-			for (int rx = -2; rx <= 2; rx++) {
-				for (int rz = -2; rz <= 2; rz++) {
+			for (int rx = -4; rx <= 4; rx++) {
+				for (int rz = -4; rz <= 4; rz++) {
 					Level4Plan plan = Level4Plan.of(seed, rx, rz);
 					for (PlacedExit pe : plan.exits) {
 						if (!pe.exit().hasStructure()) continue;
@@ -398,5 +398,25 @@ final class Level4LayoutTest {
 		assertTrue(sawMezzanine && sawMezzStair && sawMezzOverlook, "expected two-story mezzanine with stair and overlook");
 		assertTrue(sawPlenum && sawLadder && sawDuct, "expected ceiling plenum crawlway above dark wing");
 		assertTrue(sawTunnel && sawTunnelStair && sawTunnelCorridor, "expected connected sub-level MEP tunnel");
+	}
+
+	@Test
+	void factionBasesAreRareAndMutuallyExclusive() {
+		int omegaCount = 0, amorCount = 0, tbdCount = 0;
+		for (int rx = 0; rx < 16; rx++) {
+			for (int rz = 0; rz < 16; rz++) {
+				Level4Plan plan = Level4Plan.of(42L, rx, rz);
+				int basesInRegion = (plan.hasOmega ? 1 : 0) + (plan.hasAmor ? 1 : 0) + (plan.hasTbd ? 1 : 0);
+				assertTrue(basesInRegion <= 1, "expected at most one faction base per region at " + rx + "," + rz);
+				if (plan.hasOmega) omegaCount++;
+				if (plan.hasAmor) amorCount++;
+				if (plan.hasTbd) tbdCount++;
+				assertTrue(Level4Events.nearestOmega(42L, rx * Level4Plan.SIZE, rz * Level4Plan.SIZE) != null,
+						"expected nearestOmega to find a base from " + rx + "," + rz);
+			}
+		}
+		assertEquals(4, omegaCount, "expected exactly 1 Omega base per 8x8 super-block across 16x16 regions");
+		assertTrue(amorCount >= 1 && amorCount <= 20, "expected rare Amor camps (~3%), got " + amorCount);
+		assertTrue(tbdCount >= 1 && tbdCount <= 24, "expected rare T.B.D. rooms (~4%), got " + tbdCount);
 	}
 }
