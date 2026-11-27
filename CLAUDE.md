@@ -958,6 +958,12 @@
   - **修復 `cornerTile` 區域接縫打穿外牆問題**（`Level4Layout.java`）：`Level4Layout.cornerTile` 殘留早期全樓連通時期的 `i == 0` / `j == 0` 邊界 `Edge.OPEN` 特例，導致空中走廊跨區域接縫處（`cx == 0, cz == 0`）的轉角柱被設為 `Kind.AIR`（鋪地毯與天花板卻直接貫穿至 `OUTSIDE_AIR`），形成面向戶外雨幕的 1 格垂直裂縫；移除該特例後統一補齊 `Kind.PILLAR` 結構柱，密閉空中走廊牆角
   - **修復東／南向塔樓外牆空中走廊交界缺口**（`Level4ChunkGenerator.java`）：`blockAtColumn` 調整為 `if (skybridge && !exterior)`，避免塔樓外牆皮膚（`isExteriorSkin`）與空中走廊交會處在走廊上方／下方被挖出直通缺口
   - **驗證**：於 `Level4LayoutTest` 新增 `indoorWalkableSpacesNeverTouchOutsideAir`（掃描多組種子與相鄰 3×3 區域驗證所有室內可行走格八鄰域皆不與 `OUTSIDE_AIR` 相接），執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本項改動於本機 `main`（未推送）
+- **Level 4 建築結構擴充第一批——半高格子間迷宮、毛坯結構翼區與高低錯層天橋**（Antigravity）：
+  - 更新企劃文件 `docs/project/5-levels/level4/README.md`，納入分四批實作的 10 項建築結構變化方案
+  - **半高格子間迷宮**（`Level4Layout.Kind.CUBICLE_WALL`／`CUBICLE_GLASS`、`Level4ChunkGenerator`）：約 37% 非出口且非天橋的 `OPEN_OFFICE` 單元內生成 4 種對稱／錯位 2 格高矮隔間（下層石膏板＋上層半截牆或透明玻璃），保留上方燈具視線同時切割地面視距與走道節奏
+  - **施工毛坯結構翼區**（`Level4Plan.ZoneKind.UNFINISHED_WING`、`Level4Layout.Kind.UNFINISHED_STUB`／`UNFINISHED_PILLAR`、`Level4ChunkGenerator`）：約 38% 區域生成 `2×2` 或 `2×3` 毛坯水泥空間，地面為雙色裸露灰混凝土（無地毯）、天花板為混凝土樑架搭配高故障率燈具，內部設灰混凝土柱與鐵欄圍籬半成品隔斷
+  - **高低錯層與觀景玻璃天橋**（`Level4Layout.skybridgeInfo`、`Level4ChunkGenerator.bridgeColumn`、`Level4Windows`）：約半數空中走廊升級為抬升 `+2` 格的高架全景玻璃天橋（兩端以磨製安山岩階梯上下銜接、橋底懸空貫穿峽谷、四面全高落地雨窗）；平層天橋中段則擴為三格高落地雨窗並於中央增設玻璃分流脊柱；`Level4Windows` 同步支援依玩家實際站立高度偵測上層陷阱窗
+  - **驗證**：更新 `Level4LayoutTest.batch1StructuresCubiclesUnfinishedAndVariedSkybridgesAppear` 與 `Level4ClientTest.views`（實機檢查格子間、毛坯地坪、高架天橋底懸空／橋面與拍攝 `level4_cubicles`／`level4_unfinished_wing`／`level4_elevated_bridge`），`.\gradlew.bat test --no-daemon` 與 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 通過；僅提交本批改動於本機 `main`（未推送）
 - 完成 **手電筒系統翻修、3D 雙款手電筒與五格電量 HUD、濾鏡／光照／光影相容與 F7 卡頓修復、紅霧滲透細節修正**（Antigravity）：
   - **紅霧滲透細節修正**（`core/trip/Anomalies.java`、`zh_tw.json`、`en_us.json`）：`infestRedRoomNear` 加入最小生成距離 ≥ 14 格（不再直接凝結在玩家腳邊）；紅霧區 `ANOMALY_VAULT_CHEST` 與 `supply_crate` 改為優先於 `RED_ANOMALY_CLUSTER` 東西兩側對稱生成，避免補給箱擋住正面視線與拍照；更新 `anomaly.noclip_backrooms.red_mist.desc` 雙語說明對齊局部紅霧與異常寶箱區機制
   - **濾鏡／迷霧／光照／Iris 光影相容與 F7 零延遲切換**（`src/client/.../core/look/Look.java`、`shaders/post/camcorder.fsh`、`post_effect/camcorder.json`、`dimension_type/level_{0..3}.json`）：

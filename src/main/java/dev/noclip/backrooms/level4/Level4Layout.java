@@ -25,6 +25,10 @@ final class Level4Layout {
 		PILLAR,
 		DRYWALL,
 		GLASS_WALL,
+		CUBICLE_WALL,
+		CUBICLE_GLASS,
+		UNFINISHED_STUB,
+		UNFINISHED_PILLAR,
 		OMEGA_WALL,
 		OMEGA_SIGN,
 		WINDOW_BLACKED,
@@ -281,23 +285,57 @@ final class Level4Layout {
 		return false;
 	}
 
-	/** Whether (x, z) is part of a skybridge spanning the canyon between towers. */
-	static boolean isSkybridge(long seed, int x, int z) {
+	record BridgeInfo(boolean eastWest, boolean elevated, int spanPos, int perpPos) {
+	}
+
+	/** Returns bridge geometry metadata if (x, z) lies on or forms a wall of an exterior skybridge. */
+	static BridgeInfo skybridgeInfo(long seed, int x, int z) {
 		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
 		Level4Plan plan = Level4Plan.of(seed, rx, rz);
 		int lx = Math.floorMod(x, SIZE), lz = Math.floorMod(z, SIZE);
 		int i = lx / CELL, j = lz / CELL;
 		int cx = lx % CELL, cz = lz % CELL;
-		if (Level4Plan.isSkybridgeCell(i, j) && plan.zones[Level4Plan.cell(i, j)] != ZoneKind.OUTSIDE) return true;
-		if (cz == 0 && j > 0 && Level4Plan.isSkybridgeCell(i, j - 1)
-				&& plan.zones[Level4Plan.cell(i, j - 1)] != ZoneKind.OUTSIDE && Level4Plan.isSkybridgeCell(i, j)) {
-			return true;
+
+		// Check if (i, j) or its N/W border cell belongs to an E-W bridge
+		int bridgeJ = j;
+		boolean ewFloor = (i >= N - Level4Plan.MARGIN || i < Level4Plan.MARGIN)
+				&& plan.zones[Level4Plan.cell(i, j)] != ZoneKind.OUTSIDE;
+		boolean ewSouthWall = !ewFloor && cz == 0 && j > 0
+				&& (i >= N - Level4Plan.MARGIN || i < Level4Plan.MARGIN)
+				&& plan.zones[Level4Plan.cell(i, j - 1)] != ZoneKind.OUTSIDE;
+		if (ewFloor || ewSouthWall) {
+			if (ewSouthWall) bridgeJ = j - 1;
+			boolean firstHalf = i >= N - Level4Plan.MARGIN;
+			int brx = firstHalf ? rx : rx - 1;
+			int spanPos = firstHalf ? lx - (N - Level4Plan.MARGIN) * CELL : Level4Plan.MARGIN * CELL + lx;
+			int perpPos = ewSouthWall ? CELL : cz;
+			boolean elevated = Math.floorMod(hash(seed, brx, rz, 471 + bridgeJ), 2) == 0;
+			return new BridgeInfo(true, elevated, spanPos, perpPos);
 		}
-		if (cx == 0 && i > 0 && Level4Plan.isSkybridgeCell(i - 1, j)
-				&& plan.zones[Level4Plan.cell(i - 1, j)] != ZoneKind.OUTSIDE && Level4Plan.isSkybridgeCell(i, j)) {
-			return true;
+
+		// Check if (i, j) or its W border cell belongs to a N-S bridge
+		int bridgeI = i;
+		boolean nsFloor = (j >= N - Level4Plan.MARGIN || j < Level4Plan.MARGIN)
+				&& plan.zones[Level4Plan.cell(i, j)] != ZoneKind.OUTSIDE;
+		boolean nsEastWall = !nsFloor && cx == 0 && i > 0
+				&& (j >= N - Level4Plan.MARGIN || j < Level4Plan.MARGIN)
+				&& plan.zones[Level4Plan.cell(i - 1, j)] != ZoneKind.OUTSIDE;
+		if (nsFloor || nsEastWall) {
+			if (nsEastWall) bridgeI = i - 1;
+			boolean firstHalf = j >= N - Level4Plan.MARGIN;
+			int brz = firstHalf ? rz : rz - 1;
+			int spanPos = firstHalf ? lz - (N - Level4Plan.MARGIN) * CELL : Level4Plan.MARGIN * CELL + lz;
+			int perpPos = nsEastWall ? CELL : cx;
+			boolean elevated = Math.floorMod(hash(seed, rx, brz, 473 + bridgeI), 2) == 0;
+			return new BridgeInfo(false, elevated, spanPos, perpPos);
 		}
-		return false;
+
+		return null;
+	}
+
+	/** Whether (x, z) is part of a skybridge spanning the canyon between towers. */
+	static boolean isSkybridge(long seed, int x, int z) {
+		return skybridgeInfo(seed, x, z) != null;
 	}
 
 	private static Tile interiorTile(long seed, Level4Plan plan, int i, int j, int cx, int cz, ZoneKind zone, int ceilH) {
@@ -383,6 +421,15 @@ final class Level4Layout {
 			return new Tile(Kind.BREAKER, zone, Level4Plan.EAST, ceilH, null, false);
 		}
 
+		if (zone == ZoneKind.UNFINISHED_WING && room != null) {
+			if ((cx == 3 && (cz == 2 || cz == 5)) || (cz == 3 && cx == 2 && (i + j) % 2 == 0)) {
+				return new Tile(Kind.UNFINISHED_PILLAR, zone, Level4Plan.NORTH, ceilH, null, false);
+			}
+			if ((cx == 2 && cz == 4) || (cx == 4 && cz == 2) || (cx == 5 && cz == 4 && (i + j) % 2 == 1)) {
+				return new Tile(Kind.UNFINISHED_STUB, zone, Level4Plan.NORTH, ceilH, null, false);
+			}
+		}
+
 		if (zone == ZoneKind.SUITE && room != null) {
 			int roll = Math.floorMod(hash(seed, i, j, 433), 100);
 			if (cx == 2 && cz == 2 && roll < 14) {
@@ -393,14 +440,52 @@ final class Level4Layout {
 			}
 		}
 
-		// Very rare water cooler / vending machine along open office pillars
-		if (zone == ZoneKind.OPEN_OFFICE && cx == 1 && cz == 1) {
+		// Very rare water cooler / vending machine along open office pillars, plus half-height cubicle mazes
+		if (zone == ZoneKind.OPEN_OFFICE && !Level4Plan.isSkybridgeCell(i, j)) {
 			int roll = Math.floorMod(hash(seed, i, j, 444), 100);
-			if (roll < 2) return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
-			if (roll == 2) return new Tile(Kind.VENDING, zone, Level4Plan.SOUTH, ceilH, null, false);
+			if (cx == 1 && cz == 1) {
+				if (roll < 2) return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
+				if (roll == 2) return new Tile(Kind.VENDING, zone, Level4Plan.SOUTH, ceilH, null, false);
+			}
+			if (roll >= 15 && roll < 52 && !hasExitInCell(plan, c)) {
+				Kind cubicle = cubicleTile(cx, cz, Math.floorMod(roll, 4));
+				if (cubicle != null) return new Tile(cubicle, zone, Level4Plan.NORTH, ceilH, null, false);
+			}
 		}
 
 		return new Tile(Kind.AIR, zone, Level4Plan.NORTH, ceilH, null, false);
+	}
+
+	private static boolean hasExitInCell(Level4Plan plan, int c) {
+		for (PlacedExit pe : plan.exits) {
+			if (pe.cell() == c) return true;
+		}
+		return false;
+	}
+
+	private static Kind cubicleTile(int cx, int cz, int variant) {
+		return switch (variant) {
+			case 0 -> {
+				if (cx == 3 && cz == 3) yield Kind.CUBICLE_GLASS;
+				if ((cx == 2 || cx == 4) && cz >= 2 && cz <= 4) yield Kind.CUBICLE_WALL;
+				yield null;
+			}
+			case 1 -> {
+				if ((cz == 2 && cx == 3) || (cz == 4 && cx == 4)) yield Kind.CUBICLE_GLASS;
+				if ((cz == 2 && cx >= 2 && cx <= 4) || (cz == 4 && cx >= 3 && cx <= 5)) yield Kind.CUBICLE_WALL;
+				yield null;
+			}
+			case 2 -> {
+				if (cz == 3 && (cx == 2 || cx == 4)) yield Kind.CUBICLE_GLASS;
+				if (cx == 3 && (cz == 2 || cz == 4)) yield Kind.CUBICLE_WALL;
+				yield null;
+			}
+			default -> {
+				if ((cx == 2 || cx == 5) && cz == 3) yield Kind.CUBICLE_GLASS;
+				if ((cx == 2 || cx == 5) && (cz == 2 || cz == 5)) yield Kind.CUBICLE_WALL;
+				yield null;
+			}
+		};
 	}
 
 	/** Whether this floor cell has carpet indentations from long-vanished desks/chairs. */

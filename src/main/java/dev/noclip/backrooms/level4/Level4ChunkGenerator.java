@@ -63,25 +63,20 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 	static BlockState blockAt(long seed, int x, int y, int z) {
 		Level4Layout.ExitStruct es = Level4Layout.exitStructure(seed, x, z);
 		Tile tile = Level4Layout.tile(seed, x, z);
-		boolean skybridge = Level4Layout.isSkybridge(seed, x, z);
+		Level4Layout.BridgeInfo bridge = Level4Layout.skybridgeInfo(seed, x, z);
 		boolean exterior = Level4Layout.isExteriorSkin(seed, x, z);
 		int topY = towerTopY(seed, x, z);
-		return blockAtColumn(seed, x, y, z, tile, es, skybridge, exterior, topY);
+		return blockAtColumn(seed, x, y, z, tile, es, bridge, exterior, topY);
 	}
 
 	private static BlockState blockAtColumn(long seed, int x, int y, int z, Tile tile,
-			Level4Layout.ExitStruct es, boolean skybridge, boolean exterior, int topY) {
+			Level4Layout.ExitStruct es, Level4Layout.BridgeInfo bridge, boolean exterior, int topY) {
 		if (y <= MIN_Y) return Blocks.BEDROCK.defaultBlockState();
 		if (tile.kind() == Kind.OUTSIDE_AIR) return Blocks.AIR.defaultBlockState();
 		if (y >= MAX_Y) return Blocks.BEDROCK.defaultBlockState();
 
-		if (skybridge && !exterior) {
-			int roofY = FLOOR_Y + tile.ceilingHeight() + 1;
-			if (y == FLOOR_Y - 1 || y == roofY + 1) return Blocks.CONCRETE.gray().defaultBlockState();
-			if (y < FLOOR_Y || y > roofY + 1) return Blocks.AIR.defaultBlockState();
-			if (y == FLOOR_Y) return floor(seed, x, z, tile);
-			if (y == roofY) return ceiling(seed, x, z, tile);
-			return columnBlock(tile, y - FLOOR_Y);
+		if (bridge != null && !exterior) {
+			return bridgeColumn(seed, x, y, z, tile, bridge);
 		}
 
 		if (es != null && y >= FLOOR_Y - 3 && y <= FLOOR_Y + 6) {
@@ -113,7 +108,93 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 		return Blocks.CONCRETE.gray().defaultBlockState();
 	}
 
+	private static BlockState bridgeColumn(long seed, int x, int y, int z, Tile tile, Level4Layout.BridgeInfo bridge) {
+		int s = bridge.spanPos();
+		if (!bridge.elevated()) {
+			int roofY = FLOOR_Y + tile.ceilingHeight() + 1;
+			if (y == FLOOR_Y - 1 || y == roofY + 1) return Blocks.CONCRETE.gray().defaultBlockState();
+			if (y < FLOOR_Y || y > roofY + 1) return Blocks.AIR.defaultBlockState();
+			if (y == FLOOR_Y) return floor(seed, x, z, tile);
+			if (y == roofY) return ceiling(seed, x, z, tile);
+			int h = y - FLOOR_Y;
+			if (s >= 11 && s <= 17) {
+				if (tile.kind() == Kind.WINDOW_RAIN || tile.kind() == Kind.WINDOW_TRAP || tile.kind() == Kind.WINDOW_BLACKED) {
+					if (h == 4) {
+						Block win = switch (tile.kind()) {
+							case WINDOW_BLACKED -> Level4Blocks.OFFICE_BLACKED_WINDOW;
+							case WINDOW_TRAP -> Level4Blocks.OFFICE_TRAP_WINDOW;
+							default -> Level4Blocks.OFFICE_RAIN_WINDOW;
+						};
+						return win.defaultBlockState();
+					}
+				}
+				if (s == 14 && bridge.perpPos() == 3 && tile.kind() == Kind.AIR) {
+					return (h <= 3 ? Level4Blocks.OFFICE_GLASS_WALL : Level4Blocks.OFFICE_PILLAR_UPPER).defaultBlockState();
+				}
+			}
+			return columnBlock(tile, h);
+		}
+
+		// Elevated +2 skybridge with ascending/descending stairs at ends and panoramic canyon glass
+		int roofY = FLOOR_Y + 7;
+		if (y == roofY + 1) return Blocks.CONCRETE.gray().defaultBlockState();
+		if (y == roofY) return ceiling(seed, x, z, tile);
+		if (y > roofY + 1) return Blocks.AIR.defaultBlockState();
+
+		boolean midDeck = s >= 3 && s <= 25;
+		if (midDeck) {
+			if (y <= FLOOR_Y) return Blocks.AIR.defaultBlockState();
+			if (y == FLOOR_Y + 1) return Blocks.CONCRETE.gray().defaultBlockState();
+			int eh = y - (FLOOR_Y + 2);
+			if (eh == 0) {
+				if (tile.walkable()) return floor(seed, x, z, tile);
+				if (tile.kind() == Kind.PILLAR) return Level4Blocks.OFFICE_PILLAR.defaultBlockState();
+				if (tile.kind() == Kind.DRYWALL) return Level4Blocks.OFFICE_DRYWALL.defaultBlockState();
+				return Level4Blocks.OFFICE_RADIATOR_WALL.defaultBlockState().setValue(Level4FacingBlock.FACING, dirFrom(tile.dir()));
+			}
+			if (tile.walkable()) return Blocks.AIR.defaultBlockState();
+			return switch (tile.kind()) {
+				case PILLAR -> Level4Blocks.OFFICE_PILLAR_UPPER.defaultBlockState();
+				case DRYWALL -> Level4Blocks.OFFICE_DRYWALL_UPPER.defaultBlockState();
+				case WINDOW_BLACKED -> Level4Blocks.OFFICE_BLACKED_WINDOW.defaultBlockState();
+				case WINDOW_TRAP -> Level4Blocks.OFFICE_TRAP_WINDOW.defaultBlockState();
+				case WINDOW_RAIN -> Level4Blocks.OFFICE_RAIN_WINDOW.defaultBlockState();
+				default -> columnBlock(tile, eh);
+			};
+		}
+
+		// End ramp spans (s = 1..2 ascending, s = 26..27 descending)
+		if (y < FLOOR_Y - 1) return Blocks.AIR.defaultBlockState();
+		if (y == FLOOR_Y - 1) return Blocks.CONCRETE.gray().defaultBlockState();
+		if (!tile.walkable()) {
+			int h = y - FLOOR_Y;
+			if (h == 0) return Blocks.CONCRETE.gray().defaultBlockState();
+			if (h <= 4) return columnBlock(tile, h);
+			if (tile.kind() == Kind.PILLAR) return Level4Blocks.OFFICE_PILLAR_UPPER.defaultBlockState();
+			if (tile.kind() == Kind.DRYWALL || h == 6) return Level4Blocks.OFFICE_DRYWALL_UPPER.defaultBlockState();
+			return switch (tile.kind()) {
+				case WINDOW_BLACKED -> Level4Blocks.OFFICE_BLACKED_WINDOW.defaultBlockState();
+				case WINDOW_TRAP -> Level4Blocks.OFFICE_TRAP_WINDOW.defaultBlockState();
+				case WINDOW_RAIN -> Level4Blocks.OFFICE_RAIN_WINDOW.defaultBlockState();
+				default -> Level4Blocks.OFFICE_DRYWALL_UPPER.defaultBlockState();
+			};
+		}
+		Direction climb = bridge.eastWest()
+				? (s <= 2 ? Direction.EAST : Direction.WEST)
+				: (s <= 2 ? Direction.SOUTH : Direction.NORTH);
+		int stepH = (s == 1 || s == 27) ? 1 : 2;
+		int dy = y - FLOOR_Y;
+		if (dy < stepH) return Blocks.POLISHED_ANDESITE.defaultBlockState();
+		if (dy == stepH) return Blocks.POLISHED_ANDESITE_STAIRS.defaultBlockState().setValue(StairBlock.FACING, climb);
+		return Blocks.AIR.defaultBlockState();
+	}
+
 	private static BlockState floor(long seed, int x, int z, Tile tile) {
+		if (tile.zone() == ZoneKind.UNFINISHED_WING) {
+			return (Math.floorMod(Level4Layout.hash(seed, x, z, 481), 5) == 0
+					? Blocks.CONCRETE.lightGray()
+					: Blocks.CONCRETE.gray()).defaultBlockState();
+		}
 		if (tile.kind() == Kind.FOUNTAIN_BASIN || tile.kind() == Kind.FOUNTAIN_POOL) {
 			return Level4Blocks.ALMOND_FOUNTAIN_BASIN.defaultBlockState();
 		}
@@ -130,19 +211,25 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 	}
 
 	private static BlockState ceiling(long seed, int x, int z, Tile tile) {
-		if (!tile.walkable() && tile.kind() != Kind.PILLAR && tile.kind() != Kind.GLASS_WALL && tile.kind() != Kind.FOUNTAIN_POOL
+		if (!tile.walkable() && tile.kind() != Kind.PILLAR && tile.kind() != Kind.GLASS_WALL
+				&& tile.kind() != Kind.CUBICLE_WALL && tile.kind() != Kind.CUBICLE_GLASS
+				&& tile.kind() != Kind.UNFINISHED_STUB && tile.kind() != Kind.UNFINISHED_PILLAR
+				&& tile.kind() != Kind.FOUNTAIN_POOL
 				&& tile.kind() != Kind.FOUNTAIN_BASIN && tile.kind() != Kind.WATER_COOLER && tile.kind() != Kind.VENDING
 				&& tile.kind() != Kind.OMEGA_COT && tile.kind() != Kind.OMEGA_LOCKER && tile.kind() != Kind.OMEGA_BARRICADE
 				&& tile.kind() != Kind.AMOR_PLANTER && tile.kind() != Kind.AMOR_PLANTER_L1 && tile.kind() != Kind.AMOR_PLANTER_VEIL
 				&& tile.kind() != Kind.TBD_SHELF && tile.kind() != Kind.TBD_HOARD && tile.kind() != Kind.BREAKER
 				&& tile.kind() != Kind.PHOTOCOPIER && tile.kind() != Kind.DESK_PHONE) {
-			return Level4Blocks.OFFICE_ACOUSTIC_CEILING.defaultBlockState();
+			return (tile.zone() == ZoneKind.UNFINISHED_WING ? Blocks.CONCRETE.gray() : Level4Blocks.OFFICE_ACOUSTIC_CEILING).defaultBlockState();
 		}
 		int lx = Math.floorMod(x, Level4Plan.CELL);
 		int lz = Math.floorMod(z, Level4Plan.CELL);
 		// Troffer strip lights centered in every cell (cx=3, cz=2..4)
 		if (lx == 3 && lz >= 2 && lz <= 4) {
 			return trofferState(seed, x, z, tile.zone()).setValue(Level4AxisBlock.AXIS, Direction.Axis.Z);
+		}
+		if (tile.zone() == ZoneKind.UNFINISHED_WING) {
+			return ((lx == 0 || lz == 0) ? Blocks.CONCRETE.gray() : Blocks.CONCRETE.lightGray()).defaultBlockState();
 		}
 		if (lx == 1 && lz == 5 && Math.floorMod(Level4Layout.hash(seed, x, z, 461), 4) == 0) {
 			return Level4Blocks.OFFICE_CEILING_VENT.defaultBlockState();
@@ -158,6 +245,11 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 			if (r < 68) return Level4Blocks.OFFICE_TROFFER_BROKEN.defaultBlockState();
 			if (r < 88) return Level4Blocks.OFFICE_TROFFER_FLICKER.defaultBlockState();
 			return Level4Blocks.OFFICE_TROFFER_DIM.defaultBlockState();
+		}
+		if (zone == ZoneKind.UNFINISHED_WING) {
+			if (r < 50) return Level4Blocks.OFFICE_TROFFER_BROKEN.defaultBlockState();
+			if (r < 80) return Level4Blocks.OFFICE_TROFFER_DIM.defaultBlockState();
+			return Level4Blocks.OFFICE_TROFFER_LIT.defaultBlockState();
 		}
 		if (zone == ZoneKind.OMEGA_BASE) {
 			return Level4Blocks.OFFICE_TROFFER_LIT.defaultBlockState();
@@ -178,6 +270,16 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 			case PILLAR -> (h == 1 ? Level4Blocks.OFFICE_PILLAR : Level4Blocks.OFFICE_PILLAR_UPPER).defaultBlockState();
 			case DRYWALL -> (h == 1 ? Level4Blocks.OFFICE_DRYWALL : Level4Blocks.OFFICE_DRYWALL_UPPER).defaultBlockState();
 			case GLASS_WALL -> (h <= 3 ? Level4Blocks.OFFICE_GLASS_WALL : Level4Blocks.OFFICE_DRYWALL_UPPER).defaultBlockState();
+			case CUBICLE_WALL -> h == 1
+					? Level4Blocks.OFFICE_DRYWALL.defaultBlockState()
+					: (h == 2 ? Level4Blocks.OFFICE_DRYWALL_UPPER.defaultBlockState() : Blocks.AIR.defaultBlockState());
+			case CUBICLE_GLASS -> h == 1
+					? Level4Blocks.OFFICE_DRYWALL.defaultBlockState()
+					: (h == 2 ? Level4Blocks.OFFICE_GLASS_WALL.defaultBlockState() : Blocks.AIR.defaultBlockState());
+			case UNFINISHED_PILLAR -> Blocks.CONCRETE.lightGray().defaultBlockState();
+			case UNFINISHED_STUB -> h == 1
+					? Blocks.CONCRETE.lightGray().defaultBlockState()
+					: (h == 2 ? Blocks.IRON_BARS.defaultBlockState() : Blocks.AIR.defaultBlockState());
 			case OMEGA_WALL -> Level4Blocks.OMEGA_WALL.defaultBlockState();
 			case OMEGA_SIGN -> (h == 2 ? Level4Blocks.OMEGA_SIGN : Level4Blocks.OMEGA_WALL).defaultBlockState();
 			case WINDOW_BLACKED -> windowColumn(Level4Blocks.OFFICE_BLACKED_WINDOW, h, dir);
@@ -406,11 +508,11 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 				int wz = minZ + z;
 				Level4Layout.ExitStruct es = Level4Layout.exitStructure(seed, wx, wz);
 				Tile tile = Level4Layout.tile(seed, wx, wz);
-				boolean skybridge = Level4Layout.isSkybridge(seed, wx, wz);
+				Level4Layout.BridgeInfo bridge = Level4Layout.skybridgeInfo(seed, wx, wz);
 				boolean exterior = Level4Layout.isExteriorSkin(seed, wx, wz);
 				int topY = towerTopY(seed, wx, wz);
 				for (int y = MIN_Y; y <= MAX_Y; y++) {
-					BlockState state = blockAtColumn(seed, wx, y, wz, tile, es, skybridge, exterior, topY);
+					BlockState state = blockAtColumn(seed, wx, y, wz, tile, es, bridge, exterior, topY);
 					chunk.setBlockState(pos.set(x, y, z), state);
 					oceanFloor.update(x, y, z, state);
 					surface.update(x, y, z, state);
@@ -426,11 +528,11 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 		BlockState[] states = new BlockState[HEIGHT];
 		Level4Layout.ExitStruct es = Level4Layout.exitStructure(seed, x, z);
 		Tile tile = Level4Layout.tile(seed, x, z);
-		boolean skybridge = Level4Layout.isSkybridge(seed, x, z);
+		Level4Layout.BridgeInfo bridge = Level4Layout.skybridgeInfo(seed, x, z);
 		boolean exterior = Level4Layout.isExteriorSkin(seed, x, z);
 		int topY = towerTopY(seed, x, z);
 		for (int i = 0; i < HEIGHT; i++) {
-			states[i] = blockAtColumn(seed, x, MIN_Y + i, z, tile, es, skybridge, exterior, topY);
+			states[i] = blockAtColumn(seed, x, MIN_Y + i, z, tile, es, bridge, exterior, topY);
 		}
 		return new NoiseColumn(MIN_Y, states);
 	}

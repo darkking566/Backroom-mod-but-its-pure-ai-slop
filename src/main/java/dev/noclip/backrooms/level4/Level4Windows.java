@@ -174,7 +174,7 @@ final class Level4Windows {
 		}
 		long seed = Level4ChunkGenerator.planSeed(level.getChunkSource().randomState());
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
-		int y = Level4ChunkGenerator.FLOOR_Y + 2;
+		int y = Math.max(Level4ChunkGenerator.FLOOR_Y + 2, player.getBlockY() + 1);
 		int px = player.getBlockX(), pz = player.getBlockZ();
 		BlockPos bestPos = null;
 		Direction bestOut = null;
@@ -208,7 +208,7 @@ final class Level4Windows {
 		double side = ((Math.floorMod(bestPos.getX() * 31 + bestPos.getZ() * 17, 2) == 0) ? 1.0 : -1.0) * 0.22;
 		double sx = bestPos.getX() + 0.5 + bestOut.getStepX() * 1.35 + (-bestOut.getStepZ()) * side;
 		double sz = bestPos.getZ() + 0.5 + bestOut.getStepZ() * 1.35 + bestOut.getStepX() * side;
-		double sy = Level4ChunkGenerator.FLOOR_Y + 0.85;
+		double sy = bestPos.getY() - 1.15;
 		WindowEntity entity = Monsters.WINDOW_ENTITY.create(level, EntitySpawnReason.NATURAL);
 		if (entity == null) return;
 		entity.snapTo(sx, sy, sz, bestOut.getOpposite().toYRot(), 0.0F);

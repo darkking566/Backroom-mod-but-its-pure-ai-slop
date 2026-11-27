@@ -108,6 +108,44 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		int[] base71 = findExitView(seed, from, Level4Exit.BASEMENT_71);
 		if (base71 != null) shoot(context, game, base71[2] + 0.5, STAND, base71[3] + 0.5, base71[4], 18, false, "level4_basement");
 
+		// Batch 1 structures: cubicle mazes, unfinished concrete wing, elevated glass skybridge
+		int[] cubicle = findKind(seed, from, Kind.CUBICLE_GLASS);
+		check(cubicle != null, "expected cubicle glass partition near arrival");
+		int[] cubicleStand = indoorStandNextTo(seed, cubicle[0], cubicle[1]);
+		if (cubicleStand != null) shoot(context, game, cubicleStand[0] + 0.5, STAND, cubicleStand[1] + 0.5, 45, 5, false, "level4_cubicles");
+		game.getServer().runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			check(l4.getBlockState(new BlockPos(cubicle[0], Level4ChunkGenerator.FLOOR_Y + 1, cubicle[1])).is(Level4Blocks.OFFICE_DRYWALL),
+					"cubicle lower half should be drywall");
+			check(l4.getBlockState(new BlockPos(cubicle[0], Level4ChunkGenerator.FLOOR_Y + 2, cubicle[1])).is(Level4Blocks.OFFICE_GLASS_WALL),
+					"cubicle upper half should be glass wall");
+			check(l4.getBlockState(new BlockPos(cubicle[0], Level4ChunkGenerator.FLOOR_Y + 3, cubicle[1])).isAir(),
+					"cubicle top clearance should remain open air");
+		});
+
+		int[] unfinished = findZone(seed, from, ZoneKind.UNFINISHED_WING);
+		if (unfinished != null) {
+			shoot(context, game, unfinished[0] + 0.5, STAND, unfinished[1] + 0.5, 35, 5, false, "level4_unfinished_wing");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				var fl = l4.getBlockState(new BlockPos(unfinished[0], Level4ChunkGenerator.FLOOR_Y, unfinished[1]));
+				check(!fl.is(Level4Blocks.OFFICE_CARPET) && !fl.is(Level4Blocks.OFFICE_DAMP_CARPET),
+						"unfinished wing should have bare concrete floor instead of carpet");
+			});
+		}
+
+		int[] elevBridge = findElevatedBridgeStand(seed, from);
+		if (elevBridge != null) {
+			shoot(context, game, elevBridge[0] + 0.5, STAND + 2.0, elevBridge[1] + 0.5, elevBridge[2], 3, false, "level4_elevated_bridge");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				check(l4.getBlockState(new BlockPos(elevBridge[0], Level4ChunkGenerator.FLOOR_Y, elevBridge[1])).isAir(),
+						"elevated bridge underside should remain open canyon air");
+				check(!l4.getBlockState(new BlockPos(elevBridge[0], Level4ChunkGenerator.FLOOR_Y + 2, elevBridge[1])).isAir(),
+						"elevated bridge floor deck should exist at FLOOR_Y + 2");
+			});
+		}
+
 		int[] rainView = findRainWindowView(seed, from);
 		if (rainView != null) {
 			shoot(context, game, rainView[0] + 0.5, STAND, rainView[1] + 0.5, rainView[2], 2, false, "level4_rain_window_view");
@@ -630,6 +668,26 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		for (int[] d : dirs) {
 			int sx = wx + d[0], sz = wz + d[1];
 			if (Level4Layout.tile(seed, sx, sz).kind() == Kind.AIR) return new int[] {sx, sz};
+		}
+		return null;
+	}
+
+	private static int[] findElevatedBridgeStand(long seed, BlockPos from) {
+		int rx0 = Math.floorDiv(from.getX(), Level4Plan.SIZE), rz0 = Math.floorDiv(from.getZ(), Level4Plan.SIZE);
+		for (int dx = -1; dx <= 1; dx++) {
+			for (int dz = -1; dz <= 1; dz++) {
+				int x0 = (rx0 + dx) * Level4Plan.SIZE, z0 = (rz0 + dz) * Level4Plan.SIZE;
+				for (int lx = 0; lx < Level4Plan.SIZE; lx++) {
+					for (int lz = 0; lz < Level4Plan.SIZE; lz++) {
+						int x = x0 + lx, z = z0 + lz;
+						Level4Layout.BridgeInfo bi = Level4Layout.skybridgeInfo(seed, x, z);
+						if (bi != null && bi.elevated() && bi.spanPos() == 14 && bi.perpPos() == 3
+								&& Level4Layout.tile(seed, x, z).kind() == Kind.AIR) {
+							return new int[] {x, z, bi.eastWest() ? 270 : 0};
+						}
+					}
+				}
+			}
 		}
 		return null;
 	}

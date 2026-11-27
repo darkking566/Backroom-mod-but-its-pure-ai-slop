@@ -256,4 +256,43 @@ final class Level4LayoutTest {
 			}
 		}
 	}
+
+	@Test
+	void batch1StructuresCubiclesUnfinishedAndVariedSkybridgesAppear() {
+		boolean sawCubicleWall = false, sawCubicleGlass = false;
+		boolean sawUnfinished = false, sawStub = false;
+		boolean sawElevatedBridge = false, sawFlatBridge = false;
+		for (long seed = 10; seed <= 16; seed++) {
+			for (int rx = -1; rx <= 1; rx++) {
+				for (int rz = -1; rz <= 1; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					for (ZoneKind z : plan.zones) {
+						if (z == ZoneKind.UNFINISHED_WING) sawUnfinished = true;
+					}
+					for (int lx = 0; lx < Level4Plan.SIZE; lx++) {
+						for (int lz = 0; lz < Level4Plan.SIZE; lz++) {
+							int x = rx * Level4Plan.SIZE + lx, z = rz * Level4Plan.SIZE + lz;
+							Tile t = Level4Layout.tile(seed, x, z);
+							if (t.kind() == Kind.CUBICLE_WALL) sawCubicleWall = true;
+							if (t.kind() == Kind.CUBICLE_GLASS) sawCubicleGlass = true;
+							if (t.kind() == Kind.UNFINISHED_STUB) sawStub = true;
+							Level4Layout.BridgeInfo bi = Level4Layout.skybridgeInfo(seed, x, z);
+							if (bi != null && t.walkable()) {
+								if (bi.elevated()) {
+									sawElevatedBridge = true;
+									assertTrue(bi.spanPos() >= 0 && bi.spanPos() <= 27,
+											"expected bridge spanPos in 0..27, got " + bi.spanPos());
+								} else {
+									sawFlatBridge = true;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		assertTrue(sawCubicleWall && sawCubicleGlass, "expected cubicle partition mazes");
+		assertTrue(sawUnfinished && sawStub, "expected unfinished concrete wing");
+		assertTrue(sawElevatedBridge && sawFlatBridge, "expected both elevated and flat skybridges");
+	}
 }
