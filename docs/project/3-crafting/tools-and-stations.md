@@ -66,7 +66,7 @@
 ### 探險照明與求生消耗品
 | 道具 ID | 中文名 | 製作位置 | 細緻配方 | 效果 |
 |---|---|---|---|---|
-| `flashlight` `[既有]` | 手電筒（亦可自行組裝） | 改裝台 | `iron_pipe` ×1 ＋ `optical_lens` ×1 ＋ `battery_cell` ×1 ＋ `copper_wire` ×2 ＋ `plastic_casing` ×1 | 既有動態光束手電筒（現可額外自製，不只靠收費亭） |
+| `flashlight` `[既有]` | 手電筒（亦可自行組裝） | 改裝台 | `iron_pipe` ×1 ＋ `optical_lens` ×1 ＋ `battery_cell` ×1 ＋ `copper_wire` ×2 ＋ `plastic_casing` ×1 | 既有動態光束手電筒（現可額外自製，不只靠收費亭）。【已做】電量 5 格（每格約 4 分鐘），一顆電池芯補 2 格；裝電池三種方法：拿著 Shift＋右鍵、在背包裡把電池點到手電筒上、跟電池芯無序合成。另有 Level 3 的「汲能手電筒」（`ambient_flashlight`）不用電池，還沒擺進世界 |
 | `flashlight_battery_pack` | 備用手電電池組 | 改裝台 | `battery_cell` ×2 ＋ `copper_wire` ×2 ＋ `plastic_casing` ×1 | 右鍵幫 `flashlight` 補滿電力 |
 | `tactical_uv_flashlight` | 強光驅暗戰術手電 | 異常煉成壇 | `flashlight` ×1 ＋ `prism_glass` ×2 ＋ `phosphor_powder` ×4 ＋ `smiler_remnant` ×2 ＋ `high_voltage_coil` ×1 | 照射可灼傷影行者並短暫暈眩微笑者（耗電較高） |
 | `field_bandage` | 戰地止血繃帶 | 3×3 | `synthetic_fabric` ×2 ＋ `damp_carpet_fiber` ×2 ＋ `almond_water` ×1 | 快速回復 3 顆心並止血 |

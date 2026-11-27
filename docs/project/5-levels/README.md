@@ -2,7 +2,7 @@
 
 本清單整合了本模組目前既有的樓層與出口（含 Level 1 出口表與收費亭事件），以及 **Backrooms Wikidot**、**Backrooms Fandom** 與衍生社群最具代表性的主樓層、子樓層、負樓層與隱秘樓層。
 
-> 這一章是 [企劃書](../README.md) 的第 5 章。已做好的樓層（0、0.1、1、2、3）各自的說明在各層資料夾的 `README.md`；每一層能收集的材料見 [合成：各層收集](../3-crafting/by-level.md)。
+> 這一章是 [企劃書](../README.md) 的第 5 章。已做好的樓層（0、0.1、1、2、3、4）各自的說明在各層資料夾的 `README.md`；每一層能收集的材料見 [合成：各層收集](../3-crafting/by-level.md)。
 
 ## 已經做好的樓層
 
@@ -12,13 +12,14 @@
 | 0.1 | 天頂站（Zenith Station） | Claude，之後 Gemini 修 | [level0p1/README.md](level0p1/README.md) |
 | 1 | 宜居地帶／停車場（Habitable Zone） | Claude，之後朋友和 Gemini 加內容 | [level1/README.md](level1/README.md) |
 | 2 | 廢棄維修通道（Abandoned Utility Halls） | Claude，之後 Gemini 加內容 | [level2/README.md](level2/README.md) |
-| 3 | 電力站（Electrical Station） | Claude | [level3/README.md](level3/README.md) |
+| 3 | 電力站（Electrical Station） | Claude，之後朋友和 Gemini 加內容 | [level3/README.md](level3/README.md) |
+| 4 | 廢棄辦公室（Abandoned Office） | 朋友 | [level4/README.md](level4/README.md) |
 
 每一層開工時，先下載 Wikidot 的照片照著做（見 [`docs/look/SOP.md`](../../look/SOP.md)）。同一個編號 Wikidot 和 Fandom 不一樣時，開工前問使用者要照哪一邊。
 
 ## 樓層架構原則（原企劃書第 4.3 節）
 
-- **不能開 300 個維度**（記憶體會爆）：風格相近的樓層合在少數維度裡，用超大座標分區（每區隔 10,000 格以上並限制邊界）或自訂生成器＋生態域切換來隔開不同的 Level。目前已做的 5 層是各自一個維度。
+- **不能開 300 個維度**（記憶體會爆）：風格相近的樓層合在少數維度裡，用超大座標分區（每區隔 10,000 格以上並限制邊界）或自訂生成器＋生態域切換來隔開不同的 Level。目前已做的 6 層是各自一個維度。
 - **分層開發**：
   - 30～50 個核心主題樓層，精細設計結構與 Boss；
   - 其餘 250 層以上，用資料驅動的樓層引擎批量擴充：地形骨架＋方塊替換表＋家具掉落池＋實體池。
