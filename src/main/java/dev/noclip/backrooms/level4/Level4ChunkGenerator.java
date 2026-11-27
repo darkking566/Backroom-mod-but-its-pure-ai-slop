@@ -118,6 +118,10 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 		if (y == topY) return Blocks.CONCRETE.gray().defaultBlockState();
 
 		int roofY = FLOOR_Y + tile.ceilingHeight() + 1;
+		if (poi != null && poi.kind() == PoiKind.SUBTUNNEL_ABYSS_DOOR && y >= FLOOR_Y - 16 && y < FLOOR_Y) {
+			BlockState abyss = subtunnelAbyssBlock(x, y, z);
+			if (abyss != null) return abyss;
+		}
 		Level4Layout.SubTunnelInfo sub = es == null ? Level4Layout.subTunnelInfo(seed, x, z) : null;
 		if (sub != null) {
 			BlockState st = subTunnelBlock(x, y, z, sub);
@@ -143,6 +147,30 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 		}
 
 		if (y >= FLOOR_Y && y <= roofY) {
+			if (poi != null && poi.kind() == PoiKind.CORRUPTED_RED_ATRIUM) {
+				if (y == roofY) {
+					BlockState normalCeil = ceiling(seed, x, z, tile);
+					if (normalCeil.is(Level4Blocks.OFFICE_TROFFER_LIT)
+							|| normalCeil.is(Level4Blocks.OFFICE_TROFFER_DIM)
+							|| normalCeil.is(Level4Blocks.OFFICE_TROFFER_FLICKER)) {
+						return Level4Blocks.OFFICE_TROFFER_BROKEN.defaultBlockState()
+								.setValue(Level4AxisBlock.AXIS, normalCeil.getValue(Level4AxisBlock.AXIS));
+					}
+				}
+				if (tile.kind() == Kind.FOUNTAIN_POOL && y == FLOOR_Y + 1) {
+					return Level4Blocks.CORRUPTED_FOUNTAIN_POOL.defaultBlockState();
+				}
+				if (tile.kind() == Kind.FOUNTAIN_BASIN) {
+					if (y == FLOOR_Y + 1) return Blocks.POLISHED_BLACKSTONE.defaultBlockState();
+					if (y == FLOOR_Y + 2) return Blocks.POTTED_DEAD_BUSH.defaultBlockState();
+				}
+				if (y == FLOOR_Y && tile.kind() == Kind.AIR) {
+					int cx = Math.floorMod(x, Level4Plan.CELL), cz = Math.floorMod(z, Level4Plan.CELL);
+					if (cx >= 1 && cx <= 5 && cz >= 1 && cz <= 5) {
+						return Level4Blocks.OFFICE_DAMP_CARPET.defaultBlockState();
+					}
+				}
+			}
 			if (poi != null) {
 				BlockState p = poiBlock(x, y, z, tile, poi);
 				if (p != null) return p;
@@ -278,6 +306,67 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 						: Blocks.CONCRETE.gray().defaultBlockState();
 			}
 			return Blocks.AIR.defaultBlockState();
+		}
+		return null;
+	}
+
+	private static BlockState subtunnelAbyssBlock(int x, int y, int z) {
+		int cx = Math.floorMod(x, Level4Plan.CELL);
+		int cz = Math.floorMod(z, Level4Plan.CELL);
+		if (cz == 4 && cx == 2 && y == FLOOR_Y - 5) {
+			return Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.NORTH);
+		}
+		if (cz == 5) {
+			if ((cx == 1 || cx == 5) && (y == FLOOR_Y - 5 || y == FLOOR_Y - 4)) {
+				return Blocks.IRON_BLOCK.defaultBlockState();
+			}
+			if ((cx == 1 || cx == 5) && y == FLOOR_Y - 3) {
+				return Blocks.IRON_BARS.defaultBlockState();
+			}
+			if ((cx == 2 || cx == 4) && (y == FLOOR_Y - 5 || y == FLOOR_Y - 4)) {
+				return Blocks.IRON_BARS.defaultBlockState();
+			}
+			if (cx == 3) {
+				if (y == FLOOR_Y - 6) return Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.NORTH);
+				if (y == FLOOR_Y - 5 || y == FLOOR_Y - 4) return Blocks.AIR.defaultBlockState();
+			}
+			return null;
+		}
+		if (cz != 6) return null;
+		if (cx == 1) {
+			if (y == FLOOR_Y - 16) return Blocks.CONCRETE.black().defaultBlockState();
+			if (y >= FLOOR_Y - 15 && y <= FLOOR_Y - 3) return Blocks.AIR.defaultBlockState();
+			return null;
+		}
+		if (cx == 2) {
+			if (y == FLOOR_Y - 16) return Blocks.CONCRETE.black().defaultBlockState();
+			if (y == FLOOR_Y - 6 || y == FLOOR_Y - 5) return Blocks.IRON_BARS.defaultBlockState();
+			if (y >= FLOOR_Y - 15 && y <= FLOOR_Y - 3) return Blocks.AIR.defaultBlockState();
+			return null;
+		}
+		if (cx == 3) {
+			if (y == FLOOR_Y - 7) return Blocks.STONE_BRICKS.defaultBlockState();
+			if (y >= FLOOR_Y - 6 && y <= FLOOR_Y - 3) return Blocks.AIR.defaultBlockState();
+			return null;
+		}
+		if (cx == 4) {
+			if (y == FLOOR_Y - 8) return Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairBlock.FACING, Direction.WEST);
+			if (y < FLOOR_Y - 8) return Blocks.STONE_BRICKS.defaultBlockState();
+			if (y >= FLOOR_Y - 7 && y <= FLOOR_Y - 4) return Blocks.AIR.defaultBlockState();
+			return null;
+		}
+		if (cx == 5) {
+			if (y <= FLOOR_Y - 9) return Blocks.STONE_BRICKS.defaultBlockState();
+			if (y == FLOOR_Y - 5) return Blocks.LANTERN.defaultBlockState().setValue(LanternBlock.HANGING, true);
+			if (y >= FLOOR_Y - 8 && y <= FLOOR_Y - 6) return Blocks.AIR.defaultBlockState();
+			return null;
+		}
+		if (cx == 6) {
+			if (y == FLOOR_Y - 8 || y == FLOOR_Y - 7) {
+				return Level4Blocks.OFFICE_BASEMENT_71.defaultBlockState()
+						.setValue(Level4ExitBlock.PART, y - (FLOOR_Y - 8))
+						.setValue(Level4ExitBlock.FACING, Direction.WEST);
+			}
 		}
 		return null;
 	}
@@ -547,6 +636,11 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 			case WINDOW_TRAP -> windowColumn(Level4Blocks.OFFICE_TRAP_WINDOW, h, dir);
 			case WINDOW_RAIN -> windowColumn(Level4Blocks.OFFICE_RAIN_WINDOW, h, dir);
 			case WINDOW_DARK_MIRROR -> windowColumn(Level4Blocks.OFFICE_DARK_MIRROR, h, dir);
+			case WINDOW_BREACHED -> {
+				if (h == 1) yield Level4Blocks.OFFICE_RADIATOR_WALL.defaultBlockState().setValue(Level4FacingBlock.FACING, dir);
+				if (h == 2 || h == 3) yield Blocks.AIR.defaultBlockState();
+				yield Level4Blocks.OFFICE_DRYWALL_UPPER.defaultBlockState();
+			}
 			case FIRE_DOOR -> {
 				if (h == 1 || h == 2) {
 					yield Level4Blocks.OFFICE_FIRE_DOOR.defaultBlockState()
@@ -970,6 +1064,20 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 				} else if (di == 1 && dj == 1 && y == FLOOR_Y + 1) {
 					if (cx == 5 && cz == 4) yield Level4Blocks.OMEGA_BARRICADE.defaultBlockState().setValue(Level4FacingBlock.FACING, Direction.EAST);
 					if (cx == 2 && cz == 2) yield Blocks.LANTERN.defaultBlockState();
+				}
+				yield null;
+			}
+			case STORM_BREACH_CORRIDOR -> {
+				if (y == FLOOR_Y && cx >= 1 && cx <= 5 && cz >= 1 && cz <= 5) {
+					yield Level4Blocks.OFFICE_DAMP_CARPET.defaultBlockState();
+				}
+				if (y == FLOOR_Y + 5 && cx == 3 && cz >= 2 && cz <= 4) {
+					yield Level4Blocks.OFFICE_TROFFER_BROKEN.defaultBlockState().setValue(Level4AxisBlock.AXIS, Direction.Axis.Z);
+				}
+				if (y == FLOOR_Y + 1) {
+					int[] uv = uvFromLocal(poi.dir(), cx, cz);
+					if (uv[0] == 2 && uv[1] == 2) yield Level4Blocks.ALMOND_BOTTLE_CLUSTER.defaultBlockState();
+					if (uv[0] == 4 && uv[1] == 2) yield Blocks.BARREL.defaultBlockState().setValue(BarrelBlock.FACING, Direction.UP);
 				}
 				yield null;
 			}

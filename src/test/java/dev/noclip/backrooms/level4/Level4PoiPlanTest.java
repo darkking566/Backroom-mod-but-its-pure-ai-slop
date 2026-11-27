@@ -168,6 +168,79 @@ final class Level4PoiPlanTest {
 	}
 
 	@Test
+	void batch3PoisAppearWithValidStructuresAndAvoidProtectedZones() {
+		Set<PoiKind> seen = EnumSet.noneOf(PoiKind.class);
+
+		for (long seed = 1; seed <= 24; seed++) {
+			for (int rx = -1; rx <= 1; rx++) {
+				for (int rz = -1; rz <= 1; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					Level4PoiPlan poiPlan = Level4PoiPlan.of(seed, rx, rz);
+
+					Set<Integer> exitCells = new HashSet<>();
+					for (PlacedExit pe : plan.exits) exitCells.add(pe.cell());
+
+					for (PlacedPoi poi : poiPlan.pois) {
+						if (poi.kind().batch != 3) continue;
+						seen.add(poi.kind());
+						int c = poi.cell();
+						ZoneKind z = plan.zones[c];
+						assertNotEquals(ZoneKind.OMEGA_BASE, z);
+						assertNotEquals(ZoneKind.AMOR_CAMP, z);
+						assertNotEquals(ZoneKind.TBD_ROOM, z);
+						assertNotEquals(ZoneKind.SOLID_CORE, z);
+						assertNotEquals(ZoneKind.OUTSIDE, z);
+						assertFalse(exitCells.contains(c), "Batch 3 POI overlapped exit cell in " + rx + "," + rz);
+
+						switch (poi.kind()) {
+							case STORM_BREACH_CORRIDOR -> {
+								assertEquals(ZoneKind.OPEN_OFFICE, z);
+								int wallDir = Level4Plan.opposite(poi.dir());
+								int wi = poi.cellI() + (wallDir == Level4Plan.EAST ? 1 : 0);
+								int wj = poi.cellJ() + (wallDir == Level4Plan.SOUTH ? 1 : 0);
+								int midX = rx * Level4Plan.SIZE + wi * Level4Plan.CELL
+										+ (wallDir == Level4Plan.NORTH || wallDir == Level4Plan.SOUTH ? 3 : 0);
+								int midZ = rz * Level4Plan.SIZE + wj * Level4Plan.CELL
+										+ (wallDir == Level4Plan.NORTH || wallDir == Level4Plan.SOUTH ? 0 : 3);
+								assertEquals(Kind.WINDOW_BREACHED, Level4Layout.tile(seed, midX, midZ).kind(),
+										"Expected WINDOW_BREACHED center gap on storm breach corridor");
+								int sideX = rx * Level4Plan.SIZE + wi * Level4Plan.CELL
+										+ (wallDir == Level4Plan.NORTH || wallDir == Level4Plan.SOUTH ? 1 : 0);
+								int sideZ = rz * Level4Plan.SIZE + wj * Level4Plan.CELL
+										+ (wallDir == Level4Plan.NORTH || wallDir == Level4Plan.SOUTH ? 0 : 1);
+								assertEquals(Kind.WINDOW_TRAP, Level4Layout.tile(seed, sideX, sideZ).kind(),
+										"Expected WINDOW_TRAP flanking panes on storm breach corridor");
+							}
+							case CORRUPTED_RED_ATRIUM -> {
+								assertEquals(ZoneKind.ATRIUM, z);
+								assertFalse(rx == 0 && rz == 0, "Corrupted red atrium must not spawn in origin region");
+							}
+							case SUBTUNNEL_ABYSS_DOOR -> {
+								assertTrue(plan.isTunnelCell(poi.cellI(), poi.cellJ()),
+										"Abyss door must sit inside MEP sub-tunnel");
+								assertTrue(poi.cellI() > plan.tunnelI0 && poi.cellI() < plan.tunnelI1,
+										"Abyss door must sit between tunnel stairwells");
+								ZoneKind southZone = plan.zones[Level4Plan.cell(poi.cellI(), poi.cellJ() + 1)];
+								assertNotEquals(ZoneKind.OUTSIDE, southZone);
+								assertNotEquals(ZoneKind.ELEVATOR_LOBBY, southZone);
+								assertNotEquals(ZoneKind.AUDITORIUM, southZone);
+							}
+							default -> {
+							}
+						}
+					}
+				}
+			}
+		}
+
+		for (PoiKind kind : PoiKind.values()) {
+			if (kind.batch == 3) {
+				assertTrue(seen.contains(kind), "Missing Batch 3 POI: " + kind);
+			}
+		}
+	}
+
+	@Test
 	void megChalkSignHasValidBackingBlockAndAirCell() {
 		for (long seed = 1; seed <= 8; seed++) {
 			for (int rx = -1; rx <= 1; rx++) {

@@ -173,6 +173,13 @@ public final class Level4Blocks {
 	public static final Block OFFICE_DARK_MIRROR = register("office_dark_mirror",
 			unbreakable(MapColor.COLOR_BLACK, SoundType.GLASS));
 
+	// Batch 3 POI blocks
+	public static final Block CORRUPTED_FOUNTAIN_POOL = register("corrupted_fountain_pool",
+			Properties.of().mapColor(MapColor.COLOR_RED)
+					.strength(-1.0F, 3600000.0F).noLootTable().sound(SoundType.HONEY_BLOCK)
+					.noOcclusion().lightLevel(s -> 3),
+			CorruptedFountainPoolBlock::new);
+
 	private Level4Blocks() {
 	}
 
@@ -273,6 +280,46 @@ public final class Level4Blocks {
 		protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 			super.createBlockStateDefinition(builder);
 			builder.add(SLASHED);
+		}
+	}
+
+	static final class CorruptedFountainPoolBlock extends Block {
+		static final BooleanProperty SAMPLED = BooleanProperty.create("sampled");
+		private static final VoxelShape POOL_FULL = Block.box(0, 0, 0, 16, 12, 16);
+		private static final VoxelShape POOL_SAMPLED = Block.box(0, 0, 0, 16, 7, 16);
+
+		CorruptedFountainPoolBlock(Properties properties) {
+			super(properties);
+			registerDefaultState(defaultBlockState().setValue(SAMPLED, false));
+		}
+
+		@Override
+		protected VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level,
+				net.minecraft.core.BlockPos pos, net.minecraft.world.phys.shapes.CollisionContext context) {
+			return state.getValue(SAMPLED) ? POOL_SAMPLED : POOL_FULL;
+		}
+
+		@Override
+		protected net.minecraft.world.InteractionResult useItemOn(net.minecraft.world.item.ItemStack stack,
+				BlockState state, net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos,
+				net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand,
+				net.minecraft.world.phys.BlockHitResult hit) {
+			if (hand != net.minecraft.world.InteractionHand.MAIN_HAND) {
+				return net.minecraft.world.InteractionResult.PASS;
+			}
+			return Level4PoiEvents.interactCorruptedPool(level, pos, state, player, stack);
+		}
+
+		@Override
+		protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state,
+				net.minecraft.world.level.Level level, net.minecraft.core.BlockPos pos,
+				net.minecraft.world.entity.player.Player player, net.minecraft.world.phys.BlockHitResult hit) {
+			return Level4PoiEvents.interactCorruptedPool(level, pos, state, player, net.minecraft.world.item.ItemStack.EMPTY);
+		}
+
+		@Override
+		protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+			builder.add(SAMPLED);
 		}
 	}
 }

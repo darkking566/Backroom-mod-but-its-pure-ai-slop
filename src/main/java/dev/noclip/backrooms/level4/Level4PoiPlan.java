@@ -218,6 +218,22 @@ final class Level4PoiPlan {
 		if (!plan.hasOmega && rng.nextInt(100) < 42) {
 			placeEvacuatedOutpost(plan, rng, usedCells);
 		}
+
+		// Batch 3 POIs
+		// #13 STORM_BREACH_CORRIDOR (Rare, ~38% per region on OPEN_OFFICE perimeter facing OUTSIDE)
+		if (rng.nextInt(100) < 38) {
+			placeStormBreachCorridor(plan, rng, usedCells);
+		}
+
+		// #16 CORRUPTED_RED_ATRIUM (Rare, ~26% replacing ATRIUM away from origin (0, 0))
+		if (plan.hasAtrium && !(rx == 0 && rz == 0) && rng.nextInt(100) < 26) {
+			placeCorruptedRedAtrium(plan, usedCells);
+		}
+
+		// #17 SUBTUNNEL_ABYSS_DOOR (Rare, ~52% when MEP subTunnel exists)
+		if (plan.tunnelJ >= 0 && rng.nextInt(100) < 52) {
+			placeSubtunnelAbyssDoor(plan, rng);
+		}
 	}
 
 	private void add(PlacedPoi poi, Set<Integer> usedCells) {
@@ -676,6 +692,73 @@ final class Level4PoiPlan {
 				usedCells.add(c);
 			}
 		}
+	}
+
+	private void placeStormBreachCorridor(Level4Plan plan, SplittableRandom rng, Set<Integer> usedCells) {
+		List<int[]> candidates = new ArrayList<>();
+		for (int i = MARGIN; i < N - MARGIN; i++) {
+			for (int j = MARGIN; j < N - MARGIN; j++) {
+				int c = Level4Plan.cell(i, j);
+				if (usedCells.contains(c) || plan.balconyDir[c] >= 0 || plan.nearHumanBase(i, j)
+						|| Level4Plan.isSkybridgeCell(i, j) || plan.zones[c] != ZoneKind.OPEN_OFFICE) {
+					continue;
+				}
+				for (int d = 0; d < 4; d++) {
+					int ni = i + DX[d], nj = j + DZ[d];
+					if (Level4Plan.inside(ni, nj) && plan.zones[Level4Plan.cell(ni, nj)] == ZoneKind.OUTSIDE
+							&& plan.edge(c, d) == Edge.WALL) {
+						candidates.add(new int[] {i, j, Level4Plan.opposite(d)});
+					}
+				}
+			}
+		}
+		if (candidates.isEmpty()) return;
+		int[] pick = candidates.get(rng.nextInt(candidates.size()));
+		add(new PlacedPoi(PoiKind.STORM_BREACH_CORRIDOR, pick[0], pick[1], pick[2], Level4Layout.FLOOR_Y, false, -1), usedCells);
+	}
+
+	private void placeCorruptedRedAtrium(Level4Plan plan, Set<Integer> usedCells) {
+		for (int id = 0; id < plan.rooms.size(); id++) {
+			RoomBox room = plan.rooms.get(id);
+			if (room.kind() != ZoneKind.ATRIUM) continue;
+			for (int a = room.i(); a < room.i() + room.w(); a++) {
+				for (int b = room.j(); b < room.j() + room.h(); b++) {
+					if (usedCells.contains(Level4Plan.cell(a, b))) return;
+				}
+			}
+			PlacedPoi anchor = new PlacedPoi(PoiKind.CORRUPTED_RED_ATRIUM, room.cx(), room.cz(), SOUTH,
+					Level4Layout.FLOOR_Y, false, id);
+			pois.add(anchor);
+			for (int a = room.i(); a < room.i() + room.w(); a++) {
+				for (int b = room.j(); b < room.j() + room.h(); b++) {
+					int c = Level4Plan.cell(a, b);
+					byCell.put(c, anchor);
+					usedCells.add(c);
+				}
+			}
+			return;
+		}
+	}
+
+	private void placeSubtunnelAbyssDoor(Level4Plan plan, SplittableRandom rng) {
+		if (plan.tunnelJ + 1 >= N) return;
+		List<Integer> candidates = new ArrayList<>();
+		for (int ci = plan.tunnelI0 + 1; ci <= plan.tunnelI1 - 1; ci++) {
+			int c = Level4Plan.cell(ci, plan.tunnelJ);
+			if (byCell.containsKey(c)) continue;
+			ZoneKind southZone = plan.zones[Level4Plan.cell(ci, plan.tunnelJ + 1)];
+			if (southZone == ZoneKind.OUTSIDE || southZone == ZoneKind.ELEVATOR_LOBBY
+					|| southZone == ZoneKind.AUDITORIUM || southZone == ZoneKind.OMEGA_BASE) {
+				continue;
+			}
+			candidates.add(ci);
+		}
+		if (candidates.isEmpty()) return;
+		int ci = candidates.get(rng.nextInt(candidates.size()));
+		PlacedPoi poi = new PlacedPoi(PoiKind.SUBTUNNEL_ABYSS_DOOR, ci, plan.tunnelJ, SOUTH,
+				Level4Layout.FLOOR_Y - 6, false, -1);
+		pois.add(poi);
+		byCell.put(poi.cell(), poi);
 	}
 
 	/** Maps wall-relative (u in 1..5 along wall, v in 0..6 depth into cell from wall) to cell-local (cx, cz). */

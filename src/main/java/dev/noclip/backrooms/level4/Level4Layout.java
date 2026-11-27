@@ -43,6 +43,7 @@ final class Level4Layout {
 		WINDOW_TRAP,
 		WINDOW_RAIN,
 		WINDOW_DARK_MIRROR,
+		WINDOW_BREACHED,
 		FIRE_DOOR,
 		EXIT_DOOR,
 		EXIT_STRUCTURE,
@@ -363,6 +364,9 @@ final class Level4Layout {
 		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
 		Level4PoiPlan.PlacedPoi poi = Level4PoiPlan.of(seed, rx, rz).atCellIndex(Level4Plan.cell(roomI, roomJ));
 		if (poi != null && poi.kind() == Level4PoiPlan.PoiKind.EVACUATED_OUTPOST) return Kind.WINDOW_BLACKED;
+		if (poi != null && poi.kind() == Level4PoiPlan.PoiKind.STORM_BREACH_CORRIDOR && poi.dir() == Level4Plan.opposite(dir)) {
+			return (along >= 2 && along <= 4) ? Kind.WINDOW_BREACHED : Kind.WINDOW_TRAP;
+		}
 		if (poi != null && poi.kind() == Level4PoiPlan.PoiKind.DELAYED_REFLECTION_MIRROR
 				&& !poi.variantFlag() && poi.dir() == Level4Plan.opposite(dir) && along >= 2 && along <= 4) {
 			return Kind.WINDOW_DARK_MIRROR;

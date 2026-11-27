@@ -2178,5 +2178,14 @@
   "message.noclip_backrooms.level4.poi.outpost_cot": "Caught a brief rest on the abandoned outpost cot (does not replace your Omega respawn).",
   "message.noclip_backrooms.level4.poi.outpost_cot_wait": "Whiteboard by the cot: 'FALL BACK TO OMEGA — ANOMALOUS WINDOWS SURGING.'",
   "message.noclip_backrooms.level4.poi.outpost_locker": "Found leftover emergency supplies in the evacuated outpost locker: 1 Bandage, 1 Almond Water.",
-  "message.noclip_backrooms.level4.poi.outpost_locker_empty": "The evacuated outpost locker was cleared out during the retreat."
+  "message.noclip_backrooms.level4.poi.outpost_locker_empty": "The evacuated outpost locker was cleared out during the retreat.",
+  "block.noclip_backrooms.corrupted_fountain_pool": "Corrupted Red-Mist Fountain Pool",
+  "message.noclip_backrooms.level4.poi.storm_loot": "Recovered storm-washed batteries, glass bottles, and a bandage from the breached corridor.",
+  "message.noclip_backrooms.level4.poi.storm_empty": "Nothing useful remains in the storm-soaked supply crate.",
+  "message.noclip_backrooms.level4.poi.red_atrium_poison": "Bitter crimson algae burns your throat — this corrupted pool is NOT Almond Water! (Sneak-click to safely sample.)",
+  "message.noclip_backrooms.level4.poi.red_atrium_sample": "Carefully collected a corrupted red-mist sample: Toxic Spore Sac & Red Room Shard.",
+  "message.noclip_backrooms.level4.poi.red_atrium_sampled": "Only stagnant crimson sludge coats the dry basin.",
+  "message.noclip_backrooms.level4.poi.abyss_loot": "Stripped an electric motor and pipe valve from the dead chiller unit.",
+  "message.noclip_backrooms.level4.poi.abyss_empty": "The chiller unit has already been stripped of valves and motors.",
+  "message.noclip_backrooms.level4.poi.abyss_exit": "You unchain the iron door at the bottom of the abyss stairs toward Level %s."
 }

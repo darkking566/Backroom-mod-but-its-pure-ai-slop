@@ -2178,5 +2178,14 @@
   "message.noclip_backrooms.level4.poi.outpost_cot": "在前哨殘點的行軍床暫時喘息回血與穩住理智（不會覆蓋 Omega 重生點）。",
   "message.noclip_backrooms.level4.poi.outpost_cot_wait": "床旁白板寫著：「撤回 Omega 基地，本區異窗激增。」",
   "message.noclip_backrooms.level4.poi.outpost_locker": "從撤離前哨置物櫃清出殘留救急物資：1 繃帶、1 瓶杏仁水。",
-  "message.noclip_backrooms.level4.poi.outpost_locker_empty": "這座前哨置物櫃在 M.E.G. 撤離時已幾乎搬空。"
+  "message.noclip_backrooms.level4.poi.outpost_locker_empty": "這座前哨置物櫃在 M.E.G. 撤離時已幾乎搬空。",
+  "block.noclip_backrooms.corrupted_fountain_pool": "變質紅霧泉眼水池",
+  "message.noclip_backrooms.level4.poi.storm_loot": "在風雨沖濕的破窗走廊箱內撿回電池芯、空玻璃瓶與繃帶。",
+  "message.noclip_backrooms.level4.poi.storm_empty": "被雨水浸濕的走廊補給箱裡已經沒有可用物資。",
+  "message.noclip_backrooms.level4.poi.red_atrium_poison": "刺鼻的暗紅藻毒湧上咽喉——這池水早已變質，絕非杏仁水！（蹲下右鍵可安全取樣）",
+  "message.noclip_backrooms.level4.poi.red_atrium_sample": "小心採集了一組紅霧變質樣本：毒性孢子囊與紅房間碎片。",
+  "message.noclip_backrooms.level4.poi.red_atrium_sampled": "枯竭的水池裡只剩濃稠暗紅淤泥。",
+  "message.noclip_backrooms.level4.poi.abyss_loot": "從報廢冷水機組拆出電動馬達與管路閥門。",
+  "message.noclip_backrooms.level4.poi.abyss_empty": "冷水機組能用的閥門與馬達已被拆光。",
+  "message.noclip_backrooms.level4.poi.abyss_exit": "你解開深淵石階盡頭的鐵鍊暗門，穿往第 %s 層。"
 }

@@ -8,6 +8,7 @@ Follows docs/look/STYLE_GUIDE.md:
 """
 
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -168,6 +169,59 @@ def save_mirror_pbr(name: str, rgba: Image.Image):
     s_img.save(TEXTURES / f"{name}_s.png", optimize=True)
 
 
+def draw_corrupted_fountain_liquid() -> Image.Image:
+    # 128x128 turbid dark gray-crimson sludge with swirling murky red ripples & pale oily highlight veins
+    img = Image.new("RGBA", (SIZE, SIZE), (56, 22, 24, 244))
+    px = img.load()
+    for y in range(SIZE):
+        for x in range(SIZE):
+            nx = (x - SIZE * 0.5) / 18.0
+            nz = (y - SIZE * 0.5) / 18.0
+            ring = math.sin(math.hypot(nx, nz) * 3.1 + math.sin(nx * 0.9) * 0.8)
+            swirl = math.sin(x * 0.14 + math.cos(y * 0.11) * 1.4) * math.cos(y * 0.13)
+            vein = max(0.0, swirl * 0.7 + ring * 0.3)
+            if vein > 0.62:
+                # Pale oily crimson highlight vein
+                r, g, b = 148, 58, 60
+            else:
+                r = int(58 + 38 * (0.5 + 0.5 * ring) + 18 * vein)
+                g = int(20 + 10 * (0.5 + 0.5 * ring))
+                b = int(22 + 12 * (0.5 + 0.5 * ring))
+            px[x, y] = (max(0, min(255, r)), max(0, min(255, g)), max(0, min(255, b)), 244)
+    return img
+
+
+def save_liquid_pbr(name: str, rgba: Image.Image):
+    TEXTURES.mkdir(parents=True, exist_ok=True)
+    rgba.save(TEXTURES / f"{name}.png", optimize=True)
+    n_img = Image.new("RGBA", (SIZE, SIZE), (128, 128, 255, 255))
+    npx = n_img.load()
+    for y in range(SIZE):
+        for x in range(SIZE):
+            nx = int(128 + 14 * math.cos(x * 0.22 + math.sin(y * 0.15)))
+            ny = int(128 + 14 * math.sin(y * 0.22 + math.cos(x * 0.15)))
+            npx[x, y] = (nx, ny, 252, 255)
+    n_img.save(TEXTURES / f"{name}_n.png", optimize=True)
+    s_img = Image.new("RGBA", (SIZE, SIZE), (210, 45, 0, 255))
+    s_img.save(TEXTURES / f"{name}_s.png", optimize=True)
+
+
+def write_fountain_model(name: str, top_y: int):
+    faces_base = {f: {"uv": [0, 0, 16, 16], "texture": "#base"} for f in ("north", "south", "east", "west", "up", "down")}
+    faces_liq = {f: {"uv": [0, 0, 16, 16], "texture": "#liq"} for f in ("north", "south", "east", "west", "up", "down")}
+    write_json(MODELS / f"{name}.json", {
+        "textures": {
+            "liq": NS + "corrupted_fountain_liquid",
+            "base": NS + "almond_fountain_basin",
+            "particle": NS + "corrupted_fountain_liquid"
+        },
+        "elements": [
+            {"from": [0, 0, 0], "to": [16, 2, 16], "faces": faces_base},
+            {"from": [0, 2, 0], "to": [16, top_y, 16], "faces": faces_liq}
+        ]
+    })
+
+
 def write_item_files(name: str):
     write_json(ITEM_MODELS / f"{name}.json", {"parent": NS + name})
     write_json(ITEMS_DEF / f"{name}.json", {"model": {"type": "minecraft:model", "model": f"noclip_backrooms:item/{name}"}})
@@ -247,7 +301,19 @@ def main():
         "variants": {"": {"model": NS + "office_dark_mirror"}}
     })
     write_item_files("office_dark_mirror")
-    print("Generated Level 4 Batch 1+2 POI assets: meg_chalk_sign, caution_tape_barrier, office_dark_mirror")
+
+    # 4. corrupted_fountain_pool (Batch 3 POI #16 - turbid gray-crimson corrupted fountain)
+    save_liquid_pbr("corrupted_fountain_liquid", draw_corrupted_fountain_liquid())
+    write_fountain_model("corrupted_fountain_pool", 12)
+    write_fountain_model("corrupted_fountain_pool_sampled", 7)
+    write_json(BLOCKSTATES / "corrupted_fountain_pool.json", {
+        "variants": {
+            "sampled=false": {"model": NS + "corrupted_fountain_pool"},
+            "sampled=true": {"model": NS + "corrupted_fountain_pool_sampled"}
+        }
+    })
+    write_item_files("corrupted_fountain_pool")
+    print("Generated Level 4 Batch 1+2+3 POI assets: meg_chalk_sign, caution_tape_barrier, office_dark_mirror, corrupted_fountain_pool")
 
 
 if __name__ == "__main__":

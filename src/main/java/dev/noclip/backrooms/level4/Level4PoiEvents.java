@@ -3,6 +3,7 @@ package dev.noclip.backrooms.level4;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.noclip.backrooms.BackroomsMod;
+import dev.noclip.backrooms.core.LevelExits;
 import dev.noclip.backrooms.core.economy.Economy;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
 import dev.noclip.backrooms.core.rpg.PlayerStats;
@@ -45,8 +46,12 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
@@ -355,6 +360,45 @@ final class Level4PoiEvents {
 					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.freight_loot"));
 					return InteractionResult.SUCCESS;
 				}
+				case STORM_BREACH_CORRIDOR -> {
+					if (!state.is(Blocks.BARREL) || pos.getY() != Level4ChunkGenerator.FLOOR_Y + 1) return InteractionResult.PASS;
+					PoiState data = state(sl);
+					if (data.isClaimed(anchor)) {
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.storm_empty"));
+						return InteractionResult.SUCCESS;
+					}
+					data.markClaimed(anchor);
+					RandomSource rng = sl.getRandom();
+					giveOrDrop(sp, new ItemStack(BackroomsItems.BATTERY_CELL, 1 + rng.nextInt(2)));
+					giveOrDrop(sp, new ItemStack(Items.GLASS_BOTTLE, 2));
+					giveOrDrop(sp, new ItemStack(Level1Items.BANDAGE, 1));
+					sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.85F, 1.0F);
+					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.storm_loot"));
+					return InteractionResult.SUCCESS;
+				}
+				case SUBTUNNEL_ABYSS_DOOR -> {
+					if (state.is(Blocks.BARREL) && pos.getY() == Level4ChunkGenerator.FLOOR_Y - 5) {
+						PoiState data = state(sl);
+						if (data.isClaimed(anchor)) {
+							sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.abyss_empty"));
+							return InteractionResult.SUCCESS;
+						}
+						data.markClaimed(anchor);
+						giveOrDrop(sp, new ItemStack(BackroomsItems.ELECTRIC_MOTOR, 1));
+						giveOrDrop(sp, new ItemStack(BackroomsItems.PIPE_VALVE, 1));
+						sl.playSound(null, pos, SoundEvents.BARREL_OPEN, SoundSource.BLOCKS, 0.85F, 0.9F);
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.abyss_loot"));
+						return InteractionResult.SUCCESS;
+					}
+					if (state.is(Level4Blocks.OFFICE_BASEMENT_71) && pos.getY() <= Level4ChunkGenerator.FLOOR_Y - 6) {
+						String dest = LevelExits.isOpen("71") ? "71" : "2";
+						sl.playSound(null, pos, SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 0.9F, 0.7F);
+						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.abyss_exit", dest));
+						LevelExits.use(sp, dest);
+						return InteractionResult.SUCCESS;
+					}
+					return InteractionResult.PASS;
+				}
 				default -> {
 					return InteractionResult.PASS;
 				}
@@ -435,21 +479,104 @@ final class Level4PoiEvents {
 					int rx = Math.floorDiv(gi, Level4Plan.N), rz = Math.floorDiv(gj, Level4Plan.N);
 					int ci = Math.floorMod(gi, Level4Plan.N), cj = Math.floorMod(gj, Level4Plan.N);
 					PlacedPoi poi = Level4PoiPlan.of(seed, rx, rz).atCellIndex(Level4Plan.cell(ci, cj));
-					if (poi == null || poi.kind() != PoiKind.CEILING_DRIP_SPOT) continue;
+					if (poi == null) continue;
 					int cx = gi * Level4Plan.CELL + 3, cz = gj * Level4Plan.CELL + 3;
-					BlockPos basin = new BlockPos(cx, Level4ChunkGenerator.FLOOR_Y + 1, cz);
-					if (!level.isLoaded(basin)) continue;
-					if (basin.distSqr(sp.blockPosition()) > 12 * 12) continue;
-					BlockState st = level.getBlockState(basin);
-					if (!st.is(Blocks.WATER_CAULDRON) && !st.is(Blocks.CAULDRON)) continue;
-					level.sendParticles(ParticleTypes.DRIPPING_WATER,
-							cx + 0.5, Level4ChunkGenerator.FLOOR_Y + 5.05, cz + 0.5,
-							2, 0.08, 0.02, 0.08, 0.0);
-					level.playSound(null, basin, SoundEvents.POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON,
-							SoundSource.AMBIENT, 0.4F, 1.05F);
+					switch (poi.kind()) {
+						case CEILING_DRIP_SPOT -> {
+							BlockPos basin = new BlockPos(cx, Level4ChunkGenerator.FLOOR_Y + 1, cz);
+							if (!level.isLoaded(basin) || basin.distSqr(sp.blockPosition()) > 12 * 12) continue;
+							BlockState st = level.getBlockState(basin);
+							if (!st.is(Blocks.WATER_CAULDRON) && !st.is(Blocks.CAULDRON)) continue;
+							level.sendParticles(ParticleTypes.DRIPPING_WATER,
+									cx + 0.5, Level4ChunkGenerator.FLOOR_Y + 5.05, cz + 0.5,
+									2, 0.08, 0.02, 0.08, 0.0);
+							level.playSound(null, basin, SoundEvents.POINTED_DRIPSTONE_DRIP_WATER_INTO_CAULDRON,
+									SoundSource.AMBIENT, 0.4F, 1.05F);
+						}
+						case STORM_BREACH_CORRIDOR -> {
+							BlockPos center = new BlockPos(cx, Level4ChunkGenerator.FLOOR_Y + 2, cz);
+							if (!level.isLoaded(center) || center.distSqr(sp.blockPosition()) > 10 * 10) continue;
+							level.sendParticles(ParticleTypes.FALLING_WATER,
+									cx + 0.5, Level4ChunkGenerator.FLOOR_Y + 4.5, cz + 0.5,
+									5, 1.2, 0.5, 1.2, 0.05);
+							level.sendParticles(ParticleTypes.CLOUD,
+									cx + 0.5, Level4ChunkGenerator.FLOOR_Y + 2.2, cz + 0.5,
+									2, 0.8, 0.4, 0.8, 0.02);
+							if (level.getRandom().nextInt(5) == 0) {
+								level.playSound(null, center, SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.WEATHER, 0.30F, 0.9F);
+								level.sendParticles(ParticleTypes.ELECTRIC_SPARK,
+										cx + 0.5, Level4ChunkGenerator.FLOOR_Y + 5.1, cz + 0.5,
+										4, 0.4, 0.1, 0.4, 0.04);
+							}
+						}
+						case CORRUPTED_RED_ATRIUM -> {
+							if (poi.cellI() != ci || poi.cellJ() != cj) continue;
+							BlockPos pool = new BlockPos(cx, Level4ChunkGenerator.FLOOR_Y + 1, cz);
+							if (!level.isLoaded(pool) || pool.distSqr(sp.blockPosition()) > 14 * 14) continue;
+							level.sendParticles(ParticleTypes.CRIMSON_SPORE,
+									cx + 0.5, Level4ChunkGenerator.FLOOR_Y + 2.0, cz + 0.5,
+									5, 1.1, 0.5, 1.1, 0.01);
+							level.sendParticles(ParticleTypes.ASH,
+									cx + 0.5, Level4ChunkGenerator.FLOOR_Y + 2.5, cz + 0.5,
+									3, 1.0, 0.6, 1.0, 0.01);
+						}
+						case SUBTUNNEL_ABYSS_DOOR -> {
+							if (sp.getBlockY() > Level4ChunkGenerator.FLOOR_Y - 3) continue;
+							BlockPos pit = new BlockPos(gi * Level4Plan.CELL + 1, Level4ChunkGenerator.FLOOR_Y - 10, gj * Level4Plan.CELL + 6);
+							if (!level.isLoaded(pit) || pit.distSqr(sp.blockPosition()) > 16 * 16) continue;
+							level.sendParticles(ParticleTypes.SMOKE,
+									pit.getX() + 0.5, pit.getY() + 1.0, pit.getZ() + 0.5,
+									3, 0.3, 0.8, 0.3, 0.02);
+							if (level.getRandom().nextInt(4) == 0) {
+								level.playSound(null, pit, SoundEvents.ANVIL_LAND, SoundSource.AMBIENT, 0.18F, 0.5F);
+							}
+						}
+						default -> {
+						}
+					}
 				}
 			}
 		}
+	}
+
+	static InteractionResult interactCorruptedPool(Level level, BlockPos pos, BlockState state, Player player, ItemStack stack) {
+		if (level.isClientSide() || !(level instanceof ServerLevel sl) || !(player instanceof ServerPlayer sp)) {
+			return InteractionResult.SUCCESS;
+		}
+		PlayerStats stats = PlayerRpg.get(sp);
+		boolean careful = sp.isShiftKeyDown()
+				|| (stack.is(Items.GLASS_BOTTLE) && (stats.sanityStat() >= 3 || stats.psi() >= 1));
+		if (!careful) {
+			sp.addEffect(new MobEffectInstance(MobEffects.POISON, 140, 0));
+			sp.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 140, 0));
+			PlayerRpg.drainSanity(sp, 10.0F);
+			sl.playSound(null, pos, SoundEvents.SLIME_SQUISH, SoundSource.BLOCKS, 0.8F, 0.65F);
+			sl.playSound(null, pos, Level4Sounds.WATER_DRINK, SoundSource.PLAYERS, 0.8F, 0.75F);
+			sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.red_atrium_poison"));
+			return InteractionResult.SUCCESS;
+		}
+		BlockPos anchor = cellAnchor(pos, Level4ChunkGenerator.FLOOR_Y);
+		PoiState data = state(sl);
+		if (data.isClaimed(anchor) || state.getValue(Level4Blocks.CorruptedFountainPoolBlock.SAMPLED)) {
+			sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.red_atrium_sampled"));
+			return InteractionResult.SUCCESS;
+		}
+		data.markClaimed(anchor);
+		for (int dx = -2; dx <= 2; dx++) {
+			for (int dz = -2; dz <= 2; dz++) {
+				BlockPos p = pos.offset(dx, 0, dz);
+				BlockState bs = sl.getBlockState(p);
+				if (bs.is(Level4Blocks.CORRUPTED_FOUNTAIN_POOL)) {
+					sl.setBlock(p, bs.setValue(Level4Blocks.CorruptedFountainPoolBlock.SAMPLED, true), 3);
+				}
+			}
+		}
+		if (stack.is(Items.GLASS_BOTTLE) && !sp.getAbilities().instabuild) stack.shrink(1);
+		giveOrDrop(sp, new ItemStack(BackroomsItems.TOXIC_SPORE_SAC, 1));
+		giveOrDrop(sp, new ItemStack(BackroomsItems.RED_ROOM_SHARD, 1));
+		sl.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 0.85F, 0.75F);
+		sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.red_atrium_sample"));
+		return InteractionResult.SUCCESS;
 	}
 
 	static InteractionResult togglePbxBreaker(ServerLevel sl, ServerPlayer sp, BlockPos pos, int now) {

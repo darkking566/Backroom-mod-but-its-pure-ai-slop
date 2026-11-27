@@ -1085,6 +1085,115 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					"outpost locker loot must be one-time only");
 		});
 		server.runCommand("gamemode spectator @a");
+
+		// === BATCH 3 POIs (#13, #16, #17) ===
+
+		// 13. Storm breach corridor (shattered outer window sill + storm carpet + washed-in supply barrel)
+		int[] storm = findPoi(seed, from, PoiKind.STORM_BREACH_CORRIDOR);
+		check(storm != null, "no STORM_BREACH_CORRIDOR POI found");
+		int[] stormCamUv = Level4PoiPlan.uvToLocal(storm[3], 3, 5);
+		int stormWallDir = Level4Plan.opposite(storm[3]);
+		shoot(context, game, storm[0] + stormCamUv[0] + 0.5, STAND, storm[2] + stormCamUv[1] + 0.5,
+				poiYawTo(storm[3]), 8, false, "level4_poi_storm_breach");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			int[] wallUv = Level4PoiPlan.uvToLocal(storm[3], 3, 0);
+			int wx = storm[0] + (stormWallDir == Level4Plan.SOUTH ? 3 : stormWallDir == Level4Plan.EAST ? Level4Plan.CELL : wallUv[0]);
+			int wz = storm[2] + (stormWallDir == Level4Plan.SOUTH ? Level4Plan.CELL : stormWallDir == Level4Plan.EAST ? 3 : wallUv[1]);
+			check(l4.getBlockState(new BlockPos(wx, STAND, wz)).is(Level4Blocks.OFFICE_RADIATOR_WALL),
+					"expected 1-block radiator sill at storm breach");
+			check(l4.getBlockState(new BlockPos(wx, STAND + 1, wz)).isAir(),
+					"expected open air shattered storm breach at " + wx + "," + wz);
+			check(l4.getBlockState(new BlockPos(storm[0] + 3, Level4ChunkGenerator.FLOOR_Y + 5, storm[2] + 3))
+					.is(Level4Blocks.OFFICE_TROFFER_BROKEN), "expected broken troffer over storm breach corridor");
+
+			int[] stBarrelUv = Level4PoiPlan.uvToLocal(storm[3], 4, 2);
+			BlockPos barrelPos = new BlockPos(storm[0] + stBarrelUv[0], STAND, storm[2] + stBarrelUv[1]);
+			p.getInventory().clearContent();
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			int batteries = p.getInventory().countItem(BackroomsItems.BATTERY_CELL);
+			check(batteries >= 1 && p.getInventory().countItem(Items.GLASS_BOTTLE) >= 2,
+					"expected storm-washed battery cells and glass bottles");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			check(p.getInventory().countItem(BackroomsItems.BATTERY_CELL) == batteries,
+					"storm breach barrel loot must be one-time only");
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 16. Corrupted Red Atrium (poisonous crimson pool + sneak-sample Toxic Spore Sac & Red Room Shard)
+		int[] redAtrium = findPoi(seed, from, PoiKind.CORRUPTED_RED_ATRIUM);
+		check(redAtrium != null, "no CORRUPTED_RED_ATRIUM POI found");
+		shoot(context, game, redAtrium[0] + 0.5, STAND, redAtrium[2] + 0.5, -45, 16, false, "level4_poi_red_atrium");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			BlockPos poolPos = new BlockPos(redAtrium[0] + 3, STAND, redAtrium[2] + 2);
+			check(l4.getBlockState(poolPos).is(Level4Blocks.CORRUPTED_FOUNTAIN_POOL),
+					"expected CORRUPTED_FOUNTAIN_POOL at " + poolPos);
+			check(!l4.getBlockState(poolPos).getValue(Level4Blocks.CorruptedFountainPoolBlock.SAMPLED),
+					"corrupted pool should start unsampled");
+			p.teleportTo(redAtrium[0] + 3.5, STAND, redAtrium[2] + 1.5);
+			p.removeAllEffects();
+			dev.noclip.backrooms.core.rpg.PlayerRpg.set(p,
+					dev.noclip.backrooms.core.rpg.PlayerRpg.get(p).withSanity(40.0F));
+			p.setShiftKeyDown(false);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(poolPos), Direction.NORTH, poolPos, false));
+			check(p.hasEffect(net.minecraft.world.effect.MobEffects.POISON)
+					&& p.hasEffect(net.minecraft.world.effect.MobEffects.NAUSEA),
+					"drinking directly from corrupted pool must inflict POISON and NAUSEA");
+			check(dev.noclip.backrooms.core.rpg.PlayerRpg.get(p).sanity() < 40.0F,
+					"drinking from corrupted pool must drain sanity");
+
+			p.removeAllEffects();
+			p.getInventory().clearContent();
+			p.setShiftKeyDown(true);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(poolPos), Direction.NORTH, poolPos, false));
+			check(l4.getBlockState(poolPos).getValue(Level4Blocks.CorruptedFountainPoolBlock.SAMPLED),
+					"sneak-sampling should lower corrupted pool");
+			check(p.getInventory().countItem(BackroomsItems.TOXIC_SPORE_SAC) == 1
+					&& p.getInventory().countItem(BackroomsItems.RED_ROOM_SHARD) == 1,
+					"expected 1 toxic_spore_sac and 1 red_room_shard from careful sampling");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(poolPos), Direction.NORTH, poolPos, false));
+			check(p.getInventory().countItem(BackroomsItems.TOXIC_SPORE_SAC) == 1,
+					"corrupted pool sampling must be one-time only");
+			p.setShiftKeyDown(false);
+		});
+		server.runCommand("gamemode spectator @a");
+
+		// 17. Sub-tunnel abyss door (chiller salvage + deep dark pit + Basement 71/2 exit door)
+		int[] abyss = findPoi(seed, from, PoiKind.SUBTUNNEL_ABYSS_DOOR);
+		check(abyss != null, "no SUBTUNNEL_ABYSS_DOOR POI found");
+		shoot(context, game, abyss[0] + 3.5, Level4ChunkGenerator.FLOOR_Y - 5, abyss[2] + 2.5, 0, 22, false, "level4_poi_abyss_door");
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			check(l4.getBlockState(new BlockPos(abyss[0] + 1, Level4ChunkGenerator.FLOOR_Y - 16, abyss[2] + 6))
+					.is(Blocks.CONCRETE.black()), "expected black concrete abyss pit floor at FLOOR_Y - 16");
+			check(l4.getBlockState(new BlockPos(abyss[0] + 6, Level4ChunkGenerator.FLOOR_Y - 8, abyss[2] + 6))
+					.is(Level4Blocks.OFFICE_BASEMENT_71), "expected abyss exit door at stair bottom");
+
+			p.getInventory().clearContent();
+			BlockPos barrelPos = new BlockPos(abyss[0] + 2, Level4ChunkGenerator.FLOOR_Y - 5, abyss[2] + 4);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			check(p.getInventory().countItem(BackroomsItems.ELECTRIC_MOTOR) == 1
+					&& p.getInventory().countItem(BackroomsItems.PIPE_VALVE) == 1,
+					"expected electric_motor and pipe_valve from chiller barrel");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(barrelPos), Direction.UP, barrelPos, false));
+			check(p.getInventory().countItem(BackroomsItems.ELECTRIC_MOTOR) == 1,
+					"chiller barrel loot must be one-time only");
+		});
+		server.runCommand("gamemode spectator @a");
 	}
 
 	/** Returns {cellOriginX, cellOriginZ, dir, baseY, roomId} for the nearest matching POI. */
@@ -1160,7 +1269,10 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					"poi.tbd_cage_curio", "poi.tbd_cage_rare", "poi.tbd_cage_empty",
 					"poi.plenum_loot", "poi.plenum_empty", "poi.freight_loot", "poi.freight_empty",
 					"poi.outpost_cot", "poi.outpost_cot_wait", "poi.outpost_locker",
-					"poi.outpost_locker_empty"}) {
+					"poi.outpost_locker_empty",
+					"poi.storm_loot", "poi.storm_empty", "poi.red_atrium_poison",
+					"poi.red_atrium_sample", "poi.red_atrium_sampled", "poi.abyss_loot",
+					"poi.abyss_empty", "poi.abyss_exit"}) {
 				check(lang.has("message.noclip_backrooms.level4." + msg), "missing wanderer message: " + msg);
 			}
 		});
