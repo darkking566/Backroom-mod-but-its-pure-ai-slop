@@ -954,3 +954,7 @@
   - **實用職業支援（空手首次互動）**：每位流浪者依身分提供一次實戰協助——`drifter` 贈 2 塊塗窗用木炭＋理智 +8、`barterer` 贈 12 信用點＋手電筒電池組、`scout` 贈 2 份磷粉＋45 秒加速與夜視、`cartographer` 贈 15 經驗＋1 枚遺失舊幣＋理智 +10、`restless` 治療 3 顆心並清除負面狀態＋簡易繃帶＋理智 +10
   - **擴充實用交換（每人上限提高至 `3` 次）**：遺失舊幣換杏仁水＋空瓶＋電池（並有機會拿聖像框）、合金換純化杏仁精華＋無菌繃帶＋2 份黑染料、2 份紙／廢紙換 2 塊木炭＋簡易繃帶、舊電路板／鍵盤換舊幣＋電池，並新增**收購 T.B.D.「無用」奇物換 20 信用點＋無菌繃帶**
   - **驗證**：更新 `zh_tw.json`／`en_us.json` 並於 `Level4ClientTest` 補齊奇物交換實測與新譯名檢查，執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本項改動於本機 `main`（未推送）
+- 修復 **Level 4 空中走廊／外牆轉角 1 格裂縫缺口**（Antigravity）：
+  - **修復 `cornerTile` 區域接縫打穿外牆問題**（`Level4Layout.java`）：`Level4Layout.cornerTile` 殘留早期全樓連通時期的 `i == 0` / `j == 0` 邊界 `Edge.OPEN` 特例，導致空中走廊跨區域接縫處（`cx == 0, cz == 0`）的轉角柱被設為 `Kind.AIR`（鋪地毯與天花板卻直接貫穿至 `OUTSIDE_AIR`），形成面向戶外雨幕的 1 格垂直裂縫；移除該特例後統一補齊 `Kind.PILLAR` 結構柱，密閉空中走廊牆角
+  - **修復東／南向塔樓外牆空中走廊交界缺口**（`Level4ChunkGenerator.java`）：`blockAtColumn` 調整為 `if (skybridge && !exterior)`，避免塔樓外牆皮膚（`isExteriorSkin`）與空中走廊交會處在走廊上方／下方被挖出直通缺口
+  - **驗證**：於 `Level4LayoutTest` 新增 `indoorWalkableSpacesNeverTouchOutsideAir`（掃描多組種子與相鄰 3×3 區域驗證所有室內可行走格八鄰域皆不與 `OUTSIDE_AIR` 相接），執行 `.\gradlew.bat build runClientGameTest -Plevels=4 --no-daemon` 全部通過；僅提交本項改動於本機 `main`（未推送）

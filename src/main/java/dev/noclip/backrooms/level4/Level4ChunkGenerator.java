@@ -75,7 +75,7 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 		if (tile.kind() == Kind.OUTSIDE_AIR) return Blocks.AIR.defaultBlockState();
 		if (y >= MAX_Y) return Blocks.BEDROCK.defaultBlockState();
 
-		if (skybridge) {
+		if (skybridge && !exterior) {
 			int roofY = FLOOR_Y + tile.ceilingHeight() + 1;
 			if (y == FLOOR_Y - 1 || y == roofY + 1) return Blocks.CONCRETE.gray().defaultBlockState();
 			if (y < FLOOR_Y || y > roofY + 1) return Blocks.AIR.defaultBlockState();

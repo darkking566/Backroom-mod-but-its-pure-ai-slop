@@ -207,13 +207,6 @@ final class Level4Layout {
 			boolean outer = i == room.i() || j == room.j();
 			if (outer) return new Tile(Kind.OMEGA_WALL, zone, Level4Plan.NORTH, cornerCeil, null, false);
 		}
-		// Keep open doorway corners clear on region edges
-		if (i == 0 && plan.edge(Level4Plan.cell(0, j), Level4Plan.WEST) == Edge.OPEN) {
-			return new Tile(Kind.AIR, zone, Level4Plan.NORTH, cornerCeil, null, false);
-		}
-		if (j == 0 && plan.edge(Level4Plan.cell(i, 0), Level4Plan.NORTH) == Edge.OPEN) {
-			return new Tile(Kind.AIR, zone, Level4Plan.NORTH, cornerCeil, null, false);
-		}
 		return new Tile(Kind.PILLAR, zone, Level4Plan.NORTH, cornerCeil, null, false);
 	}
 

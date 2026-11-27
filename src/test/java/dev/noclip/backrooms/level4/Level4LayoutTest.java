@@ -235,4 +235,25 @@ final class Level4LayoutTest {
 		assertTrue(seenStructs.contains(Level4Exit.STAIRS_5));
 		assertTrue(seenStructs.contains(Level4Exit.BASEMENT_71));
 	}
+
+	@Test
+	void indoorWalkableSpacesNeverTouchOutsideAir() {
+		for (long seed = 1; seed <= 6; seed++) {
+			for (int x = -Level4Plan.SIZE; x < Level4Plan.SIZE * 2; x++) {
+				for (int z = -Level4Plan.SIZE; z < Level4Plan.SIZE * 2; z++) {
+					Tile center = Level4Layout.tile(seed, x, z);
+					if (!center.walkable()) continue;
+					for (int dx = -1; dx <= 1; dx++) {
+						for (int dz = -1; dz <= 1; dz++) {
+							if (dx == 0 && dz == 0) continue;
+							Tile neighbor = Level4Layout.tile(seed, x + dx, z + dz);
+							assertTrue(neighbor.kind() != Kind.OUTSIDE_AIR,
+									"wall gap between indoor walkable tile and OUTSIDE_AIR at seed=" + seed
+											+ " (" + x + "," + z + ") -> (" + (x + dx) + "," + (z + dz) + ")");
+						}
+					}
+				}
+			}
+		}
+	}
 }
