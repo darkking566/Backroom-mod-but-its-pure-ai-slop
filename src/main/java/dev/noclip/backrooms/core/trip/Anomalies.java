@@ -406,10 +406,11 @@ public final class Anomalies {
 	 */
 	public static BlockPos infestRedRoomNear(ServerLevel level, BlockPos around) {
 		var rnd = level.getRandom();
-		for (int attempt = 0; attempt < 18; attempt++) {
-			int dx = rnd.nextInt(37) - 18;
-			int dz = rnd.nextInt(37) - 18;
-			if (attempt < 14 && dx * dx + dz * dz < 144) continue;
+		for (int attempt = 0; attempt < 24; attempt++) {
+			int dx = rnd.nextInt(53) - 26;
+			int dz = rnd.nextInt(53) - 26;
+			// Always keep newly condensed Red Mist enclaves at least 14 blocks away from the player
+			if (dx * dx + dz * dz < 196) continue;
 			BlockPos candidate = around.offset(dx, 0, dz);
 			BlockPos res = infestRedRoomAt(level, candidate);
 			if (res != null) return res;
@@ -457,8 +458,9 @@ public final class Anomalies {
 		// Place the crimson anomaly cluster at center + guarantee an anomaly vault chest beside it (+ optional bonus supply crate)
 		level.setBlock(center, BackroomsProps.RED_ANOMALY_CLUSTER.defaultBlockState()
 				.setValue(NoClipPropBlock.FACING, Direction.SOUTH), Block.UPDATE_ALL);
+		Direction[] flankOrder = {Direction.EAST, Direction.WEST, Direction.NORTH, Direction.SOUTH};
 		Direction vaultDir = null;
-		for (Direction dir : Direction.Plane.HORIZONTAL) {
+		for (Direction dir : flankOrder) {
 			BlockPos beside = center.relative(dir);
 			if (level.getBlockState(beside).isAir() && level.getBlockState(beside.below()).isFaceSturdy(level, beside.below(), Direction.UP)) {
 				level.setBlock(beside, BackroomsProps.ANOMALY_VAULT_CHEST.defaultBlockState()
@@ -475,9 +477,13 @@ public final class Anomalies {
 		}
 		Block supplyCrate = BuiltInRegistries.BLOCK.getValue(BackroomsMod.id("supply_crate"));
 		if (supplyCrate != Blocks.AIR) {
-			BlockPos opp = center.relative(vaultDir.getOpposite());
-			if (level.getBlockState(opp).isAir() && level.getBlockState(opp.below()).isFaceSturdy(level, opp.below(), Direction.UP)) {
-				level.setBlock(opp, supplyCrate.defaultBlockState(), Block.UPDATE_ALL);
+			for (Direction dir : new Direction[] {vaultDir.getOpposite(), Direction.WEST, Direction.EAST, Direction.NORTH}) {
+				if (dir == vaultDir || dir == Direction.SOUTH) continue;
+				BlockPos opp = center.relative(dir);
+				if (level.getBlockState(opp).isAir() && level.getBlockState(opp.below()).isFaceSturdy(level, opp.below(), Direction.UP)) {
+					level.setBlock(opp, supplyCrate.defaultBlockState(), Block.UPDATE_ALL);
+					break;
+				}
 			}
 		}
 		// Ensure overhead red illumination mounted flush in the room's ceiling
@@ -506,13 +512,14 @@ public final class Anomalies {
 		return immutableCenter;
 	}
 
-	/** The flashlight (Level 0's) loses a second charge each second it is lit. */
+	/** Standard limited-battery flashlight loses an extra charge each second it is lit during Static Overload. */
 	private static void drainFlashlight(ServerPlayer player) {
 		for (ItemStack stack : List.of(player.getMainHandItem(), player.getOffhandItem())) {
-			if (!BuiltInRegistries.ITEM.getKey(stack.getItem()).toString().equals("noclip_backrooms:flashlight")) continue;
-			CustomData data = stack.get(DataComponents.CUSTOM_DATA);
-			if (data == null || !data.copyTag().getBooleanOr("lit", false)) continue;
-			if (stack.getDamageValue() < stack.getMaxDamage() - 2) stack.setDamageValue(stack.getDamageValue() + 1);
+			if (!dev.noclip.backrooms.level0.FlashlightItem.isLit(stack)) continue;
+			if (dev.noclip.backrooms.level0.FlashlightItem.isInfinite(stack)) continue;
+			if (dev.noclip.backrooms.level0.FlashlightItem.battery(stack) > 2) {
+				dev.noclip.backrooms.level0.FlashlightItem.drain(stack, 1);
+			}
 		}
 	}
 

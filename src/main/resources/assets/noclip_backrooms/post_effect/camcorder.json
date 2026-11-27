@@ -15,7 +15,7 @@
                 {
                     "sampler_name": "Clock",
                     "location": "noclip_backrooms:camcorder_clock",
-                    "width": 2,
+                    "width": 4,
                     "height": 1,
                     "bilinear": false
                 }

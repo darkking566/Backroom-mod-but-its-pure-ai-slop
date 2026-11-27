@@ -2,6 +2,7 @@ package dev.noclip.backrooms.core.look;
 
 import dev.noclip.backrooms.BackroomsMod;
 import dev.noclip.backrooms.items.BackroomsConsumableItem;
+import dev.noclip.backrooms.level0.FlashlightItem;
 import dev.noclip.backrooms.tools.BackroomsToolItem;
 import dev.noclip.backrooms.weapons.BackroomsFirearmItem;
 import dev.noclip.backrooms.weapons.BackroomsMagicItem;
@@ -44,6 +45,21 @@ public final class ItemTooltips {
 
 		Language lang = Language.getInstance();
 		String path = id.getPath();
+
+		// Segmented 5-bar / infinite battery line for Backrooms flashlights (replaces vanilla durability bar)
+		if (FlashlightItem.isFlashlight(stack)) {
+			if (FlashlightItem.isInfinite(stack)) {
+				lines.add(Component.translatable("tooltip.noclip_backrooms.ambient_flashlight.battery")
+						.withStyle(ChatFormatting.AQUA));
+			} else {
+				int bars = FlashlightItem.bars(stack);
+				int pct = Math.round(FlashlightItem.batteryRatio(stack) * 100.0F);
+				ChatFormatting barColor = bars >= 3 ? ChatFormatting.GREEN : (bars == 2 ? ChatFormatting.YELLOW : ChatFormatting.RED);
+				lines.add(Component.translatable("tooltip.noclip_backrooms.flashlight.battery",
+						FlashlightItem.barGlyphs(stack), pct).withStyle(barColor));
+			}
+		}
+
 		String exactKey = "tooltip.noclip_backrooms." + path;
 		if (lang.has(exactKey)) {
 			addFormattedLines(lines, lang.getOrDefault(exactKey));

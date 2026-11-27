@@ -110,12 +110,11 @@ public final class BackroomsConsumableItem extends Item {
 				player.getCooldowns().addCooldown(stack, 40);
 			}
 			case BATTERY_PACK -> {
-				Item flashlight = BuiltInRegistries.ITEM.getValue(BackroomsMod.id("flashlight"));
 				boolean recharged = false;
 				for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
 					ItemStack invStack = player.getInventory().getItem(i);
-					if (invStack.is(flashlight) && invStack.isDamaged()) {
-						invStack.setDamageValue(0);
+					if (dev.noclip.backrooms.level0.FlashlightItem.needsCharge(invStack)) {
+						dev.noclip.backrooms.level0.FlashlightItem.recharge(invStack, dev.noclip.backrooms.level0.FlashlightItem.MAX_BATTERY);
 						recharged = true;
 						break;
 					}
