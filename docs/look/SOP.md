@@ -5,7 +5,7 @@
 ## 0. 開工前
 
 - `git status` 看有沒有別人改到一半的東西；先抓 GitHub 合併朋友的進度。
-- 同一時間只有一邊跑 Gradle（見 `AGENTS.md`）。`play.bat` 開著遊戲時也不要跑測試。
+- 同一時間只有一邊跑 Gradle（見 `CLAUDE.md`）。`play.bat` 開著遊戲時也不要跑測試。
 
 ## 1. 收集參考
 

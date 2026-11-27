@@ -5,7 +5,7 @@ Fabric 模組，Minecraft 26.2、Java 25，模組代號 `noclip_backrooms`。在
 - 開遊戲試玩：雙擊 `play.bat`
 - 編譯並跑單元測試：`.\gradlew.bat build`
 - 真實遊戲自動測試：`.\gradlew.bat runClientGameTest`；只跑某幾層加 `-Plevels=1,3`（Level 0.1 寫 `0.1`，畫面風格測試寫 `look`），Level 1 只跑某幾段再加 `-Psections=people,secrets`
-- 進度與試玩方法：[NEXT.md](NEXT.md)；協作規則：[AGENTS.md](AGENTS.md)；素材授權：[CREDITS.md](CREDITS.md)
+- 進度與試玩方法：[tasks/todo.md](tasks/todo.md)；協作規則：[CLAUDE.md](CLAUDE.md)；素材授權：[CREDITS.md](CREDITS.md)
 
 ## 資料夾怎麼分：一層一個資料夾，跨樓層的放 core
 
@@ -83,7 +83,7 @@ docs/look/                  畫面規範（貼圖尺寸、光影設定、每層�
 
 出口只要寫上目的地的層號（例如 `"188"`）就好。那層還沒做的話，出口會顯示「尚未開放」；等那層用 `LevelExits.open` 登記，所有通往它的出口就一起接通，不用回頭改。
 
-git 分支不是用來分樓層的：大家都在 `Desktop\Backroom - Claude`（`claude` 分支）工作，`main` 是整合好、推上 GitHub 的版本（規則見 AGENTS.md）。`src/main` 是 Gradle 的「主程式」資料夾，跟 git 的 `main` 分支無關。
+git 分支不是用來分樓層的：大家都在同一個資料夾的 `main` 輪流工作（規則見 CLAUDE.md）。`src/main` 是 Gradle 的「主程式」資料夾，跟 git 的 `main` 分支無關。
 
 ## 新增一層（以 Level 2 為例）
 
