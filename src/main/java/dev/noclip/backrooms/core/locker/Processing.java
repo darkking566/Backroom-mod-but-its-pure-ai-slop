@@ -26,7 +26,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * The institute's machines work while you are away (docs/project/1-gameplay/README.md, "按趟結算的工業加工與研究"):
+ * The institute's machines work while you are away (docs/企劃書/1-遊戲玩法/README.md, "按趟結算的工業加工與研究"):
  * sneak and use one to load it before a trip; when you next get back alive, it has done its work, better the deeper the
  * trip went, and what it made waits in your locker (and in the mission report). Nothing runs on the clock, so the five
  * days are not spent waiting on machines.

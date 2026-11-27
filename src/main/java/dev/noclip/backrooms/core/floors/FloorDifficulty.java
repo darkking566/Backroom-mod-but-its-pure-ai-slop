@@ -46,7 +46,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Dual-axis Backrooms difficulty & anti-farm system (docs/project/1-gameplay/README.md, "雙軸難度"):
+ * Dual-axis Backrooms difficulty & anti-farm system (docs/企劃書/1-遊戲玩法/README.md, "雙軸難度"):
  * <ul>
  * <li>Vertical axis: {@link FloorRun#floor()} visited on this trip;</li>
  * <li>Horizontal axis: distance walked from the current level's landing spot

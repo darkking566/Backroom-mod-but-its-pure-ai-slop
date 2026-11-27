@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 
 /**
- * The institute's objects as blocks (docs/project/1-gameplay/README.md, "研究所改版"): Blender meshes with baked photo
+ * The institute's objects as blocks (docs/企劃書/1-遊戲玩法/README.md, "研究所改版"): Blender meshes with baked photo
  * textures (tools/film/make_institute_props.py), drawn like the film props through the props' shared block entity. The
  * list and the places come from {@link InstituteFurnishing}; inside the institute they cannot be broken (Institute), and
  * elsewhere they break into scrap like other furniture.

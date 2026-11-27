@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-/** The horror-direction rules (docs/project/1-gameplay/README.md): levels make you steadier, not stronger. */
+/** The horror-direction rules (docs/企劃書/1-遊戲玩法/README.md): levels make you steadier, not stronger. */
 final class PlayerStatsTest {
 	@Test
 	void initialStatsStartAtLevelOneWithFullSanity() {

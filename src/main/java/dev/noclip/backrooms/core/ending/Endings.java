@@ -50,7 +50,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Dual-ending endgame progression (docs/project/1-gameplay/README.md, "主線與雙結局"):
+ * Dual-ending endgame progression (docs/企劃書/1-遊戲玩法/README.md, "主線與雙結局"):
  * <ul>
  *   <li><b>Ending A — Cured &amp; Contract Released ("contract")</b>: research Purple Science Pack, craft and drink the
  *       9x9 {@code wretch_cure} (permanently eliminating Wretch rejection and healing to full; max health stays halved), reach full

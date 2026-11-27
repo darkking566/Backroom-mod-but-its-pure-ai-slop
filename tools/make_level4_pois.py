@@ -2,7 +2,7 @@
 
     py tools/make_level4_pois.py
 
-Follows docs/look/STYLE_GUIDE.md:
+Follows docs/畫面規範/風格規範.md:
 - 128x128 surface/cutout textures with labPBR _n / _s maps
 - Transparent margins retain foreground RGB so realistic resizing produces crisp edges
 """

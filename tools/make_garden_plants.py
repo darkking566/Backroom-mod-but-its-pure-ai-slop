@@ -15,7 +15,7 @@ from PIL import Image, ImageDraw
 ROOT = Path(__file__).resolve().parent.parent
 BASE = ROOT / "src/main/resources/assets/noclip_backrooms/textures/block/level1"
 PACK = ROOT / "src/main/resources/resourcepacks/realistic/assets/noclip_backrooms/textures/block/level1"
-PREVIEW = ROOT / "docs/look/level1_garden_plants.png"
+PREVIEW = ROOT / "docs/畫面規範/level1_garden_plants.png"
 S = 1024
 SPEC = (90, 10, 170, 255)  # smoothness, F0, subsurface (leaves let some light through), no emission
 

@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
 /**
- * The Frontrooms (docs/project/1-gameplay/README.md, "獨立維度：前室"): M.E.G.'s quarantine institute and a patch of
+ * The Frontrooms (docs/企劃書/1-遊戲玩法/README.md, "獨立維度：前室"): M.E.G.'s quarantine institute and a patch of
  * ordinary country around it, walled in. Everyone who gets out of the Backrooms is brought here, and stays until one of
  * the endings; time runs here. Everything for it lives in this package; the rest of the mod only calls
  * {@link #register()} and refers to {@link Home#FRONTROOMS}.

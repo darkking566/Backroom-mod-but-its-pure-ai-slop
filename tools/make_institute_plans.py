@@ -1,4 +1,4 @@
-"""The floor plans of the M.E.G. institute in the Frontrooms (docs/project/1-gameplay/README.md, "研究所改版"), drawn
+"""The floor plans of the M.E.G. institute in the Frontrooms (docs/企劃書/1-遊戲玩法/README.md, "研究所改版"), drawn
 with rectangles and written out as InstitutePlans.java (one string a row, one character a block column). The building
 itself (walls, windows, stairs, the atrium, the facade) is made from these by frontrooms/InstituteLayout.java.
 

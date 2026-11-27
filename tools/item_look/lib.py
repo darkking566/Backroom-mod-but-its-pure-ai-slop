@@ -1,6 +1,6 @@
 """Shared pieces of the realistic items pack: texture helpers, the material registry, box models and their writing.
 
-Materials are 64x64 (docs/look/STYLE_GUIDE.md: props 64), each with labPBR _n / _s, made on first use and written into
+Materials are 64x64 (docs/畫面規範/風格規範.md: props 64), each with labPBR _n / _s, made on first use and written into
 whichever atlas (item or block) a model that uses them needs. Models are plain Minecraft box models.
 """
 import hashlib

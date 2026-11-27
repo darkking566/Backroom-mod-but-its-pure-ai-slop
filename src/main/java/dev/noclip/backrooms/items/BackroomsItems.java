@@ -37,7 +37,7 @@ import net.minecraft.world.item.equipment.ArmorType;
 
 /**
  * Master item registry for the entire Backrooms crafting, salvage, tool, armor, melee, firearm,
- * ammo, tactical mod, monster drop, Boss core, and magic weapon catalog (docs/project/3-crafting/).
+ * ammo, tactical mod, monster drop, Boss core, and magic weapon catalog (docs/企劃書/3-合成/).
  * Also registers 4 dedicated Backrooms Creative Mode Tabs so JEI indexes every item automatically.
  */
 public final class BackroomsItems {
@@ -133,7 +133,7 @@ public final class BackroomsItems {
 
 	// =========================================================================
 	// 1B. GDD ALIGNED MATERIALS, CIRCUITS, SCIENCE PACKS, TECH BRICKS & GLASS SERIES
-	//     (docs/project/（原企劃書，已併入各章） & docs/project/3-crafting/by-level.md)
+	//     (docs/企劃書/（原企劃書，已併入各章） & docs/企劃書/3-合成/各層收集.md)
 	// =========================================================================
 	// Level 0 Office Junk, Salvage & Electronics (GDD 6.2 A/B/C)
 	public static final Item RAGS = mat("rags", Rarity.COMMON);

@@ -43,7 +43,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 
 /**
- * The M.E.G. quota cycle (docs/project/1-gameplay/README.md): the Wretch countdown of the body and the quota of the
+ * The M.E.G. quota cycle (docs/企劃書/1-遊戲玩法/README.md): the Wretch countdown of the body and the quota of the
  * employer, on one clock that runs only while someone of the team is out of the Backrooms (the Backrooms have no time):
  * at the institute in the Frontrooms, or in the Overworld. The team is everyone who has been in the Backrooms.
  *

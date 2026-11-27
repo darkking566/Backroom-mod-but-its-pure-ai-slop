@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The staff town in the Frontrooms (docs/project/1-gameplay/README.md, "前室的夜晚：398"), as plain numbers: one street
+ * The staff town in the Frontrooms (docs/企劃書/1-遊戲玩法/README.md, "前室的夜晚：398"), as plain numbers: one street
  * west of the avenue, four houses on each side, a corner store, a park with a picnic, swings and a clock. By day it is
  * the "Earth" of 狐霖's Frontrooms, a 1990s American street; but every house inside is furnished from the film's 1991
  * furniture store, on Level 0's carpet under Level 0's wallpaper. Nothing here touches Minecraft's blocks.

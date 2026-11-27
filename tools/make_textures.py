@@ -5,7 +5,7 @@
 Needs Pillow and NumPy. Every texture gets two companions that shaders read in the labPBR format:
   *_n.png  bumps: normal (RG), crevice shading (B), depth (A)
   *_s.png  surface: smoothness (R), reflectance (G), porosity (B), glow (A)
-Also writes docs/project/5-levels/level0/textures.png, a tiled preview. Level 0 textures go to textures/block/level0/.
+Also writes docs/企劃書/5-樓層/Level0-大廳/textures.png, a tiled preview. Level 0 textures go to textures/block/level0/.
 """
 
 import json
@@ -580,7 +580,7 @@ def preview(textures):
         for dx in (0, SIZE):
             for dy in (0, SIZE):
                 sheet.paste(tile, (gap + i % columns * (side + gap) + dx, gap + i // columns * (side + gap) + dy))
-    sheet.save(ROOT / "docs/project/5-levels/level0/textures.png", optimize=True)
+    sheet.save(ROOT / "docs/企劃書/5-樓層/Level0-大廳/textures.png", optimize=True)
 
 
 def check():

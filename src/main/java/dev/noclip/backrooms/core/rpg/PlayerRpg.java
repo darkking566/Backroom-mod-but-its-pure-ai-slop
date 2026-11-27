@@ -80,7 +80,7 @@ public final class PlayerRpg {
 	private static final Identifier MOD_SCOUT_ADS = BackroomsMod.id("badge_scout_ads_speed");
 	private static final Set<String> PROTECTED_LOOT = Set.of(
 			"evidence_photo", "topology_tape", "meg_squad_report", "wretch_cure");
-	/** Half of the player's base 20 health, everywhere, once they have been in the Backrooms (docs/project/1-gameplay/README.md). */
+	/** Half of the player's base 20 health, everywhere, once they have been in the Backrooms (docs/企劃書/1-遊戲玩法/README.md). */
 	public static final double FRAILTY = -10.0;
 	/** In the Backrooms, eating well heals at a quarter of the usual speed (mixin.FoodDataBackroomsRegen). */
 	public static final float BACKROOMS_FOOD_REGEN = 0.25F;
@@ -89,7 +89,7 @@ public final class PlayerRpg {
 	private static final Map<UUID, Long> LAST_HURT = new HashMap<>();
 
 	private static final int SANITY_TICK_INTERVAL = 10; // 0.5 seconds
-	/** The Backrooms drain rates below are per second (docs/project/2-player/README.md); one step is half a second. */
+	/** The Backrooms drain rates below are per second (docs/企劃書/2-玩家能力值/README.md); one step is half a second. */
 	private static final float STEP_SECONDS = SANITY_TICK_INTERVAL / 20.0F;
 
 	public static final SoundEvent SANITY_LOW_DRONE = registerSound("sanity.low_drone");
@@ -138,7 +138,7 @@ public final class PlayerRpg {
 		ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
 			if (!(source.getEntity() instanceof ServerPlayer killer)) return;
 			if (!(entity instanceof Monster)) return;
-			// Killing is not the way to grow (docs/project/1-gameplay/README.md): most experience comes from surviving (SurvivalXp).
+			// Killing is not the way to grow (docs/企劃書/1-遊戲玩法/README.md): most experience comes from surviving (SurvivalXp).
 			int reward;
 			if (entity instanceof BeastOfLevel5 || entity instanceof dev.noclip.backrooms.monsters.shepherdsnake.ShepherdSnake) {
 				reward = 150;

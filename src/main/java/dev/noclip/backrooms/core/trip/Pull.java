@@ -40,7 +40,7 @@ import net.minecraft.world.level.LightLayer;
 
 /**
  * Mode 1 + Mode 2 Horror Loop: Overworld Backrooms Seepage &amp; Wretch Reality-Rejection
- * (docs/project/1-gameplay/README.md).
+ * (docs/企劃書/1-遊戲玩法/README.md).
  *
  * <p>Replaces passive forced teleportation with escalating Overworld dread:
  * <ul>
@@ -87,7 +87,7 @@ public final class Pull {
 
 	public static void register() {
 		ServerTickEvents.END_SERVER_TICK.register(Pull::tick);
-		// The seepage and the rift are gone (2026-11-26, docs/project/1-gameplay/README.md): put back any ground an older
+		// The seepage and the rift are gone (2026-11-26, docs/企劃書/1-遊戲玩法/README.md): put back any ground an older
 		// version turned into carpet, and close its rifts.
 		net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents.SERVER_STARTED.register(server ->
 				SeepageData.get(server.overworld()).restoreEverything(server.overworld()));

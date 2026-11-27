@@ -4,7 +4,7 @@ Writes 512 px colour textures with labPBR _n/_s companions into
 src/main/resources/resourcepacks/realistic/assets/noclip_backrooms/textures/block/level0/. A resource pack
 overrides textures by name, so the drawn 128 px textures of make_textures.py (and that tool) stay as they are;
 turning the pack off in the Resource Packs screen brings them back. Also writes the pack's pack.mcmeta and a
-before/after sheet at docs/look/level0_realistic.png.
+before/after sheet at docs/畫面規範/level0_realistic.png.
 
 Photo material comes from ambientCG (https://ambientcg.com, CC0), fetched on first use into tools/.cache/ambientcg/
 (not committed): Carpet016 and Fabric028 for the carpet; Wallpaper001A for the paper grain; Wallpaper002A/B/C for
@@ -34,7 +34,7 @@ PACK = ROOT / "src/main/resources/resourcepacks/realistic"
 OUT = PACK / "assets/noclip_backrooms/textures/block/level0"
 OLD = ROOT / "src/main/resources/assets/noclip_backrooms/textures/block/level0"
 CACHE = TOOLS / ".cache/ambientcg"
-PREVIEW = ROOT / "docs/look/level0_realistic.png"
+PREVIEW = ROOT / "docs/畫面規範/level0_realistic.png"
 S = 512
 Y, X = np.mgrid[0:S, 0:S].astype(np.float32)
 T = (Y + 0.5) / S  # 0 at the top of a texture, 1 at the bottom

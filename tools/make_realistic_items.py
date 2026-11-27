@@ -107,7 +107,7 @@ def main():
         bg = Image.new("RGBA", tile.size, (60, 60, 60, 255))
         bg.alpha_composite(tile)
         sheet.paste(bg.convert("RGB"), ((i % 10) * cell + 3, (i // 10) * cell + 3))
-    sheet.save(ROOT / "docs/look/items_materials.png")
+    sheet.save(ROOT / "docs/畫面規範/items_materials.png")
     print(f"{len(done)} items and props, {len(names)} materials -> {lib.PACK.relative_to(ROOT)}")
 
 

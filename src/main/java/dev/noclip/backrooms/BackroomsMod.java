@@ -56,7 +56,7 @@ public final class BackroomsMod implements ModInitializer {
 		dev.noclip.backrooms.core.trade.Appraisal.register();
 		dev.noclip.backrooms.core.quest.Survivors.register();
 		Guilds.register();
-		// The horror direction (docs/project/1-gameplay/README.md): trips in and out, being pulled back, contracts, experience.
+		// The horror direction (docs/企劃書/1-遊戲玩法/README.md): trips in and out, being pulled back, contracts, experience.
 		Trips.register();
 		Pull.register();
 		Contracts.register();

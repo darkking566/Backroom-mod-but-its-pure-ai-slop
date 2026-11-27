@@ -3,7 +3,7 @@ Level 4 block models, blockstates, item models, and loot tables.
 
     py tools/make_level4.py
 
-Follows docs/look/STYLE_GUIDE.md:
+Follows docs/畫面規範/風格規範.md:
 - Charcoal/blue-grey speckled commercial carpet (plus 4 desk/chair dent variants and damp carpet)
 - Matte cool off-white drywall with white baseboards (+ 9 subtle wear variants)
 - 4-tile acoustic ceiling grid + HVAC vents + 4-state louvered fluorescent troffers (lit/dim/flicker/broken)
@@ -144,7 +144,7 @@ def radiator_wall(seed):
 
 
 def acoustic_ceiling(seed):
-    """4-tile suspended office acoustic ceiling grid with metal T-bars (STYLE_GUIDE 64px tiles on 128px block)."""
+    """4-tile suspended office acoustic ceiling grid with metal T-bars (風格規範 64px tiles on 128px block)."""
     m = flat((194, 198, 195), smooth=0.10, f0=10, porosity=90)
     # Acoustic stipple pores
     stip = step(0.55, 0.9, noise(seed, 128))
@@ -1049,7 +1049,7 @@ def preview(textures):
         for dx in (0, SIZE):
             for dy in (0, SIZE):
                 sheet.paste(tile, (gap + i % columns * (side + gap) + dx, gap + i // columns * (side + gap) + dy))
-    out = mt.ROOT / "docs/project/5-levels/level4/textures.png"
+    out = mt.ROOT / "docs/企劃書/5-樓層/Level4-廢棄辦公室/textures.png"
     out.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(out, optimize=True)
 

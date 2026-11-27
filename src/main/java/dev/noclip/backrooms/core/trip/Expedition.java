@@ -16,7 +16,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 
 /**
- * Where the team falls into the Backrooms from outside (docs/project/1-gameplay/README.md, "多人時同一片後室"). The
+ * Where the team falls into the Backrooms from outside (docs/企劃書/1-遊戲玩法/README.md, "多人時同一片後室"). The
  * first to fall into a level opens a stretch of it, somewhere new; everyone who falls into that level after them (dying,
  * deployed, dropped at dawn, the sand) lands in the same stretch. Once nobody of the team is in the Backrooms any more,
  * the stretches close, and the next fall opens a new one.

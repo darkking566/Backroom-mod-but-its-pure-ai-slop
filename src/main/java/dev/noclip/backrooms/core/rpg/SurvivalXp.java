@@ -28,7 +28,7 @@ import net.minecraft.world.item.component.WrittenBookContent;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Experience for surviving rather than killing (docs/project/1-gameplay/README.md & 2-player/README.md):
+ * Experience for surviving rather than killing (docs/企劃書/1-遊戲玩法/README.md & 2-玩家能力值/README.md):
  * new floor discovery, shaking off hunters, reading new field notes/manuals, and buyer trade deliveries.
  */
 public final class SurvivalXp {

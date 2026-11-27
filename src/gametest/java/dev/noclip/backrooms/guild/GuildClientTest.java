@@ -18,7 +18,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
 /**
- * The stone guilds beside the villages are gone (docs/project/1-gameplay/README.md, 2026-11-26: the M.E.G. institute in
+ * The stone guilds beside the villages are gone (docs/企劃書/1-遊戲玩法/README.md, 2026-11-26: the M.E.G. institute in
  * the Frontrooms took their place): a world with villages has no guild beside them, and pulling one down
  * (core.guild.GuildRemoval, which does it to older worlds' guilds as they load) leaves grass where its floor was and
  * nothing above it. Run alone with gradlew runClientGameTest -Plevels=guild

@@ -16,7 +16,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 
 /**
- * What the player sees of the floor count & dual-axis difficulty (docs/project/1-gameplay/README.md):
+ * What the player sees of the floor count & dual-axis difficulty (docs/企劃書/1-遊戲玩法/README.md):
  * "Floor 3" and active Band / Distance / Threat multiplier at the top left while in the Backrooms,
  * plus "Level 0 · The Lobby" above the inventory.
  */

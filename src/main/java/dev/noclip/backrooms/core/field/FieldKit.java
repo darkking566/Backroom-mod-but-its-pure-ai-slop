@@ -55,7 +55,7 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
 
 /**
- * The investigator's field kit (docs/project/1-gameplay/README.md, "後室進階玩法與創新機制"):
+ * The investigator's field kit (docs/企劃書/1-遊戲玩法/README.md, "後室進階玩法與創新機制"):
  * <ul>
  * <li>for marking the way: chalk (arrows, crosses, "EXIT" on floors and walls; click a mark again to change it), glow
  * sticks, and the red guide line, laid behind you while the spool is in hand and switched on;</li>

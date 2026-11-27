@@ -35,7 +35,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 
 /**
- * The nights of Level 398, "a cruel prank" (docs/project/1-gameplay/README.md, "前室的夜晚：398"; after 狐霖's
+ * The nights of Level 398, "a cruel prank" (docs/企劃書/1-遊戲玩法/README.md, "前室的夜晚：398"; after 狐霖's
  * Frontrooms): once someone in the Frontrooms knows the truth of the B2 files, the town's nights are 398's.
  * <ul>
  * <li>a title at nightfall; the picnic's people and the shopkeeper are gone, and people without faces (the Faceling)

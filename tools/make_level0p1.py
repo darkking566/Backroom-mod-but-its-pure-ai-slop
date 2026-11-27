@@ -4,7 +4,7 @@ drop tables, and the entries the shared files need (language files, mining tags,
     py tools/make_level0p1.py
 
 Uses the drawing helpers and the labPBR writer of make_textures.py (Pillow, NumPy). Textures go to
-textures/block/level0p1/, models to models/block/level0p1/. Also writes docs/project/5-levels/level0p1/textures.png.
+textures/block/level0p1/, models to models/block/level0p1/. Also writes docs/企劃書/5-樓層/Level0.1-天頂站/textures.png.
 Looks follow the Wikidot page: glossy white-and-steel futurism, broken down; cables out of the walls; lived-in rooms.
 Safe to run again: it only touches Level 0.1's own files and adds missing lines to the shared ones.
 """
@@ -1211,7 +1211,7 @@ def preview(textures):
     for i, name in enumerate(names):
         tile = Image.fromarray(np.clip(np.rint(textures[name].color), 0, 255).astype("uint8"), "RGB")
         sheet.paste(tile, (gap + i % columns * (side + gap), gap + i // columns * (side + gap)))
-    out = mt.ROOT / "docs/project/5-levels/level0p1/textures.png"
+    out = mt.ROOT / "docs/企劃書/5-樓層/Level0.1-天頂站/textures.png"
     out.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(out, optimize=True)
 

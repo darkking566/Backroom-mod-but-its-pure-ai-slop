@@ -1,4 +1,4 @@
-"""The M.E.G. institute's objects (docs/project/1-gameplay/README.md, "研究所改版"), after the research facility at the
+"""The M.E.G. institute's objects (docs/企劃書/1-遊戲玩法/README.md, "研究所改版"), after the research facility at the
 end of the film (A24's Backrooms, 2026): a gurney and equipment wrapped in plastic, a steel interview table with a blue
 folder, an X-ray viewer, hazmat suits, CRT consoles, a decontamination shower, and the machine that sends people in.
 

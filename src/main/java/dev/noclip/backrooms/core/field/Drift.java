@@ -23,7 +23,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * Space drift (docs/project/1-gameplay/README.md, "會背叛玩家的空間標記系統"). Marks are only as reliable as the space
+ * Space drift (docs/企劃書/1-遊戲玩法/README.md, "會背叛玩家的空間標記系統"). Marks are only as reliable as the space
  * they are drawn in: when a player's mind slips (sanity under 40%) or they wander far from every mark they have left, a
  * chalk arrow somewhere behind them quietly turns, or a glow stick goes out. Deep down (from the fourth floor of a trip)
  * the walls also carry old arrows from the missing squad, pointing wherever they pointed then.

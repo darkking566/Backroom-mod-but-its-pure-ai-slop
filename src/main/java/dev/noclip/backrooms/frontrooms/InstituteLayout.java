@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The M.E.G. research institute at the middle of the Frontrooms (docs/project/1-gameplay/README.md, "研究所改版"), as
+ * The M.E.G. research institute at the middle of the Frontrooms (docs/企劃書/1-遊戲玩法/README.md, "研究所改版"), as
  * plain data. Five floor plans (B2, B1 and three floors above ground) 96 blocks wide (x) and 72 deep (z), drawn by
  * tools/make_institute_plans.py into {@link InstitutePlans}, are turned here into pieces of the building by
  * {@link #cell}, together with what no plan shows: the stairs between floors, the atrium three floors high with the

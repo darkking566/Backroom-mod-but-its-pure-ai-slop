@@ -1,7 +1,7 @@
 package dev.noclip.backrooms.core.quota;
 
 /**
- * The numbers of the M.E.G. quota cycle (docs/project/1-gameplay/README.md), kept apart from Minecraft so they can be
+ * The numbers of the M.E.G. quota cycle (docs/企劃書/1-遊戲玩法/README.md), kept apart from Minecraft so they can be
  * unit-tested. Time is "home time": ticks the team has spent in the Overworld; the Backrooms have no time.
  */
 public final class QuotaMath {

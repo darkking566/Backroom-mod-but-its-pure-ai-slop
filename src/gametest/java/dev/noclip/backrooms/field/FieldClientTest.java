@@ -59,7 +59,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * What a trip into the Backrooms brings now (docs/project/1-gameplay/README.md, "後室進階玩法與創新機制"): the trip's
+ * What a trip into the Backrooms brings now (docs/企劃書/1-遊戲玩法/README.md, "後室進階玩法與創新機制"): the trip's
  * anomaly (red mist, mimics, absolute silence), the field kit (chalk, glow sticks, the guide line, a battery lamp, a
  * tripwire alarm, a barricade a hound batters down), evidence (a photo of a smiler and a mapping beacon's tape, sold to
  * the buyer), the institute's machines working while the player was away, and the weapons' horror balance.

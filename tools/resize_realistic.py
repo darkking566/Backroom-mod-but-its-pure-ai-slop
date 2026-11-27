@@ -1,4 +1,4 @@
-"""Brings the realistic resource pack to the design spec's texture sizes (docs/project, 7.1; docs/look/STYLE_GUIDE.md):
+"""Brings the realistic resource pack to the design spec's texture sizes (docs/企劃書, 7.1; docs/畫面規範/風格規範.md):
 walls, floors, ceilings and anything else drawn on a whole block face at 128x128, props (furniture, lamps, pipes, small
 things) at 64x64. The _n and _s maps follow their texture. Already small enough is left alone, so it can be run again
 after any generator (make_level0_realistic.py and the others still draw at 512 and save through here).

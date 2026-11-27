@@ -35,7 +35,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * Specialization badges (docs/project/2-player/README.md, "流派徽章", Plan B):
+ * Specialization badges (docs/企劃書/2-玩家能力值/README.md, "流派徽章", Plan B):
  * <ul>
  * <li>Unlocked permanently per-player using {@link BackroomsItems#LOST_OLD_COIN} from the Level 0 Martial Master
  * inside the Manila Room (outside the M.E.G. economy);</li>

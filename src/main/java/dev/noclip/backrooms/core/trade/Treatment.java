@@ -18,7 +18,7 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 
 /**
- * The institute's medic treats whoever pays (docs/project/1-gameplay/README.md, "醫療隔離翼"): full health, a clear head
+ * The institute's medic treats whoever pays (docs/企劃書/1-遊戲玩法/README.md, "醫療隔離翼"): full health, a clear head
  * and none of the Backrooms' afflictions. It does nothing for the Wretch rejection's clock; only the quota does.
  */
 public final class Treatment {

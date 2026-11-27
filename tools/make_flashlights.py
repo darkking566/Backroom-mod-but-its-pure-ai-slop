@@ -3,7 +3,7 @@ both Backrooms flashlights:
   1. flashlight / flashlight_on: worn dark anodized aluminum heavy-duty tactical/utility flashlight
   2. ambient_flashlight / ambient_flashlight_on: Level 3 brass/gunmetal induction-coil infinite flashlight
 
-Follows docs/look/STYLE_GUIDE.md (64x64 prop/item texture resolution, weathered gritty palette).
+Follows docs/畫面規範/風格規範.md (64x64 prop/item texture resolution, weathered gritty palette).
 """
 
 import json

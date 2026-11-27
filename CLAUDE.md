@@ -9,10 +9,10 @@
 - 不改寫歷史、不強制覆蓋、不發布；推送前先抓 GitHub 合併朋友的進度，經使用者同意才推
 - 不碰 `run/saves`，不代為同意 EULA
 - 程式和資源照樓層分資料夾（`level0`、`level1`、……），跨樓層共用的放 `core`，怪物放 `monsters`；什麼放哪見 `README.md`
-- 做樓層畫面、方塊、道具、模型時照 `docs/look/STYLE_GUIDE.md`（整格的面 128、道具 64、labPBR、CC0、髒舊變體編號、燈的四種狀態、光影設定）與 `docs/look/SOP.md`（每層的步驟與驗收）
-- 企劃書全部在 `docs/project/`（總目錄 `docs/project/README.md`）：1 遊戲玩法、2 玩家能力值、3 合成、4 怪物、5 樓層；新企劃寫進對應章節，不要在 `docs/` 底下另開企劃檔
+- 做樓層畫面、方塊、道具、模型時照 `docs/畫面規範/風格規範.md`（整格的面 128、道具 64、labPBR、CC0、髒舊變體編號、燈的四種狀態、光影設定）與 `docs/畫面規範/每層流程.md`（每層的步驟與驗收）
+- 企劃書全部在 `docs/企劃書/`（總目錄 `docs/企劃書/README.md`）：1 遊戲玩法、2 玩家能力值、3 合成、4 怪物、5 樓層；新企劃寫進對應章節，不要在 `docs/` 底下另開企劃檔；文件的檔名與資料夾用中文（`README.md` 與圖片檔名除外，樓層資料夾是 `Level<編號>-<中文名>`）
 - 外部素材（音效、照片材質、模型）的出處與授權一律寫進 `CREDITS.md`
-- 分工（2026-11-26 起，細節見 `docs/project/README.md` 的「分工」）：
+- 分工（2026-11-26 起，細節見 `docs/企劃書/README.md` 的「分工」）：
   - 朋友（GitHub）：Level 0 與之後的新樓層
   - Claude：物件建模（先做各層會敲掉變資源的家具與物品，之後才是武器、醫療）、物品在世界裡的分布與擺放（2026-11-27 起）、跨樓層出口、怪物 AI 與生怪、測試
   - Antigravity（Gemini）：合成系統、物品、工具、武器、寶箱、怪物模型
@@ -23,7 +23,7 @@
 - 專案在兩台電腦上出現過：`Desktop\Backroom` 與 `D:\Workspace\Personal_Project\Backroom-mod-but-its-pure-ai-slop`，路徑以當下那台為準
 - Java 25：`D:\Workspace` 這台是 `C:/Program Files/Eclipse Adoptium/jdk-25.0.5.10002-hotspot`（`JAVA_HOME` 已設）；`Desktop\Backroom` 那台最後記的是 `C:/Program Files/Microsoft/jdk-25.0.5.102-hotspot`
 - Blender 5.3：`Desktop\Backroom` 那台在 `E:/SteamLibrary/steamapps/common/Blender/blender.exe`（`D:\Workspace` 這台沒找到）；使用者開著的那個連著 MCP，自己用背景模式另開，不動它
-- 使用者本機 `run/` 開著 Iris＋Complementary Unbound（後室版）；推薦設定在 `docs/look/shaders/`，光影包授權不允許修改或散佈
+- 使用者本機 `run/` 開著 Iris＋Complementary Unbound（後室版）；推薦設定在 `docs/畫面規範/光影設定/`，光影包授權不允許修改或散佈
 - 照片材質一律 ambientCG CC0，快取在 `tools/.cache/`（不進 git）
 
 ## 測試開關
@@ -49,7 +49,7 @@
 
 ## 使用者定下的方向
 
-- 遊戲大方向（2026-11-25 起）：恐怖、逃離後室；玩家是掉進後室的 M.E.G. 調查員（企劃全在 `docs/project/`）
+- 遊戲大方向（2026-11-25 起）：恐怖、逃離後室；玩家是掉進後室的 M.E.G. 調查員（企劃全在 `docs/企劃書/`）
 - 建模順序：先做每層會敲掉變資源的物件（Level 0 先，以電影版為主），再做武器、醫療；合成表等建模定了再整個重做
 - 物品風格：冷兵器與槍寫實；魔法類直接用 Gemini 原本的模型
 - 血量：進過後室的人 10 血（主世界同），後室吃飽回血 ×0.25；每 5 級 +2 血、+10 理智；根治藥只補滿血，不把上限調回 20（2026-11-28）

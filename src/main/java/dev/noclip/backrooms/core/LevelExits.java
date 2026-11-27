@@ -120,7 +120,7 @@ public final class LevelExits {
 
 	/**
 	 * Where a level should put a player who is arriving, as {x, z}. Through an exit it is a stretch of the level far
-	 * from the exit, so that coming back to a level is coming to a new part of it, as in 狐霖's Backrooms (docs/project/1-gameplay/README.md);
+	 * from the exit, so that coming back to a level is coming to a new part of it, as in 狐霖's Backrooms (docs/企劃書/1-遊戲玩法/README.md);
 	 * it depends only on where the exit is and where it leads, so whoever takes the same exit lands together.
 	 * Falling in from outside (core.trip.Expedition) it is the team's stretch of that level; otherwise (commands) it is
 	 * where the player stands.

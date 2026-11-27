@@ -17,7 +17,7 @@ import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
 /**
- * Each investigator's M.E.G. locker in the institute (docs/project/1-gameplay/README.md): six rows that stay with the
+ * Each investigator's M.E.G. locker in the institute (docs/企劃書/1-遊戲玩法/README.md): six rows that stay with the
  * player through death, opened at any locker; and the relics, what M.E.G. collected from where they died outside the
  * Backrooms, which wait there until there is room in the locker.
  */

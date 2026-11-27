@@ -35,7 +35,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 
 /**
- * The staff town as it lives (docs/project/1-gameplay/README.md, "前室的夜晚：398"), after 狐霖's Frontrooms:
+ * The staff town as it lives (docs/企劃書/1-遊戲玩法/README.md, "前室的夜晚：398"), after 狐霖's Frontrooms:
  * <ul>
  * <li>a mailbox: leafing through the stack of letters gives one letter from home (and now and then a coin), once a day;</li>
  * <li>the picnic in the park: sitting down with them fills you and steadies you, once a day;</li>

@@ -29,7 +29,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Waiting to be picked up (docs/project/1-gameplay/README.md, "撤離接應倒數"). Getting out is never a click: whoever
+ * Waiting to be picked up (docs/企劃書/1-遊戲玩法/README.md, "撤離接應倒數"). Getting out is never a click: whoever
  * calls for extraction (from a base they settled at, at an exit door, with a homeward anchor) has to hold out where
  * they are for 30 to 60 seconds, longer the deeper the trip has gone, while the signal draws whatever is near and,
  * twice, brings more out of the dark. Wander off, change level or die and the pickup is off.

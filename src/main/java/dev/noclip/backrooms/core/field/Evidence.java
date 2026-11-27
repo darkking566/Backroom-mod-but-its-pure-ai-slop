@@ -52,7 +52,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Field evidence for M.E.G.'s quota (docs/project/1-gameplay/README.md, "高風險現場取證"):
+ * Field evidence for M.E.G.'s quota (docs/企劃書/1-遊戲玩法/README.md, "高風險現場取證"):
  * <ul>
  * <li>the camera: a photo of whatever is in the frame within sixteen blocks, worth more the closer and the worse the
  * subject, three times as much when it is this cycle's photo target; its flash draws the light-seekers (smilers,

@@ -39,7 +39,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomData;
 
 /**
- * M.E.G. contracts (docs/project/1-gameplay/README.md): reach orders, entity hunts, field photography,
+ * M.E.G. contracts (docs/企劃書/1-遊戲玩法/README.md): reach orders, entity hunts, field photography,
  * topology mapping, supply recovery, and multi-level uninterrupted courier runs, filtered by deadlock prevention
  * so only currently reachable levels & registered targets are ever offered.
  */

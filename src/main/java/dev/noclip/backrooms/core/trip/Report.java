@@ -25,7 +25,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * The mission report (docs/project/1-gameplay/README.md, "任務報告畫面"), sent a moment after someone gets back to
+ * The mission report (docs/企劃書/1-遊戲玩法/README.md, "任務報告畫面"), sent a moment after someone gets back to
  * the institute, when their screen has the new place loaded: like the end of a day in Lethal Company.
  */
 public final class Report {

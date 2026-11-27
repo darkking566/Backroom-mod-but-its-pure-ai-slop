@@ -21,7 +21,7 @@ ROOT = R.ROOT
 OLD = ROOT / "src/main/resources/assets/noclip_backrooms/textures/block/level0p1"
 R.OUT = R.PACK / "assets/noclip_backrooms/textures/block/level0p1"
 R.OLD = OLD
-R.PREVIEW = ROOT / "docs/look/level0p1_realistic.png"
+R.PREVIEW = ROOT / "docs/畫面規範/level0p1_realistic.png"
 S = R.S
 
 # What each texture is made of: the first name fragment that matches wins (so "frost_wall" is ice before it is wall).
