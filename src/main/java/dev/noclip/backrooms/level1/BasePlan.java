@@ -18,7 +18,7 @@ final class BasePlan {
 		SIGN_X, SIGN_Z,
 		FLOODLIGHT, COT, LOCKER, DESK, COMPUTER_DESK,
 		FIRE, BEDROLL, TENT_WALL, TENT_FLOOR, TENT_BEDROLL,
-		COUNTER_TRADE, COUNTER_TOM, CLINIC_BED, SIGNUP_BOOTH,
+		COUNTER_TRADE, COUNTER_TOM, CLINIC_BED, SIGNUP_BOOTH, RELAY_BOX,
 		/** A lone door frame at the south end of Alpha Base: the way into Level 1.1. */
 		ALPHA_FRAME
 	}
@@ -65,6 +65,7 @@ final class BasePlan {
 		if (lz == 44 && lx >= 34 && lx <= 44 && lx % 2 == 0) return Piece.LOCKER;
 		if (lz == 23 && lx == 38) return Piece.COMPUTER_DESK;
 		if (lz == 23 && lx == 40) return Piece.DESK;
+		if (lz == 23 && lx == 42) return Piece.RELAY_BOX;
 		if (lz == 45 && lx == 24) return Piece.ALPHA_FRAME;
 		return null;
 	}
@@ -76,6 +77,7 @@ final class BasePlan {
 		if (lz == 44 && lx >= 34 && lx <= 44 && lx % 2 == 0) return Piece.LOCKER;
 		if (lz == 23 && lx == 38) return Piece.COMPUTER_DESK;
 		if (lz == 23 && lx == 40) return Piece.DESK;
+		if (lz == 23 && lx == 42) return Piece.RELAY_BOX;
 		return null;
 	}
 

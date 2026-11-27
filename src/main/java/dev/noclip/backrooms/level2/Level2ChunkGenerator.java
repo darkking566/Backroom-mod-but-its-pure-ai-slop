@@ -5,6 +5,7 @@ import dev.noclip.backrooms.level2.Level2Layout.Kind;
 import dev.noclip.backrooms.level2.Level2Layout.Tile;
 import dev.noclip.backrooms.level2.Level2Plan.Room;
 import dev.noclip.backrooms.level2.Level2Plan.RoomKind;
+import dev.noclip.backrooms.props.BackroomsProps;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.core.BlockPos;
@@ -171,6 +172,9 @@ final class Level2ChunkGenerator extends ChunkGenerator {
 			boolean corner = (lx == room.x0() + 2 || lx == room.x1() - 2) && (lz == room.z0() + 2 || lz == room.z1() - 2);
 			if (h == 4) return corner ? Blocks.LANTERN.defaultBlockState().setValue(LanternBlock.HANGING, true) : light(seed, x, z);
 			if (lx == cx && lz == cz) return h == 1 ? Blocks.CRAFTING_TABLE.defaultBlockState() : h == 2 ? Blocks.LANTERN.defaultBlockState() : air();
+			if (lx == cx - 1 && lz == cz && h == 1) {
+				return BackroomsProps.RELAY_DROPOFF_BOX.defaultBlockState().trySetValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING, face);
+			}
 			if (lx == cx + 1 && lz == cz && h == 1) {
 				return Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, Direction.from2DDataValue(Level2Layout.chestTurn(seed, x, z, room)));
 			}

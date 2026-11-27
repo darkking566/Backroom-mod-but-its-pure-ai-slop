@@ -218,6 +218,20 @@ public final class FloorDifficulty {
 		return compute(floor, dist, penalty);
 	}
 
+	/** Scales a percentage spawn chance (0..100) by the player's dual-axis {@code spawnRateMult}; unchanged at baseline. */
+	public static int scaledChance(ServerPlayer player, int baseChance) {
+		double mult = of(player).spawnRateMult();
+		if (mult <= 1.001) return baseChance;
+		return Math.min(95, (int) Math.round(baseChance * mult));
+	}
+
+	/** Scales a nearby monster cap by the player's dual-axis {@code spawnRateMult} (up to 2x); unchanged at baseline. */
+	public static int scaledCap(ServerPlayer player, int baseCap) {
+		double mult = of(player).spawnRateMult();
+		if (mult <= 1.001) return baseCap;
+		return Math.max(baseCap, (int) Math.round(baseCap * Math.min(2.0, mult)));
+	}
+
 	public static int farmPenalty(ServerPlayer player) {
 		return FARM_PENALTY.getOrDefault(player.getUUID(), 0);
 	}

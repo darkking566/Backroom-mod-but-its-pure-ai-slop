@@ -16,6 +16,10 @@ final class GammaPlan {
 	static final int I = 3, J = 4, W = 10, H = 8;
 	/** The maze cell in front of the gate, on Gamma's north side; it is always a wide passage. */
 	static final int FRONT_I = 7, FRONT_J = J - 1;
+	/** The three locked side-door approaches (west, east, south); each maze cell in front is kept wide. */
+	static final int SIDE_WEST_I = I - 1, SIDE_WEST_J = J + 2;
+	static final int SIDE_EAST_I = I + W, SIDE_EAST_J = J + 2;
+	static final int SIDE_SOUTH_I = FRONT_I, SIDE_SOUTH_J = J + H;
 	private static final int SALT = 309;
 
 	private GammaPlan() {
@@ -31,6 +35,15 @@ final class GammaPlan {
 	/** Whether a maze cell (in cells over the whole level) is the one in front of a Gamma's gate. */
 	static boolean front(long seed, int gi, int gj) {
 		return Math.floorMod(gi, N) == FRONT_I && Math.floorMod(gj, N) == FRONT_J && in(seed, Math.floorDiv(gi, N), Math.floorDiv(gj, N));
+	}
+
+	/** Whether a maze cell is immediately outside one of Gamma's three locked side doors. */
+	static boolean sideFront(long seed, int gi, int gj) {
+		int i = Math.floorMod(gi, N), j = Math.floorMod(gj, N);
+		boolean match = (i == SIDE_WEST_I && j == SIDE_WEST_J)
+				|| (i == SIDE_EAST_I && j == SIDE_EAST_J)
+				|| (i == SIDE_SOUTH_I && j == SIDE_SOUTH_J);
+		return match && in(seed, Math.floorDiv(gi, N), Math.floorDiv(gj, N));
 	}
 
 	/** The world x, z of the north-west corner of the Gamma in a region that holds one. */

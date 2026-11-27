@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level3;
 
+import dev.noclip.backrooms.core.floors.FloorDifficulty;
 import dev.noclip.backrooms.level3.Level3Layout.Kind;
 import dev.noclip.backrooms.level3.Level3Layout.Tile;
 import dev.noclip.backrooms.level3.Level3Plan.HallKind;
@@ -71,12 +72,13 @@ final class Level3Monsters {
 		RandomSource random = level.getRandom();
 		for (ServerPlayer player : level.players()) {
 			if (player.isCreative() || player.isSpectator()) continue;
+			int cap = FloorDifficulty.scaledCap(player, MAX_MONSTERS_NEAR);
 			int near = countNear(level, player);
-			if (near >= MAX_MONSTERS_NEAR) continue;
+			if (near >= cap) continue;
 			Tile under = Level3Layout.tile(seed, player.getBlockX(), player.getBlockZ());
 			boolean inAssembly = under.hall() != null && under.hall().kind() == HallKind.ASSEMBLY;
 			boolean inDark = level.getBrightness(LightLayer.BLOCK, player.blockPosition()) < DARK;
-			int chance = inAssembly ? 55 : inDark ? 42 : 20;
+			int chance = FloorDifficulty.scaledChance(player, inAssembly ? 55 : inDark ? 42 : 20);
 			if (random.nextInt(100) >= chance) continue;
 			Entry picked = inAssembly
 					? (random.nextBoolean() ? POOL.get(0) : POOL.get(1))
@@ -84,7 +86,7 @@ final class Level3Monsters {
 			if (picked == null) continue;
 			Mob spawned = spawnOne(player, picked.type());
 			if (spawned != null && picked.type() == Monsters.DEATHMOTH) {
-				int extra = Math.min(1 + random.nextInt(2), MAX_MONSTERS_NEAR - near - 1);
+				int extra = Math.min(1 + random.nextInt(2), cap - near - 1);
 				for (int i = 0; i < extra; i++) spawnOne(player, Monsters.DEATHMOTH);
 			}
 		}

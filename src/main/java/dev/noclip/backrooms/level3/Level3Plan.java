@@ -304,9 +304,12 @@ final class Level3Plan {
 	private void openHalls(SplittableRandom random) {
 		for (int h = 0; h < halls.size(); h++) {
 			Hall hall = halls.get(h);
-			// Gamma has one way in, its gate, from the wide passage north of it.
+			// Gamma has its main gate on the north and three locked side doors on west, east and south.
 			if (hall.kind() == HallKind.GAMMA) {
 				edges[cell(GammaPlan.FRONT_I, GammaPlan.FRONT_J) * 4 + SOUTH] = Edge.HALL;
+				edges[cell(GammaPlan.SIDE_WEST_I, GammaPlan.SIDE_WEST_J) * 4 + EAST] = Edge.HALL;
+				edges[cell(GammaPlan.SIDE_EAST_I, GammaPlan.SIDE_EAST_J) * 4 + WEST] = Edge.HALL;
+				edges[cell(GammaPlan.SIDE_SOUTH_I, GammaPlan.SIDE_SOUTH_J) * 4 + NORTH] = Edge.HALL;
 				continue;
 			}
 			List<int[]> sides = new ArrayList<>();
@@ -345,6 +348,8 @@ final class Level3Plan {
 				if (edges[c * 4 + d] != Edge.HALL) continue;
 				int i = c % N + DX[d], j = c / N + DZ[d];
 				if (!inside(i, j) || halls.get(hallOf[cell(i, j)]).kind() != target || seen[c] >= 0) continue;
+				// In Gamma's region, signs always lead to the north main gate (side doors are locked from outside).
+				if (gamma && (c % N != GammaPlan.FRONT_I || c / N != GammaPlan.FRONT_J)) continue;
 				seen[c] = 0;
 				baseTo[c] = (byte) d;
 				queue[tail++] = c;

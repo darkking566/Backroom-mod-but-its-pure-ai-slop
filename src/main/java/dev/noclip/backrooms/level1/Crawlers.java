@@ -35,7 +35,7 @@ final class Crawlers {
 		for (ServerPlayer player : level.players()) {
 			if (player.isCreative() || player.isSpectator()) continue;
 			boolean inGarden = Level1Layout.sector(seed, player.getBlockX(), player.getBlockZ()) == Level1Layout.Sector.GARDEN;
-			int chance = inGarden ? 48 : 22;
+			int chance = dev.noclip.backrooms.core.floors.FloorDifficulty.scaledChance(player, inGarden ? 48 : 22);
 			if (random.nextInt(100) >= chance) continue;
 			AABB near = player.getBoundingBox().inflate(44, 16, 44);
 			if (!level.getEntitiesOfClass(Crawler.class, near).isEmpty()) continue;

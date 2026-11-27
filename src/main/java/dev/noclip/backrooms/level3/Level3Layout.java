@@ -82,7 +82,7 @@ public final class Level3Layout {
 	}
 
 	static Profile profile(long seed, int gi, int gj) {
-		if (GammaPlan.front(seed, gi, gj)) return Profile.WIDE;
+		if (GammaPlan.front(seed, gi, gj) || GammaPlan.sideFront(seed, gi, gj)) return Profile.WIDE;
 		int roll = Math.floorMod(hash(seed, gi, gj, PROFILES), 100);
 		return roll < 22 ? Profile.WIDE : roll < 65 ? Profile.NORMAL : roll < 85 ? Profile.NARROW : Profile.LOW;
 	}
@@ -154,11 +154,20 @@ public final class Level3Layout {
 		return Tile.WALL;
 	}
 
-	/** Gamma's outer wall, its gate, and inside: GammaLayout says what is there at each height. */
+	/** Gamma's outer wall, its gate, three locked side doors, and inside: GammaLayout says what is there at each height. */
 	private static Tile gammaTile(Hall hall, int lx, int lz) {
 		int u = lx - hall.x0(), v = lz - hall.z0();
 		if (v == 0 && u >= GammaLayout.GATE_U && u <= GammaLayout.GATE_U + 1) {
 			return new Tile(Kind.HALL_GAP, NORTH, GammaLayout.GATE_CLEARANCE, null, hall, u, v);
+		}
+		if (u == 0 && v == GammaLayout.SIDE_V) {
+			return new Tile(Kind.HALL_GAP, WEST, 2, null, hall, u, v);
+		}
+		if (u == GammaLayout.W - 1 && v == GammaLayout.SIDE_V) {
+			return new Tile(Kind.HALL_GAP, EAST, 2, null, hall, u, v);
+		}
+		if (v == GammaLayout.D - 1 && u == GammaLayout.GATE_U) {
+			return new Tile(Kind.HALL_GAP, SOUTH, 2, null, hall, u, v);
 		}
 		boolean edge = u == 0 || v == 0 || u == GammaLayout.W - 1 || v == GammaLayout.D - 1;
 		return new Tile(edge ? Kind.HALL_WALL : Kind.HALL, 0, edge ? 0 : Level3Halls.HEIGHT, null, hall, u, v);
@@ -290,6 +299,18 @@ public final class Level3Layout {
 		int along = axis == 0 ? ox : oz, across = axis == 0 ? oz : ox;
 		if (across != low(p.width)) return null;
 		if (along == 1 && plan.baseTo[cell] >= 0) return new Sign(false, Level3Plan.opposite(wall), plan.baseTo[cell] == ((wall + 1) & 3));
+		// Outside Gamma's region: distant direction+distance signs (denser within 2 regions, sparser further out).
+		if (along == 1 && plan.baseTo[cell] < 0) {
+			int[] gate = GammaPlan.nearestGate(seed, x, z);
+			if (gate != null) {
+				double dist = Math.hypot(gate[0] - x, gate[1] - z);
+				boolean show = dist <= 2.0 * SIZE || (dist <= 4.5 * SIZE && Math.floorMod(hash(seed, x, z, DECOR + 19), 100) < 35);
+				if (show) {
+					int want = axis == 0 ? (gate[0] >= x ? EAST : WEST) : (gate[1] >= z ? SOUTH : NORTH);
+					return new Sign(false, Level3Plan.opposite(wall), want == ((wall + 1) & 3));
+				}
+			}
+		}
 		int ahead = along == CELL - 2 ? (axis == 0 ? EAST : SOUTH) : along == 1 ? (axis == 0 ? WEST : NORTH) : -1;
 		if (ahead < 0) return null;
 		int gx = Math.floorDiv(x, CELL) + Level3Plan.DX[ahead], gz = Math.floorDiv(z, CELL) + Level3Plan.DZ[ahead];

@@ -62,7 +62,8 @@ final class Level4Layout {
 		TBD_HOARD,
 		BREAKER,
 		PHOTOCOPIER,
-		DESK_PHONE
+		DESK_PHONE,
+		RELAY_BOX
 	}
 
 	record ExitStruct(Level4Exit exit, ZoneKind zone, int dir, int depth, int along) {
@@ -608,6 +609,7 @@ final class Level4Layout {
 				if (cx == 2 && cz == 2) return new Tile(Kind.WATER_COOLER, zone, Level4Plan.SOUTH, ceilH, null, false);
 				if (cx == 5 && cz == 2) return new Tile(Kind.VENDING, zone, Level4Plan.WEST, ceilH, null, false);
 				if (cx == 2 && cz == 5) return new Tile(Kind.DESK_PHONE, zone, Level4Plan.NORTH, ceilH, null, false);
+				if (cx == 5 && cz == 5) return new Tile(Kind.RELAY_BOX, zone, Level4Plan.NORTH, ceilH, null, false);
 				if (cx == 5 && cz == 5) return new Tile(Kind.VENDING, zone, Level4Plan.WEST, ceilH, null, false);
 			}
 		}

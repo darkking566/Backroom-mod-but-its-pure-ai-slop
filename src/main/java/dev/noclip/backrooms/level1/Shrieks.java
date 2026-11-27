@@ -34,7 +34,7 @@ final class Shrieks {
 		RandomSource random = level.getRandom();
 		for (ServerPlayer player : level.players()) {
 			if (player.isCreative() || player.isSpectator()) continue;
-			if (random.nextInt(100) >= 24) continue;
+			if (random.nextInt(100) >= dev.noclip.backrooms.core.floors.FloorDifficulty.scaledChance(player, 24)) continue;
 			AABB near = player.getBoundingBox().inflate(52, 16, 52);
 			if (!level.getEntitiesOfClass(Shriek.class, near).isEmpty()) continue;
 			spawnNear(level, seed, player, random);

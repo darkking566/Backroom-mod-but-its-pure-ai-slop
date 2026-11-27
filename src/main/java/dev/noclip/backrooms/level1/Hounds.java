@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level1;
 
+import dev.noclip.backrooms.core.floors.FloorDifficulty;
 import dev.noclip.backrooms.monsters.Monsters;
 import dev.noclip.backrooms.monsters.hound.Hound;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -56,14 +57,14 @@ final class Hounds {
 		RandomSource random = level.getRandom();
 		for (ServerPlayer player : level.players()) {
 			if (player.isCreative() || player.isSpectator()) continue;
-			if (random.nextInt(100) < CHANCE) spawnNear(player);
+			if (random.nextInt(100) < FloorDifficulty.scaledChance(player, CHANCE)) spawnNear(player);
 		}
 	}
 
 	/** A hound somewhere behind the player in the halls, unless two are already about; null if none came. */
 	static Hound spawnNear(ServerPlayer player) {
 		ServerLevel level = player.level();
-		if (level.getEntitiesOfClass(Hound.class, new AABB(player.blockPosition()).inflate(NEAR)).size() >= MAX_NEAR) return null;
+		if (level.getEntitiesOfClass(Hound.class, new AABB(player.blockPosition()).inflate(NEAR)).size() >= FloorDifficulty.scaledCap(player, MAX_NEAR)) return null;
 		BlockPos at = Marauders.findSpot(player, NEAREST, FARTHEST);
 		if (at == null) return null;
 		Hound hound = Monsters.HOUND.create(level, EntitySpawnReason.EVENT);

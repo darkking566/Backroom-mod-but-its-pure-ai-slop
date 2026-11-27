@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.level2;
 
+import dev.noclip.backrooms.core.floors.FloorDifficulty;
 import dev.noclip.backrooms.level2.Level2Layout.Kind;
 import dev.noclip.backrooms.monsters.Monsters;
 import java.util.List;
@@ -67,9 +68,9 @@ final class Level2Monsters {
 		RandomSource random = level.getRandom();
 		for (ServerPlayer player : level.players()) {
 			if (player.isCreative() || player.isSpectator()) continue;
-			if (countNear(level, player) >= MAX_MONSTERS_NEAR) continue;
+			if (countNear(level, player) >= FloorDifficulty.scaledCap(player, MAX_MONSTERS_NEAR)) continue;
 			boolean inDark = level.getBrightness(LightLayer.BLOCK, player.blockPosition()) < DARK;
-			int chance = inDark ? 45 : 22;
+			int chance = FloorDifficulty.scaledChance(player, inDark ? 45 : 22);
 			if (random.nextInt(100) >= chance) continue;
 			Entry picked = pick(random, inDark, peaceful);
 			if (picked != null) spawnOne(player, picked.type());

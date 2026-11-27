@@ -34,7 +34,7 @@ final class ShepherdSnakes {
 		RandomSource random = level.getRandom();
 		for (ServerPlayer player : level.players()) {
 			if (player.isCreative() || player.isSpectator()) continue;
-			if (random.nextInt(100) >= 14) continue;
+			if (random.nextInt(100) >= dev.noclip.backrooms.core.floors.FloorDifficulty.scaledChance(player, 14)) continue;
 			AABB near = player.getBoundingBox().inflate(96, 24, 96);
 			if (!level.getEntitiesOfClass(ShepherdSnake.class, near).isEmpty()) continue;
 			spawnNear(level, seed, player, random);

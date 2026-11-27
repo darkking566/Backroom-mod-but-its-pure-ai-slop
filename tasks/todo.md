@@ -7,32 +7,29 @@
 - 開遊戲：雙擊 `play.bat`（等同 `.\gradlew.bat runClient`）；改貼圖、模型、文字後跑 `.\gradlew.bat processResources`，遊戲裡按 F3+T；改 Java 要重開遊戲；改維度設定（`data/`）至少退回主選單
 - 進後室：生存模式世界、允許指令；挖 1×1 深 3 格的坑站進去，對著坑壁頂端放兩次沙子埋住頭（創造模式不會觸發）
 - 直接傳送：Level 0 `/execute in noclip_backrooms:level_0 run tp @s 3.5 33 3.5`（地板 y=32）；Level 1 `/execute in noclip_backrooms:level_1 run tp @s 32.5 33 41.5`
-- 樓層進出：Level 0 → 1 待 1.5～3 分鐘後走進閃爍冒火花的牆；Level 1 → 2 往下的樓梯；Level 2 → 3 噴紅色「3」的門；各層說明在 `docs/project/5-levels/<層>/README.md`
-- 光影：Iris 1.11.4、Sodium 0.9.2、Complementary Unbound r5.10；光影設定的 Resource Pack Support（RP_MODE）要改 labPBR；推薦設定在 `docs/look/shaders/`
+- 樓層進出：Level 0 → 1 待 1.5～3 分鐘後走進閃爍冒火花的牆；Level 1 → 2 往下的樓梯；Level 2 → 3 噴紅色「3」的門；各層說明在 `docs/企劃書/5-樓層/<層>/README.md`
+- 光影：Iris 1.11.4、Sodium 0.9.2、Complementary Unbound r5.10；光影設定的 Resource Pack Support（RP_MODE）要改 labPBR；推薦設定在 `docs/畫面規範/光影設定/`
 
 ## 各區現況
 
-- **Level 0**（朋友）：電影級大改版（淨高 5 格、`CELL=10`、5×5 扇區一張 Stage）；環面空間 `Level0Space`＋完整鏡像 `Level0Mirror`（方塊、實體、分身）。擺東西要照範本座標（`template()`），不能照區塊掃描
+- **Level 0**（朋友）：電影級大改版（淨高 5 格、`CELL=10`、5×5 扇區一張 Stage）；環面空間 `Level0Space`＋完整鏡像 `Level0Mirror`（方塊、實體、分身、音效、粒子、箱子內容、告示牌字）；深處（250m+／紅室）出沒無盡之菌 `Level0Bacteria`。擺東西要照範本座標（`template()`），不能照區塊掃描
 - **Level 0 電影物件**（Claude）：68 個物件＋VHS 錄影帶（`level0/film/`、`tools/film/`）；擺進生成器現在歸 Claude
-- **Level 0.1 天頂站**（Claude 起、朋友續做）：球殼、房間、機器人、停電、寫實材質；審查報告全部處理完
-- **Level 1 停車場**：六區段、據點、居民、出口、怪物；審查報告全部處理完；Gemini 加了四批興趣點與彩蛋
-- **Level 2、3**：Claude 首版；朋友加寫實材質、怪物、據點、Gamma 大型基地（生存模式打不壞、探測門看得到袋子裡的武器）
-- **Level 4**（朋友）：辦公室、三大勢力、陷阱窗、會消失的出口、雨景、10 種建築結構；Gemini 加了高樓雨霧街谷（192 格高）、窗戶怪 3D 模型、20 種興趣點（`docs/project/5-levels/level4/POI.md`）
+- **Level 0.1 天頂站**（Claude 起、朋友續做）：球殼、房間、機器人、停電、寫實材質、視聽幻覺與導航失效（`ZenithHallucinations`）；審查報告全部處理完
+- **Level 1 停車場**：六區段、據點（含中繼投遞箱與黑市商人）、居民、出口、怪物；審查報告全部處理完；Gemini 加了四批興趣點與彩蛋
+- **Level 2、3**：Claude 首版；朋友加寫實材質、怪物、據點、Gamma 大型基地；已補齊 Level 2 非門出口（64／189／樞紐）、EL3A／Gamma 中繼箱與黑市、Gamma 三邊鎖住側門／D1 監視器／D2 鈦牆鐵絲網電網／遠距方向距離路標／檔案員收購拓印與狂亂筆記／鬼屋／寫實貼圖
+- **Level 4**（朋友）：辦公室、三大勢力（Base Omega 含中繼投遞箱與黑市商人）、陷阱窗、會消失的出口、雨景、10 種建築結構；Gemini 加了高樓雨霧街谷（192 格高）、窗戶怪 3D 模型、20 種興趣點（`docs/企劃書/5-樓層/Level4-廢棄辦公室/興趣點.md`）
 - **家具外框**（Gemini）：各層非整格物件的準心外框與碰撞貼合模型（`PropShapes`、各層 `*Shapes`）
-- **恐怖系統**（`core/trip`、`core/quota`、`core/guild`、`core/field`、`core/locker`）：安頓、撤離倒數、死亡規則、隊伍落點、任務報告、配額、委託、無線電、異常詞綴、野戰工具、按趟加工、武器平衡、雙結局；另有樓層門禁 `LevelGates`、寶箱分級、黑市、鑑定、受困倖存者支線（Gemini）
-- **前室**（`frontrooms/`，Claude）：研究所照電影結尾重做（三層、園區、318 件 Blender 物件）、眷舍小鎮、398 的夜晚
+- **恐怖與故事系統**（`core/trip`、`core/quota`、`core/story`、`core/guild`、`core/field`、`core/locker`）：第一趟「跟著纜線走」與 42 句塗鴉、M.E.G. 6 件主線與 B1 收容格怪物、安頓、撤離倒數、死亡規則、隊伍落點、任務報告、配額與研究所隨期數升級、雙軸難度（含生怪倍率 `spawnRateMult`）、委託、無線電、異常詞綴、野戰工具、按趟加工、武器平衡、雙結局；另有樓層門禁 `LevelGates`、寶箱分級、黑市、鑑定、受困倖存者支線（Gemini）
+- **前室**（`frontrooms/`，Claude）：研究所照電影結尾重做（三層、園區、318 件 Blender 物件、B1 收容格）、眷舍小鎮（含槍櫃台、照順序家信、隨排斥變慢的日夜時鐘）、398 的夜晚與好結局「回家了」（接結局 B）
 - **寫實物品包**（`resourcepacks/realistic_items/`）：83 件（冷兵器、槍、配件、家具）；Blender 曲面網格只試做 3 件（騎士長劍、9mm 手槍、辦公椅）
-- **畫面**：寫實材質包（Level 0、0.1、1、2、3、4）、攝影機濾鏡（F7）、每層 `Look.Mood`、規範 `docs/look/STYLE_GUIDE.md`、`SOP.md`
+- **畫面**：寫實材質包（Level 0、0.1、1、2、3、4）、攝影機濾鏡（F7）、每層 `Look.Mood`、規範 `docs/畫面規範/風格規範.md`、`每層流程.md`
 
 ## 待辦
 
-- Level 0 鏡像還沒做：音效、粒子、箱子內容、告示牌字
-- Level 0 電影物件還沒做：穿模、倒放、地毯吞沒、藍色膠帶門框
-- 前室還沒做：398 好結局怎麼接結局 B、小女孩、槍店、時鐘變慢、收容區的怪物
-- 企劃只寫了文件：第一趟「跟著纜線走」與 42 句塗鴉、M.E.G. 任務主線與 Boss、研究所跟著配額升級
+- Level 0 電影物件還沒做：擺進地圖（展示間區、單件散落）、穿模、倒放、地毯吞沒、藍色膠帶門框
+- 故事線待討論後補：Boss 與反抗 M.E.G. 的結局反轉；前室小女孩（Gemini 負責）
 - Gemini 留的：「首次合成新物品給經驗」還沒接進合成台
-- 企劃書有、遊戲沒有，使用者說先放著之後改（2026-11-28 審查）：工具 1～4 階拆東西的權限（`requires_tier` 標籤不存在）、《後室合成圖鑑》介面（現在只是聊天欄說明）、廢料治安套減流血與竊皮偽裝套降偵測、雙軸難度的生怪變多（`spawnRateMult` 沒人用）
-- 測試失敗沒查：`runClientGameTest -Plevels=props,4` 卡在「elevator shaft should rise high above FLOOR_Y」（2026-11-28 記）
+- 企劃書有、遊戲沒有，使用者說先放著之後改（2026-11-28 審查）：工具 1～4 階拆東西的權限（`requires_tier` 標籤不存在）、《後室合成圖鑑》介面（現在只是聊天欄說明）、廢料治安套減流血與竊皮偽裝套降偵測
 
 ## 等使用者決定
 

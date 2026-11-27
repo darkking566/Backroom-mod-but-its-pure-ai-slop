@@ -474,6 +474,9 @@ final class Level4Bases {
 							// 2 strolling squad operatives
 							spawned += spawnFactionPerson(level, seed, room.kind(), x0, z0, x1, z1, x0 + 4, cz - 5, "colonist", "M.E.G. Squad Operative", STAFF_TAG, OMEGA_SQUAD_TAG, true);
 							spawned += spawnFactionPerson(level, seed, room.kind(), x0, z0, x1, z1, x0 + 4, cz + 5, "speednoclipper", "M.E.G. Squad Operative", STAFF_TAG, OMEGA_SQUAD_TAG, true);
+							// Discreet black-market broker in the east supply wing (separate tag so Omega's 10 M.E.G. staff stay 10).
+							spawned += spawnFactionPerson(level, seed, room.kind(), x0, z0, x1, z1, x1 - 4, cz - 4, ShopRole.BLACK_MARKET.look(),
+									"Black Market Broker", "noclip_backrooms_level4_black_market", ShopRole.BLACK_MARKET.tag(), true);
 						}
 						case AMOR_CAMP -> {
 							// Wiki: exactly 10 members, fightable

@@ -34,7 +34,7 @@ final class Clumps {
 		RandomSource random = level.getRandom();
 		for (ServerPlayer player : level.players()) {
 			if (player.isCreative() || player.isSpectator()) continue;
-			if (random.nextInt(100) >= 30) continue;
+			if (random.nextInt(100) >= dev.noclip.backrooms.core.floors.FloorDifficulty.scaledChance(player, 30)) continue;
 			AABB near = player.getBoundingBox().inflate(44, 16, 44);
 			if (!level.getEntitiesOfClass(Clump.class, near).isEmpty()) continue;
 			spawnNear(level, seed, player, random);

@@ -28,6 +28,8 @@ final class GammaLayout {
 	static final int W = GammaPlan.W * Level3Plan.CELL, D = GammaPlan.H * Level3Plan.CELL, Y = Level3ChunkGenerator.HEIGHT;
 	/** The gate is two blocks wide (u 26, 27) in the north wall, three high over the maze floor. */
 	static final int GATE_U = 26, GATE_CLEARANCE = 3;
+	/** The west/east side doors sit at v = 14 (matching maze cell J+2 offset 2); south side door sits at u = GATE_U, v = D-1. */
+	static final int SIDE_V = 14;
 	static final int TUNNEL = 1, MALL_1 = 9, MALL_2 = 16, MALL_3 = 23, RESIDENTIAL = 32, ADMIN = 39, ROOF = 46;
 	/** The floors, bottom to top; the stairwell joins each to the next. */
 	static final int[] FLOORS = {TUNNEL, MALL_1, MALL_2, MALL_3, RESIDENTIAL, ADMIN};
@@ -37,18 +39,20 @@ final class GammaLayout {
 	static final int SPRING_U0 = 21, SPRING_U1 = 26, SPRING_V0 = 21, SPRING_V1 = 26;
 
 	enum Thing {
-		AIR, BEDROCK, BRICK, WALL, FLOOR, MALL_FLOOR, CEILING, LIGHT, BULB, DAYLIGHT, RAIL, STAIRS, GLASS, WATER, RIM,
-		CHECKPOINT, LOCKER, COT, TABLE, SUPPLY_CRATE, CRATE, CAMERA, MEG_SIGN, LECTERN, IRON_DOOR, CAGE_GATE, EXIT_DOOR,
-		ELEVATOR, PLANKS, PATCH, COBWEB, CANOPY_RED, CANOPY_YELLOW, CANOPY_BLUE, SERVER, ARCADE, SCREEN, JUKEBOX, SMOKER;
+		AIR, BEDROCK, BRICK, TITANIUM, WALL, FLOOR, MALL_FLOOR, CEILING, LIGHT, BULB, DAYLIGHT, RAIL, STAIRS, GLASS, WATER, RIM,
+		CHECKPOINT, LOCKER, COT, TABLE, SUPPLY_CRATE, CRATE, CAMERA, MEG_SIGN, LECTERN, IRON_DOOR, SIDE_DOOR, CAGE_GATE, EXIT_DOOR,
+		ELEVATOR, PLANKS, PATCH, COBWEB, CANOPY_RED, CANOPY_YELLOW, CANOPY_BLUE, SERVER, ARCADE, SCREEN, JUKEBOX, SMOKER,
+		BARBED_WIRE, ELECTRIC_FENCE, RELAY_BOX;
 
 		/** Whether a player can stand in it (or climb through it). */
 		boolean open() {
-			return this == AIR || this == WATER || this == COBWEB || this == CHECKPOINT || this == IRON_DOOR || this == CAGE_GATE;
+			return this == AIR || this == WATER || this == COBWEB || this == CHECKPOINT || this == IRON_DOOR || this == SIDE_DOOR
+					|| this == CAGE_GATE || this == BARBED_WIRE;
 		}
 
 		/** Whether a player can stand on it. */
 		boolean footing() {
-			return !open() && this != RAIL && this != CANOPY_RED && this != CANOPY_YELLOW && this != CANOPY_BLUE;
+			return !open() && this != RAIL && this != CANOPY_RED && this != CANOPY_YELLOW && this != CANOPY_BLUE && this != ELECTRIC_FENCE;
 		}
 	}
 
@@ -71,6 +75,7 @@ final class GammaLayout {
 			new Spot("performer", 24, MALL_2 + 1, 9, "speednoclipper", "Street Performer", null),
 			new Spot("cook", 5, MALL_2 + 1, 19, "tom", "Food Cart", null),
 			new Spot("pawnbroker", 54, MALL_1 + 1, 42, "trader", "B.N.T.G. Pawnbroker", "buyer"),
+			new Spot("black_market", 52, MALL_1 + 1, 36, "speednoclipper", "Black Market Broker", "black_market"),
 			new Spot("archivist", 37, ADMIN + 1, 44, "colonist", "M.E.G. Archivist", null),
 			new Spot("mason", 5, TUNNEL + 1, 40, "aiko", "Mason", "mason"));
 
@@ -129,6 +134,11 @@ final class GammaLayout {
 			box(0, W - 1, y, y, D - 1, D - 1, Thing.BRICK);
 			box(0, 0, y, y, 0, D - 1, Thing.BRICK);
 			box(W - 1, W - 1, y, y, 0, D - 1, Thing.BRICK);
+			// Inner titanium defense lining behind the outer brick wall (D2).
+			box(1, W - 2, y, y, 1, 1, Thing.TITANIUM);
+			box(1, W - 2, y, y, D - 2, D - 2, Thing.TITANIUM);
+			box(1, 1, y, y, 1, D - 2, Thing.TITANIUM);
+			box(W - 2, W - 2, y, y, 1, D - 2, Thing.TITANIUM);
 		}
 		mall();
 		storage();
@@ -183,6 +193,8 @@ final class GammaLayout {
 		}
 		tall(1, MALL_1 + 1, 24, Thing.ELEVATOR, EAST);
 		set(1, MALL_1 + 3, 24, Thing.MEG_SIGN);
+		// Relay drop-off box beside the mall shops.
+		set(13, MALL_1 + 1, 5, Thing.RELAY_BOX, SOUTH, 0);
 
 		// First floor: the old wooden quarter in the north-west corner, food carts, the haunted house, a busker.
 		box(2, 12, MALL_2, MALL_2, 2, 12, Thing.PLANKS);
@@ -262,6 +274,11 @@ final class GammaLayout {
 		}
 		set(GATE_U - 1, y1 - 1, 2, Thing.CAMERA, SOUTH, 0);
 		set(GATE_U + 2, y1 - 1, 2, Thing.CAMERA, SOUTH, 0);
+		// D2 perimeter defenses: electric fence flanking the entry hall & razor wire atop the checkpoint parapet.
+		for (int u = 16; u <= 20; u++) set(u, y0, 2, Thing.ELECTRIC_FENCE, 0, 0);
+		for (int u = 32; u <= 35; u++) set(u, y0, 2, Thing.ELECTRIC_FENCE, 0, 0);
+		for (int u = 19; u <= 23; u++) set(u, y1, 8, Thing.BARBED_WIRE);
+		for (int u = 30; u <= 34; u++) set(u, y1, 8, Thing.BARBED_WIRE);
 		// The M.E.G.'s sign is set into the wall itself.
 		set(GATE_U - 2, y0 + 1, 9, Thing.MEG_SIGN);
 		set(GATE_U + 3, y0 + 1, 9, Thing.MEG_SIGN);
@@ -290,6 +307,17 @@ final class GammaLayout {
 		lights(2, 45, 2, 12, y1, Thing.LIGHT, false);
 		tall(27, y0, D - 2, Thing.EXIT_DOOR, NORTH);
 		set(27, y0 + 3, D - 2, Thing.MEG_SIGN);
+		// Three locked side doors (west, east, south): openable only from inside Gamma.
+		box(1, 1, y0, y0 + 1, SIDE_V, SIDE_V, Thing.AIR);
+		tall(0, y0, SIDE_V, Thing.SIDE_DOOR, WEST);
+		box(26, 26, y0, y0 + 1, D - 2, D - 2, Thing.AIR);
+		tall(GATE_U, y0, D - 1, Thing.SIDE_DOOR, SOUTH);
+		// Short east service corridor through the storage roof slab to the east side door.
+		box(46, W - 2, RESIDENTIAL, RESIDENTIAL, SIDE_V, SIDE_V + 1, Thing.FLOOR);
+		box(46, W - 2, y0, y0 + 2, SIDE_V, SIDE_V + 1, Thing.AIR);
+		set(50, y0 + 2, SIDE_V, Thing.BULB);
+		set(55, y0 + 2, SIDE_V, Thing.BULB);
+		tall(W - 1, y0, SIDE_V, Thing.SIDE_DOOR, EAST);
 	}
 
 	/** A room behind a wall at u = door, its far end at u = back (west of the door if dir is WEST, else east). */

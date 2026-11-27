@@ -808,6 +808,10 @@ final class Level4ChunkGenerator extends ChunkGenerator {
 			case DESK_PHONE -> h == 1
 					? Level4Blocks.OFFICE_DESK_PHONE.defaultBlockState().setValue(Level4FacingBlock.FACING, dir)
 					: Blocks.AIR.defaultBlockState();
+			case RELAY_BOX -> h == 1
+					? dev.noclip.backrooms.props.BackroomsProps.RELAY_DROPOFF_BOX.defaultBlockState()
+							.trySetValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING, dir)
+					: Blocks.AIR.defaultBlockState();
 		};
 	}
 

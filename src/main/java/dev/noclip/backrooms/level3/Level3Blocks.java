@@ -166,9 +166,19 @@ public final class Level3Blocks {
 			.sound(SoundType.GLASS).lightLevel(state -> 15));
 	public static final Block CHECKPOINT_DOOR = register("checkpoint_door", unbreakable(MapColor.METAL).lightLevel(state -> 4),
 			GammaCheckpointBlock::new);
+	/** Base Gamma's inner titanium defense plate, perimeter razor wire, and high-voltage fence. */
+	public static final Block TITANIUM_WALL = register("gamma_titanium_wall", Properties.of().mapColor(MapColor.METAL).strength(5.0F, 12.0F).sound(SoundType.METAL));
+	public static final Block BARBED_WIRE = register("gamma_razor_wire", Properties.of().mapColor(MapColor.METAL).strength(2.0F)
+			.sound(SoundType.METAL).noCollision().noOcclusion(), Level3HazardBlocks.BarbedWire::new);
+	public static final Block ELECTRIC_FENCE = register("gamma_electric_fence", unbreakable(MapColor.METAL).lightLevel(state -> 3),
+			Level3HazardBlocks.ElectricFence::new);
 	public static final Block BLUE_STATION_LIGHT = register("blue_station_light", fixture(9), p -> new Level3AxisBlock(p, FIXTURE));
 	public static final Block UEC_APPARATUS = register("uec_apparatus", machine().noOcclusion().lightLevel(s -> 3),
 			p -> new Level3FacingBlock(p, UEC_APPARATUS_SHAPE, Level3FacingBlock.Effect.WHIR));
+
+	// Collectible field records turned in to Base Gamma's Archivist (A5 & C3)
+	public static final Item SANCTUM_RUBBING = registerItem("sanctum_rubbing");
+	public static final Item FRANTIC_NOTE = registerItem("frantic_note");
 
 	// Ways out, which nothing breaks either
 	public static final Block ELEVATOR = register("station_elevator", unbreakable(MapColor.GOLD).lightLevel(state -> 3),
@@ -182,6 +192,10 @@ public final class Level3Blocks {
 
 	static void register() {
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.BUILDING_BLOCKS).register(output -> ALL.forEach(output::accept));
+		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.INGREDIENTS).register(output -> {
+			output.accept(SANCTUM_RUBBING);
+			output.accept(FRANTIC_NOTE);
+		});
 	}
 
 	private static Properties brick(MapColor color) {
@@ -211,6 +225,12 @@ public final class Level3Blocks {
 
 	private static Block register(String name, Properties properties) {
 		return register(name, properties, Block::new);
+	}
+
+	private static Item registerItem(String name) {
+		Identifier id = Level3.id(name);
+		ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, id);
+		return Registry.register(BuiltInRegistries.ITEM, key, new Item(new Item.Properties().setId(key).stacksTo(16)));
 	}
 
 	private static Block register(String name, Properties properties, Function<Properties, Block> factory) {
