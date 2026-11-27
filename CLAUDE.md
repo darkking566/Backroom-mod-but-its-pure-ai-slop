@@ -588,6 +588,7 @@
   - 測試：`Level0ClientTest` 加「中央場景放的方塊同時出現在已載入與之後才載入的複製品」「邊緣外的盔甲座被移回」「邊緣外看得到分身」（截圖 `level0_seam_ghost`）；修朋友的「卡住的落點」檢查：第一格中央是坑洞時 Noclip 本來就落在同一格的走道上；`HorrorClientTest` 獵犬段改站在場景內（受傷的獵犬會往暗處退、跨過接縫）；`FieldClientTest` 紅線失敗訊息加上玩家位置
   - 驗證：`gradlew build`、`runClientGameTest -Plevels=0,horror,floors,field,frontrooms,film,1 -Psections=leaveThroughDoor`（分兩次跑完都通過）
   - 還沒鏡像：音效、粒子、方塊實體的內容（箱子內容、告示牌字）
+- 使用者同意後，把 `main` 推送到 GitHub（合併朋友的 Level 4、第 0 層環面 `af5e82dd`、完整鏡像 `1a751068`）；推送前抓過 GitHub，沒有新提交要合併；沒有強制推送、沒有改寫歷史
 
 ## 動作記錄（Antigravity）
 
