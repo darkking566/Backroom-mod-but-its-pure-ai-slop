@@ -2496,7 +2496,7 @@
   "message.noclip_backrooms.field.album_stored": "收進 %s 張（相簿 %s／%s）",
   "photo.noclip_backrooms.empty": "相簿是空的",
   "photo.noclip_backrooms.no_image": "沒有影像",
-  "camera.noclip_backrooms.film": "底片 %s",
+  "camera.noclip_backrooms.film": "底片",
   "camera.noclip_backrooms.ready": "● 就緒",
   "camera.noclip_backrooms.winding": "○ 捲片中",
   "camera.noclip_backrooms.distance": "%s 公尺",

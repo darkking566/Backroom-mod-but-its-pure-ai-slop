@@ -2496,7 +2496,7 @@
   "message.noclip_backrooms.field.album_stored": "Stored %s (album %s/%s)",
   "photo.noclip_backrooms.empty": "The album is empty",
   "photo.noclip_backrooms.no_image": "No picture",
-  "camera.noclip_backrooms.film": "Film %s",
+  "camera.noclip_backrooms.film": "Film",
   "camera.noclip_backrooms.ready": "● Ready",
   "camera.noclip_backrooms.winding": "○ Winding",
   "camera.noclip_backrooms.distance": "%s m",
