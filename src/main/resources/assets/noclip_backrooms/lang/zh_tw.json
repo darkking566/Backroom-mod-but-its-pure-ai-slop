@@ -1950,7 +1950,7 @@
   "tooltip.noclip_backrooms.clipp_card": "神祕的跨層通行卡。\n▶ 進入新樓層時可提供額外切入庇護與物資補給。",
   "tooltip.noclip_backrooms.bntg_beacon": "B.N.T.G. 商團專用的空間信標。\n▶ 在 Level 0 右鍵啟動，可直接撕開裂縫前往 Level 0.1（天頂站）。",
   "tooltip.noclip_backrooms.meg_camera": "M.E.G. 現場取證用拍立得相機。\n▶ 對準實體或異常場景右鍵拍攝取證，照片可賣給採購員折抵配額。",
-  "tooltip.noclip_backrooms.evidence_photo": "記錄著實體或異常現場的拍立得照片。\n▶ 帶回研究所交給採購員可換取高額信用點與配額進度。",
+  "tooltip.noclip_backrooms.evidence_photo": "記錄著實體或異常現場的拍立得照片。\n▶ 帶回研究所交給採購員可換取高額信用點與配額進度。\n▶ 拿在手上右鍵可以看照片。",
   "tooltip.noclip_backrooms.topology_tape": "紀錄後室空間結構的測繪磁帶。\n▶ 交給採購員後可永久測繪該樓層，日後從研究所免費直達。",
   "tooltip.noclip_backrooms.mapping_beacon": "M.E.G. 空間測繪信標。\n▶ 放置於距離進入點 300 格以上處啟動掃描，完成後取得測繪磁帶。",
   "tooltip.noclip_backrooms.chalk": "探索記號粉筆。\n▶ 右鍵在地面或牆壁畫上方向箭頭；再次右鍵切換符號（箭頭／叉號／EXIT）。",

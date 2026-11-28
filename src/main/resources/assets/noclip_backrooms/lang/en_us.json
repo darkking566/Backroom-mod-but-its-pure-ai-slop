@@ -1950,7 +1950,7 @@
   "tooltip.noclip_backrooms.clipp_card": "Enigmatic inter-level pass.\n▶ Assists with safer arrival and supplies when entering new levels.",
   "tooltip.noclip_backrooms.bntg_beacon": "B.N.T.G. spatial trader beacon.\n▶ Use in Level 0 to open a direct seam into Level 0.1 (Zenith Station).",
   "tooltip.noclip_backrooms.meg_camera": "M.E.G. field evidence Polaroid camera.\n▶ Right-click entities or anomaly scenes to snap photos and sell to the Buyer for quota.",
-  "tooltip.noclip_backrooms.evidence_photo": "Developed field evidence photograph.\n▶ Sell to the Institute Buyer for high credits and quota progress.",
+  "tooltip.noclip_backrooms.evidence_photo": "Developed field evidence photograph.\n▶ Sell to the Institute Buyer for high credits and quota progress.\n▶ Right-click to look at it.",
   "tooltip.noclip_backrooms.topology_tape": "Recorded Backrooms spatial mapping tape.\n▶ Sell to the Buyer to permanently map that level for free Institute deployment.",
   "tooltip.noclip_backrooms.mapping_beacon": "M.E.G. spatial mapping beacon.\n▶ Place 300+ blocks from your entry point to scan and collect a Topology Tape.",
   "tooltip.noclip_backrooms.chalk": "Expedition marking chalk.\n▶ Right-click floors or walls to mark arrows; click a mark again to cycle symbols.",
