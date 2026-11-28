@@ -71,7 +71,7 @@ public final class FieldKit {
 	public static final Block GLOW_STICK_BLOCK = block("glow_stick", Properties.of().mapColor(MapColor.COLOR_LIGHT_GREEN).instabreak().noCollision()
 			.noOcclusion().lightLevel(s -> 9).sound(SoundType.CANDLE).noLootTable().pushReaction(PushReaction.DESTROY), FieldBlocks.GlowStick::new);
 	public static final Block RED_LINE = block("red_line", Properties.of().mapColor(MapColor.COLOR_RED).instabreak().noCollision().noOcclusion()
-			.sound(SoundType.WOOL).noLootTable().replaceable().pushReaction(PushReaction.DESTROY), FieldBlocks.RedLine::new);
+			.lightLevel(s -> 7).sound(SoundType.WOOL).noLootTable().replaceable().pushReaction(PushReaction.DESTROY), FieldBlocks.RedLine::new);
 	public static final Block BARRICADE = block("barricade", Properties.of().mapColor(MapColor.WOOD).strength(2.0F, 3.0F).noOcclusion()
 			.sound(SoundType.WOOD), FieldBlocks.Barricade::new);
 	public static final Block TRIPWIRE_BLOCK = block("tripwire_alarm", Properties.of().mapColor(MapColor.METAL).instabreak().noCollision()
@@ -194,8 +194,7 @@ public final class FieldKit {
 			ServerLevel level = (ServerLevel) player.level();
 			BlockPos feet = player.blockPosition();
 			if (!level.getBlockState(feet).isAir() || !level.getBlockState(feet.below()).isFaceSturdy(level, feet.below(), Direction.UP)) continue;
-			Direction.Axis axis = Math.abs(player.getDeltaMovement().x) > Math.abs(player.getDeltaMovement().z) ? Direction.Axis.X : Direction.Axis.Z;
-			level.setBlockAndUpdate(feet, RED_LINE.defaultBlockState().setValue(FieldBlocks.RedLine.AXIS, axis));
+			level.setBlockAndUpdate(feet, FieldBlocks.RedLine.connectedState(level, feet));
 			ItemStack spool = player.getItemInHand(hand);
 			if (!player.isCreative()) spool.hurtAndBreak(1, player, hand);
 		}

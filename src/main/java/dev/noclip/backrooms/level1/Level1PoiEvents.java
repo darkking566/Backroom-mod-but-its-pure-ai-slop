@@ -64,6 +64,14 @@ final class Level1PoiEvents {
 				trigger(serverLevel, serverPlayer, pos, null);
 				return InteractionResult.SUCCESS;
 			}
+			if (target.is(Level1Blocks.VEHICLE_PART)) {
+				BlockPos master = Level1VehiclePartBlock.masterPos(pos, target);
+				BlockState mState = serverLevel.getBlockState(master);
+				if (mState.getBlock() instanceof Level1VehicleBlock) {
+					scavengeVehicle(serverLevel, serverPlayer, master, null);
+					return InteractionResult.SUCCESS;
+				}
+			}
 			if (target.is(Level1Blocks.ABANDONED_CAR) || target.is(Level1Blocks.ABANDONED_VAN)) {
 				scavengeVehicle(serverLevel, serverPlayer, pos, null);
 				return InteractionResult.SUCCESS;
@@ -84,6 +92,7 @@ final class Level1PoiEvents {
 			return false;
 		}
 		state.markScavenged(pos);
+		dev.noclip.backrooms.core.story.Missions.onBlockInteract(player, "vehicle_l1", pos, "1");
 		level.sendParticles(ParticleTypes.CLOUD, pos.getX() + 0.5, pos.getY() + 0.8, pos.getZ() + 0.5, 6, 0.3, 0.2, 0.3, 0.02);
 
 		RandomSource random = level.getRandom();

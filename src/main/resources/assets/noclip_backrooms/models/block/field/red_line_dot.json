@@ -1,0 +1,23 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "particle": "noclip_backrooms:block/field/red_line",
+    "t": "noclip_backrooms:block/field/red_line"
+  },
+  "elements": [
+    {
+      "from": [6.8, 0.12, 6.8],
+      "to": [9.2, 0.28, 9.2],
+      "shade": false,
+      "faces": {
+        "up": { "texture": "#t", "uv": [2.0, 7.6, 14.0, 8.4], "light_emission": 12 },
+        "down": { "texture": "#t", "uv": [2.0, 7.6, 14.0, 8.4], "light_emission": 12 },
+        "north": { "texture": "#t", "uv": [2.0, 7.6, 14.0, 8.4], "light_emission": 12 },
+        "south": { "texture": "#t", "uv": [2.0, 7.6, 14.0, 8.4], "light_emission": 12 },
+        "east": { "texture": "#t", "uv": [2.0, 7.6, 14.0, 8.4], "light_emission": 12 },
+        "west": { "texture": "#t", "uv": [2.0, 7.6, 14.0, 8.4], "light_emission": 12 }
+      }
+    }
+  ]
+}

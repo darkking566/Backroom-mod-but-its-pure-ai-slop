@@ -53,18 +53,9 @@ public final class FirstTrip {
 		StoryBlocks.register();
 		// Out of the Backrooms alive, by the door or any other way: they have been to the institute.
 		Floors.onHome((player, run) -> {
-			// The radio is issued on the same homecoming (core.trip.Trips), so ask the flag itself: players from before
-			// the main quest also hear the welcome once, and get their first assignment.
-			boolean first = !Boolean.TRUE.equals(player.getAttached(DONE));
 			player.setAttached(DONE, true);
 			player.removeAttached(DOOR);
-			// The first time at the institute: the commander's welcome, and the first assignment.
-			if (first) {
-				for (int i = 1; i <= 2; i++) {
-					player.sendSystemMessage(Component.translatable("message.noclip_backrooms.first_trip.welcome." + i).withStyle(ChatFormatting.AQUA));
-				}
-				MainQuest.brief(player);
-			}
+			Missions.onPlayerHome(player);
 		});
 	}
 
@@ -130,15 +121,10 @@ public final class FirstTrip {
 		return level0.getBlockState(door).is(StoryBlocks.GUIDE_DOOR) ? door : null;
 	}
 
-	/** The player opened the glowing door: on their first trip it takes them to the institute; otherwise it is shut. */
+	/** The player opened an existing glowing door: always takes them back to the M.E.G. institute. */
 	static void throughDoor(ServerPlayer player) {
 		if (player.isRemoved() || player.hasDisconnected() || !player.isAlive()) return;
 		if (!Home.inBackrooms(player.level().dimension())) return;
-		if (done(player)) {
-			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.first_trip.door_shut").withStyle(ChatFormatting.GRAY));
-			player.level().playSound(null, player.blockPosition(), SoundEvents.IRON_DOOR_CLOSE, SoundSource.BLOCKS, 0.7F, 0.6F);
-			return;
-		}
 		player.level().playSound(null, player.blockPosition(), SoundEvents.IRON_DOOR_OPEN, SoundSource.BLOCKS, 0.9F, 0.9F);
 		Home.send(player);
 	}

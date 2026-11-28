@@ -292,6 +292,8 @@ public final class Badges {
 	public static void talk(ServerPlayer player) {
 		BadgeData data = get(player);
 		int coins = countCoins(player.getInventory());
+		player.sendSystemMessage(Component.translatable("message.noclip_backrooms.badge.vendor_intro")
+				.withStyle(ChatFormatting.AQUA));
 		player.sendSystemMessage(Component.translatable("message.noclip_backrooms.badge.vendor_header", coins)
 				.withStyle(ChatFormatting.GOLD));
 		for (Badge badge : Badge.values()) {

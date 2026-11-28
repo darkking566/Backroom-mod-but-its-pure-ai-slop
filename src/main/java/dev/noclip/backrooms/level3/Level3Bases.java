@@ -117,6 +117,7 @@ final class Level3Bases {
 					if (!sp.getInventory().add(rubbing)) sp.drop(rubbing, false);
 					level.playSound(null, pos, SoundEvents.BOOK_PAGE_TURN, SoundSource.BLOCKS, 0.8F, 0.9F);
 					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level3.sanctum_rubbing").withStyle(ChatFormatting.GOLD));
+					dev.noclip.backrooms.core.story.Missions.onBlockInteract(sp, "pedestal_l3", pos, "3");
 				} else {
 					sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level3.sanctum_unreadable").withStyle(ChatFormatting.GRAY));
 				}

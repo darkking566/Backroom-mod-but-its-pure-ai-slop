@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -16,6 +17,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -276,12 +278,21 @@ public final class Level1Blocks {
 			p -> new ShapedBlock(p, Block.box(0.5, 0, 2, 15.5, 10.5, 19)));
 	// The big props collide as far as their models reach: a block's shape may stick out up to one block past its own
 	// space and the game still checks it (only clicking on the part that sticks out does not pick the block).
-	/** A dusty 90s abandoned sedan parked in the garage halls and indoor overpasses. */
+	/** Invisible multi-block collision proxy cell for full-scale Level 1 vehicles. */
+	public static final Block VEHICLE_PART = registerBlockOnly("vehicle_part", Properties.of()
+			.mapColor(MapColor.METAL).strength(3.0F).sound(SoundType.METAL).noOcclusion().noLootTable(),
+			Level1VehiclePartBlock::new);
+	/** A dusty 90s full-scale 2x2x4 abandoned sedan parked in the garage halls and indoor overpasses. */
 	public static final Block ABANDONED_CAR = register("abandoned_car", Properties.of().mapColor(MapColor.COLOR_LIGHT_GRAY).strength(3.0F).sound(SoundType.METAL).noOcclusion(),
-			p -> new OldComputerBlock(p, Shapes.or(Block.box(0, 0, -8.4, 16, 9.6, 24.4), Block.box(1.2, 9.6, -0.8, 14.8, 16.8, 18.4))));
-	/** A boxy 90s cargo delivery van parked in garage stalls and loading docks. */
+			p -> new Level1VehicleBlock(p, Level1VehicleBlock.Kind.SEDAN));
+	/** A boxy 90s full-scale 2x2x5 cargo delivery van parked in garage stalls and loading docks. */
 	public static final Block ABANDONED_VAN = register("abandoned_van", Properties.of().mapColor(MapColor.SNOW).strength(3.0F).sound(SoundType.METAL).noOcclusion(),
-			p -> new OldComputerBlock(p, Shapes.or(Block.box(0, 0, -9, 16, 11.2, 25), Block.box(0.2, 11.2, -5.8, 15.8, 20.6, 25))));
+			p -> new Level1VehicleBlock(p, Level1VehicleBlock.Kind.VAN));
+	public static final BlockEntityType<Level1VehicleBlockEntity> VEHICLE_BLOCK_ENTITY = Registry.register(
+			BuiltInRegistries.BLOCK_ENTITY_TYPE,
+			Level1.id("vehicle"),
+			FabricBlockEntityTypeBuilder.create(Level1VehicleBlockEntity::new, ABANDONED_CAR, ABANDONED_VAN).build()
+	);
 	/** A softly humming retro vending machine with a lit display window. */
 	public static final Block VENDING_MACHINE = register("vending_machine", Properties.of().mapColor(MapColor.COLOR_RED).strength(2.5F).sound(SoundType.METAL).noOcclusion().lightLevel(state -> 7),
 			p -> new OldComputerBlock(p, Block.box(0.8, 0, 2, 15.2, 29.4, 14.2)));

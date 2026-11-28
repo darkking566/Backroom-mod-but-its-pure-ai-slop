@@ -169,6 +169,11 @@ public final class FlashlightItem extends Item {
 	}
 
 	@Override
+	public boolean allowComponentsUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
+		return !oldStack.is(newStack.getItem()) || isLit(oldStack) != isLit(newStack);
+	}
+
+	@Override
 	public InteractionResult use(Level level, Player player, InteractionHand hand) {
 		ItemStack stack = player.getItemInHand(hand);
 

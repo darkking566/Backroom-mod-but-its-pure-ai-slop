@@ -337,10 +337,17 @@ public final class Anomalies {
 	private static void tickMimicFigures(ServerLevel level, ServerPlayer player) {
 		List<Person> near = level.getEntitiesOfClass(Person.class, player.getBoundingBox().inflate(28),
 				p -> p.isAlive() && p.entityTags().contains(MIMIC_FIGURE_TAG));
+		int now = level.getServer().getTickCount();
 		for (Person figure : near) {
 			figure.getLookControl().setLookAt(player, 25, 25);
-			if (figure.distanceToSqr(player) <= 12.25) {
+			double dSq = figure.distanceToSqr(player);
+			if (dSq <= 20.25 && figure.tickCount >= 10) {
 				revealMimicFigure(level, figure, player, false);
+			} else if (dSq <= 144.0 && Math.floorMod(now + figure.getId(), 12) == 0 && level.getRandom().nextInt(3) == 0) {
+				int idx = 1 + level.getRandom().nextInt(3);
+				player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.anomaly.mimic_whisper." + idx)
+						.withStyle(ChatFormatting.DARK_GRAY, ChatFormatting.ITALIC));
+				level.playSound(null, figure.blockPosition(), SoundEvents.PHANTOM_AMBIENT, SoundSource.HOSTILE, 0.2F, 0.55F);
 			}
 		}
 		if (near.size() < 2 && player.getRandom().nextInt(20) == 0) {

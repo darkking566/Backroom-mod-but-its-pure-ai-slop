@@ -1,11 +1,23 @@
 {
-  "variants": {
-    "axis=x": {
-      "model": "noclip_backrooms:block/field/red_line"
+  "multipart": [
+    {
+      "apply": { "model": "noclip_backrooms:block/field/red_line_dot" }
     },
-    "axis=z": {
-      "model": "noclip_backrooms:block/field/red_line",
-      "y": 90
+    {
+      "when": { "north": "true" },
+      "apply": { "model": "noclip_backrooms:block/field/red_line_side" }
+    },
+    {
+      "when": { "east": "true" },
+      "apply": { "model": "noclip_backrooms:block/field/red_line_side", "y": 90 }
+    },
+    {
+      "when": { "south": "true" },
+      "apply": { "model": "noclip_backrooms:block/field/red_line_side", "y": 180 }
+    },
+    {
+      "when": { "west": "true" },
+      "apply": { "model": "noclip_backrooms:block/field/red_line_side", "y": 270 }
     }
-  }
+  ]
 }

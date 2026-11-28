@@ -1,6 +1,8 @@
 package dev.noclip.backrooms.core.rpg;
 
 import dev.noclip.backrooms.core.Home;
+import dev.noclip.backrooms.core.story.MissionClient;
+import dev.noclip.backrooms.core.story.MissionSyncPayload;
 import dev.noclip.backrooms.mixin.client.AbstractContainerScreenAccess;
 import java.util.EnumMap;
 import java.util.List;
@@ -53,9 +55,9 @@ public final class InventoryStatsPanel {
 	private InventoryStatsPanel() {
 	}
 
-	/** Selects the active RPG panel tab (0 = base stats, 1 = hidden stats & badge). */
+	/** Selects the active RPG panel tab (0 = base stats, 1 = hidden stats & badge, 2 = active missions). */
 	public static void selectTab(int tab) {
-		activeTab = tab == 1 ? 1 : 0;
+		activeTab = Mth.clamp(tab, 0, 2);
 	}
 
 	public static void register() {
@@ -65,14 +67,18 @@ public final class InventoryStatsPanel {
 			Map<PlayerStats.StatKind, VanillaPlusButton> plusButtons = new EnumMap<>(PlayerStats.StatKind.class);
 			VanillaTabButton tab0Btn = new VanillaTabButton(0, "ui.noclip_backrooms.rpg.tab_stats");
 			VanillaTabButton tab1Btn = new VanillaTabButton(1, "ui.noclip_backrooms.rpg.tab_adv");
+			VanillaTabButton tab2Btn = new VanillaTabButton(2, "ui.noclip_backrooms.rpg.tab_mission");
+			MissionBannerButton bannerBtn = new MissionBannerButton();
 			BadgeActionButton switchBtn = new BadgeActionButton(true);
 			BadgeActionButton clearBtn = new BadgeActionButton(false);
 
 			StatsBackdropWidget backdrop = new StatsBackdropWidget(
-					inv, plusButtons, tab0Btn, tab1Btn, switchBtn, clearBtn);
+					inv, plusButtons, tab0Btn, tab1Btn, tab2Btn, bannerBtn, switchBtn, clearBtn);
 			Screens.getWidgets(inv).add(backdrop);
 			Screens.getWidgets(inv).add(tab0Btn);
 			Screens.getWidgets(inv).add(tab1Btn);
+			Screens.getWidgets(inv).add(tab2Btn);
+			Screens.getWidgets(inv).add(bannerBtn);
 			Screens.getWidgets(inv).add(switchBtn);
 			Screens.getWidgets(inv).add(clearBtn);
 
@@ -108,6 +114,7 @@ public final class InventoryStatsPanel {
 		int py = panelY(inv);
 		if (mouseX < px + 6 || mouseX > px + PANEL_W - 6) return;
 
+		if (activeTab == 2) return;
 		PlayerStats stats = PlayerRpg.get(client.player);
 		if (activeTab == 0) {
 			if (mouseX > px + PANEL_W - 22) return;
@@ -298,7 +305,7 @@ public final class InventoryStatsPanel {
 		private final String labelKey;
 
 		VanillaTabButton(int tab, String labelKey) {
-			super(0, 0, 57, 12, Component.translatable(labelKey));
+			super(0, 0, 37, 12, Component.translatable(labelKey));
 			this.tab = tab;
 			this.labelKey = labelKey;
 		}
@@ -408,23 +415,70 @@ public final class InventoryStatsPanel {
 		}
 	}
 
+	private static final class MissionBannerButton extends AbstractWidget {
+		MissionBannerButton() {
+			super(0, 0, PANEL_W, 15, Component.empty());
+		}
+
+		@Override
+		public void onClick(MouseButtonEvent event, boolean doubleClick) {
+			activeTab = 2;
+		}
+
+		@Override
+		protected void extractWidgetRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float delta) {
+			MissionSyncPayload m = MissionClient.state();
+			int x = getX(), y = getY(), w = getWidth(), h = getHeight();
+			drawBeveledButton(g, x, y, w, h, true, activeTab == 2, isHovered());
+			boolean hasAny = m.hasExploration() || m.hasBounty();
+			int barColor = (m.expReady() || m.bountyReady()) ? 0xFF3CB85B : (hasAny ? 0xFF2896C8 : 0xFF6B6B6B);
+			g.fill(x + 1, y + 1, x + 3, y + h - 1, barColor);
+
+			Font font = Minecraft.getInstance().font;
+			String txt;
+			if (m.hasExploration()) {
+				long doneCount = m.expObjectives().stream().filter(MissionSyncPayload.ObjLine::done).count();
+				txt = Component.translatable("ui.noclip_backrooms.mission.banner_active",
+						m.expLevel(), doneCount, m.expObjectives().size()).getString();
+			} else if (m.hasBounty()) {
+				txt = Component.translatable(m.bountyTitleKey()).getString() + " (" + m.bountyProgress() + "/" + m.bountyGoal() + ")";
+			} else {
+				txt = Component.translatable("ui.noclip_backrooms.mission.banner_none").getString();
+			}
+			float scale = 0.72F;
+			int ty = y + 4;
+			g.pose().pushMatrix();
+			g.pose().scale(scale, scale);
+			g.text(font, txt, Math.round((x + 6) / scale), Math.round(ty / scale), activeTab == 2 ? 0xFF3A2C00 : 0xFF242424, false);
+			g.pose().popMatrix();
+		}
+
+		@Override
+		protected void updateWidgetNarration(NarrationElementOutput output) {
+		}
+	}
+
 	/** Passive vanilla-styled backdrop widget drawn behind the panel buttons. */
 	private static final class StatsBackdropWidget extends AbstractWidget {
 		private final InventoryScreen inv;
 		private final Map<PlayerStats.StatKind, VanillaPlusButton> buttons;
 		private final VanillaTabButton tab0Btn;
 		private final VanillaTabButton tab1Btn;
+		private final VanillaTabButton tab2Btn;
+		private final MissionBannerButton bannerBtn;
 		private final BadgeActionButton switchBtn;
 		private final BadgeActionButton clearBtn;
 
 		StatsBackdropWidget(InventoryScreen inv, Map<PlayerStats.StatKind, VanillaPlusButton> buttons,
-				VanillaTabButton tab0Btn, VanillaTabButton tab1Btn,
-				BadgeActionButton switchBtn, BadgeActionButton clearBtn) {
+				VanillaTabButton tab0Btn, VanillaTabButton tab1Btn, VanillaTabButton tab2Btn,
+				MissionBannerButton bannerBtn, BadgeActionButton switchBtn, BadgeActionButton clearBtn) {
 			super(0, 0, PANEL_W, PANEL_H, Component.empty());
 			this.inv = inv;
 			this.buttons = buttons;
 			this.tab0Btn = tab0Btn;
 			this.tab1Btn = tab1Btn;
+			this.tab2Btn = tab2Btn;
+			this.bannerBtn = bannerBtn;
 			this.switchBtn = switchBtn;
 			this.clearBtn = clearBtn;
 			this.active = false;
@@ -437,7 +491,9 @@ public final class InventoryStatsPanel {
 			setPosition(px, py);
 
 			tab0Btn.setPosition(px + 8, py + 17);
-			tab1Btn.setPosition(px + 67, py + 17);
+			tab1Btn.setPosition(px + 47, py + 17);
+			tab2Btn.setPosition(px + 86, py + 17);
+			bannerBtn.setPosition(px, py >= 22 ? py - 18 : py + PANEL_H + 3);
 
 			PlayerStats stats = client.player != null ? PlayerRpg.get(client.player) : PlayerStats.initial();
 			PlayerStats.StatKind[] tab0Kinds = {
@@ -500,8 +556,54 @@ public final class InventoryStatsPanel {
 
 			if (activeTab == 0) {
 				extractTab0(g, font, stats, px, py, mouseX, mouseY);
-			} else {
+			} else if (activeTab == 1) {
 				extractTab1(g, client, font, stats, px, py, mouseX, mouseY);
+			} else {
+				extractTab2(g, font, px, py);
+			}
+		}
+
+		private void extractTab2(GuiGraphicsExtractor g, Font font, int px, int py) {
+			MissionSyncPayload m = MissionClient.state();
+			int y = py + 34;
+			drawSmallText(g, font, Component.translatable("ui.noclip_backrooms.mission.active_exp").getString(), px + 8, y, 0xFF284F75, 0.76F);
+			y += 10;
+
+			if (m.hasExploration()) {
+				drawVanillaSlot(g, px + 7, y, PANEL_W - 14, 58, 0xFF6A6A6A);
+				String ttl = Component.translatable(m.expTitleKey(), m.expLevel()).getString();
+				drawSmallTextShadow(g, font, ttl, px + 11, y + 3, m.expReady() ? 0xFF9DF2A8 : 0xFF98E2FF, 0.72F);
+				String rew = "+" + m.expReward();
+				drawSmallTextShadow(g, font, rew, px + PANEL_W - 11 - Math.round(font.width(rew) * 0.70F), y + 3, 0xFFFFE588, 0.70F);
+
+				int oy = y + 14;
+				for (int i = 0; i < m.expObjectives().size() && i < 3; i++) {
+					MissionSyncPayload.ObjLine o = m.expObjectives().get(i);
+					String line = (o.done() ? "☑ " : "☐ ") + Component.translatable(o.labelKey()).getString()
+							+ " " + o.progress() + "/" + o.goal();
+					drawSmallTextShadow(g, font, line, px + 11, oy, o.done() ? 0xFF9DF2A8 : 0xFFFFFFFF, 0.64F);
+					oy += 13;
+				}
+			} else {
+				drawVanillaSlot(g, px + 7, y, PANEL_W - 14, 58, 0xFF757575);
+				drawSmallTextShadow(g, font, Component.translatable("ui.noclip_backrooms.mission.tab_empty").getString(), px + 12, y + 22, 0xFFE0E0E0, 0.70F);
+			}
+
+			y += 64;
+			g.fill(px + 7, y, px + PANEL_W - 7, y + 1, MC_SHADOW);
+			g.fill(px + 7, y + 1, px + PANEL_W - 7, y + 2, MC_HIGHLIGHT);
+			y += 6;
+
+			drawSmallText(g, font, Component.translatable("ui.noclip_backrooms.mission.active_bounty").getString(), px + 8, y, 0xFF6B4210, 0.76F);
+			y += 10;
+			drawVanillaSlot(g, px + 7, y, PANEL_W - 14, 34, 0xFF6A6A6A);
+			if (m.hasBounty()) {
+				String bTitle = Component.translatable(m.bountyTitleKey()).getString();
+				drawSmallTextShadow(g, font, bTitle, px + 11, y + 4, m.bountyReady() ? 0xFF9DF2A8 : 0xFFFFD866, 0.72F);
+				String bProg = (m.bountyReady() ? "完成 " : "") + m.bountyProgress() + "/" + m.bountyGoal() + " (+" + m.bountyReward() + ")";
+				drawSmallTextShadow(g, font, bProg, px + 11, y + 16, 0xFFEAEAEA, 0.68F);
+			} else {
+				drawSmallTextShadow(g, font, Component.translatable("ui.noclip_backrooms.mission.bounty_none").getString(), px + 11, y + 12, 0xFFD8D8D8, 0.68F);
 			}
 		}
 

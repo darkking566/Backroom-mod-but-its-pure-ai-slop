@@ -1,19 +1,7 @@
 {
   "variants": {
-    "facing=north": {
-      "model": "noclip_backrooms:block/level1/abandoned_car"
-    },
-    "facing=east": {
-      "model": "noclip_backrooms:block/level1/abandoned_car",
-      "y": 90
-    },
-    "facing=south": {
-      "model": "noclip_backrooms:block/level1/abandoned_car",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "noclip_backrooms:block/level1/abandoned_car",
-      "y": 270
+    "": {
+      "model": "noclip_backrooms:block/level1/vehicle_empty"
     }
   }
 }

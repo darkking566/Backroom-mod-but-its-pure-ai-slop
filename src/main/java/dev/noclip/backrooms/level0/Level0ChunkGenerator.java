@@ -482,15 +482,19 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 		Heightmap oceanFloor = chunk.getOrCreateHeightmapUnprimed(Heightmap.Types.OCEAN_FLOOR_WG);
 		Heightmap surface = chunk.getOrCreateHeightmapUnprimed(Heightmap.Types.WORLD_SURFACE_WG);
 		BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
+		BlockState[] col = new BlockState[HEIGHT];
 		int minX = chunk.getPos().getMinBlockX(), minZ = chunk.getPos().getMinBlockZ();
 
 		for (int x = 0; x < 16; x++) {
 			for (int z = 0; z < 16; z++) {
-				for (int y = MIN_Y; y <= MAX_Y; y++) {
-					BlockState state = worldBlockAt(seed, minX + x, y, minZ + z);
+				int wx = minX + x, wz = minZ + z;
+				fillColumnStates(seed, wx, wz, col);
+				for (int i = 0; i < HEIGHT; i++) {
+					int y = MIN_Y + i;
+					BlockState state = col[i];
 					chunk.setBlockState(pos.set(x, y, z), state);
 					if (state.getBlock() instanceof EntityBlock entityBlock) {
-						BlockPos worldPos = new BlockPos(minX + x, y, minZ + z);
+						BlockPos worldPos = new BlockPos(wx, y, wz);
 						BlockEntity be = entityBlock.newBlockEntity(worldPos, state);
 						if (be != null) {
 							chunk.setBlockEntity(be);
@@ -502,6 +506,37 @@ final class Level0ChunkGenerator extends ChunkGenerator {
 			}
 		}
 		return CompletableFuture.completedFuture(chunk);
+	}
+
+	/** Computes one full column (MIN_Y..MAX_Y) identically to {@link #worldBlockAt}, fast-filling uniform bedrock and subfloor bands. */
+	static void fillColumnStates(long seed, int worldX, int worldZ, BlockState[] out) {
+		int x = Level0Space.template(worldX), z = Level0Space.template(worldZ);
+		BlockState bedrock = Blocks.BEDROCK.defaultBlockState();
+		out[0] = bedrock;
+		int cx = Math.floorDiv(x, Maze.CELL), cz = Math.floorDiv(z, Maze.CELL);
+		Maze.Zone zone = Maze.zoneAt(seed, x, z);
+		boolean special = zone == Maze.Zone.CHASM || zone == Maze.Zone.MEGATHALL || zone == Maze.Zone.PITS
+				|| ManilaRoomPlan.roomAtBlock(seed, x, z) != null
+				|| StaircasePlan.complexAtBlock(seed, x, z) != null;
+		if (special) {
+			for (int i = 1; i < HEIGHT; i++) {
+				out[i] = blockAt(seed, x, MIN_Y + i, z, Maze.EpochSource.ZERO);
+			}
+			return;
+		}
+		BlockState subfloor = Blocks.CONCRETE.black().defaultBlockState();
+		int subEnd = FLOOR_Y - 2;
+		for (int y = MIN_Y + 1; y <= subEnd; y++) {
+			out[y - MIN_Y] = subfloor;
+		}
+		int ceilY = Maze.cellCeilingY(seed, cx, cz);
+		int maxActiveY = Math.min(MAX_Y, Math.max(CEILING_Y + 4, ceilY + 3));
+		for (int y = FLOOR_Y - 1; y <= maxActiveY; y++) {
+			out[y - MIN_Y] = blockAt(seed, x, y, z, Maze.EpochSource.ZERO);
+		}
+		for (int y = maxActiveY + 1; y <= MAX_Y; y++) {
+			out[y - MIN_Y] = bedrock;
+		}
 	}
 
 	@Override

@@ -1919,11 +1919,11 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		var server = game.getServer();
 		BlockPos at = server.computeOnServer(s -> player(s).blockPosition());
 		int x0 = at.getX(), z0 = at.getZ();
-		server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run fill %d %d %d %d %d %d minecraft:air", x0 - 4, STAND, z0 - 4, x0 + 4, STAND + 3, z0 + 4));
+		server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run fill %d %d %d %d %d %d minecraft:air", x0 - 4, STAND, z0 - 4, x0 + 7, STAND + 3, z0 + 4));
 		server.runOnServer(s -> {
 			ServerLevel level = level1(s);
 			BlockPos pos = new BlockPos(x0, STAND, z0);
-			Block[] props = {Level1Blocks.ABANDONED_CAR, Level1Blocks.ABANDONED_VAN, Level1Blocks.VENDING_MACHINE, Level1Blocks.ELECTRICAL_CABINET,
+			Block[] props = {Level1Blocks.VENDING_MACHINE, Level1Blocks.ELECTRICAL_CABINET,
 					Level1Blocks.FLOODLIGHT, Level1Blocks.SITE_MACHINE};
 			int probes = 0;
 			for (Block block : props) {
@@ -1951,7 +1951,40 @@ public final class Level1ClientTest implements FabricClientGameTest {
 			}
 			level.setBlock(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
 			System.out.println("[bigProps] probes " + probes);
+
+			// Full-scale multi-block Level 1 vehicles (2x2x4 sedan & 2x2x5 van) populate solid VEHICLE_PART cells and scavenge from any part.
+			for (Block vehicle : new Block[]{Level1Blocks.ABANDONED_CAR, Level1Blocks.ABANDONED_VAN}) {
+				BlockPos vPos = (vehicle == Level1Blocks.ABANDONED_VAN) ? pos.east(4) : pos;
+				Level1VehicleBlock vb = (Level1VehicleBlock) vehicle;
+				BlockState mState = vb.defaultBlockState().setValue(Level1VehicleBlock.FACING, Direction.NORTH);
+				level.setBlock(vPos, mState, Block.UPDATE_ALL);
+				vb.ensureParts(level, vPos, mState);
+				int[] rear = Level1VehicleBlock.rotatedOffset(Direction.NORTH, 1, vb.kind().maxZ);
+				BlockPos rearPart = vPos.offset(rear[0], 0, rear[1]);
+				check(level.getBlockState(rearPart).is(Level1Blocks.VEHICLE_PART), vehicle + " missing rear passenger VEHICLE_PART at " + rearPart);
+				check(Level1VehiclePartBlock.masterPos(rearPart, level.getBlockState(rearPart)).equals(vPos), "VEHICLE_PART masterPos mismatch");
+				check(level.getBlockCollisions(null, new AABB(rearPart)).iterator().hasNext(), vehicle + " part has no collision");
+				check(Level1PoiEvents.scavengeVehicle(level, player(s), vPos, false), vehicle + " scavenge failed");
+				check(Level1PoiEvents.isVehicleScavenged(level, vPos), vehicle + " did not mark scavenged");
+				vb.breakWholeStructure(level, vPos, mState, null, vPos);
+				check(level.getBlockState(rearPart).isAir(), vehicle + " parts were not cleaned up");
+			}
 		});
+		// Spawn both full-scale vehicles side-by-side and screenshot them.
+		server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run fill %d %d %d %d %d %d minecraft:air", x0 - 6, STAND, z0 - 6, x0 + 8, STAND + 3, z0 + 6));
+		server.runOnServer(s -> {
+			ServerLevel level = level1(s);
+			BlockPos carPos = new BlockPos(x0 - 2, STAND, z0);
+			BlockState car = Level1Blocks.ABANDONED_CAR.defaultBlockState().setValue(Level1VehicleBlock.FACING, Direction.NORTH);
+			level.setBlock(carPos, car, Block.UPDATE_ALL);
+			((Level1VehicleBlock) Level1Blocks.ABANDONED_CAR).ensureParts(level, carPos, car);
+			BlockPos vanPos = new BlockPos(x0 + 2, STAND, z0);
+			BlockState van = Level1Blocks.ABANDONED_VAN.defaultBlockState().setValue(Level1VehicleBlock.FACING, Direction.NORTH);
+			level.setBlock(vanPos, van, Block.UPDATE_ALL);
+			((Level1VehicleBlock) Level1Blocks.ABANDONED_VAN).ensureParts(level, vanPos, van);
+		});
+		shoot(context, game, x0 + 0.5, STAND + 2.0, z0 - 4.8, 0, 18, "level1_fullscale_vehicles");
+		server.runCommand(String.format(Locale.ROOT, "execute in noclip_backrooms:level_1 run fill %d %d %d %d %d %d minecraft:air", x0 - 6, STAND, z0 - 6, x0 + 8, STAND + 3, z0 + 6));
 	}
 
 	/** The Garden's grass, fern and three flowers in a row on moss under a lamp, close up. */
@@ -2044,8 +2077,11 @@ public final class Level1ClientTest implements FabricClientGameTest {
 		for (int x = around.getX() - 24; x < around.getX() + 24; x++) {
 			for (int z = around.getZ() - 24; z < around.getZ() + 24; z++) {
 				for (int y : ys) {
+					BlockPos pos = new BlockPos(x, y, z);
+					BlockState actual = level.getBlockState(pos);
 					BlockState expected = Level1ChunkGenerator.blockAt(seed, x, y, z);
-					check(level.getBlockState(new BlockPos(x, y, z)).is(expected.getBlock()), "world differs from generator at " + x + ", " + y + ", " + z);
+					if (actual.is(Level1Blocks.VEHICLE_PART) && expected.isAir()) continue;
+					check(actual.is(expected.getBlock()), "world differs from generator at " + x + ", " + y + ", " + z);
 				}
 			}
 		}

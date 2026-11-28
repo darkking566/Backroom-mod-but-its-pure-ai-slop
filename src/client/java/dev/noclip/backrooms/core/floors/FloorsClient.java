@@ -28,7 +28,14 @@ public final class FloorsClient {
 
 	private static DifficultyPayload difficulty = DifficultyPayload.NONE;
 
+	private static int lastHudBottom = 8;
+
 	private FloorsClient() {
+	}
+
+	/** Bottom Y pixel coordinate drawn by the floor/difficulty/badge HUD on the top-left. */
+	public static int hudBottomY() {
+		return lastHudBottom;
 	}
 
 	public static void register() {
@@ -56,7 +63,10 @@ public final class FloorsClient {
 	private static void hud(GuiGraphicsExtractor graphics, DeltaTracker delta) {
 		Minecraft client = Minecraft.getInstance();
 		int floor = floor();
-		if (floor <= 0 || client.gui.hud.isHidden()) return;
+		if (floor <= 0 || client.gui.hud.isHidden()) {
+			lastHudBottom = 8;
+			return;
+		}
 		graphics.pose().pushMatrix();
 		graphics.pose().scale(SCALE, SCALE);
 		graphics.text(client.font, Component.translatable("hud.noclip_backrooms.floor", floor), 10, 8, TEXT, true);
@@ -80,7 +90,9 @@ public final class FloorsClient {
 		if (badge != null) {
 			graphics.text(client.font, Component.translatable("hud.noclip_backrooms.badge", badge.title()),
 					15, nextY, 0xFFE8C868, true);
+			nextY += 11;
 		}
+		lastHudBottom = nextY + 2;
 	}
 
 	private static void header(Screen screen, GuiGraphicsExtractor graphics) {

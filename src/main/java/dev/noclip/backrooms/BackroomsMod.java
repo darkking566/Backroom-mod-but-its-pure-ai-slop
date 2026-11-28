@@ -51,6 +51,7 @@ public final class BackroomsMod implements ModInitializer {
 		BackroomsWeaponNetworking.register();
 		Monsters.register();
 		People.register();
+		dev.noclip.backrooms.core.people.NpcLife.register();
 		Economy.register();
 		Shops.register();
 		dev.noclip.backrooms.core.trade.Appraisal.register();
@@ -76,6 +77,7 @@ public final class BackroomsMod implements ModInitializer {
 		dev.noclip.backrooms.core.radio.Radio.register();
 		dev.noclip.backrooms.core.story.FirstTrip.register();
 		dev.noclip.backrooms.core.story.MainQuest.register();
+		dev.noclip.backrooms.core.story.Missions.register();
 		dev.noclip.backrooms.core.trade.Treatment.register();
 		dev.noclip.backrooms.core.guild.GuildRemoval.register();
 		dev.noclip.backrooms.frontrooms.Frontrooms.register();

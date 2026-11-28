@@ -40,6 +40,7 @@ final class GeneratorBlock extends ShapedBlock {
 		} else {
 			serverPlayer.sendOverlayMessage(Component.translatable("message.noclip_backrooms.generator_running"));
 		}
+		dev.noclip.backrooms.core.story.Missions.onBlockInteract(serverPlayer, "generator_l1", pos, "1");
 		return InteractionResult.SUCCESS;
 	}
 

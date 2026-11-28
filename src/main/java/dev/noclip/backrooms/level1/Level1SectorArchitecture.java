@@ -245,7 +245,7 @@ public final class Level1SectorArchitecture {
 		if (hasMainFloor && y == FLOOR + 1 && current.isAir() && tile == Tile.FLOOR
 				&& Level1Layout.kindAt(seed, x, z) == Kind.PARKING) {
 			int bx = Math.floorMod(x, Level1Layout.BAY_X), bz = Math.floorMod(z, Level1Layout.BAY_Z);
-			if ((bx == 3 || bx == 6) && (bz == 4 || bz == 13)
+			if (bx == 4 && (bz == 4 || bz == 13)
 					&& Math.floorMod(Level1Layout.hash(seed, x, z, 163), 100) < 10) {
 				Direction dir = Math.floorMod(Level1Layout.hash(seed, x, z, 167), 2) == 0 ? Direction.NORTH : Direction.SOUTH;
 				Block vehicle = Math.floorMod(Level1Layout.hash(seed, x, z, 173), 3) == 0

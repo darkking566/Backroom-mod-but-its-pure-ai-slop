@@ -1,0 +1,48 @@
+# Auto-generated Level 1 vehicle material library
+newmtl MAT_BODY_SEDAN
+Kd 0.4800 0.5200 0.5600
+d 1.0
+
+newmtl MAT_BODY_VAN
+Kd 0.7900 0.7700 0.7200
+d 1.0
+
+newmtl MAT_TRIM
+Kd 0.1800 0.1900 0.2100
+d 1.0
+
+newmtl MAT_TIRE
+Kd 0.1000 0.1000 0.1100
+d 1.0
+
+newmtl MAT_RIM
+Kd 0.6400 0.6600 0.6900
+d 1.0
+
+newmtl MAT_GLASS
+Kd 0.1400 0.2200 0.2800
+d 1.0
+
+newmtl MAT_UNDER
+Kd 0.1200 0.1100 0.1100
+d 1.0
+
+newmtl MAT_RUST
+Kd 0.4200 0.2600 0.1600
+d 1.0
+
+newmtl EMIT_HOT
+Kd 0.9500 0.9200 0.8000
+Ke 0.9500 0.9200 0.8000
+d 1.0
+
+newmtl EMIT_ALT
+Kd 0.8500 0.1600 0.1600
+Ke 0.8500 0.1600 0.1600
+d 1.0
+
+newmtl EMIT_MAIN
+Kd 0.3500 0.7200 0.8200
+Ke 0.3500 0.7200 0.8200
+d 1.0
+

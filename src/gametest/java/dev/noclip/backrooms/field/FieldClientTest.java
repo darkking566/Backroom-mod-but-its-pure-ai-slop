@@ -204,6 +204,7 @@ public final class FieldClientTest implements FabricClientGameTest {
 			server.runCommand("clear @a");
 
 			// The guide line lays itself while walking.
+			stand(server);
 			server.runOnServer(s -> {
 				ServerPlayer p = player(s);
 				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FieldKit.GUIDE_LINE));
@@ -215,6 +216,30 @@ public final class FieldClientTest implements FabricClientGameTest {
 			String where = server.computeOnServer(s -> player(s).position() + " onGround=" + player(s).onGround()
 					+ " hand=" + player(s).getMainHandItem());
 			check(lines >= 2, "the guide line laid " + lines + " blocks (player at " + where + ")");
+			check(FieldKit.RED_LINE.defaultBlockState().getLightEmission() == 7, "red guide line must emit light");
+			BlockPos rlBase = stand(server).south(2);
+			server.runOnServer(s -> {
+				ServerLevel sl = level(s);
+				sl.setBlockAndUpdate(rlBase.below(), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+				sl.setBlockAndUpdate(rlBase.east().below(), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+				sl.setBlockAndUpdate(rlBase.south().below(), net.minecraft.world.level.block.Blocks.STONE.defaultBlockState());
+				sl.setBlockAndUpdate(rlBase, FieldKit.RED_LINE.defaultBlockState());
+				sl.setBlockAndUpdate(rlBase.east(), FieldKit.RED_LINE.defaultBlockState());
+				sl.setBlockAndUpdate(rlBase.south(), FieldKit.RED_LINE.defaultBlockState());
+				var conn = sl.getBlockState(rlBase);
+				check(conn.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.EAST),
+						"red line did not auto-connect east: " + conn);
+				check(conn.getValue(net.minecraft.world.level.block.state.properties.BlockStateProperties.SOUTH),
+						"red line did not auto-connect south: " + conn);
+			});
+			var prevLook = server.computeOnServer(s -> new double[]{player(s).getX(), player(s).getY(), player(s).getZ(), player(s).getYRot(), player(s).getXRot()});
+			server.runCommand(String.format(java.util.Locale.ROOT, "execute as @a in noclip_backrooms:level_0 run tp @s %.1f %d %.1f 0 42",
+					rlBase.getX() + 0.5, rlBase.getY(), rlBase.getZ() - 2.0));
+			context.waitTicks(10);
+			context.takeScreenshot("field_red_line");
+			server.runCommand(String.format(java.util.Locale.ROOT, "execute as @a in noclip_backrooms:level_0 run tp @s %.2f %.2f %.2f %.1f %.1f",
+					prevLook[0], prevLook[1], prevLook[2], prevLook[3], prevLook[4]));
+			context.waitTicks(2);
 
 			// A battery lamp steadies the mind.
 			BlockPos here1 = stand(server);

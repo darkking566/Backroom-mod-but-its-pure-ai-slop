@@ -79,7 +79,7 @@ public final class Shops {
 			Long last = LAST_OPEN.put(serverPlayer.getUUID(), now);
 			if (last != null && now - last < 5 && now >= last) return InteractionResult.SUCCESS;
 			if (role == ShopRole.MASTER) {
-				dev.noclip.backrooms.core.guild.Contracts.talk(serverPlayer);
+				dev.noclip.backrooms.core.story.Missions.interactCommander(serverPlayer);
 			} else if (role == ShopRole.MARTIAL_MASTER) {
 				dev.noclip.backrooms.core.rpg.Badges.talk(serverPlayer);
 			} else {

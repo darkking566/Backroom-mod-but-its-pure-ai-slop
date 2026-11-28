@@ -351,7 +351,7 @@ public final class InstituteLayout {
 		int step = flight.step(x, z);
 		int surface = flight.low() + 1 + step;
 		if (y < surface) return Cell.SOLID;
-		if (y == surface) return step == flight.steps() - 1 ? Cell.of(Kind.FLOOR) : new Cell(Kind.STAIR, flight.facing(), 0, false, 's');
+		if (y == surface) return new Cell(Kind.STAIR, flight.facing(), 0, false, 's');
 		return Cell.AIR;
 	}
 

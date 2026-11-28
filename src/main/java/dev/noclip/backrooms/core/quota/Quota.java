@@ -162,6 +162,10 @@ public final class Quota {
 
 	/** Called when someone walks out of the Backrooms alive (core.trip.Trips): the first time, the cycle starts. */
 	public static void onHome(ServerPlayer player) {
+		// Automatic 5-day Wretch quota cycle removed; missions & clearance are handled via Missions.
+	}
+
+	private static void startManualCycle(ServerPlayer player) {
 		MinecraftServer server = player.level().getServer();
 		QuotaData d = data(server);
 		if (d.active) return;
@@ -172,6 +176,18 @@ public final class Quota {
 		d.changed();
 		player.sendSystemMessage(Component.translatable("message.noclip_backrooms.quota.started", d.required).withStyle(ChatFormatting.GOLD));
 		sendAll(server, d);
+	}
+
+	/** Synchronizes Institute wing clearance with the team's completed mission count. */
+	public static void syncMissionClearance(MinecraftServer server, int completedCount) {
+		QuotaData d = data(server);
+		int target = Math.max(d.paid, Math.max(0, completedCount));
+		if (target != d.paid) {
+			d.paid = target;
+			d.changed();
+			for (var listener : CLEARANCE) listener.accept(server, d.paid);
+			sendAll(server, d);
+		}
 	}
 
 	/** A fresh cycle: day 1, a quota sized to the team and the cycles paid so far, new required items. */
@@ -497,6 +513,7 @@ public final class Quota {
 		if (LevelExits.isOpen("0")) list.add("0");
 		java.util.Set<String> known = new java.util.HashSet<>(d.visited);
 		known.addAll(dev.noclip.backrooms.core.story.MainQuest.assigned(server));
+		known.addAll(dev.noclip.backrooms.core.story.Missions.unlockedLevels(server));
 		List<String> been = new ArrayList<>(known);
 		Collections.sort(been);
 		for (String level : been) {
@@ -569,7 +586,7 @@ public final class Quota {
 			dispatcher.register(Commands.literal("backrooms").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
 					.then(Commands.literal("quota")
 							.then(Commands.literal("start").executes(ctx -> {
-								onHome(ctx.getSource().getPlayerOrException());
+								startManualCycle(ctx.getSource().getPlayerOrException());
 								return 1;
 							}))
 							.then(Commands.literal("day").then(Commands.argument("day", IntegerArgumentType.integer(1, QuotaMath.CYCLE_DAYS))

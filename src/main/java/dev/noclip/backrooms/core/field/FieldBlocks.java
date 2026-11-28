@@ -22,6 +22,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -124,19 +125,57 @@ final class FieldBlocks {
 		}
 	}
 
-	/** The guide line, laid along the floor as the spool unwinds. */
+	/** The glowing guide line, laid along the floor as the spool unwinds and auto-connecting 4 ways like redstone. */
 	static final class RedLine extends Block {
-		static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.HORIZONTAL_AXIS;
+		static final BooleanProperty NORTH = BlockStateProperties.NORTH;
+		static final BooleanProperty EAST = BlockStateProperties.EAST;
+		static final BooleanProperty SOUTH = BlockStateProperties.SOUTH;
+		static final BooleanProperty WEST = BlockStateProperties.WEST;
 		private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 0.5, 16);
 
 		RedLine(Properties properties) {
 			super(properties);
-			registerDefaultState(stateDefinition.any().setValue(AXIS, Direction.Axis.X));
+			registerDefaultState(stateDefinition.any()
+					.setValue(NORTH, false)
+					.setValue(EAST, false)
+					.setValue(SOUTH, false)
+					.setValue(WEST, false));
 		}
 
 		@Override
 		protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-			builder.add(AXIS);
+			builder.add(NORTH, EAST, SOUTH, WEST);
+		}
+
+		static BlockState connectedState(BlockGetter level, BlockPos pos) {
+			return FieldKit.RED_LINE.defaultBlockState()
+					.setValue(NORTH, connectsTo(level, pos.north()))
+					.setValue(EAST, connectsTo(level, pos.east()))
+					.setValue(SOUTH, connectsTo(level, pos.south()))
+					.setValue(WEST, connectsTo(level, pos.west()));
+		}
+
+		private static boolean connectsTo(BlockGetter level, BlockPos neighbor) {
+			return level.getBlockState(neighbor).is(FieldKit.RED_LINE);
+		}
+
+		@Override
+		public BlockState getStateForPlacement(BlockPlaceContext context) {
+			return connectedState(context.getLevel(), context.getClickedPos());
+		}
+
+		@Override
+		protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos,
+				Direction dir, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
+			if (dir.getAxis().isVertical()) return state;
+			boolean connected = neighborState.is(this);
+			return switch (dir) {
+				case NORTH -> state.setValue(NORTH, connected);
+				case EAST -> state.setValue(EAST, connected);
+				case SOUTH -> state.setValue(SOUTH, connected);
+				case WEST -> state.setValue(WEST, connected);
+				default -> state;
+			};
 		}
 
 		@Override

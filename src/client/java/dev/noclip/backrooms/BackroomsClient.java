@@ -93,10 +93,13 @@ public final class BackroomsClient implements ClientModInitializer {
 		dev.noclip.backrooms.core.trip.AnomalyClient.register();
 		dev.noclip.backrooms.frontrooms.Night398Client.register();
 		dev.noclip.backrooms.core.locker.ResearchClient.register();
+		dev.noclip.backrooms.core.story.MissionClient.register();
 		for (StationType station : StationType.values()) {
 			MenuScreens.register(BackroomsCrafting.menuType(station), BackroomsStationScreen::new);
 		}
 		BlockEntityRenderers.register(BackroomsProps.PROP_BLOCK_ENTITY, BlenderPropRenderer::new);
+		BlockEntityRenderers.register(dev.noclip.backrooms.level1.Level1Blocks.VEHICLE_BLOCK_ENTITY,
+				dev.noclip.backrooms.level1.Level1VehicleRenderer::new);
 		BackroomsArmorRenderer.registerAll();
 		WeaponAnimState.register();
 		WeaponCrosshairHud.register();

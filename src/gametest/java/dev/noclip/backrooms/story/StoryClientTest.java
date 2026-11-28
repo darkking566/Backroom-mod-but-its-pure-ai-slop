@@ -5,8 +5,12 @@ import dev.noclip.backrooms.core.LevelExits;
 import dev.noclip.backrooms.core.ending.Endings;
 import dev.noclip.backrooms.core.story.FirstTrip;
 import dev.noclip.backrooms.core.story.MainQuest;
+import dev.noclip.backrooms.core.story.MissionBoardScreen;
+import dev.noclip.backrooms.core.story.MissionClient;
+import dev.noclip.backrooms.core.story.Missions;
 import dev.noclip.backrooms.core.story.StoryBlocks;
 import dev.noclip.backrooms.frontrooms.FrontroomsTown;
+import dev.noclip.backrooms.frontrooms.InstituteLayout;
 import dev.noclip.backrooms.frontrooms.Nights398;
 import dev.noclip.backrooms.frontrooms.TownLife;
 import dev.noclip.backrooms.level0.Level0;
@@ -104,7 +108,46 @@ public final class StoryClientTest implements FabricClientGameTest {
 			context.takeScreenshot("story_first_trip_institute");
 			context.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
 
-			// The main quest: the commander's first assignment (a mapping job, with a beacon handed over).
+			// Mission Board & Arrival guidance: no sudden top-left mission before talking to Commander; Commander glows.
+			check(server.computeOnServer(s -> !Missions.isBriefed(s)), "mission was already briefed before talking to Commander");
+			var cmdSpot = InstituteLayout.spot('k');
+			server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:frontrooms run tp @s %.1f %d %.1f 180 5",
+					cmdSpot.x() + 0.5, InstituteLayout.FLOOR + 1, cmdSpot.z() + 2.5));
+			game.getConnection().waitForChunksRender();
+			context.waitTicks(20);
+			check(server.computeOnServer(s -> !s.getLevel(Home.FRONTROOMS).getEntitiesOfClass(
+					dev.noclip.backrooms.core.people.Person.class, player(s).getBoundingBox().inflate(24),
+					p -> p.entityTags().contains(dev.noclip.backrooms.core.trade.ShopRole.MASTER.tag())
+							&& p.hasEffect(net.minecraft.world.effect.MobEffects.GLOWING)).isEmpty()),
+					"Commander should glow while unbriefed");
+			context.takeScreenshot("story_institute_glowing_guide");
+
+			server.runOnServer(s -> Missions.interactCommander(player(s)));
+			context.waitFor(client -> client.gui.screen() instanceof MissionBoardScreen, 100);
+			context.waitTicks(8);
+			context.takeScreenshot("story_mission_board");
+			context.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
+			context.waitFor(client -> client.gui.screen() == null, 60);
+			check(server.computeOnServer(s -> Missions.isBriefed(s)), "talking to Commander did not mark briefed");
+
+			server.runOnServer(s -> Missions.acceptExploration(player(s), "0"));
+			context.waitFor(client -> MissionClient.state().hasExploration(), 100);
+			check(server.computeOnServer(s -> player(s).getInventory().contains(new net.minecraft.world.item.ItemStack(dev.noclip.backrooms.core.field.FieldKit.CAMERA))),
+					"accepting a Level 0 survey did not issue a Polaroid camera");
+			context.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
+			context.waitFor(client -> client.gui.screen() == null, 60);
+			context.runOnClient(client -> dev.noclip.backrooms.core.rpg.InventoryStatsPanel.selectTab(2));
+			context.getInput().pressKey(GLFW.GLFW_KEY_E);
+			context.waitFor(client -> client.gui.screen() instanceof net.minecraft.client.gui.screens.inventory.InventoryScreen, 100);
+			context.waitTicks(6);
+			context.takeScreenshot("story_inventory_mission");
+			context.getInput().pressKey(GLFW.GLFW_KEY_ESCAPE);
+			context.waitFor(client -> client.gui.screen() == null, 60);
+			context.waitTicks(10);
+			context.takeScreenshot("story_mission_hud");
+
+			// Explicit MainQuest briefing verifies legacy Containment specimens & progression.
+			server.runOnServer(s -> MainQuest.brief(player(s)));
 			check(server.computeOnServer(s -> MainQuest.chapterIndex(s)) == 0, "the main quest did not start at its first assignment");
 			check(server.computeOnServer(s -> player(s).getInventory().contains(new net.minecraft.world.item.ItemStack(dev.noclip.backrooms.core.field.FieldKit.BEACON))),
 					"no mapping beacon for the first assignment");
@@ -175,11 +218,49 @@ public final class StoryClientTest implements FabricClientGameTest {
 
 			mirroredContents(server);
 
-			// The second trip: no cable, and the exits open.
+			// The second trip: no cable, existing guide door still works, and exits open.
+			server.runCommand("gamemode survival @a");
 			server.runOnServer(s -> LevelExits.fallInto(player(s), "0"));
 			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 400);
+			game.getConnection().waitForChunksRender();
 			context.waitTicks(10);
 			check(!server.computeOnServer(s -> player(s).hasAttached(FirstTrip.DOOR)), "a cable on the second trip");
+			check(server.computeOnServer(s -> {
+				for (int x = -80; x <= 80; x += 23) {
+					for (int z = -80; z <= 80; z += 29) {
+						if (!dev.noclip.backrooms.level0.Level0MissionHelper.verifyColumnMatchesWorld(0L, x, z)) return false;
+					}
+				}
+				return true;
+			}), "Level 0 fast column fill diverged from worldBlockAt");
+			BlockPos stand = server.computeOnServer(s -> {
+				ServerPlayer p = player(s);
+				BlockPos atPos = p.blockPosition();
+				BlockPos at = atPos.north();
+				ServerLevel l0 = level0(s);
+				l0.setBlockAndUpdate(atPos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+				l0.setBlockAndUpdate(atPos.above(), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState());
+				l0.setBlockAndUpdate(at, StoryBlocks.GUIDE_DOOR.defaultBlockState()
+						.setValue(StoryBlocks.Door.FACING, net.minecraft.core.Direction.SOUTH)
+						.setValue(StoryBlocks.Door.HALF, net.minecraft.world.level.block.state.properties.DoubleBlockHalf.LOWER));
+				l0.setBlockAndUpdate(at.above(), StoryBlocks.GUIDE_DOOR.defaultBlockState()
+						.setValue(StoryBlocks.Door.FACING, net.minecraft.core.Direction.SOUTH)
+						.setValue(StoryBlocks.Door.HALF, net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER));
+				return atPos;
+			});
+			server.runCommand(String.format(Locale.ROOT, "execute as @a in noclip_backrooms:level_0 run tp @s %.1f %d %.1f 180 5",
+					stand.getX() + 0.5, stand.getY(), stand.getZ() + 0.5));
+			game.getConnection().waitForChunksRender();
+			context.waitTicks(10);
+			String aim2 = context.computeOnClient(client -> client.hitResult instanceof net.minecraft.world.phys.BlockHitResult hit
+					? client.level.getBlockState(hit.getBlockPos()) + " at " + hit.getBlockPos() : String.valueOf(client.hitResult));
+			check(aim2.contains("guide_door"), "the crosshair is not on the existing door: " + aim2);
+			context.getInput().pressMouse(GLFW.GLFW_MOUSE_BUTTON_RIGHT);
+			server.waitFor(s -> player(s).level().dimension() == Home.FRONTROOMS, 400);
+			context.waitFor(client -> client.gui.screen() instanceof dev.noclip.backrooms.core.trip.MissionReportScreen, 100);
+			context.runOnClient(client -> client.gui.screen().onClose());
+			server.runOnServer(s -> LevelExits.fallInto(player(s), "0"));
+			server.waitFor(s -> player(s).level().dimension() == Level0.LEVEL_0, 400);
 			server.runOnServer(s -> LevelExits.use(player(s), "1"));
 			server.waitFor(s -> player(s).level().dimension() == Level1.LEVEL_1, 400);
 		}

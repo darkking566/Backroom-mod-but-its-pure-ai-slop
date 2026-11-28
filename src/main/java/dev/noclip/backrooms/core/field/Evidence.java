@@ -7,10 +7,13 @@ import dev.noclip.backrooms.core.quota.Quota;
 import dev.noclip.backrooms.core.quota.QuotaData;
 import dev.noclip.backrooms.core.trip.Anomalies;
 import dev.noclip.backrooms.core.trip.Trips;
+import dev.noclip.backrooms.level0.Level0MissionHelper;
 import dev.noclip.backrooms.level0p1.Level0p1;
 import dev.noclip.backrooms.level0p1.ZenithBlackouts;
 import dev.noclip.backrooms.level1.Blackouts;
 import dev.noclip.backrooms.level1.Level1;
+import dev.noclip.backrooms.level2.Level2;
+import dev.noclip.backrooms.level4.Level4;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -74,8 +77,18 @@ public final class Evidence {
 			Map.entry("deathmoth", 45), Map.entry("clump", 50), Map.entry("faceling", 35), Map.entry("duller", 70), Map.entry("wretch", 55),
 			Map.entry("partygoer", 90), Map.entry("bacteria", 75), Map.entry("shepherd_snake", 85), Map.entry("bone_thief", 80));
 	/** Scene photos: special Backrooms events and anomalous landmarks in frame. */
-	static final Set<String> SCENE_IDS = Set.of("blackout_moment", "red_room_altar", "anomaly_vault", "electrical_hazard");
-	private static final Set<String> RED_ALTAR_BLOCKS = Set.of("red_anomaly_cluster", "red_fluorescent_light", "red_wallpaper");
+	static final Set<String> SCENE_IDS = Set.of(
+			"blackout_moment", "red_room_altar", "anomaly_vault", "electrical_hazard",
+			"pitfalls", "chasm_rift", "manila_room", "flickering_light", "eyed_crate", "hot_zone", "trap_window");
+	private static final Set<String> RED_ALTAR_BLOCKS = Set.of(
+			"red_anomaly_cluster", "red_fluorescent_light", "red_wallpaper",
+			"red_wallpaper_baseboard", "peeling_red_wallpaper");
+	private static final Set<String> MANILA_BLOCKS = Set.of(
+			"manila_wallpaper", "manila_wallpaper_baseboard", "manila_light",
+			"manila_table", "manila_cabinet", "manila_note", "manila_door");
+	private static final Set<String> EYED_CRATE_BLOCKS = Set.of("eyed_crate", "shut_eyed_crate");
+	private static final Set<String> HOT_ZONE_BLOCKS = Set.of("valve_pipes", "steam_pipes", "boiler_valve");
+	private static final Set<String> TRAP_WINDOW_BLOCKS = Set.of("office_trap_window", "office_rain_window");
 	private static final Set<String> VAULT_BLOCKS = Set.of("anomaly_vault_chest", "anomaly_altar", "crystal_vein_node", "uec_apparatus", "jerry_mural", "purple_brick");
 	private static final Set<String> HAZARD_BLOCKS = Set.of("sparking_outlet", "angel_statue", "black_sludge", "singularity");
 	/** One photo target a cycle, in turn (creatures and notable scenes). */
@@ -225,6 +238,7 @@ public final class Evidence {
 			if (!player.getInventory().add(photo)) player.drop(photo, false);
 			dev.noclip.backrooms.core.guild.Contracts.onPhoto(serverPlayer, id, where == null ? "" : where);
 			dev.noclip.backrooms.core.story.MainQuest.onPhoto(serverPlayer, id, where == null ? "" : where);
+			dev.noclip.backrooms.core.story.Missions.onPhoto(serverPlayer, id, where == null ? "" : where);
 			flash(server, serverPlayer);
 			camera.hurtAndBreak(1, player, hand);
 			player.getCooldowns().addCooldown(camera, 40);
@@ -252,8 +266,12 @@ public final class Evidence {
 			int bestScore = 0;
 			int redBlocksSeen = 0;
 			double closestRedDist = CAMERA_RANGE;
+			int manilaBlocksSeen = 0;
+			double closestManilaDist = CAMERA_RANGE;
 			boolean brokenLightInDark = false;
 			double closestDarkDist = CAMERA_RANGE;
+			double closestFlickerDist = CAMERA_RANGE;
+			boolean sawFlickerLight = false;
 
 			for (BlockPos pos : BlockPos.betweenClosed(origin.offset(-r, -5, -r), origin.offset(r, 6, r))) {
 				BlockState state = level.getBlockState(pos);
@@ -264,10 +282,16 @@ public final class Evidence {
 
 				boolean isRedCluster = path.equals("red_anomaly_cluster");
 				boolean isRedBlock = RED_ALTAR_BLOCKS.contains(path);
+				boolean isManila = MANILA_BLOCKS.contains(path);
+				boolean isEyedCrate = EYED_CRATE_BLOCKS.contains(path);
+				boolean isHotPipe = level.dimension().equals(Level2.LEVEL_2) && HOT_ZONE_BLOCKS.contains(path);
+				boolean isTrapWindow = level.dimension().equals(Level4.LEVEL_4) && TRAP_WINDOW_BLOCKS.contains(path);
 				boolean isVault = VAULT_BLOCKS.contains(path);
 				boolean isHazard = HAZARD_BLOCKS.contains(path);
-				boolean isDeadFixture = path.contains("broken_") || path.contains("flickering_") || path.contains("dead_");
-				if (!isRedCluster && !isRedBlock && !isVault && !isHazard && !isDeadFixture) continue;
+				boolean isFlicker = path.contains("flickering_") || path.contains("_flicker") || path.contains("broken_") || path.contains("dead_");
+				if (!isRedCluster && !isRedBlock && !isManila && !isEyedCrate && !isHotPipe && !isTrapWindow && !isVault && !isHazard && !isFlicker) {
+					continue;
+				}
 
 				Vec3 center = Vec3.atCenterOf(pos);
 				Vec3 to = center.subtract(eye);
@@ -285,6 +309,27 @@ public final class Evidence {
 				} else if (isRedBlock) {
 					redBlocksSeen++;
 					closestRedDist = Math.min(closestRedDist, dist);
+				} else if (isManila) {
+					manilaBlocksSeen++;
+					closestManilaDist = Math.min(closestManilaDist, dist);
+				} else if (isTrapWindow) {
+					int score = 88;
+					if (score > bestScore || (score == bestScore && best != null && dist < best.distance())) {
+						bestScore = score;
+						best = new SceneShot("trap_window", 85, dist);
+					}
+				} else if (isEyedCrate) {
+					int score = 85;
+					if (score > bestScore || (score == bestScore && best != null && dist < best.distance())) {
+						bestScore = score;
+						best = new SceneShot("eyed_crate", 85, dist);
+					}
+				} else if (isHotPipe) {
+					int score = 78;
+					if (score > bestScore || (score == bestScore && best != null && dist < best.distance())) {
+						bestScore = score;
+						best = new SceneShot("hot_zone", 75, dist);
+					}
 				} else if (isVault) {
 					int score = 75;
 					if (score > bestScore || (score == bestScore && best != null && dist < best.distance())) {
@@ -297,17 +342,35 @@ public final class Evidence {
 						bestScore = score;
 						best = new SceneShot("electrical_hazard", 65, dist);
 					}
-				} else if (isDeadFixture && level.getMaxLocalRawBrightness(origin) <= 5
-						&& Anomalies.current(level.getServer()) == Anomalies.Affix.STATIC) {
-					brokenLightInDark = true;
-					closestDarkDist = Math.min(closestDarkDist, dist);
+				} else if (isFlicker) {
+					sawFlickerLight = true;
+					closestFlickerDist = Math.min(closestFlickerDist, dist);
+					if (level.getMaxLocalRawBrightness(origin) <= 5
+							&& Anomalies.current(level.getServer()) == Anomalies.Affix.STATIC) {
+						brokenLightInDark = true;
+						closestDarkDist = Math.min(closestDarkDist, dist);
+					}
 				}
 			}
 			if (best == null && redBlocksSeen >= 3) {
 				best = new SceneShot("red_room_altar", 110, closestRedDist);
 			}
+			if (best == null && manilaBlocksSeen >= 2) {
+				best = new SceneShot("manila_room", 80, closestManilaDist);
+			}
+			if (best == null && level.dimension().equals(dev.noclip.backrooms.level0.Level0.LEVEL_0)) {
+				String zoneScene = Level0MissionHelper.sceneAt(level, BlockPos.containing(eye.add(look.scale(5.0))));
+				if (zoneScene == null) zoneScene = Level0MissionHelper.sceneAt(level, origin);
+				if (zoneScene != null) {
+					int val = "red_room_altar".equals(zoneScene) ? 100 : "chasm_rift".equals(zoneScene) ? 90 : 80;
+					best = new SceneShot(zoneScene, val, 4.5);
+				}
+			}
 			if (best == null && brokenLightInDark) {
 				best = new SceneShot("blackout_moment", 85, closestDarkDist);
+			}
+			if (best == null && sawFlickerLight) {
+				best = new SceneShot("flickering_light", 65, closestFlickerDist);
 			}
 			return best;
 		}

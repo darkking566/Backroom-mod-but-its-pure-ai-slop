@@ -83,6 +83,7 @@ final class FuseBoxEvents {
 						? Component.translatable("message.noclip_backrooms.fuse_box.restored", lit)
 						: Component.translatable("message.noclip_backrooms.fuse_box.already_lit"));
 			}
+			dev.noclip.backrooms.core.story.Missions.onBlockInteract(player, "fuse_box", pos, "0");
 		} else {
 			setNearbyLights(level, pos, TRIP_RADIUS_XZ, false);
 			level.sendParticles(ParticleTypes.SMOKE,

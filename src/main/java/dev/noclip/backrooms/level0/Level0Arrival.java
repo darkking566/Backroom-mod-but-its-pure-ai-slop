@@ -23,12 +23,14 @@ public final class Level0Arrival {
 		// Through an exit, a fresh stretch of Level 0 (docs/企劃書/1-遊戲玩法/README.md); falling in from the Overworld, under the player.
 		int[] at = dev.noclip.backrooms.core.LevelExits.anchor(player);
 		// Land in the region's centre Stage (Level 0 repeats it all around; StageLoop keeps players there).
+		long seed = Level0ChunkGenerator.mazeSeed(level0.getChunkSource().randomState());
 		int cx = Math.floorDiv(Level0Space.template(at[0]), CELL), cz = Math.floorDiv(Level0Space.template(at[1]), CELL);
 		for (int ring = 0; ring < RINGS; ring++) {
 			for (int i = -ring; i <= ring; i++) {
 				for (int j = -ring; j <= ring; j++) {
 					if (Math.max(Math.abs(i), Math.abs(j)) != ring) continue;
 					int x = (cx + i) * CELL + CENTER, z = (cz + j) * CELL + CENTER;
+					if (!freePlanned(seed, x, z)) continue;
 					Vec3 landing = new Vec3(x + 0.5, STAND_Y, z + 0.5);
 					if (!free(level0, player, landing)) continue;
 					player.stopRiding();
@@ -40,6 +42,14 @@ public final class Level0Arrival {
 			}
 		}
 		return false;
+	}
+
+	private static boolean freePlanned(long seed, int x, int z) {
+		if (Maze.zoneAt(seed, Level0Space.template(x), Level0Space.template(z)) == Maze.Zone.RED_ROOM) return false;
+		var floor = Level0ChunkGenerator.worldBlockAt(seed, x, STAND_Y - 1, z);
+		if (floor.isAir() || !floor.getFluidState().isEmpty()) return false;
+		return Level0ChunkGenerator.worldBlockAt(seed, x, STAND_Y, z).isAir()
+				&& Level0ChunkGenerator.worldBlockAt(seed, x, STAND_Y + 1, z).isAir();
 	}
 
 	private static boolean free(ServerLevel level, ServerPlayer player, Vec3 landing) {

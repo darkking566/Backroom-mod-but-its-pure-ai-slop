@@ -184,7 +184,7 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			check(server.computeOnServer(s -> dev.noclip.backrooms.core.radio.Radio.carries(player(s))), "M.E.G. issued no radio");
 			check(server.computeOnServer(s -> !Trips.settled(player(s))), "home, the player still wakes up in the Backrooms");
 			check(server.computeOnServer(s -> Floors.of(player(s)).floor()) == 0, "the trip did not end at home");
-			check(server.computeOnServer(s -> Quota.data(s).active()), "getting out did not start the M.E.G. cycle");
+			check(server.computeOnServer(s -> !Quota.data(s).active()), "getting out auto-started the legacy 5-day quota cycle");
 			check(server.computeOnServer(s -> PlayerRpg.get(player(s)).level()) > levelBefore
 					|| server.computeOnServer(s -> PlayerRpg.get(player(s)).xp()) > xpBefore, "no experience for getting out alive");
 
@@ -206,6 +206,7 @@ public final class HorrorClientTest implements FabricClientGameTest {
 			//    a night slept through counts, the rejection follows the days, a serum only holds it back, selling to the
 			//    buyer hands things in, meeting the quota pays out, missing it means debt, a closed outpost and a drop
 			//    into the Backrooms at dawn.
+			server.runCommand("execute as @a run backrooms quota start");
 			check(server.computeOnServer(s -> QuotaMath.day(Quota.data(s).homeTicks())) == 1, "the cycle did not start on day 1");
 			check(server.computeOnServer(s -> Quota.data(s).required()) == QuotaMath.FIRST_QUOTA, "the first quota is not 100");
 			check(server.computeOnServer(s -> Quota.data(s).items().size()) == 1, "the first cycle does not ask for one item");

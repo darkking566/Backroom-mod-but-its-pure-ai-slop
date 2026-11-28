@@ -105,6 +105,7 @@ final class Level4Windows {
 			world.playSound(null, pos, SoundEvents.SLIME_BLOCK_PLACE, SoundSource.BLOCKS, 0.85F, 0.8F);
 			PlayerRpg.grantXp(sp, 15);
 			sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.window_painted"));
+			dev.noclip.backrooms.core.story.Missions.onBlockInteract(sp, "seal_window_l4", pos, "4");
 			return InteractionResult.SUCCESS;
 		});
 	}

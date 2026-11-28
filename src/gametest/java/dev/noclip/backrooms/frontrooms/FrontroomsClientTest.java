@@ -193,7 +193,28 @@ public final class FrontroomsClientTest implements FabricClientGameTest {
 			server.runCommand("gamemode spectator @a");
 			server.runCommand("gamemode survival @a");
 
+			// Staircases meet every upper landing cleanly (no full-block 1m bump at top step).
+			server.runOnServer(s -> {
+				ServerLevel fr = level(s);
+				for (InstituteLayout.Flight f : InstituteLayout.flights()) {
+					for (int x = f.minX(); x <= f.maxX(); x++) {
+						for (int z = f.minZ(); z <= f.maxZ(); z++) {
+							int surface = f.low() + 1 + f.step(x, z);
+							BlockState st = fr.getBlockState(new BlockPos(x, surface, z));
+							check(st.getBlock() instanceof net.minecraft.world.level.block.StairBlock,
+									"institute stair at (" + x + "," + surface + "," + z + ") is not StairBlock: " + st);
+							if (surface == f.high()) {
+								BlockPos landingHead = new BlockPos(x + f.dx(), f.high() + 1, z + f.dz());
+								check(fr.getBlockState(landingHead).getCollisionShape(fr, landingHead).isEmpty(),
+										"upper landing blocked at " + landingHead);
+							}
+						}
+					}
+				}
+			});
+
 			// Quotas open the wings: one the medical wing, three the armoury, five B1.
+			server.runCommand("execute as @a run backrooms quota start");
 			meet(server);
 			check(open(server, medical) && !open(server, armoury), "one quota did not open just the medical wing");
 			stand(server, medic.x(), medic.z() - 2);
