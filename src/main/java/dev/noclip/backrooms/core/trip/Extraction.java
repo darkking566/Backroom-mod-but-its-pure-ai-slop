@@ -32,7 +32,8 @@ import net.minecraft.world.phys.Vec3;
  * Waiting to be picked up (docs/企劃書/1-遊戲玩法/README.md, "撤離接應倒數"). Getting out is never a click: whoever
  * calls for extraction (from a base they settled at, at an exit door, with a homeward anchor) has to hold out where
  * they are for 30 to 60 seconds, longer the deeper the trip has gone, while the signal draws whatever is near and,
- * twice, brings more out of the dark. Wander off, change level or die and the pickup is off.
+ * twice, brings more out of the dark. Wander off, change level or die and the pickup is off. The pickup M.E.G. sends
+ * for the first assignment (core.story.MainQuest) is quiet: nothing is drawn to it.
  */
 public final class Extraction {
 	/** How often the signal calls the creatures near it, and how far it carries. */
@@ -46,10 +47,12 @@ public final class Extraction {
 		final double radius;
 		final int total;
 		final int floor;
+		final boolean quiet;
 		final ServerBossEvent bar;
 		int left;
 
-		Run(ServerPlayer player, Vec3 at, double radius, int total, int floor) {
+		Run(ServerPlayer player, Vec3 at, double radius, int total, int floor, boolean quiet) {
+			this.quiet = quiet;
 			this.level = player.level().dimension();
 			this.at = at;
 			this.radius = radius;
@@ -80,6 +83,10 @@ public final class Extraction {
 
 	/** Calls for a pickup where the player stands; they must stay within {@code radius} of it. */
 	public static boolean start(ServerPlayer player, Vec3 at, double radius) {
+		return start(player, at, radius, false);
+	}
+
+	public static boolean start(ServerPlayer player, Vec3 at, double radius, boolean quiet) {
 		if (!Home.inBackrooms(player.level().dimension())) return false;
 		if (RUNS.containsKey(player.getUUID())) {
 			player.sendOverlayMessage(Component.translatable("message.noclip_backrooms.extraction.already").withStyle(ChatFormatting.YELLOW));
@@ -87,8 +94,8 @@ public final class Extraction {
 		}
 		int floor = Math.max(1, Floors.of(player).floor());
 		int seconds = seconds(floor);
-		RUNS.put(player.getUUID(), new Run(player, at, radius, seconds * 20, floor));
-		player.sendSystemMessage(Component.translatable("message.noclip_backrooms.extraction.started", seconds).withStyle(ChatFormatting.GOLD));
+		RUNS.put(player.getUUID(), new Run(player, at, radius, seconds * 20, floor, quiet));
+		player.sendSystemMessage(Component.translatable("message.noclip_backrooms.extraction." + (quiet ? "started_quiet" : "started"), seconds).withStyle(ChatFormatting.GOLD));
 		player.level().playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.NOTE_BLOCK_BIT.value(), SoundSource.PLAYERS, 1.0F, 0.6F);
 		return true;
 	}
@@ -121,8 +128,8 @@ public final class Extraction {
 			run.bar.setProgress(1.0F - (float) run.left / run.total);
 			run.bar.setName(Component.translatable("bossbar.noclip_backrooms.extraction", (run.left + 19) / 20));
 			ServerLevel level = (ServerLevel) player.level();
-			if (run.left % CALL_EVERY == 0) call(level, player);
-			if (run.left == run.total * 2 / 3 || run.left == run.total / 3) wave(level, player, run);
+			if (!run.quiet && run.left % CALL_EVERY == 0) call(level, player);
+			if (!run.quiet && (run.left == run.total * 2 / 3 || run.left == run.total / 3)) wave(level, player, run);
 			if (run.left % 100 == 0 && run.left > 0) {
 				level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.NOTE_BLOCK_BIT.value(), SoundSource.PLAYERS, 0.8F, 1.4F);
 			}

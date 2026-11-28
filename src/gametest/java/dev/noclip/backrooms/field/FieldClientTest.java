@@ -336,6 +336,13 @@ public final class FieldClientTest implements FabricClientGameTest {
 					e.discard();
 				}
 			});
+			// The first assignment is done: M.E.G. offers a pickup on the spot (wandering off calls it off again).
+			check(server.computeOnServer(s -> dev.noclip.backrooms.core.story.MainQuest.pickup(player(s))), "no pickup for the finished first assignment");
+			check(server.computeOnServer(s -> dev.noclip.backrooms.core.trip.Extraction.running(player(s))), "the pickup is not on its way");
+			server.runCommand("execute as @a at @s run tp @s ~40 ~ ~");
+			server.waitFor(s -> !dev.noclip.backrooms.core.trip.Extraction.running(player(s)), 100);
+			server.runCommand("execute as @a at @s run tp @s ~-40 ~ ~");
+			context.waitTicks(10);
 			spawnBuyer(server);
 			check(server.computeOnServer(s -> sell(s, FieldKit.TAPE)) == Shops.Outcome.DONE, "the buyer would not take the tape");
 			check(server.computeOnServer(s -> Quota.data(s).mapped("0")), "selling the tape did not map Level 0");

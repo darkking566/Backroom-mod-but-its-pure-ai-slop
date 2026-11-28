@@ -8,6 +8,7 @@ import dev.noclip.backrooms.core.economy.Wallet;
 import dev.noclip.backrooms.core.field.FieldKit;
 import dev.noclip.backrooms.core.floors.Floors;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
+import dev.noclip.backrooms.core.trip.Extraction;
 import dev.noclip.backrooms.monsters.Monsters;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -17,6 +18,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -72,6 +74,8 @@ public final class MainQuest {
 	}
 
 	private static final List<Chapter> CHAPTERS = List.of(Chapter.values());
+	/** How far the player may wander while the first assignment's pickup is on its way. */
+	private static final double PICKUP_RADIUS = 12;
 
 	private MainQuest() {
 	}
@@ -82,6 +86,8 @@ public final class MainQuest {
 				talk(ctx.getSource().getPlayerOrException());
 				return 1;
 			})));
+			dispatcher.register(Commands.literal("meg").then(Commands.literal("pickup")
+					.executes(ctx -> pickup(ctx.getSource().getPlayerOrException()) ? 1 : 0)));
 			dispatcher.register(Commands.literal("backrooms").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
 					.then(Commands.literal("story").then(Commands.literal("next").executes(ctx -> {
 						ServerPlayer player = ctx.getSource().getPlayerOrException();
@@ -164,6 +170,30 @@ public final class MainQuest {
 				? Component.translatable("message.noclip_backrooms.quest.done", chapter.title())
 				: Component.translatable("message.noclip_backrooms.quest.progress", chapter.title(), data.progress, chapter.goal))
 				.withStyle(ChatFormatting.GOLD));
+		if (data.reached && chapter == Chapter.LOBBY) offerPickup(player);
+	}
+
+	/**
+	 * A newcomer has no way to find home from the lobby: with the first assignment done, M.E.G. comes to wherever they
+	 * stand, and nothing is drawn to the signal.
+	 */
+	private static void offerPickup(ServerPlayer player) {
+		if (!Home.inBackrooms(player.level().dimension())) return;
+		player.sendSystemMessage(Component.translatable("message.noclip_backrooms.quest.pickup_offer").withStyle(ChatFormatting.GRAY)
+				.append(" ")
+				.append(Component.translatable("message.noclip_backrooms.trip.extract_button").withStyle(style -> style
+						.withColor(ChatFormatting.GREEN)
+						.withClickEvent(new ClickEvent.RunCommand("/meg pickup")))));
+	}
+
+	/** Calls that pickup ({@code /meg pickup}); false when M.E.G. does not offer one. */
+	public static boolean pickup(ServerPlayer player) {
+		Data data = Data.get(player.level().getServer());
+		if (!data.reached || current(player.level().getServer()) != Chapter.LOBBY || !Home.inBackrooms(player.level().dimension())) {
+			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.quest.pickup_none"));
+			return false;
+		}
+		return Extraction.start(player, player.position(), PICKUP_RADIUS, true);
 	}
 
 	/**
@@ -218,6 +248,7 @@ public final class MainQuest {
 		player.sendSystemMessage(Component.translatable("quest.noclip_backrooms." + chapter.id + ".goal").withStyle(ChatFormatting.YELLOW));
 		if (data.reached) {
 			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.quest.come_back").withStyle(ChatFormatting.GREEN));
+			if (chapter == Chapter.LOBBY) offerPickup(player);
 		} else if (chapter.goal > 1) {
 			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.quest.status", data.progress, chapter.goal).withStyle(ChatFormatting.GRAY));
 		}
