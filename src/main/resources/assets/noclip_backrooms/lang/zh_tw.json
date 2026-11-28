@@ -2482,5 +2482,9 @@
   "photo.noclip_backrooms.take": "取出",
   "photo.noclip_backrooms.prev": "上一張",
   "photo.noclip_backrooms.next": "下一張",
-  "photo.noclip_backrooms.title": "照片"
+  "photo.noclip_backrooms.title": "照片",
+  "photo.noclip_backrooms.back": "返回",
+  "photo.noclip_backrooms.prev_page": "上一頁",
+  "photo.noclip_backrooms.next_page": "下一頁",
+  "photo.noclip_backrooms.taken_day": "第 %s 天拍攝"
 }

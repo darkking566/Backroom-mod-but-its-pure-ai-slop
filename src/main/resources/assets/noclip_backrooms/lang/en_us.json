@@ -2482,5 +2482,9 @@
   "photo.noclip_backrooms.take": "Take out",
   "photo.noclip_backrooms.prev": "Previous",
   "photo.noclip_backrooms.next": "Next",
-  "photo.noclip_backrooms.title": "Photos"
+  "photo.noclip_backrooms.title": "Photos",
+  "photo.noclip_backrooms.back": "Back",
+  "photo.noclip_backrooms.prev_page": "Prev page",
+  "photo.noclip_backrooms.next_page": "Next page",
+  "photo.noclip_backrooms.taken_day": "Taken on day %s"
 }

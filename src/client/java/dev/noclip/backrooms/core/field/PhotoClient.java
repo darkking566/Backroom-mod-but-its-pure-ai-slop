@@ -44,7 +44,11 @@ public final class PhotoClient {
 		ClientPlayNetworking.registerGlobalReceiver(PhotoPayloads.Image.TYPE,
 				(payload, context) -> keep(payload.photo(), payload.pixels()));
 		ClientPlayNetworking.registerGlobalReceiver(PhotoPayloads.View.TYPE,
-				(payload, context) -> context.client().gui.setScreen(new PhotoScreen(payload.album(), payload.photos())));
+				(payload, context) -> {
+			PhotoScreen screen = new PhotoScreen(payload.album(), payload.photos());
+			if (context.client().gui.screen() instanceof PhotoScreen before) screen.openAt(before);
+			context.client().gui.setScreen(screen);
+		});
 		ClientTickEvents.END_CLIENT_TICK.register(PhotoClient::tick);
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			shutterDone(client);

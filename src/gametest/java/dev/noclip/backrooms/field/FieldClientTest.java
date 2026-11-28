@@ -270,22 +270,38 @@ public final class FieldClientTest implements FabricClientGameTest {
 			check(context.computeOnClient(client -> !client.gui.hud.isHidden()), "the shutter left the HUD off");
 			server.runOnServer(s -> {
 				ServerPlayer p = player(s);
+				// Copies of it, to fill more than one spread of the book.
+				for (int n = 0; n < 8; n++) p.getInventory().add(carried(p, FieldKit.PHOTO).copy());
 				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FieldKit.ALBUM));
 				p.setShiftKeyDown(true);
 				p.gameMode.useItem(p, p.level(), p.getMainHandItem(), InteractionHand.MAIN_HAND);
 				p.setShiftKeyDown(false);
 			});
-			check(server.computeOnServer(s -> Photos.contents(player(s).getMainHandItem()).size() == 1 && carried(player(s), FieldKit.PHOTO).isEmpty()),
+			check(server.computeOnServer(s -> Photos.contents(player(s).getMainHandItem()).size() == 9 && carried(player(s), FieldKit.PHOTO).isEmpty()),
 					"the album did not take the photo");
 			server.runOnServer(s -> player(s).gameMode.useItem(player(s), player(s).level(), player(s).getMainHandItem(), InteractionHand.MAIN_HAND));
 			context.waitFor(client -> client.gui.screen() instanceof PhotoScreen screen && screen.showingPicture(), 200);
 			context.waitTicks(5);
 			context.takeScreenshot("field_album");
+			context.clickScreenButton("photo.noclip_backrooms.next_page");
+			context.waitTicks(2);
+			context.takeScreenshot("field_album_page2");
+			context.clickScreenButton("photo.noclip_backrooms.prev_page");
+			// A real click on the print holds it up; "take out" gives the photo back and leaves the book open.
+			double[] print = context.computeOnClient(client -> {
+				int[] at = ((PhotoScreen) client.gui.screen()).firstPrint();
+				double gui = client.getWindow().getGuiScale();
+				return new double[] {at[0] * gui, at[1] * gui};
+			});
+			context.getInput().setCursorPos(print[0], print[1]);
+			context.getInput().pressMouse(0);
+			context.waitTicks(5);
+			check(context.computeOnClient(client -> ((PhotoScreen) client.gui.screen()).holdingUp()), "clicking a print did not hold it up");
+			context.takeScreenshot("field_album_detail");
+			context.clickScreenButton("photo.noclip_backrooms.take");
+			context.waitFor(client -> client.gui.screen() instanceof PhotoScreen screen && !screen.holdingUp(), 100);
 			context.runOnClient(client -> client.gui.screen().onClose());
-			server.runOnServer(s -> Photos.take(player(s), 0));
-			context.waitFor(client -> client.gui.screen() instanceof PhotoScreen, 100);
-			context.runOnClient(client -> client.gui.screen().onClose());
-			check(server.computeOnServer(s -> Photos.contents(player(s).getMainHandItem()).isEmpty() && !carried(player(s), FieldKit.PHOTO).isEmpty()),
+			check(server.computeOnServer(s -> Photos.contents(player(s).getMainHandItem()).size() == 8 && !carried(player(s), FieldKit.PHOTO).isEmpty()),
 					"the photo did not come back out of the album");
 			server.runCommand("kill @e[type=!player]");
 			spawnBuyer(server);
