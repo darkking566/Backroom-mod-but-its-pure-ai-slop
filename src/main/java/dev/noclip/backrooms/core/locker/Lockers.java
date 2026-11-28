@@ -83,7 +83,8 @@ public final class Lockers {
 		int taken = 0;
 		for (int i = 0; i < inventory.getContainerSize(); i++) {
 			ItemStack stack = inventory.getItem(i);
-			if (stack.isEmpty()) continue;
+			// The mapping beacon stays on the person (core.trip.Relics).
+			if (stack.isEmpty() || stack.is(dev.noclip.backrooms.core.field.FieldKit.BEACON)) continue;
 			inventory.setItem(i, ItemStack.EMPTY);
 			if (EnchantmentHelper.has(stack, EnchantmentEffectComponents.PREVENT_EQUIPMENT_DROP)) continue;
 			taken++;

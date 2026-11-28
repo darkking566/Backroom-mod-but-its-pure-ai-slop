@@ -119,11 +119,25 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			context.takeScreenshot("level0_far_away");
 			server.runOnServer(s -> check(!player(s).isInWall(), "distant cell centre is blocked"));
 
+			// Death leaves everything where it fell but the mapping beacon, and tells the way back.
+			server.runCommand("clear @a");
+			server.runCommand("give @a noclip_backrooms:mapping_beacon");
+			server.runCommand("give @a minecraft:bread");
+			context.waitTicks(5);
 			server.runCommand("kill @a");
 			context.waitFor(client -> client.player != null && client.player.isDeadOrDying());
 			context.runOnClient(client -> client.player.respawn());
 			server.waitFor(s -> player(s).isAlive() && player(s).level().dimension() == Level0.LEVEL_0, 400);
 			game.getConnection().waitForChunksRender();
+			server.runOnServer(s -> {
+				var inventory = player(s).getInventory();
+				check(inventory.countItem(dev.noclip.backrooms.core.field.FieldKit.BEACON) == 1, "death took the mapping beacon, or doubled it");
+				check(inventory.countItem(net.minecraft.world.item.Items.BREAD) == 0, "the rest was not left behind");
+				check(player(s).hasAttached(dev.noclip.backrooms.core.trip.Relics.AT), "where the things fell was not noted");
+				check(dev.noclip.backrooms.core.trip.Relics.tell(player(s)), "no way back to the things");
+				check(dev.noclip.backrooms.core.trip.Relics.octant(0, 5, 0) == 0 && dev.noclip.backrooms.core.trip.Relics.octant(-5, 0, 0) == 2
+						&& dev.noclip.backrooms.core.trip.Relics.octant(0, -5, 0) == 4 && dev.noclip.backrooms.core.trip.Relics.octant(5, 0, 0) == 6, "directions are off");
+			});
 
 			int[] zone = server.computeOnServer(s -> dev.noclip.backrooms.core.trip.Expedition.zone(s, "0"));
 			int landX = Math.floorDiv(zone[0], Maze.CELL) * Maze.CELL + Maze.CENTER;

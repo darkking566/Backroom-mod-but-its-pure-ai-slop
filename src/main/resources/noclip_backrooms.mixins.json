@@ -6,6 +6,7 @@
 	"mixins": [
 		"BlockEntityMirror",
 		"FoodDataBackroomsRegen",
+		"InventoryKeepsBeacon",
 		"LivingEntityWeaponBalance",
 		"LevelSetBlockMirror",
 		"PlayerSprintExhaustionMixin",

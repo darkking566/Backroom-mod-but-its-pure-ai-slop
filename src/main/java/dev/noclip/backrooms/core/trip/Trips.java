@@ -76,6 +76,7 @@ public final class Trips {
 	}
 
 	public static void register() {
+		Relics.register();
 		// Dying outside the Backrooms once they have been in: M.E.G. collects what they carried.
 		ServerLivingEntityEvents.ALLOW_DEATH.register((entity, source, amount) -> {
 			if (entity instanceof ServerPlayer player && Home.isHome(player.level().dimension()) && Home.entered(player)
@@ -91,10 +92,13 @@ public final class Trips {
 		ServerPlayerEvents.AFTER_RESPAWN.register((old, player, alive) -> {
 			if (alive) return;
 			if (Home.inBackrooms(old.level().dimension())) {
-				if (settled(old)) return;
-				player.sendSystemMessage(Component.translatable("message.noclip_backrooms.trip.lost").withStyle(ChatFormatting.GRAY));
+				boolean settled = settled(old);
+				if (!settled) player.sendSystemMessage(Component.translatable("message.noclip_backrooms.trip.lost").withStyle(ChatFormatting.GRAY));
 				MinecraftServer server = player.level().getServer();
-				server.schedule(new TickTask(server.getTickCount(), () -> backToEntry(player)));
+				server.schedule(new TickTask(server.getTickCount(), () -> {
+					if (!settled) backToEntry(player);
+					Relics.offer(player);
+				}));
 			} else if (Home.entered(old) && !(dev.noclip.backrooms.core.ending.Endings.isFree(old) && old.level().dimension() == Level.OVERWORLD)) {
 				player.sendSystemMessage(Component.translatable("message.noclip_backrooms.trip.fell_back").withStyle(ChatFormatting.DARK_RED));
 				LevelExits.fallInto(player, "0");
@@ -109,6 +113,8 @@ public final class Trips {
 		CommandRegistrationCallback.EVENT.register((dispatcher, registry, environment) -> {
 			dispatcher.register(Commands.literal("meg").then(Commands.literal("extract")
 					.executes(ctx -> extract(ctx.getSource().getPlayerOrException()) ? 1 : 0)));
+			dispatcher.register(Commands.literal("meg").then(Commands.literal("relics")
+					.executes(ctx -> Relics.tell(ctx.getSource().getPlayerOrException()) ? 1 : 0)));
 			dispatcher.register(Commands.literal("backrooms").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
 					.then(Commands.literal("extract").then(Commands.literal("now").executes(ctx -> {
 						Extraction.finishNow(ctx.getSource().getPlayerOrException());
@@ -187,6 +193,7 @@ public final class Trips {
 	private static void cameHome(ServerPlayer player, FloorRun run) {
 		restoreHome(player);
 		player.removeAttached(ENTRY);
+		player.removeAttached(Relics.AT);
 		// The first time anyone gets out, the team's M.E.G. cycle starts (the days count from then on).
 		dev.noclip.backrooms.core.quota.Quota.onHome(player);
 		PlayerRpg.grantXp(player, ESCAPE_XP + ESCAPE_XP_PER_FLOOR * run.floor());
