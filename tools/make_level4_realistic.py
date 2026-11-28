@@ -28,14 +28,15 @@ MATERIAL = [
     (("carpet",), "carpet"),
     (("cot",), "fabric"),
     (("desk_wood", "fire_door", "tbd_shelf", "tbd_hoard", "amor_planter"), "wood"),
-    (("elevator", "breaker", "locker", "vending", "cooler_body", "photocopier", "hatch"), "steel"),
+    (("elevator", "breaker", "locker", "vending", "cooler_body", "photocopier", "hatch",
+      "office_supply_crate", "industrial_toolbox", "office_steel_safe", "executive_broadcast_screen_side"), "steel"),
     (("drywall", "pillar", "radiator", "acoustic_ceiling", "ceiling_vent", "omega_wall", "omega_barricade", "almond_fountain_basin"), "concrete"),
 ]
 PLAIN = ("troffer", "window", "glass_wall", "exit_sign", "cooler_jug", "almond_liquid", "almond_bottle",
          "amor_mushroom", "amor_substrate", "desk_phone", "omega_sign",
          "stairwell", "door_4p3", "door_11", "door_13", "basement_71",
          "meg_chalk_sign", "caution_tape_barrier", "office_dark_mirror", "corrupted_fountain",
-         "executive_red_phone", "executive_desk_wood")
+         "executive_red_phone", "executive_broadcast_screen_front")
 
 
 def kind(name):
@@ -91,31 +92,41 @@ def substrates():
 
 
 def composite(name, subs):
+    mat = kind(name)
     src = Image.open(OLD / f"{name}.png").convert("RGBA")
+    if mat is None:
+        # Plain/emissive/mirror POI textures keep exact native resolution & sharp labPBR _s alpha masks
+        old_n = Image.open(OLD / f"{name}_n.png").convert("RGBA")
+        old_s = Image.open(OLD / f"{name}_s.png").convert("RGBA")
+        src.save(OUT / f"{name}.png", optimize=True)
+        old_n.save(OUT / f"{name}_n.png", optimize=True)
+        old_s.save(OUT / f"{name}_s.png", optimize=True)
+        return np.asarray(src.convert("RGB"), dtype="uint8")
+
     has_alpha = src.getextrema()[-1][0] < 255
     rgb = np.asarray(src.convert("RGB").resize((S, S), Image.Resampling.LANCZOS), dtype=np.float32) / 255.0
     alpha = np.asarray(src.getchannel("A").resize((S, S), Image.Resampling.NEAREST), dtype=np.uint8) if has_alpha else None
 
     old_n = Image.open(OLD / f"{name}_n.png").convert("RGBA").resize((S, S), Image.Resampling.BILINEAR)
     old_s = Image.open(OLD / f"{name}_s.png").convert("RGBA").resize((S, S), Image.Resampling.BILINEAR)
+    old_s_a = np.asarray(Image.open(OLD / f"{name}_s.png").convert("RGBA").getchannel("A").resize((S, S), Image.Resampling.NEAREST), dtype=np.float32)
     n_arr = np.asarray(old_n, dtype=np.float32)
     s_arr = np.asarray(old_s, dtype=np.float32)
+    s_arr[..., 3] = old_s_a
 
-    mat = kind(name)
-    if mat is not None:
-        delta, smooth_val = subs[mat]
-        sx = zlib.crc32(name.encode()) % S
-        sy = zlib.crc32(name[::-1].encode()) % S
-        d = np.roll(delta, (sy, sx), axis=(0, 1))
-        # Modulate midtones without blowing out bright white drywall or dark blacked-out areas
-        mid = 1.0 - np.abs(rgb.mean(axis=2) * 2.0 - 1.0) * 0.4
-        rgb = np.clip(rgb + (d * mid)[..., None], 0.0, 1.0)
-        # Subtle micro-normal perturbation
-        dx = np.roll(d, -1, axis=1) - np.roll(d, 1, axis=1)
-        dy = np.roll(d, -1, axis=0) - np.roll(d, 1, axis=0)
-        n_arr[..., 0] = np.clip(n_arr[..., 0] - dx * 90.0, 0, 255)
-        n_arr[..., 1] = np.clip(n_arr[..., 1] - dy * 90.0, 0, 255)
-        s_arr[..., 0] = np.clip(s_arr[..., 0] * 0.65 + (smooth_val * 255.0) * 0.35 + d * 40.0, 0, 255)
+    delta, smooth_val = subs[mat]
+    sx = zlib.crc32(name.encode()) % S
+    sy = zlib.crc32(name[::-1].encode()) % S
+    d = np.roll(delta, (sy, sx), axis=(0, 1))
+    # Modulate midtones without blowing out bright white drywall or dark blacked-out areas
+    mid = 1.0 - np.abs(rgb.mean(axis=2) * 2.0 - 1.0) * 0.4
+    rgb = np.clip(rgb + (d * mid)[..., None], 0.0, 1.0)
+    # Subtle micro-normal perturbation
+    dx = np.roll(d, -1, axis=1) - np.roll(d, 1, axis=1)
+    dy = np.roll(d, -1, axis=0) - np.roll(d, 1, axis=0)
+    n_arr[..., 0] = np.clip(n_arr[..., 0] - dx * 90.0, 0, 255)
+    n_arr[..., 1] = np.clip(n_arr[..., 1] - dy * 90.0, 0, 255)
+    s_arr[..., 0] = np.clip(s_arr[..., 0] * 0.65 + (smooth_val * 255.0) * 0.35 + d * 40.0, 0, 255)
 
     out_rgb = np.clip(np.rint(rgb * 255.0), 0, 255).astype("uint8")
     import time
@@ -146,12 +157,14 @@ def preview(tiles):
     sheet.save(PREVIEW, optimize=True)
 
 
-def main():
+def main(only_prefixes=None):
     OUT.mkdir(parents=True, exist_ok=True)
     subs = substrates()
     names = []
     for f in sorted(OLD.glob("*.png")):
         if f.stem.endswith(("_n", "_s")) or f.with_suffix(".png.mcmeta").exists():
+            continue
+        if only_prefixes and not any(f.stem.startswith(p) for p in only_prefixes):
             continue
         with Image.open(f) as image:
             if image.width != image.height:
@@ -170,13 +183,25 @@ def main():
         tag = kind(name) or "plain"
         counts[tag] = counts.get(tag, 0) + 1
 
-    for f in sorted(OUT.glob("office_rain_window*.png")):
-        f.unlink(missing_ok=True)
-    preview(preview_tiles)
+    if not only_prefixes:
+        for f in sorted(OUT.glob("office_rain_window*.png")):
+            f.unlink(missing_ok=True)
+        preview(preview_tiles)
     print(f"{len(names)} Level 4 textures (+ _n/_s) -> {OUT.relative_to(ROOT)}", counts)
 
 
-def resize_level4_only():
+def resize_specular_preserve_alpha(path: Path, size: int):
+    img = Image.open(path).convert("RGBA")
+    if img.width <= size:
+        return False
+    rgb = img.convert("RGB").resize((size, size), Image.Resampling.BOX)
+    a = img.getchannel("A").resize((size, size), Image.Resampling.NEAREST)
+    r, g, b = rgb.split()
+    Image.merge("RGBA", (r, g, b, a)).save(path)
+    return True
+
+
+def resize_level4_only(only_prefixes=None):
     import time
     import resize_realistic  # noqa: E402
     seen = resize_realistic.kinds()
@@ -184,12 +209,17 @@ def resize_level4_only():
     for f in sorted(OUT.glob("*.png")):
         m = f.stem
         base = m[:-2] if m.endswith(("_n", "_s")) else m
+        if only_prefixes and not any(base.startswith(p) for p in only_prefixes):
+            continue
         key = f"block/level4/{base}"
         whole = seen.get(key)
         size = resize_realistic.SURFACE if (not whole or True in whole) else resize_realistic.PROP
         for attempt in range(3):
             try:
-                if resize_realistic.resize(f, size, False):
+                if m.endswith("_s"):
+                    if resize_specular_preserve_alpha(f, size):
+                        resized += 1
+                elif resize_realistic.resize(f, size, False):
                     resized += 1
                 break
             except OSError:
@@ -200,5 +230,9 @@ def resize_level4_only():
 
 
 if __name__ == "__main__":
-    main()
-    resize_level4_only()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--only", nargs="*", default=None)
+    args = parser.parse_args()
+    main(args.only)
+    resize_level4_only(args.only)
