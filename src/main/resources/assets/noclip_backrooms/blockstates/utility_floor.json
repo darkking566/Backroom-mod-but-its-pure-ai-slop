@@ -15,6 +15,51 @@
       {
         "model": "noclip_backrooms:block/level2/utility_floor",
         "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_floor_1"
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_floor_1",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_floor_1",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_floor_1",
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_floor_2"
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_floor_2",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_floor_2",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_floor_2",
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_floor_3"
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_floor_3",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_floor_3",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_floor_3",
+        "y": 270
       }
     ]
   }

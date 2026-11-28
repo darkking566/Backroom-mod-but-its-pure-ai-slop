@@ -2,25 +2,137 @@
   "variants": {
     "": [
       {
-        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling"
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling",
+        "weight": 10
       },
       {
         "model": "noclip_backrooms:block/level4/office_acoustic_ceiling",
+        "weight": 10,
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling",
+        "weight": 10,
         "y": 180
       },
       {
-        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_1"
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling",
+        "weight": 10,
+        "y": 270
       },
       {
         "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_1",
+        "weight": 10
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_1",
+        "weight": 10,
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_1",
+        "weight": 10,
         "y": 180
       },
       {
-        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_2"
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_1",
+        "weight": 10,
+        "y": 270
       },
       {
         "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_2",
+        "weight": 10
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_2",
+        "weight": 10,
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_2",
+        "weight": 10,
         "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_2",
+        "weight": 10,
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_6",
+        "weight": 4
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_6",
+        "weight": 4,
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_6",
+        "weight": 4,
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_6",
+        "weight": 4,
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_3",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_3",
+        "weight": 2,
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_3",
+        "weight": 2,
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_3",
+        "weight": 2,
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_4",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_4",
+        "weight": 2,
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_4",
+        "weight": 2,
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_4",
+        "weight": 2,
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_5",
+        "weight": 1
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_5",
+        "weight": 1,
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_5",
+        "weight": 1,
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_acoustic_ceiling_5",
+        "weight": 1,
+        "y": 270
       }
     ]
   }

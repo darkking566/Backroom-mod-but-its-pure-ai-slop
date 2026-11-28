@@ -15,6 +15,36 @@
       {
         "model": "noclip_backrooms:block/level2/utility_ceiling",
         "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_ceiling_1"
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_ceiling_1",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_ceiling_1",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_ceiling_1",
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_ceiling_2"
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_ceiling_2",
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_ceiling_2",
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level2/utility_ceiling_2",
+        "y": 270
       }
     ]
   }

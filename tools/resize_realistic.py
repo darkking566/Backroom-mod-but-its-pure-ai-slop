@@ -51,7 +51,7 @@ def whole_face(model, models, depth=0):
                 return True
         return False
     parent = model.get("parent", "").split(":")[-1]
-    if parent in FULL_PARENTS:
+    if parent in FULL_PARENTS or parent.startswith("block/door_"):
         return True
     if model.get("parent", "").startswith("noclip_backrooms:") and parent in models and depth < 6:
         return whole_face(models[parent], models, depth + 1)

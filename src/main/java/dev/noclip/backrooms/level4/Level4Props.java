@@ -15,6 +15,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.chunk.LevelChunk;
 
 /**
@@ -43,23 +44,48 @@ final class Level4Props {
 		int roll = Math.floorMod((int) h, 100);
 		boolean placed = false;
 
-		// Place workstations inside Omega Base if this chunk overlaps its center
+		// Place workstations & desk/stage props inside Omega Base and Auditorium
 		int benchesPlaced = 0;
-		for (int x = minX + 2; x <= minX + 13; x += 4) {
-			for (int z = minZ + 2; z <= minZ + 13; z += 4) {
+		for (int x = minX; x <= minX + 15; x++) {
+			for (int z = minZ; z <= minZ + 15; z++) {
 				var tile = Level4Layout.tile(seed, x, z);
-				if (tile.zone() == ZoneKind.OMEGA_BASE && tile.kind() == Kind.AIR) {
-					Block bench = benchesPlaced == 0 ? BackroomsProps.SALVAGE_BENCH : BackroomsProps.WORKSHOP_BENCH;
-					BlockPos pos = new BlockPos(x, Level4ChunkGenerator.FLOOR_Y + 1, z);
-					if (canPlace(chunk, minX, minZ, pos, bench, Direction.SOUTH)) {
-						place(chunk, pos, bench, Direction.SOUTH);
-						placed = true;
-						benchesPlaced++;
-						if (benchesPlaced >= 2) break;
+				if (tile.zone() == ZoneKind.OMEGA_BASE) {
+					if (benchesPlaced < 2 && ((x - minX) & 3) == 2 && ((z - minZ) & 3) == 2 && tile.kind() == Kind.AIR) {
+						Block bench = benchesPlaced == 0 ? BackroomsProps.SALVAGE_BENCH : BackroomsProps.WORKSHOP_BENCH;
+						BlockPos pos = new BlockPos(x, Level4ChunkGenerator.FLOOR_Y + 1, z);
+						if (canPlace(chunk, minX, minZ, pos, bench, Direction.SOUTH)) {
+							place(chunk, pos, bench, Direction.SOUTH);
+							placed = true;
+							benchesPlaced++;
+						}
+					}
+					BlockPos deskPos = new BlockPos(x, Level4ChunkGenerator.FLOOR_Y + 1, z);
+					BlockState deskState = chunk.getBlockState(deskPos);
+					if (deskState.is(Level1Blocks.OFFICE_DESK) && deskState.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
+						Direction deskFace = deskState.getValue(BlockStateProperties.HORIZONTAL_FACING);
+						if (Math.floorMod(x + z, 2) == 0) {
+							placed |= tryPlaceOnDesk(chunk, minX, minZ, deskPos.above(), BackroomsProps.PROP_DESKTOP_COMPUTER, deskFace);
+						}
+						if (Math.floorMod(x, Level4Plan.CELL) == 3) {
+							placed |= tryPlacePoiSingle(chunk, minX, minZ, deskPos.relative(deskFace),
+									BackroomsProps.PROP_OFFICE_CHAIR, deskFace.getOpposite());
+						}
+					}
+				} else if (tile.zone() == ZoneKind.AUDITORIUM && tile.kind() == Kind.AIR) {
+					var aud = Level4Layout.auditoriumInfo(seed, x, z);
+					if (aud != null && aud.stage()) {
+						if ((aud.rx() == 10 && aud.rz() == 17) || (aud.rx() == 13 && aud.rz() == 18)) {
+							placed |= tryPlaceOnDesk(chunk, minX, minZ,
+									new BlockPos(x, Level4ChunkGenerator.FLOOR_Y, z),
+									BackroomsProps.PROP_DESKTOP_COMPUTER, Direction.NORTH);
+						} else if (aud.rx() == 10 && aud.rz() == 18) {
+							placed |= tryPlacePoiSingle(chunk, minX, minZ,
+									new BlockPos(x, Level4ChunkGenerator.FLOOR_Y - 1, z),
+									BackroomsProps.PROP_OFFICE_CHAIR, Direction.NORTH);
+						}
 					}
 				}
 			}
-			if (benchesPlaced >= 2) break;
 		}
 
 		// Batch 1 & 2 POI 3D furniture inside single-chunk bounds
@@ -235,6 +261,7 @@ final class Level4Props {
 		return state.is(Level4Blocks.OFFICE_CARPET)
 				|| state.is(Level4Blocks.OFFICE_CARPET_DENT)
 				|| state.is(Level4Blocks.OFFICE_DAMP_CARPET)
+				|| state.is(net.minecraft.world.level.block.Blocks.POLISHED_ANDESITE)
 				|| state.is(net.minecraft.world.level.block.Blocks.DARK_OAK_PLANKS);
 	}
 

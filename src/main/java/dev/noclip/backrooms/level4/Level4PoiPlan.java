@@ -177,6 +177,7 @@ final class Level4PoiPlan {
 
 	private Level4PoiPlan(long seed, int rx, int rz) {
 		Level4Plan plan = Level4Plan.of(seed, rx, rz);
+		if (plan.hasAtriumZero) return;
 		SplittableRandom rng = new SplittableRandom(Level4Layout.hash(seed, rx, rz, POI_SALT));
 		Set<Integer> usedCells = new HashSet<>();
 

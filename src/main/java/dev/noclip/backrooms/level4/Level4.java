@@ -39,6 +39,7 @@ public final class Level4 {
 		Level4Monsters.register();
 		Level4Events.register();
 		Level4PoiEvents.register();
+		Level4AtriumZeroEvents.register();
 		Level4Props.register();
 	}
 }

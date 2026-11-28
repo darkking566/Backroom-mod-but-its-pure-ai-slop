@@ -1,19 +1,69 @@
 {
   "variants": {
-    "facing=north": {
-      "model": "noclip_backrooms:block/level4/office_radiator_wall"
-    },
-    "facing=east": {
-      "model": "noclip_backrooms:block/level4/office_radiator_wall",
-      "y": 90
-    },
-    "facing=south": {
-      "model": "noclip_backrooms:block/level4/office_radiator_wall",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "noclip_backrooms:block/level4/office_radiator_wall",
-      "y": 270
-    }
+    "facing=north": [
+      {
+        "model": "noclip_backrooms:block/level4/office_radiator_wall",
+        "weight": 8
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_radiator_wall_1",
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_radiator_wall_2",
+        "weight": 2
+      }
+    ],
+    "facing=east": [
+      {
+        "model": "noclip_backrooms:block/level4/office_radiator_wall",
+        "y": 90,
+        "weight": 8
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_radiator_wall_1",
+        "y": 90,
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_radiator_wall_2",
+        "y": 90,
+        "weight": 2
+      }
+    ],
+    "facing=south": [
+      {
+        "model": "noclip_backrooms:block/level4/office_radiator_wall",
+        "y": 180,
+        "weight": 8
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_radiator_wall_1",
+        "y": 180,
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_radiator_wall_2",
+        "y": 180,
+        "weight": 2
+      }
+    ],
+    "facing=west": [
+      {
+        "model": "noclip_backrooms:block/level4/office_radiator_wall",
+        "y": 270,
+        "weight": 8
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_radiator_wall_1",
+        "y": 270,
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_radiator_wall_2",
+        "y": 270,
+        "weight": 2
+      }
+    ]
   }
 }

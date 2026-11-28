@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "noclip_backrooms:block/level4/camp_sleeping_bag"
+    },
+    "facing=east": {
+      "model": "noclip_backrooms:block/level4/camp_sleeping_bag",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "noclip_backrooms:block/level4/camp_sleeping_bag",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "noclip_backrooms:block/level4/camp_sleeping_bag",
+      "y": 270
+    }
+  }
+}

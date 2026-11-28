@@ -26,7 +26,7 @@ S = 512
 
 MATERIAL = [
     (("carpet",), "carpet"),
-    (("cot",), "fabric"),
+    (("cot", "camp_sleeping_bag"), "fabric"),
     (("desk_wood", "fire_door", "tbd_shelf", "tbd_hoard", "amor_planter"), "wood"),
     (("elevator", "breaker", "locker", "vending", "cooler_body", "photocopier", "hatch",
       "office_supply_crate", "industrial_toolbox", "office_steel_safe", "executive_broadcast_screen_side"), "steel"),
@@ -36,7 +36,8 @@ PLAIN = ("troffer", "window", "glass_wall", "exit_sign", "cooler_jug", "almond_l
          "amor_mushroom", "amor_substrate", "desk_phone", "omega_sign",
          "stairwell", "door_4p3", "door_11", "door_13", "basement_71",
          "meg_chalk_sign", "caution_tape_barrier", "office_dark_mirror", "corrupted_fountain",
-         "executive_red_phone", "executive_broadcast_screen_front")
+         "executive_red_phone", "executive_broadcast_screen_front",
+         "paint_bucket_top", "drip_bucket_water")
 
 
 def kind(name):

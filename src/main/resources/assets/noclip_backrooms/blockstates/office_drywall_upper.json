@@ -3,15 +3,23 @@
     "": [
       {
         "model": "noclip_backrooms:block/level4/office_drywall_upper",
-        "weight": 8
+        "weight": 28
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_drywall_upper_clean_1",
+        "weight": 16
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_drywall_upper_clean_2",
+        "weight": 16
       },
       {
         "model": "noclip_backrooms:block/level4/office_drywall_upper_1",
-        "weight": 1
+        "weight": 2
       },
       {
         "model": "noclip_backrooms:block/level4/office_drywall_upper_2",
-        "weight": 1
+        "weight": 2
       },
       {
         "model": "noclip_backrooms:block/level4/office_drywall_upper_3",
@@ -19,11 +27,11 @@
       },
       {
         "model": "noclip_backrooms:block/level4/office_drywall_upper_4",
-        "weight": 1
+        "weight": 2
       },
       {
         "model": "noclip_backrooms:block/level4/office_drywall_upper_5",
-        "weight": 1
+        "weight": 2
       },
       {
         "model": "noclip_backrooms:block/level4/office_drywall_upper_6",
@@ -39,7 +47,7 @@
       },
       {
         "model": "noclip_backrooms:block/level4/office_drywall_upper_9",
-        "weight": 1
+        "weight": 2
       }
     ]
   }

@@ -2,48 +2,98 @@
   "variants": {
     "": [
       {
-        "model": "noclip_backrooms:block/level1/damp_garage_floor"
+        "model": "noclip_backrooms:block/level1/damp_garage_floor",
+        "weight": 3
       },
       {
         "model": "noclip_backrooms:block/level1/damp_garage_floor",
+        "weight": 3,
         "y": 90
       },
       {
         "model": "noclip_backrooms:block/level1/damp_garage_floor",
+        "weight": 3,
         "y": 180
       },
       {
         "model": "noclip_backrooms:block/level1/damp_garage_floor",
+        "weight": 3,
         "y": 270
       },
       {
-        "model": "noclip_backrooms:block/level1/damp_garage_floor_1"
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_1",
+        "weight": 2
       },
       {
         "model": "noclip_backrooms:block/level1/damp_garage_floor_1",
+        "weight": 2,
         "y": 90
       },
       {
         "model": "noclip_backrooms:block/level1/damp_garage_floor_1",
+        "weight": 2,
         "y": 180
       },
       {
         "model": "noclip_backrooms:block/level1/damp_garage_floor_1",
+        "weight": 2,
         "y": 270
       },
       {
-        "model": "noclip_backrooms:block/level1/damp_garage_floor_2"
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_2",
+        "weight": 2
       },
       {
         "model": "noclip_backrooms:block/level1/damp_garage_floor_2",
+        "weight": 2,
         "y": 90
       },
       {
         "model": "noclip_backrooms:block/level1/damp_garage_floor_2",
+        "weight": 2,
         "y": 180
       },
       {
         "model": "noclip_backrooms:block/level1/damp_garage_floor_2",
+        "weight": 2,
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_3",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_3",
+        "weight": 2,
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_3",
+        "weight": 2,
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_3",
+        "weight": 2,
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_4",
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_4",
+        "weight": 3,
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_4",
+        "weight": 3,
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level1/damp_garage_floor_4",
+        "weight": 3,
         "y": 270
       }
     ]

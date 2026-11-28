@@ -209,6 +209,20 @@ public final class Level4Blocks {
 					.strength(2.5F).sound(SoundType.GLASS).lightLevel(s -> 9),
 			p -> new Level4FacingBlock(p, Level4FacingBlock.full()));
 
+	// Realistic POI props (replacing vanilla cauldrons & green carpet)
+	public static final Block PAINT_BUCKET = register("paint_bucket",
+			Properties.of().mapColor(MapColor.COLOR_BLACK).strength(0.8F).sound(SoundType.METAL).noOcclusion(),
+			PaintBucketBlock::new);
+	public static final Block DRIP_BUCKET = register("drip_bucket",
+			Properties.of().mapColor(MapColor.COLOR_YELLOW).strength(0.6F).sound(SoundType.METAL).noOcclusion(),
+			DripBucketBlock::new);
+	public static final Block CAMP_SLEEPING_BAG = register("camp_sleeping_bag",
+			Properties.of().mapColor(MapColor.COLOR_GREEN).strength(0.5F).sound(SoundType.WOOL).noOcclusion(),
+			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(2, 0, 0, 14, 3, 16)));
+	public static final Block ATRIUM_ZERO_PLAQUE = register("atrium_zero_plaque",
+			unbreakable(MapColor.GOLD, SoundType.METAL).noOcclusion().lightLevel(s -> 3),
+			p -> new Level4FacingBlock(p, Level4FacingBlock.northBox(2, 0, 2, 14, 15, 14)));
+
 	private Level4Blocks() {
 	}
 
@@ -363,6 +377,41 @@ public final class Level4Blocks {
 		@Override
 		protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 			builder.add(SILHOUETTE);
+		}
+	}
+
+	static final class PaintBucketBlock extends Block {
+		private static final VoxelShape SHAPE = Block.box(3, 0, 3, 13, 10.5, 13);
+
+		PaintBucketBlock(Properties properties) {
+			super(properties);
+		}
+
+		@Override
+		protected VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level,
+				net.minecraft.core.BlockPos pos, net.minecraft.world.phys.shapes.CollisionContext context) {
+			return SHAPE;
+		}
+	}
+
+	static final class DripBucketBlock extends Block {
+		static final IntegerProperty WATER_LEVEL = IntegerProperty.create("level", 0, 2);
+		private static final VoxelShape SHAPE = Block.box(2.5, 0, 2.5, 13.5, 11, 13.5);
+
+		DripBucketBlock(Properties properties) {
+			super(properties);
+			registerDefaultState(defaultBlockState().setValue(WATER_LEVEL, 2));
+		}
+
+		@Override
+		protected VoxelShape getShape(BlockState state, net.minecraft.world.level.BlockGetter level,
+				net.minecraft.core.BlockPos pos, net.minecraft.world.phys.shapes.CollisionContext context) {
+			return SHAPE;
+		}
+
+		@Override
+		protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+			builder.add(WATER_LEVEL);
 		}
 	}
 }

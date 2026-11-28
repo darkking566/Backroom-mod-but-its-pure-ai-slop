@@ -288,6 +288,9 @@ final class Level4Layout {
 	}
 
 	private static Tile cornerTile(long seed, Level4Plan plan, int i, int j, ZoneKind zone, int ceilH) {
+		if (zone == ZoneKind.ATRIUM_ZERO && i > Level4Plan.MARGIN && j > Level4Plan.MARGIN) {
+			return new Tile(Kind.AIR, zone, Level4Plan.NORTH, OPEN_HEIGHT, null, false);
+		}
 		int cornerCeil = Math.max(ceilH, Math.max(tallBorderHeight(plan, i - 1, j),
 				Math.max(tallBorderHeight(plan, i, j - 1), tallBorderHeight(plan, i - 1, j - 1))));
 		if (zone == ZoneKind.OMEGA_BASE) {
@@ -361,6 +364,7 @@ final class Level4Layout {
 	}
 
 	private static Kind exteriorWindowKind(long seed, Level4Plan plan, int roomI, int roomJ, int dir, int along, int x, int z) {
+		if (plan.hasAtriumZero) return Kind.WINDOW_RAIN;
 		if (plan.nearHumanBase(roomI, roomJ)) return Kind.WINDOW_BLACKED;
 		int rx = Math.floorDiv(x, SIZE), rz = Math.floorDiv(z, SIZE);
 		Level4PoiPlan.PlacedPoi poi = Level4PoiPlan.of(seed, rx, rz).atCellIndex(Level4Plan.cell(roomI, roomJ));
@@ -399,16 +403,16 @@ final class Level4Layout {
 	record BridgeInfo(boolean eastWest, boolean elevated, int spanPos, int perpPos) {
 	}
 
-	record AuditoriumInfo(int floorY, boolean stair, int stairDir, boolean stage, boolean screenWall, int rx) {
+	record AuditoriumInfo(int floorY, boolean stair, int stairDir, boolean stage, boolean screenWall, int rx, int rz) {
 	}
 
 	record MezzanineInfo(int stairStep, boolean stairRail, boolean overlookOpen, boolean overlookRail, boolean upperGlassWall) {
 	}
 
-	record PlenumInfo(boolean wallShell, int ladderDir, boolean ventGrate, boolean duct) {
+	record PlenumInfo(boolean wallShell, int ladderDir, boolean ventGrate, boolean duct, int rx, int rz) {
 	}
 
-	record SubTunnelInfo(boolean stair, int stepY, int stairDir, boolean stairRail, boolean corridor, boolean wallSide, boolean light) {
+	record SubTunnelInfo(boolean stair, int stepY, int stairDir, boolean stairRail, boolean corridor, boolean wallSide, boolean light, boolean pipeAllowed) {
 	}
 
 	/** Returns two-story mezzanine geometry inside {@link ZoneKind#MEZZANINE}, or null elsewhere. */
@@ -452,7 +456,7 @@ final class Level4Layout {
 		boolean duct = !wallShell && ladderDir < 0
 				&& (((rx == 7 || rx == 14) && rz >= 2 && rz <= 18)
 						|| ((rz == 7 || rz == 14) && rx >= 2 && rx <= 18 && rx != 4 && rx != 18));
-		return new PlenumInfo(wallShell, ladderDir, ventGrate, duct);
+		return new PlenumInfo(wallShell, ladderDir, ventGrate, duct, rx, rz);
 	}
 
 	/** Returns sub-level MEP chiller corridor & stairwell geometry, or null outside tunnel cells. */
@@ -468,21 +472,25 @@ final class Level4Layout {
 		if (i == plan.tunnelI0 && cx >= 1) {
 			if (cz == 3) {
 				int stepY = FLOOR_Y + 1 - cx;
-				return new SubTunnelInfo(true, stepY, Level4Plan.WEST, false, false, false, false);
+				return new SubTunnelInfo(true, stepY, Level4Plan.WEST, false, false, false, false, false);
 			}
-			return new SubTunnelInfo(false, 0, Level4Plan.WEST, cx >= 1 && (cz == 2 || cz == 4), false, wallSide, false);
+			return new SubTunnelInfo(false, 0, Level4Plan.WEST, cx >= 1 && (cz == 2 || cz == 4), false, false, false, false);
 		}
 		if (i == plan.tunnelI1 && cx >= 1) {
 			if (cz == 3) {
 				int stepY = FLOOR_Y - 6 + cx;
-				return new SubTunnelInfo(true, stepY, Level4Plan.EAST, false, false, false, false);
+				return new SubTunnelInfo(true, stepY, Level4Plan.EAST, false, false, false, false, false);
 			}
-			return new SubTunnelInfo(false, 0, Level4Plan.EAST, cx >= 1 && (cz == 2 || cz == 4), false, wallSide, false);
+			return new SubTunnelInfo(false, 0, Level4Plan.EAST, cx >= 1 && (cz == 2 || cz == 4), false, false, false, false);
 		}
 		if (i > plan.tunnelI0 && (i < plan.tunnelI1 || cx == 0)) {
 			boolean corridor = cz >= 2 && cz <= 4;
 			boolean light = corridor && cz == 3 && cx == 3;
-			return new SubTunnelInfo(false, 0, Level4Plan.EAST, false, corridor, wallSide, light);
+			boolean pipeAllowed = corridor
+					&& !(i == plan.tunnelI0 + 1 && cx <= 1)
+					&& !(i == plan.tunnelI1 && cx == 0)
+					&& !(i == plan.tunnelI1 - 1 && cx == 6);
+			return new SubTunnelInfo(false, 0, Level4Plan.EAST, false, corridor, wallSide, light, pipeAllowed);
 		}
 		return null;
 	}
@@ -499,15 +507,15 @@ final class Level4Layout {
 		int rx = lx - room.i() * CELL;
 		int rz = lz - room.j() * CELL;
 		boolean screen = (rz == 19 && rx >= 5 && rx <= 15);
-		if (rz <= 3) return new AuditoriumInfo(FLOOR_Y, false, Level4Plan.NORTH, false, screen, rx);
-		if (rz <= 6) return new AuditoriumInfo(FLOOR_Y - 1, rz == 4 && rx >= 2 && rx <= 18, Level4Plan.NORTH, false, screen, rx);
-		if (rz <= 9) return new AuditoriumInfo(FLOOR_Y - 2, rz == 7 && rx >= 2 && rx <= 18, Level4Plan.NORTH, false, screen, rx);
-		if (rz <= 12) return new AuditoriumInfo(FLOOR_Y - 3, rz == 10 && rx >= 2 && rx <= 18, Level4Plan.NORTH, false, screen, rx);
-		if (rz <= 15) return new AuditoriumInfo(FLOOR_Y - 3, false, Level4Plan.NORTH, false, screen, rx);
+		if (rz <= 3) return new AuditoriumInfo(FLOOR_Y, false, Level4Plan.NORTH, false, screen, rx, rz);
+		if (rz <= 6) return new AuditoriumInfo(FLOOR_Y - 1, rz == 4 && rx >= 2 && rx <= 18, Level4Plan.NORTH, false, screen, rx, rz);
+		if (rz <= 9) return new AuditoriumInfo(FLOOR_Y - 2, rz == 7 && rx >= 2 && rx <= 18, Level4Plan.NORTH, false, screen, rx, rz);
+		if (rz <= 12) return new AuditoriumInfo(FLOOR_Y - 3, rz == 10 && rx >= 2 && rx <= 18, Level4Plan.NORTH, false, screen, rx, rz);
+		if (rz <= 15) return new AuditoriumInfo(FLOOR_Y - 3, false, Level4Plan.NORTH, false, screen, rx, rz);
 		if (rz == 16 && rx >= 8 && rx <= 12) {
-			return new AuditoriumInfo(FLOOR_Y - 3, true, Level4Plan.SOUTH, true, screen, rx);
+			return new AuditoriumInfo(FLOOR_Y - 3, true, Level4Plan.SOUTH, true, screen, rx, rz);
 		}
-		return new AuditoriumInfo(FLOOR_Y - 2, false, Level4Plan.SOUTH, true, screen, rx);
+		return new AuditoriumInfo(FLOOR_Y - 2, false, Level4Plan.SOUTH, true, screen, rx, rz);
 	}
 
 	/** Returns bridge geometry metadata if (x, z) lies on or forms a wall of an exterior skybridge. */
@@ -610,7 +618,19 @@ final class Level4Layout {
 				if (cx == 5 && cz == 2) return new Tile(Kind.VENDING, zone, Level4Plan.WEST, ceilH, null, false);
 				if (cx == 2 && cz == 5) return new Tile(Kind.DESK_PHONE, zone, Level4Plan.NORTH, ceilH, null, false);
 				if (cx == 5 && cz == 5) return new Tile(Kind.RELAY_BOX, zone, Level4Plan.NORTH, ceilH, null, false);
-				if (cx == 5 && cz == 5) return new Tile(Kind.VENDING, zone, Level4Plan.WEST, ceilH, null, false);
+			}
+			// Interior glass partitions dividing barracks, armory/supply, and medical bay
+			if (!hasExitInCell(plan, c)) {
+				int di = i - i0, dj = j - j0;
+				if (di == 1 && dj >= 1 && dj <= 3 && cx == 1 && (cz == 1 || cz == 2 || cz == 4 || cz == 5)) {
+					return new Tile(Kind.CUBICLE_GLASS, zone, Level4Plan.EAST, ceilH, null, false);
+				}
+				if (di == 3 && dj >= 1 && dj <= 3 && cx == 5 && (cz == 1 || cz == 2 || cz == 4 || cz == 5)) {
+					return new Tile(Kind.CUBICLE_GLASS, zone, Level4Plan.WEST, ceilH, null, false);
+				}
+				if (dj == 3 && (di == 1 || di == 3) && cz == 5 && (cx == 1 || cx == 2 || cx == 4 || cx == 5)) {
+					return new Tile(Kind.CUBICLE_GLASS, zone, Level4Plan.SOUTH, ceilH, null, false);
+				}
 			}
 		}
 

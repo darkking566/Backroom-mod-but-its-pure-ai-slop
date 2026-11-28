@@ -54,6 +54,7 @@ final class Level4Monsters {
 		for (ServerPlayer player : level.players()) {
 			if (player.isCreative() || player.isSpectator()) continue;
 			if (Level4Layout.inOmegaBase(seed, player.getBlockX(), player.getBlockZ())) continue;
+			if (Level4Layout.tile(seed, player.getBlockX(), player.getBlockZ()).zone() == ZoneKind.ATRIUM_ZERO) continue;
 			if (Level4PoiPlan.isFrozenFriday(seed, player.getBlockX(), player.getBlockZ())) continue;
 			if (countNear(level, player) >= FloorDifficulty.scaledCap(player, MAX_NEAR)) continue;
 
@@ -88,7 +89,7 @@ final class Level4Monsters {
 			int z = (int) Math.floor(player.getZ() + Math.sin(angle) * dist);
 			var tile = Level4Layout.tile(seed, x, z);
 			if (tile.kind() != Kind.AIR || tile.zone() == ZoneKind.OMEGA_BASE || tile.zone() == ZoneKind.AMOR_CAMP
-					|| Level4PoiPlan.isFrozenFriday(seed, x, z)) continue;
+					|| tile.zone() == ZoneKind.ATRIUM_ZERO || Level4PoiPlan.isFrozenFriday(seed, x, z)) continue;
 			BlockPos pos = new BlockPos(x, Level4ChunkGenerator.FLOOR_Y + 1, z);
 			if (!level.isLoaded(pos) || !level.getBlockState(pos).isAir()) continue;
 			if (level.getBrightness(LightLayer.BLOCK, pos) > 7 && tile.zone() != ZoneKind.DARK_WING) continue;

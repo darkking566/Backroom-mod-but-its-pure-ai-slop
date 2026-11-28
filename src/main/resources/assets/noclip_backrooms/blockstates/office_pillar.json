@@ -1,7 +1,18 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level4/office_pillar"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level4/office_pillar",
+        "weight": 10
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_pillar_1",
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_pillar_2",
+        "weight": 2
+      }
+    ]
   }
 }

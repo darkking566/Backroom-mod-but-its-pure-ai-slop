@@ -763,6 +763,150 @@ def draw_executive_broadcast_screen():
     return (front, n_front, Image.fromarray(sf_arr, "RGBA")), (side, n_side, s_side)
 
 
+def draw_paint_bucket():
+    # Commercial 5-gallon steel/HDPE pail with yellow caution band and glossy black paint drips
+    noise = fbm_noise(4610)
+    xx, yy = np.meshgrid(np.arange(SIZE, dtype=np.float32), np.arange(SIZE, dtype=np.float32))
+    rib_m = (yy >= 4) & (yy <= 20) & (((yy.astype(int) // 6) % 2) == 0)
+    label_m = (yy >= 54) & (yy <= 88)
+    base = np.where(label_m, 0.0, np.where(rib_m, 14.0, 0.0)) + noise * 7.0
+    s_arr = np.zeros((SIZE, SIZE, 4), dtype="uint8")
+    s_arr[..., 0] = np.clip(np.rint(np.where(label_m, 214, 206) + base), 0, 255)
+    s_arr[..., 1] = np.clip(np.rint(np.where(label_m, 174, 204) + base), 0, 255)
+    s_arr[..., 2] = np.clip(np.rint(np.where(label_m, 42, 198) + base), 0, 255)
+    s_arr[..., 3] = 255
+    side = Image.fromarray(s_arr, "RGBA")
+    sd = ImageDraw.Draw(side)
+    sd.rectangle([0, 0, SIZE - 1, 8], fill=(166, 166, 162, 255))
+    sd.rectangle([0, 52, SIZE - 1, 56], fill=(32, 32, 34, 255))
+    sd.rectangle([0, 86, SIZE - 1, 90], fill=(32, 32, 34, 255))
+    sd.rectangle([0, SIZE - 10, SIZE - 1, SIZE - 1], fill=(128, 128, 124, 255))
+
+    drip_img = Image.new("L", (SIZE, SIZE), 0)
+    dd = ImageDraw.Draw(drip_img)
+    sd.rectangle([0, 0, SIZE - 1, 14], fill=(16, 17, 20, 255))
+    dd.rectangle([0, 0, SIZE - 1, 14], fill=255)
+    for dx0, dw, dlen in [(10, 8, 46), (26, 6, 32), (44, 10, 68), (72, 7, 40), (92, 9, 58), (112, 6, 36)]:
+        sd.rectangle([dx0, 12, dx0 + dw, dlen], fill=(16, 17, 20, 255))
+        sd.ellipse([dx0, dlen - dw // 2, dx0 + dw, dlen + dw // 2 + 2], fill=(16, 17, 20, 255))
+        dd.rectangle([dx0, 12, dx0 + dw, dlen], fill=255)
+        dd.ellipse([dx0, dlen - dw // 2, dx0 + dw, dlen + dw // 2 + 2], fill=255)
+    drip_m = np.asarray(drip_img, dtype=bool)
+    h_side = noise * 0.12 + np.where(rib_m, 0.35, 0.0) + np.where(drip_m, 0.25, 0.0)
+    n_side = height_to_normal(h_side, strength=2.8)
+    spec_side = np.zeros((SIZE, SIZE, 4), dtype="uint8")
+    spec_side[..., 0] = np.where(drip_m, 224, np.clip(np.rint(118 + noise * 16.0), 86, 146))
+    spec_side[..., 1] = 0
+    spec_side[..., 2] = 0
+    spec_side[..., 3] = 255
+
+    # Glossy black liquid paint top
+    tnoise = fbm_noise(4611)
+    t_arr = np.zeros((SIZE, SIZE, 4), dtype="uint8")
+    swirl = np.sin(np.hypot(xx - 64.0, yy - 64.0) * 0.25) * 3.0 + tnoise * 3.5
+    t_arr[..., 0] = np.clip(np.rint(14 + swirl), 6, 28)
+    t_arr[..., 1] = np.clip(np.rint(15 + swirl), 7, 30)
+    t_arr[..., 2] = np.clip(np.rint(18 + swirl), 9, 34)
+    t_arr[..., 3] = 255
+    top = Image.fromarray(t_arr, "RGBA")
+    n_top = height_to_normal(tnoise * 0.05, strength=1.2)
+    stop = np.zeros((SIZE, SIZE, 4), dtype="uint8")
+    stop[..., 0] = np.clip(np.rint(232 + tnoise * 8.0), 216, 246)
+    stop[..., 1] = 0
+    stop[..., 2] = 0
+    stop[..., 3] = 255
+    return (side, n_side, Image.fromarray(spec_side, "RGBA")), (top, n_top, Image.fromarray(stop, "RGBA"))
+
+
+def draw_drip_bucket():
+    # Institutional yellow-ochre HDPE utility bucket + murky ceiling rainwater
+    noise = fbm_noise(4620)
+    xx, yy = np.meshgrid(np.arange(SIZE, dtype=np.float32), np.arange(SIZE, dtype=np.float32))
+    rib_m = ((yy >= 6) & (yy <= 20)) | ((yy >= 44) & (yy <= 50))
+    grime = np.maximum(0.0, (yy - 92.0) / 36.0) * 26.0 + np.maximum(0.0, noise) * 9.0
+    s_arr = np.zeros((SIZE, SIZE, 4), dtype="uint8")
+    s_arr[..., 0] = np.clip(np.rint(214 + np.where(rib_m, 10.0, 0.0) - grime), 0, 255)
+    s_arr[..., 1] = np.clip(np.rint(166 + np.where(rib_m, 8.0, 0.0) - grime * 0.9), 0, 255)
+    s_arr[..., 2] = np.clip(np.rint(40 + np.where(rib_m, 4.0, 0.0) - grime * 0.4), 0, 255)
+    s_arr[..., 3] = 255
+    side = Image.fromarray(s_arr, "RGBA")
+    sd = ImageDraw.Draw(side)
+    sd.rectangle([0, 0, SIZE - 1, 7], fill=(184, 140, 32, 255))
+    sd.rectangle([0, SIZE - 8, SIZE - 1, SIZE - 1], fill=(108, 86, 28, 255))
+
+    n_side = height_to_normal(noise * 0.14 + np.where(rib_m, 0.35, 0.0), strength=2.6)
+    spec_side = np.zeros((SIZE, SIZE, 4), dtype="uint8")
+    spec_side[..., 0] = np.clip(np.rint(120 + noise * 18.0), 86, 152)
+    spec_side[..., 1] = 0
+    spec_side[..., 2] = 0
+    spec_side[..., 3] = 255
+
+    # Murky greenish-brown ceiling rainwater with subtle drop ripples
+    wnoise = fbm_noise(4621)
+    r = np.hypot(xx - 64.0, yy - 64.0)
+    ripple = np.sin(r * 0.55) * np.exp(-r / 38.0) * 8.0
+    w_arr = np.zeros((SIZE, SIZE, 4), dtype="uint8")
+    w_arr[..., 0] = np.clip(np.rint(68 + ripple + wnoise * 6.0), 30, 120)
+    w_arr[..., 1] = np.clip(np.rint(92 + ripple + wnoise * 7.0), 40, 140)
+    w_arr[..., 2] = np.clip(np.rint(84 + ripple + wnoise * 6.0), 38, 130)
+    w_arr[..., 3] = 235
+    water = Image.fromarray(w_arr, "RGBA")
+    n_water = height_to_normal(wnoise * 0.08 + np.sin(r * 0.55) * np.exp(-r / 38.0) * 0.25, strength=2.2)
+    sw = np.zeros((SIZE, SIZE, 4), dtype="uint8")
+    sw[..., 0] = np.clip(np.rint(236 + wnoise * 6.0), 220, 248)
+    sw[..., 1] = 0
+    sw[..., 2] = 0
+    sw[..., 3] = 255
+    return (side, n_side, Image.fromarray(spec_side, "RGBA")), (water, n_water, Image.fromarray(sw, "RGBA"))
+
+
+def draw_camp_sleeping_bag():
+    # Quilted olive-drab ripstop nylon sleeping bag + khaki-tan rolled camp pillow
+    noise = fbm_noise(4630)
+    xx, yy = np.meshgrid(np.arange(SIZE, dtype=np.float32), np.arange(SIZE, dtype=np.float32))
+    baffle = np.sin((yy / 22.0) * math.pi)
+    seam_m = np.abs(baffle) < 0.14
+    zipper_m = (xx >= 112) & (xx <= 122)
+    fold_shade = baffle * 9.0 + noise * 7.0
+    arr = np.zeros((SIZE, SIZE, 4), dtype="uint8")
+    arr[..., 0] = np.clip(np.rint(np.where(zipper_m, 34, 74 + fold_shade)), 0, 255)
+    arr[..., 1] = np.clip(np.rint(np.where(zipper_m, 36, 90 + fold_shade)), 0, 255)
+    arr[..., 2] = np.clip(np.rint(np.where(zipper_m, 34, 56 + fold_shade * 0.7)), 0, 255)
+    arr[..., 3] = 255
+    bag = Image.fromarray(arr, "RGBA")
+    bd = ImageDraw.Draw(bag)
+    for sy in range(22, SIZE, 22):
+        bd.line([(0, sy), (111, sy)], fill=(48, 58, 36, 255), width=2)
+    for zy in range(6, SIZE, 6):
+        bd.rectangle([115, zy, 119, zy + 2], fill=(122, 126, 130, 255))
+
+    h_bag = noise * 0.12 + baffle * 0.42 - np.where(seam_m, 0.35, 0.0)
+    n_bag = height_to_normal(h_bag, strength=3.0, ao=np.where(seam_m, 195.0, 255.0))
+    s_bag = np.zeros((SIZE, SIZE, 4), dtype="uint8")
+    s_bag[..., 0] = np.where(zipper_m, 140, np.clip(np.rint(28 + noise * 8.0), 12, 48))
+    s_bag[..., 1] = np.where(zipper_m, 180, 0)
+    s_bag[..., 2] = 0
+    s_bag[..., 3] = 255
+
+    # Khaki-tan camp pillow / folded cot pillow
+    pnoise = fbm_noise(4631)
+    pcrease = np.exp(-((yy - 64.0) ** 2) / 90.0) * -10.0 + pnoise * 7.0
+    p_arr = np.zeros((SIZE, SIZE, 4), dtype="uint8")
+    p_arr[..., 0] = np.clip(np.rint(168 + pcrease), 0, 255)
+    p_arr[..., 1] = np.clip(np.rint(154 + pcrease), 0, 255)
+    p_arr[..., 2] = np.clip(np.rint(126 + pcrease), 0, 255)
+    p_arr[..., 3] = 255
+    pillow = Image.fromarray(p_arr, "RGBA")
+    ImageDraw.Draw(pillow).rectangle([2, 2, SIZE - 3, SIZE - 3], outline=(132, 120, 96, 255), width=3)
+    n_pil = height_to_normal(pnoise * 0.14 - np.exp(-((yy - 64.0) ** 2) / 90.0) * 0.25, strength=2.4)
+    s_pil = np.zeros((SIZE, SIZE, 4), dtype="uint8")
+    s_pil[..., 0] = np.clip(np.rint(18 + pnoise * 6.0), 8, 34)
+    s_pil[..., 1] = 0
+    s_pil[..., 2] = 0
+    s_pil[..., 3] = 255
+    return (bag, n_bag, Image.fromarray(s_bag, "RGBA")), (pillow, n_pil, Image.fromarray(s_pil, "RGBA"))
+
+
 def main():
     # 1. meg_chalk_sign (normal + slashed)
     chalk_img, chalk_n, chalk_s = draw_meg_chalk_sign(False)
@@ -1015,7 +1159,133 @@ def main():
     })
     write_item_files("executive_broadcast_screen")
     write_loot_self("executive_broadcast_screen")
-    print("Generated Level 4 Batch 1..4 + Route A/B POI assets complete")
+
+    # 9. Stage 2 vanilla-replacement POI props: paint_bucket, drip_bucket, camp_sleeping_bag, upgraded omega_cot
+    (pb_side, pb_sn, pb_ss), (pb_top, pb_tn, pb_ts) = draw_paint_bucket()
+    save_pbr_pair("paint_bucket_side", pb_side, pb_sn, pb_ss)
+    save_pbr_pair("paint_bucket_top", pb_top, pb_tn, pb_ts)
+    pb_body_faces = {f: {"uv": [3, 2, 13, 15], "texture": "#side"} for f in ("north", "south", "east", "west")}
+    pb_body_faces["down"] = {"uv": [3, 3, 13, 13], "texture": "#side"}
+    pb_rim_faces = {f: {"uv": [2, 0, 14, 2], "texture": "#side"} for f in ("north", "south", "east", "west", "up", "down")}
+    write_json(MODELS / "paint_bucket.json", {
+        "textures": {
+            "side": NS + "paint_bucket_side",
+            "top": NS + "paint_bucket_top",
+            "particle": NS + "paint_bucket_side"
+        },
+        "elements": [
+            {"from": [3, 0, 3], "to": [13, 9.5, 13], "faces": pb_body_faces},
+            {"from": [2.6, 9.5, 2.6], "to": [13.4, 10.5, 3.8], "faces": pb_rim_faces},
+            {"from": [2.6, 9.5, 12.2], "to": [13.4, 10.5, 13.4], "faces": pb_rim_faces},
+            {"from": [2.6, 9.5, 3.8], "to": [3.8, 10.5, 12.2], "faces": pb_rim_faces},
+            {"from": [12.2, 9.5, 3.8], "to": [13.4, 10.5, 12.2], "faces": pb_rim_faces},
+            {"from": [3.8, 8.5, 3.8], "to": [12.2, 9.6, 12.2], "faces": {"up": {"uv": [2, 2, 14, 14], "texture": "#top"}}},
+            {"from": [2.4, 5.2, 2.4], "to": [3.0, 9.4, 8.0], "faces": box_faces("side", [0, 1, 2, 3])},
+            {"from": [13.0, 5.2, 2.4], "to": [13.6, 9.4, 8.0], "faces": box_faces("side", [0, 1, 2, 3])},
+            {"from": [2.4, 4.9, 2.0], "to": [13.6, 5.5, 2.6], "faces": box_faces("side", [0, 1, 2, 3])}
+        ]
+    })
+    write_json(BLOCKSTATES / "paint_bucket.json", {
+        "variants": {"": {"model": NS + "paint_bucket"}}
+    })
+    write_item_files("paint_bucket")
+    write_loot_self("paint_bucket")
+
+    (db_side, db_sn, db_ss), (db_water, db_wn, db_ws) = draw_drip_bucket()
+    save_pbr_pair("drip_bucket_side", db_side, db_sn, db_ss)
+    save_pbr_pair("drip_bucket_water", db_water, db_wn, db_ws)
+    db_wall_faces = {f: {"uv": [2, 1, 14, 15], "texture": "#side"} for f in ("north", "south", "east", "west", "up", "down")}
+    db_base_elems = [
+        {"from": [2.5, 0, 2.5], "to": [13.5, 1.2, 13.5], "faces": box_faces("side", [2, 13, 14, 16])},
+        {"from": [2.5, 1.2, 2.5], "to": [13.5, 11.0, 3.6], "faces": db_wall_faces},
+        {"from": [2.5, 1.2, 12.4], "to": [13.5, 11.0, 13.5], "faces": db_wall_faces},
+        {"from": [2.5, 1.2, 3.6], "to": [3.6, 11.0, 12.4], "faces": db_wall_faces},
+        {"from": [12.4, 1.2, 3.6], "to": [13.5, 11.0, 12.4], "faces": db_wall_faces},
+        {"from": [2.0, 5.6, 2.1], "to": [2.5, 9.8, 8.2], "faces": box_faces("side", [0, 14, 2, 16])},
+        {"from": [13.5, 5.6, 2.1], "to": [14.0, 9.8, 8.2], "faces": box_faces("side", [0, 14, 2, 16])},
+        {"from": [2.0, 5.3, 1.8], "to": [14.0, 5.9, 2.4], "faces": box_faces("side", [0, 14, 2, 16])}
+    ]
+    for lvl, water_y in [(0, None), (1, 4.8), (2, 8.6)]:
+        elems = list(db_base_elems)
+        if water_y is not None:
+            elems.append({
+                "from": [3.6, 1.2, 3.6],
+                "to": [12.4, water_y, 12.4],
+                "faces": {"up": {"uv": [0, 0, 16, 16], "texture": "#water"}}
+            })
+        write_json(MODELS / f"drip_bucket_{lvl}.json", {
+            "textures": {
+                "side": NS + "drip_bucket_side",
+                "water": NS + "drip_bucket_water",
+                "particle": NS + "drip_bucket_side"
+            },
+            "elements": elems
+        })
+    write_json(BLOCKSTATES / "drip_bucket.json", {
+        "variants": {
+            "level=0": {"model": NS + "drip_bucket_0"},
+            "level=1": {"model": NS + "drip_bucket_1"},
+            "level=2": {"model": NS + "drip_bucket_2"}
+        }
+    })
+    write_json(ITEM_MODELS / "drip_bucket.json", {"parent": NS + "drip_bucket_2"})
+    write_json(ITEMS_DEF / "drip_bucket.json", {"model": {"type": "minecraft:model", "model": "noclip_backrooms:item/drip_bucket"}})
+    write_loot_self("drip_bucket")
+
+    (bag_img, bag_n, bag_s), (pil_img, pil_n, pil_s) = draw_camp_sleeping_bag()
+    save_pbr_pair("camp_sleeping_bag_top", bag_img, bag_n, bag_s)
+    save_pbr_pair("camp_sleeping_bag_pillow", pil_img, pil_n, pil_s)
+    bag_faces = {f: {"uv": [0, 0, 13, 16], "texture": "#top"} for f in ("north", "south", "east", "west", "up", "down")}
+    pil_faces = {f: {"uv": [0, 0, 16, 16], "texture": "#pillow"} for f in ("north", "south", "east", "west", "up", "down")}
+    write_json(MODELS / "camp_sleeping_bag.json", {
+        "textures": {
+            "top": NS + "camp_sleeping_bag_top",
+            "pillow": NS + "camp_sleeping_bag_pillow",
+            "particle": NS + "camp_sleeping_bag_top"
+        },
+        "elements": [
+            {"from": [2, 0, -8], "to": [14, 2.5, 11], "faces": bag_faces},
+            {"from": [2.5, 0, -9], "to": [13.5, 2.2, -8], "faces": bag_faces},
+            {"from": [2.5, 0, 11], "to": [13.5, 3.6, 15.2], "faces": pil_faces},
+            {"from": [13.6, 1.5, -7], "to": [14.2, 2.3, 10.5], "faces": box_faces("top", [14, 0, 15.5, 16])}
+        ]
+    })
+    write_json(BLOCKSTATES / "camp_sleeping_bag.json", {
+        "variants": {
+            f"facing={facing}": {"model": NS + "camp_sleeping_bag", **({"y": y} if y else {})}
+            for facing, y in [("north", 0), ("east", 90), ("south", 180), ("west", 270)]
+        }
+    })
+    write_item_files("camp_sleeping_bag")
+    write_loot_self("camp_sleeping_bag")
+
+    # Upgrade stubby 1x1 omega_cot model to a full-length 26-unit folding military cot with brushed steel frame & pillow
+    cot_canvas_faces = {f: {"uv": [0, 0, 16, 16], "texture": "#tex"} for f in ("north", "south", "east", "west", "down")}
+    cot_canvas_faces["up"] = {"uv": [0, 16, 16, 0], "texture": "#tex"}
+    cot_frame_faces = box_faces("frame", [0, 0, 16, 16])
+    cot_leg_zs = [(-8.5, -7.3), (2.4, 3.6), (13.3, 14.5)]
+    cot_elems = [
+        {"from": [1.5, 5.2, -9.5], "to": [14.5, 6.8, 15.5], "faces": cot_canvas_faces},
+        {"from": [0.8, 4.6, -10.0], "to": [1.8, 6.4, 16.0], "faces": cot_frame_faces},
+        {"from": [14.2, 4.6, -10.0], "to": [15.2, 6.4, 16.0], "faces": cot_frame_faces},
+        {"from": [1.8, 4.6, -10.0], "to": [14.2, 6.2, -9.0], "faces": cot_frame_faces},
+        {"from": [1.8, 4.6, 15.0], "to": [14.2, 6.2, 16.0], "faces": cot_frame_faces},
+        {"from": [3.0, 6.8, 10.5], "to": [13.0, 8.8, 14.8], "faces": pil_faces},
+    ]
+    for z0, z1 in cot_leg_zs:
+        cot_elems.append({"from": [1.2, 0.0, z0], "to": [2.2, 4.6, z1], "faces": cot_frame_faces})
+        cot_elems.append({"from": [13.8, 0.0, z0], "to": [14.8, 4.6, z1], "faces": cot_frame_faces})
+        cot_elems.append({"from": [2.2, 0.6, z0], "to": [13.8, 1.4, z1], "faces": cot_frame_faces})
+    write_json(MODELS / "omega_cot.json", {
+        "textures": {
+            "tex": NS + "omega_cot",
+            "frame": NS + "office_elevator_frame",
+            "pillow": NS + "camp_sleeping_bag_pillow",
+            "particle": NS + "omega_cot"
+        },
+        "elements": cot_elems
+    })
+    print("Generated Level 4 Batch 1..4 + Route A/B + Stage 2 POI assets complete")
 
 
 if __name__ == "__main__":

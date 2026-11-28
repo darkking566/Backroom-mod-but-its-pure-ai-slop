@@ -148,9 +148,10 @@ final class Level4Events {
 			if (sp.isSpectator()) continue;
 
 			boolean frozenSilence = Level4PoiPlan.isFrozenFriday(seed, sp.getBlockX(), sp.getBlockZ());
+			boolean inAtriumZero = Level4Layout.tile(seed, sp.getBlockX(), sp.getBlockZ()).zone() == ZoneKind.ATRIUM_ZERO;
 
 			// Continuous rain patter near windows/outdoors/atriums (softened deep indoors) + rare sudden rain-silence omen
-			if (!frozenSilence && now >= NEXT_AMBIENT.computeIfAbsent(sp.getUUID(), k -> now + 10)) {
+			if (!frozenSilence && !inAtriumZero && now >= NEXT_AMBIENT.computeIfAbsent(sp.getUUID(), k -> now + 10)) {
 				NEXT_AMBIENT.put(sp.getUUID(), now + 22 + rng.nextInt(10));
 				if (now >= RAIN_SILENT_UNTIL.getOrDefault(sp.getUUID(), 0)) {
 					var tile = Level4Layout.tile(seed, sp.getBlockX(), sp.getBlockZ());
@@ -194,7 +195,7 @@ final class Level4Events {
 			}
 
 			// Subtle 60Hz HVAC hum indoors
-			if (!frozenSilence && now >= NEXT_HUM.computeIfAbsent(sp.getUUID(), k -> now + 50 + rng.nextInt(60))) {
+			if (!frozenSilence && !inAtriumZero && now >= NEXT_HUM.computeIfAbsent(sp.getUUID(), k -> now + 50 + rng.nextInt(60))) {
 				NEXT_HUM.put(sp.getUUID(), now + 110 + rng.nextInt(80));
 				if (Level4Layout.tile(seed, sp.getBlockX(), sp.getBlockZ()).kind() != Kind.OUTSIDE_AIR) {
 					double a = rng.nextDouble() * Math.PI * 2;
@@ -205,7 +206,7 @@ final class Level4Events {
 			}
 
 			// Phantom footsteps / chair scrape when walking across desk-indented carpet
-			if (now % 20 == 0 && !sp.isCreative()) {
+			if (!inAtriumZero && now % 20 == 0 && !sp.isCreative()) {
 				BlockPos under = sp.blockPosition().below();
 				if (level.getBlockState(under).is(Level4Blocks.OFFICE_CARPET_DENT)
 						&& now >= NEXT_DENT_STEP.getOrDefault(sp.getUUID(), 0)

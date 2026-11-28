@@ -5,8 +5,10 @@ import dev.noclip.backrooms.core.LevelExits;
 import dev.noclip.backrooms.core.economy.Economy;
 import dev.noclip.backrooms.core.people.Person;
 import dev.noclip.backrooms.items.BackroomsItems;
+import dev.noclip.backrooms.level0p1.ZenithBlocks;
 import dev.noclip.backrooms.level1.Level1Blocks;
 import dev.noclip.backrooms.level1.Level1Items;
+import dev.noclip.backrooms.level2.Level2Blocks;
 import dev.noclip.backrooms.level4.Level4Layout.Kind;
 import dev.noclip.backrooms.level4.Level4Layout.Tile;
 import dev.noclip.backrooms.level4.Level4Plan.PlacedExit;
@@ -31,6 +33,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.AABB;
@@ -82,6 +85,7 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			if (TestFilter.section("wanderers")) wanderers(context, game, seed, arrival);
 			if (TestFilter.section("extras")) extras(context, game, seed, arrival);
 			if (TestFilter.section("pois")) pois(context, game, seed, arrival);
+			if (TestFilter.section("atriumzero")) atriumZero(context, game, seed, arrival);
 			if (TestFilter.section("blocks")) checkBlocks(game);
 		}
 	}
@@ -105,7 +109,22 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		int[] atrium = findZone(seed, from, ZoneKind.ATRIUM);
 		if (atrium != null) shoot(context, game, atrium[0] + 4.5, STAND, atrium[1] + 4.5, 135, 3, false, "level4_atrium");
 		int[] omega = findZone(seed, from, ZoneKind.OMEGA_BASE);
-		if (omega != null) shoot(context, game, omega[0] + 0.5, STAND, omega[1] + 2.2, 165, 6, true, "level4_omega_base");
+		if (omega != null) {
+			shoot(context, game, omega[0] + 0.5, STAND, omega[1] + 2.2, 165, 6, true, "level4_omega_base");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				boolean hasDesk = false, hasGlass = false;
+				for (int ox = -14; ox <= 14; ox++) {
+					for (int oz = -14; oz <= 14; oz++) {
+						var st = l4.getBlockState(new BlockPos(omega[0] + ox, STAND, omega[1] + oz));
+						var stUp = l4.getBlockState(new BlockPos(omega[0] + ox, STAND + 1, omega[1] + oz));
+						if (st.is(Level1Blocks.OFFICE_DESK)) hasDesk = true;
+						if (st.is(Level4Blocks.OFFICE_GLASS_WALL) || stUp.is(Level4Blocks.OFFICE_GLASS_WALL)) hasGlass = true;
+					}
+				}
+				check(hasDesk && hasGlass, "expected OMEGA_BASE interior command desks and glass dividers");
+			});
+		}
 		int[] amor = findZone(seed, from, ZoneKind.AMOR_CAMP);
 		if (amor != null) shoot(context, game, amor[0] + 0.8, STAND, amor[1] + 1.8, 135, 10, true, "level4_amor_camp");
 		int[] tbd = findZone(seed, from, ZoneKind.TBD_ROOM);
@@ -149,12 +168,54 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		int[] elevBridge = findElevatedBridgeStand(seed, from);
 		if (elevBridge != null) {
 			shoot(context, game, elevBridge[0] + 0.5, STAND + 2.0, elevBridge[1] + 0.5, elevBridge[2], 3, false, "level4_elevated_bridge");
+			Level4Layout.BridgeInfo bridgeInfo = Level4Layout.skybridgeInfo(seed, elevBridge[0], elevBridge[1]);
+			boolean ew = bridgeInfo != null && bridgeInfo.eastWest();
+			int bdx = ew ? 1 : 0;
+			int bdz = ew ? 0 : 1;
+			int bx0 = elevBridge[0] - 14 * bdx;
+			int bz0 = elevBridge[1] - 14 * bdz;
+			shoot(context, game, bx0 + 5 * bdx + 0.5, STAND + 2.0, bz0 + 5 * bdz + 0.5, ew ? 90f : 180f, 20f, false, "level4_elevated_bridge_stairs");
 			game.getServer().runOnServer(s -> {
 				ServerLevel l4 = level4(s);
 				check(l4.getBlockState(new BlockPos(elevBridge[0], Level4ChunkGenerator.FLOOR_Y, elevBridge[1])).isAir(),
 						"elevated bridge underside should remain open canyon air");
 				check(!l4.getBlockState(new BlockPos(elevBridge[0], Level4ChunkGenerator.FLOOR_Y + 2, elevBridge[1])).isAir(),
 						"elevated bridge floor deck should exist at FLOOR_Y + 2");
+				Direction forward = ew ? Direction.EAST : Direction.SOUTH;
+				Direction backward = forward.getOpposite();
+				for (int sPos : new int[] {0, 1, 27, 28}) {
+					int sx = bx0 + sPos * bdx, sz = bz0 + sPos * bdz;
+					check(!l4.getBlockState(new BlockPos(sx, Level4ChunkGenerator.FLOOR_Y, sz)).isAir(),
+							"elevated bridge threshold/landing floor should be solid at s=" + sPos);
+					check(l4.getBlockState(new BlockPos(sx, Level4ChunkGenerator.FLOOR_Y + 1, sz)).isAir(),
+							"elevated bridge threshold/landing lower clearance should be air at s=" + sPos);
+					check(l4.getBlockState(new BlockPos(sx, Level4ChunkGenerator.FLOOR_Y + 2, sz)).isAir(),
+							"elevated bridge threshold/landing upper clearance should be air at s=" + sPos);
+				}
+				for (int[] stair : new int[][] {{2, 1, 0}, {3, 2, 0}, {26, 1, 1}, {25, 2, 1}}) {
+					int sPos = stair[0], stepH = stair[1];
+					Direction expectedFacing = stair[2] == 0 ? forward : backward;
+					int sx = bx0 + sPos * bdx, sz = bz0 + sPos * bdz;
+					for (int dy = 0; dy < stepH; dy++) {
+						check(l4.getBlockState(new BlockPos(sx, Level4ChunkGenerator.FLOOR_Y + dy, sz)).is(Blocks.POLISHED_ANDESITE),
+								"expected polished andesite base under stair at s=" + sPos + " dy=" + dy);
+					}
+					var stState = l4.getBlockState(new BlockPos(sx, Level4ChunkGenerator.FLOOR_Y + stepH, sz));
+					check(stState.is(Blocks.POLISHED_ANDESITE_STAIRS) && stState.getValue(StairBlock.FACING) == expectedFacing,
+							"expected aligned stair facing " + expectedFacing + " at s=" + sPos + " stepH=" + stepH);
+					check(l4.getBlockState(new BlockPos(sx, Level4ChunkGenerator.FLOOR_Y + stepH + 1, sz)).isAir(),
+							"expected stair headroom +1 clear at s=" + sPos);
+					check(l4.getBlockState(new BlockPos(sx, Level4ChunkGenerator.FLOOR_Y + stepH + 2, sz)).isAir(),
+							"expected stair headroom +2 clear at s=" + sPos);
+				}
+				for (int sPos : new int[] {4, 24}) {
+					int sx = bx0 + sPos * bdx, sz = bz0 + sPos * bdz;
+					check(!l4.getBlockState(new BlockPos(sx, Level4ChunkGenerator.FLOOR_Y + 2, sz)).isAir(),
+							"elevated bridge midDeck floor should start cleanly at s=" + sPos);
+					check(l4.getBlockState(new BlockPos(sx, Level4ChunkGenerator.FLOOR_Y + 3, sz)).isAir()
+									&& l4.getBlockState(new BlockPos(sx, Level4ChunkGenerator.FLOOR_Y + 4, sz)).isAir(),
+							"elevated bridge midDeck headroom should be clear at s=" + sPos);
+				}
 			});
 		}
 
@@ -175,11 +236,34 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		int[] balcony = findKind(seed, from, Kind.BALCONY_FLOOR);
 		if (balcony != null) {
 			shoot(context, game, balcony[0] + 0.5, STAND, balcony[1] + 0.5, 0, 0, false, "level4_balcony");
+			int[] balconyRail = findKind(seed, from, Kind.BALCONY_RAIL);
 			game.getServer().runOnServer(s -> {
 				ServerLevel l4 = level4(s);
 				check(l4.canSeeSky(new BlockPos(balcony[0], STAND, balcony[1])), "recessed rain balcony should see open sky");
 				check(!l4.getBlockState(new BlockPos(balcony[0], Level4ChunkGenerator.FLOOR_Y, balcony[1])).isAir(),
 						"balcony floor should be solid concrete");
+				if (balconyRail != null) {
+					var railState = l4.getBlockState(new BlockPos(balconyRail[0], Level4ChunkGenerator.FLOOR_Y + 2, balconyRail[1]));
+					check(railState.is(Blocks.IRON_BARS) && ((railState.getValue(BlockStateProperties.EAST) && railState.getValue(BlockStateProperties.WEST))
+									|| (railState.getValue(BlockStateProperties.NORTH) && railState.getValue(BlockStateProperties.SOUTH))),
+							"balcony iron bar railing should be connected horizontally");
+				}
+			});
+		}
+
+		int[] fireDoorView = findFireDoorWithSignView(seed, from);
+		if (fireDoorView != null) {
+			shoot(context, game, fireDoorView[0] + 0.5, STAND, fireDoorView[1] + 0.5, fireDoorView[6], -8, false, "level4_fire_door");
+			game.getServer().runOnServer(s -> {
+				ServerLevel l4 = level4(s);
+				check(l4.getBlockState(new BlockPos(fireDoorView[2], Level4ChunkGenerator.FLOOR_Y + 1, fireDoorView[3])).is(Level4Blocks.OFFICE_FIRE_DOOR),
+						"expected office fire door lower half");
+				check(l4.getBlockState(new BlockPos(fireDoorView[2], Level4ChunkGenerator.FLOOR_Y + 2, fireDoorView[3])).is(Level4Blocks.OFFICE_FIRE_DOOR),
+						"expected office fire door upper half");
+				check(l4.getBlockState(new BlockPos(fireDoorView[2], Level4ChunkGenerator.FLOOR_Y + 3, fireDoorView[3])).is(Level4Blocks.OFFICE_DRYWALL_UPPER),
+						"expected solid drywall lintel above office fire door");
+				check(l4.getBlockState(new BlockPos(fireDoorView[4], Level4ChunkGenerator.FLOOR_Y + 3, fireDoorView[5])).is(Level4Blocks.OFFICE_EXIT_SIGN),
+						"expected exit sign mounted flush on lintel front above door");
 			});
 		}
 
@@ -208,6 +292,19 @@ public final class Level4ClientTest implements FabricClientGameTest {
 						"sunken auditorium floor should be lowered below FLOOR_Y");
 				check(!l4.getBlockState(new BlockPos(auditorium[0], Level4ChunkGenerator.FLOOR_Y - 3, auditorium[1])).isAir(),
 						"sunken auditorium pit floor should exist at FLOOR_Y - 3");
+				boolean hasBench = false, hasDesk = false, hasFrame = false;
+				for (int ax = -11; ax <= 11; ax++) {
+					for (int az = -11; az <= 11; az++) {
+						for (int ay = Level4ChunkGenerator.FLOOR_Y - 3; ay <= Level4ChunkGenerator.FLOOR_Y + 3; ay++) {
+							var st = l4.getBlockState(new BlockPos(auditorium[0] + ax, ay, auditorium[1] + az));
+							if (st.is(ZenithBlocks.STATION_BENCH)) hasBench = true;
+							if (st.is(Level1Blocks.OFFICE_DESK)) hasDesk = true;
+							if (st.is(Level4Blocks.OFFICE_ELEVATOR_FRAME)) hasFrame = true;
+						}
+					}
+				}
+				check(hasBench && hasDesk && hasFrame,
+						"expected tiered benches, stage podium desk, and screen bezel frame in AUDITORIUM");
 			});
 		}
 
@@ -231,8 +328,13 @@ public final class Level4ClientTest implements FabricClientGameTest {
 				ServerLevel l4 = level4(s);
 				check(l4.getBlockState(new BlockPos(tunnelSpot[0], Level4ChunkGenerator.FLOOR_Y - 5, tunnelSpot[1])).isAir(),
 						"sub-level MEP tunnel corridor should be hollow at FLOOR_Y - 5");
-				check(!l4.getBlockState(new BlockPos(tunnelSpot[0], Level4ChunkGenerator.FLOOR_Y - 6, tunnelSpot[1])).isAir(),
-						"sub-level MEP tunnel floor should exist at FLOOR_Y - 6");
+				var subFloor = l4.getBlockState(new BlockPos(tunnelSpot[0], Level4ChunkGenerator.FLOOR_Y - 6, tunnelSpot[1]));
+				check(subFloor.is(Level2Blocks.FLOOR_CABLE_DUCT) || subFloor.is(Level2Blocks.DRAIN_GRATE),
+						"expected Level 2 cable duct or drain grate floor in sub-level MEP tunnel");
+				var subWallPipe = l4.getBlockState(new BlockPos(tunnelSpot[0], Level4ChunkGenerator.FLOOR_Y - 4, tunnelSpot[1] - 2));
+				check(subWallPipe.is(Level2Blocks.STEEL_PIPES) || subWallPipe.is(Level2Blocks.VALVE_PIPES)
+						|| subWallPipe.is(Level2Blocks.LEAKING_PIPES) || subWallPipe.is(Level2Blocks.MACHINE_PANEL),
+						"expected mounted Level 2 wall pipes in sub-level MEP tunnel");
 			});
 		}
 
@@ -243,6 +345,17 @@ public final class Level4ClientTest implements FabricClientGameTest {
 				check(plenumSpot != null, "expected plenum crawlspace above DARK_WING");
 				check(l4.getBlockState(new BlockPos(plenumSpot[0], Level4ChunkGenerator.FLOOR_Y + 6, plenumSpot[1])).isAir(),
 						"ceiling plenum crawlspace should be hollow at FLOOR_Y + 6");
+				boolean hasDuctOrPipe = false;
+				for (int px = -12; px <= 12 && !hasDuctOrPipe; px++) {
+					for (int pz = -12; pz <= 12; pz++) {
+						var st = l4.getBlockState(new BlockPos(dark[0] + px, Level4ChunkGenerator.FLOOR_Y + 8, dark[1] + pz));
+						if (st.is(Level2Blocks.OVERHEAD_PIPE_BRIDGE) || st.is(Level4Blocks.OFFICE_ELEVATOR_FRAME)) {
+							hasDuctOrPipe = true;
+							break;
+						}
+					}
+				}
+				check(hasDuctOrPipe, "expected overhead pipe bridges or steel HVAC ducts inside DARK_WING plenum");
 			});
 		}
 
@@ -711,6 +824,15 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		int[] breakroom = findPoi(seed, from, PoiKind.BREAKROOM_CORNER);
 		check(breakroom != null, "no BREAKROOM_CORNER POI found");
 		shoot(context, game, breakroom[0] + 3.5, STAND, breakroom[2] + 3.5, poiYawTo(breakroom[3]), 14, false, "level4_poi_breakroom");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			int[] counterUv = Level4PoiPlan.uvToLocal(breakroom[3], 1, 1);
+			int[] sinkUv = Level4PoiPlan.uvToLocal(breakroom[3], 3, 1);
+			check(l4.getBlockState(new BlockPos(breakroom[0] + counterUv[0], STAND, breakroom[2] + counterUv[1]))
+					.is(ZenithBlocks.KITCHEN_COUNTER), "expected Zenith KITCHEN_COUNTER in BREAKROOM_CORNER");
+			check(l4.getBlockState(new BlockPos(breakroom[0] + sinkUv[0], STAND, breakroom[2] + sinkUv[1]))
+					.is(ZenithBlocks.KITCHEN_SINK), "expected Zenith KITCHEN_SINK in BREAKROOM_CORNER");
+		});
 
 		// 2. M.E.G. chalk wall
 		int[] chalk = findPoi(seed, from, PoiKind.MEG_CHALK_WALL);
@@ -772,10 +894,15 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			ServerPlayer p = player(s);
 			p.getInventory().clearContent();
 			p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.GLASS_BOTTLE));
-			BlockPos cauldron = new BlockPos(drip[0] + 3, STAND, drip[2] + 3);
+			BlockPos bucket = new BlockPos(drip[0] + 3, STAND, drip[2] + 3);
+			check(l4.getBlockState(bucket).is(Level4Blocks.DRIP_BUCKET)
+					&& l4.getBlockState(bucket).getValue(Level4Blocks.DripBucketBlock.WATER_LEVEL) == 2,
+					"expected DRIP_BUCKET at level 2 in CEILING_DRIP_SPOT");
 			p.gameMode.useItemOn(p, l4, p.getMainHandItem(), InteractionHand.MAIN_HAND,
-					new BlockHitResult(Vec3.atCenterOf(cauldron), Direction.UP, cauldron, false));
-			check(p.getInventory().countItem(BackroomsItems.MURKY_WATER_VIAL) >= 1, "expected murky_water_vial from drip cauldron");
+					new BlockHitResult(Vec3.atCenterOf(bucket), Direction.UP, bucket, false));
+			check(p.getInventory().countItem(BackroomsItems.MURKY_WATER_VIAL) >= 1, "expected murky_water_vial from drip bucket");
+			check(l4.getBlockState(bucket).getValue(Level4Blocks.DripBucketBlock.WATER_LEVEL) == 1,
+					"expected DRIP_BUCKET water level to drop to 1 after bottling");
 		});
 		server.runCommand("gamemode spectator @a");
 
@@ -813,6 +940,9 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			ServerPlayer p = player(s);
 			p.getInventory().clearContent();
 			BlockPos barrel = new BlockPos(bx, STAND, bz);
+			int[] paintUv = Level4PoiPlan.uvToLocal(cart[3], 2, 1);
+			check(l4.getBlockState(new BlockPos(cart[0] + paintUv[0], STAND, cart[2] + paintUv[1])).is(Level4Blocks.PAINT_BUCKET),
+					"expected PAINT_BUCKET on paint cart");
 			check(l4.getBlockState(barrel).is(Level4Blocks.INDUSTRIAL_TOOLBOX),
 					"expected INDUSTRIAL_TOOLBOX on paint cart at " + barrel);
 			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
@@ -841,16 +971,20 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		server.runOnServer(s -> {
 			ServerLevel l4 = level4(s);
 			player(s).teleportTo(camp[0] + 3.5, campStandY, camp[2] + 3.5);
-			for (int x = camp[0]; x < camp[0] + Level4Plan.CELL && campBarrelRef[0] == null; x++) {
+			boolean hasBag = false, hasLight = false;
+			for (int x = camp[0]; x < camp[0] + Level4Plan.CELL; x++) {
 				for (int z = camp[2]; z < camp[2] + Level4Plan.CELL; z++) {
 					BlockPos cand = new BlockPos(x, campStandY, z);
-					if (l4.getBlockState(cand).is(Level4Blocks.MEG_SUPPLY_CRATE)) {
+					var st = l4.getBlockState(cand);
+					if (campBarrelRef[0] == null && st.is(Level4Blocks.MEG_SUPPLY_CRATE)) {
 						campBarrelRef[0] = cand;
-						break;
 					}
+					if (st.is(Level4Blocks.CAMP_SLEEPING_BAG)) hasBag = true;
+					if (st.is(Level1Blocks.FLOODLIGHT)) hasLight = true;
 				}
 			}
 			check(campBarrelRef[0] != null, "expected MEG_SUPPLY_CRATE inside MISSING_WANDERER_CAMP");
+			check(hasBag && hasLight, "expected CAMP_SLEEPING_BAG and FLOODLIGHT inside MISSING_WANDERER_CAMP");
 		});
 		game.getConnection().waitForChunksDownload();
 		BlockPos cb = campBarrelRef[0];
@@ -918,6 +1052,11 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			check(l4.getBlockState(doorPos).getValue(DoorBlock.OPEN), "crowbar should pry open PBX iron door");
 
 			int[] pbxBarrelUv = Level4PoiPlan.uvToLocal(pbx[3], 5, 2);
+			int[] rack1Uv = Level4PoiPlan.uvToLocal(pbx[3], 1, 5);
+			int[] rack2Uv = Level4PoiPlan.uvToLocal(pbx[3], 2, 5);
+			check(l4.getBlockState(new BlockPos(pbx[0] + rack1Uv[0], STAND, pbx[2] + rack1Uv[1])).is(ZenithBlocks.SERVER_RACK)
+					&& l4.getBlockState(new BlockPos(pbx[0] + rack2Uv[0], STAND, pbx[2] + rack2Uv[1])).is(ZenithBlocks.SERVER_RACK),
+					"expected Zenith SERVER_RACK inside PBX room");
 			BlockPos barrelPos = new BlockPos(pbx[0] + pbxBarrelUv[0], STAND, pbx[2] + pbxBarrelUv[1]);
 			check(l4.getBlockState(barrelPos).is(Level4Blocks.INDUSTRIAL_TOOLBOX),
 					"expected INDUSTRIAL_TOOLBOX inside PBX room at " + barrelPos);
@@ -1052,8 +1191,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 					"expected iron bars peep grate below plenum hub");
 			check(l4.getBlockState(new BlockPos(hub[0] + 2, Level4ChunkGenerator.FLOOR_Y + 5, hub[2] + 3)).is(Blocks.POLISHED_ANDESITE),
 					"expected polished andesite platform in plenum hub");
-			check(l4.getBlockState(new BlockPos(hub[0] + 4, Level4ChunkGenerator.FLOOR_Y + 8, hub[2] + 4)).is(Blocks.LANTERN),
-					"expected hanging lantern in plenum hub");
+			check(l4.getBlockState(new BlockPos(hub[0] + 4, Level4ChunkGenerator.FLOOR_Y + 8, hub[2] + 4)).is(Level1Blocks.CAGED_LAMP),
+					"expected hanging caged lamp in plenum hub");
 			p.getInventory().clearContent();
 			BlockPos barrelPos = new BlockPos(hub[0] + 2, Level4ChunkGenerator.FLOOR_Y + 6, hub[2] + 2);
 			check(l4.getBlockState(barrelPos).is(Level4Blocks.INDUSTRIAL_TOOLBOX),
@@ -1119,6 +1258,8 @@ public final class Level4ClientTest implements FabricClientGameTest {
 
 			BlockPos cotPos = new BlockPos(outpost[0] + 2, STAND, outpost[2] + 2);
 			check(l4.getBlockState(cotPos).is(Level4Blocks.OMEGA_COT), "expected OMEGA_COT at evacuated outpost");
+			check(l4.getBlockState(new BlockPos(outpost[0] + Level4Plan.CELL + 2, STAND, outpost[2] + Level4Plan.CELL + 2))
+					.is(Level1Blocks.FLOODLIGHT), "expected FLOODLIGHT at evacuated outpost");
 			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
 					new BlockHitResult(Vec3.atCenterOf(cotPos), Direction.UP, cotPos, false));
 			check(p.getHealth() > 4.0F, "outpost cot should heal player");
@@ -1192,6 +1333,9 @@ public final class Level4ClientTest implements FabricClientGameTest {
 			BlockPos poolPos = new BlockPos(redAtrium[0] + 3, STAND, redAtrium[2] + 2);
 			check(l4.getBlockState(poolPos).is(Level4Blocks.CORRUPTED_FOUNTAIN_POOL),
 					"expected CORRUPTED_FOUNTAIN_POOL at " + poolPos);
+			check(l4.getBlockState(new BlockPos(redAtrium[0] + 2, STAND, redAtrium[2] + 2)).is(Level2Blocks.VOID_CONCRETE)
+					&& l4.getBlockState(new BlockPos(redAtrium[0] + 2, STAND + 1, redAtrium[2] + 2)).is(Level1Blocks.DESK_PLANT_DEAD),
+					"expected VOID_CONCRETE basin and DESK_PLANT_DEAD at corrupted red atrium corners");
 			check(!l4.getBlockState(poolPos).getValue(Level4Blocks.CorruptedFountainPoolBlock.SAMPLED),
 					"corrupted pool should start unsampled");
 			p.teleportTo(redAtrium[0] + 3.5, STAND, redAtrium[2] + 1.5);
@@ -1412,6 +1556,77 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		server.runCommand("gamemode spectator @a");
 	}
 
+	private static void atriumZero(ClientGameTestContext context, TestSingleplayerContext game, long seed, BlockPos from) {
+		var server = game.getServer();
+		int[] az = Level4Plan.atriumZeroRegionInBlock(seed, 0, 0);
+		int baseX = az[0] * Level4Plan.SIZE;
+		int baseZ = az[1] * Level4Plan.SIZE;
+
+		shoot(context, game, baseX + 20.5, 33.5, baseZ + 56.5, -90, -12, false, "level4_atrium_zero_entry");
+		shoot(context, game, baseX + 56.5, 33.5, baseZ + 66.5, 180, -18, false, "level4_atrium_zero_basin");
+		shoot(context, game, baseX + 20.5, 49.5, baseZ + 53.5, -75, 22, false, "level4_atrium_zero_upper");
+		shoot(context, game, baseX + 56.5, 19.5, baseZ + 58.5, 180, -4, false, "level4_atrium_zero_catwalk");
+
+		server.runCommand("gamemode survival @a");
+		server.runOnServer(s -> {
+			ServerLevel l4 = level4(s);
+			ServerPlayer p = player(s);
+			p.getInventory().clearContent();
+
+			BlockPos plaquePos = new BlockPos(baseX + Level4AtriumZero.CENTER, STAND, baseZ + Level4AtriumZero.CENTER);
+			check(l4.getBlockState(plaquePos).is(Level4Blocks.ATRIUM_ZERO_PLAQUE), "expected ATRIUM_ZERO_PLAQUE at center");
+			check(l4.getBlockState(new BlockPos(baseX + 35, 127, baseZ + 35)).isAir(), "expected open-sky shaft top at y=127");
+			check(l4.getBlockState(new BlockPos(baseX + 95, 49, baseZ + 16)).is(Level4Blocks.MEG_SUPPLY_CRATE), "expected upper camp supply crate");
+			check(l4.getBlockState(new BlockPos(baseX + 96, 49, baseZ + 16)).is(Level4Blocks.OFFICE_STEEL_SAFE), "expected upper camp steel safe");
+			check(l4.getBlockState(new BlockPos(baseX + 96, 49, baseZ + 18)).is(Level4Blocks.CAMP_SLEEPING_BAG), "expected upper camp sleeping bag");
+			check(l4.getBlockState(new BlockPos(baseX + 60, 25, baseZ + 67)).is(Blocks.LADDER), "expected lower catwalk access ladder");
+			check(l4.getBlockState(new BlockPos(baseX + 56, 19, baseZ + 44)).is(Level4Blocks.OFFICE_DOOR_11), "expected permanent Level 11 exit door");
+			check(l4.getBlockState(new BlockPos(baseX + 56, 21, baseZ + 45)).is(Level4Blocks.OFFICE_EXIT_SIGN), "expected exit sign above Level 11 door");
+
+			// Plaque interaction (one-time)
+			p.teleportTo(baseX + 56.5, STAND, baseZ + 58.5);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(plaquePos), Direction.UP, plaquePos, false));
+			check(p.getInventory().countItem(BackroomsItems.PURIFIED_ALMOND_ESSENCE) == 2
+					&& p.getInventory().countItem(Level1Items.ALMOND_WATER) == 2,
+					"expected plaque one-time Almond Water & Essence reward");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(plaquePos), Direction.UP, plaquePos, false));
+			check(p.getInventory().countItem(BackroomsItems.PURIFIED_ALMOND_ESSENCE) == 2,
+					"plaque reward must be one-time only");
+
+			// Upper survey camp safe interaction (one-time)
+			p.getInventory().clearContent();
+			BlockPos campSafe = new BlockPos(baseX + 96, 49, baseZ + 16);
+			p.teleportTo(baseX + 95.5, 49.0, baseZ + 17.5);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(campSafe), Direction.UP, campSafe, false));
+			check(p.getInventory().countItem(Level1Items.ALLOY) == 2
+					&& p.getInventory().countItem(Level4Items.RAIN_GLASS_ORB) == 1,
+					"expected upper camp safe loot");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(campSafe), Direction.UP, campSafe, false));
+			check(p.getInventory().countItem(Level4Items.RAIN_GLASS_ORB) == 1,
+					"upper camp safe loot must be one-time only");
+
+			// Lower catwalk vault safe interaction (one-time)
+			p.getInventory().clearContent();
+			BlockPos catwalkSafe = new BlockPos(baseX + 58, 19, baseZ + 46);
+			p.teleportTo(baseX + 56.5, 19.0, baseZ + 46.5);
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(catwalkSafe), Direction.UP, catwalkSafe, false));
+			check(p.getInventory().countItem(BackroomsItems.PURIFIED_ALMOND_ESSENCE) == 3
+					&& p.getInventory().countItem(BackroomsItems.MICROCHIP) == 1
+					&& p.getInventory().countItem(BackroomsItems.HIGH_VOLTAGE_COIL) == 1,
+					"expected lower catwalk vault safe loot");
+			p.gameMode.useItemOn(p, l4, ItemStack.EMPTY, InteractionHand.MAIN_HAND,
+					new BlockHitResult(Vec3.atCenterOf(catwalkSafe), Direction.UP, catwalkSafe, false));
+			check(p.getInventory().countItem(BackroomsItems.MICROCHIP) == 1,
+					"lower catwalk vault safe loot must be one-time only");
+		});
+		server.runCommand("gamemode spectator @a");
+	}
+
 	/** Returns {cellOriginX, cellOriginZ, dir, baseY, roomId} for the nearest matching POI. */
 	private static int[] findPoi(long seed, BlockPos from, PoiKind target) {
 		int rx0 = Math.floorDiv(from.getX(), Level4Plan.SIZE), rz0 = Math.floorDiv(from.getZ(), Level4Plan.SIZE);
@@ -1541,6 +1756,33 @@ public final class Level4ClientTest implements FabricClientGameTest {
 		for (int[] d : dirs) {
 			int sx = wx + d[0], sz = wz + d[1];
 			if (Level4Layout.tile(seed, sx, sz).kind() == Kind.AIR) return new int[] {sx, sz};
+		}
+		return null;
+	}
+
+	private static int[] findFireDoorWithSignView(long seed, BlockPos from) {
+		for (int r = 1; r <= 120; r++) {
+			for (int dx = -r; dx <= r; dx++) {
+				for (int dz = -r; dz <= r; dz++) {
+					if (Math.abs(dx) != r && Math.abs(dz) != r) continue;
+					int x = from.getX() + dx, z = from.getZ() + dz;
+					Tile t = Level4Layout.tile(seed, x, z);
+					if (t.kind() != Kind.FIRE_DOOR || !t.exitSign() || Level4PoiPlan.atCell(seed, x, z) != null) continue;
+					int[][] sides = Math.floorMod(z, Level4Plan.CELL) == 0
+							? new int[][] {{0, 1, 180}, {0, -1, 0}}
+							: new int[][] {{1, 0, 90}, {-1, 0, 270}};
+					for (int[] s : sides) {
+						int sx = x + s[0], sz = z + s[1];
+						int cx = x + 2 * s[0], cz = z + 2 * s[1];
+						if (Level4Layout.tile(seed, sx, sz).kind() == Kind.AIR
+								&& Level4Layout.tile(seed, cx, cz).kind() == Kind.AIR
+								&& Level4PoiPlan.atCell(seed, sx, sz) == null
+								&& Level4PoiPlan.atCell(seed, cx, cz) == null) {
+							return new int[] {cx, cz, x, z, sx, sz, s[2]};
+						}
+					}
+				}
+			}
 		}
 		return null;
 	}

@@ -8,6 +8,7 @@ import dev.noclip.backrooms.core.economy.Economy;
 import dev.noclip.backrooms.core.rpg.PlayerRpg;
 import dev.noclip.backrooms.core.rpg.PlayerStats;
 import dev.noclip.backrooms.items.BackroomsItems;
+import dev.noclip.backrooms.level0p1.ZenithBlocks;
 import dev.noclip.backrooms.level1.Level1Items;
 import dev.noclip.backrooms.level4.Level4Plan.PlacedExit;
 import dev.noclip.backrooms.level4.Level4Plan.RoomBox;
@@ -54,7 +55,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoorBlock;
-import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -236,7 +236,7 @@ final class Level4PoiEvents {
 
 			switch (poi.kind()) {
 				case BREAKROOM_CORNER -> {
-					if (!state.is(Blocks.CAULDRON) && !state.is(Blocks.QUARTZ_SLAB)) return InteractionResult.PASS;
+					if (!state.is(ZenithBlocks.KITCHEN_SINK) && !state.is(ZenithBlocks.KITCHEN_COUNTER)) return InteractionResult.PASS;
 					PoiState data = state(sl);
 					if (data.isClaimed(anchor)) {
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.breakroom_empty"));
@@ -278,15 +278,13 @@ final class Level4PoiEvents {
 					return InteractionResult.SUCCESS;
 				}
 				case CEILING_DRIP_SPOT -> {
-					if (!state.is(Blocks.WATER_CAULDRON) && !state.is(Blocks.CAULDRON)) return InteractionResult.PASS;
+					if (!state.is(Level4Blocks.DRIP_BUCKET)) return InteractionResult.PASS;
 					ItemStack held = sp.getMainHandItem();
-					if (state.is(Blocks.WATER_CAULDRON) && held.is(Items.GLASS_BOTTLE)) {
+					int lvl = state.getValue(Level4Blocks.DripBucketBlock.WATER_LEVEL);
+					if (lvl > 0 && held.is(Items.GLASS_BOTTLE)) {
 						if (!sp.getAbilities().instabuild) held.shrink(1);
 						giveOrDrop(sp, new ItemStack(BackroomsItems.MURKY_WATER_VIAL));
-						int lvl = state.getValue(LayeredCauldronBlock.LEVEL);
-						sl.setBlock(pos, lvl > 1
-								? state.setValue(LayeredCauldronBlock.LEVEL, lvl - 1)
-								: Blocks.CAULDRON.defaultBlockState(), 3);
+						sl.setBlock(pos, state.setValue(Level4Blocks.DripBucketBlock.WATER_LEVEL, lvl - 1), 3);
 						sl.playSound(null, pos, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 0.8F, 0.9F);
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.drip_murky"));
 					} else if (poi.variantFlag()) {
@@ -316,7 +314,7 @@ final class Level4PoiEvents {
 					return InteractionResult.SUCCESS;
 				}
 				case WINDOW_PAINT_CART -> {
-					if (!state.is(Level4Blocks.INDUSTRIAL_TOOLBOX) && !state.is(Blocks.CAULDRON)) return InteractionResult.PASS;
+					if (!state.is(Level4Blocks.INDUSTRIAL_TOOLBOX) && !state.is(Level4Blocks.PAINT_BUCKET)) return InteractionResult.PASS;
 					PoiState data = state(sl);
 					if (data.isClaimed(anchor)) {
 						sp.sendOverlayMessage(Component.translatable("message.noclip_backrooms.level4.poi.paint_cart_empty"));
@@ -619,7 +617,7 @@ final class Level4PoiEvents {
 							BlockPos basin = new BlockPos(cx, Level4ChunkGenerator.FLOOR_Y + 1, cz);
 							if (!level.isLoaded(basin) || basin.distSqr(sp.blockPosition()) > 12 * 12) continue;
 							BlockState st = level.getBlockState(basin);
-							if (!st.is(Blocks.WATER_CAULDRON) && !st.is(Blocks.CAULDRON)) continue;
+							if (!st.is(Level4Blocks.DRIP_BUCKET)) continue;
 							level.sendParticles(ParticleTypes.DRIPPING_WATER,
 									cx + 0.5, Level4ChunkGenerator.FLOOR_Y + 5.05, cz + 0.5,
 									2, 0.08, 0.02, 0.08, 0.0);
@@ -860,6 +858,18 @@ final class Level4PoiEvents {
 
 	static void clearAmorDesecrated(ServerLevel level, UUID playerId) {
 		state(level).setDesecrated(playerId, false);
+	}
+
+	static boolean isClaimed(ServerLevel level, BlockPos pos) {
+		return state(level).isClaimed(pos);
+	}
+
+	static void markClaimed(ServerLevel level, BlockPos pos) {
+		state(level).markClaimed(pos);
+	}
+
+	static void giveItem(ServerPlayer player, ItemStack stack) {
+		giveOrDrop(player, stack);
 	}
 
 	private static PoiState state(ServerLevel level) {

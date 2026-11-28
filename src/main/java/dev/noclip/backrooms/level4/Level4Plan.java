@@ -17,8 +17,9 @@ final class Level4Plan {
 	static final int MARGIN = 2;
 	static final int NORTH = 0, EAST = 1, SOUTH = 2, WEST = 3;
 	static final int[] DX = {0, 1, 0, -1}, DZ = {-1, 0, 1, 0};
-	private static final int PLAN_SALT = 401, EDGE_SALT = 402, OMEGA_SALT = 409;
+	private static final int PLAN_SALT = 401, EDGE_SALT = 402, OMEGA_SALT = 409, ATRIUM_ZERO_SALT = 413;
 	static final int OMEGA_SPREAD = 8;
+	static final int ATRIUM_ZERO_SPREAD = 12;
 	private static final ConcurrentHashMap<Key, Level4Plan> CACHE = new ConcurrentHashMap<>();
 
 	enum ZoneKind {
@@ -28,6 +29,8 @@ final class Level4Plan {
 		SUITE,
 		/** Double-height rainy atrium with a central Almond Water fountain. */
 		ATRIUM,
+		/** Ultra-rare full-tower hollow rainy megastructure ("Atrium Zero"). */
+		ATRIUM_ZERO,
 		/** Open-sky central rain shaft ringed by glass perimeter corridors. */
 		LIGHTWELL,
 		/** Unlit/flickering abandoned wing where rare entities lurk. */
@@ -85,6 +88,7 @@ final class Level4Plan {
 	final boolean hasAmor;
 	final boolean hasTbd;
 	final boolean hasAtrium;
+	final boolean hasAtriumZero;
 	final int tunnelJ;
 	final int tunnelI0;
 	final int tunnelI1;
@@ -124,6 +128,45 @@ final class Level4Plan {
 		for (int k : edgeOpenings(seed, rx, rz - 1, SOUTH)) {
 			zones[cell(k, 0)] = ZoneKind.OPEN_OFFICE;
 			zones[cell(k, 1)] = ZoneKind.OPEN_OFFICE;
+		}
+
+		this.hasAtriumZero = isAtriumZeroRegion(seed, rx, rz);
+		if (hasAtriumZero) {
+			this.hasOmega = false;
+			this.hasAmor = false;
+			this.hasTbd = false;
+			this.hasAtrium = false;
+			this.tunnelJ = -1;
+			this.tunnelI0 = -1;
+			this.tunnelI1 = -1;
+			for (int i = MARGIN; i < N - MARGIN; i++) {
+				for (int j = MARGIN; j < N - MARGIN; j++) {
+					zones[cell(i, j)] = ZoneKind.ATRIUM_ZERO;
+				}
+			}
+			for (int i = 0; i < N; i++) {
+				edges[cell(i, 0) * 4 + NORTH] = zones[cell(i, 0)] == ZoneKind.OUTSIDE ? Edge.WALL : Edge.OPEN;
+				edges[cell(i, N - 1) * 4 + SOUTH] = zones[cell(i, N - 1)] == ZoneKind.OUTSIDE ? Edge.WALL : Edge.OPEN;
+				edges[cell(0, i) * 4 + WEST] = zones[cell(0, i)] == ZoneKind.OUTSIDE ? Edge.WALL : Edge.OPEN;
+				edges[cell(N - 1, i) * 4 + EAST] = zones[cell(N - 1, i)] == ZoneKind.OUTSIDE ? Edge.WALL : Edge.OPEN;
+			}
+			for (int c = 0; c < N * N; c++) {
+				int i = c % N, j = c / N;
+				ZoneKind z = zones[c];
+				for (int d : new int[] {EAST, SOUTH}) {
+					int a = i + DX[d], b = j + DZ[d];
+					if (!inside(a, b)) continue;
+					ZoneKind nz = zones[cell(a, b)];
+					if (z == ZoneKind.OUTSIDE && nz == ZoneKind.OUTSIDE) {
+						setEdge(c, d, Edge.OPEN);
+					} else if (z == ZoneKind.OUTSIDE || nz == ZoneKind.OUTSIDE) {
+						setEdge(c, d, Edge.WALL);
+					} else {
+						setEdge(c, d, Edge.OPEN);
+					}
+				}
+			}
+			return;
 		}
 
 		this.hasOmega = isOmegaRegion(seed, rx, rz);
@@ -195,6 +238,27 @@ final class Level4Plan {
 	static boolean isOmegaRegion(long seed, int rx, int rz) {
 		int bx = Math.floorDiv(rx, OMEGA_SPREAD), bz = Math.floorDiv(rz, OMEGA_SPREAD);
 		int[] picked = omegaRegionInBlock(seed, bx, bz);
+		return rx == picked[0] && rz == picked[1];
+	}
+
+	static int[] atriumZeroRegionInBlock(long seed, int bx, int bz) {
+		int total = ATRIUM_ZERO_SPREAD * ATRIUM_ZERO_SPREAD;
+		int start = Math.floorMod(Level4Layout.hash(seed, bx, bz, ATRIUM_ZERO_SALT), total);
+		for (int off = 0; off < total; off++) {
+			int idx = (start + off) % total;
+			int rx = bx * ATRIUM_ZERO_SPREAD + idx % ATRIUM_ZERO_SPREAD;
+			int rz = bz * ATRIUM_ZERO_SPREAD + idx / ATRIUM_ZERO_SPREAD;
+			if (Math.abs(rx) <= 1 && Math.abs(rz) <= 1) continue;
+			if (isOmegaRegion(seed, rx, rz)) continue;
+			return new int[] {rx, rz};
+		}
+		return new int[] {bx * ATRIUM_ZERO_SPREAD, bz * ATRIUM_ZERO_SPREAD};
+	}
+
+	static boolean isAtriumZeroRegion(long seed, int rx, int rz) {
+		if (Math.abs(rx) <= 1 && Math.abs(rz) <= 1) return false;
+		int bx = Math.floorDiv(rx, ATRIUM_ZERO_SPREAD), bz = Math.floorDiv(rz, ATRIUM_ZERO_SPREAD);
+		int[] picked = atriumZeroRegionInBlock(seed, bx, bz);
 		return rx == picked[0] && rz == picked[1];
 	}
 
@@ -431,6 +495,16 @@ final class Level4Plan {
 				if (walkable(room.cx(), room.j() + room.h())) setEdge(cell(room.cx(), room.j() + room.h() - 1), SOUTH, Edge.OPEN);
 				if (walkable(room.i() - 1, room.cz())) setEdge(cell(room.i(), room.cz()), WEST, Edge.OPEN);
 				if (walkable(room.i() + room.w(), room.cz())) setEdge(cell(room.i() + room.w() - 1, room.cz()), EAST, Edge.OPEN);
+				if (room.kind() == ZoneKind.ATRIUM) {
+					for (int a = room.i(); a < room.i() + room.w(); a++) {
+						if (isSkybridgeCell(a, room.j() - 1) && walkable(a, room.j() - 1)) setEdge(cell(a, room.j()), NORTH, Edge.OPEN);
+						if (isSkybridgeCell(a, room.j() + room.h()) && walkable(a, room.j() + room.h())) setEdge(cell(a, room.j() + room.h() - 1), SOUTH, Edge.OPEN);
+					}
+					for (int b = room.j(); b < room.j() + room.h(); b++) {
+						if (isSkybridgeCell(room.i() - 1, b) && walkable(room.i() - 1, b)) setEdge(cell(room.i(), b), WEST, Edge.OPEN);
+						if (isSkybridgeCell(room.i() + room.w(), b) && walkable(room.i() + room.w(), b)) setEdge(cell(room.i() + room.w() - 1, b), EAST, Edge.OPEN);
+					}
+				}
 				continue;
 			}
 			if (room.kind() == ZoneKind.DARK_WING || room.kind() == ZoneKind.UNFINISHED_WING) {

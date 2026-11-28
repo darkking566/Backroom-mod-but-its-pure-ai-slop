@@ -419,4 +419,275 @@ final class Level4LayoutTest {
 		assertTrue(amorCount >= 1 && amorCount <= 20, "expected rare Amor camps (~3%), got " + amorCount);
 		assertTrue(tbdCount >= 1 && tbdCount <= 24, "expected rare T.B.D. rooms (~4%), got " + tbdCount);
 	}
+
+	@Test
+	void atriumZeroMegastructureIsRareConnectedAndSafe() {
+		long testSeed = 42L;
+		int count = 0;
+		int foundRx = 0, foundRz = 0;
+		for (int rx = 0; rx < 24; rx++) {
+			for (int rz = 0; rz < 24; rz++) {
+				Level4Plan plan = Level4Plan.of(testSeed, rx, rz);
+				if (!plan.hasAtriumZero) continue;
+				count++;
+				foundRx = rx;
+				foundRz = rz;
+				assertTrue(Math.abs(rx) > 1 || Math.abs(rz) > 1, "Atrium Zero must avoid origin radius 1");
+				assertTrue(!plan.hasOmega && !plan.hasAmor && !plan.hasTbd, "Atrium Zero must be mutually exclusive with faction bases");
+				assertTrue(Level4PoiPlan.of(testSeed, rx, rz).pois.isEmpty(), "Atrium Zero must not generate room POIs");
+
+				// Verify full BFS connectivity across all walkable cells including all 8 skybridges
+				boolean[] seen = new boolean[Level4Plan.N * Level4Plan.N];
+				int[] queue = new int[Level4Plan.N * Level4Plan.N];
+				int start = -1, walkableCount = 0;
+				for (int c = 0; c < Level4Plan.N * Level4Plan.N; c++) {
+					if (plan.zones[c] != ZoneKind.SOLID_CORE && plan.zones[c] != ZoneKind.OUTSIDE) {
+						walkableCount++;
+						if (start < 0) start = c;
+					}
+				}
+				int head = 0, tail = 0;
+				queue[tail++] = start;
+				seen[start] = true;
+				while (head < tail) {
+					int c = queue[head++];
+					int i = c % Level4Plan.N, j = c / Level4Plan.N;
+					for (int d = 0; d < 4; d++) {
+						Edge e = plan.edge(c, d);
+						if (e != Edge.OPEN && e != Edge.DOOR) continue;
+						int a = i + Level4Plan.DX[d], b = j + Level4Plan.DZ[d];
+						if (!plan.walkable(a, b)) continue;
+						int nc = Level4Plan.cell(a, b);
+						if (!seen[nc]) {
+							seen[nc] = true;
+							queue[tail++] = nc;
+						}
+					}
+				}
+				assertEquals(walkableCount, tail, "Atrium Zero region must be 100% connected");
+			}
+		}
+		assertEquals(4, count, "expected exactly 1 Atrium Zero per 12x12 block across 24x24 regions");
+
+		// Verify safety and 3D megastructure geometry in the found Atrium Zero region
+		int baseX = foundRx * Level4Plan.SIZE;
+		int baseZ = foundRz * Level4Plan.SIZE;
+		assertTrue(!Level4Wanderers.isWanderZone(ZoneKind.ATRIUM_ZERO));
+		for (int lx = 0; lx < Level4Plan.SIZE; lx++) {
+			for (int lz = 0; lz < Level4Plan.SIZE; lz++) {
+				Tile t = Level4Layout.tile(testSeed, baseX + lx, baseZ + lz);
+				assertTrue(t.kind() != Kind.WINDOW_TRAP, "Atrium Zero must never generate Entity 2 trap windows");
+			}
+		}
+
+		// Open-sky roof & deep abyssal pool at shaft interior
+		Tile midShaftTile = Level4Layout.tile(testSeed, baseX + 35, baseZ + 35);
+		assertEquals(Level4AtriumZero.Part.AIR, Level4AtriumZero.partAt(testSeed, 35, 127, 35, midShaftTile));
+		assertEquals(Level4AtriumZero.Part.AIR, Level4AtriumZero.partAt(testSeed, 35, -62, 35, midShaftTile));
+		assertEquals(Level4AtriumZero.Part.ABYSS_WATER, Level4AtriumZero.partAt(testSeed, 35, -63, 35, midShaftTile));
+
+		// North rain bridge connects perimeter ring (lz=21) to central octagonal basin (lz=44)
+		for (int lz = 21; lz <= 44; lz++) {
+			Tile bt = Level4Layout.tile(testSeed, baseX + Level4AtriumZero.CENTER, baseZ + lz);
+			Level4AtriumZero.Part floor = Level4AtriumZero.partAt(testSeed, Level4AtriumZero.CENTER, 32, lz, bt);
+			assertTrue(floor == Level4AtriumZero.Part.GLASS_WALL || floor == Level4AtriumZero.Part.POLISHED_ANDESITE,
+					"Expected continuous bridge floor at lz=" + lz + ", got " + floor);
+			assertEquals(Level4AtriumZero.Part.AIR,
+					Level4AtriumZero.partAt(testSeed, Level4AtriumZero.CENTER, 33, lz, bt));
+		}
+
+		// Central basin features: observation plaque, Almond Water pool, skyfall tower, and 4 abyss waterfalls
+		Tile centerTile = Level4Layout.tile(testSeed, baseX + Level4AtriumZero.CENTER, baseZ + Level4AtriumZero.CENTER);
+		assertEquals(Level4AtriumZero.Part.POLISHED_ANDESITE,
+				Level4AtriumZero.partAt(testSeed, Level4AtriumZero.CENTER, 32, Level4AtriumZero.CENTER, centerTile));
+		assertEquals(Level4AtriumZero.Part.ATRIUM_PLAQUE,
+				Level4AtriumZero.partAt(testSeed, Level4AtriumZero.CENTER, 33, Level4AtriumZero.CENTER, centerTile));
+		Tile poolTile = Level4Layout.tile(testSeed, baseX + Level4AtriumZero.CENTER + 7, baseZ + Level4AtriumZero.CENTER + 6);
+		assertEquals(Level4AtriumZero.Part.ALMOND_POOL,
+				Level4AtriumZero.partAt(testSeed, Level4AtriumZero.CENTER + 7, 32, Level4AtriumZero.CENTER + 6, poolTile));
+		Tile poolRimTile = Level4Layout.tile(testSeed, baseX + Level4AtriumZero.CENTER + 7, baseZ + Level4AtriumZero.CENTER + 7);
+		assertEquals(Level4AtriumZero.Part.ALMOND_BASIN,
+				Level4AtriumZero.partAt(testSeed, Level4AtriumZero.CENTER + 7, 32, Level4AtriumZero.CENTER + 7, poolRimTile));
+		Tile towerFallTile = Level4Layout.tile(testSeed, baseX + Level4AtriumZero.CENTER + 5, baseZ + Level4AtriumZero.CENTER + 2);
+		assertEquals(Level4AtriumZero.Part.WATERFALL,
+				Level4AtriumZero.partAt(testSeed, Level4AtriumZero.CENTER + 5, 82, Level4AtriumZero.CENTER + 2, towerFallTile));
+		Tile abyssFallTile = Level4Layout.tile(testSeed, baseX + Level4AtriumZero.CENTER + 10, baseZ + Level4AtriumZero.CENTER + 9);
+		assertEquals(Level4AtriumZero.Part.WATERFALL,
+				Level4AtriumZero.partAt(testSeed, Level4AtriumZero.CENTER + 10, 0, Level4AtriumZero.CENTER + 9, abyssFallTile));
+
+		// Multi-story ghost office curtain wall both high above (y=60) and deep below (y=-10)
+		Tile rimWallTile = Level4Layout.tile(testSeed, baseX + 21, baseZ + Level4AtriumZero.CENTER + 1);
+		assertEquals(Level4AtriumZero.Part.RAIN_WINDOW, Level4AtriumZero.partAt(testSeed, 21, 60, Level4AtriumZero.CENTER + 1, rimWallTile));
+		assertEquals(Level4AtriumZero.Part.RAIN_WINDOW, Level4AtriumZero.partAt(testSeed, 21, -10, Level4AtriumZero.CENTER + 1, rimWallTile));
+
+		// Skybridge doorway & outer perimeter ring stay open and carpeted
+		Level4Plan foundPlan = Level4Plan.of(testSeed, foundRx, foundRz);
+		int bridgeJ = -1;
+		for (int j = Level4Plan.MARGIN; j < Level4Plan.N - Level4Plan.MARGIN; j++) {
+			if (foundPlan.zones[Level4Plan.cell(1, j)] == ZoneKind.OPEN_OFFICE) {
+				bridgeJ = j;
+				break;
+			}
+		}
+		assertTrue(bridgeJ >= 0, "expected a west skybridge connecting to Atrium Zero");
+		int bridgeLz = bridgeJ * Level4Plan.CELL + 3;
+		Tile bridgeDoorTile = Level4Layout.tile(testSeed, baseX + 14, baseZ + bridgeLz);
+		assertEquals(Kind.AIR, bridgeDoorTile.kind());
+		assertEquals(Level4AtriumZero.Part.CARPET, Level4AtriumZero.partAt(testSeed, 14, 32, bridgeLz, bridgeDoorTile));
+		for (int y = 33; y <= 36; y++) {
+			assertEquals(Level4AtriumZero.Part.AIR, Level4AtriumZero.partAt(testSeed, 14, y, bridgeLz, bridgeDoorTile));
+		}
+		Tile eastRingTile = Level4Layout.tile(testSeed, baseX + 97, baseZ + Level4AtriumZero.CENTER);
+		assertEquals(Level4AtriumZero.Part.CARPET, Level4AtriumZero.partAt(testSeed, 97, 32, Level4AtriumZero.CENTER, eastRingTile));
+		assertEquals(Level4AtriumZero.Part.AIR, Level4AtriumZero.partAt(testSeed, 97, 33, Level4AtriumZero.CENTER, eastRingTile));
+
+		// Stage 2: Upper y=48 observation gallery & NE survey camp
+		assertEquals(Level4AtriumZero.Part.CARPET, Level4AtriumZero.partAt(testSeed, 97, 48, Level4AtriumZero.CENTER, eastRingTile));
+		assertEquals(Level4AtriumZero.Part.AIR, Level4AtriumZero.partAt(testSeed, 97, 49, Level4AtriumZero.CENTER, eastRingTile));
+		assertEquals(Level4AtriumZero.Part.GLASS_WALL, Level4AtriumZero.partAt(testSeed, 21, 49, Level4AtriumZero.CENTER + 1, rimWallTile));
+		Tile campTile = Level4Layout.tile(testSeed, baseX + 95, baseZ + 16);
+		assertEquals(Level4AtriumZero.Part.SUPPLY_CRATE_SOUTH, Level4AtriumZero.partAt(testSeed, 95, 49, 16, campTile));
+		assertEquals(Level4AtriumZero.Part.STEEL_SAFE_SOUTH, Level4AtriumZero.partAt(testSeed, 96, 49, 16, campTile));
+		assertEquals(Level4AtriumZero.Part.SLEEPING_BAG_WEST, Level4AtriumZero.partAt(testSeed, 96, 49, 18, campTile));
+
+		// Stage 2: NW & SE 5x5 spiral stairs (all 16 steps y=32..48 clear headroom) + flat bypasses
+		int[][] nwPath = {
+				{15, 19, 32}, {16, 19, 33}, {17, 19, 34}, {18, 19, 35},
+				{19, 19, 36}, {19, 18, 37}, {19, 17, 38}, {19, 16, 39},
+				{19, 15, 40}, {18, 15, 41}, {17, 15, 42}, {16, 15, 43},
+				{15, 15, 44}, {15, 16, 45}, {15, 17, 46}, {15, 18, 47},
+				{15, 19, 48}
+		};
+		for (int idx = 0; idx < nwPath.length; idx++) {
+			int slx = nwPath[idx][0], slz = nwPath[idx][1], sy = nwPath[idx][2];
+			Tile st = Level4Layout.tile(testSeed, baseX + slx, baseZ + slz);
+			Level4AtriumZero.Part stepPart = Level4AtriumZero.partAt(testSeed, slx, sy, slz, st);
+			assertTrue(stepPart != Level4AtriumZero.Part.AIR, "NW spiral step missing at idx=" + idx);
+			if (idx > 0 && idx < nwPath.length - 1) {
+				assertEquals(Level4AtriumZero.Part.AIR, Level4AtriumZero.partAt(testSeed, slx, sy + 1, slz, st));
+				assertEquals(Level4AtriumZero.Part.AIR, Level4AtriumZero.partAt(testSeed, slx, sy + 2, slz, st));
+			}
+		}
+		int[][] sePath = {
+				{97, 93, 32}, {96, 93, 33}, {95, 93, 34}, {94, 93, 35},
+				{93, 93, 36}, {93, 94, 37}, {93, 95, 38}, {93, 96, 39},
+				{93, 97, 40}, {94, 97, 41}, {95, 97, 42}, {96, 97, 43},
+				{97, 97, 44}, {97, 96, 45}, {97, 95, 46}, {97, 94, 47},
+				{97, 93, 48}
+		};
+		for (int idx = 0; idx < sePath.length; idx++) {
+			int slx = sePath[idx][0], slz = sePath[idx][1], sy = sePath[idx][2];
+			Tile st = Level4Layout.tile(testSeed, baseX + slx, baseZ + slz);
+			Level4AtriumZero.Part stepPart = Level4AtriumZero.partAt(testSeed, slx, sy, slz, st);
+			assertTrue(stepPart != Level4AtriumZero.Part.AIR, "SE spiral step missing at idx=" + idx);
+			if (idx > 0 && idx < sePath.length - 1) {
+				assertEquals(Level4AtriumZero.Part.AIR, Level4AtriumZero.partAt(testSeed, slx, sy + 1, slz, st));
+				assertEquals(Level4AtriumZero.Part.AIR, Level4AtriumZero.partAt(testSeed, slx, sy + 2, slz, st));
+			}
+		}
+		Tile nwBypass = Level4Layout.tile(testSeed, baseX + 20, baseZ + 20);
+		assertEquals(Level4AtriumZero.Part.CARPET, Level4AtriumZero.partAt(testSeed, 20, 32, 20, nwBypass));
+		assertEquals(Level4AtriumZero.Part.AIR, Level4AtriumZero.partAt(testSeed, 20, 33, 20, nwBypass));
+		Tile seBypass = Level4Layout.tile(testSeed, baseX + 92, baseZ + 92);
+		assertEquals(Level4AtriumZero.Part.CARPET, Level4AtriumZero.partAt(testSeed, 92, 48, 92, seBypass));
+		assertEquals(Level4AtriumZero.Part.AIR, Level4AtriumZero.partAt(testSeed, 92, 49, 92, seBypass));
+
+		// Stage 2: Lower y=18 catwalk, access ladder, safe, and permanent City Door (Level 11) exit
+		Tile ladderTile = Level4Layout.tile(testSeed, baseX + 60, baseZ + 67);
+		for (int y = 19; y <= 32; y++) {
+			assertEquals(Level4AtriumZero.Part.LADDER_NORTH, Level4AtriumZero.partAt(testSeed, 60, y, 67, ladderTile));
+		}
+		for (int lz = 45; lz <= 66; lz++) {
+			Tile cwTile = Level4Layout.tile(testSeed, baseX + 56, baseZ + lz);
+			Level4AtriumZero.Part cwFloor = Level4AtriumZero.partAt(testSeed, 56, 18, lz, cwTile);
+			assertTrue(cwFloor == Level4AtriumZero.Part.POLISHED_ANDESITE || cwFloor == Level4AtriumZero.Part.ELEVATOR_FRAME,
+					"Lower catwalk spine broken at lz=" + lz);
+		}
+		Tile exitTile = Level4Layout.tile(testSeed, baseX + 56, baseZ + 44);
+		assertEquals(Level4AtriumZero.Part.EXIT_DOOR_11_LOWER, Level4AtriumZero.partAt(testSeed, 56, 19, 44, exitTile));
+		assertEquals(Level4AtriumZero.Part.EXIT_DOOR_11_UPPER, Level4AtriumZero.partAt(testSeed, 56, 20, 44, exitTile));
+		Tile safeTile = Level4Layout.tile(testSeed, baseX + 58, baseZ + 46);
+		assertEquals(Level4AtriumZero.Part.STEEL_SAFE_WEST, Level4AtriumZero.partAt(testSeed, 58, 19, 46, safeTile));
+
+		// Stage 2: Four suspended observation elevators with glass walls, ceiling lights, and full cables
+		int[][] elevators = {
+				{34, 54, 34}, {78, 43, 34}, {34, 19, 78}, {78, 66, 78}
+		};
+		for (int[] ev : elevators) {
+			int ex = ev[0], ey = ev[1], ez = ev[2];
+			Tile evCenter = Level4Layout.tile(testSeed, baseX + ex, baseZ + ez);
+			Tile evWall = Level4Layout.tile(testSeed, baseX + ex + 2, baseZ + ez);
+			assertEquals(Level4AtriumZero.Part.GLASS_WALL, Level4AtriumZero.partAt(testSeed, ex + 2, ey + 2, ez, evWall));
+			Level4AtriumZero.Part lightPart = Level4AtriumZero.partAt(testSeed, ex, ey + 4, ez, evCenter);
+			assertTrue(lightPart == Level4AtriumZero.Part.TROFFER_LIT
+					|| lightPart == Level4AtriumZero.Part.TROFFER_DIM
+					|| lightPart == Level4AtriumZero.Part.TROFFER_FLICKER);
+			assertEquals(Level4AtriumZero.Part.IRON_BARS, Level4AtriumZero.partAt(testSeed, ex, 100, ez, evCenter));
+			assertEquals(Level4AtriumZero.Part.IRON_BARS, Level4AtriumZero.partAt(testSeed, ex, -20, ez, evCenter));
+		}
+	}
+
+	@Test
+	void walkableSkybridgeJunctionsToBuildingPerimeterStayOpen() {
+		for (long seed = 1; seed <= 20; seed++) {
+			for (int rx = -1; rx <= 1; rx++) {
+				for (int rz = -1; rz <= 1; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					for (int k = Level4Plan.MARGIN; k < Level4Plan.N - Level4Plan.MARGIN; k++) {
+						int[][] pairs = {
+								{Level4Plan.MARGIN - 1, k, Level4Plan.EAST},
+								{Level4Plan.N - Level4Plan.MARGIN, k, Level4Plan.WEST},
+								{k, Level4Plan.MARGIN - 1, Level4Plan.SOUTH},
+								{k, Level4Plan.N - Level4Plan.MARGIN, Level4Plan.NORTH}
+						};
+						for (int[] p : pairs) {
+							int si = p[0], sj = p[1], dir = p[2];
+							if (!plan.walkable(si, sj)) continue;
+							int bi = si + Level4Plan.DX[dir], bj = sj + Level4Plan.DZ[dir];
+							if (!plan.walkable(bi, bj)) continue;
+							assertEquals(Edge.OPEN, plan.edge(Level4Plan.cell(si, sj), dir),
+									"skybridge junction should be OPEN at seed=" + seed + " rx=" + rx + " rz=" + rz
+											+ " (" + si + "," + sj + ") dir=" + dir);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	@Test
+	void subTunnelOverheadPipesClearBothStairwellEntrances() {
+		boolean checkedAnyTunnel = false;
+		for (long seed = 1; seed <= 25; seed++) {
+			for (int rx = -1; rx <= 1; rx++) {
+				for (int rz = -1; rz <= 1; rz++) {
+					Level4Plan plan = Level4Plan.of(seed, rx, rz);
+					if (plan.tunnelJ < 0) continue;
+					checkedAnyTunnel = true;
+					int baseX = rx * Level4Plan.SIZE;
+					int baseZ = rz * Level4Plan.SIZE;
+					int[][] blockedCols = {
+							{plan.tunnelI0 + 1, 0},
+							{plan.tunnelI0 + 1, 1},
+							{plan.tunnelI1 - 1, 6},
+							{plan.tunnelI1, 0}
+					};
+					for (int[] col : blockedCols) {
+						for (int cz = 2; cz <= 4; cz++) {
+							int x = baseX + col[0] * Level4Plan.CELL + col[1];
+							int z = baseZ + plan.tunnelJ * Level4Plan.CELL + cz;
+							Level4Layout.SubTunnelInfo sub = Level4Layout.subTunnelInfo(seed, x, z);
+							assertTrue(sub != null && sub.corridor(), "expected corridor at stair-adjacent col (" + col[0] + "," + col[1] + ")");
+							assertTrue(!sub.pipeAllowed(), "overhead pipe must stay clear near stairwell bottom at (" + col[0] + "," + col[1] + ")");
+						}
+					}
+					int midX = baseX + (plan.tunnelI0 + 2) * Level4Plan.CELL + 3;
+					int midZ = baseZ + plan.tunnelJ * Level4Plan.CELL + 3;
+					Level4Layout.SubTunnelInfo midSub = Level4Layout.subTunnelInfo(seed, midX, midZ);
+					assertTrue(midSub != null && midSub.pipeAllowed(), "expected overhead pipes allowed in mid-tunnel corridor");
+				}
+			}
+		}
+		assertTrue(checkedAnyTunnel, "expected at least one sub-tunnel across tested seeds/regions");
+	}
 }

@@ -1,7 +1,15 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level4/office_rain_window"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level4/office_rain_window"
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_rain_window_1"
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_rain_window_2"
+      }
+    ]
   }
 }

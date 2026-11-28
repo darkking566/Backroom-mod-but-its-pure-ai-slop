@@ -1,7 +1,22 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level4/omega_wall"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level4/omega_wall",
+        "weight": 24
+      },
+      {
+        "model": "noclip_backrooms:block/level4/omega_wall_1",
+        "weight": 10
+      },
+      {
+        "model": "noclip_backrooms:block/level4/omega_wall_2",
+        "weight": 6
+      },
+      {
+        "model": "noclip_backrooms:block/level4/omega_wall_3",
+        "weight": 6
+      }
+    ]
   }
 }

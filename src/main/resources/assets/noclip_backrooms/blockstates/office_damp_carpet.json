@@ -1,7 +1,120 @@
 {
   "variants": {
-    "": {
-      "model": "noclip_backrooms:block/level4/office_damp_carpet"
-    }
+    "": [
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet",
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet",
+        "weight": 3,
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet",
+        "weight": 3,
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet",
+        "weight": 3,
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_1",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_1",
+        "weight": 2,
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_1",
+        "weight": 2,
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_1",
+        "weight": 2,
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_2",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_2",
+        "weight": 2,
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_2",
+        "weight": 2,
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_2",
+        "weight": 2,
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_3",
+        "weight": 3
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_3",
+        "weight": 3,
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_3",
+        "weight": 3,
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_3",
+        "weight": 3,
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_4",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_4",
+        "weight": 2,
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_4",
+        "weight": 2,
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_4",
+        "weight": 2,
+        "y": 270
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_5",
+        "weight": 2
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_5",
+        "weight": 2,
+        "y": 90
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_5",
+        "weight": 2,
+        "y": 180
+      },
+      {
+        "model": "noclip_backrooms:block/level4/office_damp_carpet_5",
+        "weight": 2,
+        "y": 270
+      }
+    ]
   }
 }

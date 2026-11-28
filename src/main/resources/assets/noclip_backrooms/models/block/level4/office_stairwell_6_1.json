@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:block/orientable",
   "textures": {
-    "front": "noclip_backrooms:block/level4/office_stairwell_6",
+    "front": "noclip_backrooms:block/level4/office_stairwell_6_top",
     "side": "noclip_backrooms:block/level4/office_drywall",
     "top": "noclip_backrooms:block/level4/office_drywall"
   }
