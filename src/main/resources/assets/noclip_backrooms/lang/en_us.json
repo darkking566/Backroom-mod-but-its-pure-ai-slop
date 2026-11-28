@@ -1593,6 +1593,7 @@
   "message.noclip_backrooms.field.photo_target": "Click! This cycle's target: %1$s (%2$s pts)",
   "message.noclip_backrooms.field.beacon_not_here": "The beacon only works in the Backrooms.",
   "message.noclip_backrooms.field.beacon_no_entry": "No record of where this trip came in: the beacon cannot fix its position.",
+  "message.noclip_backrooms.field.beacon_recovered": "Scan interrupted: the mapping beacon is back on you.",
   "message.noclip_backrooms.field.beacon_too_near": "Too near the landing (%1$s blocks); at least %2$s.",
   "message.noclip_backrooms.field.beacon_started": "The beacon is scanning: hold out %s seconds. Its beeps and flashes draw whatever is near.",
   "message.noclip_backrooms.field.beacon_lost": "The beacon was knocked out; the scan failed.",

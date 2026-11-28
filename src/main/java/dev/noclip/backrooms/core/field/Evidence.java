@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.ChatFormatting;
@@ -91,6 +92,9 @@ public final class Evidence {
 	static void register() {
 		ServerLifecycleEvents.SERVER_STARTED.register(server -> SCANS.clear());
 		ServerTickEvents.END_SERVER_TICK.register(Evidence::tick);
+		ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
+			if (entity instanceof ServerPlayer player) takeBackBeacons(player);
+		});
 	}
 
 	/** This cycle's photo target (an entity id path or scene id), worth three times as much. */
@@ -406,6 +410,24 @@ public final class Evidence {
 				dev.noclip.backrooms.core.guild.Contracts.onTape(owner, scan.level());
 				dev.noclip.backrooms.core.story.MainQuest.onTape(owner, scan.level());
 			}
+		}
+	}
+
+	/**
+	 * The owner died mid-scan: the beacon goes back on them (the drop is already over, and core.trip.Relics hands it to the
+	 * new body), so it is not left standing somewhere they may never find.
+	 */
+	private static void takeBackBeacons(ServerPlayer player) {
+		for (Iterator<Map.Entry<GlobalPos, Scan>> it = SCANS.entrySet().iterator(); it.hasNext(); ) {
+			Map.Entry<GlobalPos, Scan> entry = it.next();
+			if (!entry.getValue().owner().equals(player.getUUID())) continue;
+			it.remove();
+			ServerLevel level = player.level().getServer().getLevel(entry.getKey().dimension());
+			BlockPos pos = entry.getKey().pos();
+			if (level == null || !level.getBlockState(pos).is(FieldKit.BEACON_BLOCK)) continue;
+			level.removeBlock(pos, false);
+			player.getInventory().add(new ItemStack(FieldKit.BEACON));
+			player.sendSystemMessage(Component.translatable("message.noclip_backrooms.field.beacon_recovered").withStyle(ChatFormatting.AQUA));
 		}
 	}
 

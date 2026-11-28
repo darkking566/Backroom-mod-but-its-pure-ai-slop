@@ -2,6 +2,7 @@ package dev.noclip.backrooms.level0;
 
 import dev.noclip.backrooms.core.floors.FloorDifficulty;
 import dev.noclip.backrooms.core.story.FirstTrip;
+import dev.noclip.backrooms.core.story.MainQuest;
 import dev.noclip.backrooms.monsters.Monsters;
 import dev.noclip.backrooms.monsters.bacteria.Bacteria;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -19,7 +20,8 @@ import net.minecraft.world.phys.AABB;
  * Spawns Bacteria (無盡之菌) in the deeper stretches of Level 0:
  * near the landing Level 0 stays eerie and empty; once a wanderer has walked 250+ blocks from landing
  * ({@code FloorDifficulty.band >= 1}) or stepped into a Red Room, Bacteria begin stalking the halls.
- * Never spawns during a newcomer's first trip along the cable or inside the Manila Room sanctuary.
+ * Never spawns during a newcomer's first trip along the cable or inside the Manila Room sanctuary, nor before the team
+ * has finished the first assignment (mapping the lobby: a newcomer has nothing to fight it with).
  */
 public final class Level0Bacteria {
 	public static final String TAG = "noclip_backrooms_level0_bacteria";
@@ -49,6 +51,7 @@ public final class Level0Bacteria {
 		if (level == null || level.getDifficulty() == Difficulty.PEACEFUL) return;
 		long seed = Level0ChunkGenerator.mazeSeed(level.getChunkSource().randomState());
 		RandomSource random = level.getRandom();
+		if (MainQuest.current(server) == MainQuest.Chapter.LOBBY) return;
 		for (ServerPlayer player : level.players()) {
 			if (player.isCreative() || player.isSpectator() || !player.isAlive()) continue;
 			if (FirstTrip.following(player)) continue;

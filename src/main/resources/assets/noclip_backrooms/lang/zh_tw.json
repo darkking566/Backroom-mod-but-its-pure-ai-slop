@@ -1593,6 +1593,7 @@
   "message.noclip_backrooms.field.photo_target": "喀嚓！拍到這一期的目標：%1$s（%2$s 點）",
   "message.noclip_backrooms.field.beacon_not_here": "信標只能在後室裡架設。",
   "message.noclip_backrooms.field.beacon_no_entry": "找不到這一趟的落點紀錄，信標沒辦法定位。",
+  "message.noclip_backrooms.field.beacon_recovered": "掃描中斷，測繪信標收回你身上了。",
   "message.noclip_backrooms.field.beacon_too_near": "離落點太近了（%1$s 格），要至少 %2$s 格。",
   "message.noclip_backrooms.field.beacon_started": "信標開始掃描：撐過 %s 秒。嗶聲和閃光會引來附近的東西。",
   "message.noclip_backrooms.field.beacon_lost": "信標被打斷了，掃描失敗。",

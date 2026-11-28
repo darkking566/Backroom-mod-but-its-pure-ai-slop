@@ -13,6 +13,9 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import net.fabricmc.fabric.api.client.gametest.v1.world.TestWorldSave;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.core.Direction;
 import net.minecraft.locale.Language;
 import net.minecraft.server.MinecraftServer;
@@ -124,6 +127,26 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			server.runCommand("give @a noclip_backrooms:mapping_beacon");
 			server.runCommand("give @a minecraft:bread");
 			context.waitTicks(5);
+			// A second beacon, mid-scan when its owner dies (the entry is moved away for the moment: far enough to set it down).
+			BlockPos scanning = server.computeOnServer(s -> {
+				ServerPlayer player = player(s);
+				ServerLevel level = player.level();
+				BlockPos at = player.blockPosition().north();
+				level.setBlockAndUpdate(at, Blocks.AIR.defaultBlockState());
+				level.setBlockAndUpdate(at.below(), Blocks.STONE.defaultBlockState());
+				var entry = player.getAttached(dev.noclip.backrooms.core.trip.Trips.ENTRY);
+				player.setAttached(dev.noclip.backrooms.core.trip.Trips.ENTRY, new dev.noclip.backrooms.core.trip.Trips.Entry(
+						level.dimension().identifier().toString(), at.east(1000), 0));
+				ItemStack held = player.getMainHandItem().copy();
+				player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(dev.noclip.backrooms.core.field.FieldKit.BEACON));
+				player.gameMode.useItemOn(player, level, player.getMainHandItem(), InteractionHand.MAIN_HAND,
+						new BlockHitResult(Vec3.atCenterOf(at.below()).add(0, 0.5, 0), Direction.UP, at.below(), false));
+				player.setItemInHand(InteractionHand.MAIN_HAND, held);
+				if (entry == null) player.removeAttached(dev.noclip.backrooms.core.trip.Trips.ENTRY);
+				else player.setAttached(dev.noclip.backrooms.core.trip.Trips.ENTRY, entry);
+				check(dev.noclip.backrooms.core.field.Evidence.scanning(level, at), "the test beacon did not start scanning");
+				return at;
+			});
 			server.runCommand("kill @a");
 			context.waitFor(client -> client.player != null && client.player.isDeadOrDying());
 			context.runOnClient(client -> client.player.respawn());
@@ -131,7 +154,10 @@ public final class Level0ClientTest implements FabricClientGameTest {
 			game.getConnection().waitForChunksRender();
 			server.runOnServer(s -> {
 				var inventory = player(s).getInventory();
-				check(inventory.countItem(dev.noclip.backrooms.core.field.FieldKit.BEACON) == 1, "death took the mapping beacon, or doubled it");
+				check(inventory.countItem(dev.noclip.backrooms.core.field.FieldKit.BEACON) == 2, "death took a mapping beacon, or doubled one");
+				ServerLevel level0 = s.getLevel(Level0.LEVEL_0);
+				level0.getChunk(scanning);
+				check(!level0.getBlockState(scanning).is(dev.noclip.backrooms.core.field.FieldKit.BEACON_BLOCK), "the scanning beacon was left standing");
 				check(inventory.countItem(net.minecraft.world.item.Items.BREAD) == 0, "the rest was not left behind");
 				check(player(s).hasAttached(dev.noclip.backrooms.core.trip.Relics.AT), "where the things fell was not noted");
 				check(dev.noclip.backrooms.core.trip.Relics.tell(player(s)), "no way back to the things");
