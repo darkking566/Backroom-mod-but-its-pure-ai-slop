@@ -18,6 +18,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -125,12 +126,14 @@ public final class Viewfinder {
 		Component state = Component.translatable(winding ? "camera.noclip_backrooms.winding" : "camera.noclip_backrooms.ready");
 		text(g, font, state, cx + 60 - font.width(state), top + 22, winding ? GOLD : INK);
 
-		// Under the brackets: how far what is in the middle is (the buyer pays by distance).
-		double distance = distance(client, delta.getGameTimeDeltaPartialTick(true));
-		if (distance >= 0) {
-			String key = distance <= Evidence.CLOSE ? "close" : distance <= Evidence.CAMERA_RANGE ? "distance" : "far";
-			Component range = Component.translatable("camera.noclip_backrooms." + key, String.format(Locale.ROOT, "%.1f", distance));
-			text(g, font, range, cx - font.width(range) / 2, cy + 20, distance <= Evidence.CLOSE ? GOLD : distance <= Evidence.CAMERA_RANGE ? INK : GREY);
+		// Under the brackets: how far what is in the middle is. Only a creature earns by being close (what counts as a
+		// scene is the server's to say), so a wall gets the bare distance.
+		Aim aim = aim(client, delta.getGameTimeDeltaPartialTick(true));
+		if (aim != null) {
+			boolean close = aim.creature() && aim.distance() <= Evidence.CLOSE, far = aim.distance() > Evidence.CAMERA_RANGE;
+			Component range = Component.translatable("camera.noclip_backrooms." + (far ? "far" : close ? "close" : "distance"),
+					String.format(Locale.ROOT, "%.1f", aim.distance()));
+			text(g, font, range, cx - font.width(range) / 2, cy + 20, far ? GREY : close ? GOLD : INK);
 		}
 
 		// Exposure on the left, zoom on the right.
@@ -190,17 +193,21 @@ public final class Viewfinder {
 		g.fill(r - 1, b - n, r, b - 1, colour);
 	}
 
-	/** Blocks to whatever is in the middle of the view (creature or wall), or -1 beyond 48. */
-	private static double distance(Minecraft client, float partial) {
+	private record Aim(double distance, boolean creature) {
+	}
+
+	/** What is in the middle of the view (creature or wall) and how many blocks off, or null beyond 48. */
+	private static Aim aim(Minecraft client, float partial) {
 		Entity player = client.player;
 		Vec3 eye = player.getEyePosition(partial), end = eye.add(player.getViewVector(partial).scale(48));
 		HitResult wall = player.pick(48, partial, false);
-		double best = wall.getType() == HitResult.Type.MISS ? -1 : wall.getLocation().distanceTo(eye);
-		for (Entity e : client.level.getEntities(player, player.getBoundingBox().inflate(48), e -> e instanceof LivingEntity && !e.isInvisible())) {
+		Aim best = wall.getType() == HitResult.Type.MISS ? null : new Aim(wall.getLocation().distanceTo(eye), false);
+		for (Entity e : client.level.getEntities(player, player.getBoundingBox().inflate(48),
+				e -> e instanceof LivingEntity && !(e instanceof Player) && !e.isInvisible())) {
 			var hit = e.getBoundingBox().clip(eye, end);
 			if (hit.isEmpty()) continue;
 			double to = hit.get().distanceTo(eye);
-			if (best < 0 || to < best) best = to;
+			if (best == null || to < best.distance()) best = new Aim(to, true);
 		}
 		return best;
 	}

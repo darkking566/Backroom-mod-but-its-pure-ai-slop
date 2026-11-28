@@ -173,6 +173,7 @@ public final class FieldClientTest implements FabricClientGameTest {
 			server.runCommand("clear @a");
 			server.runOnServer(s -> player(s).setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FieldKit.CAMERA)));
 			context.waitTicks(45);
+			check(!server.computeOnServer(s -> Evidence.shoot(player(s), 1)), "the shutter went with the camera not held up");
 			context.getInput().holdMouse(1);
 			context.waitFor(client -> Viewfinder.showing(client), 100);
 			for (int n = 0; n < 4; n++) context.getInput().scroll(1);
