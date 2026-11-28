@@ -13,6 +13,7 @@
 		"ItemInHandRendererWeaponAnimation",
 		"LightmapFalloff",
 		"MinecraftFirearmInput",
+		"MouseHandlerViewfinder",
 		"SpecialModelRenderersAccess",
 		"WalkAnimationStateAccess"
 	],

@@ -7,6 +7,7 @@ import dev.noclip.backrooms.core.field.Evidence;
 import dev.noclip.backrooms.core.field.FieldKit;
 import dev.noclip.backrooms.core.field.PhotoScreen;
 import dev.noclip.backrooms.core.field.Photos;
+import dev.noclip.backrooms.core.field.Viewfinder;
 import dev.noclip.backrooms.core.locker.Lockers;
 import dev.noclip.backrooms.core.locker.Processing;
 import dev.noclip.backrooms.core.locker.Research;
@@ -168,6 +169,39 @@ public final class FieldClientTest implements FabricClientGameTest {
 			context.waitTicks(10);
 			context.takeScreenshot("field_chalk_and_glow_stick");
 
+			// The viewfinder, as a player works it: hold use, wheel for zoom, sneak+wheel for exposure, attack for the shutter.
+			server.runCommand("clear @a");
+			server.runOnServer(s -> player(s).setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FieldKit.CAMERA)));
+			context.waitTicks(45);
+			context.getInput().holdMouse(1);
+			context.waitFor(client -> Viewfinder.showing(client), 100);
+			for (int n = 0; n < 4; n++) context.getInput().scroll(1);
+			context.getInput().holdKey(options -> options.keyShift);
+			context.waitTicks(2);
+			for (int n = 0; n < 2; n++) context.getInput().scroll(1);
+			context.getInput().releaseKey(options -> options.keyShift);
+			context.waitTicks(10);
+			check(context.computeOnClient(client -> Viewfinder.zoom() == 2 && Viewfinder.exposure() == 1), "the wheel did not set zoom and exposure: "
+					+ context.computeOnClient(client -> Viewfinder.zoom() + " / " + Viewfinder.exposure()));
+			context.takeScreenshot("field_viewfinder");
+			context.getInput().pressMouse(0);
+			server.waitFor(s -> !carried(player(s), FieldKit.PHOTO).isEmpty(), 100);
+			java.util.UUID framed = server.computeOnServer(s -> Photos.id(carried(player(s), FieldKit.PHOTO)));
+			server.waitFor(s -> Photos.load(s, framed) != null, 200);
+			check(context.computeOnClient(client -> !client.gui.hud.isHidden()), "the shutter left the HUD off");
+			context.getInput().releaseMouse(1);
+			context.waitFor(client -> !Viewfinder.showing(client), 100);
+			// Look at what came out of it.
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				p.setItemInHand(InteractionHand.MAIN_HAND, carried(p, FieldKit.PHOTO).copy());
+				p.gameMode.useItem(p, p.level(), p.getMainHandItem(), InteractionHand.MAIN_HAND);
+			});
+			context.waitFor(client -> client.gui.screen() instanceof PhotoScreen screen && screen.showingPicture(), 200);
+			context.takeScreenshot("field_viewfinder_photo");
+			context.runOnClient(client -> client.gui.screen().onClose());
+			server.runCommand("clear @a");
+
 			// The guide line lays itself while walking.
 			server.runOnServer(s -> {
 				ServerPlayer p = player(s);
@@ -244,7 +278,7 @@ public final class FieldClientTest implements FabricClientGameTest {
 			server.runOnServer(s -> {
 				ServerPlayer p = player(s);
 				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FieldKit.CAMERA));
-				p.gameMode.useItem(p, p.level(), p.getMainHandItem(), InteractionHand.MAIN_HAND);
+				snap(p);
 			});
 			long photo = server.computeOnServer(s -> {
 				var inventory = player(s).getInventory();
@@ -374,7 +408,7 @@ public final class FieldClientTest implements FabricClientGameTest {
 			server.runOnServer(s -> {
 				ServerPlayer p = player(s);
 				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FieldKit.CAMERA));
-				p.gameMode.useItem(p, p.level(), p.getMainHandItem(), InteractionHand.MAIN_HAND);
+				snap(p);
 			});
 			long altarPhoto = server.computeOnServer(s -> {
 				var inv = player(s).getInventory();
@@ -447,7 +481,7 @@ public final class FieldClientTest implements FabricClientGameTest {
 				Blackouts.startNow();
 				ServerPlayer p = player(s);
 				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FieldKit.CAMERA));
-				p.gameMode.useItem(p, p.level(), p.getMainHandItem(), InteractionHand.MAIN_HAND);
+				snap(p);
 				Blackouts.endNow();
 			});
 			long blackoutPhoto = server.computeOnServer(s -> {
@@ -544,6 +578,12 @@ public final class FieldClientTest implements FabricClientGameTest {
 
 	private static Item item(String id) {
 		return BuiltInRegistries.ITEM.getValue(Identifier.parse(id));
+	}
+
+	/** Holds the camera in the main hand up and presses the shutter. */
+	private static void snap(ServerPlayer player) {
+		player.gameMode.useItem(player, player.level(), player.getMainHandItem(), InteractionHand.MAIN_HAND);
+		Evidence.shoot(player, 1);
 	}
 
 	private static ItemStack carried(ServerPlayer player, net.minecraft.world.item.Item item) {

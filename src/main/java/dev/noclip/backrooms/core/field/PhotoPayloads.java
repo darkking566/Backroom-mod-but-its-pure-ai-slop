@@ -31,6 +31,18 @@ public final class PhotoPayloads {
 		}
 	}
 
+	/** Client to server: the shutter, pressed in the viewfinder at {@code zoom}. */
+	public record Shoot(float zoom) implements CustomPacketPayload {
+		public static final Type<Shoot> TYPE = id("camera_shoot");
+		public static final StreamCodec<RegistryFriendlyByteBuf, Shoot> CODEC = StreamCodec.composite(
+				ByteBufCodecs.FLOAT, Shoot::zoom, Shoot::new);
+
+		@Override
+		public Type<Shoot> type() {
+			return TYPE;
+		}
+	}
+
 	/** Client to server: the shot just taken. */
 	public record Upload(UUID photo, byte[] pixels) implements CustomPacketPayload {
 		public static final Type<Upload> TYPE = id("photo_upload");

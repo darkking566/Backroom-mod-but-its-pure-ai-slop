@@ -9,7 +9,19 @@ public final class PhotoImage {
 	/** Two bytes a pixel; under the 32767 bytes a client may send in one packet. */
 	public static final int BYTES = WIDTH * HEIGHT * 2;
 
+	public static final float MAX_ZOOM = 4, MAX_EXPOSURE = 2;
+
 	private PhotoImage() {
+	}
+
+	/** A viewfinder zoom a client claims, kept to what the camera can do. */
+	public static float clampZoom(float zoom) {
+		return zoom >= 1 ? Math.min(zoom, MAX_ZOOM) : 1; // the comparison also turns NaN away
+	}
+
+	/** The cosine a thing's direction must beat to be in a frame {@code degrees} wide each side of the middle at ×1. */
+	public static double minDot(double degrees, float zoom) {
+		return Math.cos(Math.atan(Math.tan(Math.toRadians(degrees)) / zoom));
 	}
 
 	/** Reads a pixel of the screen as 0xRRGGBB (alpha ignored). */
@@ -17,8 +29,9 @@ public final class PhotoImage {
 		int rgb(int x, int y);
 	}
 
-	/** The middle 4:3 of a {@code width}×{@code height} screen, shrunk and aged. */
-	public static byte[] develop(Source screen, int width, int height, long seed) {
+	/** The middle 4:3 of a {@code width}×{@code height} screen, shrunk and aged, {@code exposure} stops brighter or darker. */
+	public static byte[] develop(Source screen, int width, int height, long seed, float exposure) {
+		double gain = Math.pow(2, exposure);
 		int cropW = Math.min(width, height * 4 / 3), cropH = Math.min(height, width * 3 / 4);
 		int left = (width - cropW) / 2, top = (height - cropH) / 2;
 		java.util.Random grain = new java.util.Random(seed);
@@ -42,9 +55,9 @@ public final class PhotoImage {
 				double dark = 0.55 + 0.45 * Math.sqrt(Math.max(0, middle));
 				double noise = (grain.nextDouble() - 0.5) * 22;
 				// Lifted blacks, warm cast, short on blue.
-				int rr = aged(r / 9.0, flash * dark, 1.05, 22, noise);
-				int gg = aged(g / 9.0, flash * dark, 0.98, 18, noise);
-				int bb = aged(b / 9.0, flash * dark, 0.78, 20, noise);
+				int rr = aged(r / 9.0 * gain, flash * dark, 1.05, 22, noise);
+				int gg = aged(g / 9.0 * gain, flash * dark, 0.98, 18, noise);
+				int bb = aged(b / 9.0 * gain, flash * dark, 0.78, 20, noise);
 				int packed = (rr >> 3) << 11 | (gg >> 2) << 5 | bb >> 3;
 				int i = (y * WIDTH + x) * 2;
 				out[i] = (byte) (packed >> 8);

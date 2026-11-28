@@ -2,6 +2,7 @@ package dev.noclip.backrooms.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import dev.noclip.backrooms.core.field.Viewfinder;
 import dev.noclip.backrooms.weapons.BackroomsFirearmItem;
 import dev.noclip.backrooms.weapons.BackroomsMagicItem;
 import dev.noclip.backrooms.weapons.BackroomsMeleeItem;
@@ -39,6 +40,11 @@ public abstract class ItemInHandRendererWeaponAnimation {
 	private void noclip_backrooms$animateWeapon(AbstractClientPlayer player, float partialTicks, float pitch,
 			InteractionHand hand, float swingProgress, ItemStack stack, float equipProgress,
 			PoseStack poseStack, SubmitNodeCollector collector, int light, CallbackInfo ci) {
+		// Nothing in front of the lens while the camera is held up.
+		if (Viewfinder.showing(Minecraft.getInstance())) {
+			ci.cancel();
+			return;
+		}
 		boolean isMain = hand == InteractionHand.MAIN_HAND;
 		if (!isMain) return;
 

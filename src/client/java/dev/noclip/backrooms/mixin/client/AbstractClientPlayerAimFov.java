@@ -1,5 +1,6 @@
 package dev.noclip.backrooms.mixin.client;
 
+import dev.noclip.backrooms.core.field.Viewfinder;
 import dev.noclip.backrooms.weapons.BackroomsFirearmItem;
 import dev.noclip.backrooms.weapons.WeaponAnimState;
 import net.minecraft.client.Minecraft;
@@ -11,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/** Smoothly zooms player FOV while aiming down sights (ADS) with any Backrooms firearm. */
+/** Zooms player FOV: the camera's viewfinder, and aiming down sights (ADS) with any Backrooms firearm. */
 @Mixin(AbstractClientPlayer.class)
 public abstract class AbstractClientPlayerAimFov {
 	@Inject(method = "getFieldOfViewModifier", at = @At("RETURN"), cancellable = true)
@@ -19,6 +20,11 @@ public abstract class AbstractClientPlayerAimFov {
 		if (!isFirstPerson) return;
 		Minecraft mc = Minecraft.getInstance();
 		if ((Object) this != mc.player) return;
+		float zoom = Viewfinder.fovZoom(mc);
+		if (zoom > 1) {
+			cir.setReturnValue(cir.getReturnValue() / zoom);
+			return;
+		}
 		ItemStack held = mc.player.getMainHandItem();
 		if (!(held.getItem() instanceof BackroomsFirearmItem gun)) return;
 

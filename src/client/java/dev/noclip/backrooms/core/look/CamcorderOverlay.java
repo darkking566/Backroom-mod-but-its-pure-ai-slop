@@ -23,7 +23,7 @@ final class CamcorderOverlay {
 
 	static void extract(GuiGraphicsExtractor graphics, DeltaTracker delta) {
 		Minecraft client = Minecraft.getInstance();
-		if (!Look.active(client) || client.gui.hud.isHidden()) return;
+		if (!Look.active(client) || client.gui.hud.isHidden() || dev.noclip.backrooms.core.field.Viewfinder.showing(client)) return;
 		Font font = client.font;
 		int width = (int) (graphics.guiWidth() / SCALE), height = (int) (graphics.guiHeight() / SCALE);
 		graphics.pose().pushMatrix();

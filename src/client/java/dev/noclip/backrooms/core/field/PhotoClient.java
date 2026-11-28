@@ -50,9 +50,11 @@ public final class PhotoClient {
 			context.client().gui.setScreen(screen);
 		});
 		ClientTickEvents.END_CLIENT_TICK.register(PhotoClient::tick);
+		Viewfinder.register();
 		ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
 			shutterDone(client);
 			forgetAll(client);
+			Viewfinder.reset();
 		});
 	}
 
@@ -60,9 +62,11 @@ public final class PhotoClient {
 		if (SHOTS.isEmpty() || --waiting > 0) return;
 		UUID id = SHOTS.peek();
 		shutterDone(client);
+		float exposure = Viewfinder.exposure();
+		Viewfinder.captured();
 		Screenshot.takeScreenshot(client.gameRenderer.mainRenderTarget(), screen -> {
 			try (screen) {
-				byte[] pixels = PhotoImage.develop(screen::getPixel, screen.getWidth(), screen.getHeight(), id.getLeastSignificantBits());
+				byte[] pixels = PhotoImage.develop(screen::getPixel, screen.getWidth(), screen.getHeight(), id.getLeastSignificantBits(), exposure);
 				if (ClientPlayNetworking.canSend(PhotoPayloads.Upload.TYPE)) ClientPlayNetworking.send(new PhotoPayloads.Upload(id, pixels));
 			}
 		});

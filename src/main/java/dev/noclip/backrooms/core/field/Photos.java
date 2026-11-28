@@ -58,6 +58,8 @@ public final class Photos {
 		PayloadTypeRegistry.clientboundPlay().register(PhotoPayloads.Capture.TYPE, PhotoPayloads.Capture.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(PhotoPayloads.Image.TYPE, PhotoPayloads.Image.CODEC);
 		PayloadTypeRegistry.clientboundPlay().register(PhotoPayloads.View.TYPE, PhotoPayloads.View.CODEC);
+		PayloadTypeRegistry.serverboundPlay().register(PhotoPayloads.Shoot.TYPE, PhotoPayloads.Shoot.CODEC);
+		ServerPlayNetworking.registerGlobalReceiver(PhotoPayloads.Shoot.TYPE, (payload, context) -> Evidence.shoot(context.player(), payload.zoom()));
 		PayloadTypeRegistry.serverboundPlay().register(PhotoPayloads.Upload.TYPE, PhotoPayloads.Upload.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(PhotoPayloads.Request.TYPE, PhotoPayloads.Request.CODEC);
 		PayloadTypeRegistry.serverboundPlay().register(PhotoPayloads.Take.TYPE, PhotoPayloads.Take.CODEC);

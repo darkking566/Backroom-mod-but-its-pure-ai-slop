@@ -1,5 +1,7 @@
 package dev.noclip.backrooms.mixin.client;
 
+import dev.noclip.backrooms.core.field.FieldKit;
+import dev.noclip.backrooms.core.field.Viewfinder;
 import dev.noclip.backrooms.weapons.BackroomsFirearmItem;
 import dev.noclip.backrooms.weapons.BackroomsMeleeItem;
 import dev.noclip.backrooms.weapons.WeaponAnimState;
@@ -32,6 +34,9 @@ public abstract class MinecraftFirearmInput {
 	@Inject(method = "handleKeybinds", at = @At("HEAD"))
 	private void noclip_backrooms$allowFiringWhileAiming(CallbackInfo ci) {
 		if (player == null || !player.isUsingItem()) return;
+		if (player.getUseItem().is(FieldKit.CAMERA)) {
+			while (options.keyAttack.consumeClick()) Viewfinder.shoot((Minecraft) (Object) this);
+		}
 		ItemStack held = player.getMainHandItem();
 		if (held.getItem() instanceof BackroomsFirearmItem gun) {
 			while (options.keyAttack.consumeClick()) {

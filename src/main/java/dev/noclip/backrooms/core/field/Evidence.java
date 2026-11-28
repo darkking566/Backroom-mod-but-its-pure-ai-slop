@@ -42,6 +42,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.ClipContext;
@@ -55,7 +56,8 @@ import net.minecraft.world.phys.Vec3;
 /**
  * Field evidence for M.E.G.'s quota (docs/企劃書/1-遊戲玩法/README.md, "高風險現場取證"):
  * <ul>
- * <li>the camera: a photo of whatever is in the frame within sixteen blocks, worth more the closer and the worse the
+ * <li>the camera: held up with the use key (client: the viewfinder, with zoom and exposure) and fired with attack; a photo
+ * of whatever is in the frame within sixteen blocks, worth more the closer and the worse the
  * subject, three times as much when it is this cycle's photo target; its flash draws the light-seekers (smilers,
  * deathmoths) from far around and anything close;</li>
  * <li>the mapping beacon: set down at least 300 blocks from where the trip came in, it scans for twenty seconds, beeping
@@ -143,7 +145,19 @@ public final class Evidence {
 		return data == null ? new CompoundTag() : data.copyTag();
 	}
 
-	/** The camera: a photo of what is in the frame, and a flash that is seen. */
+	/**
+	 * The shutter, from the viewfinder: only for a player holding the camera up, and not before it has wound on.
+	 *
+	 * @param zoom the viewfinder's, as the client says; the frame the subject must be in narrows with it
+	 */
+	public static boolean shoot(ServerPlayer player, float zoom) {
+		ItemStack camera = player.getUseItem();
+		if (!player.isUsingItem() || !camera.is(FieldKit.CAMERA) || player.isSpectator() || player.getCooldowns().isOnCooldown(camera)) return false;
+		Camera.photograph(player, camera, player.getUsedItemHand(), PhotoImage.clampZoom(zoom));
+		return true;
+	}
+
+	/** The camera: held up to the eye; the shutter ({@link #shoot}) takes what is in the frame, with a flash that is seen. */
 	static final class Camera extends Item {
 		Camera(Properties properties) {
 			super(properties);
@@ -151,10 +165,25 @@ public final class Evidence {
 
 		@Override
 		public InteractionResult use(Level level, Player player, InteractionHand hand) {
-			ItemStack camera = player.getItemInHand(hand);
-			if (!(player instanceof ServerPlayer serverPlayer) || !(level instanceof ServerLevel server)) return InteractionResult.SUCCESS;
-			if (player.getCooldowns().isOnCooldown(camera)) return InteractionResult.FAIL;
-			LivingEntity subject = subject(serverPlayer);
+			player.startUsingItem(hand);
+			return InteractionResult.CONSUME;
+		}
+
+		@Override
+		public int getUseDuration(ItemStack stack, LivingEntity user) {
+			return 72000;
+		}
+
+		@Override
+		public ItemUseAnimation getUseAnimation(ItemStack stack) {
+			return ItemUseAnimation.SPYGLASS;
+		}
+
+		private static void photograph(ServerPlayer player, ItemStack camera, InteractionHand hand, float zoom) {
+			ServerLevel server = player.level();
+			Level level = server;
+			ServerPlayer serverPlayer = player;
+			LivingEntity subject = subject(serverPlayer, zoom);
 			String id;
 			int value;
 			Component name;
@@ -170,7 +199,7 @@ public final class Evidence {
 				}
 				if (subject.distanceTo(player) <= CLOSE) value = value * 3 / 2;
 			} else {
-				SceneShot scene = detectScene(server, serverPlayer);
+				SceneShot scene = detectScene(server, serverPlayer, zoom);
 				if (scene != null) {
 					id = scene.id();
 					value = scene.baseValue();
@@ -201,11 +230,10 @@ public final class Evidence {
 			player.getCooldowns().addCooldown(camera, 40);
 			serverPlayer.sendOverlayMessage(Component.translatable(target ? "message.noclip_backrooms.field.photo_target" : "message.noclip_backrooms.field.photo",
 					name, value).withStyle(target ? ChatFormatting.GOLD : ChatFormatting.WHITE));
-			return InteractionResult.SUCCESS;
 		}
 
 		/** Detects notable Backrooms scenes in frame when no creature is the primary subject. */
-		private static SceneShot detectScene(ServerLevel level, ServerPlayer player) {
+		private static SceneShot detectScene(ServerLevel level, ServerPlayer player, float zoom) {
 			if (!Home.inBackrooms(level.dimension())) return null;
 			// 1. Live blackout moment in Level 0 (domino blackout), Level 1, or Level 0.1
 			if ((level.dimension() == dev.noclip.backrooms.level0.Level0.LEVEL_0
@@ -216,7 +244,7 @@ public final class Evidence {
 			}
 			Vec3 eye = player.getEyePosition();
 			Vec3 look = player.getLookAngle();
-			double minDot = Math.cos(Math.toRadians(28));
+			double minDot = PhotoImage.minDot(28, zoom);
 			BlockPos origin = player.blockPosition();
 			int r = (int) CAMERA_RANGE;
 
@@ -290,7 +318,7 @@ public final class Evidence {
 		}
 
 		/** The nearest living thing (not a player) near the middle of the frame, in plain sight. */
-		private static LivingEntity subject(ServerPlayer player) {
+		private static LivingEntity subject(ServerPlayer player, float zoom) {
 			Vec3 eye = player.getEyePosition(), look = player.getLookAngle();
 			LivingEntity best = null;
 			double bestDistance = Double.MAX_VALUE;
@@ -301,7 +329,7 @@ public final class Evidence {
 				if (distance > CAMERA_RANGE || distance < 0.5) continue;
 				// In the frame: the line of sight passes through it, or it is near the middle.
 				boolean onLine = e.getBoundingBox().inflate(0.4).clip(eye, eye.add(look.scale(CAMERA_RANGE))).isPresent();
-				if (!onLine && to.normalize().dot(look) < Math.cos(Math.toRadians(25))) continue;
+				if (!onLine && to.normalize().dot(look) < PhotoImage.minDot(25, zoom)) continue;
 				if (!player.hasLineOfSight(e)) continue;
 				if (distance < bestDistance) {
 					best = e;

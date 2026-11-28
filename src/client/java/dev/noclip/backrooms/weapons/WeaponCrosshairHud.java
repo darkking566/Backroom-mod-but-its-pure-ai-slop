@@ -20,6 +20,8 @@ public final class WeaponCrosshairHud {
 	public static void register() {
 		HudElementRegistry.replaceElement(VanillaHudElements.CROSSHAIR, vanilla -> (graphics, delta) -> {
 			Minecraft mc = Minecraft.getInstance();
+			// The camera's viewfinder has its own focus brackets.
+			if (dev.noclip.backrooms.core.field.Viewfinder.showing(mc)) return;
 			if (mc.player == null || !mc.options.getCameraType().isFirstPerson() || mc.gui.hud.isHidden()) {
 				vanilla.extractRenderState(graphics, delta);
 				return;
