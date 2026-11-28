@@ -210,6 +210,7 @@ Wiki 說各團隊會留下彩色布料，掛著物資和一張紙條，指引你
 - **走廊與大廳稀疏微型興趣點（`Level1Vignettes.java`）與新互動事件（`Level1PoiEvents.java`）**：
   - **走廊死路小場景（約 65% 走廊區塊挑 1 處非房間、非故障區的死路）**：治安值班角（`CORRIDOR_SECURITY_NOOK`，故障燈＋老電腦＋配電箱）、避難物資藏匿點（`CORRIDOR_SHELTER_CACHE`，護罩燈＋上鎖軍械箱＋殘骸）、走廊販賣機角（`CORRIDOR_VENDING_ALCOVE`，亮燈＋販賣機＋電視桌）。
   - **大廳路邊小場景（約 50% 非深谷／非地標／非據點大廳）**：拋錨事故點（`HALL_BREAKDOWN_SPOT`，廢棄汽車／廂型車＋錐筒＋油桶＋探照燈＋補給箱）與大廳販賣機休息角（`HALL_VENDING_BREAK_CORNER`，販賣機＋電視桌＋木椅＋導線柱配電箱）。
+  - **廢棄車輛改成真實大小**（2026-11-28，朋友，`Level1VehicleBlock`、`Level1VehiclePartBlock`、`Level1VehicleRenderer`，模型工具 `tools/make_level1_vehicles.py`）：轎車佔 2 寬 × 2 高 × 4 長、廂型車 2 × 2 × 5，整台都撞得到，敲掉車身任何一格整台一起拆；勘查任務「搜刮 Level 1 廢棄車輛」就是數這個。
   - **廢棄車輛搜刮**：右鍵 `abandoned_car`／`abandoned_van` 可撬開車內置物箱搜刮 1 次（持久化記錄不重複拿取），有 75% 機率安全找到杏仁水、合金、繃帶、磷粉（偶爾撬棍／C.L.I.P.P. 卡），25% 機率觸發車載防盜警報，拿到 1 塊合金但驚動半徑 28 格內敵對怪物。
   - **自動販賣機投幣**：手持 1 塊 `alloy` 右鍵 `vending_machine` 可換取 1 瓶杏仁水（另有 15% 機率附帶 1 個繃帶）。
 - **稀有伏筆與彩蛋興趣點（`Level1EasterEggs.java`，每 `4×4` 大廳巨集區域最多 1 座，位於無柱安全口袋 `lx 28..34, lz 51..57`）**：
