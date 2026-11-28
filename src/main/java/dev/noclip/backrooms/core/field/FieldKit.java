@@ -82,7 +82,8 @@ public final class FieldKit {
 			.sound(SoundType.METAL).lightLevel(s -> 7), FieldBlocks.Beacon::new);
 
 	public static final Item CAMERA = item("meg_camera", p -> new Evidence.Camera(p.stacksTo(1).durability(24)));
-	public static final Item PHOTO = item("evidence_photo", p -> new Evidence.Photo(p.stacksTo(1)));
+	public static final Item PHOTO = item("evidence_photo", p -> new Photos.Photo(p.stacksTo(1)));
+	public static final Item ALBUM = item("photo_album", p -> new Photos.Album(p.stacksTo(1)));
 	public static final Item TAPE = item("topology_tape", p -> new Evidence.Tape(p.stacksTo(1)));
 	public static final Item BEACON = item("mapping_beacon", p -> new Evidence.BeaconItem(BEACON_BLOCK, p.stacksTo(1).useBlockDescriptionPrefix()));
 	public static final Item CHALK = item("chalk", p -> new Chalk(p.durability(64)));
@@ -105,7 +106,7 @@ public final class FieldKit {
 
 	public static void register() {
 		CreativeModeTabEvents.modifyOutputEvent(CreativeModeTabs.TOOLS_AND_UTILITIES).register(output -> {
-			for (Item item : new Item[] {CAMERA, BEACON, BIO_SCANNER, CHALK, GLOW_STICK, GUIDE_LINE, BARRICADE_PLANKS, TRIPWIRE_ALARM, EMERGENCY_LAMP}) {
+			for (Item item : new Item[] {CAMERA, ALBUM, BEACON, BIO_SCANNER, CHALK, GLOW_STICK, GUIDE_LINE, BARRICADE_PLANKS, TRIPWIRE_ALARM, EMERGENCY_LAMP}) {
 				output.accept(item);
 			}
 		});
@@ -117,6 +118,7 @@ public final class FieldKit {
 		});
 		ServerTickEvents.END_SERVER_TICK.register(FieldKit::tick);
 		Evidence.register();
+		Photos.register();
 		Drift.register();
 	}
 

@@ -29,6 +29,7 @@
     {"item": "noclip_backrooms:tripwire_alarm", "count": 2, "price": 30},
     {"item": "noclip_backrooms:emergency_lamp", "count": 1, "price": 35},
     {"item": "noclip_backrooms:meg_camera", "count": 1, "price": 120},
+    {"item": "noclip_backrooms:photo_album", "count": 1, "price": 40},
     {"item": "noclip_backrooms:mapping_beacon", "count": 1, "price": 150},
     {"item": "noclip_backrooms:bio_scanner", "count": 1, "price": 90}
   ]

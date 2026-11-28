@@ -2473,5 +2473,14 @@
   "message.noclip_backrooms.level3.frantic_note.7": "筆記 7/8：「檢查站會採血。要是血是透明的，慢慢往後退。」",
   "message.noclip_backrooms.level3.frantic_note.8": "筆記 8/8：「把聖所拓印和筆記拿給 Gamma 頂樓的檔案員，M.E.G. 會付錢。」",
   "message.noclip_backrooms.level3.archivist_hint": "檔案員：「把聖所牌匾拓印或通道裡的狂亂筆記帶來，M.E.G. 照份數付報酬。」",
-  "message.noclip_backrooms.level3.archivist_paid": "檔案員收下了 %s 份記錄，核發 %s 點。"
+  "message.noclip_backrooms.level3.archivist_paid": "檔案員收下了 %s 份記錄，核發 %s 點。",
+  "item.noclip_backrooms.photo_album": "相簿",
+  "tooltip.noclip_backrooms.photo_album": "收照片用的相簿，最多 24 張。\n▶ 右鍵翻看；蹲下右鍵把身上的照片收進去。要賣得先取出。",
+  "message.noclip_backrooms.field.album_stored": "收進 %s 張（相簿 %s／%s）",
+  "photo.noclip_backrooms.empty": "相簿是空的",
+  "photo.noclip_backrooms.no_image": "沒有影像",
+  "photo.noclip_backrooms.take": "取出",
+  "photo.noclip_backrooms.prev": "上一張",
+  "photo.noclip_backrooms.next": "下一張",
+  "photo.noclip_backrooms.title": "照片"
 }

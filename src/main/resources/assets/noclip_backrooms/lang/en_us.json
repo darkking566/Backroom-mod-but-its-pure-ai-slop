@@ -2473,5 +2473,14 @@
   "message.noclip_backrooms.level3.frantic_note.7": "Note 7/8: 'Check the blood at the gate. If it's clear, back away slowly.'",
   "message.noclip_backrooms.level3.frantic_note.8": "Note 8/8: 'Bring the rubbings and pages to the Archivist on the top floor of Gamma.'",
   "message.noclip_backrooms.level3.archivist_hint": "Archivist: 'Bring me Sanctum plaque rubbings or frantic notes from the tunnels — M.E.G. pays for every record.'",
-  "message.noclip_backrooms.level3.archivist_paid": "Archivist logged %s field record(s): +%s credits."
+  "message.noclip_backrooms.level3.archivist_paid": "Archivist logged %s field record(s): +%s credits.",
+  "item.noclip_backrooms.photo_album": "Photo Album",
+  "tooltip.noclip_backrooms.photo_album": "Keeps up to 24 photos.\n▶ Right-click to look through it; sneak + right-click to put your loose photos in. Take one out to sell it.",
+  "message.noclip_backrooms.field.album_stored": "Stored %s (album %s/%s)",
+  "photo.noclip_backrooms.empty": "The album is empty",
+  "photo.noclip_backrooms.no_image": "No picture",
+  "photo.noclip_backrooms.take": "Take out",
+  "photo.noclip_backrooms.prev": "Previous",
+  "photo.noclip_backrooms.next": "Next",
+  "photo.noclip_backrooms.title": "Photos"
 }

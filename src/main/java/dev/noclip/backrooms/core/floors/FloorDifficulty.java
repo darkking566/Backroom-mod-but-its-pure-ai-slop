@@ -86,7 +86,7 @@ public final class FloorDifficulty {
 	private static final Identifier HP_MOD_ID = BackroomsMod.id("dual_axis_hp");
 	private static final Identifier DMG_MOD_ID = BackroomsMod.id("dual_axis_dmg");
 	private static final Set<String> PROTECTED_LOOT = Set.of(
-			"evidence_photo", "topology_tape", "meg_squad_report", "wretch_cure");
+			"evidence_photo", "photo_album", "topology_tape", "meg_squad_report", "wretch_cure");
 
 	private static final Map<UUID, Deque<Transition>> HISTORY = new HashMap<>();
 	private static final Map<UUID, Integer> FARM_PENALTY = new HashMap<>();

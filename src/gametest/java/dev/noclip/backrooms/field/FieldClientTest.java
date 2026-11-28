@@ -5,6 +5,8 @@ import dev.noclip.backrooms.core.LevelExits;
 import dev.noclip.backrooms.core.ending.Endings;
 import dev.noclip.backrooms.core.field.Evidence;
 import dev.noclip.backrooms.core.field.FieldKit;
+import dev.noclip.backrooms.core.field.PhotoScreen;
+import dev.noclip.backrooms.core.field.Photos;
 import dev.noclip.backrooms.core.locker.Lockers;
 import dev.noclip.backrooms.core.locker.Processing;
 import dev.noclip.backrooms.core.locker.Research;
@@ -260,12 +262,38 @@ public final class FieldClientTest implements FabricClientGameTest {
 				return b.toString();
 			}));
 			context.takeScreenshot("field_camera");
+
+			// The picture: sent up by the client, kept in the save, looked at, put in the album and taken out again.
+			java.util.UUID picture = server.computeOnServer(s -> Photos.id(carried(player(s), FieldKit.PHOTO)));
+			check(picture != null, "the photo has no picture id");
+			server.waitFor(s -> Photos.load(s, picture) != null, 200);
+			check(context.computeOnClient(client -> !client.gui.hud.isHidden()), "the shutter left the HUD off");
+			server.runOnServer(s -> {
+				ServerPlayer p = player(s);
+				p.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FieldKit.ALBUM));
+				p.setShiftKeyDown(true);
+				p.gameMode.useItem(p, p.level(), p.getMainHandItem(), InteractionHand.MAIN_HAND);
+				p.setShiftKeyDown(false);
+			});
+			check(server.computeOnServer(s -> Photos.contents(player(s).getMainHandItem()).size() == 1 && carried(player(s), FieldKit.PHOTO).isEmpty()),
+					"the album did not take the photo");
+			server.runOnServer(s -> player(s).gameMode.useItem(player(s), player(s).level(), player(s).getMainHandItem(), InteractionHand.MAIN_HAND));
+			context.waitFor(client -> client.gui.screen() instanceof PhotoScreen screen && screen.showingPicture(), 200);
+			context.waitTicks(5);
+			context.takeScreenshot("field_album");
+			context.runOnClient(client -> client.gui.screen().onClose());
+			server.runOnServer(s -> Photos.take(player(s), 0));
+			context.waitFor(client -> client.gui.screen() instanceof PhotoScreen, 100);
+			context.runOnClient(client -> client.gui.screen().onClose());
+			check(server.computeOnServer(s -> Photos.contents(player(s).getMainHandItem()).isEmpty() && !carried(player(s), FieldKit.PHOTO).isEmpty()),
+					"the photo did not come back out of the album");
 			server.runCommand("kill @e[type=!player]");
 			spawnBuyer(server);
 			long before = server.computeOnServer(s -> Quota.data(s).delivered());
 			check(server.computeOnServer(s -> sell(s, FieldKit.PHOTO)) == Shops.Outcome.DONE, "the buyer would not take the photo");
 			check(server.computeOnServer(s -> Quota.data(s).delivered()) >= before + Math.min(photo, server.computeOnServer(s -> Quota.data(s).required()) - before),
 					"the photo did not count toward the quota");
+			check(server.computeOnServer(s -> Photos.load(s, picture) == null), "the sold photo's picture is still there");
 
 			// The mapping beacon: refused near the landing, and gives a tape far from it.
 			server.runOnServer(s -> player(s).setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(FieldKit.BEACON)));
@@ -493,6 +521,12 @@ public final class FieldClientTest implements FabricClientGameTest {
 
 	private static Item item(String id) {
 		return BuiltInRegistries.ITEM.getValue(Identifier.parse(id));
+	}
+
+	private static ItemStack carried(ServerPlayer player, net.minecraft.world.item.Item item) {
+		var inventory = player.getInventory();
+		for (int n = 0; n < inventory.getContainerSize(); n++) if (inventory.getItem(n).is(item)) return inventory.getItem(n);
+		return ItemStack.EMPTY;
 	}
 
 	private static Shops.Outcome sell(MinecraftServer server, Item item) {

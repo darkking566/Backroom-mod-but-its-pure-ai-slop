@@ -79,7 +79,7 @@ public final class PlayerRpg {
 	private static final Identifier MOD_BACKROOMS_HP = BackroomsMod.id("backrooms_frailty");
 	private static final Identifier MOD_SCOUT_ADS = BackroomsMod.id("badge_scout_ads_speed");
 	private static final Set<String> PROTECTED_LOOT = Set.of(
-			"evidence_photo", "topology_tape", "meg_squad_report", "wretch_cure");
+			"evidence_photo", "photo_album", "topology_tape", "meg_squad_report", "wretch_cure");
 	/** Half of the player's base 20 health, everywhere, once they have been in the Backrooms (docs/企劃書/1-遊戲玩法/README.md). */
 	public static final double FRAILTY = -10.0;
 	/** In the Backrooms, eating well heals at a quarter of the usual speed (mixin.FoodDataBackroomsRegen). */

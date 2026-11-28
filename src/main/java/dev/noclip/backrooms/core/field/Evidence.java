@@ -124,6 +124,7 @@ public final class Evidence {
 
 	/** Sold: a tape maps its level for good. */
 	public static void sold(MinecraftServer server, ServerPlayer player, ItemStack stack) {
+		if (stack.is(FieldKit.PHOTO)) Photos.forget(server, stack);
 		if (!stack.is(FieldKit.TAPE)) return;
 		String level = tag(stack).getStringOr("level", "");
 		QuotaData data = Quota.data(server);
@@ -185,7 +186,7 @@ public final class Evidence {
 			tag.putString("level", where == null ? "" : where);
 			tag.putInt("value", value);
 			ItemStack photo = new ItemStack(FieldKit.PHOTO);
-			photo.set(DataComponents.CUSTOM_DATA, CustomData.of(tag));
+			Photos.shot(serverPlayer, photo, tag);
 			photo.set(DataComponents.CUSTOM_NAME, Component.translatable("item.noclip_backrooms.evidence_photo.of", name,
 					where == null ? "?" : where, value).withStyle(style -> style.withItalic(false)));
 			if (!player.getInventory().add(photo)) player.drop(photo, false);
@@ -309,7 +310,10 @@ public final class Evidence {
 		/** The flash: everything close turns, and the light-seekers come from far around. */
 		private static void flash(ServerLevel level, ServerPlayer player) {
 			Vec3 eye = player.getEyePosition();
-			level.sendParticles(ParticleTypes.END_ROD, eye.x + player.getLookAngle().x, eye.y, eye.z + player.getLookAngle().z, 24, 0.2, 0.2, 0.2, 0.15);
+			// The others see the flash; the photographer's own would only cover the picture.
+			for (ServerPlayer other : level.players()) {
+				if (other != player) level.sendParticles(other, ParticleTypes.END_ROD, false, false, eye.x + player.getLookAngle().x, eye.y, eye.z + player.getLookAngle().z, 24, 0.2, 0.2, 0.2, 0.15);
+			}
 			level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SPYGLASS_USE, SoundSource.PLAYERS, 1.0F, 1.8F);
 			level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.PLAYERS, 0.8F, 2.0F);
 			for (Monster monster : level.getEntitiesOfClass(Monster.class, player.getBoundingBox().inflate(FLASH_RANGE), Monster::isAlive)) {
@@ -317,12 +321,6 @@ public final class Evidence {
 				boolean seeker = id.equals("smiler") || id.equals("deathmoth");
 				if (seeker || monster.distanceTo(player) <= NEAR_FLASH) monster.setTarget(player);
 			}
-		}
-	}
-
-	static final class Photo extends Item {
-		Photo(Properties properties) {
-			super(properties);
 		}
 	}
 
